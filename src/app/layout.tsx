@@ -23,6 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Replace Me - Hire Top Filipino Remote Talent",
   description: "Connect directly with top-tier Filipino talent or find your dream remote role. Skip the agency fees and middlemen. Scale your business faster.",
+  icons: {
+    icon: "/images/logo_favicon.png",
+  },
 };
 
 export default function RootLayout({
