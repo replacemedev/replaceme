@@ -124,6 +124,7 @@ const faqs = [
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   // States for Carousel
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -182,6 +183,8 @@ export default function Home() {
     };
   }, []);
 
+
+
   // Carousel responsive calculation
   useEffect(() => {
     const handleResize = () => {
@@ -227,22 +230,24 @@ export default function Home() {
         className={`fixed top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 ${isScrolled ? "py-2.5 shadow-sm" : "py-4"
           }`}
       >
-        <div className="flex justify-between items-center px-margin-desktop w-full">
+        <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full">
           {/* Brand */}
           <a
+            onClick={() => setActiveSection("")}
             className="flex items-center gap-3 transition-transform duration-200 hover:opacity-90 scale-102"
             href="#"
           >
-            <div className="relative w-9 h-9 shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgbZNrJ_I1U7tfeSy8YkH35JJfvtqezZW9pQe2LjKUZfDo7UsctaBNHF_FFCs0pq77ubGBzwNaT7qCYhDJkDaD0qvzDbhIjdTKppteix5d80HcmtrJADVh0fquMQFXaQZpHonlYPP-F6yUCc4iuzRD_pywAJm9F_6FNa8h8zjyn7w8_yjZLBd3uctn5xNxDx4C3ICLHvCvjk9J4RIxkmvaLBCg7nRT-Wq0yhWnG-A6RytUFEnXqYlgmYNoh17B-78M7U5pQQVCNgs"
                 alt="Replace Me Logo"
                 fill
-                className="object-cover rounded-full"
-                sizes="36px"
+                className="object-contain"
+                sizes="48px"
+                priority
               />
             </div>
-            <span className="font-display-md text-2xl font-bold text-[#0a4a29]">
+            <span className="font-display-md text-2xl font-bold text-[#0a4a29] leading-none relative top-[-4px]">
               Replace Me
             </span>
           </a>
@@ -250,34 +255,74 @@ export default function Home() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <a
-              className="text-[#475569] font-body-base font-semibold hover:text-[#22c55e] transition-colors duration-200"
+              onClick={() => setActiveSection("top-talent")}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                activeSection === "top-talent" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+              }`}
               href="#top-talent"
             >
               Find Talent
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                  activeSection === "top-talent" ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </a>
             <a
-              className="text-[#475569] font-body-base font-semibold hover:text-[#22c55e] transition-colors duration-200"
+              onClick={() => setActiveSection("find-work")}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                activeSection === "find-work" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+              }`}
               href="#find-work"
             >
               Find Work
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                  activeSection === "find-work" ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </a>
             <a
-              className="text-[#475569] font-body-base font-semibold hover:text-[#22c55e] transition-colors duration-200"
+              onClick={() => setActiveSection("how-it-works")}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                activeSection === "how-it-works" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+              }`}
               href="#how-it-works"
             >
               How it Works
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                  activeSection === "how-it-works" ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </a>
             <a
-              className="text-[#475569] font-body-base font-semibold hover:text-[#22c55e] transition-colors duration-200"
+              onClick={() => setActiveSection("pricing")}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                activeSection === "pricing" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+              }`}
               href="#pricing"
             >
               Pricing
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                  activeSection === "pricing" ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </a>
             <a
-              className="text-[#475569] font-body-base font-semibold hover:text-[#22c55e] transition-colors duration-200"
+              onClick={() => setActiveSection("faq")}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                activeSection === "faq" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+              }`}
               href="#faq"
             >
               FAQ
+              <span
+                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                  activeSection === "faq" ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </a>
           </nav>
 
@@ -313,36 +358,61 @@ export default function Home() {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
             <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-medium py-2 hover:text-[#22c55e]"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setActiveSection("top-talent");
+              }}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                activeSection === "top-talent" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              }`}
               href="#top-talent"
             >
               Find Talent
             </a>
             <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-medium py-2 hover:text-[#22c55e]"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setActiveSection("find-work");
+              }}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                activeSection === "find-work" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              }`}
               href="#find-work"
             >
               Find Work
             </a>
             <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-medium py-2 hover:text-[#22c55e]"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setActiveSection("how-it-works");
+              }}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                activeSection === "how-it-works" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              }`}
               href="#how-it-works"
             >
               How it Works
             </a>
             <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-medium py-2 hover:text-[#22c55e]"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setActiveSection("pricing");
+              }}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                activeSection === "pricing" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              }`}
               href="#pricing"
             >
               Pricing
             </a>
             <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-medium py-2 hover:text-[#22c55e]"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setActiveSection("faq");
+              }}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                activeSection === "faq" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              }`}
               href="#faq"
             >
               FAQ
@@ -915,16 +985,16 @@ export default function Home() {
           {/* Brand Column */}
           <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
             <a className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity" href="#">
-              <div className="relative w-9 h-9 shrink-0">
+              <div className="relative w-12 h-12 shrink-0">
                 <Image
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgbZNrJ_I1U7tfeSy8YkH35JJfvtqezZW9pQe2LjKUZfDo7UsctaBNHF_FFCs0pq77ubGBzwNaT7qCYhDJkDaD0qvzDbhIjdTKppteix5d80HcmtrJADVh0fquMQFXaQZpHonlYPP-F6yUCc4iuzRD_pywAJm9F_6FNa8h8zjyn7w8_yjZLBd3uctn5xNxDx4C3ICLHvCvjk9J4RIxkmvaLBCg7nRT-Wq0yhWnG-A6RytUFEnXqYlgmYNoh17B-78M7U5pQQVCNgs"
                   alt="Replace Me Logo"
                   fill
-                  className="object-cover rounded-full"
-                  sizes="36px"
+                  className="object-contain"
+                  sizes="48px"
                 />
               </div>
-              <span className="font-display-md text-2xl font-extrabold text-slate-800">Replace Me</span>
+              <span className="font-display-md text-2xl font-extrabold text-slate-800 leading-none relative top-[-4px]">Replace Me</span>
             </a>
             <p className="text-slate-400 font-body-base text-sm mt-2 max-w-sm">
               Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
