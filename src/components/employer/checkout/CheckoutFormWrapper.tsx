@@ -3,14 +3,26 @@
 import React from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { StripePaymentForm } from "./StripePaymentForm";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+const StripePaymentForm = dynamic(
+  () => import("./StripePaymentForm").then((mod) => mod.StripePaymentForm),
+  {
+    ssr: false, // Stripe forms require window/document access
+    loading: () => (
+      <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-500 font-medium font-body-bold">Loading payment secure window...</p>
+      </div>
+    ),
+  }
+)
+
 // Initialize Stripe outside of the render cycle
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "pk_test_51replace_me_mock_publishable_key"
-);
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface CheckoutFormWrapperProps {
   planId: string;

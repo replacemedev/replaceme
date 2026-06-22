@@ -9,6 +9,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 
+export const runtime = "edge";
+
 export const metadata = {
   title: "Pricing - Scale Your Remote Team | ReplaceMe",
   description: "Simple, transparent pricing. Find the plan that fits your remote hiring needs. Start free and upgrade when you're ready to hire.",
