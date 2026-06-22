@@ -220,7 +220,7 @@ export default function Home() {
 
       <main className="pt-[72px]">
         {/* Hero Section */}
-        <section className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
+        <section className="relative min-h-[calc(100vh-72px)] flex items-center justify-center py-16 lg:py-0 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
           {/* Decorative Glowing Blobs */}
           <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
           <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
@@ -229,9 +229,9 @@ export default function Home() {
           {/* Dot Pattern Overlay */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
 
-          <div className="px-margin-desktop max-w-container-max mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-              <div className="lg:col-span-7 space-y-10 pr-0 lg:pr-8 reveal-item">
+          <div className="px-margin-desktop max-w-container-max mx-auto relative z-10 w-full">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-16 w-full">
+              <div className="w-full lg:w-[58%] space-y-10 pr-0 lg:pr-8 reveal-item">
                 <h1 className="text-display-xl-mobile md:text-display-xl text-slate-900 leading-[1.15] font-extrabold tracking-tight">
                   Your Direct Bridge to <span className="text-[#22c55e]">Filipino</span>
                   <br />
@@ -252,7 +252,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="lg:col-span-5 relative hidden lg:block reveal-item" style={{ transitionDelay: "200ms" }}>
+              <div className="w-full lg:w-[42%] relative hidden lg:block reveal-item" style={{ transitionDelay: "200ms" }}>
                 <div className="relative w-full aspect-square max-w-[500px] mx-auto">
                   {/* Main Image */}
                   <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-xl border-[8px] border-white bg-slate-50">
@@ -290,6 +290,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
 
         {/* Why Employers Choose Replace Me */}
         <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">

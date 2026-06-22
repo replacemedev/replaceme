@@ -50,37 +50,35 @@ export default function LoginPage() {
       sidePanel={testimonialPanel}
       sidePanelPosition="right"
     >
-      <div className="w-full max-w-md mx-auto relative z-10">
-        <div className="mb-10">
-          <Link href="/" className="inline-flex items-center gap-2 mb-8 hover:opacity-90 transition-opacity">
-             <div className="relative w-8 h-8">
-               <Image
-                 src="/images/logo_favicon.png"
-                 alt="Replace Me"
-                 fill
-                 className="object-contain"
-                 sizes="32px"
-               />
-             </div>
-             <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
+      <div className="mb-8">
+        <Link href="/" className="inline-flex items-center gap-2 mb-6 hover:opacity-90 transition-opacity">
+           <div className="relative w-8 h-8">
+             <Image
+               src="/images/logo_favicon.png"
+               alt="Replace Me"
+               fill
+               className="object-contain"
+               sizes="32px"
+             />
+           </div>
+           <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
+        </Link>
+        
+        <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Welcome back</h1>
+        <p className="text-body-base text-slate-600">
+          Sign in to access your professional dashboard and manage your network.
+        </p>
+      </div>
+
+      <LoginForm />
+
+      <div className="mt-8 text-center">
+        <p className="text-sm font-body-base text-slate-600">
+          Don't have an account?{" "}
+          <Link href="/signup" className="font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors">
+            Sign up
           </Link>
-          
-          <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Welcome back</h1>
-          <p className="text-body-base text-slate-600">
-            Sign in to access your professional dashboard and manage your network.
-          </p>
-        </div>
-
-        <LoginForm />
-
-        <div className="mt-8 text-center">
-          <p className="text-sm font-body-base text-slate-600">
-            Don't have an account?{" "}
-            <Link href="/signup" className="font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors">
-              Sign up
-            </Link>
-          </p>
-        </div>
+        </p>
       </div>
     </AuthLayout>
   )

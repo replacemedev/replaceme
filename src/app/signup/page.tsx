@@ -32,36 +32,34 @@ export default function SignUpPage() {
       sidePanel={imagePanel}
       sidePanelPosition="left"
     >
-      <div className="w-full max-w-md mx-auto relative z-10">
-        <div className="mb-8 flex flex-col items-center">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-90 transition-opacity">
-            <div className="relative w-8 h-8">
-              <Image
-                src="/images/logo_favicon.png"
-                alt="Replace Me"
-                fill
-                className="object-contain"
-                sizes="32px"
-              />
-            </div>
-            <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
-          </Link>
-          <p className="text-body-base text-slate-500 mb-8 text-center">
-            Join the premier professional marketplace.
-          </p>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-          <SignUpForm />
-          
-          <div className="mt-8 text-center">
-            <p className="text-sm font-body-base text-slate-600">
-              Already have an account?{" "}
-              <Link href="/login" className="font-body-bold font-bold text-[#22c55e] hover:text-[#16a34a] transition-colors">
-                Log in
-              </Link>
-            </p>
+      <div className="mb-8 flex flex-col items-center">
+        <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-90 transition-opacity">
+          <div className="relative w-8 h-8">
+            <Image
+              src="/images/logo_favicon.png"
+              alt="Replace Me"
+              fill
+              className="object-contain"
+              sizes="32px"
+            />
           </div>
+          <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
+        </Link>
+        <p className="text-body-base text-slate-500 mb-4 text-center">
+          Join the premier professional marketplace.
+        </p>
+      </div>
+
+      <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        <SignUpForm />
+        
+        <div className="mt-8 text-center">
+          <p className="text-sm font-body-base text-slate-600">
+            Already have an account?{" "}
+            <Link href="/login" className="font-body-bold font-bold text-[#22c55e] hover:text-[#16a34a] transition-colors">
+              Log in
+            </Link>
+          </p>
         </div>
       </div>
     </AuthLayout>
