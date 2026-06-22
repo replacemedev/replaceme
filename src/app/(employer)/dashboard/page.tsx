@@ -83,12 +83,12 @@ export default async function EmployerDashboard() {
                   </span>
                 )}
               </div>
-              <Link
-                href="/jobs"
-                className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-              >
-                View All
-              </Link>
+            <Link
+              href="/jobs"
+              className="text-sm font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors"
+            >
+              View All
+            </Link>
             </div>
 
             {jobs.length > 0 ? (

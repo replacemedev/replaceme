@@ -53,7 +53,7 @@ export function RecentApplicantRow({ applicant }: RecentApplicantRowProps) {
             Applied for{" "}
             <Link 
               href={`/jobs/${applicant.job_id}`}
-              className="text-blue-600 hover:text-blue-800 hover:underline font-semibold"
+              className="text-[#006e2f] hover:text-[#005321] hover:underline font-semibold"
             >
               {applicant.applied_role}
             </Link>{" "}

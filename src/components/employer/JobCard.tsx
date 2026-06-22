@@ -31,7 +31,7 @@ export function JobCard({ job }: JobCardProps) {
 
         <Link
           href={`/jobs/${job.id}`}
-          className="block text-lg font-bold text-blue-600 hover:text-blue-800 hover:underline leading-snug tracking-tight truncate-2-lines transition-colors"
+          className="block text-lg font-bold text-[#006e2f] hover:text-[#005321] hover:underline leading-snug tracking-tight truncate-2-lines transition-colors"
         >
           {job.title}
         </Link>
@@ -51,19 +51,19 @@ export function JobCard({ job }: JobCardProps) {
       <div className="flex items-center gap-3 pt-1 text-xs font-bold text-slate-400 select-none">
         <Link 
           href={`/jobs/${job.id}/edit`} 
-          className="text-blue-600 hover:text-blue-800 transition-colors uppercase hover:underline"
+          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline"
         >
           EDIT
         </Link>
         <span className="text-slate-200">|</span>
         <button 
-          className="text-blue-600 hover:text-blue-800 transition-colors uppercase hover:underline cursor-pointer"
+          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline cursor-pointer"
         >
           DELETE
         </button>
         <span className="text-slate-200">|</span>
         <button 
-          className="text-blue-600 hover:text-blue-800 transition-colors uppercase hover:underline cursor-pointer"
+          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline cursor-pointer"
         >
           REFRESH
         </button>
