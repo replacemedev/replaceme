@@ -5,6 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout"
 import { LoginForm } from "@/components/auth/LoginForm"
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm"
 import { VerifyCodeForm } from "@/components/auth/VerifyCodeForm"
+import { AuthFooter } from "@/components/auth/AuthFooter"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -57,7 +58,9 @@ export default function LoginPage() {
     <AuthLayout
       sidePanel={testimonialPanel}
       sidePanelPosition="right"
+      footer={<AuthFooter />}
     >
+
       <div className="mb-6">
         <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-90 transition-opacity">
            <div className="relative w-8 h-8">

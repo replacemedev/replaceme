@@ -44,12 +44,12 @@ export async function signUp(formData: any) {
 
     const supabase = await createClient();
 
-    // 1. Validate Form Data
+    // 1. Validate Form Data using strict schemas
     const schema = role === "employer" ? employerSignUpSchema : workerSignUpSchema;
     const parsed = schema.safeParse(formData);
 
     if (!parsed.success) {
-      return { error: parsed.error.issues[0].message };
+      return { success: false, error: parsed.error.issues[0].message };
     }
 
     const data = parsed.data;
@@ -68,6 +68,7 @@ export async function signUp(formData: any) {
         data: {
           role: data.role,
           username: data.username,
+          full_name: data.fullName,
           first_name: firstName,
           last_name: lastName,
           company_name: "companyName" in data ? data.companyName : null,
@@ -77,17 +78,17 @@ export async function signUp(formData: any) {
 
     if (authError) {
       const msg = authError.message;
-      if (msg.includes("profiles_username_key") || msg.includes("username") && msg.includes("already exists")) {
-        return { error: "auth/username-already-exists" };
+      if (msg.includes("profiles_username_key") || msg.includes("company_profiles_username_key") || msg.includes("username") || msg.includes("Username") || msg.includes("already exists") || msg.includes("23505")) {
+        return { success: false, error: "auth/username-already-exists" };
       }
-      if (msg.includes("already registered") || msg.includes("Email already exists") || msg.includes("email") && msg.includes("already exists")) {
-        return { error: "auth/email-already-exists" };
+      if (msg.includes("already registered") || msg.includes("Email already exists") || (msg.includes("email") && msg.includes("already exists"))) {
+        return { success: false, error: "auth/email-already-exists" };
       }
-      return { error: handleAuthError(authError) };
+      return { success: false, error: handleAuthError(authError) };
     }
 
     if (!authData.user) {
-      return { error: "Failed to create user account." };
+      return { success: false, error: "Failed to create user account." };
     }
 
     // 3. Conditional Stripe Customer Creation for Employers
@@ -144,7 +145,7 @@ export async function signUp(formData: any) {
     };
   } catch (error) {
     safeError("signUp error:", error);
-    return { error: handleAuthError(error) };
+    return { success: false, error: handleAuthError(error) };
   }
 }
 
@@ -155,7 +156,7 @@ export async function logIn(formData: any) {
     
     const parsed = loginSchema.safeParse(formData);
     if (!parsed.success) {
-      return { error: parsed.error.issues[0].message };
+      return { success: false, error: parsed.error.issues[0].message };
     }
 
     const { email, password } = parsed.data;
@@ -166,7 +167,7 @@ export async function logIn(formData: any) {
     });
 
     if (error) {
-      return { error: handleAuthError(error) };
+      return { success: false, error: handleAuthError(error) };
     }
 
     // Fetch the user's role to redirect correctly
@@ -186,7 +187,7 @@ export async function logIn(formData: any) {
     };
   } catch (error) {
     safeError("logIn error:", error);
-    return { error: handleAuthError(error) };
+    return { success: false, error: handleAuthError(error) };
   }
 }
 
@@ -207,7 +208,7 @@ export async function sendResetPasswordOTP(email: string) {
     if (error) {
       safeError(`[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`);
       if (error.status === 429) {
-        return { error: "Too many requests. Please wait a few minutes before trying again." };
+        return { success: false, error: "Too many requests. Please wait a few minutes before trying again." };
       }
       return {
         success: true,
@@ -221,7 +222,7 @@ export async function sendResetPasswordOTP(email: string) {
     };
   } catch (error) {
     safeError("[Auth] sendResetPasswordOTP unexpected error:", error);
-    return { error: "An unexpected error occurred. Please try again." };
+    return { success: false, error: "An unexpected error occurred. Please try again." };
   }
 }
 
@@ -238,11 +239,11 @@ export async function verifyOTPAndResetPassword(email: string, code: string, new
 
     if (error) {
       safeError(`[Auth] verifyOtp error: ${error.message}`);
-      return { error: "Invalid or expired verification code." };
+      return { success: false, error: "Invalid or expired verification code." };
     }
 
     if (!data.user) {
-      return { error: "Verification failed. User session could not be established." };
+      return { success: false, error: "Verification failed. User session could not be established." };
     }
 
     const { error: updateError } = await supabase.auth.updateUser({
@@ -251,7 +252,7 @@ export async function verifyOTPAndResetPassword(email: string, code: string, new
 
     if (updateError) {
       safeError(`[Auth] updateUser password error: ${updateError.message}`);
-      return { error: "Failed to reset password. Please try again." };
+      return { success: false, error: "Failed to reset password. Please try again." };
     }
 
     safeLog("[Auth] Password reset successful");
@@ -261,7 +262,8 @@ export async function verifyOTPAndResetPassword(email: string, code: string, new
     };
   } catch (error) {
     safeError("[Auth] verifyOTPAndResetPassword unexpected error:", error);
-    return { error: "An unexpected error occurred. Please try again." };
+    return { success: false, error: "An unexpected error occurred. Please try again." };
   }
 }
+
 

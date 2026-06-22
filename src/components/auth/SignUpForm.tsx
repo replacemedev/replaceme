@@ -52,17 +52,18 @@ export function SignUpForm() {
     
     try {
       const result = await signUp(data)
-      if (result?.error) {
-        if (result.error === "auth/username-already-exists") {
+      if (!result.success) {
+        const errMsg = result.error
+        if (errMsg === "auth/username-already-exists") {
           setError("username", { message: "This username is already taken. Please choose another." })
-        } else if (result.error === "auth/email-already-exists") {
+        } else if (errMsg === "auth/email-already-exists") {
           setError("email", { message: "This email is already registered. Please log in." })
         } else {
-          const errMsg = typeof result.error === "string" ? result.error : "Failed to create user account."
-          setAuthError(errMsg)
-          toast.error(errMsg)
+          const sanitizedMsg = typeof errMsg === "string" ? errMsg : "Failed to create user account."
+          setAuthError(sanitizedMsg)
+          toast.error(sanitizedMsg)
         }
-      } else if (result?.success) {
+      } else {
         toast.success(result.message)
         if (result.redirectUrl) {
           router.push(result.redirectUrl)
@@ -94,9 +95,9 @@ export function SignUpForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form method="POST" onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Username
           </label>
           <Input
@@ -108,7 +109,7 @@ export function SignUpForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Full Name
           </label>
           <Input
@@ -121,7 +122,7 @@ export function SignUpForm() {
 
         {selectedRole === "employer" && (
           <div>
-            <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+            <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
               Company Name
             </label>
             <Input
@@ -134,7 +135,7 @@ export function SignUpForm() {
         )}
 
         <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Email Address
           </label>
           <Input
@@ -146,7 +147,7 @@ export function SignUpForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Password
           </label>
           <PasswordInput
@@ -159,7 +160,7 @@ export function SignUpForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Confirm Password
           </label>
           <PasswordInput
@@ -170,7 +171,7 @@ export function SignUpForm() {
           />
         </div>
 
-        <div className="pt-2 pb-2">
+        <div className="pt-1.5 pb-1.5">
           <label className="flex items-start gap-3 cursor-pointer group">
             <Checkbox {...register("terms")} className="mt-1" />
             <span className="text-sm font-body-base text-slate-600 leading-relaxed">
@@ -182,7 +183,7 @@ export function SignUpForm() {
           )}
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1.5">
           <Button type="submit" variant="success" disabled={isLoading} className="w-full text-base h-12">
             {isLoading ? "Creating Account..." : "Create Account"}
           </Button>

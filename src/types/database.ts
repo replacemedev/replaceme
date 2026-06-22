@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -51,7 +53,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "jobs"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       billing_plans: {
@@ -91,7 +93,9 @@ export type Database = {
           id: string
           industry: string | null
           logo_url: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string
+          username: string | null
           website_url: string | null
         }
         Insert: {
@@ -103,7 +107,9 @@ export type Database = {
           id?: string
           industry?: string | null
           logo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
+          username?: string | null
           website_url?: string | null
         }
         Update: {
@@ -115,7 +121,9 @@ export type Database = {
           id?: string
           industry?: string | null
           logo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string
+          username?: string | null
           website_url?: string | null
         }
         Relationships: [
@@ -125,7 +133,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       contracts: {
@@ -189,7 +197,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       conversations: {
@@ -218,7 +226,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "jobs"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       employer_credits: {
@@ -256,7 +264,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       employer_subscriptions: {
@@ -313,7 +321,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "billing_plans"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       faqs: {
@@ -405,7 +413,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       messages: {
@@ -447,7 +455,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       notifications: {
@@ -485,7 +493,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       participants: {
@@ -521,7 +529,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       pinned_workers: {
@@ -557,7 +565,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {
@@ -696,7 +704,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -835,7 +843,13 @@ export type CompositeTypes<
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = never
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

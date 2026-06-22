@@ -6,12 +6,14 @@ export function AuthLayout({
   sidePanelPosition = "right",
   title,
   subtitle,
+  footer,
 }: {
   children: React.ReactNode
   sidePanel: React.ReactNode
   sidePanelPosition?: "left" | "right"
   title?: string
   subtitle?: string
+  footer?: React.ReactNode
 }) {
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-[#f8fafe]">
@@ -20,8 +22,8 @@ export function AuthLayout({
           {sidePanel}
         </div>
       )}
-      <div className="flex w-full lg:w-1/2 flex-col items-center justify-center px-6 py-12 sm:px-12 lg:px-20 xl:px-32">
-        <div className="w-full max-w-md mx-auto">
+      <div className="flex w-full lg:w-1/2 flex-col justify-between min-h-screen px-6 py-8 sm:px-12 lg:px-20 xl:px-32">
+        <div className="flex-1 flex flex-col justify-center w-full max-w-md mx-auto py-8">
           {/* Logo is typically at the top of the form panel, or welcome texts */}
           {(title || subtitle) && (
             <div className="mb-10">
@@ -31,6 +33,7 @@ export function AuthLayout({
           )}
           {children}
         </div>
+        {footer}
       </div>
       {sidePanelPosition === "right" && (
         <div className="hidden lg:flex lg:w-1/2 relative bg-[#ebfdf2] items-center justify-center p-12 overflow-hidden">
@@ -40,3 +43,4 @@ export function AuthLayout({
     </div>
   )
 }
+

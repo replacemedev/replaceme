@@ -51,19 +51,21 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
     
     try {
       const result = await logIn(data)
-      if (result?.error) {
+      if (!result.success) {
         const errMsg = typeof result.error === "string" ? result.error : "Invalid login credentials.";
         setAuthError(errMsg)
         toast.error(errMsg)
-      } else if (result?.success) {
+      } else {
         if (data.rememberMe) {
           localStorage.setItem("remember_email", data.email)
         } else {
           localStorage.removeItem("remember_email")
         }
         toast.success(result.message)
-        router.push(result.redirectUrl)
-        router.refresh()
+        if (result.redirectUrl) {
+          router.push(result.redirectUrl)
+          router.refresh()
+        }
       }
     } catch (err) {
       setAuthError("An unexpected error occurred. Please try again.")
@@ -77,8 +79,8 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
     <div className="w-full">
       <RoleSelector
         options={[
-          { label: "Employer", value: "employer" },
           { label: "Worker", value: "worker" },
+          { label: "Employer", value: "employer" },
         ]}
         value={selectedRole}
         onChange={(val) => setValue("role", val as "employer" | "worker")}
@@ -90,7 +92,7 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form method="POST" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
             Username or Email Address
