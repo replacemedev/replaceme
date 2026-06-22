@@ -1,0 +1,461 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Job Details - Replace Me</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "success": "#22C55E",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-background": "#131b2e",
+                        "tertiary-container": "#7cba8a",
+                        "surface-container": "#eaedff",
+                        "outline": "#6d7b6c",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "surface-dim": "#d2d9f4",
+                        "outline-variant": "#bccbb9",
+                        "surface-variant": "#dae2fd",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#004b1e",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#306d58",
+                        "surface-container-low": "#f2f3ff",
+                        "on-primary-fixed": "#002109",
+                        "on-primary-fixed-variant": "#005321",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-subdued": "#F8FAFC",
+                        "on-tertiary-container": "#074a25",
+                        "tertiary-fixed": "#b1f2be",
+                        "primary-container": "#22c55e",
+                        "secondary": "#2b6954",
+                        "surface-mint": "#F0FDF4",
+                        "surface-bright": "#faf8ff",
+                        "on-surface": "#131b2e",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#4ae176",
+                        "surface-container-high": "#e2e7ff",
+                        "primary-fixed-dim": "#4ae176",
+                        "error": "#EF4444",
+                        "primary": "#006e2f",
+                        "primary-fixed": "#6bff8f",
+                        "secondary-container": "#adedd3",
+                        "info": "#3B82F6",
+                        "background": "#faf8ff",
+                        "secondary-fixed": "#b0f0d6",
+                        "tertiary": "#2e6a41",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#006e2f",
+                        "inverse-surface": "#283044",
+                        "border-subtle": "#E2E8F0",
+                        "on-secondary-fixed": "#002117",
+                        "ink-secondary": "#334155",
+                        "surface": "#faf8ff",
+                        "ink-muted": "#64748B",
+                        "surface-container-highest": "#dae2fd",
+                        "on-surface-variant": "#3d4a3d",
+                        "on-tertiary-fixed-variant": "#12512c",
+                        "canvas": "#FFFFFF",
+                        "tertiary-fixed-dim": "#96d5a3",
+                        "on-tertiary-fixed": "#00210d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem", // ROUND_EIGHT
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "base-unit": "4px",
+                        "margin-desktop": "40px",
+                        "section-gap": "96px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "body-base": ["Inter"],
+                        "body-bold": ["Inter"],
+                        "display-md": ["Plus Jakarta Sans"],
+                        "display-xl": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "display-xl-mobile": ["Plus Jakarta Sans"],
+                        "caption": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-base": ["16px", { "lineHeight": "1.8", "letterSpacing": "0", "fontWeight": "400" }], // Increased line-height
+                        "body-bold": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "600" }],
+                        "display-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "800" }], // Bolder
+                        "display-xl": ["56px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "800" }], // Larger, tighter tracking
+                        "display-lg": ["36px", { "lineHeight": "1.25", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+                        "display-xl-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "caption": ["14px", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { 
+            background-color: #faf8ff; 
+            background-image: radial-gradient(circle at 100% 0%, rgba(34, 197, 94, 0.03) 0%, transparent 50%), 
+                              radial-gradient(circle at 0% 100%, rgba(0, 110, 47, 0.03) 0%, transparent 50%);
+            color: #131b2e; 
+            font-family: 'Inter', sans-serif; 
+        }
+        .hero-section { 
+            background-color: #004b1e; /* Deep branded background */
+            background-image: radial-gradient(circle at top right, rgba(107, 255, 143, 0.15) 0%, transparent 60%);
+            color: #ffffff; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .content-card { 
+            background-color: #ffffff; 
+            border-radius: 0.5rem; 
+            border: 1px solid #E2E8F0; 
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); /* Soft elevation */
+            overflow: hidden; 
+            transition: all 0.3s ease; 
+        }
+        .content-card:hover { 
+            box-shadow: 0 12px 30px -4px rgba(34, 197, 94, 0.08), 0 4px 6px -2px rgba(34, 197, 94, 0.04); 
+            border-color: #b1f2be; 
+        }
+        .card-header { 
+            background-color: #faf8ff; 
+            padding: 24px 32px; 
+            border-bottom: 1px solid #E2E8F0; 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+        }
+        .card-body { padding: 32px; }
+        
+        .btn-primary { 
+            background-color: #22C55E; 
+            color: #ffffff; 
+            border-radius: 0.5rem; 
+            font-weight: 600; 
+            padding: 16px 40px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.39); /* Glow effect */
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5); 
+            background-color: #16A34A; 
+        }
+        
+        .btn-secondary-outline { 
+            border: 1px solid rgba(255,255,255,0.3); 
+            color: #ffffff; 
+            border-radius: 0.5rem; 
+            font-weight: 600; 
+            padding: 10px 20px; 
+            transition: all 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(255,255,255,0.05); 
+        }
+        .btn-secondary-outline:hover { 
+            background-color: rgba(255,255,255,0.15); 
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .btn-ghost { 
+            color: rgba(255,255,255,0.8); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-weight: 600; 
+            transition: all 0.2s; 
+        }
+        .btn-ghost:hover { color: #ffffff; }
+        
+        .stat-icon { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 0.5rem; 
+            background-color: #F0FDF4; 
+            color: #006e2f; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-shrink: 0; 
+        }
+        
+        .custom-bullet {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background-color: #e2e7ff;
+            color: #006e2f;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<main>
+<!-- Hero Section -->
+<section class="hero-section pt-margin-desktop px-margin-mobile md:px-margin-desktop pb-32 lg:pb-40"><div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url(&quot;https://www.transparenttextures.com/patterns/carbon-fibre.png&quot;); mix-blend-mode: overlay;"></div>
+<div class="max-w-container-max mx-auto relative z-10">
+<div class="flex justify-between items-start mb-16">
+<a class="btn-ghost font-body-bold text-body-bold" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                        Back to search results
+                    </a>
+<button class="btn-secondary-outline text-caption font-caption">
+<span class="material-symbols-outlined mr-2" style="font-size: 16px; font-variation-settings: &quot;FILL&quot; 1;">error</span>
+                        REPORT
+                    </button>
+</div>
+<div class="flex flex-col lg:flex-row items-end justify-between gap-8 glass-panel p-8 md:p-12 rounded-xl">
+<div class="max-w-3xl">
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl mb-4 uppercase text-on-primary">
+                            THUMBNAIL DESIGNER
+                        </h1>
+<p class="text-tertiary-fixed font-body-base text-lg opacity-90">MAPTURE MEDIA • Posted on Jun 17, 2026</p>
+</div>
+<div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto shrink-0">
+<button class="btn-primary w-full sm:w-auto text-body-bold font-body-bold text-lg">
+                            APPLY FOR THIS JOB
+                        </button>
+<button class="btn-secondary-outline w-full sm:w-auto">
+<span class="material-symbols-outlined mr-2" style="font-size: 20px; font-variation-settings: &quot;FILL&quot; 1;">bookmark_border</span>
+                            Save
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Area - Centered Wide Layout -->
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 -mt-24 relative z-20">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+<!-- Main Content Column -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Job Overview Card -->
+<div class="content-card shadow-lg border-none ring-1 ring-border-subtle">
+<div class="card-header bg-surface-container-lowest">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">description</span>
+</div>
+<h2 class="font-display-md text-display-md text-on-surface uppercase tracking-wide">JOB OVERVIEW</h2>
+</div>
+<div class="card-body bg-surface-container-lowest font-body-base text-body-base text-ink-secondary space-y-10">
+<div class="prose max-w-none text-lg text-ink-secondary leading-relaxed">
+<p class="">We're hiring a Thumbnail Designer to join us at MAPTURE MEDIA, a YouTube media company managing multiple faceless channels across TV, Animation, History, and News.</p>
+<p class="mt-6">We're looking for someone who can create clear, attention-grabbing thumbnails and is willing to improve over time.</p>
+</div>
+<div>
+<h3 class="font-display-md text-2xl text-on-surface mb-6">Responsibilities:</h3>
+<ul class="space-y-4">
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Design YouTube thumbnails for long-form videos</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Translate video topics and scripts into simple, strong visual concepts</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Apply basic principles of composition, contrast, and readability to maximize CTR</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Adapt to different styles depending on the channel</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Work with our team to execute ideas</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">check</span></span>
+<span class="text-lg">Follow internal guidelines and deliver consistently</span>
+</li>
+</ul>
+</div>
+<div>
+<h3 class="font-display-md text-2xl text-on-surface mb-6">Requirements (Flexible):</h3>
+<ul class="space-y-4">
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">star</span></span>
+<span class="text-lg">Proficiency in Photoshop</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">star</span></span>
+<span class="text-lg">Basic understanding of visual hierarchy and composition</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">star</span></span>
+<span class="text-lg">Ability to keep designs clean and easy to understand</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">star</span></span>
+<span class="text-lg">Willingness to follow briefs and accept feedback</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">star</span></span>
+<span class="text-lg">Reliable and able to meet deadlines</span>
+</li>
+</ul>
+<p class="mt-6 italic text-ink-muted text-lg">Previous YouTube thumbnail experience is a plus, but not required.</p>
+</div>
+<div>
+<h3 class="font-display-md text-2xl text-on-surface mb-6">What You Can Expect:</h3>
+<ul class="space-y-4">
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span></span>
+<span class="text-lg">Consistent work if you perform well</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span></span>
+<span class="text-lg">Clear briefs and structured workflow</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span></span>
+<span class="text-lg">Feedback to help you improve over time</span>
+</li>
+<li class="flex items-start">
+<span class="custom-bullet bg-surface-container-high text-primary"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span></span>
+<span class="text-lg">Opportunity to take on more work as you get better</span>
+</li>
+</ul>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl border border-border-subtle shadow-sm">
+<h3 class="font-display-md text-2xl text-on-surface mb-3">Compensation:</h3>
+<p class="text-2xl font-body-bold text-primary">Starts at $200/month</p>
+<p class="mt-2 text-lg text-ink-secondary">with opportunities to increase based on workload and quality.</p>
+</div>
+
+</div>
+</div>
+</div>
+<!-- Sidebar (Right) - Elevated -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Sticky Container -->
+<div class="sticky top-8 space-y-8">
+<!-- Quick Stats Card -->
+<div class="content-card shadow-lg border-none ring-1 ring-border-subtle">
+<div class="card-header bg-surface-container-lowest">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">analytics</span>
+</div>
+<h2 class="font-display-md text-lg uppercase tracking-wide text-on-surface">JOB DETAILS</h2>
+</div>
+<div class="card-body p-8 space-y-8 bg-surface-container-lowest">
+<div class="flex items-center gap-5">
+<div class="stat-icon bg-surface-container text-primary shadow-sm bg-surface-container-low">
+<span class="material-symbols-outlined text-2xl">work</span>
+</div>
+<div>
+<p class="font-label-mono text-label-mono text-ink-muted uppercase mb-1">TYPE OF WORK</p>
+<p class="font-body-bold text-body-bold text-on-surface text-xl">Any</p>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="stat-icon bg-surface-container text-primary shadow-sm bg-surface-container-low">
+<span class="material-symbols-outlined text-2xl">payments</span>
+</div>
+<div>
+<p class="font-label-mono text-label-mono text-ink-muted uppercase mb-1">WAGE / SALARY</p>
+<p class="font-body-bold text-body-bold text-on-surface text-xl">$200/month</p>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="stat-icon bg-surface-container text-primary shadow-sm bg-surface-container-low">
+<span class="material-symbols-outlined text-2xl">schedule</span>
+</div>
+<div>
+<p class="font-label-mono text-label-mono text-ink-muted uppercase mb-1">HOURS PER WEEK</p>
+<p class="font-body-bold text-body-bold text-on-surface text-xl">40</p>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="stat-icon bg-surface-container text-primary shadow-sm bg-surface-container-low">
+<span class="material-symbols-outlined text-2xl">calendar_month</span>
+</div>
+<div>
+<p class="font-label-mono text-label-mono text-ink-muted uppercase mb-1">DATE UPDATED</p>
+<p class="font-body-bold text-body-bold text-on-surface text-xl">Jun 17, 2026</p>
+</div>
+</div>
+</div>
+</div>
+<!-- About Employer Card -->
+<div class="content-card shadow-lg border-none ring-1 ring-border-subtle">
+<div class="card-header bg-surface-container-lowest">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">business</span>
+</div>
+<h2 class="font-display-md text-lg text-on-surface uppercase tracking-wide">EMPLOYER INFO</h2>
+</div>
+<div class="card-body p-8 space-y-6 bg-surface-container-lowest font-body-base text-body-base">
+<div class="pb-4 border-b border-border-subtle last:border-0">
+<p class="text-ink-muted text-sm mb-2">Company Name</p>
+<p class="font-body-bold text-on-surface text-xl uppercase tracking-wider text-primary">MAPTURE MEDIA</p>
+</div>
+<div class="py-4 border-b border-border-subtle last:border-0">
+<p class="text-ink-muted text-sm mb-2">Member since</p>
+<p class="font-body-bold text-on-surface text-lg">September 5, 2025</p>
+</div>
+<div class="pt-4 border-b border-border-subtle last:border-0">
+<p class="text-ink-muted text-sm mb-2">Total Job Posts</p>
+<p class="font-body-bold text-on-surface text-lg">32 Active Posts</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component Execution -->
+<footer class="bg-surface-subdued dark:bg-inverse-surface w-full mt-12 border-t border-border-subtle dark:border-on-surface-variant">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-12 max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<span class="font-display-md text-display-md font-bold text-on-surface dark:text-canvas mb-4 block">Replace Me</span>
+<p class="font-caption text-caption text-ink-muted dark:text-surface-variant">© 2024 Replace Me. All rights reserved.</p>
+</div>
+<div class="col-span-1 md:col-span-3 flex flex-wrap gap-6 justify-start md:justify-end">
+<a class="font-caption text-caption text-ink-muted dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">About Us</a>
+<a class="font-caption text-caption text-ink-muted dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-ink-muted dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="font-caption text-caption text-ink-muted dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Help Center</a>
+<a class="font-caption text-caption text-ink-muted dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 opacity-80 hover:opacity-100 transition-opacity" href="#">Contact</a>
+</div>
+</div>
+</footer>
+
+
+
+
+</body></html>

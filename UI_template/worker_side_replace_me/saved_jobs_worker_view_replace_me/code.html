@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved Jobs - Replace Me Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-mint": "#F0FDF4",
+                        "inverse-surface": "#283044",
+                        "ink-muted": "#64748B",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "surface-bright": "#faf8ff",
+                        "on-tertiary-fixed": "#00210d",
+                        "on-surface": "#131b2e",
+                        "outline": "#6d7b6c",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#7cba8a",
+                        "secondary-container": "#adedd3",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#dae2fd",
+                        "on-background": "#131b2e",
+                        "primary": "#006e2f",
+                        "inverse-primary": "#4ae176",
+                        "secondary-fixed": "#b0f0d6",
+                        "ink-secondary": "#334155",
+                        "error-container": "#ffdad6",
+                        "surface-subdued": "#F8FAFC",
+                        "success": "#22C55E",
+                        "background": "#faf8ff",
+                        "info": "#3B82F6",
+                        "surface-container-high": "#e2e7ff",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "primary-fixed": "#6bff8f",
+                        "tertiary-fixed-dim": "#96d5a3",
+                        "on-primary-container": "#004b1e",
+                        "primary-fixed-dim": "#4ae176",
+                        "tertiary-fixed": "#b1f2be",
+                        "tertiary": "#2e6a41",
+                        "on-primary-fixed-variant": "#005321",
+                        "surface-container-highest": "#dae2fd",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error": "#EF4444",
+                        "secondary": "#2b6954",
+                        "on-surface-variant": "#3d4a3d",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-secondary-fixed": "#002117",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed-variant": "#12512c",
+                        "on-tertiary-container": "#074a25",
+                        "primary-container": "#22c55e",
+                        "outline-variant": "#bccbb9",
+                        "surface-dim": "#d2d9f4",
+                        "on-primary-fixed": "#002109",
+                        "surface-container": "#eaedff",
+                        "surface-tint": "#006e2f",
+                        "surface-container-low": "#f2f3ff",
+                        "canvas": "#FFFFFF",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "border-subtle": "#E2E8F0",
+                        "on-secondary-container": "#306d58"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "section-gap": "96px",
+                        "gutter": "24px",
+                        "base-unit": "4px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Inter"],
+                        "body-base": ["Inter"],
+                        "display-xl": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-bold": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "display-xl-mobile": ["Plus Jakarta Sans"],
+                        "display-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "caption": ["14px", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400" }],
+                        "body-base": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-xl": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg": ["36px", { "lineHeight": "1.25", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+                        "body-bold": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "600" }],
+                        "label-mono": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-xl-mobile": ["36px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.15), 0 8px 10px -6px rgba(34, 197, 94, 0.1);
+            border-color: #22C55E;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-base pt-16">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 dark:bg-inverse-surface/90 backdrop-blur-md border-b border-border-subtle dark:border-outline-variant shadow-sm">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="font-display-md text-display-md font-extrabold text-primary dark:text-inverse-primary tracking-tight">
+                Replace Me
+            </div>
+<!-- Navigation Links (Desktop) -->
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-ink-muted dark:text-surface-variant hover:text-primary transition-colors font-body-base text-body-base hover:bg-surface-mint dark:hover:bg-secondary-container/10 px-3 py-2 rounded-lg duration-200 Active: scale-95 transition-transform" href="#">
+                    Dashboard
+                </a>
+<a class="text-primary dark:text-inverse-primary font-body-bold text-body-bold border-b-2 border-primary pb-1 px-3 pt-2 hover:bg-surface-mint dark:hover:bg-secondary-container/10 rounded-t-lg duration-200 Active: scale-95 transition-transform" href="#">
+                    Job Search
+                </a>
+<a class="text-ink-muted dark:text-surface-variant hover:text-primary transition-colors font-body-base text-body-base hover:bg-surface-mint dark:hover:bg-secondary-container/10 px-3 py-2 rounded-lg duration-200 Active: scale-95 transition-transform" href="#">
+                    My Applications
+                </a>
+<a class="text-ink-muted dark:text-surface-variant hover:text-primary transition-colors font-body-base text-body-base hover:bg-surface-mint dark:hover:bg-secondary-container/10 px-3 py-2 rounded-lg duration-200 Active: scale-95 transition-transform" href="#">
+                    Profile
+                </a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center space-x-4 text-primary dark:text-inverse-primary">
+<button aria-label="notifications" class="p-2 rounded-full hover:bg-surface-mint transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="settings" class="p-2 rounded-full hover:bg-surface-mint transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-border-subtle cursor-pointer hover:border-primary transition-colors">
+<img alt="Worker Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAki8UyJdQtl-o_ov3de2LpPaOrO1CNXMmMEtl2iWyNwuIhLagHFayBLx5PFXXQQqVBAi3wENZdU6eVprPEnmD2r-IKXv6Cz4dE88CkE9lQfDX1xmBafnWHxiumN8rbC8f6aumciXXBoaChU9fFrKRi4E03b05FusxAGPFfjXacqJnonhMkksc7OTtYWiq9tR2_n3ww9IGSb4fzh-Fj_72oTGP6fmrte7rZcRtvruleHPrTAkrLXcMH-CUuPkM9Hpp1I2tEwwP_XEQ"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-[800px] mx-auto px-margin-mobile md:px-0 py-12 md:py-16">
+<!-- Header -->
+<header class="mb-10 text-center md:text-left">
+<h1 class="font-display-lg text-display-lg text-on-background mb-2">Saved Jobs</h1>
+<p class="font-body-base text-body-base text-ink-muted">Review and manage positions you've bookmarked for later application.</p>
+</header>
+<!-- Search & Filter Controls -->
+<div class="flex flex-col md:flex-row gap-4 mb-8">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted">search</span>
+<input class="w-full h-[52px] pl-12 pr-4 bg-canvas border border-border-subtle rounded-xl text-body-base font-body-base focus:outline-none focus:ring-3 focus:ring-primary/15 focus:border-primary transition-all" placeholder="Search saved jobs..." type="text"/>
+</div>
+<div class="relative min-w-[200px]">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted">sort</span>
+<select class="w-full h-[52px] pl-12 pr-10 bg-canvas border border-border-subtle rounded-xl text-body-base font-body-base appearance-none focus:outline-none focus:ring-3 focus:ring-primary/15 focus:border-primary transition-all cursor-pointer">
+<option>Date Saved (Newest)</option>
+<option>Date Saved (Oldest)</option>
+<option>Salary (Highest)</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Job List -->
+<div class="flex flex-col gap-6">
+<!-- Card 1 -->
+<article class="bg-canvas border border-border-subtle rounded-xl p-6 card-hover group relative">
+<div class="flex flex-col md:flex-row gap-6 md:items-start justify-between">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg border border-border-subtle bg-surface-subdued flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img alt="TechNova modern corporate office building exterior with glass facade and bright daylight reflecting modern corporate aesthetic." class="w-full h-full object-cover opacity-80" data-alt="A modern glass corporate building exterior, high quality, tech forward, reflecting bright daylight, high contrast, clean architecture, representing a premium tech company office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv8WIyAeYu7iP2xUrbbIEXuofLZ94CPd020pS6GqAw94INIEMwx7HukT2lZlNbXRSH8ViY9cphncR0k29BKSktw1yGKhpC5-g-mqYcr5Z-MIv8_56I-lOkiMTi-NERiUn2RWKt4FLDgVhR1XldGr1du3RU76OvVi4DshrUnMS1orSRewCKIAnPUVZKdm3lLX9EfX68A7rModya5sBJ4fuLH0duyWiXqNer0GopzyPENAAy1uOZw7mJQ3p9Zj2u3p-MZn1RuWO52dw"/>
+</div>
+<div>
+<h2 class="font-body-bold text-body-bold text-on-background mb-1 group-hover:text-primary transition-colors">Senior Frontend Engineer</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> TechNova
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Remote, US
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-on-primary-container px-3 py-1 rounded-full font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $130k - $160k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-full font-label-mono text-label-mono">Full-time</span>
+</div>
+</div>
+</div>
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-4 mt-4 md:mt-0">
+<span class="font-caption text-caption text-ink-muted">Saved 2 days ago</span>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<button aria-label="Remove saved job" class="p-2 text-ink-muted hover:text-error hover:bg-error-container/20 rounded-full transition-colors tooltip-trigger relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 bg-success text-on-primary px-6 py-2.5 rounded-lg font-body-bold text-body-bold hover:bg-primary-container shadow-[0_4px_14px_0_rgba(34,197,94,0.39)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.23)] hover:-translate-y-[1px] transition-all duration-200">
+                                Apply Now
+                            </button>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-canvas border border-border-subtle rounded-xl p-6 card-hover group relative">
+<div class="flex flex-col md:flex-row gap-6 md:items-start justify-between">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg border border-border-subtle bg-surface-subdued flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img alt="Minimalist interior of a creative agency office, concrete floors, white walls, and soft natural lighting." class="w-full h-full object-cover opacity-80" data-alt="A clean, minimalist creative agency interior featuring exposed concrete floors, pristine white walls, and soft natural lighting filtering through large windows, evoking a modern, airy workspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbq29qtmA4jF-wn2fwqIBYQrEvGM2Fs15mn4qZvXU3XGV5Q99dQRGOYti7NUj30wgPcIqwnXO4T3ejHxgymET96jX0G6NOoocEmVE1GmXhk6BF5o923GmBciv_43FQ7XtFVCAOwGHsUW_vGkZgCrncFr6P_5BxCk9TU2_2f9Vj_4kthutq-nsIF_X5PlVe8kMrLjAEY3U6kO_7CzgsUXXsdUMaek-IgzjVtRPgWU6w1ILAy8mN2oXZ1rt15ikU8ijQB7teEBFAuqI"/>
+</div>
+<div>
+<h2 class="font-body-bold text-body-bold text-on-background mb-1 group-hover:text-primary transition-colors">UX/UI Designer</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> Creative Pulse
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> New York, NY (Hybrid)
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-on-primary-container px-3 py-1 rounded-full font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $90k - $120k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-full font-label-mono text-label-mono">Full-time</span>
+</div>
+</div>
+</div>
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-4 mt-4 md:mt-0">
+<span class="font-caption text-caption text-ink-muted">Saved 1 week ago</span>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<button aria-label="Remove saved job" class="p-2 text-ink-muted hover:text-error hover:bg-error-container/20 rounded-full transition-colors relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 bg-success text-on-primary px-6 py-2.5 rounded-lg font-body-bold text-body-bold hover:bg-primary-container shadow-[0_4px_14px_0_rgba(34,197,94,0.39)] hover:shadow-[0_6px_20px_rgba(34,197,94,0.23)] hover:-translate-y-[1px] transition-all duration-200">
+                                Apply Now
+                            </button>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-canvas border border-border-subtle rounded-xl p-6 card-hover group relative">
+<div class="flex flex-col md:flex-row gap-6 md:items-start justify-between">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg border border-border-subtle bg-surface-subdued flex-shrink-0 flex items-center justify-center overflow-hidden p-2">
+<div class="w-full h-full bg-secondary-fixed-dim rounded-md flex items-center justify-center text-primary font-display-md">
+                                D
+                             </div>
+</div>
+<div>
+<h2 class="font-body-bold text-body-bold text-on-background mb-1 group-hover:text-primary transition-colors">Data Scientist</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-3">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> DataFlow Systems
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Seattle, WA
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-on-primary-container px-3 py-1 rounded-full font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $140k - $180k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-full font-label-mono text-label-mono">Contract</span>
+</div>
+</div>
+</div>
+<div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-4 mt-4 md:mt-0">
+<span class="font-caption text-caption text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> Expires in 2 days
+                        </span>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<button aria-label="Remove saved job" class="p-2 text-ink-muted hover:text-error hover:bg-error-container/20 rounded-full transition-colors relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 border border-success text-success bg-transparent px-6 py-2.5 rounded-lg font-body-bold text-body-bold hover:bg-surface-mint transition-all duration-200">
+                                View Details
+                            </button>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-section-gap bg-surface-subdued dark:bg-inverse-surface border-t border-border-subtle dark:border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-gutter">
+<!-- Brand -->
+<div class="font-display-md text-display-md text-ink-secondary dark:text-surface-bright font-bold">
+                Replace Me
+            </div>
+<!-- Copyright -->
+<div class="font-caption text-caption text-ink-muted dark:text-surface-variant text-center">
+                © 2024 Replace Me Platform. All rights reserved.
+            </div>
+<!-- Links -->
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-caption text-caption text-ink-muted hover:text-primary dark:text-surface-variant hover:underline transition-all opacity-100 hover:opacity-80" href="#">
+                    Terms of Service
+                </a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary dark:text-surface-variant hover:underline transition-all opacity-100 hover:opacity-80" href="#">
+                    Privacy Policy
+                </a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary dark:text-surface-variant hover:underline transition-all opacity-100 hover:opacity-80" href="#">
+                    Support Center
+                </a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary dark:text-surface-variant hover:underline transition-all opacity-100 hover:opacity-80" href="#">
+                    Contact Us
+                </a>
+</div>
+</div>
+</footer>
+</body></html>

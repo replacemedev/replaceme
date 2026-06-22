@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Replace Me - Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#0b513d",
+                      "tertiary-fixed": "#b1f2be",
+                      "outline-variant": "#bccbb9",
+                      "on-tertiary-container": "#074a25",
+                      "surface-mint": "#F0FDF4",
+                      "secondary": "#2b6954",
+                      "on-primary-fixed": "#002109",
+                      "ink-muted": "#64748B",
+                      "on-error": "#ffffff",
+                      "border-subtle": "#E2E8F0",
+                      "primary-fixed-dim": "#4ae176",
+                      "error": "#EF4444",
+                      "info": "#3B82F6",
+                      "on-primary-fixed-variant": "#005321",
+                      "surface-container-highest": "#dae2fd",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d2d9f4",
+                      "on-tertiary-fixed": "#00210d",
+                      "surface-bright": "#faf8ff",
+                      "error-container": "#ffdad6",
+                      "surface-subdued": "#F8FAFC",
+                      "surface-container": "#eaedff",
+                      "surface-variant": "#dae2fd",
+                      "surface-tint": "#006e2f",
+                      "outline": "#6d7b6c",
+                      "primary": "#006e2f",
+                      "on-surface-variant": "#3d4a3d",
+                      "surface-container-low": "#f2f3ff",
+                      "secondary-container": "#adedd3",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#6bff8f",
+                      "surface": "#faf8ff",
+                      "inverse-on-surface": "#eef0ff",
+                      "on-secondary-container": "#306d58",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#2e6a41",
+                      "primary-container": "#22c55e",
+                      "success": "#22C55E",
+                      "on-tertiary-fixed-variant": "#12512c",
+                      "on-primary-container": "#004b1e",
+                      "on-background": "#131b2e",
+                      "inverse-primary": "#4ae176",
+                      "inverse-surface": "#283044",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#96d5a3",
+                      "ink-secondary": "#334155",
+                      "secondary-fixed": "#b0f0d6",
+                      "canvas": "#FFFFFF",
+                      "background": "#faf8ff",
+                      "surface-container-high": "#e2e7ff",
+                      "secondary-fixed-dim": "#95d3ba",
+                      "on-surface": "#131b2e",
+                      "on-secondary-fixed": "#002117",
+                      "tertiary-container": "#7cba8a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1280px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "40px",
+                      "gutter": "24px",
+                      "base-unit": "4px",
+                      "section-gap": "96px"
+              },
+              "fontFamily": {
+                      "display-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-xl-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "caption": [
+                              "Inter"
+                      ],
+                      "display-xl": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-bold": [
+                              "Inter"
+                      ],
+                      "label-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "body-base": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-xl-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "display-lg": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.25",
+                                      "letterSpacing": "-0.015em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "caption": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-bold": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-base": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.surface-subdued');
+        }
+        /* Custom form styles to match design system */
+        .form-input {
+            border: 1px solid theme('colors.border-subtle');
+            border-radius: 12px;
+            height: 52px;
+            padding: 0 16px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: theme('colors.on-background');
+            background-color: theme('colors.surface');
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: theme('colors.primary-container');
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+        .btn-primary {
+            background-color: theme('colors.primary-container');
+            color: theme('colors.on-primary');
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2), 0 2px 4px -1px rgba(34, 197, 94, 0.1);
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -2px rgba(34, 197, 94, 0.15);
+        }
+        .card-glow {
+            transition: all 0.3s ease;
+        }
+        .card-glow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.1), 0 10px 10px -5px rgba(34, 197, 94, 0.04);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+      </style>
+</head>
+<body class="min-h-screen text-on-background font-body-base">
+<!-- No Navigation as per Semantic Shell Mandate (Linear/Transactional intent) -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-24 flex flex-col lg:flex-row gap-gutter lg:gap-24">
+<!-- Left Column: Summary -->
+<div class="lg:w-5/12 flex flex-col gap-8">
+<div class="flex flex-col gap-6">
+<!-- Back Action -->
+<a class="inline-flex items-center gap-2 text-ink-muted hover:text-primary transition-colors font-body-bold text-body-bold w-fit" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+                    Back to pricing
+                </a>
+<!-- Brand Anchor -->
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-primary mt-4">Replace Me</h1>
+</div>
+<div class="flex flex-col gap-2 mt-8">
+<p class="font-caption text-caption text-ink-muted uppercase tracking-wider font-semibold">Subscribe to</p>
+<h2 class="font-display-lg text-display-lg">Professional Plan</h2>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="font-display-xl text-display-xl">$99.00</span>
+<span class="font-body-base text-body-base text-ink-muted">per month</span>
+</div>
+</div>
+<!-- Benefits List -->
+<div class="mt-6 flex flex-col gap-4">
+<p class="font-body-bold text-body-bold mb-2 border-b border-border-subtle pb-4">Key Benefits</p>
+<ul class="flex flex-col gap-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" data-icon="check_circle">check_circle</span>
+<span class="font-body-base text-body-base">Unlimited Job Posts</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" data-icon="check_circle">check_circle</span>
+<span class="font-body-base text-body-base">Unlimited Applicants</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" data-icon="check_circle">check_circle</span>
+<span class="font-body-base text-body-base">Unlimited Messaging</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" data-icon="check_circle">check_circle</span>
+<span class="font-body-base text-body-base">Priority Support</span>
+</li>
+</ul>
+</div>
+<!-- Testimonial / Social Proof -->
+<div class="mt-12 bg-surface p-6 rounded-2xl border border-border-subtle card-glow">
+<p class="font-body-base text-body-base italic text-ink-secondary mb-4">"Upgrading to Professional completely transformed our hiring pipeline. The unlimited applicant tier alone saved us thousands."</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-dim overflow-hidden border border-border-subtle">
+<img class="w-full h-full object-cover" data-alt="A small professional headshot of a smiling female executive wearing a sharp dark blazer against a bright minimalist office background, clear lighting, modern corporate aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1zp9cmlZvbtAHEFBzb7X9m30QvGTZIFmCmo1iE-lQF8MHmIP-HgNCLSowur5M133FR0HQb1hd4bYSShp-k2ua2KLrwGXz0_03mAGPIjemGVujmSaowvdmowffiIxgTl_ctCFr8XZzUnZzd1PYK_VsxdBhq8KRXbb2YIcsvDlfv6-Zlq3n6MxtZ1PoMW8hMqIjBR57jT1CLYdNZfdSwerHcsO-oPpUueN8F31mCH2GyRalHtdLv6iXRdL5FkSfRK_gAom8ZpLw1o8"/>
+</div>
+<div>
+<p class="font-body-bold text-body-bold">Sarah Jenkins</p>
+<p class="font-caption text-caption text-ink-muted">VP of Talent, TechFlow</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Payment Form -->
+<div class="lg:w-7/12 flex flex-col gap-6">
+<div class="bg-surface rounded-2xl border border-border-subtle p-6 md:p-10 shadow-sm">
+<h3 class="font-display-md text-display-md mb-8">Payment Details</h3>
+<form class="flex flex-col gap-6" onsubmit="event.preventDefault();">
+<!-- Contact Info -->
+<div class="flex flex-col gap-2">
+<label class="font-body-bold text-body-bold" for="email">Email address</label>
+<input class="form-input" id="email" placeholder="you@company.com" required="" type="email"/>
+</div>
+<div class="h-px w-full bg-border-subtle my-4"></div>
+<!-- Payment Details -->
+<div class="flex flex-col gap-4">
+<label class="font-body-bold text-body-bold">Card Information</label>
+<!-- Stripe-like combined input structure -->
+<div class="flex flex-col rounded-xl overflow-hidden border border-border-subtle focus-within:border-primary-container focus-within:ring-1 focus-within:ring-primary-container transition-all">
+<div class="relative border-b border-border-subtle">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted" data-icon="credit_card">credit_card</span>
+<input class="w-full h-[52px] pl-12 pr-4 bg-transparent outline-none font-body-base" placeholder="Card number" required="" type="text"/>
+</div>
+<div class="flex">
+<div class="relative w-1/2 border-r border-border-subtle">
+<input class="w-full h-[52px] px-4 bg-transparent outline-none font-body-base" placeholder="MM / YY" required="" type="text"/>
+</div>
+<div class="relative w-1/2">
+<input class="w-full h-[52px] px-4 bg-transparent outline-none font-body-base" placeholder="CVC" required="" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-2">
+<label class="font-body-bold text-body-bold" for="name">Name on card</label>
+<input class="form-input" id="name" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-2 mt-2">
+<label class="font-body-bold text-body-bold" for="country">Country or region</label>
+<select class="form-input appearance-none bg-no-repeat bg-[right_16px_center]" id="country" required="" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+<option value="us">United States</option>
+<option value="ca">Canada</option>
+<option value="uk">United Kingdom</option>
+<option value="au">Australia</option>
+<option value="eu">European Union</option>
+</select>
+</div>
+<!-- Action Button -->
+<button class="btn-primary mt-6 group" type="submit">
+                        Pay $99.00
+                        <span class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Trust Markers -->
+<div class="mt-8 flex flex-col items-center gap-4 text-ink-muted">
+<div class="flex items-center gap-2 font-caption text-caption">
+<span class="material-symbols-outlined text-[16px]" data-icon="lock">lock</span>
+<span>Secure SSL Connection</span>
+<span class="mx-2 px-1 text-border-subtle">|</span>
+<span>Powered by Stripe</span>
+</div>
+<div class="flex items-center gap-2 font-caption text-caption text-center max-w-[300px]">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified_user">verified_user</span>
+<span>30-day money-back guarantee. No questions asked. Cancel anytime.</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer logic: Usually suppressed on checkout, but included minimal version for legal compliance -->
+<footer class="border-t border-border-subtle bg-surface w-full py-12 mt-auto">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter">
+<p class="font-caption text-caption text-ink-muted">© 2024 Replace Me Inc. All rights reserved. Secure payments powered by Stripe.</p>
+<div class="flex gap-6">
+<a class="font-caption text-caption text-ink-muted hover:text-primary transition-opacity hover:opacity-100 underline decoration-primary-container" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary transition-opacity hover:opacity-100 underline decoration-primary-container" href="#">Terms of Service</a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary transition-opacity hover:opacity-100 underline decoration-primary-container" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

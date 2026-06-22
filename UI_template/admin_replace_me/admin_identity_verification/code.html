@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Identity Check - Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-mint": "#F0FDF4",
+                        "primary-fixed-dim": "#4ae176",
+                        "surface-bright": "#faf8ff",
+                        "on-tertiary-container": "#074a25",
+                        "on-error-container": "#93000a",
+                        "border-subtle": "#E2E8F0",
+                        "surface": "#faf8ff",
+                        "on-secondary-fixed": "#002117",
+                        "on-tertiary-fixed": "#00210d",
+                        "success": "#22C55E",
+                        "inverse-surface": "#283044",
+                        "surface-variant": "#dae2fd",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e2e7ff",
+                        "primary-container": "#22c55e",
+                        "outline-variant": "#bccbb9",
+                        "background": "#faf8ff",
+                        "tertiary-fixed": "#b1f2be",
+                        "tertiary-container": "#7cba8a",
+                        "on-secondary": "#ffffff",
+                        "canvas": "#FFFFFF",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eaedff",
+                        "secondary-container": "#adedd3",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#4ae176",
+                        "on-primary-container": "#004b1e",
+                        "inverse-on-surface": "#eef0ff",
+                        "on-surface-variant": "#3d4a3d",
+                        "ink-muted": "#64748B",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "info": "#3B82F6",
+                        "on-surface": "#131b2e",
+                        "surface-subdued": "#F8FAFC",
+                        "secondary-fixed": "#b0f0d6",
+                        "surface-container-low": "#f2f3ff",
+                        "primary-fixed": "#6bff8f",
+                        "on-primary-fixed": "#002109",
+                        "tertiary": "#2e6a41",
+                        "surface-tint": "#006e2f",
+                        "tertiary-fixed-dim": "#96d5a3",
+                        "error-container": "#ffdad6",
+                        "error": "#EF4444",
+                        "outline": "#6d7b6c",
+                        "ink-secondary": "#334155",
+                        "surface-dim": "#d2d9f4",
+                        "surface-container-highest": "#dae2fd",
+                        "primary": "#006e2f",
+                        "on-primary-fixed-variant": "#005321",
+                        "on-tertiary-fixed-variant": "#12512c",
+                        "secondary": "#2b6954",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#306d58",
+                        "on-background": "#131b2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "base-unit": "4px",
+                        "section-gap": "96px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "display-xl-mobile": ["Plus Jakarta Sans"],
+                        "display-xl": ["Plus Jakarta Sans"],
+                        "display-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "caption": ["Inter"],
+                        "body-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-xl-mobile": ["36px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-xl": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["36px", { "lineHeight": "1.25", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+                        "caption": ["14px", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400" }],
+                        "body-bold": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hover-glow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.15), 0 4px 6px -4px rgba(34, 197, 94, 0.05);
+            border-color: #22C55E;
+        }
+        .transition-all-custom {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base antialiased selection:bg-surface-mint selection:text-primary min-h-screen">
+<!-- TopNavBar -->
+<nav class="hidden md:flex bg-canvas/90 dark:bg-on-background/90 font-body-base text-body-base fixed top-0 w-full z-50 backdrop-blur-md border-border-subtle dark:border-outline-variant shadow-sm justify-between items-center h-16 px-gutter max-w-container-max mx-auto">
+<div class="flex items-center gap-6">
+<span class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed-dim">Replace Me</span>
+</div>
+<div class="flex items-center gap-8">
+<a class="text-ink-muted dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-102 transition-transform duration-200" href="#">Dashboard</a>
+<a class="text-ink-muted dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-102 transition-transform duration-200" href="#">Users</a>
+<a class="text-ink-muted dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-102 transition-transform duration-200" href="#">Moderation</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 hover:text-primary dark:hover:text-primary-fixed-dim transition-colors scale-102 transition-transform duration-200" href="#">Verification</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-subdued border border-border-subtle rounded-lg text-caption font-caption focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all-custom" placeholder="Search..." type="text"/>
+</div>
+<button class="text-ink-muted hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-ink-muted hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-border-subtle">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a system administrator in a well-lit office setting. The individual is wearing a smart-casual outfit. The lighting is bright and modern, creating a clean corporate look. The background is slightly blurred showing modern glass office partitions. The color palette emphasizes clean whites, professional blues, and subtle warm skin tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf2alPTa2CPdMeFZ9fye0MhiREfnjO3MJy1FjFr983zVgQT3Yow68baEFX8zIdZkCIAkDPV1NACD-6J04IshvepseNeec6YaoCynwdNpPDhu2ntHOal6LcHoTmS69mTWHdRSdi0XeyQh2YCx4gou5DnWbXRgVhBRsETujd3w-DWhd9Zdc4bjwq4Ginisg7vB8ufTDfXW9x-w7P-sl1a2AlSNGS7N1q8d2Whr9GwaoBS4oNYGkZt8lu-OlBwAjNYyZheCWHHlvaMCE"/>
+</div>
+</div>
+</nav>
+<!-- Main Layout Container -->
+<div class="flex h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="bg-surface-subdued dark:bg-on-background font-body-base text-body-base h-screen w-64 fixed left-0 top-16 border-r border-border-subtle dark:border-outline-variant flex flex-col py-8 px-4 gap-4 z-40 hidden md:flex">
+<div class="flex items-center gap-3 px-4 mb-6">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-primary flex-shrink-0">
+<img alt="System Admin" class="w-full h-full object-cover" data-alt="A small abstract logo graphic representing a system administration panel. It features a stylized cogwheel or gear morphing into a secure lock icon. The graphic is rendered in bright vibrant emerald green against a stark white background. The style is flat, modern, and highly legible, typical of modern tech branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtbZ69IIndx8bsIfX2v1tK-kvaAB_yHJOhgGeWjW2dppI23Wn4_UAwdbPm2TMAv4Hiy_wHmsjkvmAvxCK9w0auD2vz99WWMBMO13xNiziM_vacNPg64GqVqWYaI4VcIOcpbEc8FdBX31r99MUiwK7QOeUQVBzA7sG8q95yy4j111KvXyumPyr8B3lm6qvf3svfjHTCnJLXljEO0vwxAWZUIB8AMjVdXcmnBJ30_QQJE8exPMmstjkqjOfbg-XWe0b0r9rd0j4v5E8"/>
+</div>
+<div>
+<h2 class="font-body-bold text-body-bold text-on-surface">Admin Portal</h2>
+<p class="font-caption text-caption text-ink-muted">Replace Me Marketplace</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-muted dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant hover:translate-x-1 transition-all duration-200 active:scale-98 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-muted dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant hover:translate-x-1 transition-all duration-200 active:scale-98 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span>User Directory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-muted dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant hover:translate-x-1 transition-all duration-200 active:scale-98 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+<span>Job Review</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-mint dark:bg-on-primary-container text-primary dark:text-primary-fixed rounded-lg font-body-bold hover:translate-x-1 transition-all duration-200 active:scale-98 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span>Identity Check</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-ink-muted dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant hover:translate-x-1 transition-all duration-200 active:scale-98 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span>Revenue</span>
+</a>
+</nav>
+<div class="mt-auto px-2">
+<button class="w-full py-3 px-4 bg-primary text-white rounded-lg font-body-bold text-body-bold hover:bg-secondary hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(34,197,94,0.25)] transition-all-custom active:scale-95">
+                    Generate Report
+                </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 md:ml-64 p-gutter md:p-margin-desktop overflow-y-auto w-full max-w-container-max">
+<!-- Header Section -->
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Identity Verification Queue</h1>
+<p class="font-body-base text-body-base text-ink-muted max-w-2xl">Review pending worker identity submissions. Verify government IDs and selfie matches to ensure marketplace trust and security.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-mint px-4 py-2 rounded-lg border border-primary/20 flex items-center gap-2">
+<span class="font-label-mono text-label-mono text-primary uppercase">Pending</span>
+<span class="font-display-md text-display-md text-on-surface">12</span>
+</div>
+</div>
+</header>
+<!-- Verification Workspace - Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Queue List (4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-4">
+<div class="sticky top-24 flex flex-col gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-white border border-border-subtle rounded-lg text-body-base focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all-custom shadow-sm" placeholder="Search queue..." type="text"/>
+</div>
+<!-- Queue Items -->
+<div class="bg-white rounded-xl border border-primary shadow-[0_4px_12px_rgba(34,197,94,0.1)] p-4 cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0">
+<img alt="Sarah J." class="w-full h-full object-cover" data-alt="A close up portrait photo of a young professional woman looking directly at the camera. She has a confident, relaxed expression. The photo is well-lit with soft natural light. The background is a plain light grey wall. The visual style is realistic, high-definition, corporate portraiture suitable for an ID profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNi0gmmEDQhm35v54LWdje9iTToKgM_5yyOS_tIInRZRIInNKZ0fyvlJtSLj32UWOOvE_aPNqwt2GwLVA_UbcCNWoNO34BSZYW3m2E4pb7oQ2-UI5ooaX-o8iWDZdoyQ0MOOsaLtaPG5taU2kpRLo37JEHkikdpH2jMExJRyaYn-fHGtQLWlXzwV2164pePe2vClkpunVN_qJgCZasKDgC4CQnx5NMewZI52akDm4gZlUpQ6Ddr-VhKPM_YICrZPQAnmMIcp6MXkI"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-bold text-body-bold text-on-surface">Sarah Jenkins</h3>
+<span class="font-caption text-caption text-ink-muted">10m ago</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-mono text-[10px] text-info bg-info/10 px-2 py-0.5 rounded uppercase">New Submission</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-border-subtle hover-glow transition-all-custom p-4 cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0">
+<img alt="Michael C." class="w-full h-full object-cover" data-alt="A close up portrait photo of a middle-aged man with short hair and glasses. He is wearing a simple collared shirt. The lighting is slightly warm. The background is out of focus, suggesting an office environment. The style is realistic and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMkDewp4dp-H0Gq4VnnY_DqM7jCdoOnrLgdaE0ch8pSGIQqLeNM7SdDcNOS-E1aSHBV31Iz6uUmasRd8_ckrDzKSV6hfAEaOROC_ZrfOUJBkEaRtkEjUlH28eOU1DzVHcvztLAYjEQBiCQh32SotKyjy0kRrRDpzrApsIw6VqHpf8yzffAlvnqZygeYJkWsCdZ4t9yhSzGBzkaBg9Dw5yCW9A-Q96DHrsRVvnu_A69VXPJ7QYEoBl99krpYROOlR0OqUsLaRVPo8c"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-bold text-body-bold text-on-surface">Michael Chen</h3>
+<span class="font-caption text-caption text-ink-muted">45m ago</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-mono text-[10px] text-ink-muted bg-surface-container-high px-2 py-0.5 rounded uppercase">Re-submission</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-xl border border-border-subtle hover-glow transition-all-custom p-4 cursor-pointer opacity-75">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full flex items-center justify-center bg-surface-container-high flex-shrink-0 text-ink-muted font-display-md">
+                                    EL
+                                </div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-bold text-body-bold text-on-surface">Elena Lopez</h3>
+<span class="font-caption text-caption text-ink-muted">2h ago</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-mono text-[10px] text-ink-muted bg-surface-container-high px-2 py-0.5 rounded uppercase">Flagged: Blurry</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detail View Canvas (8 cols) -->
+<div class="lg:col-span-8">
+<div class="bg-white rounded-xl border border-border-subtle shadow-sm overflow-hidden flex flex-col h-full min-h-[700px]">
+<!-- Worker Profile Summary Header -->
+<div class="p-6 border-b border-border-subtle bg-surface flex justify-between items-start">
+<div class="flex items-center gap-6">
+<div class="w-20 h-20 rounded-full border-4 border-white shadow-sm overflow-hidden bg-surface-container-high">
+<img alt="Sarah J. Full" class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a professional woman matching the Sarah Jenkins thumbnail. The image is crisp, bright, and suitable for a high-quality ID badge. The lighting is even, illuminating her face clearly against a neutral background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHWknkTd4HiB7Qwnt2OdVW3MJCmrGxIe-y6oGlKzcuX8f_kt6qI_Os_uv5F0qijLkDqNI_LBp1fXjJwjuKFKnCTeQ1NMKzkVGFSKW6bx2XrKzbhiKdAO-oaiEPtz4brbC5AsKADRW-BcADR_ihyIwZQgCWuD0Z3fHxScKHRbZeIbN108vyvC1a_HNwcuMXn9tWaEIK_3mKgMtNq-LdRBirwU7RO_19Zidkd1O3MwkojIcSgrCklKKiD9f_1nm7JVFUnbpuL1DbEYY"/>
+</div>
+<div>
+<h2 class="font-display-md text-display-md text-on-surface mb-1">Sarah Jenkins</h2>
+<div class="flex flex-col gap-1 font-caption text-caption text-ink-muted">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">mail</span> sarah.jenkins@example.com
+                                        </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Seattle, WA • US Citizen
+                                        </div>
+</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-label-mono text-label-mono text-ink-muted uppercase mb-1">Risk Score</div>
+<div class="inline-flex items-center gap-2 bg-surface-mint text-primary px-3 py-1 rounded-full font-body-bold">
+<span class="material-symbols-outlined text-[18px]">shield</span> Low Risk
+                                </div>
+</div>
+</div>
+<!-- Documents Bento Grid -->
+<div class="p-6 flex-grow bg-surface-subdued">
+<h3 class="font-body-bold text-body-bold text-on-surface mb-4">Submitted Documents</h3>
+<div class="grid grid-cols-2 gap-6">
+<!-- ID Front -->
+<div class="bg-white p-4 rounded-xl border border-border-subtle shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-3">
+<span class="font-label-mono text-label-mono text-ink-secondary uppercase">Government ID (Front)</span>
+<button class="text-ink-muted hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">zoom_in</span></button>
+</div>
+<div class="flex-grow bg-surface-container-high rounded-lg overflow-hidden border border-border-subtle relative group">
+<img alt="ID Front" class="w-full h-full object-cover" data-alt="A detailed mockup of a standard US state driver's license lying flat on a well-lit white surface. The personal details are blurred or generic, but the layout clearly resembles an official ID card with a photo, holographic elements, and clear text. The lighting is bright and overhead, emphasizing clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3WgvYT-rhy5wSsM3gTgnDD40CaAejZkwlK8oq_n5Doe-pqZ7yQL2TSKuYMJ4R0vZO13CsKsjsAz36joW7TAx-bo3VE7a0yktLmr6ZzTTi8lwhdFHSVZh6R8aR_42FpeRmejr41O_TI7g5anDgbFgSKAEBfz038KodFhqGDwEvHsEpOOP69ET7Zh5_85NKzpD0Ei6iofgnZlv0Dsej4nt8Odt_26vjG0Dq6iBZsG34C3vT3mZq_oIiWTil_A4IWwjbG7EEgZchFus"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="text-white font-body-bold flex items-center gap-2"><span class="material-symbols-outlined">fullscreen</span> Expand</span>
+</div>
+</div>
+<div class="mt-3 flex items-start gap-2 text-caption font-caption text-ink-muted">
+<span class="material-symbols-outlined text-[16px] text-success">check_circle</span>
+<span>AI Analysis: Clear, readable, edges visible. Hologram detected.</span>
+</div>
+</div>
+<!-- ID Back -->
+<div class="bg-white p-4 rounded-xl border border-border-subtle shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-3">
+<span class="font-label-mono text-label-mono text-ink-secondary uppercase">Government ID (Back)</span>
+<button class="text-ink-muted hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">zoom_in</span></button>
+</div>
+<div class="flex-grow bg-surface-container-high rounded-lg overflow-hidden border border-border-subtle relative group">
+<img alt="ID Back" class="w-full h-full object-cover" data-alt="A detailed mockup of the back of a standard US state driver's license. It features a prominent 2D barcode (PDF417), magnetic stripe, and standard legal text. The card is lying flat on a clean white surface under bright, clear lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKLzJUFD_jVTWAwfkeASPxR1E6noBaT0zs6eFEUdFmsVhomxkyixQs_cZKJiKNNfFQ8GfKeDvFlH1DryjFlP-fRyI57VNWuItiey1uT4oz7yuroW9IFPlcV66Qt3rtCLrxIHd-0q4MaG0dZAOV6H4V8l-6IGQ8DQfXs0kkmXWys7EDR1LE11z5x_yJWgUAQaoqHKFN9UBAFkA4X2X0NIUIvHTYLDG6G6vpRf8XT2sXT2cNzkcEyjMLA17d20m8e99tTjFyasQ74no"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="text-white font-body-bold flex items-center gap-2"><span class="material-symbols-outlined">fullscreen</span> Expand</span>
+</div>
+</div>
+<div class="mt-3 flex items-start gap-2 text-caption font-caption text-ink-muted">
+<span class="material-symbols-outlined text-[16px] text-success">check_circle</span>
+<span>AI Analysis: Barcode parsed successfully. Data matches front.</span>
+</div>
+</div>
+<!-- Selfie Match -->
+<div class="col-span-2 bg-white p-4 rounded-xl border border-border-subtle shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-3">
+<span class="font-label-mono text-label-mono text-ink-secondary uppercase">Liveness &amp; Selfie Match</span>
+<div class="flex items-center gap-2 bg-surface-mint px-2 py-1 rounded text-primary font-caption">
+<span class="material-symbols-outlined text-[16px]">face</span> 98% Match Confidence
+                                        </div>
+</div>
+<div class="flex gap-4 items-center">
+<div class="w-32 h-40 bg-surface-container-high rounded-lg overflow-hidden border border-border-subtle flex-shrink-0">
+<img alt="Selfie" class="w-full h-full object-cover" data-alt="A front-facing selfie of the same professional woman from the previous profile photos. She is holding a piece of paper or ID near her face. The lighting is slightly more uneven, typical of a smartphone selfie, but her features are very clear and match the ID photo. The background is a simple home environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJLOmAKr_VXwNElMLdnM8G_Ld1rIlap6LV1QkowlIEoClqAQLmA0LON-e4AA8PST6bxV8NoZGKI2Y7rcH8fhGS3x35sB1aDpoBlxo5r_uy7mR-fXaiERzfFDb9ZPfoCYCX2jr-e09PhuhohvXxY_A7BMzy2_XTd3EY8qcm-khVpseaFOEBJFqt4SqBIcm1Y6VRmxYSgEa_VYA7MsSD74eEiWzKjkxqivI5jVKIXYZIB9-QJ3tBtvgyZ6Qz_2BnYPVJoq3zkuNEa38"/>
+</div>
+<div class="flex flex-col gap-3 flex-grow">
+<div class="flex items-center gap-3 p-3 bg-surface-subdued rounded-lg border border-border-subtle">
+<span class="material-symbols-outlined text-success">verified</span>
+<div class="flex flex-col">
+<span class="font-body-bold text-on-surface text-sm">Face Geometry Match</span>
+<span class="font-caption text-ink-muted text-xs">Strong correlation with ID photo.</span>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-subdued rounded-lg border border-border-subtle">
+<span class="material-symbols-outlined text-success">how_to_reg</span>
+<div class="flex flex-col">
+<span class="font-body-bold text-on-surface text-sm">Liveness Check Passed</span>
+<span class="font-caption text-ink-muted text-xs">Motion and depth verified. No spoofing detected.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="p-6 bg-white border-t border-border-subtle flex justify-between items-center">
+<button class="px-6 py-2.5 border border-error text-error rounded-lg font-body-bold hover:bg-error-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">block</span> Reject
+                            </button>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 border border-outline-variant text-ink-secondary rounded-lg font-body-bold hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">replay</span> Request Re-submission
+                                </button>
+<button class="px-8 py-2.5 bg-primary text-white rounded-lg font-body-bold hover:bg-secondary hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(34,197,94,0.25)] transition-all-custom flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">check_circle</span> Verify Identity
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

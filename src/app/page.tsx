@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 // Talent Carousel data
 const talentList = [
@@ -9,7 +12,7 @@ const talentList = [
     name: "Juan Dela Cruz",
     role: "Senior React Developer",
     desc: "Expert in building scalable React applications and design systems. 7+ years of remote work experience with US startups.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB9dEJMmbkyigLnZOOhCjBiUAKd9myiNtavRiIRXXgwDIjU_Iv2aWS6wfqL8yu3m8drFweFnSoKNyyqRipuDA9uiRFEkiAyKdrNoX1t-J5Al4-Nuc7NKCe2qfHZV-HoAxoTUZSft3JQlcO-t892DwQ7eHi0WVPQDJIwWEuLXCzJnGOMdBD_ZLxBmxbSZOgcwog-Mky7Y_g3Z8uuZiPwNa1Y9bZ9lurFDhKmZhkbBNuRjmlF2rx5mIuPQLw9UqulFHXi7Fr-8Ujbkww",
+    image: "/images/juan-dela-cruz.png",
     badge: "TOP RATED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "star"
@@ -18,7 +21,7 @@ const talentList = [
     name: "Ana Reyes",
     role: "Content Strategist",
     desc: "Creative content strategist with a knack for SEO-driven storytelling and engaging B2B campaigns.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDpuEKCf_iU4qoZqdbEvRE-Y4U6C2z8Z5CvVq2rEmNUBcbaU4NT_rYLhLKRxysEENZepMf5ZUId7ZUbVGuaMsGBoKlwSuY1TbTf1CgRLvwrJu6aFDZV1AWsk6vg3O1cvoK6I6U1GnqQi2uk6cRx6KpkKnqqXthV0UxbgFrwbTP6fUhshKjFpaBTb8Q_5_ZyJNfNeczyQc7nlU3Zl1w1eSwNWalh6MTlB8Cpf5JSaOHb5FHlUAlHa1rMjlWeMHBFItBXyoXY2G0dwS0",
+    image: "/images/ana-reyes.png",
     badge: "VETTED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "verified"
@@ -27,7 +30,7 @@ const talentList = [
     name: "Mark Villar",
     role: "Project Manager",
     desc: "Certified Agile PM adept at keeping distributed teams aligned and delivering complex SaaS projects on time.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAt_dpEk0QG9a3VhXSbLOalAHZOX8-PvKSM5fereuX3tzveP2XLQI1aLwWpWmCqElU7g8IurqX8VU55It9Nt0U5i4KTqJ6rI9mtPHD3vhdsRmy3fS9t9pyWncHkOTe-ONd13Mnosj9klZG5QHUxIokpPLoqc9Non4YpPoRqfJAODPPD8dDSPOLLyoJRi2Gx_Z-3qFG3Vdn_009kJRQsCwD9eVQ6fG-F2FAQeAK_07niaV-yYzikqftf96-ZkPCPjPQ_zH4v5dfQ8EU",
+    image: "/images/mark-villar.png",
     badge: "AVAILABLE",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "schedule"
@@ -36,7 +39,7 @@ const talentList = [
     name: "Maria Santos",
     role: "SEO Specialist",
     desc: "Data-driven SEO expert focused on organic growth, technical audits, and high-converting keyword strategies.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB7wPFda53LrOZHKSSv-M5_FSR-Je4c2YThz5kYWbxMRAzumlT6jEZxsU-_xzBOrEtd7AThAayvxfgdbHSlq0M2JeLSSu_ZU5mBS1IBxjKTFY9A4lXa2onxm_L1N0mSBUVuoFeNSK2pibx5mORroXUT4FSqYlxLEGyPrI7ihUohTmjWcuinP1sFE9EsEflSrLQEPRHjbZ8_D09Obpq1rXBNRmn01Udy0iNYMObs6xUnQ6oqZjIPhDgg_I66Oh3cTzvZjirdnOKBTPg",
+    image: "/images/maria-santos.png",
     badge: "VETTED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "verified"
@@ -45,7 +48,7 @@ const talentList = [
     name: "Paolo Garcia",
     role: "Mobile App Developer",
     desc: "Proficient in React Native and Swift. Builds seamless, high-performance mobile experiences for iOS and Android.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCyo-jgxdauhpDoA0XB_x0FUdU-CQCAxh34ZIlY9aoHKrB4wHjBQmzcdv7d36RnzOG7urkPLEul3hqsYYfzdaDx6rwxDXZyZwgIrNrs6DD3DDpSDAWxVO-dnZZaHnmG59gMi2RhjRJnElesJ2Ov1VeWBkfcg_wiMlg6Q6Dz8v6gD2PTcIsQa-ZrJYV9_9h8jlNyxpbacj0_ab_AbDRfl-SHQesRbQFNHe1D58uXBIVr1_-cu02gS7fGa_iR7KNydU91wOEq8YKqi8A",
+    image: "/images/paolo-garcia.png",
     badge: "TOP RATED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "star"
@@ -54,7 +57,7 @@ const talentList = [
     name: "Camille Mendoza",
     role: "Data Analyst",
     desc: "Translates complex datasets into actionable insights using SQL, Python, and Tableau for e-commerce brands.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBTqJUXPVAOWusaqooYSwuyeNaQfY98Tvdb_ovCR2Lkz8SvXtveG1uRapUgFxDqhcpFzfrbM67VJz_NXMwxWhVtNs5POYh6H-BZt7XEDJIoMTFTc_CUhOOG1dF5zPrZl-DFG4Fa2qFQHeRXmUrHFTeCl4jDTvURiVDV441I7Judh_9tclYCXTCALOMB4D2aHIDQPRiKMr_YD66kQlsmBm3Jx2QsHt1vC3VDxBSyiQq4GF82xHEvm8VR3AAZL_9GOyIQFH3PA-Blhes",
+    image: "/images/camille-mendoza.png",
     badge: "AVAILABLE",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "schedule"
@@ -63,7 +66,7 @@ const talentList = [
     name: "Jose Bautista",
     role: "Graphic Designer",
     desc: "Versatile designer skilled in branding, marketing collateral, and UI design. Expert in Adobe Creative Suite.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDSYvZ5rL6zXF9z-d11mC0o7V-19__FE7_c29mZo4EFDNxNJefTz9gmBhbW4hARZEJ0AgS3QRGe4GY1jm0BTtRvI990M68CeLlLfFKhK_PwMlfdKp93XCFbpymkoPrLpDlvOn3LHvS_ukA0q5cyNkBJeHBunRW9T50VSfxII0Y2GfD56oz48H2uFCRfB2f5RC0KUvN-qjiOl6Dd2KU0SDMWY_QDJTp2JwV9NHzAeS8ktkRS0yI6sj6NNs1YSoz3xYqdNEPDd3yoHo4",
+    image: "/images/jose-bautista.png",
     badge: "VETTED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "verified"
@@ -72,7 +75,7 @@ const talentList = [
     name: "Isabella Reyes",
     role: "Customer Success Lead",
     desc: "Dedicated to reducing churn and driving customer satisfaction. Experienced in Zendesk and Intercom management.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDpuEKCf_iU4qoZqdbEvRE-Y4U6C2z8Z5CvVq2rEmNUBcbaU4NT_rYLhLKRxysEENZepMf5ZUId7ZUbVGuaMsGBoKlwSuY1TbTf1CgRLvwrJu6aFDZV1AWsk6vg3O1cvoK6I6U1GnqQi2uk6cRx6KpkKnqqXthV0UxbgFrwbTP6fUhshKjFpaBTb8Q_5_ZyJNfNeczyQc7nlU3Zl1w1eSwNWalh6MTlB8Cpf5JSaOHb5FHlUAlHa1rMjlWeMHBFItBXyoXY2G0dwS0",
+    image: "/images/ana-reyes.png",
     badge: "TOP RATED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "star"
@@ -81,7 +84,7 @@ const talentList = [
     name: "Miguel Ocampo",
     role: "DevOps Engineer",
     desc: "Streamlines CI/CD pipelines and manages cloud infrastructure on AWS and Azure. Kubernetes certified.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAt_dpEk0QG9a3VhXSbLOalAHZOX8-PvKSM5fereuX3tzveP2XLQI1aLwWpWmCqElU7g8IurqX8VU55It9Nt0U5i4KTqJ6rI9mtPHD3vhdsRmy3fS9t9pyWncHkOTe-ONd13Mnosj9klZG5QHUxIokpPLoqc9Non4YpPoRqfJAODPPD8dDSPOLLyoJRi2Gx_Z-3qFG3Vdn_009kJRQsCwD9eVQ6fG-F2FAQeAK_07niaV-yYzikqftf96-ZkPCPjPQ_zH4v5dfQ8EU",
+    image: "/images/mark-villar.png",
     badge: "AVAILABLE",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "schedule"
@@ -90,7 +93,7 @@ const talentList = [
     name: "Sofia Villanueva",
     role: "Digital Marketer",
     desc: "Growth marketer specializing in paid social and search campaigns. Manages $50k+ monthly ad spends efficiently.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBTqJUXPVAOWusaqooYSwuyeNaQfY98Tvdb_ovCR2Lkz8SvXtveG1uRapUgFxDqhcpFzfrbM67VJz_NXMwxWhVtNs5POYh6H-BZt7XEDJIoMTFTc_CUhOOG1dF5zPrZl-DFG4Fa2qFQHeRXmUrHFTeCl4jDTvURiVDV441I7Judh_9tclYCXTCALOMB4D2aHIDQPRiKMr_YD66kQlsmBm3Jx2QsHt1vC3VDxBSyiQq4GF82xHEvm8VR3AAZL_9GOyIQFH3PA-Blhes",
+    image: "/images/camille-mendoza.png",
     badge: "VETTED",
     badgeClass: "text-emerald-600 border-slate-200",
     badgeIcon: "verified"
@@ -122,9 +125,6 @@ const faqs = [
 ];
 
 export default function Home() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
 
   // States for Carousel
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -150,14 +150,6 @@ export default function Home() {
 
   // Scroll Reveal Observer
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
 
     // Intersection Observer for scroll reveals
     const observer = new IntersectionObserver(
@@ -178,7 +170,6 @@ export default function Home() {
     revealItems.forEach((item) => observer.observe(item));
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       observer.disconnect();
     };
   }, []);
@@ -225,216 +216,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Header: TopNavBar */}
-      <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 ${isScrolled ? "py-2.5 shadow-sm" : "py-4"
-          }`}
-      >
-        <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full">
-          {/* Brand */}
-          <a
-            onClick={() => setActiveSection("")}
-            className="flex items-center gap-3 transition-transform duration-200 hover:opacity-90 scale-102"
-            href="#"
-          >
-            <div className="relative w-12 h-12 shrink-0">
-              <Image
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgbZNrJ_I1U7tfeSy8YkH35JJfvtqezZW9pQe2LjKUZfDo7UsctaBNHF_FFCs0pq77ubGBzwNaT7qCYhDJkDaD0qvzDbhIjdTKppteix5d80HcmtrJADVh0fquMQFXaQZpHonlYPP-F6yUCc4iuzRD_pywAJm9F_6FNa8h8zjyn7w8_yjZLBd3uctn5xNxDx4C3ICLHvCvjk9J4RIxkmvaLBCg7nRT-Wq0yhWnG-A6RytUFEnXqYlgmYNoh17B-78M7U5pQQVCNgs"
-                alt="Replace Me Logo"
-                fill
-                className="object-contain"
-                sizes="48px"
-                priority
-              />
-            </div>
-            <span className="font-display-md text-2xl font-bold text-[#0a4a29] leading-none relative top-[-4px]">
-              Replace Me
-            </span>
-          </a>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a
-              onClick={() => setActiveSection("top-talent")}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                activeSection === "top-talent" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-              href="#top-talent"
-            >
-              Find Talent
-              <span
-                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                  activeSection === "top-talent" ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </a>
-            <a
-              onClick={() => setActiveSection("find-work")}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                activeSection === "find-work" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-              href="#find-work"
-            >
-              Find Work
-              <span
-                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                  activeSection === "find-work" ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </a>
-            <a
-              onClick={() => setActiveSection("how-it-works")}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                activeSection === "how-it-works" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-              href="#how-it-works"
-            >
-              How it Works
-              <span
-                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                  activeSection === "how-it-works" ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </a>
-            <a
-              onClick={() => setActiveSection("pricing")}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                activeSection === "pricing" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-              href="#pricing"
-            >
-              Pricing
-              <span
-                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                  activeSection === "pricing" ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </a>
-            <a
-              onClick={() => setActiveSection("faq")}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                activeSection === "faq" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-              href="#faq"
-            >
-              FAQ
-              <span
-                className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                  activeSection === "faq" ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </a>
-          </nav>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-6">
-            <a
-              className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
-              href="#login"
-            >
-              Sign In
-            </a>
-            <a
-              className="bg-[#22c55e] text-white px-6 py-2.5 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
-              href="#"
-            >
-              Get Started
-            </a>
-          </div>
-
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex items-center p-2 text-on-surface hover:text-[#22c55e] focus:outline-none"
-            aria-label="Toggle Menu"
-          >
-            <span className="material-symbols-outlined text-3xl">
-              {mobileMenuOpen ? "close" : "menu"}
-            </span>
-          </button>
-        </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
-            <a
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setActiveSection("top-talent");
-              }}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                activeSection === "top-talent" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href="#top-talent"
-            >
-              Find Talent
-            </a>
-            <a
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setActiveSection("find-work");
-              }}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                activeSection === "find-work" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href="#find-work"
-            >
-              Find Work
-            </a>
-            <a
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setActiveSection("how-it-works");
-              }}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                activeSection === "how-it-works" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href="#how-it-works"
-            >
-              How it Works
-            </a>
-            <a
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setActiveSection("pricing");
-              }}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                activeSection === "pricing" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href="#pricing"
-            >
-              Pricing
-            </a>
-            <a
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setActiveSection("faq");
-              }}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                activeSection === "faq" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href="#faq"
-            >
-              FAQ
-            </a>
-            <hr className="border-slate-100 my-2" />
-            <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-slate-700 font-body-bold py-2 text-center hover:text-[#22c55e]"
-              href="#login"
-            >
-              Sign In
-            </a>
-            <a
-              onClick={() => setMobileMenuOpen(false)}
-              className="bg-[#22c55e] text-white text-center py-3 rounded-xl font-body-bold"
-              href="#"
-            >
-              Get Started
-            </a>
-          </div>
-        )}
-      </header>
+      <Header />
 
       <main className="pt-[72px]">
         {/* Hero Section */}
@@ -459,14 +241,14 @@ export default function Home() {
                   Connect directly with top-tier Filipino talent or find your dream remote role. Skip the agency fees and middlemen. Scale your business faster or launch your global career with world-class opportunities.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                  <button className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
+                  <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
                     <span>Hire Talent Now</span>
                     <span className="material-symbols-outlined text-xl">arrow_forward</span>
-                  </button>
-                  <button className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
+                  </Link>
+                  <Link href="/signup" className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
                     <span>Find a Job</span>
                     <span className="material-symbols-outlined text-xl">search</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
 
@@ -475,7 +257,7 @@ export default function Home() {
                   {/* Main Image */}
                   <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-xl border-[8px] border-white bg-slate-50">
                     <Image
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1tpYyLAr_beHtfseqt1zCJ4lzwUVez3L2vZ4RorW_a5Lc8NzeW8IvXd2ruJKduvkYoYbbGchSLq8umAqUB-6i-fRrzyhicoJ9G98UkFHslaem-EWRMrAQ1lFP30cLDdDZT9nx3tQ3nqn_PO7f9_BJh7Y2Plp_xyCsZSBRCtV7qoH9zrKIrE3evE2md5OOVorc_tXcA8hyxePxvQ6OnoeWXWikuLqn0GUEUJMO3SaWV_yH0dd0s3UjfHi-CRE5T0RpFviAfJTSGsw"
+                      src="/images/hero-worker.png"
                       alt="Professional Filipino Remote Worker"
                       fill
                       className="object-cover"
@@ -559,10 +341,10 @@ export default function Home() {
                 <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Elevate Your Career with <span className="text-[#22c55e]">Global Opportunities</span></h2>
                 <p className="text-slate-500 font-body-base text-lg leading-relaxed">Find stable, long-term remote work with international clients who value your expertise and dedication.</p>
                 <div className="pt-2">
-                  <button className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base">
+                  <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                     <span>Create Your Free Profile</span>
                     <span className="material-symbols-outlined text-lg">person_add</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
 
@@ -802,7 +584,7 @@ export default function Home() {
                       <div className="relative w-16 h-16 shrink-0">
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
                           <Image
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTqJUXPVAOWusaqooYSwuyeNaQfY98Tvdb_ovCR2Lkz8SvXtveG1uRapUgFxDqhcpFzfrbM67VJz_NXMwxWhVtNs5POYh6H-BZt7XEDJIoMTFTc_CUhOOG1dF5zPrZl-DFG4Fa2qFQHeRXmUrHFTeCl4jDTvURiVDV441I7Judh_9tclYCXTCALOMB4D2aHIDQPRiKMr_YD66kQlsmBm3Jx2QsHt1vC3VDxBSyiQq4GF82xHEvm8VR3AAZL_9GOyIQFH3PA-Blhes"
+                            src="/images/sarah-jenkins.png"
                             alt="Sarah Jenkins"
                             fill
                             className="object-cover"
@@ -829,7 +611,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <div className="relative w-12 h-12 shrink-0">
                       <Image
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyo-jgxdauhpDoA0XB_x0FUdU-CQCAxh34ZIlY9aoHKrB4wHjBQmzcdv7d36RnzOG7urkPLEul3hqsYYfzdaDx6rwxDXZyZwgIrNrs6DD3DDpSDAWxVO-dnZZaHnmG59gMi2RhjRJnElesJ2Ov1VeWBkfcg_wiMlg6Q6Dz8v6gD2PTcIsQa-ZrJYV9_9h8jlNyxpbacj0_ab_AbDRfl-SHQesRbQFNHe1D58uXBIVr1_-cu02gS7fGa_iR7KNydU91wOEq8YKqi8A"
+                        src="/images/paolo-garcia.png"
                         alt="Michael Chen"
                         fill
                         className="rounded-xl object-cover border border-slate-100 shadow-xs"
@@ -850,7 +632,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <div className="relative w-12 h-12 shrink-0">
                       <Image
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSYvZ5rL6zXF9z-d11mC0o7V-19__FE7_c29mZo4EFDNxNJefTz9gmBhbW4hARZEJ0AgS3QRGe4GY1jm0BTtRvI990M68CeLlLfFKhK_PwMlfdKp93XCFbpymkoPrLpDlvOn3LHvS_ukA0q5cyNkBJeHBunRW9T50VSfxII0Y2GfD56oz48H2uFCRfB2f5RC0KUvN-qjiOl6Dd2KU0SDMWY_QDJTp2JwV9NHzAeS8ktkRS0yI6sj6NNs1YSoz3xYqdNEPDd3yoHo4"
+                        src="/images/jose-bautista.png"
                         alt="David Miller"
                         fill
                         className="rounded-xl object-cover border border-slate-100 shadow-xs"
@@ -912,10 +694,10 @@ export default function Home() {
                   <span className="text-slate-700 font-body-base text-base font-semibold">Cancel Anytime</span>
                 </li>
               </ul>
-              <button className="bg-[#22c55e] text-white w-full py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 shadow-[0_12px_24px_-6px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
+              <Link href="/signup" className="bg-[#22c55e] text-white w-full py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 shadow-[0_12px_24px_-6px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
                 <span>Hire Talent Now</span>
                 <span className="material-symbols-outlined text-xl">arrow_forward</span>
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -976,63 +758,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white w-full py-20 border-t border-slate-100 relative overflow-hidden">
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)] opacity-30 pointer-events-none z-0" />
-
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 px-margin-desktop w-full relative z-10">
-          {/* Brand Column */}
-          <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
-            <a className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity" href="#">
-              <div className="relative w-12 h-12 shrink-0">
-                <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgbZNrJ_I1U7tfeSy8YkH35JJfvtqezZW9pQe2LjKUZfDo7UsctaBNHF_FFCs0pq77ubGBzwNaT7qCYhDJkDaD0qvzDbhIjdTKppteix5d80HcmtrJADVh0fquMQFXaQZpHonlYPP-F6yUCc4iuzRD_pywAJm9F_6FNa8h8zjyn7w8_yjZLBd3uctn5xNxDx4C3ICLHvCvjk9J4RIxkmvaLBCg7nRT-Wq0yhWnG-A6RytUFEnXqYlgmYNoh17B-78M7U5pQQVCNgs"
-                  alt="Replace Me Logo"
-                  fill
-                  className="object-contain"
-                  sizes="48px"
-                />
-              </div>
-              <span className="font-display-md text-2xl font-extrabold text-slate-800 leading-none relative top-[-4px]">Replace Me</span>
-            </a>
-            <p className="text-slate-400 font-body-base text-sm mt-2 max-w-sm">
-              Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
-            </p>
-          </div>
-
-          {/* Employer Links Column */}
-          <div className="col-span-1 flex flex-col gap-4 text-sm">
-            <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Employers</h4>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Post a Job</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Pricing</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Employer FAQs</a>
-          </div>
-
-          {/* Jobseeker Links Column */}
-          <div className="col-span-1 flex flex-col gap-4 text-sm">
-            <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Jobseekers</h4>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Browse Jobs</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Create Profile</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Worker FAQs</a>
-          </div>
-
-          {/* Legal & Support Column */}
-          <div className="col-span-1 flex flex-col gap-4 text-sm">
-            <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Legal &amp; Support</h4>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Privacy Policy</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Terms of Service</a>
-            <a className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="#">Contact Us</a>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="mt-16 pt-8 border-t border-slate-100 px-margin-desktop w-full flex items-center justify-between relative z-10">
-          <p className="text-slate-400 font-body-base text-sm">
-            © 2026 Replace Me. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Pricing - Replace Me</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;  /* Preferred icon size */
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'liga';
+        }
+    </style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary-fixed-dim": "#4ae176",
+                "primary-fixed": "#6bff8f",
+                "error": "#EF4444",
+                "on-primary-container": "#004b1e",
+                "on-error": "#ffffff",
+                "tertiary-fixed-dim": "#96d5a3",
+                "tertiary": "#2e6a41",
+                "on-tertiary-fixed": "#00210d",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "secondary-fixed-dim": "#95d3ba",
+                "on-secondary-fixed": "#002117",
+                "surface-container-highest": "#dae2fd",
+                "on-background": "#131b2e",
+                "surface-container-high": "#e2e7ff",
+                "on-primary-fixed": "#002109",
+                "surface-container-low": "#f2f3ff",
+                "secondary": "#2b6954",
+                "surface-tint": "#006e2f",
+                "inverse-on-surface": "#eef0ff",
+                "on-primary": "#ffffff",
+                "surface-dim": "#d2d9f4",
+                "surface-subdued": "#F8FAFC",
+                "surface-mint": "#F0FDF4",
+                "primary": "#006e2f",
+                "on-tertiary-container": "#074a25",
+                "on-secondary-fixed-variant": "#0b513d",
+                "on-surface": "#131b2e",
+                "ink-muted": "#64748B",
+                "background": "#faf8ff",
+                "tertiary-container": "#7cba8a",
+                "ink-secondary": "#334155",
+                "success": "#22C55E",
+                "outline-variant": "#bccbb9",
+                "info": "#3B82F6",
+                "error-container": "#ffdad6",
+                "border-subtle": "#E2E8F0",
+                "canvas": "#FFFFFF",
+                "surface": "#faf8ff",
+                "surface-bright": "#faf8ff",
+                "secondary-fixed": "#b0f0d6",
+                "inverse-primary": "#4ae176",
+                "on-primary-fixed-variant": "#005321",
+                "secondary-container": "#adedd3",
+                "on-error-container": "#93000a",
+                "tertiary-fixed": "#b1f2be",
+                "on-secondary": "#ffffff",
+                "on-surface-variant": "#3d4a3d",
+                "inverse-surface": "#283044",
+                "surface-container": "#eaedff",
+                "primary-container": "#22c55e",
+                "outline": "#6d7b6c",
+                "on-secondary-container": "#306d58",
+                "on-tertiary-fixed-variant": "#12512c",
+                "surface-variant": "#dae2fd"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-mobile": "16px",
+                "margin-desktop": "40px",
+                "gutter": "24px",
+                "base-unit": "4px",
+                "section-gap": "96px",
+                "container-max": "1280px"
+        },
+        "fontFamily": {
+                "label-mono": [
+                        "JetBrains Mono"
+                ],
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-xl": [
+                        "Plus Jakarta Sans"
+                ],
+                "caption": [
+                        "Inter"
+                ],
+                "body-bold": [
+                        "Inter"
+                ],
+                "body-base": [
+                        "Inter"
+                ],
+                "display-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-xl-mobile": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "label-mono": [
+                        "12px",
+                        {
+                                "lineHeight": "1.4",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "36px",
+                        {
+                                "lineHeight": "1.25",
+                                "letterSpacing": "-0.015em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "caption": [
+                        "14px",
+                        {
+                                "lineHeight": "1.5",
+                                "letterSpacing": "0",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-bold": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-base": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-xl-mobile": [
+                        "36px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+</head>
+<body class="bg-background text-on-background font-body-base antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface/90 dark:bg-inverse-surface/90 font-body-base text-body-base docked full-width top-0 sticky backdrop-blur-md border-b border-border-subtle dark:border-outline shadow-sm z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-20">
+<!-- Brand -->
+<a class="font-display-md text-display-md font-bold text-primary dark:text-primary-fixed flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+                Replace Me
+            </a>
+<!-- Navigation Links -->
+<div class="hidden md:flex items-center gap-8">
+<a class="text-ink-secondary dark:text-on-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Dashboard</a>
+<a class="text-ink-secondary dark:text-on-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Job Posts</a>
+<a class="text-ink-secondary dark:text-on-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Hired Workers</a>
+<a class="text-ink-secondary dark:text-on-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Messages</a>
+</div>
+<!-- Actions -->
+<div class="hidden md:flex items-center gap-4">
+<!-- Active Navigation Element Contextually Applied to 'Pricing' conceptually -->
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Pricing</a>
+<button class="bg-primary-container text-on-primary hover:scale-[1.02] transition-transform px-6 py-2 rounded-lg font-body-bold text-body-bold shadow-sm shadow-primary-container/20">
+                    Post a Job
+                </button>
+<img alt="Employer Profile" class="w-10 h-10 rounded-full border border-border-subtle object-cover" data-alt="A small circular avatar image representing a corporate employer profile in a tech-forward light-mode interface. The image features a subtle emerald green background with a modern, professional placeholder silhouette or abstract logo. The style is premium, clean, and integrates perfectly with a minimalist corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCicRtAKF_4oTuim9OT8WXTNizpDnzFlZCwCcR1RN4CBEi0-zXKk4MWZVK_HF8HnLsX7cfN1xOx-TKMN71kCHUGeQXqQ1hxIenzhHy-ulNOEpeH4zh0TW5RrqfKNOTo6W0cwWrjLHPSdy_No3SckevOfgKt084AzLH9BjE1Haa4pY33hwxbzcHU-ZibBeTmm5UWILjsOf91QnR3vgXoz-2TNZ-lmZ05XnDFooCpp43VsV5rbpyT5t8PG3I4OOeEaxAWCkrt7IlEELs">
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-ink-secondary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col justify-center items-center py-section-gap px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto">
+<!-- Header Section -->
+<div class="text-center max-w-3xl mx-auto mb-16">
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-on-surface mb-6">Scale Your Remote Team. Simple, Transparent Pricing.</h1>
+<p class="font-body-base text-body-base text-ink-secondary text-lg">From your first virtual assistant to an entire remote department, choose the plan that fits your hiring needs. Start free and upgrade when you're ready to hire.</p>
+</div>
+<!-- Pricing Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-24">
+<!-- Card 1: Discovery -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 flex flex-col hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-container/15 hover:border-primary-container transition-all duration-300 relative group">
+<div class="mb-8">
+<h2 class="font-display-md text-display-md text-on-surface mb-2">Discovery <span class="text-ink-muted text-lg font-normal">(Free Trial)</span></h2>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-on-surface">$0</span>
+<span class="font-body-base text-body-base text-ink-muted">/mo</span>
+</div>
+</div>
+<ul class="flex-grow flex flex-col gap-4 mb-8">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">1 Active Job Post</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Up to 15 Applicants</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">2-Day Approval</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Anonymized Applicant Previews</span>
+</li>
+</ul>
+<button class="w-full bg-surface-container-high text-ink-secondary hover:bg-border-subtle px-6 py-3 rounded-lg font-body-bold text-body-bold transition-colors">
+                    Post a Job for Free
+                </button>
+</div>
+<!-- Card 2: Essential (Most Popular) -->
+<div class="bg-canvas border-2 border-primary-container rounded-xl p-8 flex flex-col hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-container/15 transition-all duration-300 relative transform md:-translate-y-4">
+<!-- Badge -->
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-surface-mint text-primary-container font-label-mono text-label-mono uppercase tracking-wider px-4 py-1 rounded-full border border-primary-container flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    Most Popular
+                </div>
+<div class="mb-8 mt-2">
+<h2 class="font-display-md text-display-md text-on-surface mb-2">Essential</h2>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-on-surface">$49</span>
+<span class="font-body-base text-body-base text-ink-muted">/mo</span>
+</div>
+</div>
+<ul class="flex-grow flex flex-col gap-4 mb-8">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Up to 3 Job Posts</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Up to 200 Applicants</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Contact 75 Candidates/mo</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Full Identities &amp; Resumes</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Instant Approval</span>
+</li>
+</ul>
+<button class="w-full bg-primary-container text-on-primary hover:scale-[1.02] shadow-md shadow-primary-container/20 px-6 py-3 rounded-lg font-body-bold text-body-bold transition-transform">
+                    Start Hiring
+                </button>
+</div>
+<!-- Card 3: Professional -->
+<div class="bg-surface-subdued border border-border-subtle rounded-xl p-8 flex flex-col hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-container/15 hover:border-primary-container transition-all duration-300 relative">
+<div class="mb-8">
+<h2 class="font-display-md text-display-md text-on-surface mb-2">Professional</h2>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-on-surface">$99</span>
+<span class="font-body-base text-body-base text-ink-muted">/mo</span>
+</div>
+</div>
+<ul class="flex-grow flex flex-col gap-4 mb-8">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Unlimited Job Posts</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Unlimited Applicants</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Unlimited Messaging</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Full Identities &amp; Resumes</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary">Instant Approval</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base text-ink-secondary font-medium">Priority Support</span>
+</li>
+</ul>
+<button class="w-full border border-primary-container text-primary-container hover:bg-surface-mint px-6 py-3 rounded-lg font-body-bold text-body-bold transition-colors">
+                    Scale Your Team
+                </button>
+</div>
+</div>
+<!-- Compare Features Table -->
+<div class="w-full mt-12 mb-24 max-w-4xl mx-auto">
+<h2 class="text-display-md font-display-md font-bold text-center mb-12 text-on-surface">Compare Features</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-subtle">
+<th class="py-4 px-6 font-body-bold text-ink-secondary w-1/4">Feature</th>
+<th class="py-4 px-6 font-body-bold text-center text-on-surface w-1/4">Discovery</th>
+<th class="py-4 px-6 font-body-bold text-center text-success w-1/4">Essential</th>
+<th class="py-4 px-6 font-body-bold text-center text-primary-container w-1/4">Professional</th>
+</tr>
+</thead>
+<tbody class="text-body-base text-ink-secondary">
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">Job Posts</td>
+<td class="py-4 px-6 text-center">1</td>
+<td class="py-4 px-6 text-center">Up to 3</td>
+<td class="py-4 px-6 text-center">Unlimited</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">Applicants per Job</td>
+<td class="py-4 px-6 text-center">15</td>
+<td class="py-4 px-6 text-center">200</td>
+<td class="py-4 px-6 text-center">Unlimited</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">Approval Time</td>
+<td class="py-4 px-6 text-center">2-Day</td>
+<td class="py-4 px-6 text-center text-success">Instant</td>
+<td class="py-4 px-6 text-center text-success">Instant</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">Candidate Contact</td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-error">close</span></td>
+<td class="py-4 px-6 text-center">75/mo</td>
+<td class="py-4 px-6 text-center">Unlimited</td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">View Identities</td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-error">close</span></td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-success">check</span></td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-success">check</span></td>
+</tr>
+<tr class="border-b border-border-subtle">
+<td class="py-4 px-6">Priority Support</td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-error">close</span></td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-error">close</span></td>
+<td class="py-4 px-6 text-center"><span class="material-symbols-outlined text-success">check</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Testimonials -->
+<div class="w-full py-16 bg-surface-subdued rounded-2xl mb-24 px-8">
+<h2 class="text-display-md font-display-md font-bold text-center mb-12 text-on-surface">Trusted by Forward-Thinking Employers</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+<!-- Testimonial 1 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 flex flex-col">
+<span class="text-display-xl text-border-subtle font-display-xl leading-none mb-4">"</span>
+<p class="font-body-base text-ink-secondary mb-8 flex-grow">"We found our lead developer within two days of upgrading to Essential. The quality of applicants and the instant posting feature saved us weeks of recruiting time."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-dim rounded-full overflow-hidden">
+<img alt="Sarah J." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX09JKNYv3Vxu8b9ZzCmeNeDxdE0cixAXcEOGUBzeOmYa7iJkrip-r8LaukHnrQnqHccDUrjDp65yXtCwqbY0ksGVBgLjK9jnqeXQfBcq7Rp2KyxQmwrSxqTRTTdSCdQZn18cWzlSKQwTjr83rGkVr0U-erAFidGJiwmmAc6vehSjE6rxiC4QbWi9FNseaeV2WHtufeKy-TmXCjoZ1uGtF6nmHTNoYoRaN9TW2NpHy5kpw4D36X-vTUe0mkg2rZy1v_Ak0xV0W6hg">
+</div>
+<div>
+<div class="font-body-bold text-on-surface">Sarah J.</div>
+<div class="font-caption text-ink-muted">CTO, TechFlow</div>
+</div>
+</div>
+</div>
+<!-- Testimonial 2 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 flex flex-col">
+<span class="text-display-xl text-border-subtle font-display-xl leading-none mb-4">"</span>
+<p class="font-body-base text-ink-secondary mb-8 flex-grow">"The Discovery plan was perfect for dipping our toes in. Once we saw the talent pool, moving to Essential was the easiest decision we made all year."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-dim rounded-full overflow-hidden">
+<img alt="Michael R." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCikqmge58ULcblQKFtPbwIq0xtSqQF0D0xGAs2XIsSX0SOAsYbtZ2l0VnFvcr-DjQqisGoHb8atfJ_S4KIVaQr70JABdVVFkFexpp2ytqRPqqC8juY86eMIQMpfCKURJXIYGittzsVh9PyzIHI7BoyHS4DKQLY1jfqlNhDG3Gavt3v3mWQBz8rFkZRd_kJudNqEfn4Mji3btvBkKUms9gtEWFaHlLT_C2DLEJ2OnwhMDSMrzSgGPRf8Am_DZX3FYsnC7qLqksAt5E">
+</div>
+<div>
+<div class="font-body-bold text-on-surface">Michael R.</div>
+<div class="font-caption text-ink-muted">Founder, Elevate</div>
+</div>
+</div>
+</div>
+<!-- Testimonial 3 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 flex flex-col">
+<span class="text-display-xl text-border-subtle font-display-xl leading-none mb-4">"</span>
+<p class="font-body-base text-ink-secondary mb-8 flex-grow">"Upgrading to the Professional plan was a no-brainer. The unlimited job posts and priority support make scaling our entire remote department effortless."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-dim rounded-full overflow-hidden">
+<img alt="Elena V." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7DSFuAC-WMvlNVPN9Pe3GTnzYlvPX65Z5-YX1fa6xmleXRiqx59Gq81tsTBalbtdUUWEWM-x0pFSjOtBLa6YT9X_US-RAnrprjI9PDZuGHsmq9pF_EUi1fMjj3tvD30_D3iMMK8VC01ZtV8fnXLnr2KATWAVOy5OpYYZllPDYfZEGd_gQmeI_ifbanmp12ytzP2PiTOCS0V_Jvnpi7u0yi9Wz2xJa_iiK6Ut8eLXoHUvH1xLwmn1RhCOfJtYpAwvVtmzYGeaJ71k">
+</div>
+<div>
+<div class="font-body-bold text-on-surface">Elena V.</div>
+<div class="font-caption text-ink-muted">HR Director, Nexus</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Logo Bar -->
+
+<!-- FAQs -->
+<div class="w-full max-w-3xl mx-auto mb-24">
+<h2 class="text-display-md font-display-md font-bold text-center mb-12 text-on-surface">Got questions?</h2>
+<div class="flex flex-col gap-4">
+<!-- FAQ 1 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-6">
+<h3 class="font-body-bold text-on-surface mb-2">Can I change plans later?</h3>
+<p class="font-body-base text-ink-secondary">Yes! You can upgrade or downgrade your plan at any time from your account settings. Prorated charges or credits will automatically be applied to your account.</p>
+</div>
+<!-- FAQ 2 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-6">
+<h3 class="font-body-bold text-on-surface mb-2">What happens to my data if I downgrade?</h3>
+<p class="font-body-base text-ink-secondary">If you downgrade from Professional or Essential to Discovery, your existing job posts beyond the 1 active limit will be paused, but you will not lose your applicant history or messages.</p>
+</div>
+<!-- FAQ 3 -->
+<div class="bg-canvas border border-border-subtle rounded-xl p-6">
+<h3 class="font-body-bold text-on-surface mb-2">Are there any hidden fees per hire?</h3>
+<p class="font-body-base text-ink-secondary">No. We charge a flat monthly subscription fee for access to the platform based on your tier. You negotiate and pay salaries directly to your hires with zero platform markup.</p>
+</div>
+</div>
+<div class="text-center mt-8">
+<button class="border border-success text-success hover:bg-surface-mint px-6 py-2 rounded-lg font-body-bold transition-colors">View all FAQs</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-on-secondary-fixed border-t border-border-subtle dark:border-outline-variant mt-auto">
+<div class="w-full py-section-gap px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter font-caption text-caption text-ink-muted dark:text-on-surface-variant">
+<div class="flex flex-col items-center md:items-start gap-2">
+<a class="font-display-md text-display-md font-bold text-primary opacity-80 hover:opacity-100 transition-opacity" href="#">Replace Me</a>
+<p class="">© 2024 Replace Me. Premium Filipino Talent Solutions.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Help Center</a>
+<a class="hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+
+
+</body></html>

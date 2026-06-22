@@ -1,0 +1,322 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Account Settings - Replace Me</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "ink-secondary": "#334155",
+                        "secondary": "#2b6954",
+                        "tertiary-fixed-dim": "#96d5a3",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#bccbb9",
+                        "on-secondary-fixed": "#002117",
+                        "success": "#22C55E",
+                        "primary": "#006e2f",
+                        "inverse-surface": "#283044",
+                        "secondary-fixed-dim": "#95d3ba",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#005321",
+                        "on-surface": "#131b2e",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface-mint": "#F0FDF4",
+                        "background": "#faf8ff",
+                        "primary-container": "#22c55e",
+                        "on-background": "#131b2e",
+                        "primary-fixed": "#6bff8f",
+                        "on-tertiary-fixed-variant": "#12512c",
+                        "surface-variant": "#dae2fd",
+                        "outline": "#6d7b6c",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#4ae176",
+                        "tertiary-fixed": "#b1f2be",
+                        "tertiary-container": "#7cba8a",
+                        "on-secondary-fixed-variant": "#0b513d",
+                        "on-secondary-container": "#306d58",
+                        "info": "#3B82F6",
+                        "border-subtle": "#E2E8F0",
+                        "surface-tint": "#006e2f",
+                        "ink-muted": "#64748B",
+                        "on-tertiary-container": "#074a25",
+                        "error": "#EF4444",
+                        "surface-dim": "#d2d9f4",
+                        "inverse-primary": "#4ae176",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-bright": "#faf8ff",
+                        "on-primary-container": "#004b1e",
+                        "surface-container-low": "#f2f3ff",
+                        "tertiary": "#2e6a41",
+                        "secondary-fixed": "#b0f0d6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#00210d",
+                        "on-surface-variant": "#3d4a3d",
+                        "surface-subdued": "#F8FAFC",
+                        "surface-container": "#eaedff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e2e7ff",
+                        "error-container": "#ffdad6",
+                        "canvas": "#FFFFFF",
+                        "surface": "#faf8ff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#adedd3",
+                        "on-primary-fixed": "#002109"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "96px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px",
+                        "base-unit": "4px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-base": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "display-xl-mobile": ["Plus Jakarta Sans"],
+                        "display-md": ["Plus Jakarta Sans"],
+                        "display-xl": ["Plus Jakarta Sans"],
+                        "caption": ["Inter"],
+                        "body-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", { "lineHeight": "1.25", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+                        "body-base": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-xl-mobile": ["36px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-md": ["24px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-xl": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "caption": ["14px", { "lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400" }],
+                        "body-bold": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #22c55e;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #22c55e;
+        }
+        .toggle-checkbox:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+        
+        /* Glow Elevation Hover */
+        .glow-hover {
+            transition: all 0.3s ease;
+        }
+        .glow-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.15), 0 8px 10px -6px rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-base antialiased selection:bg-primary-container selection:text-white">
+<!-- TopNavBar -->
+<header class="bg-surface/90 dark:bg-on-surface/90 backdrop-blur-md text-primary font-body-base text-body-base fixed top-0 w-full z-50 border-b border-border-subtle dark:border-outline-variant shadow-sm flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-display-md text-display-md font-bold text-primary scale-102 active:scale-95 transition-transform hover:text-primary transition-colors duration-200" href="#">
+                Replace Me
+            </a>
+<nav class="hidden md:flex gap-8 items-center h-full pt-1">
+<a class="text-ink-secondary dark:text-surface-variant font-body-base hover:text-primary transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-ink-secondary dark:text-surface-variant font-body-base hover:text-primary transition-colors duration-200" href="#">Job Search</a>
+<a class="text-ink-secondary dark:text-surface-variant font-body-base hover:text-primary transition-colors duration-200" href="#">My Applications</a>
+<!-- Active Nav Item -->
+<a class="text-primary font-body-bold border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-200" href="#">Profile</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-ink-secondary hover:text-primary transition-colors duration-200 scale-102 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-ink-secondary hover:text-primary transition-colors duration-200 scale-102 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-dim overflow-hidden border border-border-subtle scale-102 active:scale-95 transition-transform cursor-pointer">
+<img alt="Worker profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a confident, modern remote worker with a friendly expression. Soft, even studio lighting with a neutral, bright background to emphasize clarity and approachability. The aesthetic is clean, premium, and trustworthy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnOjKdvxztnJLeNeAXDijL43WTouO1llNgZBuCxHlnxAuflUjyTm2_uQud6z9a6JT9F4B6Z7ISAk8EEcAB8zjufjSNlGw6wiewGCyn30Uu7QeXjZ8RLfdFC46mh4iPdSh2m0QPuQv2EqUTYJJsd8k94zSdhGquIcIaMxvkzCQp3aokVZrLJ3yDpbGl-bcgQa4_IuWDFTN4RSy4EKIMXzhytEgdk-NXC2WgyIifLOrpbx4Gy3kajQhDDvN5vCJHhwS4th0JznTKoeA">
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-32 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[800px] mx-auto w-full">
+<!-- Header -->
+<div class="mb-12">
+<h1 class="font-display-md text-display-md text-ink-secondary mb-2">Account Settings</h1>
+<p class="text-ink-muted text-body-base">Manage your profile visibility, security, and preferences.</p>
+</div>
+<div class="space-y-8">
+<!-- Profile Visibility Section -->
+<section class="bg-canvas border border-border-subtle rounded-xl p-8 glow-hover shadow-sm">
+<div class="flex items-center gap-3 mb-6 border-b border-border-subtle pb-4">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">visibility</span>
+<h2 class="font-body-bold text-body-bold text-ink-secondary">Profile Visibility</h2>
+</div>
+<div class="space-y-6">
+<div class="flex justify-between items-center">
+<div>
+<p class="font-body-bold text-ink-secondary text-body-base">Available for Hire</p>
+<p class="text-caption text-ink-muted mt-1">Let employers know you are actively looking for new opportunities.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300" id="toggle-hire" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-border-subtle cursor-pointer transition-colors duration-300" for="toggle-hire"></label>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<p class="font-body-bold text-ink-secondary text-body-base">Public Profile Visibility</p>
+<p class="text-caption text-ink-muted mt-1">Allow your profile to be indexed by search engines outside the platform.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300" id="toggle-public" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-border-subtle cursor-pointer transition-colors duration-300" for="toggle-public"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Account Details Section -->
+<section class="bg-canvas border border-border-subtle rounded-xl p-8 glow-hover shadow-sm">
+<div class="flex items-center gap-3 mb-6 border-b border-border-subtle pb-4">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">lock</span>
+<h2 class="font-body-bold text-body-bold text-ink-secondary">Account Details</h2>
+</div>
+<!-- Email Sub-section -->
+
+
+<!-- Password Sub-section -->
+<div>
+<h3 class="font-body-bold text-ink-secondary mb-4 text-sm">Password</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+<div>
+<label class="block text-sm text-ink-muted mb-2">Current Password</label>
+<div class="relative">
+<input class="w-full h-[52px] px-4 rounded-xl border border-border-subtle focus:ring-2 focus:ring-primary-container/20 focus:border-primary transition-all text-ink-secondary" type="password" value="••••••••">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-ink-muted cursor-pointer hover:text-ink-secondary">visibility</span>
+</div>
+</div>
+<div>
+<label class="block text-sm text-ink-muted mb-2">New Password</label>
+<div class="relative">
+<input class="w-full h-[52px] px-4 rounded-xl border border-border-subtle focus:ring-2 focus:ring-primary-container/20 focus:border-primary transition-all text-ink-secondary" placeholder="Enter new password" type="password">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-ink-muted cursor-pointer hover:text-ink-secondary">visibility_off</span>
+</div>
+</div>
+</div>
+<p class="text-sm text-ink-muted mb-6">Can't remember your password? <a class="text-info hover:underline" href="#">Reset password</a></p>
+<button class="bg-secondary text-white px-6 py-3 rounded-xl shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all font-body-bold text-sm">
+                        Change Password
+                    </button>
+</div>
+</section>
+<!-- Notification Preferences -->
+<section class="bg-canvas border border-border-subtle rounded-xl p-8 glow-hover shadow-sm">
+<div class="flex items-center gap-3 mb-6 border-b border-border-subtle pb-4">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<h2 class="font-body-bold text-body-bold text-ink-secondary">Notification Preferences</h2>
+</div>
+<div class="space-y-4">
+<label class="flex items-start gap-3 cursor-pointer group">
+<input checked="" class="mt-1 w-5 h-5 rounded border-border-subtle text-primary-container focus:ring-primary-container/20 transition-colors cursor-pointer" type="checkbox">
+<div>
+<p class="font-body-bold text-ink-secondary text-sm group-hover:text-primary transition-colors">Email Notifications for New Jobs</p>
+<p class="text-caption text-ink-muted">Receive a daily digest of job postings matching your skills.</p>
+</div>
+</label>
+<label class="flex items-start gap-3 cursor-pointer group">
+<input checked="" class="mt-1 w-5 h-5 rounded border-border-subtle text-primary-container focus:ring-primary-container/20 transition-colors cursor-pointer" type="checkbox">
+<div>
+<p class="font-body-bold text-ink-secondary text-sm group-hover:text-primary transition-colors">Messaging Alerts</p>
+<p class="text-caption text-ink-muted">Get immediately notified when an employer sends you a message.</p>
+</div>
+</label>
+<label class="flex items-start gap-3 cursor-pointer group">
+<input class="mt-1 w-5 h-5 rounded border-border-subtle text-primary-container focus:ring-primary-container/20 transition-colors cursor-pointer" type="checkbox">
+<div>
+<p class="font-body-bold text-ink-secondary text-sm group-hover:text-primary transition-colors">Newsletter</p>
+<p class="text-caption text-ink-muted">Weekly tips, platform updates, and remote work insights.</p>
+</div>
+</label>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="bg-error-container/20 border border-error/20 rounded-xl p-8 shadow-sm">
+<div class="flex items-center gap-3 mb-6 border-b border-error/10 pb-4">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="font-body-bold text-body-bold text-error">Danger Zone</h2>
+</div>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<p class="font-body-bold text-ink-secondary text-body-base">Deactivate Account</p>
+<p class="text-caption text-ink-muted mt-1 max-w-md">Once you delete your account, there is no going back. Please be certain. All data will be permanently removed.</p>
+</div>
+<button class="border border-error text-error hover:bg-error hover:text-white px-6 py-3 rounded-xl transition-all font-body-bold text-sm shrink-0 whitespace-nowrap">
+                        Deactivate Account
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-subdued dark:bg-inverse-surface text-secondary font-caption text-caption w-full py-section-gap border-t border-border-subtle flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-gutter">
+<div class="font-display-md text-display-md text-ink-secondary">
+            Replace Me
+        </div>
+<div class="text-ink-muted">
+            © 2024 Replace Me. Empowering Filipino talent globally.
+        </div>
+<div class="flex flex-wrap gap-6">
+<a class="text-ink-muted hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="text-ink-muted hover:text-primary underline transition-all" href="#">Terms of Service</a>
+<a class="text-ink-muted hover:text-primary underline transition-all" href="#">Security</a>
+<a class="text-ink-muted hover:text-primary underline transition-all" href="#">Help Center</a>
+</div>
+</footer>
+<script>
+        // Simple logic to toggle eye icon visibility state
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if(icon.textContent === 'visibility' || icon.textContent === 'visibility_off') {
+                icon.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    if(input && input.tagName === 'INPUT') {
+                        if(input.type === 'password') {
+                            input.type = 'text';
+                            this.textContent = 'visibility';
+                        } else {
+                            input.type = 'password';
+                            this.textContent = 'visibility_off';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+
+</body></html>

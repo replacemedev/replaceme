@@ -1,0 +1,403 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Saved Jobs - Replace Me Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed-variant": "#0b513d",
+                "on-primary-container": "#004b1e",
+                "on-tertiary-container": "#074a25",
+                "error-container": "#ffdad6",
+                "surface-variant": "#dae2fd",
+                "on-primary-fixed-variant": "#005321",
+                "secondary-fixed-dim": "#95d3ba",
+                "surface": "#faf8ff",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#faf8ff",
+                "secondary": "#2b6954",
+                "border-subtle": "#E2E8F0",
+                "background": "#faf8ff",
+                "primary-fixed": "#6bff8f",
+                "primary-container": "#22c55e",
+                "on-primary": "#ffffff",
+                "ink-muted": "#64748B",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed": "#002109",
+                "on-tertiary-fixed-variant": "#12512c",
+                "info": "#3B82F6",
+                "surface-container-highest": "#dae2fd",
+                "tertiary": "#2e6a41",
+                "surface-mint": "#F0FDF4",
+                "ink-secondary": "#334155",
+                "canvas": "#FFFFFF",
+                "outline-variant": "#bccbb9",
+                "on-surface": "#131b2e",
+                "inverse-primary": "#4ae176",
+                "on-tertiary-fixed": "#00210d",
+                "primary": "#006e2f",
+                "surface-dim": "#d2d9f4",
+                "secondary-fixed": "#b0f0d6",
+                "inverse-on-surface": "#eef0ff",
+                "on-secondary-fixed": "#002117",
+                "tertiary-fixed": "#b1f2be",
+                "error": "#EF4444",
+                "on-error-container": "#93000a",
+                "on-secondary-container": "#306d58",
+                "surface-container": "#eaedff",
+                "tertiary-fixed-dim": "#96d5a3",
+                "on-surface-variant": "#3d4a3d",
+                "surface-subdued": "#F8FAFC",
+                "on-background": "#131b2e",
+                "secondary-container": "#adedd3",
+                "on-error": "#ffffff",
+                "tertiary-container": "#7cba8a",
+                "surface-tint": "#006e2f",
+                "outline": "#6d7b6c",
+                "primary-fixed-dim": "#4ae176",
+                "inverse-surface": "#283044",
+                "surface-container-low": "#f2f3ff",
+                "success": "#22C55E",
+                "surface-container-high": "#e2e7ff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-max": "1280px",
+                "base-unit": "4px",
+                "margin-desktop": "40px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "section-gap": "96px"
+        },
+        "fontFamily": {
+                "display-md": [
+                        "Plus Jakarta Sans"
+                ],
+                "caption": [
+                        "Inter"
+                ],
+                "body-bold": [
+                        "Inter"
+                ],
+                "body-base": [
+                        "Inter"
+                ],
+                "display-xl": [
+                        "Plus Jakarta Sans"
+                ],
+                "display-lg": [
+                        "Plus Jakarta Sans"
+                ],
+                "label-mono": [
+                        "JetBrains Mono"
+                ],
+                "display-xl-mobile": [
+                        "Plus Jakarta Sans"
+                ]
+        },
+        "fontSize": {
+                "display-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "caption": [
+                        "14px",
+                        {
+                                "lineHeight": "1.5",
+                                "letterSpacing": "0",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-bold": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-base": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ],
+                "display-lg": [
+                        "36px",
+                        {
+                                "lineHeight": "1.25",
+                                "letterSpacing": "-0.015em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-mono": [
+                        "12px",
+                        {
+                                "lineHeight": "1.4",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-xl-mobile": [
+                        "36px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "800"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.15), 0 8px 10px -6px rgba(34, 197, 94, 0.1);
+            border-color: #22C55E;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #E2E8F0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #bccbb9; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-base">
+<!-- TopNavBar Shared Component -->
+<nav class="bg-white/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-border-subtle shadow-sm font-body-base text-body-base">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="flex items-center gap-2 cursor-pointer scale-105 active:scale-95 transition-transform">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined icon-fill text-xl">work</span>
+</div>
+<span class="font-display-md text-display-md font-bold text-on-surface">Replace Me</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<ul class="hidden md:flex items-center gap-8 h-full">
+<li class="h-full flex items-center">
+<a class="text-ink-muted hover:text-primary transition-colors hover:bg-surface-mint transition-all duration-200 px-3 py-2 rounded-md" href="#">Dashboard</a>
+</li>
+<li class="h-full flex items-center text-primary font-bold border-b-2 border-primary pb-1 pt-1">
+<a class="px-3 py-2" href="#">Job Search</a>
+</li>
+<li class="h-full flex items-center">
+<a class="text-ink-muted hover:text-primary transition-colors hover:bg-surface-mint transition-all duration-200 px-3 py-2 rounded-md" href="#">My Applications</a>
+</li>
+<li class="h-full flex items-center">
+<a class="text-ink-muted hover:text-primary transition-colors hover:bg-surface-mint transition-all duration-200 px-3 py-2 rounded-md" href="#">Profile</a>
+</li>
+</ul>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button aria-label="notifications" class="hidden md:flex items-center justify-center w-10 h-10 rounded-full text-ink-muted hover:text-primary hover:bg-surface-mint transition-all duration-200 scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="help" class="hidden md:flex items-center justify-center w-10 h-10 rounded-full text-ink-muted hover:text-primary hover:bg-surface-mint transition-all duration-200 scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-border-subtle cursor-pointer scale-105 active:scale-95 transition-transform">
+<img alt="Worker Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAki8UyJdQtl-o_ov3de2LpPaOrO1CNXMmMEtl2iWyNwuIhLagHFayBLx5PFXXQQqVBAi3wENZdU6eVprPEnmD2r-IKXv6Cz4dE88CkE9lQfDX1xmBafnWHxiumN8rbC8f6aumciXXBoaChU9fFrKRi4E03b05FusxAGPFfjXacqJnonhMkksc7OTtYWiq9tR2_n3ww9IGSb4fzh-Fj_72oTGP6fmrte7rZcRtvruleHPrTAkrLXcMH-CUuPkM9Hpp1I2tEwwP_XEQ">
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-[800px] mx-auto px-margin-mobile md:px-0 py-section-gap flex flex-col gap-12">
+<!-- Header -->
+<header class="text-left">
+<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-on-surface mb-3 tracking-tight">Saved Jobs</h1>
+<p class="font-body-base text-body-base text-ink-muted max-w-2xl">Review and manage positions you've bookmarked for later application.</p>
+</header>
+<!-- Search & Filter Controls -->
+<div class="flex flex-col md:flex-row gap-4">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted">search</span>
+<input class="w-full h-[52px] pl-12 pr-4 bg-white border border-border-subtle rounded-xl text-body-base font-body-base focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" placeholder="Search saved jobs..." type="text">
+</div>
+<div class="relative min-w-[200px]">
+<select class="w-full h-[52px] pl-4 pr-10 bg-white border border-border-subtle rounded-xl text-body-bold font-body-bold text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer shadow-sm">
+<option>Date Saved (Newest)</option>
+<option>Date Saved (Oldest)</option>
+<option>Salary (Highest)</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Job List -->
+<div class="flex flex-col gap-5">
+<!-- Card 1 -->
+<article class="bg-white border border-border-subtle rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
+<div class="flex items-start md:items-center gap-6 flex-grow">
+<div class="w-16 h-16 rounded-xl border border-border-subtle bg-surface-subdued flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img alt="TechNova modern corporate office building exterior with glass facade and bright daylight reflecting modern corporate aesthetic." class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A modern glass corporate building exterior, high quality, tech forward, reflecting bright daylight, high contrast, clean architecture, representing a premium tech company office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv8WIyAeYu7iP2xUrbbIEXuofLZ94CPd020pS6GqAw94INIEMwx7HukT2lZlNbXRSH8ViY9cphncR0k29BKSktw1yGKhpC5-g-mqYcr5Z-MIv8_56I-lOkiMTi-NERiUn2RWKt4FLDgVhR1XldGr1du3RU76OvVi4DshrUnMS1orSRewCKIAnPUVZKdm3lLX9EfX68A7rModya5sBJ4fuLH0duyWiXqNer0GopzyPENAAy1uOZw7mJQ3p9Zj2u3p-MZn1RuWO52dw">
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-display-md text-display-md text-on-surface mb-1 group-hover:text-primary transition-colors">Senior Frontend Engineer</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> TechNova
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Remote, US
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-primary px-3 py-1 rounded-md font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $130k - $160k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-md font-label-mono text-label-mono">Full-time</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-4 mt-4 md:mt-0 pl-0 md:pl-6 md:border-l border-border-subtle w-full md:w-auto">
+
+<div class="flex items-center gap-3 w-full md:w-auto justify-end">
+<button aria-label="Remove saved job" class="p-2 text-primary hover:text-primary-container hover:bg-surface-mint rounded-full transition-colors relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 bg-success text-white px-6 py-2.5 rounded-xl font-body-bold text-body-bold hover:bg-primary-container shadow-sm hover:shadow-md hover:-translate-y-[1px] transition-all duration-200">
+                                Apply Now
+                            </button>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-white border border-border-subtle rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
+<div class="flex items-start md:items-center gap-6 flex-grow">
+<div class="w-16 h-16 rounded-xl border border-border-subtle bg-surface-subdued flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img alt="Minimalist interior of a creative agency office, concrete floors, white walls, and soft natural lighting." class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="A clean, minimalist creative agency interior featuring exposed concrete floors, pristine white walls, and soft natural lighting filtering through large windows, evoking a modern, airy workspace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbq29qtmA4jF-wn2fwqIBYQrEvGM2Fs15mn4qZvXU3XGV5Q99dQRGOYti7NUj30wgPcIqwnXO4T3ejHxgymET96jX0G6NOoocEmVE1GmXhk6BF5o923GmBciv_43FQ7XtFVCAOwGHsUW_vGkZgCrncFr6P_5BxCk9TU2_2f9Vj_4kthutq-nsIF_X5PlVe8kMrLjAEY3U6kO_7CzgsUXXsdUMaek-IgzjVtRPgWU6w1ILAy8mN2oXZ1rt15ikU8ijQB7teEBFAuqI">
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-display-md text-display-md text-on-surface mb-1 group-hover:text-primary transition-colors">UX/UI Designer</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> Creative Pulse
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> New York, NY (Hybrid)
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-primary px-3 py-1 rounded-md font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $90k - $120k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-md font-label-mono text-label-mono">Full-time</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-4 mt-4 md:mt-0 pl-0 md:pl-6 md:border-l border-border-subtle w-full md:w-auto">
+
+<div class="flex items-center gap-3 w-full md:w-auto justify-end">
+<button aria-label="Remove saved job" class="p-2 text-primary hover:text-primary-container hover:bg-surface-mint rounded-full transition-colors relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 bg-success text-white px-6 py-2.5 rounded-xl font-body-bold text-body-bold hover:bg-primary-container shadow-sm hover:shadow-md hover:-translate-y-[1px] transition-all duration-200">
+                                Apply Now
+                            </button>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-white border border-border-subtle rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
+<div class="flex items-start md:items-center gap-6 flex-grow">
+<div class="w-16 h-16 rounded-xl border border-border-subtle bg-surface-mint flex-shrink-0 flex items-center justify-center overflow-hidden text-primary">
+<span class="font-display-lg text-display-lg font-bold">D</span>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-display-md text-display-md text-on-surface mb-1 group-hover:text-primary transition-colors">Data Scientist</h2>
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">apartment</span> DataFlow Systems
+                                </span>
+<span class="text-border-subtle hidden md:inline">•</span>
+<span class="font-body-base text-body-base text-ink-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Seattle, WA
+                                </span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-mint text-primary px-3 py-1 rounded-md font-label-mono text-label-mono flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">payments</span> $140k - $180k
+                                </span>
+<span class="bg-surface-subdued text-ink-secondary px-3 py-1 rounded-md font-label-mono text-label-mono">Contract</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-4 mt-4 md:mt-0 pl-0 md:pl-6 md:border-l border-border-subtle w-full md:w-auto">
+
+<div class="flex items-center gap-3 w-full md:w-auto justify-end">
+<button aria-label="Remove saved job" class="p-2 text-primary hover:text-primary-container hover:bg-surface-mint rounded-full transition-colors relative">
+<span class="material-symbols-outlined icon-fill">bookmark</span>
+</button>
+<button class="flex-grow md:flex-grow-0 bg-white border border-success text-success px-6 py-2.5 rounded-xl font-body-bold text-body-bold hover:bg-surface-mint transition-all duration-200 shadow-sm">
+                                View Details
+                            </button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Footer Shared Component -->
+<footer class="bg-white mt-auto font-caption text-caption text-ink-secondary border-t border-border-subtle w-full py-section-gap">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto gap-8">
+<div class="flex items-center gap-2 cursor-pointer opacity-80 hover:opacity-100 transition-opacity">
+<div class="w-6 h-6 rounded-md bg-ink-muted flex items-center justify-center text-white">
+<span class="material-symbols-outlined icon-fill text-sm">work</span>
+</div>
+<span class="font-display-md text-xl font-bold text-ink-secondary">Replace Me</span>
+</div>
+<div class="text-ink-muted">
+                © 2024 Replace Me Portals. All rights reserved.
+            </div>
+<ul class="flex flex-wrap justify-center md:justify-end gap-8">
+<li class=""><a class="text-ink-muted hover:text-primary hover:underline transition-all" href="#">Support Center</a></li>
+<li class=""><a class="text-ink-muted hover:text-primary hover:underline transition-all" href="#">Legal Policy</a></li>
+<li class=""><a class="text-ink-muted hover:text-primary hover:underline transition-all" href="#">Privacy</a></li>
+<li class=""><a class="text-ink-muted hover:text-primary hover:underline transition-all" href="#">Terms of Service</a></li>
+</ul>
+</div>
+</footer>
+
+
+</body></html>

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Worker Verification - Replace Me</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#22c55e",
+                      "surface-subdued": "#F8FAFC",
+                      "surface-dim": "#d2d9f4",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#002109",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#6bff8f",
+                      "on-tertiary-fixed-variant": "#12512c",
+                      "surface-variant": "#dae2fd",
+                      "on-primary-fixed-variant": "#005321",
+                      "error": "#EF4444",
+                      "secondary": "#2b6954",
+                      "outline-variant": "#bccbb9",
+                      "background": "#faf8ff",
+                      "on-background": "#131b2e",
+                      "canvas": "#FFFFFF",
+                      "outline": "#6d7b6c",
+                      "on-tertiary-fixed": "#00210d",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#131b2e",
+                      "on-error-container": "#93000a",
+                      "primary-fixed-dim": "#4ae176",
+                      "success": "#22C55E",
+                      "inverse-on-surface": "#eef0ff",
+                      "inverse-primary": "#4ae176",
+                      "info": "#3B82F6",
+                      "surface-container": "#eaedff",
+                      "border-subtle": "#E2E8F0",
+                      "tertiary-fixed-dim": "#96d5a3",
+                      "tertiary": "#2e6a41",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-container": "#004b1e",
+                      "primary": "#006e2f",
+                      "ink-secondary": "#334155",
+                      "on-secondary-container": "#306d58",
+                      "tertiary-fixed": "#b1f2be",
+                      "secondary-container": "#adedd3",
+                      "surface-tint": "#006e2f",
+                      "surface-container-low": "#f2f3ff",
+                      "surface-bright": "#faf8ff",
+                      "secondary-fixed-dim": "#95d3ba",
+                      "on-secondary-fixed": "#002117",
+                      "surface": "#faf8ff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#b0f0d6",
+                      "on-surface-variant": "#3d4a3d",
+                      "inverse-surface": "#283044",
+                      "surface-container-highest": "#dae2fd",
+                      "tertiary-container": "#7cba8a",
+                      "on-tertiary-container": "#074a25",
+                      "on-secondary-fixed-variant": "#0b513d",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#e2e7ff",
+                      "ink-muted": "#64748B",
+                      "surface-mint": "#F0FDF4"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base-unit": "4px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "section-gap": "96px",
+                      "margin-desktop": "40px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "display-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-bold": [
+                              "Inter"
+                      ],
+                      "label-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "caption": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-xl-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-xl": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-base": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-bold": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "caption": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.25",
+                                      "letterSpacing": "-0.015em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-xl-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-base": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .glass-nav {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+        }
+        .glow-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.15), 0 8px 10px -6px rgba(34, 197, 94, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-base min-h-screen flex flex-col">
+<!-- Top Navigation (Standard Worker Portal) -->
+<header class="fixed top-0 w-full z-50 glass-nav border-b border-border-subtle shadow-sm flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<div class="font-display-md text-display-md text-primary tracking-tight">Replace Me</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-ink-muted hover:text-primary transition-colors duration-200 scale-102 active:scale-98 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container relative">
+<img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO4CbzFSZaFoK2MHP2OO1MZ_LMfsj_M8IPupLUAY-XO841zHadnfkZMuJbnPQ-VFJA-JgQTZsPI3Z5lwe8W_2BMuciiiVam2QTcVOSQ9trh-PZLKGMXVrwtHqV5E4JyqMLjVj6pc7BCm5X0Q8diAjg-o9ywId6QkriaUV48vNjAjFmRKQ1uI1uIixjC86T18cVFs_2bUJDFCr142ZCG9FbuWXdy4gJfqRvO4LEsoYnhsaKWAq0Hv0XR_TRNPjypibI_eFX0oIv4MI"/>
+<div class="absolute bottom-0 right-0 w-2 h-2 bg-success rounded-full border border-canvas"></div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<div class="max-w-3xl mx-auto w-full">
+<!-- Header Section -->
+<div class="text-center mb-12">
+<h1 class="font-display-xl text-display-xl text-on-surface mb-4">Worker Verification</h1>
+<p class="text-ink-muted font-body-base max-w-xl mx-auto">Complete your identity verification to unlock premium features and build trust with clients.</p>
+</div>
+<!-- Stepper -->
+<div class="mb-12">
+<div class="flex items-center justify-between relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-border-subtle z-0 rounded-full"></div>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-1 bg-success z-0 rounded-full"></div>
+<!-- Step 1: Complete -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-success text-on-primary flex items-center justify-center mb-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<span class="font-label-mono text-label-mono text-success uppercase">Personal Info</span>
+</div>
+<!-- Step 2: Active -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-mint border-2 border-success text-success flex items-center justify-center mb-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface uppercase font-bold">Identity Verification</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-canvas border border-border-subtle text-ink-muted flex items-center justify-center mb-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<span class="font-label-mono text-label-mono text-ink-muted uppercase">Professional Review</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Main Form Area -->
+<div class="md:col-span-8 space-y-8">
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 glow-hover transition-all duration-300">
+<h2 class="font-display-md text-display-md mb-2">1. Upload Government ID</h2>
+<p class="text-ink-muted text-caption font-caption mb-6">Please upload a clear, unexpired government-issued ID (e.g., Passport, UMID, Driver's License).</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- Front ID Upload -->
+<div class="border-2 border-dashed border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-success hover:bg-surface-mint transition-colors group">
+<span class="material-symbols-outlined text-ink-muted group-hover:text-success text-4xl mb-3">upload_file</span>
+<span class="font-body-bold text-body-bold text-on-surface group-hover:text-success mb-1">Front of ID</span>
+<span class="font-caption text-caption text-ink-muted">Drag &amp; drop or click to upload</span>
+</div>
+<!-- Back ID Upload -->
+<div class="border-2 border-dashed border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-success hover:bg-surface-mint transition-colors group">
+<span class="material-symbols-outlined text-ink-muted group-hover:text-success text-4xl mb-3">upload_file</span>
+<span class="font-body-bold text-body-bold text-on-surface group-hover:text-success mb-1">Back of ID</span>
+<span class="font-caption text-caption text-ink-muted">Drag &amp; drop or click to upload</span>
+</div>
+</div>
+</div>
+<div class="bg-canvas border border-border-subtle rounded-xl p-8 glow-hover transition-all duration-300">
+<h2 class="font-display-md text-display-md mb-2">2. Selfie with ID</h2>
+<p class="text-ink-muted text-caption font-caption mb-6">To ensure authenticity, please provide a clear photo of yourself holding the ID you uploaded above.</p>
+<div class="border-2 border-dashed border-border-subtle rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-success hover:bg-surface-mint transition-colors group">
+<span class="material-symbols-outlined text-ink-muted group-hover:text-success text-5xl mb-4">photo_camera</span>
+<span class="font-body-bold text-body-bold text-on-surface group-hover:text-success mb-2">Take or Upload a Selfie</span>
+<span class="font-caption text-caption text-ink-muted">Make sure your face and the ID details are clearly visible.</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 justify-end pt-4">
+<button class="px-6 py-3 rounded-xl border border-success text-success font-body-bold text-body-bold hover:bg-surface-mint transition-colors text-center">
+                            Save &amp; Finish Later
+                        </button>
+<button class="px-6 py-3 rounded-xl bg-success text-on-primary font-body-bold text-body-bold hover:scale-102 active:scale-98 transition-transform shadow-[0_4px_14px_0_rgba(34,197,94,0.39)] text-center">
+                            Submit for Verification
+                        </button>
+</div>
+</div>
+<!-- Sidebar / Contextual Info -->
+<div class="md:col-span-4 space-y-6">
+<div class="bg-surface-subdued rounded-xl p-6 border border-border-subtle">
+<h3 class="font-body-bold text-body-bold text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-success" style="font-variation-settings: 'FILL' 1;">star</span>
+                            Verification Benefits
+                        </h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<div class="mt-0.5 w-5 h-5 rounded-full bg-surface-mint flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-success font-bold">check</span>
+</div>
+<div>
+<span class="font-body-bold text-body-bold text-on-surface block text-sm">Verified Badge</span>
+<span class="font-caption text-caption text-ink-muted">Display a badge on your profile building trust.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-0.5 w-5 h-5 rounded-full bg-surface-mint flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-success font-bold">check</span>
+</div>
+<div>
+<span class="font-body-bold text-body-bold text-on-surface block text-sm">Higher Search Ranking</span>
+<span class="font-caption text-caption text-ink-muted">Appear higher in client search results.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-0.5 w-5 h-5 rounded-full bg-surface-mint flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-success font-bold">check</span>
+</div>
+<div>
+<span class="font-body-bold text-body-bold text-on-surface block text-sm">Access to Premium Jobs</span>
+<span class="font-caption text-caption text-ink-muted">Unlock jobs restricted to verified talent.</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="bg-surface-mint rounded-xl p-6 border border-[#bbf7d0]">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-success">lock</span>
+<div>
+<span class="font-body-bold text-body-bold text-on-surface block text-sm mb-1">Secure &amp; Private</span>
+<span class="font-caption text-caption text-ink-muted">Your documents are encrypted and only used for verification purposes. They are never shared publicly.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-section-gap border-t border-border-subtle bg-surface-subdued">
+<div class="flex flex-col md:flex-row justify-between items-center py-8 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="font-display-md text-display-md text-primary mb-4 md:mb-0">Replace Me</div>
+<div class="flex flex-wrap gap-6 justify-center">
+<a class="font-caption text-caption text-ink-muted hover:text-primary underline transition-opacity hover:opacity-80" href="#">About</a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary underline transition-opacity hover:opacity-80" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary underline transition-opacity hover:opacity-80" href="#">Terms of Service</a>
+<a class="font-caption text-caption text-ink-muted hover:text-primary underline transition-opacity hover:opacity-80" href="#">Contact</a>
+</div>
+<div class="font-caption text-caption text-ink-muted mt-4 md:mt-0">© 2024 Replace Me. Modern Filipino Talent Solutions.</div>
+</div>
+</footer>
+</body></html>
