@@ -3,6 +3,7 @@ import { Header } from "@/components/dashboard/EmployerHeader";
 import { Footer } from "@/components/layout/Footer";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadMessageCount } from "@/actions/employer/messages";
+export const dynamic = "force-dynamic";
 
 export default async function EmployerLayout({
   children,
