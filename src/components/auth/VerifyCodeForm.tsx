@@ -1,0 +1,164 @@
+"use client"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
+import { Lock, Key } from "lucide-react"
+import { verifyOTPAndResetPassword, sendResetPasswordOTP } from "@/actions/auth"
+import { toast } from "sonner"
+
+const verifyCodeSchema = z.object({
+  code: z.string().min(6, "Code must be exactly 6 digits").max(6, "Code must be exactly 6 digits"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(8, "Confirm password is required"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
+
+type VerifyCodeFormValues = z.infer<typeof verifyCodeSchema>
+
+export function VerifyCodeForm({
+  email,
+  onSuccess,
+  onBack,
+}: {
+  email: string
+  onSuccess: () => void
+  onBack: () => void
+}) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<VerifyCodeFormValues>({
+    resolver: zodResolver(verifyCodeSchema),
+    defaultValues: {
+      code: "",
+      password: "",
+      confirmPassword: "",
+    },
+  })
+
+  const onSubmit = async (data: VerifyCodeFormValues) => {
+    setIsLoading(true)
+    setErrorMsg(null)
+
+    try {
+      const result = await verifyOTPAndResetPassword(email, data.code, data.password)
+      if (result.error) {
+        setErrorMsg(result.error)
+        toast.error(result.error)
+      } else {
+        toast.success(result.message)
+        onSuccess()
+      }
+    } catch (err) {
+      setErrorMsg("An unexpected error occurred. Please try again.")
+      toast.error("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    setIsResending(true)
+    try {
+      const result = await sendResetPasswordOTP(email)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.success("A new verification code has been sent.")
+      }
+    } catch (err) {
+      toast.error("Failed to resend code. Please try again.")
+    } finally {
+      setIsResending(false)
+    }
+  }
+
+  return (
+    <div className="w-full">
+      {errorMsg && (
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
+          {errorMsg}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+            Verification Code
+          </label>
+          <Input
+            {...register("code")}
+            type="text"
+            placeholder="Enter 6-digit OTP"
+            icon={<Key size={18} />}
+            error={errors.code?.message}
+            maxLength={6}
+          />
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-xs text-slate-400">Sent to {email}</span>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isResending || isLoading}
+              className="text-xs font-body-bold font-bold text-[#006e2f] hover:text-[#005321] hover:underline disabled:opacity-50"
+            >
+              {isResending ? "Resending..." : "Resend Code"}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+            New Password
+          </label>
+          <PasswordInput
+            {...register("password")}
+            placeholder="Min. 8 characters"
+            icon={<Lock size={18} />}
+            error={errors.password?.message}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
+            Confirm New Password
+          </label>
+          <PasswordInput
+            {...register("confirmPassword")}
+            placeholder="Confirm new password"
+            icon={<Lock size={18} />}
+            error={errors.confirmPassword?.message}
+          />
+        </div>
+
+        <div className="pt-2 space-y-3">
+          <Button type="submit" disabled={isLoading} className="w-full text-base h-12">
+            {isLoading ? "Resetting Password..." : "Reset Password"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onBack}
+            disabled={isLoading}
+            className="w-full text-base h-12 text-slate-600 hover:text-slate-900"
+          >
+            Back
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}

@@ -196,3 +196,72 @@ export async function logOut() {
   revalidatePath("/", "layout");
   redirect("/login");
 }
+
+export async function sendResetPasswordOTP(email: string) {
+  try {
+    safeLog(`[Auth] Send reset password OTP requested for: ${email}`);
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      safeError(`[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`);
+      if (error.status === 429) {
+        return { error: "Too many requests. Please wait a few minutes before trying again." };
+      }
+      return {
+        success: true,
+        message: "If an account matches that email, a verification code has been sent."
+      };
+    }
+
+    return {
+      success: true,
+      message: "If an account matches that email, a verification code has been sent."
+    };
+  } catch (error) {
+    safeError("[Auth] sendResetPasswordOTP unexpected error:", error);
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+
+export async function verifyOTPAndResetPassword(email: string, code: string, newPassword: string) {
+  try {
+    safeLog(`[Auth] Verifying reset OTP for: ${email}`);
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: "recovery",
+    });
+
+    if (error) {
+      safeError(`[Auth] verifyOtp error: ${error.message}`);
+      return { error: "Invalid or expired verification code." };
+    }
+
+    if (!data.user) {
+      return { error: "Verification failed. User session could not be established." };
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      safeError(`[Auth] updateUser password error: ${updateError.message}`);
+      return { error: "Failed to reset password. Please try again." };
+    }
+
+    safeLog("[Auth] Password reset successful");
+    return {
+      success: true,
+      message: "Password reset successful! You have been signed in."
+    };
+  } catch (error) {
+    safeError("[Auth] verifyOTPAndResetPassword unexpected error:", error);
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+

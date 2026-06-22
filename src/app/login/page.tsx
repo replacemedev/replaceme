@@ -1,9 +1,17 @@
+"use client"
+
+import { useState } from "react"
 import { AuthLayout } from "@/components/auth/AuthLayout"
 import { LoginForm } from "@/components/auth/LoginForm"
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm"
+import { VerifyCodeForm } from "@/components/auth/VerifyCodeForm"
 import Image from "next/image"
 import Link from "next/link"
 
 export default function LoginPage() {
+  const [view, setView] = useState<'login' | 'forgot_password' | 'verify_code'>('login')
+  const [resetEmail, setResetEmail] = useState('')
+
   const testimonialPanel = (
     <div className="w-full h-full flex flex-col relative px-8 py-12 md:px-16 lg:px-24 justify-between">
       {/* Background Image & Overlay matching Stitch Design */}
@@ -50,8 +58,8 @@ export default function LoginPage() {
       sidePanel={testimonialPanel}
       sidePanelPosition="right"
     >
-      <div className="mb-8">
-        <Link href="/" className="inline-flex items-center gap-2 mb-6 hover:opacity-90 transition-opacity">
+      <div className="mb-6">
+        <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-90 transition-opacity">
            <div className="relative w-8 h-8">
              <Image
                src="/images/logo_favicon.png"
@@ -64,22 +72,64 @@ export default function LoginPage() {
            <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
         </Link>
         
-        <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Welcome back</h1>
-        <p className="text-body-base text-slate-600">
-          Sign in to access your professional dashboard and manage your network.
-        </p>
+        {view === 'login' && (
+          <>
+            <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Welcome back</h1>
+            <p className="text-body-base text-slate-600">
+              Sign in to access your professional dashboard and manage your network.
+            </p>
+          </>
+        )}
+
+        {view === 'forgot_password' && (
+          <>
+            <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Reset password</h1>
+            <p className="text-body-base text-slate-600">
+              Enter your email and we'll send you a 6-digit verification code.
+            </p>
+          </>
+        )}
+
+        {view === 'verify_code' && (
+          <>
+            <h1 className="text-display-lg font-display-lg font-bold text-slate-900 mb-2">Verify security code</h1>
+            <p className="text-body-base text-slate-600">
+              Enter the code sent to your email to reset your password.
+            </p>
+          </>
+        )}
       </div>
 
-      <LoginForm />
-
-      <div className="mt-8 text-center">
-        <p className="text-sm font-body-base text-slate-600">
-          Don't have an account?{" "}
-          <Link href="/signup" className="font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors">
-            Sign up
-          </Link>
-        </p>
+      <div className="w-full bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+        {view === 'login' && <LoginForm onForgotPassword={() => setView('forgot_password')} />}
+        {view === 'forgot_password' && (
+          <ForgotPasswordForm
+            onSuccess={(email) => {
+              setResetEmail(email)
+              setView('verify_code')
+            }}
+            onBack={() => setView('login')}
+          />
+        )}
+        {view === 'verify_code' && (
+          <VerifyCodeForm
+            email={resetEmail}
+            onSuccess={() => setView('login')}
+            onBack={() => setView('forgot_password')}
+          />
+        )}
       </div>
+
+      {view === 'login' && (
+        <div className="mt-4 text-center">
+          <p className="text-sm font-body-base text-slate-600">
+            Don't have an account?{" "}
+            <Link href="/signup" className="font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      )}
     </AuthLayout>
   )
 }

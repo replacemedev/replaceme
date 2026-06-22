@@ -32,8 +32,8 @@ export default function SignUpPage() {
       sidePanel={imagePanel}
       sidePanelPosition="left"
     >
-      <div className="mb-8 flex flex-col items-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-90 transition-opacity">
+      <div className="mb-4 flex flex-col items-center">
+        <Link href="/" className="inline-flex items-center gap-2 mb-2 hover:opacity-90 transition-opacity">
           <div className="relative w-8 h-8">
             <Image
               src="/images/logo_favicon.png"
@@ -45,7 +45,7 @@ export default function SignUpPage() {
           </div>
           <span className="font-display-md font-bold text-xl text-slate-900 leading-none relative top-[-1px]">Replace Me</span>
         </Link>
-        <p className="text-body-base text-slate-500 mb-4 text-center">
+        <p className="text-body-base text-slate-500 mb-0 text-center">
           Join the premier professional marketplace.
         </p>
       </div>

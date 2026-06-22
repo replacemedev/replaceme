@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -15,7 +15,7 @@ import { loginSchema, type LoginFormValues } from "@/lib/validations/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-export function LoginForm() {
+export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
@@ -28,14 +28,22 @@ export function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      role: "employer",
+      role: "worker",
       email: "",
       password: "",
       rememberMe: false,
     },
   })
 
-  const selectedRole = watch("role") || "employer"
+  const selectedRole = watch("role") || "worker"
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("remember_email")
+    if (savedEmail) {
+      setValue("email", savedEmail)
+      setValue("rememberMe", true)
+    }
+  }, [setValue])
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true)
@@ -48,6 +56,11 @@ export function LoginForm() {
         setAuthError(errMsg)
         toast.error(errMsg)
       } else if (result?.success) {
+        if (data.rememberMe) {
+          localStorage.setItem("remember_email", data.email)
+        } else {
+          localStorage.removeItem("remember_email")
+        }
         toast.success(result.message)
         router.push(result.redirectUrl)
         router.refresh()
@@ -61,7 +74,7 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+    <div className="w-full">
       <RoleSelector
         options={[
           { label: "Employer", value: "employer" },
@@ -109,12 +122,13 @@ export function LoginForm() {
               Remember me
             </span>
           </label>
-          <a
-            href="/forgot-password"
+          <button
+            type="button"
+            onClick={onForgotPassword}
             className="text-sm font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors"
           >
             Forgot password?
-          </a>
+          </button>
         </div>
 
         <div className="pt-4">
@@ -126,3 +140,4 @@ export function LoginForm() {
     </div>
   )
 }
+
