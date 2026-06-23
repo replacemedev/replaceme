@@ -3,19 +3,17 @@
 import React from "react";
 import Image from "next/image";
 import { MessageSquare, Trash2, Eye } from "lucide-react";
-import { Applicant, ApplicantStatus } from "@/types/employer/applicants";
-import { StatusDropdown } from "./StatusDropdown";
+import { Applicant } from "@/types/employer/applicants";
+import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
 
 interface ApplicantCardProps {
   applicant: Applicant;
-  onStatusChange: (status: ApplicantStatus) => Promise<void>;
   onMessageClick?: () => void;
   onDeleteClick?: () => void;
 }
 
 export function ApplicantCard({
   applicant,
-  onStatusChange,
   onMessageClick,
   onDeleteClick,
 }: ApplicantCardProps) {
@@ -33,7 +31,7 @@ export function ApplicantCard({
     : "bg-slate-100 text-slate-500";
   const matchText = isHighMatch ? `${applicant.matchScore}% MATCH` : "LOW MATCH";
 
-  const isRejected = applicant.status === "Rejected";
+  const isRejected = applicant.status === "REJECTED";
 
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col justify-between shadow-sm min-h-[220px] transition-all hover:shadow-md hover:border-slate-200/50">
@@ -73,7 +71,10 @@ export function ApplicantCard({
             <span className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase ${matchPillStyle}`}>
               {matchText}
             </span>
-            <StatusDropdown status={applicant.status} onStatusChange={onStatusChange} />
+            <ApplicationStatusDropdown
+              applicationId={applicant.id}
+              status={applicant.status}
+            />
           </div>
         </div>
 

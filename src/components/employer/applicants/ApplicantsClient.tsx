@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Unlock } from "lucide-react";
-import { Applicant, ApplicantStatus } from "@/types/employer/applicants";
+import { Applicant } from "@/types/employer/applicants";
 import { ApplicantsToolbar } from "./ApplicantsToolbar";
 import { ApplicantCard } from "./ApplicantCard";
 import { LockedApplicantCard } from "./LockedApplicantCard";
-import { updateApplicantStatus, unlockCandidate, getApplicants } from "@/actions/employer/applicants";
+import { unlockCandidate, getApplicants } from "@/actions/employer/applicants";
 import { toast } from "sonner";
 
 interface ApplicantsClientProps {
@@ -41,24 +41,7 @@ export function ApplicantsClient({
     setCreditsBalance(initialCreditsBalance);
   }, [initialCreditsBalance]);
 
-  // Handle status update Server Action
-  const handleStatusChange = async (appId: string, newStatus: ApplicantStatus) => {
-    const originalApplicants = [...applicants];
-    
-    setApplicants((prev) =>
-      prev.map((app) => (app.id === appId ? { ...app, status: newStatus } : app))
-    );
-
-    const result = await updateApplicantStatus(appId, newStatus);
-
-    if (result.error) {
-      toast.error(result.error);
-      setApplicants(originalApplicants);
-    } else {
-      toast.success("Applicant status updated successfully.");
-      router.refresh();
-    }
-  };
+  // Handle status updates via ApplicationStatusDropdown (server action + router.refresh)
 
   // Trigger lightweight confirmation or redirect depending on credits balance
   const handleUnlockClick = (app: Applicant) => {
@@ -155,7 +138,6 @@ export function ApplicantsClient({
               <ApplicantCard
                 key={app.id}
                 applicant={app}
-                onStatusChange={(status) => handleStatusChange(app.id, status)}
                 onMessageClick={() => handleChatWithCandidate(app.candidateId)}
               />
             ) : (

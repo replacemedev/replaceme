@@ -5,6 +5,7 @@ import { Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { UserDropdown } from "./UserDropdown";
 import { MobileTriggerAndMenu } from "./MobileTriggerAndMenu";
+import { WorkerDesktopNav } from "./WorkerDesktopNav";
 
 export async function WorkerHeader() {
   const supabase = await createClient();
@@ -54,26 +55,7 @@ export async function WorkerHeader() {
         </div>
 
         {/* Middle Section: Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="/worker/dashboard"
-            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/worker/jobs"
-            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
-          >
-            Jobs
-          </Link>
-          <Link
-            href="/worker/messages"
-            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
-          >
-            Messages
-          </Link>
-        </nav>
+        <WorkerDesktopNav />
 
         {/* Right Section: Utilities & User Profile */}
         <div className="flex items-center gap-2 sm:gap-4">

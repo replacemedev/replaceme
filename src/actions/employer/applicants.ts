@@ -2,7 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
-import { Applicant, ApplicantStatus, MatchLabel } from "@/types/employer/applicants";
+import { Applicant, MatchLabel } from "@/types/employer/applicants";
+import { ApplicationStatus } from "@/types/applications";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -124,7 +125,7 @@ export async function getApplicants(jobId: string): Promise<{
           role: candidate?.professional_title || "Developer",
           matchScore,
           matchLabel,
-          status: app.status as ApplicantStatus,
+          status: app.status as ApplicationStatus,
           skills: candidate?.skills || ["React", "TypeScript"],
           experienceYears: 3,
           isUnlocked,
@@ -145,73 +146,17 @@ export async function getApplicants(jobId: string): Promise<{
 }
 
 /**
- * Update workflow status for an applicant securely.
- * Checks session, confirms role, and validates job ownership (IDOR checks).
+ * @deprecated Use updateApplicationStatus from @/actions/applications
  */
 export async function updateApplicantStatus(
   applicationId: string,
-  status: ApplicantStatus
+  status: ApplicationStatus
 ): Promise<{ success?: boolean; error?: string }> {
-  try {
-    safeLog(`[Auth] Update applicant status initiated for app: ${applicationId} to ${status}`);
-
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { error: "Authentication failed. Please log in." };
-    }
-
-    // Verify role is employer
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile || profile.role !== "employer") {
-      return { error: "Access denied. Employer role required." };
-    }
-
-    // IDOR check: Verify the employer owns the job related to this application
-    const { data: application, error: appError } = await supabase
-      .from("applications")
-      .select("job_id")
-      .eq("id", applicationId)
-      .single();
-
-    if (appError || !application) {
-      return { error: "Application not found." };
-    }
-
-    const { data: job, error: jobError } = await supabase
-      .from("jobs")
-      .select("id")
-      .eq("id", application.job_id)
-      .eq("employer_id", profile.id)
-      .maybeSingle();
-
-    if (jobError || !job) {
-      return { error: "Access denied. You do not own the job associated with this applicant." };
-    }
-
-    // Perform update on db
-    const { error: updateError } = await supabase
-      .from("applications")
-      .update({ status })
-      .eq("id", applicationId);
-
-    if (updateError) {
-      safeError("Error updating status:", updateError);
-      return { error: "Failed to update status in the database." };
-    }
-
-    safeLog(`[Auth] Applicant status updated successfully`);
-    return { success: true };
-  } catch (err) {
-    safeError("updateApplicantStatus error occurred:", err);
-    return { error: "An unexpected error occurred while updating status." };
-  }
+  const { updateApplicationStatus } = await import("@/actions/applications");
+  const result = await updateApplicationStatus(applicationId, status);
+  return result.success
+    ? { success: true }
+    : { error: result.error };
 }
 
 /**

@@ -54,8 +54,8 @@ export default async function WorkerDashboard() {
     .eq("candidate_id", profile.id);
 
   const appliedCount = apps ? apps.length : 0;
-  const interviewsCount = apps ? apps.filter(a => a.status === "Interviewing").length : 0;
-  const hiredCount = apps ? apps.filter(a => a.status === "Hired").length : 0;
+  const interviewsCount = apps ? apps.filter(a => a.status === "INTERVIEW_SCHEDULED").length : 0;
+  const hiredCount = apps ? apps.filter(a => a.status === "HIRED").length : 0;
 
   // 2. Fetch worker skills
   const { data: skills } = await supabase

@@ -3,7 +3,9 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, Briefcase, MessageSquare, LayoutDashboard } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { X } from "lucide-react";
+import { WORKER_NAV_ITEMS } from "@/config/workerNav";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,8 +14,8 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
-  // Close drawer on click outside the panel content
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isOpen) {
@@ -28,18 +30,15 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   return (
     <div className="fixed inset-0 z-50 md:hidden flex" role="dialog" aria-modal="true">
-      {/* Overlay backdrop */}
-      <div 
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn" 
+      <div
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn"
         onClick={onClose}
       />
 
-      {/* Drawer Panel */}
-      <div 
+      <div
         ref={panelRef}
         className="relative flex flex-col w-4/5 max-w-sm bg-white h-full p-6 shadow-2xl transition-transform duration-300 ease-out z-10 animate-slideRight"
       >
-        {/* Header / Logo in Drawer */}
         <div className="flex items-center justify-between pb-6 border-b border-slate-100">
           <Link
             className="flex items-center gap-2.5"
@@ -68,32 +67,32 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </button>
         </div>
 
-        {/* Navigation links inside drawer */}
-        <nav className="flex flex-col gap-4 py-6">
-          <Link
-            href="/worker/dashboard"
-            onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50 rounded-xl transition-all"
-          >
-            <LayoutDashboard size={18} className="text-slate-400" />
-            Dashboard
-          </Link>
-          <Link
-            href="/worker/jobs"
-            onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50 rounded-xl transition-all"
-          >
-            <Briefcase size={18} className="text-slate-400" />
-            Jobs
-          </Link>
-          <Link
-            href="/worker/messages"
-            onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50 rounded-xl transition-all"
-          >
-            <MessageSquare size={18} className="text-slate-400" />
-            Messages
-          </Link>
+        <nav className="flex flex-col gap-2 py-6">
+          {WORKER_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all ${
+                  isActive
+                    ? "text-[#006e2f] bg-[#ebfdf2]/70"
+                    : "text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50"
+                }`}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <Icon
+                  size={18}
+                  className={isActive ? "text-[#006e2f]" : "text-slate-400"}
+                />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </div>

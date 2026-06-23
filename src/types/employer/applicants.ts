@@ -1,4 +1,7 @@
-export type ApplicantStatus = "Applied" | "Interviewing" | "Shortlisted" | "Rejected" | "Hired";
+import type { ApplicationStatus } from "@/types/applications";
+
+/** Alias — employer and worker share ApplicationStatus from applications.ts */
+export type ApplicantStatus = ApplicationStatus;
 
 export type MatchLabel = "high" | "mid" | "low";
 

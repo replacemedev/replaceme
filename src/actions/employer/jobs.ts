@@ -150,7 +150,7 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
       .from("applications")
       .select("*", { count: "exact", head: true })
       .eq("job_id", jobId)
-      .eq("status", "Interviewing");
+      .eq("status", "UNDER_REVIEW");
 
     // Map database model to high-fidelity frontend structures
     return {
