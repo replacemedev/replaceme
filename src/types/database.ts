@@ -51,6 +51,13 @@ export type Database = {
             foreignKeyName: "applications_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
             referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
@@ -188,6 +195,13 @@ export type Database = {
             foreignKeyName: "contracts_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
             referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
@@ -224,7 +238,49 @@ export type Database = {
             foreignKeyName: "conversations_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      earnings_overview: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          is_highlighted: boolean
+          month_name: string
+          worker_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          is_highlighted?: boolean
+          month_name: string
+          worker_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          is_highlighted?: boolean
+          month_name?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "earnings_overview_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -320,6 +376,48 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "billing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employer_testimonials: {
+        Row: {
+          created_at: string
+          employer_id: string
+          id: string
+          rating: number
+          review_text: string
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          id?: string
+          rating: number
+          review_text: string
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          id?: string
+          rating?: number
+          review_text?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employer_testimonials_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["employer_id"]
+          },
+          {
+            foreignKeyName: "employer_testimonials_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -571,8 +669,10 @@ export type Database = {
       profiles: {
         Row: {
           auth_user_id: string | null
+          availability: string | null
           avatar_url: string | null
           bio: string | null
+          birth_year: number | null
           created_at: string
           email: string | null
           experience_years: number | null
@@ -580,7 +680,11 @@ export type Database = {
           full_name: string | null
           hourly_rate: number | null
           id: string
+          is_remote: boolean | null
+          is_top_rated: boolean | null
           last_name: string | null
+          location: string | null
+          portfolio_url: string | null
           professional_title: string | null
           role: Database["public"]["Enums"]["user_role"]
           skills: string[] | null
@@ -589,8 +693,10 @@ export type Database = {
         }
         Insert: {
           auth_user_id?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
+          birth_year?: number | null
           created_at?: string
           email?: string | null
           experience_years?: number | null
@@ -598,7 +704,11 @@ export type Database = {
           full_name?: string | null
           hourly_rate?: number | null
           id: string
+          is_remote?: boolean | null
+          is_top_rated?: boolean | null
           last_name?: string | null
+          location?: string | null
+          portfolio_url?: string | null
           professional_title?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
@@ -607,8 +717,10 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
+          birth_year?: number | null
           created_at?: string
           email?: string | null
           experience_years?: number | null
@@ -616,7 +728,11 @@ export type Database = {
           full_name?: string | null
           hourly_rate?: number | null
           id?: string
+          is_remote?: boolean | null
+          is_top_rated?: boolean | null
           last_name?: string | null
+          location?: string | null
+          portfolio_url?: string | null
           professional_title?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           skills?: string[] | null
@@ -707,9 +823,114 @@ export type Database = {
           },
         ]
       }
+      worker_projects: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          role: string
+          title: string
+          worker_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          role: string
+          title: string
+          worker_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          role?: string
+          title?: string
+          worker_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_projects_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_skills: {
+        Row: {
+          category: string | null
+          created_at: string
+          experience_duration: string | null
+          id: string
+          proficiency: number
+          proficiency_label: string | null
+          skill_name: string
+          worker_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          experience_duration?: string | null
+          id?: string
+          proficiency: number
+          proficiency_label?: string | null
+          skill_name: string
+          worker_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          experience_duration?: string | null
+          id?: string
+          proficiency?: number
+          proficiency_label?: string | null
+          skill_name?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_skills_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      job_posts: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          description: string | null
+          employer_id: string | null
+          employment_type: string | null
+          hours_per_week: number | null
+          id: string | null
+          is_premium_path: boolean | null
+          logo_url: string | null
+          monthly_salary: number | null
+          skills: string[] | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       increment_job_clicks: {
@@ -723,6 +944,10 @@ export type Database = {
       is_conversation_member: {
         Args: { conv_id: string; user_id: string }
         Returns: boolean
+      }
+      seed_worker_dashboard_data: {
+        Args: { worker_id: string }
+        Returns: undefined
       }
     }
     Enums: {
