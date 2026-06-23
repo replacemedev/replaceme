@@ -222,6 +222,7 @@ export async function toggleSavedJob(
       }
 
       revalidatePath("/worker/jobs");
+      revalidatePath(`/worker/jobs/${jobId}`);
       return { success: true, saved: false };
     }
 
@@ -236,6 +237,7 @@ export async function toggleSavedJob(
     }
 
     revalidatePath("/worker/jobs");
+    revalidatePath(`/worker/jobs/${jobId}`);
     return { success: true, saved: true };
   } catch (err) {
     safeError("toggleSavedJob:", err);
