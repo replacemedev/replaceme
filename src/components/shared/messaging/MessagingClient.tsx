@@ -12,6 +12,7 @@ import {
 } from "@/types/messaging";
 import { InboxSidebar } from "./InboxSidebar";
 import { ChatArea } from "./ChatArea";
+import { MessagingCenterShell } from "./MessagingCenterShell";
 import {
   sendMessagingMessage,
   markMessagingThreadRead,
@@ -122,7 +123,7 @@ export function MessagingClient({
     threads.find((t) => t.id === selectedThreadId) ?? null;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-slate-50 border-x border-slate-200 max-w-7xl mx-auto">
+    <MessagingCenterShell>
       <InboxSidebar
         threads={threads}
         selectedThreadId={selectedThreadId}
@@ -142,6 +143,6 @@ export function MessagingClient({
         onSendMessage={handleSendMessage}
         onTogglePin={handleTogglePin}
       />
-    </div>
+    </MessagingCenterShell>
   );
 }

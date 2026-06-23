@@ -8,6 +8,7 @@ Unified `/worker/messages` and `/employer/messages` on shared components under `
 
 | Component | Path | Used by |
 |-----------|------|---------|
+| `MessagingCenterShell` | `shared/messaging/MessagingCenterShell.tsx` | Centered bounded box wrapper |
 | `MessagingClient` | `shared/messaging/MessagingClient.tsx` | Worker + Employer pages |
 | `InboxSidebar` | `shared/messaging/InboxSidebar.tsx` | Via MessagingClient |
 | `InboxThreadItem` | `shared/messaging/InboxThreadItem.tsx` | Via InboxSidebar |
@@ -48,15 +49,17 @@ RLS enabled on both tables. Empty inbox is valid.
 
 ## Layout & overflow
 
-- [x] Split pane: `w-[320px]` sidebar + fluid `ChatArea`
-- [x] Full height: `h-[calc(100vh-64px)]` (header offset)
+- [x] **Centered bounded box:** `max-w-7xl mx-auto my-8 h-[75vh] min-h-[600px]` with `rounded-2xl shadow-sm border` — not full-bleed
+- [x] **No page-level header/footer:** Global chrome comes from worker/employer layouts only; messaging pages render core content inside `MessagingCenterShell`
+- [x] Outer page padding: `px-4 sm:px-6 lg:px-8` for spacing on all four sides
+- [x] Inner split pane: `w-[320px]` sidebar + fluid `ChatArea` inside the bounded box
 - [x] Sidebar list: `flex-1 overflow-y-auto`
 - [x] Message history: independent scroll in `ChatArea`
 
 ## Visual UI consistency (design reference)
 
 - [x] Search bar with magnifying glass icon
-- [x] Job Role `<select>` filter below search ("All Roles" + dynamic options)
+- [x] Job Role `<select>` filter below search with visible "Filter by Job Role" label ("All Roles" + dynamic options)
 - [x] Segmented control: All / Unread / Pinned
 - [x] Thread item: green initials avatar, party name, time, snippet, violet job pill
 - [x] Active thread: light green background + solid green left border
@@ -68,14 +71,14 @@ RLS enabled on both tables. Empty inbox is valid.
 
 ## DOM flatness (ponytail)
 
-- [x] Single flex row for split pane (no nested wrapper div soup)
+- [x] Two-level shell only: outer padding wrapper + inner flex split pane (no div soup beyond `MessagingCenterShell`)
 - [x] `ChatArea` uses semantic `<section>` + `<header>`
 - [x] No role-specific layout wrappers in page routes
 
 ## Manual test checklist
 
-1. Log in as worker → `/worker/messages` → empty states render
-2. Log in as employer → `/employer/messages` → identical layout and empty states
+1. Log in as worker → `/worker/messages` → centered box with margin on all sides, empty states render
+2. Log in as employer → `/employer/messages` → identical centered box layout and empty states
 3. Create a thread in Supabase (via application flow) → appears on both sides with correct `oppositeParty`
 4. Job Role dropdown populates only roles tied to active threads
 5. Filter by job role → sidebar filters correctly; empty filter shows "No conversations found"
