@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { RoleSelector } from "@/components/auth/RoleSelector"
-import { Lock, Mail, User } from "lucide-react"
+import { Lock, Mail } from "lucide-react"
 import { logIn } from "@/actions/auth"
 import { loginSchema, type LoginFormValues } from "@/lib/validations/auth"
 import { useRouter } from "next/navigation"
@@ -23,19 +22,15 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      role: "worker",
       email: "",
       password: "",
       rememberMe: false,
     },
   })
-
-  const selectedRole = watch("role") || "worker"
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("remember_email")
@@ -77,15 +72,6 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
 
   return (
     <div className="w-full">
-      <RoleSelector
-        options={[
-          { label: "Worker", value: "worker" },
-          { label: "Employer", value: "employer" },
-        ]}
-        value={selectedRole}
-        onChange={(val) => setValue("role", val as "employer" | "worker")}
-      />
-
       {authError && (
         <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
           {authError}

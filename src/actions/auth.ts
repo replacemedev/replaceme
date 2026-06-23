@@ -170,20 +170,29 @@ export async function logIn(formData: any) {
       return { success: false, error: handleAuthError(error) };
     }
 
-    // Fetch the user's role to redirect correctly
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("auth_user_id", data.user.id)
-      .single();
+    // 1. Try reading the role directly from authenticated session metadata
+    let role = data.user.user_metadata?.role;
 
-    const role = profile?.role || "worker";
+    // 2. Fall back to querying the database profiles table using user primary key
+    if (!role) {
+      const { data: profile, error: dbError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+      
+      if (!dbError && profile) {
+        role = profile.role;
+      }
+    }
+
+    const finalRole = role || "worker";
 
     revalidatePath("/", "layout");
     return {
       success: true,
       message: "Login successful! Redirecting...",
-      redirectUrl: role === "employer" ? "/dashboard" : "/worker/dashboard"
+      redirectUrl: finalRole === "employer" ? "/dashboard" : "/worker/dashboard"
     };
   } catch (error) {
     safeError("logIn error:", error);

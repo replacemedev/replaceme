@@ -25,8 +25,9 @@ export function SignUpForm() {
     register,
     handleSubmit,
     setError,
+    setValue,
+    unregister,
     formState: { errors },
-    reset,
   } = useForm<any>({
     resolver: zodResolver(selectedRole === "employer" ? employerSignUpSchema : workerSignUpSchema),
     defaultValues: {
@@ -43,7 +44,10 @@ export function SignUpForm() {
   const handleRoleChange = (role: string) => {
     const newRole = role as "employer" | "worker"
     setSelectedRole(newRole)
-    reset({ role: newRole }) // Reset form when role changes
+    setValue("role", newRole)
+    if (newRole === "worker") {
+      unregister("companyName")
+    }
   }
 
   const onSubmit = async (data: any) => {
@@ -96,6 +100,7 @@ export function SignUpForm() {
       )}
 
       <form method="POST" onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <input type="hidden" {...register("role")} />
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
             Username
