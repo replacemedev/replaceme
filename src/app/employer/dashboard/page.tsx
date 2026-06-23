@@ -138,7 +138,7 @@ export default async function EmployerDashboard() {
             icon={<UserCheck size={22} />}
             description="Your hires will appear here"
             actionLabel="BROWSE TALENT POOL"
-            actionHref="/resumes"
+            actionHref="/employer/dashboard"
           />
         </div>
       </div>

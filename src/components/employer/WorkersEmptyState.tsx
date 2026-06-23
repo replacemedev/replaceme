@@ -12,10 +12,10 @@ export function WorkersEmptyState() {
         Your hires will appear here
       </p>
       <Link
-        href="/resumes"
-        className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-lg transition-colors shadow-xs"
+        href="/employer/dashboard"
+        className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] rounded-lg transition-colors shadow-xs cursor-pointer"
       >
-        BROWSE RESUMES
+        BROWSE TALENT
       </Link>
     </div>
   );

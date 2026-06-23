@@ -20,20 +20,20 @@ export function ProfileStrengthCard({ percentage }: ProfileStrengthCardProps) {
 
       <div className="space-y-1.5">
         <div className="flex justify-between items-center text-[10px] font-bold tracking-tight">
-          <span className="text-[#22c55e]">{percentage}%</span>
+          <span className="text-[#006e2f]">{percentage}%</span>
           <span className="text-slate-500">Intermediate</span>
         </div>
         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
           <div 
-            className="bg-[#22c55e] h-full rounded-full transition-all duration-500" 
+            className="bg-[#006e2f] h-full rounded-full transition-all duration-500" 
             style={{ width: `${percentage}%` }} 
           />
         </div>
       </div>
 
       <Link
-        href="/profile/edit"
-        className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold text-white bg-[#22c55e] hover:bg-[#16a34a] rounded-xl transition-all duration-150 shadow-xs cursor-pointer select-none"
+        href="/worker/profile"
+        className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] rounded-xl transition-all duration-150 shadow-xs cursor-pointer select-none"
       >
         Complete Profile
         <ArrowRight size={14} />

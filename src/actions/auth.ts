@@ -141,7 +141,7 @@ export async function signUp(formData: any) {
     return {
       success: true,
       message: "Registration successful! Redirecting...",
-      redirectUrl: role === "employer" ? "/dashboard" : "/worker/dashboard"
+      redirectUrl: role === "employer" ? "/employer/dashboard" : "/worker/dashboard"
     };
   } catch (error) {
     safeError("signUp error:", error);
@@ -223,7 +223,7 @@ export async function logIn(formData: any) {
     return {
       success: true,
       message: "Login successful! Redirecting...",
-      redirectUrl: finalRole === "employer" ? "/dashboard" : "/worker/dashboard"
+      redirectUrl: finalRole === "employer" ? "/employer/dashboard" : "/worker/dashboard"
     };
   } catch (error) {
     safeError("logIn error:", error);

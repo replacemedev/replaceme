@@ -6,9 +6,9 @@ import { Sparkles, ArrowRight } from "lucide-react";
 
 export function UpgradeBanner() {
   return (
-    <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm mb-8 animate-fadeIn">
+    <div className="bg-[#ebfdf2]/40 border border-[#006e2f]/20 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm mb-8 animate-fadeIn">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-[#16a34a] shrink-0">
+        <div className="w-12 h-12 rounded-2xl bg-[#ebfdf2] flex items-center justify-center text-[#006e2f] shrink-0">
           <Sparkles size={24} className="animate-pulse" />
         </div>
         <div>
@@ -21,7 +21,7 @@ export function UpgradeBanner() {
         </div>
       </div>
       <Link
-        href="/pricing"
+        href="/employer/pricing"
         className="h-11 px-5 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center gap-2 shrink-0 shadow-sm cursor-pointer"
       >
         Upgrade Now

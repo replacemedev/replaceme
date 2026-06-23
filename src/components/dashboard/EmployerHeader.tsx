@@ -75,7 +75,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
         {/* Brand/Logo */}
         <Link
           className="flex items-center gap-3 transition-transform duration-200 hover:opacity-90 scale-102"
-          href="/dashboard"
+          href="/employer/dashboard"
         >
           <div className="relative w-10 h-10 shrink-0">
             <Image
@@ -95,8 +95,8 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <Link
-            href="/dashboard"
-            className="text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200"
+            href="/employer/dashboard"
+            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
           >
             Dashboard
           </Link>
@@ -104,7 +104,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
             <button
               onClick={() => setJobsDropdownOpen(!jobsDropdownOpen)}
               type="button"
-              className="flex items-center gap-1.5 text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200 focus:outline-none"
+              className="flex items-center gap-1.5 text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200 focus:outline-none cursor-pointer"
               aria-expanded={jobsDropdownOpen}
               aria-haspopup="true"
             >
@@ -123,7 +123,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                 aria-label="Jobs actions dropdown"
               >
                 <Link
-                  href="/jobs"
+                  href="/employer/jobs"
                   onClick={() => setJobsDropdownOpen(false)}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left"
                   role="menuitem"
@@ -131,9 +131,9 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                   All Job Posts
                 </Link>
                 <Link
-                  href="/jobs/create"
+                  href="/employer/jobs/create"
                   onClick={() => setJobsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-medium text-[#22c55e]"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-medium text-[#006e2f]"
                   role="menuitem"
                 >
                   Create a Job Post
@@ -142,31 +142,31 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
             )}
           </div>
           <Link
-            href="/messages"
-            className="text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200 flex items-center gap-1.5 relative"
+            href="/employer/messages"
+            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200 flex items-center gap-1.5 relative"
           >
             Messages
             {unreadMessageCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-[#22c55e] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
+              <span className="px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
                 {unreadMessageCount}
               </span>
             )}
           </Link>
           <Link
-            href="/pinned"
-            className="text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200"
+            href="/employer/pinned"
+            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
           >
             Pinned
           </Link>
           <Link
-            href="/hired"
-            className="text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200"
+            href="/employer/hired"
+            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
           >
             Hired
           </Link>
           <Link
-            href="/pricing"
-            className="text-slate-600 hover:text-[#22c55e] font-semibold text-sm transition-colors duration-200"
+            href="/employer/pricing"
+            className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
           >
             Pricing
           </Link>
@@ -177,7 +177,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
           {/* Notifications */}
           <button
             type="button"
-            className="relative p-2.5 text-slate-500 hover:text-[#22c55e] hover:bg-slate-50 rounded-xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#22c55e] min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="relative p-2.5 text-slate-500 hover:text-[#006e2f] hover:bg-slate-50 rounded-xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#006e2f] min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
             aria-label="View notifications"
           >
             <Bell size={22} />
@@ -196,7 +196,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               type="button"
-              className="flex items-center gap-2.5 p-1.5 pr-3 hover:bg-slate-50 rounded-2xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#22c55e] aria-expanded={dropdownOpen}"
+              className="flex items-center gap-2.5 p-1.5 pr-3 hover:bg-slate-50 rounded-2xl transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#006e2f] cursor-pointer"
               aria-haspopup="true"
               aria-expanded={dropdownOpen}
               aria-label="User menu"
@@ -212,7 +212,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                     sizes="36px"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-emerald-800 font-semibold text-sm rounded-full">
+                  <div className="w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-semibold text-sm rounded-full">
                     {initials}
                   </div>
                 )}
@@ -245,9 +245,9 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                 </div>
 
                 <Link
-                  href="/settings/account"
+                  href="/employer/settings/account"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
                   role="menuitem"
                 >
                   <User size={16} className="text-slate-400" />
@@ -255,9 +255,9 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                 </Link>
 
                 <Link
-                  href="/settings/company"
+                  href="/employer/settings/company"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
                   role="menuitem"
                 >
                   <Settings size={16} className="text-slate-400" />
@@ -270,7 +270,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                   type="button"
                   disabled={isPending}
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-medium disabled:opacity-50"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
                   role="menuitem"
                 >
                   <LogOut size={16} className="text-red-500" />
@@ -284,7 +284,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             type="button"
-            className="md:hidden flex items-center justify-center p-2 text-slate-500 hover:text-[#22c55e] focus:outline-none rounded-xl hover:bg-slate-50 min-h-[44px] min-w-[44px]"
+            className="md:hidden flex items-center justify-center p-2 text-slate-500 hover:text-[#006e2f] focus:outline-none rounded-xl hover:bg-slate-50 min-h-[44px] min-w-[44px] cursor-pointer"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -297,42 +297,42 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-100 bg-white px-margin-desktop py-4 flex flex-col gap-3 shadow-inner animate-fadeIn">
           <Link
-            href="/dashboard"
+            href="/employer/dashboard"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#22c55e] transition-colors"
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] transition-colors"
           >
             Dashboard
           </Link>
           <Link
-            href="/messages"
+            href="/employer/messages"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#22c55e] transition-colors flex items-center gap-2"
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] transition-colors flex items-center gap-2"
           >
             Messages
             {unreadMessageCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-[#22c55e] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
+              <span className="px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
                 {unreadMessageCount}
               </span>
             )}
           </Link>
           <Link
-            href="/pinned"
+            href="/employer/pinned"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#22c55e] transition-colors"
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] transition-colors"
           >
             Pinned
           </Link>
           <Link
-            href="/hired"
+            href="/employer/hired"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#22c55e] transition-colors"
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] transition-colors"
           >
             Hired
           </Link>
           <Link
-            href="/pricing"
+            href="/employer/pricing"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#22c55e] transition-colors"
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] transition-colors"
           >
             Pricing
           </Link>
@@ -342,16 +342,16 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
             <p className="text-xs font-bold uppercase tracking-wider">Jobs</p>
           </div>
           <Link
-            href="/jobs"
+            href="/employer/jobs"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-medium py-1.5 pl-6 text-slate-600 hover:text-[#22c55e] transition-colors border-l-2 border-transparent hover:border-[#22c55e]"
+            className="font-medium py-1.5 pl-6 text-slate-600 hover:text-[#006e2f] transition-colors border-l-2 border-transparent hover:border-[#006e2f]"
           >
             All Job Posts
           </Link>
           <Link
-            href="/jobs/create"
+            href="/employer/jobs/create"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-medium py-1.5 pl-6 text-[#22c55e] hover:text-[#16a34a] transition-colors border-l-2 border-[#22c55e]"
+            className="font-medium py-1.5 pl-6 text-[#006e2f] hover:text-[#005321] transition-colors border-l-2 border-[#006e2f]"
           >
             Create a Job Post
           </Link>

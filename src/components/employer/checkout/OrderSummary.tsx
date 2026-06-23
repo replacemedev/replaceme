@@ -27,7 +27,7 @@ export function OrderSummary({
       <div>
         {/* Back Link */}
         <Link
-          href="/pricing"
+          href="/employer/pricing"
           className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors group mb-8 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -43,6 +43,7 @@ export function OrderSummary({
               fill
               className="object-contain"
               sizes="32px"
+              priority
             />
           </div>
           <span className="text-2xl font-black text-[#0a4a29] leading-none">
@@ -52,7 +53,7 @@ export function OrderSummary({
 
         {/* Plan Header */}
         <div className="space-y-3">
-          <span className="text-xs font-black tracking-wider text-[#10b981] uppercase">
+          <span className="text-xs font-black tracking-wider text-[#006e2f] uppercase">
             SUBSCRIBE TO
           </span>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
@@ -77,8 +78,8 @@ export function OrderSummary({
           <ul className="space-y-4">
             {features.map((feat, idx) => (
               <li key={idx} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center relative top-0.5 border border-[#10b981]/10">
-                  <Check className="w-3 h-3 text-[#10b981] stroke-[3]" />
+                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#ebfdf2] flex items-center justify-center relative top-0.5 border border-[#006e2f]/10">
+                  <Check className="w-3 h-3 text-[#006e2f] stroke-[3]" />
                 </div>
                 <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                   {feat}

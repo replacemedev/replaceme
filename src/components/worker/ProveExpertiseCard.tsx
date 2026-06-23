@@ -27,7 +27,7 @@ export function ProveExpertiseCard() {
 
       <div className="relative z-10">
         <Link
-          href="/tests"
+          href="/worker/tests"
           className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white bg-[#006e2f] hover:bg-[#005321] active:bg-[#00421a] rounded-xl transition-all duration-150 shadow-xs cursor-pointer select-none"
         >
           Take a Test

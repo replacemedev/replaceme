@@ -32,7 +32,9 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/signup");
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/worker/dashboard");
+  const isWorkerRoute = request.nextUrl.pathname.startsWith("/worker");
+  const isEmployerRoute = request.nextUrl.pathname.startsWith("/employer");
+  const isProtectedRoute = isWorkerRoute || isEmployerRoute;
 
   // If user is not logged in and tries to access a protected route, redirect to login
   if (!user && isProtectedRoute) {
@@ -53,20 +55,20 @@ export async function updateSession(request: NextRequest) {
     // If user is logged in and tries to access login/signup, redirect to their dashboard
     if (isAuthRoute) {
       if (role === "employer") {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL("/employer/dashboard", request.url));
       } else {
         return NextResponse.redirect(new URL("/worker/dashboard", request.url));
       }
     }
 
-    // If worker tries to access employer dashboard
-    if (role === "worker" && request.nextUrl.pathname.startsWith("/dashboard")) {
+    // If worker tries to access employer pages
+    if (role === "worker" && isEmployerRoute) {
       return NextResponse.redirect(new URL("/worker/dashboard", request.url));
     }
 
-    // If employer tries to access worker dashboard
-    if (role === "employer" && request.nextUrl.pathname.startsWith("/worker/dashboard")) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+    // If employer tries to access worker pages
+    if (role === "employer" && isWorkerRoute) {
+      return NextResponse.redirect(new URL("/employer/dashboard", request.url));
     }
   }
 
