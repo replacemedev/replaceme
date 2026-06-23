@@ -1,0 +1,481 @@
+{
+    "version": 3,
+    "skills": {
+        "find-skills": {
+            "source": "vercel-labs/skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/vercel-labs/skills.git",
+            "skillPath": "skills/find-skills/SKILL.md",
+            "skillFolderHash": "3013fdeb8a11b10b1eb795ec3ae8bfca38f7c26d",
+            "installedAt": "2026-04-15T14:49:08.921Z",
+            "updatedAt": "2026-04-15T14:49:08.921Z"
+        },
+        "ux-enhancer": {
+            "source": "gashiartim/ux-enhancer",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/gashiartim/ux-enhancer.git",
+            "skillPath": "SKILL.md",
+            "skillFolderHash": "3a315c463f2707942668d180a7fad637316f6fab",
+            "installedAt": "2026-06-18T16:41:51.667Z",
+            "updatedAt": "2026-06-18T16:41:51.667Z"
+        },
+        "drawio-skill": {
+            "source": "Agents365-ai/drawio-skill",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/Agents365-ai/drawio-skill.git",
+            "skillPath": "skills/drawio-skill/SKILL.md",
+            "skillFolderHash": "40f4e63095913e45d4b66bb3ddd9c319df1d7554",
+            "installedAt": "2026-06-21T15:20:04.997Z",
+            "updatedAt": "2026-06-21T15:20:04.997Z"
+        },
+        "improve": {
+            "source": "shadcn/improve",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/shadcn/improve.git",
+            "skillPath": "skills/improve/SKILL.md",
+            "skillFolderHash": "7d77d76815e6deb704427f17f6e393f55e3cb6da",
+            "installedAt": "2026-06-21T15:20:34.292Z",
+            "updatedAt": "2026-06-21T15:20:34.292Z"
+        },
+        "chef-assistant": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/malicious_skill/SKILL.md",
+            "skillFolderHash": "c7ec33d64243047cb25161830363c29e0952da7b",
+            "installedAt": "2026-06-21T15:20:55.591Z",
+            "updatedAt": "2026-06-21T15:20:55.591Z"
+        },
+        "code-formatter": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/mcp_clean_skill/SKILL.md",
+            "skillFolderHash": "9da06c9f11ea65705a951657e39c4c09cc076736",
+            "installedAt": "2026-06-21T15:20:55.594Z",
+            "updatedAt": "2026-06-21T15:20:55.594Z"
+        },
+        "friendly-greeter": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/mcp_mismatched_skill/SKILL.md",
+            "skillFolderHash": "c08eed55c3ad93d990985cdb2050fa76a7e2a80a",
+            "installedAt": "2026-06-21T15:20:55.595Z",
+            "updatedAt": "2026-06-21T15:20:55.595Z"
+        },
+        "over-privileged-helper": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/mcp_overprivileged_skill/SKILL.md",
+            "skillFolderHash": "a903c9b9b837f737fe28c00295debae1df90078d",
+            "installedAt": "2026-06-21T15:20:55.595Z",
+            "updatedAt": "2026-06-21T15:20:55.595Z"
+        },
+        "reаd_data": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/mcp_poisoned_tool/SKILL.md",
+            "skillFolderHash": "2320d28d0885b1c8554126543eb7a302ad6dde04",
+            "installedAt": "2026-06-21T15:20:55.596Z",
+            "updatedAt": "2026-06-21T15:20:55.596Z"
+        },
+        "underdeclared-agent": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/mcp_underdeclared_skill/SKILL.md",
+            "skillFolderHash": "1f3363ef5d779c9ec31780619d2374a28494669d",
+            "installedAt": "2026-06-21T15:20:55.597Z",
+            "updatedAt": "2026-06-21T15:20:55.597Z"
+        },
+        "safe-greeting": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/safe_skill/SKILL.md",
+            "skillFolderHash": "6ed77dcaab1914ac53b63c93fb0dae1eccbf2808",
+            "installedAt": "2026-06-21T15:20:55.597Z",
+            "updatedAt": "2026-06-21T15:20:55.597Z"
+        },
+        "text-summarizer": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sdi/sdi1_mismatch/SKILL.md",
+            "skillFolderHash": "a8fdf37b4ed6d0bc0178048e7545ee6b0bdb1493",
+            "installedAt": "2026-06-21T15:20:55.598Z",
+            "updatedAt": "2026-06-21T15:20:55.598Z"
+        },
+        "markdown-formatter": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sdi/sdi2_inappropriate/SKILL.md",
+            "skillFolderHash": "2630293f1c3636f60071f1524a73efd637c05aa8",
+            "installedAt": "2026-06-21T15:20:55.599Z",
+            "updatedAt": "2026-06-21T15:20:55.599Z"
+        },
+        "config-reader": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sdi/sdi3_scope_creep/SKILL.md",
+            "skillFolderHash": "37ebbbe5b7568153b01e13f4240f13a9c8dec3d7",
+            "installedAt": "2026-06-21T15:20:55.599Z",
+            "updatedAt": "2026-06-21T15:20:55.599Z"
+        },
+        "data-processor": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sdi/sdi4_divergence/SKILL.md",
+            "skillFolderHash": "867b539b7e667fa702f535df237cd4685eefa37d",
+            "installedAt": "2026-06-21T15:20:55.600Z",
+            "updatedAt": "2026-06-21T15:20:55.600Z"
+        },
+        "file-indexer": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sdi/sdi_clean/SKILL.md",
+            "skillFolderHash": "2ba0e86a6183b03760315ec71c9315bb60e55c9f",
+            "installedAt": "2026-06-21T15:20:55.601Z",
+            "updatedAt": "2026-06-21T15:20:55.601Z"
+        },
+        "terraform-deployer": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp1_clean/SKILL.md",
+            "skillFolderHash": "82920fe71895e8afa7b5821b0aa613d62f32bdbe",
+            "installedAt": "2026-06-21T15:20:55.601Z",
+            "updatedAt": "2026-06-21T15:20:55.601Z"
+        },
+        "general-assistant": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp1_vague_triggers/SKILL.md",
+            "skillFolderHash": "4f413fcf6ef64255850578c938db9d6a510d81ff",
+            "installedAt": "2026-06-21T15:20:55.602Z",
+            "updatedAt": "2026-06-21T15:20:55.602Z"
+        },
+        "deploy-service": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp2_clean/SKILL.md",
+            "skillFolderHash": "06456ff7e66023c0ee2cb7de58751f09ec05dfc4",
+            "installedAt": "2026-06-21T15:20:55.603Z",
+            "updatedAt": "2026-06-21T15:20:55.603Z"
+        },
+        "file-organizer": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp2_missing_warnings/SKILL.md",
+            "skillFolderHash": "ea93ee3569b70fc41ca76c1a2ad463a9971d515b",
+            "installedAt": "2026-06-21T15:20:55.603Z",
+            "updatedAt": "2026-06-21T15:20:55.603Z"
+        },
+        "jp-compliance-reporter": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp3_clean/SKILL.md",
+            "skillFolderHash": "e3469c07e4103692c47cacdbcface14e5a9b6a1a",
+            "installedAt": "2026-06-21T15:20:55.604Z",
+            "updatedAt": "2026-06-21T15:20:55.604Z"
+        },
+        "report-generator": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/sqp/sqp3_locale_forcing/SKILL.md",
+            "skillFolderHash": "9a12f038c8ee50b4e518e34ddf487df2bcdde21d",
+            "installedAt": "2026-06-21T15:20:55.604Z",
+            "updatedAt": "2026-06-21T15:20:55.604Z"
+        },
+        "helpful-formatter": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/ssd/ssd1_semantic_injection/SKILL.md",
+            "skillFolderHash": "05bd7ea5d691f3ce5e923ec28f27775bb07ccec2",
+            "installedAt": "2026-06-21T15:20:55.605Z",
+            "updatedAt": "2026-06-21T15:20:55.605Z"
+        },
+        "creative-writing-coach": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/ssd/ssd2_novel_phrasing/SKILL.md",
+            "skillFolderHash": "5c977fb1293248ce77d4bb2feec95234382fd56b",
+            "installedAt": "2026-06-21T15:20:55.606Z",
+            "updatedAt": "2026-06-21T15:20:55.606Z"
+        },
+        "personal-assistant": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/ssd/ssd3_nl_exfiltration/SKILL.md",
+            "skillFolderHash": "53f6b4e3c8710348f8aab996ba0a880e1e4a1181",
+            "installedAt": "2026-06-21T15:20:55.607Z",
+            "updatedAt": "2026-06-21T15:20:55.607Z"
+        },
+        "onboarding-guide": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/ssd/ssd4_narrative_deception/SKILL.md",
+            "skillFolderHash": "6fdb49efee6e25ac3aa8c56f294b48afa8ff8dde",
+            "installedAt": "2026-06-21T15:20:55.608Z",
+            "updatedAt": "2026-06-21T15:20:55.608Z"
+        },
+        "code-reviewer": {
+            "source": "nvidia/skillspector",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/nvidia/skillspector.git",
+            "skillPath": "tests/fixtures/ssd/ssd_clean/SKILL.md",
+            "skillFolderHash": "c74a75771a678dbdceb324913d1afb7d05e54bab",
+            "installedAt": "2026-06-21T15:20:55.609Z",
+            "updatedAt": "2026-06-21T15:20:55.609Z"
+        },
+        "absolute": {
+            "source": "AbsolutelySkilled/AbsolutelySkilled",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/AbsolutelySkilled/AbsolutelySkilled.git",
+            "skillPath": "skills/absolute/SKILL.md",
+            "skillFolderHash": "3bf54ea8429f347928fa7cc3d4630e5e5d801caf",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "api-rest": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/api-rest/SKILL.md",
+            "skillFolderHash": "2c351187255be16045f62c5892921e7674d41def",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "architecture-decision-records": {
+            "source": "spencerpauly/awesome-cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/spencerpauly/awesome-cursor-skills.git",
+            "skillPath": "resources/architecture-decision-records/SKILL.md",
+            "skillFolderHash": "815c525d0c7d75c41f46d88ad2e56a015b8193a0",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "auth-better-auth": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/auth-better-auth/SKILL.md",
+            "skillFolderHash": "9a09f92911978d365448a8b9ad70a9ceb31055e5",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "database-design": {
+            "source": "spencerpauly/awesome-cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/spencerpauly/awesome-cursor-skills.git",
+            "skillPath": "resources/database-design/SKILL.md",
+            "skillFolderHash": "fe96baa16ce9946d70f5ce9d107df37f809e4b11",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "db-postgres": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/db-postgres/SKILL.md",
+            "skillFolderHash": "434bf193992f9500bdfe650836804d91f9338a85",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "improve-codebase-architecture": {
+            "source": "mattpocock/skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/mattpocock/skills.git",
+            "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+            "skillFolderHash": "8bf292143ca93b00276a0de0fc5f84f2381f4690",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "nextjs-16": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/nextjs-16/SKILL.md",
+            "skillFolderHash": "7d6f7f23a46732fcaffcbd8e349ecf280b3d5e51",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "nextjs-typescript-tailwindcss-supabase": {
+            "source": "mindrally/skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/mindrally/skills.git",
+            "skillPath": "nextjs-typescript-tailwindcss-supabase/SKILL.md",
+            "skillFolderHash": "b866ca1d166d1e9140c236a839550c1c46853113",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "ponytail": {
+            "source": "DietrichGebert/ponytail",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/DietrichGebert/ponytail.git",
+            "skillPath": "skills/ponytail/SKILL.md",
+            "skillFolderHash": "9c2a14a09838e12a6bc248e054529fe494060c0d",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "react-native-patterns": {
+            "source": "spencerpauly/awesome-cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/spencerpauly/awesome-cursor-skills.git",
+            "skillPath": "resources/react-native-patterns/SKILL.md",
+            "skillFolderHash": "bfd334c78246b5b5fd634f486653649eade74692",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "state-tanstack": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/state-tanstack/SKILL.md",
+            "skillFolderHash": "71d146d1ec67694eb92e4ae1c3a76ef735756aea",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "supastarter-nextjs-skill": {
+            "source": "oscardrt/supastarter-nextjs-skill",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/oscardrt/supastarter-nextjs-skill.git",
+            "skillPath": "supastarter-nextjs-skill/SKILL.md",
+            "skillFolderHash": "9a875fe5b99655dc5993074b35997374a67d6e66",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "ui-design-system": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/ui-design-system/SKILL.md",
+            "skillFolderHash": "a707d89289f6e74a45019c802fb26537a6fe5dca",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "ui-principles": {
+            "source": "aussiegingersnap/cursor-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/aussiegingersnap/cursor-skills.git",
+            "skillPath": "skills/ui-principles/SKILL.md",
+            "skillFolderHash": "4bebeeb77b55210cb0468a63ed9fc6d7fcec7966",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "vercel-composition-patterns": {
+            "source": "vercel-labs/agent-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+            "skillPath": "skills/composition-patterns/SKILL.md",
+            "skillFolderHash": "575757e3e25761c8c562d6e395d29f0b76c98b12",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "vercel-react-best-practices": {
+            "source": "vercel-labs/agent-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+            "skillPath": "skills/react-best-practices/SKILL.md",
+            "skillFolderHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "vercel-react-view-transitions": {
+            "source": "vercel-labs/agent-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+            "skillPath": "skills/react-view-transitions/SKILL.md",
+            "skillFolderHash": "c8952fc9127fa0564d0cb71dccb4215a5608ac93",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "web-design-guidelines": {
+            "source": "vercel-labs/agent-skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+            "skillPath": "skills/web-design-guidelines/SKILL.md",
+            "skillFolderHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee",
+            "installedAt": "2026-06-23T12:14:56.123Z",
+            "updatedAt": "2026-06-23T12:14:56.123Z"
+        },
+        "context7-cli": {
+            "source": "upstash/context7",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/upstash/context7.git",
+            "skillPath": "skills/context7-cli/SKILL.md",
+            "skillFolderHash": "6077b3c638fb7efb31d9b2c815436650de4aef73",
+            "installedAt": "2026-06-23T12:29:11.984Z",
+            "updatedAt": "2026-06-23T12:29:11.984Z"
+        },
+        "context7-mcp": {
+            "source": "upstash/context7",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/upstash/context7.git",
+            "skillPath": "skills/context7-mcp/SKILL.md",
+            "skillFolderHash": "6b02383f86f87e81a722b3b6c6d6e06efa5c72f2",
+            "installedAt": "2026-06-23T12:29:11.984Z",
+            "updatedAt": "2026-06-23T12:29:11.984Z"
+        },
+        "find-docs": {
+            "source": "upstash/context7",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/upstash/context7.git",
+            "skillPath": "skills/find-docs/SKILL.md",
+            "skillFolderHash": "0210767e57873317edc8b91783a2f1b74eb9bbdd",
+            "installedAt": "2026-06-23T12:29:11.984Z",
+            "updatedAt": "2026-06-23T12:29:11.984Z"
+        },
+        "shadcn": {
+            "source": "shadcn-ui/ui",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/shadcn-ui/ui.git",
+            "skillPath": "skills/shadcn/SKILL.md",
+            "skillFolderHash": "ac9d0d69caac7de1d1e5647f3db3bcd2f13af355",
+            "installedAt": "2026-06-23T12:29:11.984Z",
+            "updatedAt": "2026-06-23T12:29:11.984Z"
+        },
+        "to-issues": {
+            "source": "mattpocock/skills",
+            "sourceType": "github",
+            "sourceUrl": "https://github.com/mattpocock/skills.git",
+            "skillPath": "skills/engineering/to-issues/SKILL.md",
+            "skillFolderHash": "4e2a11d35f018490d42a79234432f779d7131b99",
+            "installedAt": "2026-06-23T12:29:11.984Z",
+            "updatedAt": "2026-06-23T12:29:11.984Z"
+        }
+    },
+    "dismissed": {
+        "findSkillsPrompt": true
+    },
+    "lastSelectedAgents": [
+        "amp",
+        "antigravity",
+        "cline",
+        "codex",
+        "cursor",
+        "deepagents",
+        "firebender",
+        "gemini-cli",
+        "github-copilot",
+        "kimi-cli",
+        "opencode",
+        "warp"
+    ]
+}

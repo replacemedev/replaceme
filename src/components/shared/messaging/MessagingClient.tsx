@@ -3,6 +3,9 @@
 import { useState, useEffect, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
+  ALL_JOB_ROLES,
+  JobRoleFilterValue,
+  MessagingJobRole,
   MessagingMessage,
   MessagingRole,
   MessagingThread,
@@ -19,6 +22,7 @@ interface MessagingClientProps {
   role: MessagingRole;
   basePath: string;
   threads: MessagingThread[];
+  availableJobRoles: MessagingJobRole[];
   initialMessages: MessagingMessage[];
   selectedThreadId: string | null;
   currentUserId: string;
@@ -28,6 +32,7 @@ export function MessagingClient({
   role,
   basePath,
   threads,
+  availableJobRoles,
   initialMessages,
   selectedThreadId,
   currentUserId,
@@ -40,6 +45,8 @@ export function MessagingClient({
   const [messages, setMessages] = useState(initialMessages);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "unread" | "pinned">("all");
+  const [selectedJobRole, setSelectedJobRole] =
+    useState<JobRoleFilterValue>(ALL_JOB_ROLES);
 
   useEffect(() => {
     setMessages(initialMessages);
@@ -123,6 +130,9 @@ export function MessagingClient({
         onSearchChange={setSearchQuery}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        availableJobRoles={availableJobRoles}
+        selectedJobRole={selectedJobRole}
+        onJobRoleChange={setSelectedJobRole}
         onSelectThread={handleSelectThread}
       />
       <ChatArea

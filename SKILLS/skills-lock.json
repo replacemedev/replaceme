@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "skills": {
+    "absolute": {
+      "source": "AbsolutelySkilled/AbsolutelySkilled",
+      "sourceType": "github",
+      "skillPath": "skills/absolute/SKILL.md",
+      "computedHash": "3bf54ea8429f347928fa7cc3d4630e5e5d801caf88508e7c8addc76268b09122"
+    },
+    "api-rest": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-rest/SKILL.md",
+      "computedHash": "2c351187255be16045f62c5892921e7674d41def40324ad301a74eb7ef3e1e3b"
+    },
+    "architecture-decision-records": {
+      "source": "spencerpauly/awesome-cursor-skills",
+      "sourceType": "github",
+      "skillPath": "resources/architecture-decision-records/SKILL.md",
+      "computedHash": "815c525d0c7d75c41f46d88ad2e56a015b8193a00106da60687a98b5eec4aa5f"
+    },
+    "auth-better-auth": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/auth-better-auth/SKILL.md",
+      "computedHash": "9a09f92911978d365448a8b9ad70a9ceb31055e5205a404e5b79bfcb3e33e104"
+    },
+    "chef-assistant": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/malicious_skill/SKILL.md",
+      "computedHash": "8b2eacf0dadbaebff112c4a4b24f7a5f69c6329a130367371ee5041fe05684e0"
+    },
+    "code-formatter": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/mcp_clean_skill/SKILL.md",
+      "computedHash": "c05821267bf8caf4a96f4bdc95c6638619e76bd30a94287b5ffb1dc954574c93"
+    },
+    "code-reviewer": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/ssd/ssd_clean/SKILL.md",
+      "computedHash": "74532e9c13b9376c7fc1d2a5223bf1728b245d974361e48fad8dc8178d5eec1e"
+    },
+    "config-reader": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sdi/sdi3_scope_creep/SKILL.md",
+      "computedHash": "b0a627d83322e43e26a52df4ad3211b2e12d64177ed2909d4bd725f5a2aa5077"
+    },
+    "context7-cli": {
+      "source": "upstash/context7",
+      "sourceType": "github",
+      "skillPath": "skills/context7-cli/SKILL.md",
+      "computedHash": "6077b3c638fb7efb31d9b2c815436650de4aef73e7b671edec2f1c63f6a1e105"
+    },
+    "context7-mcp": {
+      "source": "upstash/context7",
+      "sourceType": "github",
+      "skillPath": "skills/context7-mcp/SKILL.md",
+      "computedHash": "6b02383f86f87e81a722b3b6c6d6e06efa5c72f23bc87bb02599e3d499ca2c58"
+    },
+    "creative-writing-coach": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/ssd/ssd2_novel_phrasing/SKILL.md",
+      "computedHash": "c93a6653986148ad233fea16a50b03dc2f522f4036b082a8e09e3a3e97948090"
+    },
+    "data-processor": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sdi/sdi4_divergence/SKILL.md",
+      "computedHash": "f22d95857b0329c64cf2760ddf6be4581b0ac43b0ccbc4230bcf22704451047d"
+    },
+    "database-design": {
+      "source": "spencerpauly/awesome-cursor-skills",
+      "sourceType": "github",
+      "skillPath": "resources/database-design/SKILL.md",
+      "computedHash": "fe96baa16ce9946d70f5ce9d107df37f809e4b11664a076a82769ce458757608"
+    },
+    "db-postgres": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/db-postgres/SKILL.md",
+      "computedHash": "434bf193992f9500bdfe650836804d91f9338a85b3146733527328ecff7f2630"
+    },
+    "deploy-service": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp2_clean/SKILL.md",
+      "computedHash": "a8abb022e547482f4571a5e4b6e9551bf35a9a601b4d8d483380b1a4391a30da"
+    },
+    "drawio-skill": {
+      "source": "Agents365-ai/drawio-skill",
+      "sourceType": "github",
+      "skillPath": "skills/drawio-skill/SKILL.md",
+      "computedHash": "c2831e1bd49708c7f1b41af4e1337165e3700ba52e2344d2b22d26e441034b85"
+    },
+    "file-indexer": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sdi/sdi_clean/SKILL.md",
+      "computedHash": "94450338959155cb9afa8b3a689988d070096cdfdbb77d0d6176fa8ae8ff322a"
+    },
+    "file-organizer": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp2_missing_warnings/SKILL.md",
+      "computedHash": "99172dc1a7ee40f5bf53d54035cfc10d21d4995dbe3ea6c500b1affded5284e7"
+    },
+    "find-docs": {
+      "source": "upstash/context7",
+      "sourceType": "github",
+      "skillPath": "skills/find-docs/SKILL.md",
+      "computedHash": "0210767e57873317edc8b91783a2f1b74eb9bbdd2139bd14e9129e9a0bbc2dd6"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "friendly-greeter": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/mcp_mismatched_skill/SKILL.md",
+      "computedHash": "cc97694f8ba5f143bd8e37c9c217c4e8ac67354fe78cf3154e04def54c6e2dd5"
+    },
+    "general-assistant": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp1_vague_triggers/SKILL.md",
+      "computedHash": "6d4c12a9a7759c1cd49a0a1898a4a0919504da9c32ba3591bfa31ed6418baf4b"
+    },
+    "helpful-formatter": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/ssd/ssd1_semantic_injection/SKILL.md",
+      "computedHash": "c9efe17231ee3b62b5790f229bbcc48f0df313ae2aa4107b62840147448d2e58"
+    },
+    "improve": {
+      "source": "shadcn/improve",
+      "sourceType": "github",
+      "skillPath": "skills/improve/SKILL.md",
+      "computedHash": "39a9358732dcff385e9e4d3e60b4547856f834e54a58b35e455aa9bd49928c13"
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "computedHash": "8bf292143ca93b00276a0de0fc5f84f2381f4690c5b0d32e99fa283a072f392f"
+    },
+    "jp-compliance-reporter": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp3_clean/SKILL.md",
+      "computedHash": "e7c25b5a22354869ac0dfc218152337e79fc6be00cb807e9a84d436af22c105b"
+    },
+    "markdown-formatter": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sdi/sdi2_inappropriate/SKILL.md",
+      "computedHash": "4bf52eb579ad39e3c200ca7abdeec7aaf543b8350bf919961746c2a1345736c4"
+    },
+    "nextjs-16": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nextjs-16/SKILL.md",
+      "computedHash": "7d6f7f23a46732fcaffcbd8e349ecf280b3d5e51a4e4a062f7112cbdb7e4d4be"
+    },
+    "nextjs-typescript-tailwindcss-supabase": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "nextjs-typescript-tailwindcss-supabase/SKILL.md",
+      "computedHash": "b866ca1d166d1e9140c236a839550c1c46853113de0905d107593f3b50800a22"
+    },
+    "onboarding-guide": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/ssd/ssd4_narrative_deception/SKILL.md",
+      "computedHash": "cddc9a2e5127026d9b8294d29f2dbab5b45112f67bb703f4bd925761223634bd"
+    },
+    "over-privileged-helper": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/mcp_overprivileged_skill/SKILL.md",
+      "computedHash": "e2050eaca5e2f2f01b9a73de2aeab8b85c5fcbe0aceaeeac30fef708ccb9f2c4"
+    },
+    "personal-assistant": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/ssd/ssd3_nl_exfiltration/SKILL.md",
+      "computedHash": "e6260f3fd2d6bdb6ac2e3923f46e50a9c10f9853d49688425bfc631d47dcfa20"
+    },
+    "ponytail": {
+      "source": "DietrichGebert/ponytail",
+      "sourceType": "github",
+      "skillPath": "skills/ponytail/SKILL.md",
+      "computedHash": "9c2a14a09838e12a6bc248e054529fe494060c0d8b78a7ff8e1696a980a12eee"
+    },
+    "react-native-patterns": {
+      "source": "spencerpauly/awesome-cursor-skills",
+      "sourceType": "github",
+      "skillPath": "resources/react-native-patterns/SKILL.md",
+      "computedHash": "bfd334c78246b5b5fd634f486653649eade74692d97f26287ecd1a6b7e4d3fba"
+    },
+    "report-generator": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp3_locale_forcing/SKILL.md",
+      "computedHash": "b386341b4c23ef443668246ee4f39bee04d876ef38e43746261e6539d160f540"
+    },
+    "reаd_data": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/mcp_poisoned_tool/SKILL.md",
+      "computedHash": "004a911f1e89209a0c26c271d14f7bb1e4af5b463cbfc9c82b6d3072e26af93c"
+    },
+    "safe-greeting": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/safe_skill/SKILL.md",
+      "computedHash": "c5c54478fe99bb2108af156265e19fd7b0d46de51f04de0c0843d520b608d702"
+    },
+    "shadcn": {
+      "source": "shadcn-ui/ui",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "ac9d0d69caac7de1d1e5647f3db3bcd2f13af355d6b3a78780fbf7fc80e8dca0"
+    },
+    "state-tanstack": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/state-tanstack/SKILL.md",
+      "computedHash": "71d146d1ec67694eb92e4ae1c3a76ef735756aea994576ace1013487a36fb527"
+    },
+    "supastarter-nextjs-skill": {
+      "source": "oscardrt/supastarter-nextjs-skill",
+      "sourceType": "github",
+      "skillPath": "supastarter-nextjs-skill/SKILL.md",
+      "computedHash": "9a875fe5b99655dc5993074b35997374a67d6e66731b37fa5826929ee90eb652"
+    },
+    "terraform-deployer": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sqp/sqp1_clean/SKILL.md",
+      "computedHash": "3fefbb687f5e480b8e7745cac2119c7f887020409503bd957d5a2012e4db560d"
+    },
+    "text-summarizer": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/sdi/sdi1_mismatch/SKILL.md",
+      "computedHash": "a69f8725e374afcc5ecbfa606f285a6f0f8f881bb6e246e152ea2f80a245d181"
+    },
+    "to-issues": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/to-issues/SKILL.md",
+      "computedHash": "4e2a11d35f018490d42a79234432f779d7131b9920373ef24cfbc68229bfef6c"
+    },
+    "ui-design-system": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ui-design-system/SKILL.md",
+      "computedHash": "a707d89289f6e74a45019c802fb26537a6fe5dca1aa931b81c8cf6eb58fcca83"
+    },
+    "ui-principles": {
+      "source": "aussiegingersnap/cursor-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ui-principles/SKILL.md",
+      "computedHash": "4bebeeb77b55210cb0468a63ed9fc6d7fcec79660f8c69ce67d711407157d646"
+    },
+    "underdeclared-agent": {
+      "source": "nvidia/skillspector",
+      "sourceType": "github",
+      "skillPath": "tests/fixtures/mcp_underdeclared_skill/SKILL.md",
+      "computedHash": "23bd54b56d6fec510710c21f6e8ee2c381e32ac6315e626377d4f55253167fe0"
+    },
+    "ux-enhancer": {
+      "source": "gashiartim/ux-enhancer",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "b557d65d14011517be74445e8cbcbeb3cee89439d89c29f05d42d4935a9fa35f"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/composition-patterns/SKILL.md",
+      "computedHash": "575757e3e25761c8c562d6e395d29f0b76c98b1273c0bd72d88e6ab1bc9c7d42"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
+    },
+    "vercel-react-view-transitions": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-view-transitions/SKILL.md",
+      "computedHash": "c8952fc9127fa0564d0cb71dccb4215a5608ac933b5831104f09173a97a46f85"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    }
+  }
+}

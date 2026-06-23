@@ -49,13 +49,13 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
     <button
       type="button"
       onClick={onClick}
-      className={`relative w-full text-left flex items-start gap-3 p-4 border-b border-slate-100 hover:bg-slate-50/80 transition-all cursor-pointer ${
+      className={`relative w-full text-left flex items-start gap-3 p-4 border-b border-slate-100 transition-colors cursor-pointer ${
         isActive
-          ? "bg-[#f4faf6]/60 border-l-[3px] border-l-[#006e2f] pl-[13px]"
-          : "pl-4"
+          ? "bg-[#f0faf3] border-l-[3px] border-l-[#006e2f] pl-[13px]"
+          : "pl-4 hover:bg-slate-50/80"
       }`}
     >
-      <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-semibold text-sm">
+      <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
         {oppositeParty.avatarUrl ? (
           <Image
             src={oppositeParty.avatarUrl}
@@ -70,13 +70,19 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-baseline mb-0.5">
-          <h4 className="font-semibold text-slate-800 text-sm truncate">
+        <div className="flex justify-between items-baseline gap-2 mb-0.5">
+          <h4
+            className={`text-sm truncate ${
+              isActive || isUnread
+                ? "font-bold text-slate-900"
+                : "font-semibold text-slate-800"
+            }`}
+          >
             {oppositeParty.name}
           </h4>
           <span
-            className={`text-[11px] font-medium shrink-0 ml-2 ${
-              isUnread ? "text-[#006e2f]" : "text-slate-400"
+            className={`text-[11px] font-semibold shrink-0 ${
+              isUnread || isActive ? "text-[#006e2f]" : "text-slate-400"
             }`}
           >
             {time}
@@ -84,8 +90,8 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
         </div>
 
         <p
-          className={`text-[13px] leading-normal line-clamp-2 pr-4 mb-2 ${
-            isUnread ? "text-slate-900 font-medium" : "text-slate-500"
+          className={`text-[13px] leading-snug line-clamp-1 mb-2 ${
+            isUnread ? "text-slate-800 font-medium" : "text-slate-500"
           }`}
         >
           {snippet}
@@ -93,14 +99,14 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
 
         <div className="flex items-center justify-between gap-2">
           {thread.jobTitle ? (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-[11px] font-medium text-slate-600">
-              {thread.jobTitle}
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-violet-50 border border-violet-100 text-[11px] font-semibold text-violet-700 truncate max-w-[85%]">
+              <span className="truncate">{thread.jobTitle}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
             </span>
           ) : (
             <span />
           )}
-          {isUnread && (
+          {isUnread && !isActive && (
             <span className="w-2 h-2 rounded-full bg-[#006e2f] shrink-0" />
           )}
         </div>

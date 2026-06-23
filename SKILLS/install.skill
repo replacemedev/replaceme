@@ -1,0 +1,270 @@
+# Cursor Agent Installation Prompt
+
+Copy this entire prompt and paste it into your Cursor Agent chat. It installs **all** recommended skills, rules, and references in one step — no separate SKILSS.json download needed.
+
+---
+
+## Prompt for Cursor/Claude:
+
+"Hey! Please install the following AI agent skills and rules into this workspace.
+
+Also, please always adhere to the following rules for all subsequent work in this session:
+
+# The Optimized Agent Workflow
+ALWAYS start with a \"Scope Prompt\" for new features:
+1. Identify ONLY required files.
+2. Do NOT scan the full repo.
+3. Ask before opening more than 5 files.
+4. Create an implementation plan first.
+5. Wait for user approval.
+
+# Force \"Plan → Build → Fix\" Phases
+- Phase 1 (Planning): Only create architecture plan. No code. List files needed.
+- Phase 2 (Targeted Build): Implement ONLY based on approved plan. Touch only listed files.
+- Phase 3 (Fix): Fix only the specific bug. Do not reanalyze the whole system.
+
+Execute these commands in the terminal sequentially. Use `.git` repository URLs (not web links). Run `npx skills add <repo> --list` first if a skill name is unknown.
+
+```bash
+# ── Core Recommended Skills (30-pack) ──────────────────────────────────────
+
+# Vercel Agent Skills
+npx skills add https://github.com/vercel-labs/agent-skills.git --skill vercel-react-best-practices -y
+npx skills add https://github.com/vercel-labs/agent-skills.git --skill web-design-guidelines -y
+npx skills add https://github.com/vercel-labs/agent-skills.git --skill vercel-composition-patterns -y
+npx skills add https://github.com/vercel-labs/agent-skills.git --skill vercel-react-view-transitions -y
+
+# Awesome Cursor Skills (spencerpauly)
+npx skills add https://github.com/spencerpauly/awesome-cursor-skills.git --skill react-native-patterns -y
+npx skills add https://github.com/spencerpauly/awesome-cursor-skills.git --skill architecture-decision-records -y
+npx skills add https://github.com/spencerpauly/awesome-cursor-skills.git --skill database-design -y
+
+# Matt Pocock — Planning & Architecture
+npx skills add https://github.com/mattpocock/skills.git --skill to-issues -y
+npx skills add https://github.com/mattpocock/skills.git --skill improve-codebase-architecture -y
+
+# Cursor Skills (aussiegingersnap)
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill nextjs-16 -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill ui-design-system -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill ui-principles -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill state-tanstack -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill db-postgres -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill api-rest -y
+npx skills add https://github.com/aussiegingersnap/cursor-skills.git --skill auth-better-auth -y
+
+# Next.js & Supabase Cursor Rules (project-local — do NOT use mdskills install; it overwrites .cursorrules)
+# Rules live in .cursor/rules/*.mdc and are already committed for this workspace:
+#   .cursor/rules/cursor-nextjs.mdc
+#   .cursor/rules/cursor-nextjs-typescript-tailwind.mdc
+#   .cursor/rules/cursor-typescript-nextjs-supabase.mdc
+#   .cursor/rules/cursor-nextjs-vercel-supabase.mdc
+# Keep BA Copilot context in .cursorrules only.
+
+# Mindrally — Next.js + Tailwind + Supabase
+npx skills add https://github.com/mindrally/skills.git --skill nextjs-typescript-tailwindcss-supabase -y
+
+# shadcn Improve + Supastarter
+npx skills add https://github.com/shadcn/improve.git --skill improve -y
+npx skills add https://github.com/oscardrt/supastarter-nextjs-skill.git -y
+
+# AbsolutelySkilled Registry (OWASP, Auth, Clean Code, System Design, A11y, Design Systems)
+npx skills add https://github.com/AbsolutelySkilled/AbsolutelySkilled.git --skill absolute -y
+
+# ── Workspace & Utility Skills ───────────────────────────────────────────────
+
+npx skills add https://github.com/vercel-labs/skills.git --skill find-skills -y
+npx skills add https://github.com/gashiartim/ux-enhancer.git -y
+npx skills add https://github.com/Agents365-ai/drawio-skill.git --skill drawio-skill -y
+npx skills add https://github.com/DietrichGebert/ponytail.git --skill ponytail -y
+
+# ── Architecture ─────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/ciembor/agent-rules-books.git --skill agent-rules-books -y
+npx skills add https://github.com/wshobson/agents.git --skill agents-marketplace -y
+
+# ── Next.js ──────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/vercel/ai.git --skill vercel-ai-sdk-rules -y
+npx skills add https://github.com/ixartz/Next-js-Boilerplate.git --skill next-js-saas-boilerplate-rules -y
+
+# ── React ────────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/kentcdodds/react-patterns.git --skill react-patterns -y
+npx skills add https://github.com/alan2207/bulletproof-react.git --skill bulletproof-react -y
+
+# ── TypeScript ───────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/total-typescript/total-typescript-book.git --skill typescript-expert -y
+npx skills add https://github.com/type-challenges/type-challenges.git --skill type-challenges -y
+
+# ── Supabase ─────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/supabase/supabase.git --skill supabase-official -y
+npx skills add https://github.com/supabase/ui.git --skill supabase-ui -y
+npx skills add https://github.com/supabase/supabase.git --skill supabase-examples -y
+
+# ── Stripe ───────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/stripe-samples/stripe-samples.git --skill stripe-samples -y
+npx skills add https://github.com/vercel/nextjs-subscription-payments.git --skill next-js-stripe-starter -y
+npx skills add https://github.com/nextacular/nextacular.git --skill saas-starter-stripe -y
+
+# ── Tailwind v4 ──────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/tailwindlabs/tailwindcss.git --skill tailwind-css -y
+npx skills add https://github.com/tailwindlabs/tailwindcss-forms.git --skill tailwind-plus-patterns -y
+npx skills add https://github.com/bitjaru/styleseed.git --skill styleseed -y
+
+# ── shadcn/ui ────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/shadcn-ui/ui.git --skill shadcn -y
+npx skills add https://github.com/majiayu000/claude-skill-registry.git --skill nextjs-shadcn-skill -y
+
+# ── UI/UX ────────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/refactoringui/refactoringui-book.git --skill refactoring-ui -y
+npx skills add https://github.com/shadcnblocks/aceternity-ui.git --skill aceternity-ui -y
+npx skills add https://github.com/magicuidesign/magicui.git --skill magic-ui -y
+npx skills add https://github.com/origin-space/originui.git --skill origin-ui -y
+npx skills add https://github.com/tremorlabs/tremor.git --skill tremor -y
+npx skills add https://github.com/cschroeter/park-ui.git --skill park-ui -y
+npx skills add https://github.com/markmead/hyperui.git --skill hyperui -y
+npx skills add https://github.com/themesberg/flowbite.git --skill flowbite -y
+npx skills add https://github.com/heroui-inc/heroui.git --skill heroui -y
+
+# ── Accessibility ────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/adobe/react-spectrum.git --skill react-aria -y
+npx skills add https://github.com/dequelabs/axe-core.git --skill axe-core -y
+npx skills add https://github.com/storybookjs/storybook.git --skill storybook-a11y -y
+
+# ── User Testing ─────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/microsoft/playwright.git --skill playwright -y
+npx skills add https://github.com/cypress-io/cypress.git --skill cypress -y
+npx skills add https://github.com/testing-library/react-testing-library.git --skill testing-library -y
+
+# ── Security ─────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/OWASP/CheatSheetSeries.git --skill owasp-cheat-sheets -y
+npx skills add https://github.com/semgrep/semgrep.git --skill semgrep -y
+npx skills add https://github.com/colinhacks/zod.git --skill zod-validation -y
+npx skills add https://github.com/nextauthjs/next-auth.git --skill auth-js -y
+npx skills add https://github.com/better-auth/better-auth.git --skill better-auth -y
+npx skills add https://github.com/arcjet/arcjet-js.git --skill arcjet -y
+
+# ── Database ─────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/drizzle-team/drizzle-orm.git --skill drizzle-orm -y
+npx skills add https://github.com/prisma/prisma.git --skill prisma -y
+npx skills add https://github.com/eugene-khyst/postgresql-performance-essentials.git --skill postgresql-patterns -y
+
+# ── Messaging ────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/triggerdotdev/trigger.dev.git --skill trigger-dev -y
+npx skills add https://github.com/novuhq/novu.git --skill novu -y
+
+# ── DevOps ───────────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/vercel/turborepo.git --skill turborepo -y
+npx skills add https://github.com/coollabsio/coolify.git --skill coolify -y
+npx skills add https://github.com/Dokploy/dokploy.git --skill dokploy -y
+
+# ── MCP Servers ──────────────────────────────────────────────────────────────
+
+npx skills add https://github.com/upstash/context7.git --skill context7-mcp --skill context7-cli --skill find-docs -y
+# Note: firecrawl, modelcontextprotocol/servers, github-mcp-server, playwright-mcp are MCP servers — install via Cursor MCP settings, not npx skills
+
+# ── SkillSpector Test Fixtures (Nvidia — security testing) ─────────────────
+
+npx skills add https://github.com/nvidia/skillspector.git --skill chef-assistant -y
+npx skills add https://github.com/nvidia/skillspector.git --skill code-formatter -y
+npx skills add https://github.com/nvidia/skillspector.git --skill friendly-greeter -y
+npx skills add https://github.com/nvidia/skillspector.git --skill over-privileged-helper -y
+npx skills add https://github.com/nvidia/skillspector.git --skill reаd_data -y
+npx skills add https://github.com/nvidia/skillspector.git --skill underdeclared-agent -y
+npx skills add https://github.com/nvidia/skillspector.git --skill safe-greeting -y
+npx skills add https://github.com/nvidia/skillspector.git --skill text-summarizer -y
+npx skills add https://github.com/nvidia/skillspector.git --skill markdown-formatter -y
+npx skills add https://github.com/nvidia/skillspector.git --skill config-reader -y
+npx skills add https://github.com/nvidia/skillspector.git --skill data-processor -y
+npx skills add https://github.com/nvidia/skillspector.git --skill file-indexer -y
+npx skills add https://github.com/nvidia/skillspector.git --skill terraform-deployer -y
+npx skills add https://github.com/nvidia/skillspector.git --skill general-assistant -y
+npx skills add https://github.com/nvidia/skillspector.git --skill deploy-service -y
+npx skills add https://github.com/nvidia/skillspector.git --skill file-organizer -y
+npx skills add https://github.com/nvidia/skillspector.git --skill jp-compliance-reporter -y
+npx skills add https://github.com/nvidia/skillspector.git --skill report-generator -y
+npx skills add https://github.com/nvidia/skillspector.git --skill helpful-formatter -y
+npx skills add https://github.com/nvidia/skillspector.git --skill creative-writing-coach -y
+npx skills add https://github.com/nvidia/skillspector.git --skill personal-assistant -y
+npx skills add https://github.com/nvidia/skillspector.git --skill onboarding-guide -y
+npx skills add https://github.com/nvidia/skillspector.git --skill code-reviewer -y
+```
+
+Please run these commands in the terminal now to install all the skills."
+
+---
+
+## Reference Catalog
+
+| # | Skill | Category | Source |
+|---|-------|----------|--------|
+| 1 | Vercel React Best Practices | Next.js/React | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) |
+| 2 | Vercel Web Design Guidelines | UI/UX | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) |
+| 3 | Vercel Composition Patterns | Next.js Architecture | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) |
+| 4 | Vercel View Transitions | UI Animation | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) |
+| 5 | React Native Patterns | Mobile Architecture | [spencerpauly/awesome-cursor-skills](https://github.com/spencerpauly/awesome-cursor-skills) |
+| 6 | Improve Architecture | Clean Architecture | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| 7 | Architecture Decision Records | Enterprise Architecture | [spencerpauly/awesome-cursor-skills](https://github.com/spencerpauly/awesome-cursor-skills) |
+| 8 | Database Design | Supabase/Postgres | [spencerpauly/awesome-cursor-skills](https://github.com/spencerpauly/awesome-cursor-skills) |
+| 9 | PRD to Issues (`to-issues`) | Product Engineering | [mattpocock/skills](https://github.com/mattpocock/skills) |
+| 10 | Next.js 16 Skill | Latest Next.js | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 11 | UI Design System | shadcn/UI | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 12 | UI Principles | Premium UI | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 13 | TanStack Query Patterns | React State | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 14 | PostgreSQL + Drizzle | Database | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 15 | REST API + Zod | API Design | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 16 | Better Auth | Authentication | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| 17 | Next.js + TypeScript + Tailwind | Modern Stack | `.cursor/rules/cursor-nextjs-typescript-tailwind.mdc` |
+| 18 | Next.js Skill | Next.js Best Practices | `.cursor/rules/cursor-nextjs.mdc` |
+| 19 | TypeScript + Next.js + Supabase | Full SaaS Stack | `.cursor/rules/cursor-typescript-nextjs-supabase.mdc` |
+| 20 | Next.js + Vercel + Supabase | Production SaaS | `.cursor/rules/cursor-nextjs-vercel-supabase.mdc` |
+| 21 | Next.js + Tailwind + Supabase | SaaS Boilerplate | [mindrally/skills](https://github.com/mindrally/skills) |
+| 22 | shadcn/ui Official Skill (`shadcn`) | UI Components | [shadcn-ui/ui](https://github.com/shadcn-ui/ui) |
+| 23 | React Native Skill | React Native | [spencerpauly/awesome-cursor-skills](https://github.com/spencerpauly/awesome-cursor-skills) |
+| 24 | Supastarter Next.js Skill | SaaS + Stripe | [oscardrt/supastarter-nextjs-skill](https://github.com/oscardrt/supastarter-nextjs-skill) |
+| 25–30 | AbsolutelySkilled (absolute) | Security, Auth, Clean Code, System Design, A11y, Design Systems | [AbsolutelySkilled/AbsolutelySkilled](https://github.com/AbsolutelySkilled/AbsolutelySkilled) |
+
+### Extended Reference (Frameworks, Tools, MCP)
+
+| Category | Skill | GitHub |
+|----------|-------|--------|
+| Architecture | Ponytail | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) |
+| Architecture | Agent Rules Books | [ciembor/agent-rules-books](https://github.com/ciembor/agent-rules-books) |
+| Architecture | Awesome Cursor Skills | [spencerpauly/awesome-cursor-skills](https://github.com/spencerpauly/awesome-cursor-skills) |
+| Architecture | Agents Marketplace | [wshobson/agents](https://github.com/wshobson/agents) |
+| Architecture | Absolutely Skilled | [AbsolutelySkilled/AbsolutelySkilled](https://github.com/AbsolutelySkilled/AbsolutelySkilled) |
+| Next.js | Next.js Skill Collection | [aussiegingersnap/cursor-skills](https://github.com/aussiegingersnap/cursor-skills) |
+| Next.js | Vercel AI SDK Rules | [vercel/ai](https://github.com/vercel/ai) |
+| Next.js | Next.js SaaS Boilerplate Rules | [ixartz/Next-js-Boilerplate](https://github.com/ixartz/Next-js-Boilerplate) |
+| React | React Patterns | [kentcdodds/react-patterns](https://github.com/kentcdodds/react-patterns) |
+| React | Bulletproof React | [alan2207/bulletproof-react](https://github.com/alan2207/bulletproof-react) |
+| TypeScript | TypeScript Expert | [total-typescript/total-typescript-book](https://github.com/total-typescript/total-typescript-book) |
+| TypeScript | Type Challenges | [type-challenges/type-challenges](https://github.com/type-challenges/type-challenges) |
+| Supabase | Supabase Official | [supabase/supabase](https://github.com/supabase/supabase) |
+| Supabase | Supabase UI | [supabase/ui](https://github.com/supabase/ui) |
+| Stripe | Stripe Samples | [stripe-samples](https://github.com/stripe-samples) |
+| Stripe | Next.js + Stripe Starter | [vercel/nextjs-subscription-payments](https://github.com/vercel/nextjs-subscription-payments) |
+| Tailwind v4 | Tailwind CSS | [tailwindlabs/tailwindcss](https://github.com/tailwindlabs/tailwindcss) |
+| shadcn/ui | shadcn/ui | [shadcn-ui/ui](https://github.com/shadcn-ui/ui) |
+| UI/UX | Refactoring UI, Aceternity, Magic UI, Origin UI, Tremor, Park UI, HyperUI, Flowbite, HeroUI | see install commands above |
+| Accessibility | React Aria, axe-core, Storybook A11y | see install commands above |
+| User Testing | Playwright, Cypress, Testing Library | see install commands above |
+| Security | OWASP, Semgrep, Zod, Auth.js, Better Auth, Arcjet | see install commands above |
+| Database | Drizzle ORM, Prisma, PostgreSQL Patterns | see install commands above |
+| Messaging | Trigger.dev, Novu | see install commands above |
+| DevOps | Turborepo, Coolify, Dokploy | see install commands above |
+| MCP | Context7 (`context7-mcp`, `context7-cli`, `find-docs`) | [upstash/context7](https://github.com/upstash/context7) |
+
+> **Note:** Many rows in the Extended Reference table are framework/documentation repos, not installable `SKILL.md` packages. Run `npx skills add <repo> --list` before installing. Repos confirmed **without** skills: `ciembor/agent-rules-books`, `playwright-mcp`, `github-mcp-server`, most UI library repos (Aceternity, Magic UI, etc.).

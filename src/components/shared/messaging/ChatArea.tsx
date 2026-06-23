@@ -1,13 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
-import {
-  Pin,
-  FolderOpen,
-  Calendar,
-  MoreVertical,
-} from "lucide-react";
+import { Pin, Tag, Archive, MoreVertical } from "lucide-react";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInputArea } from "./ChatInputArea";
@@ -21,6 +16,64 @@ interface ChatAreaProps {
   onTogglePin: () => Promise<void>;
 }
 
+function formatDateSeparator(isoString: string) {
+  const date = new Date(isoString);
+  const now = new Date();
+  const time = date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (date.toDateString() === now.toDateString()) {
+    return `TODAY, ${time}`;
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) {
+    return `YESTERDAY, ${time}`;
+  }
+
+  const day = date
+    .toLocaleDateString([], { weekday: "long" })
+    .toUpperCase();
+  const datePart = date.toLocaleDateString([], {
+    month: "short",
+    day: "numeric",
+  });
+  return `${day}, ${datePart}`;
+}
+
+function groupMessagesByDay(messages: MessagingMessage[]) {
+  const groups: { dateKey: string; label: string; items: MessagingMessage[] }[] =
+    [];
+
+  for (const message of messages) {
+    const dateKey = new Date(message.created_at).toDateString();
+    const last = groups[groups.length - 1];
+    if (last?.dateKey === dateKey) {
+      last.items.push(message);
+    } else {
+      groups.push({
+        dateKey,
+        label: formatDateSeparator(message.created_at),
+        items: [message],
+      });
+    }
+  }
+
+  return groups;
+}
+
+function partyInitials(name: string) {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export function ChatArea({
   thread,
   messages,
@@ -30,6 +83,7 @@ export function ChatArea({
 }: ChatAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPinning, setIsPinning] = useState(false);
+  const messageGroups = useMemo(() => groupMessagesByDay(messages), [messages]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -44,20 +98,14 @@ export function ChatArea({
     );
   }
 
-  const { oppositeParty, jobTitle } = thread;
-  const headerTitle = jobTitle || "Application Conversation";
-  const initials = oppositeParty.name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const { oppositeParty, contextTitle } = thread;
+  const initials = partyInitials(oppositeParty.name);
 
   return (
     <section className="flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0">
       <header className="shrink-0 h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-semibold text-sm">
+          <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
             {oppositeParty.avatarUrl ? (
               <Image
                 src={oppositeParty.avatarUrl}
@@ -71,22 +119,22 @@ export function ChatArea({
             )}
           </div>
           <div className="min-w-0">
-            <h3 className="font-bold text-slate-800 text-sm md:text-base truncate">
-              {headerTitle}
+            <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
+              {contextTitle}
             </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-xs text-slate-500 font-semibold truncate">
                 {oppositeParty.name}
               </span>
-              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold">
-                <span className="w-1 h-1 rounded-full bg-[#006e2f] animate-pulse" />
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold uppercase tracking-wide">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#006e2f]" />
                 Online
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 shrink-0">
           <button
             type="button"
             onClick={async () => {
@@ -107,45 +155,47 @@ export function ChatArea({
           <button
             type="button"
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
-            aria-label="Categorize"
+            aria-label="Tag conversation"
           >
-            <FolderOpen className="h-4.5 w-4.5" />
+            <Tag className="h-4.5 w-4.5" />
           </button>
           <button
             type="button"
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
-            aria-label="Schedule"
+            aria-label="Archive conversation"
           >
-            <Calendar className="h-4.5 w-4.5" />
+            <Archive className="h-4.5 w-4.5" />
           </button>
           <button
             type="button"
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
-            aria-label="More"
+            aria-label="More options"
           >
             <MoreVertical className="h-4.5 w-4.5" />
           </button>
         </div>
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 min-h-0">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
         {messages.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-12">
             No messages yet. Send one below to start the conversation.
           </p>
         ) : (
-          <>
-            <p className="text-center text-[10px] uppercase font-bold text-slate-400 bg-slate-100/80 px-3 py-1 rounded-full w-fit mx-auto mb-6">
-              Today
-            </p>
-            {messages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                currentUserId={currentUserId}
-              />
-            ))}
-          </>
+          messageGroups.map((group) => (
+            <div key={group.dateKey} className="mb-6 last:mb-0">
+              <p className="text-center text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-6">
+                {group.label}
+              </p>
+              {group.items.map((msg) => (
+                <MessageBubble
+                  key={msg.id}
+                  message={msg}
+                  currentUserId={currentUserId}
+                />
+              ))}
+            </div>
+          ))
         )}
       </div>
 

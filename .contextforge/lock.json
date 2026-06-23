@@ -1,0 +1,278 @@
+{
+  "registry": "https://registry.contextforge.org/index.json",
+  "resolvedAt": "2026-06-23T13:33:40.606Z",
+  "packs": {
+    "verification-before-completion": {
+      "title": "Verification Before Completion",
+      "version": "0.1.0",
+      "topic": "agent-workflow",
+      "classification": "always-referenced",
+      "path": "packs/verification-before-completion/pack.json",
+      "source": "https://registry.contextforge.org/packs/verification-before-completion/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "systematic-debugging": {
+      "title": "Systematic Debugging",
+      "version": "0.1.0",
+      "topic": "agent-workflow",
+      "classification": "always-referenced",
+      "path": "packs/systematic-debugging/pack.json",
+      "source": "https://registry.contextforge.org/packs/systematic-debugging/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "code-review": {
+      "title": "Code Review",
+      "version": "0.1.0",
+      "topic": "agent-workflow",
+      "classification": "task-triggered",
+      "path": "packs/code-review/pack.json",
+      "source": "https://registry.contextforge.org/packs/code-review/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "git-workflow": {
+      "title": "Git Workflow",
+      "version": "0.1.0",
+      "topic": "agent-workflow",
+      "classification": "task-triggered",
+      "path": "packs/git-workflow/pack.json",
+      "source": "https://registry.contextforge.org/packs/git-workflow/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "dependency-management": {
+      "title": "Dependency Management",
+      "version": "0.1.0",
+      "topic": "security",
+      "classification": "task-triggered",
+      "path": "packs/dependency-management/pack.json",
+      "source": "https://registry.contextforge.org/packs/dependency-management/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "diataxis-docs": {
+      "title": "Diátaxis Documentation",
+      "version": "0.1.0",
+      "topic": "agent-workflow",
+      "classification": "task-triggered",
+      "path": "packs/diataxis-docs/pack.json",
+      "source": "https://registry.contextforge.org/packs/diataxis-docs/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "nextjs-best-practices": {
+      "title": "Next.js Best Practices",
+      "version": "0.1.0",
+      "topic": "nextjs",
+      "classification": "always-referenced",
+      "path": "packs/nextjs-best-practices/pack.json",
+      "source": "https://registry.contextforge.org/packs/nextjs-best-practices/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "react-performance": {
+      "title": "React Performance",
+      "version": "0.1.0",
+      "topic": "react",
+      "classification": "always-referenced",
+      "path": "packs/react-performance/pack.json",
+      "source": "https://registry.contextforge.org/packs/react-performance/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "react-composition": {
+      "title": "React Composition Patterns",
+      "version": "0.1.0",
+      "topic": "react",
+      "classification": "always-referenced",
+      "path": "packs/react-composition/pack.json",
+      "source": "https://registry.contextforge.org/packs/react-composition/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "shadcn-ui": {
+      "title": "shadcn/ui",
+      "version": "0.1.0",
+      "topic": "design-system",
+      "classification": "always-referenced",
+      "path": "packs/shadcn-ui/pack.json",
+      "source": "https://registry.contextforge.org/packs/shadcn-ui/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "tailwind-v4": {
+      "title": "Tailwind Design System (v4)",
+      "version": "0.1.0",
+      "topic": "frontend",
+      "classification": "always-referenced",
+      "path": "packs/tailwind-v4/pack.json",
+      "source": "https://registry.contextforge.org/packs/tailwind-v4/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "ui-ux-design": {
+      "title": "UI/UX Design",
+      "version": "0.1.0",
+      "topic": "design-system",
+      "classification": "task-triggered",
+      "path": "packs/ui-ux-design/pack.json",
+      "source": "https://registry.contextforge.org/packs/ui-ux-design/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "frontend-aesthetics": {
+      "title": "Frontend Aesthetics",
+      "version": "0.1.0",
+      "topic": "frontend",
+      "classification": "task-triggered",
+      "path": "packs/frontend-aesthetics/pack.json",
+      "source": "https://registry.contextforge.org/packs/frontend-aesthetics/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "typescript-advanced-types": {
+      "title": "TypeScript Advanced Types",
+      "version": "0.1.0",
+      "topic": "frontend",
+      "classification": "task-triggered",
+      "path": "packs/typescript-advanced-types/pack.json",
+      "source": "https://registry.contextforge.org/packs/typescript-advanced-types/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "supabase": {
+      "title": "Supabase",
+      "version": "0.1.0",
+      "topic": "backend",
+      "classification": "always-referenced",
+      "path": "packs/supabase/pack.json",
+      "source": "https://registry.contextforge.org/packs/supabase/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "security-baseline": {
+      "title": "Security Baseline",
+      "version": "0.1.0",
+      "topic": "security",
+      "classification": "task-triggered",
+      "path": "packs/security-baseline/pack.json",
+      "source": "https://registry.contextforge.org/packs/security-baseline/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    },
+    "system-design": {
+      "title": "System Design",
+      "version": "0.1.0",
+      "topic": "architecture",
+      "classification": "task-triggered",
+      "path": "packs/system-design/pack.json",
+      "source": "https://registry.contextforge.org/packs/system-design/pack.json",
+      "files": [
+        "rules",
+        "agents",
+        "claude",
+        "skill",
+        "cursor",
+        "copilot"
+      ]
+    }
+  }
+}

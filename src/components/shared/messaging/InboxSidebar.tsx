@@ -1,7 +1,12 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { MessagingThread } from "@/types/messaging";
+import {
+  ALL_JOB_ROLES,
+  JobRoleFilterValue,
+  MessagingJobRole,
+  MessagingThread,
+} from "@/types/messaging";
 import { InboxThreadItem } from "./InboxThreadItem";
 
 interface InboxSidebarProps {
@@ -11,6 +16,9 @@ interface InboxSidebarProps {
   onSearchChange: (query: string) => void;
   activeTab: "all" | "unread" | "pinned";
   onTabChange: (tab: "all" | "unread" | "pinned") => void;
+  availableJobRoles: MessagingJobRole[];
+  selectedJobRole: JobRoleFilterValue;
+  onJobRoleChange: (jobRoleId: JobRoleFilterValue) => void;
   onSelectThread: (threadId: string) => void;
 }
 
@@ -21,9 +29,16 @@ export function InboxSidebar({
   onSearchChange,
   activeTab,
   onTabChange,
+  availableJobRoles,
+  selectedJobRole,
+  onJobRoleChange,
   onSelectThread,
 }: InboxSidebarProps) {
   const filtered = threads.filter((t) => {
+    if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
+      return false;
+    }
+
     const q = searchQuery.toLowerCase();
     const matches =
       t.oppositeParty.name.toLowerCase().includes(q) ||
@@ -36,13 +51,14 @@ export function InboxSidebar({
   });
 
   return (
-    <aside className="w-80 shrink-0 border-r border-slate-200 bg-white flex flex-col h-full">
+    <aside className="w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full">
       <div className="p-4 border-b border-slate-100 shrink-0">
-        <h2 className="text-xl font-bold text-slate-800 tracking-tight mb-3">
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
           Inbox
         </h2>
+
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+          <Search className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400 pointer-events-none" />
           <input
             type="search"
             placeholder="Search messages..."
@@ -51,6 +67,24 @@ export function InboxSidebar({
             className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] focus:border-[#006e2f]"
           />
         </div>
+
+        <label htmlFor="job-role-filter" className="sr-only">
+          Filter by Job Role
+        </label>
+        <select
+          id="job-role-filter"
+          value={selectedJobRole}
+          onChange={(e) => onJobRoleChange(e.target.value as JobRoleFilterValue)}
+          className="w-full mb-3 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] focus:border-[#006e2f] cursor-pointer"
+        >
+          <option value={ALL_JOB_ROLES}>All Roles</option>
+          {availableJobRoles.map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.title}
+            </option>
+          ))}
+        </select>
+
         <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/50">
           {(["all", "unread", "pinned"] as const).map((tab) => (
             <button
@@ -71,7 +105,7 @@ export function InboxSidebar({
 
       <div className="flex-1 overflow-y-auto min-h-0">
         {filtered.length === 0 ? (
-          <p className="flex items-center justify-center h-full text-sm font-medium text-slate-400">
+          <p className="flex items-center justify-center h-full text-sm font-medium text-slate-400 px-4 text-center">
             No conversations found
           </p>
         ) : (

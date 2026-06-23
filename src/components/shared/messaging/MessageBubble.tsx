@@ -152,15 +152,13 @@ export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
   }
 
   return (
-    <div className="flex flex-col items-start w-full mb-6 last:mb-2 max-w-[85%] sm:max-w-[70%] mr-auto">
-      {/* Chat Bubble card */}
-      <div className="w-full bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs">
+    <div className="flex flex-col items-start w-full mb-6 last:mb-2 max-w-[85%] sm:max-w-[72%] mr-auto">
+      <div className="w-full bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs">
         {renderParsedContent(message.content)}
       </div>
 
-      {/* Footer Details */}
       <div className="flex items-center gap-1.5 mt-2 ml-1">
-        <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-semibold text-[9px]">
+        <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-[9px]">
           {initials}
         </div>
         <span className="text-[11px] font-semibold text-slate-400">

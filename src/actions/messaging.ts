@@ -3,6 +3,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import {
+  buildContextTitle,
+  extractJobRolesFromThreads,
+  MessagingJobRole,
   MessagingMessage,
   MessagingRole,
   MessagingThread,
@@ -52,6 +55,7 @@ async function enrichThreads(
       .is("read_at", null);
 
     const jobs = t.jobs as { id: string; title: string } | null;
+    const jobTitle = jobs?.title ?? null;
     let oppositeParty: MessagingThread["oppositeParty"];
 
     if (role === "worker") {
@@ -87,7 +91,8 @@ async function enrichThreads(
       created_at: t.created_at as string,
       updated_at: t.updated_at as string,
       oppositeParty,
-      jobTitle: jobs?.title ?? null,
+      jobTitle,
+      contextTitle: buildContextTitle(jobTitle),
       last_message: lastMessages?.[0] ?? null,
       unread_count: unreadCount ?? 0,
     });
@@ -303,6 +308,14 @@ export async function toggleMessagingThreadPin(
     safeError("toggleMessagingThreadPin:", err);
     return { success: false };
   }
+}
+
+/** Unique job roles from the user's active threads (jobs / job_posts via FK). */
+export async function getMessagingJobRoles(
+  role: MessagingRole
+): Promise<MessagingJobRole[]> {
+  const threads = await getMessagingThreads(role);
+  return extractJobRolesFromThreads(threads);
 }
 
 export async function getUnreadMessagingCount(

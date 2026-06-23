@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getMessagingThreads,
   getMessagingMessages,
+  getMessagingJobRoles,
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 
@@ -30,7 +31,10 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   if (!profile || profile.role !== "worker") redirect("/login");
 
   const { threadId } = await searchParams;
-  const threads = await getMessagingThreads("worker");
+  const [threads, availableJobRoles] = await Promise.all([
+    getMessagingThreads("worker"),
+    getMessagingJobRoles("worker"),
+  ]);
   const initialMessages = threadId
     ? await getMessagingMessages(threadId)
     : [];
@@ -40,6 +44,7 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
       role="worker"
       basePath="/worker/messages"
       threads={threads}
+      availableJobRoles={availableJobRoles}
       initialMessages={initialMessages}
       selectedThreadId={threadId ?? null}
       currentUserId={profile.id}
