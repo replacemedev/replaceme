@@ -39,3 +39,16 @@ export interface WorkerDashboardData {
   skills: WorkerSkill[];
   earnings: EarningsMonth[];
 }
+
+export interface RecentMessage {
+  conversation_id: string;
+  latest_message: string | null;
+  latest_message_time: string | null;
+  sender_id: string | null;
+  other_first_name: string | null;
+  other_last_name: string | null;
+  other_avatar_url: string | null;
+  other_company_name: string | null;
+  other_company_logo: string | null;
+}
+

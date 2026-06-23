@@ -1,5 +1,5 @@
 import React from "react";
-import { WorkerHeader } from "@/components/dashboard/WorkerHeader";
+import { WorkerHeader } from "@/components/layout/WorkerHeader";
 import { Footer } from "@/components/layout/Footer";
 import { createClient } from "@/lib/supabase/server";
 

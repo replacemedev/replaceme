@@ -18,6 +18,8 @@ import { ProveExpertiseCard } from "@/components/worker/ProveExpertiseCard";
 import { EarningsOverviewCard } from "@/components/worker/EarningsOverviewCard";
 import { SkillPill } from "@/components/worker/SkillPill";
 import { QuickActionCard } from "@/components/worker/QuickActionCard";
+import { RecentMessageRow } from "@/components/worker/RecentMessageRow";
+import { RecentMessage } from "@/types/worker";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +90,86 @@ export default async function WorkerDashboard() {
     };
   });
 
+  // 5. Fetch recent conversations/messages for this worker
+  const { data: participantRows } = await supabase
+    .from("participants")
+    .select(`
+      conversation_id,
+      conversation:conversations (
+        id,
+        updated_at,
+        messages (
+          content,
+          created_at,
+          sender_id
+        ),
+        participants (
+          profile:profiles (
+            id,
+            first_name,
+            last_name,
+            avatar_url,
+            company_profiles (
+              company_name,
+              logo_url
+            )
+          )
+        )
+      )
+    `)
+    .eq("profile_id", profile.id);
+
+  const recentMessages: RecentMessage[] = [];
+  if (participantRows) {
+    for (const row of participantRows) {
+      const conv = row.conversation as any;
+      if (!conv) continue;
+      
+      // Get other participant (the employer)
+      const otherParticipant = conv.participants?.find(
+        (p: any) => p.profile?.id !== profile.id
+      );
+      
+      const otherProfile = otherParticipant?.profile;
+      const otherCompany = otherProfile?.company_profiles;
+      const companyName = Array.isArray(otherCompany)
+        ? otherCompany[0]?.company_name
+        : otherCompany?.company_name;
+      const companyLogo = Array.isArray(otherCompany)
+        ? otherCompany[0]?.logo_url
+        : otherCompany?.logo_url;
+
+      // Sort messages descending by created_at to find the latest
+      const msgs = conv.messages || [];
+      const sortedMsgs = [...msgs].sort(
+        (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      const latestMsg = sortedMsgs[0];
+
+      recentMessages.push({
+        conversation_id: conv.id,
+        latest_message: latestMsg?.content || null,
+        latest_message_time: latestMsg?.created_at || null,
+        sender_id: latestMsg?.sender_id || null,
+        other_first_name: otherProfile?.first_name || null,
+        other_last_name: otherProfile?.last_name || null,
+        other_avatar_url: otherProfile?.avatar_url || null,
+        other_company_name: companyName || null,
+        other_company_logo: companyLogo || null,
+      });
+    }
+  }
+
+  // Sort conversations by latest message time, descending
+  recentMessages.sort((a, b) => {
+    const timeA = a.latest_message_time ? new Date(a.latest_message_time).getTime() : 0;
+    const timeB = b.latest_message_time ? new Date(b.latest_message_time).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  // Limit to top 3 messages
+  const displayMessages = recentMessages.slice(0, 3);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-10">
       {/* Top Greeting Section */}
@@ -98,6 +180,24 @@ export default async function WorkerDashboard() {
         <p className="text-slate-500 font-medium text-sm leading-relaxed max-w-2xl">
           Welcome back to your dashboard. You have some new opportunities waiting for you. Let's make today productive.
         </p>
+      </div>
+
+      {/* Recent Messages Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+          Recent Messages
+        </h2>
+        {displayMessages.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {displayMessages.map((msg) => (
+              <RecentMessageRow key={msg.conversation_id} message={msg} />
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center bg-white border border-slate-200 rounded-2xl text-slate-500 font-semibold text-sm">
+            No recent messages yet. Connected employers will chat with you here.
+          </div>
+        )}
       </div>
 
       {/* Top Stats Row (4 Columns Grid) */}
