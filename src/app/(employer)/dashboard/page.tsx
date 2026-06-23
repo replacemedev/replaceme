@@ -77,9 +77,9 @@ export default async function EmployerDashboard() {
                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">
                   Your Job Posts
                 </h2>
-                {activeJobsCount > 0 && (
+                {jobs.length > 0 && (
                   <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-[11px] font-extrabold text-white bg-red-500 rounded-full select-none">
-                    {activeJobsCount}
+                    {jobs.length}
                   </span>
                 )}
               </div>

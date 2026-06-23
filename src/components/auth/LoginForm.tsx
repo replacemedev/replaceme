@@ -70,24 +70,24 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
     }
   }
 
+  const onError = (errors: any) => {
+    const firstErrorKey = Object.keys(errors)[0]
+    if (firstErrorKey) {
+      toast.error(errors[firstErrorKey].message)
+    }
+  }
+
   return (
     <div className="w-full">
-      {authError && (
-        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-          {authError}
-        </div>
-      )}
-
-      <form method="POST" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form method="POST" onSubmit={handleSubmit(onSubmit, onError)} className="space-y-5">
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
-            Username or Email Address
+            Email or Username
           </label>
           <Input
             {...register("email")}
-            placeholder="Enter your email"
+            placeholder="Enter your email or username"
             icon={<Mail size={18} />}
-            error={errors.email?.message}
           />
         </div>
 
@@ -99,7 +99,6 @@ export function LoginForm({ onForgotPassword }: { onForgotPassword: () => void }
             {...register("password")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
-            error={errors.password?.message}
           />
         </div>
 

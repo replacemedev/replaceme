@@ -31,7 +31,7 @@ export function JobCard({ job }: JobCardProps) {
 
         <Link
           href={`/jobs/${job.id}`}
-          className="block text-lg font-bold text-[#006e2f] hover:text-[#005321] hover:underline leading-snug tracking-tight truncate-2-lines transition-colors"
+          className="block text-lg font-bold text-blue-600 hover:text-blue-800 hover:underline leading-snug tracking-tight truncate-2-lines transition-colors"
         >
           {job.title}
         </Link>

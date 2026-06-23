@@ -59,9 +59,9 @@ export function SignUpForm() {
       if (!result.success) {
         const errMsg = result.error
         if (errMsg === "auth/username-already-exists") {
-          setError("username", { message: "This username is already taken. Please choose another." })
+          toast.error("This username is already taken. Please choose another.")
         } else if (errMsg === "auth/email-already-exists") {
-          setError("email", { message: "This email is already registered. Please log in." })
+          toast.error("This email is already registered. Please log in.")
         } else {
           const sanitizedMsg = typeof errMsg === "string" ? errMsg : "Failed to create user account."
           setAuthError(sanitizedMsg)
@@ -70,8 +70,7 @@ export function SignUpForm() {
       } else {
         toast.success(result.message)
         if (result.redirectUrl) {
-          router.push(result.redirectUrl)
-          router.refresh()
+          window.location.href = result.redirectUrl
         }
       }
     } catch (err) {
@@ -79,6 +78,13 @@ export function SignUpForm() {
       toast.error("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const onError = (errors: any) => {
+    const firstErrorKey = Object.keys(errors)[0]
+    if (firstErrorKey) {
+      toast.error(errors[firstErrorKey].message)
     }
   }
 
@@ -93,13 +99,7 @@ export function SignUpForm() {
         onChange={handleRoleChange}
       />
 
-      {authError && (
-        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-          {authError}
-        </div>
-      )}
-
-      <form method="POST" onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      <form method="POST" onSubmit={handleSubmit(onSubmit, onError)} className="space-y-3">
         <input type="hidden" {...register("role")} />
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-1.5">
@@ -109,7 +109,6 @@ export function SignUpForm() {
             {...register("username")}
             placeholder="janesmith"
             icon={<User size={18} />}
-            error={errors.username?.message as string}
           />
         </div>
 
@@ -121,7 +120,6 @@ export function SignUpForm() {
             {...register("fullName")}
             placeholder="Jane Doe"
             icon={<User size={18} />}
-            error={errors.fullName?.message as string}
           />
         </div>
 
@@ -134,7 +132,6 @@ export function SignUpForm() {
               {...register("companyName")}
               placeholder="TechCorp Inc."
               icon={<Briefcase size={18} />}
-              error={errors.companyName?.message as string}
             />
           </div>
         )}
@@ -147,7 +144,6 @@ export function SignUpForm() {
             {...register("email")}
             placeholder="jane@example.com"
             icon={<Mail size={18} />}
-            error={errors.email?.message as string}
           />
         </div>
 
@@ -159,7 +155,6 @@ export function SignUpForm() {
             {...register("password")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
-            error={errors.password?.message as string}
           />
           <p className="text-xs text-slate-500 mt-1">Must be at least 8 characters.</p>
         </div>
@@ -172,7 +167,6 @@ export function SignUpForm() {
             {...register("confirmPassword")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
-            error={errors.confirmPassword?.message as string}
           />
         </div>
 
@@ -183,14 +177,21 @@ export function SignUpForm() {
               I agree to the <a href="/terms" className="text-[#22c55e] hover:underline">Terms of Service</a> and <a href="/privacy" className="text-[#22c55e] hover:underline">Privacy Policy</a>
             </span>
           </label>
-          {errors.terms && (
-            <p className="text-red-500 text-xs mt-1">{errors.terms.message as string}</p>
-          )}
         </div>
 
         <div className="pt-1.5">
           <Button type="submit" variant="success" disabled={isLoading} className="w-full text-base h-12">
-            {isLoading ? "Creating Account..." : "Create Account"}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating Account...
+              </span>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </div>
       </form>

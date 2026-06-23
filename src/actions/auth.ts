@@ -27,7 +27,7 @@ function handleAuthError(error: any): string {
   }
   
   if (message.includes("Email not confirmed")) {
-    return "Please check your email to confirm your account before logging in.";
+    return "Please confirm your email address before logging in. A confirmation link was sent to your email.";
   }
   
   if (message.includes("Invalid login credentials")) {
@@ -133,7 +133,7 @@ export async function signUp(formData: any) {
     if (!authData.session) {
       return {
         success: true,
-        message: "Registration successful! Please check your email to confirm your account before logging in.",
+        message: "Registration successful! Please check your email to confirm your account before logging in. (This link/code expires in 10 minutes)",
         requiresConfirmation: true
       };
     }
@@ -161,19 +161,50 @@ export async function logIn(formData: any) {
 
     const { email, password } = parsed.data;
 
+    // 1. Dual username/email login lookup
+    let emailToAuth = email;
+    if (!email.includes("@")) {
+      const { data: profileData, error: profileErr } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("username", email)
+        .single();
+      
+      if (profileErr || !profileData?.email) {
+        return { success: false, error: "Invalid login credentials." };
+      }
+      emailToAuth = profileData.email;
+    }
+
+    // 2. Perform authentication with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: emailToAuth,
       password,
     });
 
     if (error) {
+      if (error.message.includes("Email not confirmed")) {
+        return { 
+          success: false, 
+          error: "Please confirm your email address before logging in. A confirmation link was sent to your email." 
+        };
+      }
       return { success: false, error: handleAuthError(error) };
     }
 
-    // 1. Try reading the role directly from authenticated session metadata
+    // 3. Strict Email Confirmation check post-session-validation
+    if (data.user && !data.user.email_confirmed_at) {
+      await supabase.auth.signOut();
+      return { 
+        success: false, 
+        error: "Please confirm your email address before logging in. A confirmation link was sent to your email." 
+      };
+    }
+
+    // 4. Try reading the role directly from authenticated session metadata
     let role = data.user.user_metadata?.role;
 
-    // 2. Fall back to querying the database profiles table using user primary key
+    // 5. Fall back to querying the database profiles table using user primary key
     if (!role) {
       const { data: profile, error: dbError } = await supabase
         .from("profiles")

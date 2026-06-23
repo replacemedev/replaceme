@@ -58,15 +58,16 @@ export function ForgotPasswordForm({
     }
   }
 
+  const onError = (errors: any) => {
+    const firstErrorKey = Object.keys(errors)[0]
+    if (firstErrorKey) {
+      toast.error(errors[firstErrorKey].message)
+    }
+  }
+
   return (
     <div className="w-full">
-      {errorMsg && (
-        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-          {errorMsg}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-5">
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
             Email Address
@@ -76,8 +77,10 @@ export function ForgotPasswordForm({
             type="email"
             placeholder="Enter your email"
             icon={<Mail size={18} />}
-            error={errors.email?.message}
           />
+          <p className="text-xs text-slate-500 mt-2">
+            This code expires in 10 minutes.
+          </p>
         </div>
 
         <div className="pt-2 space-y-3">

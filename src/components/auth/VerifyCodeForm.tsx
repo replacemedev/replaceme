@@ -85,15 +85,16 @@ export function VerifyCodeForm({
     }
   }
 
+  const onError = (errors: any) => {
+    const firstErrorKey = Object.keys(errors)[0]
+    if (firstErrorKey) {
+      toast.error(errors[firstErrorKey].message)
+    }
+  }
+
   return (
     <div className="w-full">
-      {errorMsg && (
-        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-          {errorMsg}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4">
         <div>
           <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
             Verification Code
@@ -103,10 +104,12 @@ export function VerifyCodeForm({
             type="text"
             placeholder="Enter 6-digit OTP"
             icon={<Key size={18} />}
-            error={errors.code?.message}
             maxLength={6}
           />
-          <div className="flex justify-between items-center mt-1">
+          <p className="text-xs text-slate-500 mt-1.5">
+            This code expires in 10 minutes.
+          </p>
+          <div className="flex justify-between items-center mt-1.5">
             <span className="text-xs text-slate-400">Sent to {email}</span>
             <button
               type="button"
@@ -127,7 +130,6 @@ export function VerifyCodeForm({
             {...register("password")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
-            error={errors.password?.message}
           />
         </div>
 
@@ -139,7 +141,6 @@ export function VerifyCodeForm({
             {...register("confirmPassword")}
             placeholder="Confirm new password"
             icon={<Lock size={18} />}
-            error={errors.confirmPassword?.message}
           />
         </div>
 
