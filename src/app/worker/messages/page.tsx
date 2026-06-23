@@ -1,54 +1,47 @@
-import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getWorkerThreads, getThreadMessages } from "@/actions/worker/messages";
-import { MessagingClient } from "@/components/worker/messages/MessagingClient";
-import { ChatMessage } from "@/types/messaging";
+import {
+  getMessagingThreads,
+  getMessagingMessages,
+} from "@/actions/messaging";
+import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 
 export const dynamic = "force-dynamic";
 
-interface WorkerMessagesPageProps {
-  searchParams: Promise<{
-    threadId?: string;
-  }>;
+interface PageProps {
+  searchParams: Promise<{ threadId?: string }>;
 }
 
-export default async function WorkerMessagesPage({ searchParams }: WorkerMessagesPageProps) {
+export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    redirect("/login");
-  }
+  if (authError || !user) redirect("/login");
 
-  // Double check worker role eligibility
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile } = await supabase
     .from("profiles")
     .select("id, role")
     .eq("id", user.id)
     .single();
 
-  if (profileError || !profile || profile.role !== "worker") {
-    redirect("/login");
-  }
+  if (!profile || profile.role !== "worker") redirect("/login");
 
-  // Fetch threads joining company profiles and job details
-  const threads = await getWorkerThreads();
-
-  // Resolve searchParams promise
-  const resolvedParams = await searchParams;
-  const activeThreadId = resolvedParams.threadId || null;
-
-  let initialMessages: ChatMessage[] = [];
-  if (activeThreadId) {
-    initialMessages = await getThreadMessages(activeThreadId);
-  }
+  const { threadId } = await searchParams;
+  const threads = await getMessagingThreads("worker");
+  const initialMessages = threadId
+    ? await getMessagingMessages(threadId)
+    : [];
 
   return (
     <MessagingClient
+      role="worker"
+      basePath="/worker/messages"
       threads={threads}
       initialMessages={initialMessages}
-      selectedThreadId={activeThreadId}
+      selectedThreadId={threadId ?? null}
       currentUserId={profile.id}
     />
   );

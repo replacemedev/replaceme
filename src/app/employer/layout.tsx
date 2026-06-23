@@ -2,7 +2,7 @@ import React from "react";
 import { Header } from "@/components/dashboard/EmployerHeader";
 import { Footer } from "@/components/layout/Footer";
 import { createClient } from "@/lib/supabase/server";
-import { getUnreadMessageCount } from "@/actions/employer/messages";
+import { getUnreadMessagingCount } from "@/actions/messaging";
 export const dynamic = "force-dynamic";
 
 export default async function EmployerLayout({
@@ -51,7 +51,7 @@ export default async function EmployerLayout({
     }
   }
 
-  const unreadMessageCount = await getUnreadMessageCount();
+  const unreadMessageCount = await getUnreadMessagingCount("employer");
 
   return (
     <>

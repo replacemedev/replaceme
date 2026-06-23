@@ -1,0 +1,50 @@
+---
+description: Next.js App Router with TypeScript and Tailwind CSS patterns for BA Copilot
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js + TypeScript + Tailwind CSS
+
+## Project paths
+
+- App Router lives in `src/app` — never create a root-level `app/` directory
+- Route-specific components: colocate in the route folder under `src/app`
+- Shared components: `src/components`
+- Hooks: `src/hooks`
+- Utilities and helpers: `src/lib`
+
+## TypeScript
+
+- Use TypeScript for all new code; prefer interfaces for object shapes
+- Avoid `any`; use `unknown` with narrowing or Zod validation
+- Use functional components with explicit prop interfaces
+- Favor named exports for components and utilities
+
+## Tailwind CSS
+
+- Use Tailwind utility classes for layout and styling
+- Mobile-first responsive design (`sm:`, `md:`, `lg:` breakpoints)
+- Keep class lists readable; extract repeated patterns to components
+- Use design tokens / theme variables when the project defines them
+
+## Next.js conventions
+
+- Default to Server Components; add `'use client'` only when needed
+- Use the App Router — not the Pages Router
+- Use `next/image` for images with explicit width/height or fill
+- Use route handlers (`route.ts`) for API endpoints under `src/app/api`
+- Implement `loading.tsx` and `error.tsx` for data-fetching routes
+
+## Code quality
+
+- Follow existing ESLint and Prettier configuration
+- Match surrounding file structure and naming conventions
+- Validate user inputs; handle errors with clear UI feedback
+- Minimize comments; prefer clear names over explanatory noise
+
+## Resources
+
+- [Next.js App Router docs](https://nextjs.org/docs/app)
+- [TypeScript handbook](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS docs](https://tailwindcss.com/docs)

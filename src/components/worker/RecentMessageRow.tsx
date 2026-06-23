@@ -26,7 +26,7 @@ export function RecentMessageRow({ message }: RecentMessageRowProps) {
 
   return (
     <Link
-      href={`/worker/messages?id=${message.conversation_id}`}
+      href={`/worker/messages?threadId=${message.conversation_id}`}
       className="group flex items-center justify-between p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-200 gap-4"
     >
       <div className="flex items-center gap-4 min-w-0 flex-1">

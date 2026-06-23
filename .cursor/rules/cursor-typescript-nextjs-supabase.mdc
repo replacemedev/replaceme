@@ -1,0 +1,80 @@
+---
+description: TypeScript, Next.js App Router, and Supabase integration patterns for BA Copilot
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript + Next.js + Supabase
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Material UI, Supabase, Tailwind, TanStack Query, and Vercel AI SDK.
+
+## Project paths
+
+- App Router: `src/app` only — never create root-level `app/`
+- Supabase clients: centralize in `src/lib/supabase` (or existing project location)
+- Server actions: `src/actions` or colocated with routes
+
+## Code style and structure
+
+- Write concise, technical TypeScript with accurate examples
+- Use functional and declarative patterns; avoid classes
+- Prefer iteration and modularization over duplication
+- Use descriptive names with auxiliary verbs (e.g., `isLoading`, `hasError`)
+- Structure files: exported component, subcomponents, helpers, static content, types
+
+## Naming conventions
+
+- Lowercase with dashes for directories (e.g., `components/auth-wizard`)
+- Favor named exports for components
+
+## TypeScript
+
+- TypeScript for all code; prefer interfaces over type aliases for objects
+- Avoid enums; use const objects or `as const`
+- Functional components with TypeScript interfaces
+
+## UI and styling
+
+- Primary UI: Material UI (MUI) per project stack
+- Use Tailwind where the project already mixes utility classes
+- Responsive, mobile-first layouts
+
+## Supabase
+
+- Use `@supabase/ssr` for server/client Supabase clients — not deprecated auth-helpers
+- On the server, authenticate with `getUser()` — never rely on `getSession()` alone
+- Enable Row Level Security on every table; define policies per operation
+- Use generated Supabase types for query type safety
+- Mutations: prefer Server Actions with Zod validation and `getUser()` checks
+
+## Performance
+
+- Minimize `'use client'`, `useEffect`, and `useState`; favor Server Components
+- Wrap client components in `Suspense` with fallbacks
+- Dynamic-import non-critical client components
+- Optimize images with `next/image`
+
+## Data fetching
+
+- Server Components for initial data where possible
+- TanStack Query for client-side cache/sync when appropriate
+- Use Next.js caching and revalidation (`revalidatePath`, `revalidateTag`)
+- Route handlers (`route.ts`) for webhooks and external API surfaces
+
+## Vercel AI SDK
+
+- Use for chat, streaming, and tool-calling features
+- Keep provider keys server-side only
+- Prefer RSC/streaming patterns aligned with App Router
+
+## Error handling
+
+- `error.tsx` boundaries for route segments that fetch data
+- `loading.tsx` for async route loading states
+- Return structured errors from Server Actions (success/error union)
+
+## SEO and metadata
+
+- Use the App Router `metadata` export or `generateMetadata` for pages
+
+Follow official Next.js docs for data fetching, rendering, and routing.

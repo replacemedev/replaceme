@@ -1,0 +1,88 @@
+---
+description: Vercel deployment and Supabase architecture guardrails for BA Copilot (auth, RLS, Server Actions)
+globs: src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Next.js + Vercel + Supabase Architecture
+
+Follow these rules unconditionally when touching auth, database, or deployment code.
+
+## Stack (BA Copilot)
+
+- Framework: Next.js App Router (`src/app`)
+- Hosting: Vercel
+- Database & auth: Supabase (PostgreSQL + RLS, `@supabase/ssr`)
+- Validation: Zod
+- Client data: TanStack Query where needed
+
+## RULE 1: NEVER use getSession() on the server
+
+`getSession()` reads the JWT from cookies without verifying it. Always use `getUser()` server-side.
+
+```typescript
+// ✅ CORRECT
+const supabase = await createClient()
+const { data: { user } } = await supabase.auth.getUser()
+if (!user) redirect('/login')
+
+// ❌ WRONG — unverified JWT
+const { data: { session } } = await supabase.auth.getSession()
+```
+
+## RULE 2: Await params and searchParams (Next.js 15+)
+
+Route `params` and `searchParams` are Promises in Next.js 15+.
+
+```typescript
+// ✅ CORRECT
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+}
+```
+
+## RULE 3: Use @supabase/ssr only
+
+Do not import from `@supabase/auth-helpers-nextjs` (deprecated for App Router).
+
+## RULE 4: Enable RLS on every table
+
+```sql
+ALTER TABLE public.my_table ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users read own rows"
+  ON public.my_table FOR SELECT
+  USING (auth.uid() = user_id);
+```
+
+## RULE 5: Default to Server Components
+
+Add `'use client'` only for interactivity. Push client boundaries to the smallest leaf.
+
+## RULE 6: Mutations via Server Actions
+
+Validate with Zod, authenticate with `getUser()`, return `{ success, data?, error? }`.
+
+## RULE 7: Data-fetching routes need loading + error UI
+
+Pair pages that fetch with `loading.tsx` and `error.tsx`.
+
+## RULE 8: Secrets stay server-side
+
+- Never put `sk_` Stripe keys or Supabase service role keys in `NEXT_PUBLIC_*`
+- Configure secrets in Vercel project settings, not committed `.env` files
+
+## RULE 9: TypeScript strict — no `any`
+
+Use generated Supabase types and Zod-inferred types.
+
+## RULE 10: Middleware refreshes sessions only
+
+Do not enforce authorization in middleware alone. Enforce in layouts/pages with `getUser()`.
+
+## Vercel deployment
+
+- Use environment variables per Vercel environment (Production / Preview / Development)
+- Supabase URL and anon key may be public; service role key must not be
+- Prefer Server Actions and Route Handlers over client-side direct DB writes
+- Use Vercel preview deployments with separate Supabase branches/projects when possible
