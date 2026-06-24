@@ -1,137 +1,50 @@
+---
+description: 
+alwaysApply: true
+---
+
 # Cursorrules
 
 ## Intro
+I am building a Premium Multi-Role SaaS Marketplace, connecting Workers, Employers, and Admins. The architecture must enforce strict separation of concerns, pixel-perfect UI/UX consistency across all roles, secure role-based access control, and unshakeable relational database integrity.
 
-I am building 'BA Copilot', where BA stands for Business Analysts. I will sometimes refer to it as bacp.
+## Tech Stack
+- **Framework:** Next.js (App Router strictly. Do NOT use Pages router).
+- **Styling:** Tailwind CSS v4 (Rely purely on Tailwind utility classes. Do not use Material UI or legacy CSS modules).
+- **Database & Auth:** Supabase (PostgreSQL, Row Level Security, Supabase Auth). Admin access must be securely gated via custom auth claims or a dedicated `admin_profiles` table.
+- **Language:** TypeScript (Strict typing required for all database schemas, UI props, and API responses).
+- **Data Fetching:** React Server Components (for reading) and Next.js Server Actions (for mutations).
 
-## BA Copilot MVP
+## Core Architectural Directives
 
-### Overview
+### 1. The Ponytail "Zero-Spaghetti" Doctrine
+- **Flat DOM Architecture:** Eradicate "div soup". Remove unnecessary wrapper `<div>` elements. Keep the DOM tree as shallow and readable as possible.
+- **No Hardcoded Spacing Hacks:** Rely purely on Tailwind Grid and Flex utilities (e.g., `gap-6`, `grid-cols-12`). Do not push elements around using arbitrary margins.
+- **State Hygiene:** Keep client-side state isolated to the tiniest components possible (e.g., `<UserDropdown />`, `<ApplyButton />`, `<DataGridFilter />`). Keep layout shells, dashboards, and data-fetching orchestrators as Server Components.
 
-It is an assistant for business analysts. The MVP will be a an ai chatbot type tool, which will render BPMN diagrams using bpmn-js. The user can then iterate on them either with:
+### 2. Absolute Zero Mock Data Policy
+- **No Hardcoding:** You are strictly forbidden from hardcoding dummy arrays, fake jobs, placeholder stats, or mockup data in UI components.
+- **No Seeding:** Do not create or suggest PL/pgSQL seeding functions to inject fake data.
+- **Graceful Empty States:** The system must natively handle empty databases using beautiful, coded `<EmptyState />` components.
 
-- additional discussion
-- editing the diagram directly (bpmn-js supports this)
+### 3. Strict Relational Integrity & Admin Security (The Marketplace Bridge)
+- Workers (`profiles`) and Employers (`company_profiles`) do not exist in silos. They are connected via explicit relational bridges: `job_posts`, `job_applications`, and `chat_threads`. 
+- **Admin Oversight:** Admins have cross-domain visibility. The database schema must support scalable global queries (e.g., total platform metrics, user moderation, dispute resolution).
+- **Backend Data Fetching:** Always execute explicit JOINs across these domains to render the UI dynamically.
+- **Server Actions & Role Verification:** All mutations MUST strictly verify user ownership/authorization. Admin-specific Server Actions MUST verify the `admin` role/claim before execution. Immediately call `revalidatePath` to synchronize state across Worker, Employer, and Admin views.
 
-### UI Description
+### 4. UI/UX & Component Unification (DRY Principle)
+- **Role-Agnostic Shared Components:** When Worker, Employer, and Admin views share the same interface (e.g., Messaging Centers, Data Tables, Stat Cards), do NOT duplicate code. Abstract them into `src/components/shared/...` and pass agnostic props (e.g., `partyName`, `viewMode`, `isAdmin`).
+- **Mobile-to-Desktop Responsiveness:** Implement a mobile-first approach. Strictly utilize Tailwind's `sm:`, `md:`, `lg:`, and `xl:` breakpoints to ensure layouts, paddings, and typography adapt flawlessly to all screen sizes.
+- **Pixel-Perfect Fidelity:** Replicate provided designs with exact spacing, hover states, interactive badges, and typography hierarchy.
 
-Here is a hierarchical, indented bullet description of the BA Copilot MVP, focusing on its functionality for creating and iterating on BPMN diagrams:
+### 5. Strict Routing Taxonomy
+- **Namespacing:** - All Worker routes MUST live under `src/app/worker/*`. 
+  - All Employer routes MUST live under `src/app/employer/*`.
+  - All Admin routes MUST live under `src/app/admin/*`.
+- **No Route Pollution:** Do not use implicit route groups (e.g., `(worker)`, `(admin)`) if they expose role-specific pages at the root level `/`. Use hard folder paths to ensure middleware can easily enforce role-based route protection.
 
-BA Copilot Interface
-
-Question Input Section
-
-Users can input questions or requests related to business processes. Example: "Based on the doc content what have I missed?"
-
-Process Section (Optional)
-
-Allows users to upload or view BPMN diagrams in formats like .png, .vsdx, etc. Users can visualize and edit existing diagrams or create new ones. Example: A BPMN diagram showing a flow of "Register expense report", "Approve", and "Deny" processes.
-
-Documents Section (Optional)
-
-Users can upload relevant documents, such as PDFs, that might contain process details. Example: "Shelter - employee handbook.pdf" uploaded to provide context for the BPMN diagram.
-
-Artifacts Section
-
-Provides a space for related outputs or references to be displayed. Example: Diagram suggestions based on uploaded content.
-
-Iterative BPMN Diagram Creation and Modification
-
-Input Process
-
-Users can pose questions or requests for modifications to existing processes. Example: Asking for missing steps in the process based on document content.
-
-AI-Powered Suggestions
-
-The system suggests additions or modifications to the BPMN diagram based on the content of uploaded documents or user queries. Example: Suggestion to add a task for checking the expense policy, citing specific sections from the uploaded handbook.
-
-Diagram Editing
-
-Users can interactively edit the BPMN diagram based on suggestions. Example: Adding a task "Check expense policy" with inputs and outputs like "Expense report" and "Checked expense report".
-
-Documentation and References
-
-The system references uploaded documents and highlights relevant sections. Example: Citing "Section 7. Claiming reimbursement for payments made on behalf of the company" from the employee handbook.
-
-User Workflow
-
-Start with a Question
-
-User initiates the process by asking a question or making a request.
-
-Upload Process Diagrams and Documents
-
-User uploads existing diagrams and documents for context.
-
-Receive AI-Generated Suggestions
-
-System provides suggestions to enhance or correct the process flow.
-
-Modify BPMN Diagram
-
-User edits the BPMN diagram based on the received suggestions.
-
-Iterate Until Satisfied
-
-User continues to ask follow-up questions and modify the diagram until the desired outcome is achieved.
-
-This BA Copilot MVP allows users to efficiently create, modify, and iterate on BPMN diagrams with contextual suggestions, leveraging uploaded documents and user queries.
-
-## BA Copilot Vision
-
-### Overview
-
-The vision for this is that it will be the home for business analysts to get assistance relating to their jobs. It will protect itself network effects to increase the value of the product e.g. BA agencies posting their products in the toolkit section, and members discussing BA topics in community section. It will also protect itself via an ever improving model for BA tasks e.g. BPMN generation. Although it will never be trained on user data. It will grow via virality via a dropbox style 'refer a friend and you both get 100 AI credits'. Revenue will be via companies paying for it for their BAs. Revenue will also be via companies paying to list on the job board.
-
-### UI Description
-
-This UI for the Business Analyst (BA) Copilot is designed to facilitate various tasks related to business analysis. Here's a description of its features:
-
-Header Section
-
-The top navigation bar displays the application name "BA Copilot" and provides options like sharing the prototype and accessing user settings.
-
-Left Sidebar Navigation
-
-Home: The main dashboard or landing page of the BA Copilot. Assistant: A section likely dedicated to personalized assistance or guided help. Vault: A storage area for important documents or resources. Library: A collection of resources, templates, or reference materials. History: Access to past interactions, tasks, or saved work. Toolkit: Tools or utilities that support various BA activities. Community: A section for engaging with other users, discussing best practices, or sharing knowledge. Job Board: An area for job-related resources, possibly listing openings or career opportunities. Settings: User-specific settings, located at the bottom, allowing for customization of the BA Copilot experience. User Information: At the bottom, the user's email is displayed (e.g., alex@tesla.com), along with a security note indicating data is secure.
-
-Main Content Area
-
-Central Interaction Box
-
-A prominent text box labeled "Ask anything..." invites users to enter questions, requests, or commands. This is the primary interface for interacting with the BA Copilot.
-
-Quick Action Buttons
-
-Below the interaction box, several buttons offer shortcuts to common BA tasks: Create flowchart from requirements: Generates a process flowchart based on a list of requirements. Create requirements from flowchart: Extracts and documents requirements from an existing flowchart. Create documentation from notes: Converts meeting notes or other informal documentation into formal documents. Create tests from documentation: Develops test cases or scripts based on existing documentation. Give me career advice: Provides personalized career guidance or resources. Recommend a toolkit: Suggests tools or software relevant to the user's current tasks or projects.
-
-Overall Layout
-
-The interface is clean, minimalist, and user-friendly, with a clear emphasis on functionality and ease of use. It is designed to guide users smoothly through typical BA tasks while providing easy access to tools and resources. This UI embodies the vision of a comprehensive yet streamlined tool tailored to assist business analysts in their day-to-day tasks, making their work more efficient and organized.
-
-## Technical
-
-### Overview
-
-The following elements of the stack are ones I'm confident I'll build with:
-
-- Next.js using App router, not Pages router always check that you have not made a recommendation that is for Pages router always check that your recommendation is appropriate for App router
-- Vercel AI
-- Supabase - db, including their type safety
-- Supabase - auth
-- Tanstack query
-- Material UI
-- Potentially Orval for API calls (typing, tanstack query, and mock service worker testing)
-- Quokka
-
-I have intermediate experience with React. However, I am new to Next.js. So whenever implementing something with Next.js, teach me as if I don't know about it. Then offer to explain more. If you feel I should replace elements of my stack above, always tell me. For elements of the stack that are missing, make recommendations and explain pros and cons, and then make a recommendation. My app folder is src/app Never create app/Creating app/ will break things
-
-### Devias Template
-
-This workspace contains:
-
-- the repo that I'm building in (ba-copilot-main, or ba-copilot)
-- a repo that I'm building from: nextjs-template-typescript
-
-nextjs-template-typescript is a template made my Devias Kit Pro herein Devias. I will bring elements in from their repo to mine. So be aware of that, and consider recommending bringing elements in from there as well, and following their coding style and structure.
-
+## Agent Directives
+- **Think Before Coding:** Always architect the database schema, relational logic, and Role-Based Access Control (RBAC) before writing the UI.
+- **Folder Organization:** Maintain strict domain-driven organization. Place specific components in their respective subfolders (e.g., `src/components/admin/moderation/`).
+- **Ask for Clarification:** If a design or requirement is underspecified, stop and ask before generating code.
