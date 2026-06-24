@@ -1,7 +1,7 @@
 import React from "react";
 import { getNavSession } from "@/lib/auth/nav-session";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
-import { NotificationsBell } from "@/components/shared/nav/NotificationsBell";
+import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { WorkerDropdown } from "@/components/worker/layout/WorkerDropdown";
 import { MobileTriggerAndMenu } from "./MobileTriggerAndMenu";
 import { WorkerDesktopNav } from "./WorkerDesktopNav";
@@ -28,15 +28,14 @@ export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
 
         <WorkerDesktopNav />
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <NotificationsBell unreadCount={resolvedSession.unreadMessageCount} />
+        <GlobalHeaderActions session={resolvedSession}>
           <WorkerDropdown
             profile={profile}
             displayName={displayName}
             initials={initials}
             isVerified={resolvedSession.isVerified}
           />
-        </div>
+        </GlobalHeaderActions>
       </div>
     </header>
   );

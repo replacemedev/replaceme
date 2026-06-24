@@ -3,7 +3,7 @@
 import { WorkerDropdown } from "@/components/worker/layout/WorkerDropdown";
 import { EmployerDropdown } from "@/components/employer/layout/EmployerDropdown";
 import { AdminDropdown } from "@/components/admin/layout/AdminDropdown";
-import { NotificationsBell } from "./NotificationsBell";
+import { NotificationBell } from "@/components/shared/header/NotificationBell";
 import type { NavSession } from "@/types/nav";
 
 interface AuthenticatedNavActionsProps {
@@ -11,7 +11,7 @@ interface AuthenticatedNavActionsProps {
 }
 
 export function AuthenticatedNavActions({ session }: AuthenticatedNavActionsProps) {
-  if (!session.isAuthenticated || !session.role || !session.profile) {
+  if (!session.isAuthenticated || !session.role || !session.profile || !session.userId) {
     return null;
   }
 
@@ -19,7 +19,10 @@ export function AuthenticatedNavActions({ session }: AuthenticatedNavActionsProp
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">
-      <NotificationsBell unreadCount={session.unreadMessageCount} />
+      <NotificationBell
+        userId={session.userId}
+        initialBootstrap={{ notifications: [], unreadCount: 0 }}
+      />
 
       {session.role === "worker" && (
         <WorkerDropdown

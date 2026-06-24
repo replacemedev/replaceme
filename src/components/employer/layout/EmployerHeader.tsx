@@ -1,6 +1,6 @@
 import { getNavSession } from "@/lib/auth/nav-session";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
-import { NotificationsBell } from "@/components/shared/nav/NotificationsBell";
+import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { EmployerDropdown } from "@/components/employer/layout/EmployerDropdown";
 import { EmployerHeaderNav, EmployerMobileMenu } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
@@ -19,17 +19,16 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
 
         <EmployerHeaderNav unreadMessageCount={resolvedSession.unreadMessageCount} />
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <NotificationsBell unreadCount={resolvedSession.unreadMessageCount} size={22} />
-          {resolvedSession.profile && (
+        <GlobalHeaderActions session={resolvedSession} bellSize={22}>
+          {resolvedSession.profile ? (
             <EmployerDropdown
               profile={resolvedSession.profile}
               displayName={resolvedSession.displayName}
               initials={resolvedSession.initials}
             />
-          )}
-          <EmployerMobileMenu unreadMessageCount={resolvedSession.unreadMessageCount} />
-        </div>
+          ) : null}
+        </GlobalHeaderActions>
+        <EmployerMobileMenu unreadMessageCount={resolvedSession.unreadMessageCount} />
       </div>
     </header>
   );
