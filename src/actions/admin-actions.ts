@@ -11,10 +11,14 @@ import {
   platformMetricsSchema,
   reviewVerificationSchema,
   suspendUserSchema,
+  adminEmployerListSchema,
+  adminWorkerListSchema,
   type AdminAuditLogRow,
   type AdminEmployerRow,
+  type AdminFetchResult,
   type AdminJobRow,
   type AdminSubscriptionRow,
+  type AdminUsersPageData,
   type AdminVerificationDocument,
   type AdminVerificationQueueRow,
   type AdminWorkerRow,
@@ -268,62 +272,142 @@ export async function fetchRecentAuditLogs(limit = 10) {
 }
 
 export async function fetchAdminWorkers(): Promise<AdminWorkerRow[]> {
-  const { supabase } = await verifyAdmin();
+  const result = await fetchAdminWorkersSafe();
+  if (!result.success) throw new Error(result.error);
+  return result.data;
+}
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select(
-      "id, first_name, last_name, email, professional_title, account_status, verification_status, is_verified, created_at"
-    )
-    .eq("role", "worker")
-    .order("created_at", { ascending: false });
+export async function fetchAdminWorkersSafe(): Promise<
+  AdminFetchResult<AdminWorkerRow[]>
+> {
+  try {
+    const { supabase } = await verifyAdmin();
 
-  if (error) throw new Error(error.message);
-  return (data ?? []) as AdminWorkerRow[];
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, first_name, last_name, email, professional_title, account_status, verification_status, is_verified, created_at"
+      )
+      .eq("role", "worker")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    const parsed = adminWorkerListSchema.safeParse(data ?? []);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: "Worker records failed validation. Check database schema alignment.",
+      };
+    }
+
+    return { success: true, data: parsed.data };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to load workers",
+    };
+  }
 }
 
 export async function fetchAdminEmployers(): Promise<AdminEmployerRow[]> {
-  const { supabase } = await verifyAdmin();
+  const result = await fetchAdminEmployersSafe();
+  if (!result.success) throw new Error(result.error);
+  return result.data;
+}
 
-  const { data, error } = await supabase
-    .from("company_profiles")
-    .select(
+export async function fetchAdminEmployersSafe(): Promise<
+  AdminFetchResult<AdminEmployerRow[]>
+> {
+  try {
+    const { supabase } = await verifyAdmin();
+
+    const { data, error } = await supabase
+      .from("company_profiles")
+      .select(
+        `
+        id,
+        employer_id,
+        company_name,
+        industry,
+        created_at,
+        profiles!company_profiles_employer_id_fkey (
+          email,
+          account_status,
+          employer_subscriptions (
+            status
+          )
+        )
       `
-      id,
-      employer_id,
-      company_name,
-      industry,
-      created_at,
-      profiles:employer_id (
-        email,
-        account_status
-      ),
-      employer_subscriptions (
-        status
       )
-    `
-    )
-    .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false });
 
-  if (error) throw new Error(error.message);
+    if (error) {
+      return { success: false, error: error.message };
+    }
 
-  return (data ?? []).map((row) => {
-    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-    const subscription = Array.isArray(row.employer_subscriptions)
-      ? row.employer_subscriptions[0]
-      : row.employer_subscriptions;
+    const mapped = (data ?? []).map((row) => {
+      const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+      const subscriptions = profile?.employer_subscriptions;
+      const subscription = Array.isArray(subscriptions)
+        ? subscriptions[0]
+        : subscriptions;
 
+      return {
+        id: row.id,
+        employer_id: row.employer_id,
+        company_name: row.company_name,
+        email: profile?.email ?? null,
+        industry: row.industry,
+        account_status: profile?.account_status ?? "active",
+        subscription_status: subscription?.status ?? null,
+        created_at: row.created_at,
+      };
+    });
+
+    const parsed = adminEmployerListSchema.safeParse(mapped);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error:
+          "Employer records failed validation. Check database schema alignment.",
+      };
+    }
+
+    return { success: true, data: parsed.data };
+  } catch (err) {
     return {
-      id: row.id,
-      employer_id: row.employer_id,
-      company_name: row.company_name,
-      email: profile?.email ?? null,
-      industry: row.industry,
-      account_status: (profile?.account_status ?? "active") as AdminEmployerRow["account_status"],
-      subscription_status: subscription?.status ?? null,
-      created_at: row.created_at,
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to load employers",
     };
-  });
+  }
+}
+
+export async function fetchAdminUsersPageData(): Promise<
+  AdminFetchResult<AdminUsersPageData>
+> {
+  const [workersResult, employersResult] = await Promise.all([
+    fetchAdminWorkersSafe(),
+    fetchAdminEmployersSafe(),
+  ]);
+
+  if (!workersResult.success) {
+    return workersResult;
+  }
+
+  if (!employersResult.success) {
+    return employersResult;
+  }
+
+  return {
+    success: true,
+    data: {
+      workers: workersResult.data,
+      employers: employersResult.data,
+    },
+  };
 }
 
 export async function fetchAdminJobs(
@@ -342,7 +426,7 @@ export async function fetchAdminJobs(
       monthly_salary,
       employer_id,
       created_at,
-      profiles:employer_id (
+      profiles!jobs_employer_id_fkey (
         company_profiles (
           company_name
         )
@@ -466,7 +550,7 @@ export async function fetchAdminSubscriptions(): Promise<
         name,
         price
       ),
-      profiles:employer_id (
+      profiles!employer_subscriptions_employer_id_fkey (
         email,
         company_profiles (
           company_name

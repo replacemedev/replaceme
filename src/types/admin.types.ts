@@ -50,13 +50,53 @@ export const EMPTY_PLATFORM_METRICS: PlatformMetrics = {
 
 export type AccountStatus = "active" | "suspended";
 
-export type VerificationStatus =
-  | "unverified"
-  | "personal_complete"
-  | "documents_submitted"
-  | "under_review"
-  | "approved"
-  | "rejected";
+export const accountStatusSchema = z.enum(["active", "suspended"]);
+
+export const verificationStatusSchema = z.enum([
+  "unverified",
+  "personal_complete",
+  "documents_submitted",
+  "under_review",
+  "approved",
+  "rejected",
+]);
+
+export const adminWorkerRowSchema = z.object({
+  id: z.string().uuid(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
+  email: z.string().nullable(),
+  professional_title: z.string().nullable(),
+  account_status: accountStatusSchema.catch("active"),
+  verification_status: verificationStatusSchema.catch("unverified"),
+  is_verified: z.boolean().catch(false),
+  created_at: z.string(),
+});
+
+export const adminEmployerRowSchema = z.object({
+  id: z.string().uuid(),
+  employer_id: z.string().uuid(),
+  company_name: z.string(),
+  email: z.string().nullable(),
+  industry: z.string().nullable(),
+  account_status: accountStatusSchema.catch("active"),
+  subscription_status: z.string().nullable(),
+  created_at: z.string(),
+});
+
+export const adminWorkerListSchema = z.array(adminWorkerRowSchema);
+export const adminEmployerListSchema = z.array(adminEmployerRowSchema);
+
+export type AdminUsersPageData = {
+  workers: AdminWorkerRow[];
+  employers: AdminEmployerRow[];
+};
+
+export type AdminFetchResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+export type VerificationStatus = z.infer<typeof verificationStatusSchema>;
 
 export interface AdminWorkerRow {
   id: string;

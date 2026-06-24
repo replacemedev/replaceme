@@ -2,10 +2,8 @@ import { Suspense } from "react";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminTabs } from "@/components/admin/shared/AdminTabs";
 import { UsersClient } from "@/components/admin/users/UsersClient";
-import {
-  fetchAdminEmployers,
-  fetchAdminWorkers,
-} from "@/actions/admin-actions";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { fetchAdminUsersPageData } from "@/actions/admin-actions";
 
 export const metadata = {
   title: "Users | Admin",
@@ -23,10 +21,25 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const tab: UserTab = params.tab === "employers" ? "employers" : "workers";
 
-  const [workers, employers] = await Promise.all([
-    fetchAdminWorkers(),
-    fetchAdminEmployers(),
-  ]);
+  const result = await fetchAdminUsersPageData();
+
+  if (!result.success) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader
+          title="User Management"
+          description="Moderate worker and employer accounts across the marketplace."
+        />
+        <ErrorState
+          title="Unable to load users"
+          description={result.error}
+          retryHref="/admin/users"
+        />
+      </div>
+    );
+  }
+
+  const { workers, employers } = result.data;
 
   return (
     <div className="space-y-6">
