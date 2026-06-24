@@ -1,5 +1,6 @@
 "use server";
 
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadMessagingCount } from "@/actions/messaging";
 import { getHomeHrefForRole } from "@/config/navigation";
@@ -36,6 +37,7 @@ function buildDisplayName(profile: NavProfile, role: UserRole): string {
 }
 
 export async function getNavSession(): Promise<NavSession> {
+  await connection();
   const supabase = await createClient();
   const {
     data: { user },

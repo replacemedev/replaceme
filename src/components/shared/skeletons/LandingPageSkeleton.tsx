@@ -2,8 +2,7 @@ import { SkeletonBlock } from "./primitives";
 
 export function LandingPageSkeleton() {
   return (
-    <div className="min-h-screen bg-[#f8fafe] animate-pulse">
-      <SkeletonBlock className="h-16 w-full rounded-none" />
+    <div className="min-h-screen bg-[#f8fafe] animate-pulse pt-[72px]">
       <div className="max-w-7xl mx-auto px-6 py-20 space-y-6">
         <SkeletonBlock className="h-14 w-full max-w-2xl mx-auto" />
         <SkeletonBlock className="h-6 w-full max-w-xl mx-auto" />

@@ -1,5 +1,5 @@
 import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
-import { LegalContentPlaceholder } from "@/components/shared/LegalContentPlaceholder";
+import { TermsOfServiceContent } from "@/components/shared/legal/TermsOfServiceContent";
 
 export const metadata = {
   title: "Terms of Service | ReplaceMe",
@@ -8,8 +8,14 @@ export const metadata = {
 
 export default function TermsOfServicePage() {
   return (
-    <LegalPageLayout title="Terms of Service">
-      <LegalContentPlaceholder />
+    <LegalPageLayout
+      badge="Legal Document"
+      badgeVariant="text"
+      title="Terms of Service"
+      lastUpdated="October 24, 2024"
+      wide
+    >
+      <TermsOfServiceContent />
     </LegalPageLayout>
   );
 }

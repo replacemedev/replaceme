@@ -1,27 +1,23 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-
 export function LegalPageSkeleton() {
   return (
-    <>
-      <Header />
-      <main className="pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1">
-        <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 animate-pulse">
-          <div className="h-10 sm:h-12 lg:h-14 w-2/3 max-w-md bg-gray-200 rounded-lg mb-8 sm:mb-10" />
-          <section className="min-h-[320px] rounded-2xl border border-slate-100 bg-white p-6 sm:p-8 lg:p-10 shadow-xs">
-            <div className="space-y-4">
-              <div className="h-4 w-full bg-gray-200 rounded" />
-              <div className="h-4 w-full bg-gray-200 rounded" />
-              <div className="h-4 w-5/6 bg-gray-200 rounded" />
-              <div className="h-4 w-full bg-gray-200 rounded" />
-              <div className="h-4 w-4/6 bg-gray-200 rounded" />
-              <div className="h-4 w-full bg-gray-200 rounded" />
-              <div className="h-4 w-3/4 bg-gray-200 rounded" />
-            </div>
-          </section>
-        </article>
-      </main>
-      <Footer />
-    </>
+    <main className="pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10 sm:mb-12">
+          <div className="h-4 w-28 bg-gray-200 rounded mx-auto mb-4" />
+          <div className="h-10 sm:h-12 w-64 bg-gray-200 rounded mx-auto mb-3" />
+          <div className="h-4 w-48 bg-gray-200 rounded mx-auto" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-8">
+          <div className="hidden lg:block h-64 bg-gray-200 rounded-xl" />
+          <div className="min-h-[480px] rounded-2xl border border-slate-100 bg-white p-8 space-y-4">
+            <div className="h-4 w-full bg-gray-200 rounded" />
+            <div className="h-4 w-full bg-gray-200 rounded" />
+            <div className="h-4 w-5/6 bg-gray-200 rounded" />
+            <div className="h-4 w-full bg-gray-200 rounded" />
+            <div className="h-4 w-4/6 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }

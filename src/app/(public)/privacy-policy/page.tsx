@@ -1,5 +1,5 @@
 import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
-import { LegalContentPlaceholder } from "@/components/shared/LegalContentPlaceholder";
+import { PrivacyPolicyContent } from "@/components/shared/legal/PrivacyPolicyContent";
 
 export const metadata = {
   title: "Privacy Policy | ReplaceMe",
@@ -8,8 +8,13 @@ export const metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalPageLayout title="Privacy Policy">
-      <LegalContentPlaceholder />
+    <LegalPageLayout
+      badge="Legal"
+      badgeVariant="pill"
+      title="Privacy Policy"
+      lastUpdated="October 26, 2024"
+    >
+      <PrivacyPolicyContent />
     </LegalPageLayout>
   );
 }
