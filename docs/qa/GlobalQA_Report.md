@@ -102,9 +102,49 @@ No new seeding migrations added.
 
 Explicit App Router segments are retained (`/worker/jobs/[id]`, etc.) instead of catch-all `[...slug]` routes to preserve stable URLs, SEO, and typed `params`. Functionally equivalent to the requested structure with better maintainability.
 
+## Global authenticated navigation
+
+### Architecture
+
+| Layer | File | Responsibility |
+|-------|------|----------------|
+| Session resolver | `src/lib/auth/nav-session.ts` | Server-only `getNavSession()` — profile JOIN `company_profiles`, unread messages, role home path |
+| Role routing config | `src/config/navigation.ts` | `ROLE_HOME_PATH`: worker → `/worker/job-search`, employer → `/employer/dashboard`, admin → `/admin/dashboard` |
+| Public shell | `src/components/layout/PublicHeader.tsx` | Async server wrapper → client `Header` with `NavSession` |
+| Auth actions | `src/components/shared/nav/AuthenticatedNavActions.tsx` | Notifications bell + role-specific profile dropdown |
+| Smart brand | `src/components/shared/nav/NavBrand.tsx` | Logo links to `session.homeHref` |
+
+### Smart logo routing verification
+
+| Role | `homeHref` | Notes |
+|------|------------|-------|
+| Guest | `/` | Landing |
+| Worker | `/worker/job-search` | Alias redirects to `/worker/jobs` |
+| Employer | `/employer/dashboard` | |
+| Admin | `/admin/dashboard` | Live Supabase counts, no mock stats |
+
+### Screens with dynamic auth header
+
+- `/` — `PublicHeader` (server session)
+- `/terms-of-service`, `/privacy-policy` — `LegalPageLayout` → `PublicHeader`
+- `/worker/*` — `WorkerHeader` via `getNavSession()`
+- `/employer/*` — `EmployerHeader` via `getNavSession()`
+- `/admin/*` — `AdminHeader` via `getNavSession()`
+
+Authenticated users on public/legal pages see **Notifications** + **Profile dropdown**; marketing nav links are hidden.
+
+### Middleware role guards (`src/utils/supabase/middleware.ts`)
+
+- Unauthenticated → blocked from `/worker`, `/employer`, `/admin`
+- Logged-in on `/login` or `/signup` → redirect to role home
+- Cross-role access blocked (worker cannot hit employer/admin routes, etc.)
+
 ## Manual verification checklist
 
 1. Navigate each primary route — brief skeleton flash before content
 2. Compare skeleton grid columns to loaded page at `lg` breakpoint
 3. Empty DB → dashboards show zero counts / `EmptyState`, not mock rows
 4. Worker dashboard loads without calling seed RPC
+5. Log in as worker — visit `/` and `/privacy-policy` — bell + dropdown visible; logo → `/worker/job-search`
+6. Log in as employer — logo → `/employer/dashboard`; worker routes redirect
+7. Admin route `/admin/dashboard` shows live counts from Supabase (0 when empty)

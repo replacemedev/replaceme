@@ -1,11 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavBrand } from "@/components/shared/nav/NavBrand";
+import { AuthenticatedNavActions } from "@/components/shared/nav/AuthenticatedNavActions";
+import { GUEST_NAV_SESSION, type NavSession } from "@/types/nav";
 
-export function Header() {
+interface HeaderProps {
+  session?: NavSession;
+}
+
+export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -31,28 +37,10 @@ export function Header() {
       }`}
     >
       <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full">
-        {/* Brand */}
-        <Link
-          onClick={() => setActiveSection("")}
-          className="flex items-center gap-3 transition-transform duration-200 hover:opacity-90 scale-102"
-          href="/"
-        >
-          <div className="relative w-12 h-12 shrink-0">
-            <Image
-              src="/images/logo_favicon.png"
-              alt="Replace Me Logo"
-              fill
-              className="object-contain"
-              sizes="48px"
-              priority
-            />
-          </div>
-          <span className="font-display-md text-2xl font-bold text-[#0a4a29] leading-none relative top-[-4px]">
-            Replace Me
-          </span>
-        </Link>
+        <NavBrand homeHref={session.homeHref} />
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation — marketing links for guests; compact for authenticated */}
+        {!session.isAuthenticated && (
         <nav className="hidden md:flex items-center gap-8">
           <Link
             onClick={() => setActiveSection("top-talent")}
@@ -125,9 +113,14 @@ export function Header() {
             />
           </Link>
         </nav>
+        )}
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-6">
+          {session.isAuthenticated ? (
+            <AuthenticatedNavActions session={session} />
+          ) : (
+            <>
           <Link
             className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
             href="/login"
@@ -140,6 +133,8 @@ export function Header() {
           >
             Get Started
           </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Toggle Button */}
@@ -157,6 +152,8 @@ export function Header() {
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
+          {!session.isAuthenticated ? (
+            <>
           <Link
             onClick={() => {
               setMobileMenuOpen(false);
@@ -232,6 +229,19 @@ export function Header() {
           >
             Get Started
           </Link>
+            </>
+          ) : (
+            <div className="flex flex-col gap-4 py-2">
+              <AuthenticatedNavActions session={session} />
+              <Link
+                href={session.homeHref}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-center text-sm font-bold text-[#006e2f] py-2"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>

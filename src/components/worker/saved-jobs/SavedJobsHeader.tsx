@@ -42,7 +42,7 @@ export function SavedJobsHeader({ q, sort }: SavedJobsHeaderProps) {
 
   return (
     <header className="mb-8">
-      <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 tracking-tight">
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
         Saved Jobs
       </h1>
       <p className="mt-2 text-sm text-slate-500 max-w-2xl">

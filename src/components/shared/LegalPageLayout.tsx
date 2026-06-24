@@ -1,4 +1,4 @@
-import { Header } from "@/components/layout/Header";
+import { PublicHeader } from "@/components/layout/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 
 interface LegalPageLayoutProps {
@@ -9,7 +9,7 @@ interface LegalPageLayoutProps {
 export function LegalPageLayout({ title, children }: LegalPageLayoutProps) {
   return (
     <>
-      <Header />
+      <PublicHeader />
       <main className="pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1">
         <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-8 sm:mb-10">

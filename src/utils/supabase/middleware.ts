@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ROLE_HOME_PATH } from '@/config/navigation'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -31,44 +32,46 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/signup");
-  const isWorkerRoute = request.nextUrl.pathname.startsWith("/worker");
-  const isEmployerRoute = request.nextUrl.pathname.startsWith("/employer");
-  const isProtectedRoute = isWorkerRoute || isEmployerRoute;
+  const pathname = request.nextUrl.pathname
+  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/signup")
+  const isWorkerRoute = pathname.startsWith("/worker")
+  const isEmployerRoute = pathname.startsWith("/employer")
+  const isAdminRoute = pathname.startsWith("/admin")
+  const isProtectedRoute = isWorkerRoute || isEmployerRoute || isAdminRoute
 
-  // If user is not logged in and tries to access a protected route, redirect to login
   if (!user && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // Role-based routing
   if (user) {
-    // Determine user role
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
-      .eq("auth_user_id", user.id)
-      .single();
+      .eq("id", user.id)
+      .maybeSingle()
 
-    const role = profile?.role || "worker";
+    const role = profile?.role ?? "worker"
+    const homePath =
+      role === "admin"
+        ? ROLE_HOME_PATH.admin
+        : role === "employer"
+          ? ROLE_HOME_PATH.employer
+          : ROLE_HOME_PATH.worker
 
-    // If user is logged in and tries to access login/signup, redirect to their dashboard
     if (isAuthRoute) {
-      if (role === "employer") {
-        return NextResponse.redirect(new URL("/employer/dashboard", request.url));
-      } else {
-        return NextResponse.redirect(new URL("/worker/dashboard", request.url));
-      }
+      return NextResponse.redirect(new URL(homePath, request.url))
     }
 
-    // If worker tries to access employer pages
-    if (role === "worker" && isEmployerRoute) {
-      return NextResponse.redirect(new URL("/worker/dashboard", request.url));
+    if (role === "admin" && (isWorkerRoute || isEmployerRoute)) {
+      return NextResponse.redirect(new URL(ROLE_HOME_PATH.admin, request.url))
     }
 
-    // If employer tries to access worker pages
-    if (role === "employer" && isWorkerRoute) {
-      return NextResponse.redirect(new URL("/employer/dashboard", request.url));
+    if (role === "worker" && (isEmployerRoute || isAdminRoute)) {
+      return NextResponse.redirect(new URL(ROLE_HOME_PATH.worker, request.url))
+    }
+
+    if (role === "employer" && (isWorkerRoute || isAdminRoute)) {
+      return NextResponse.redirect(new URL(ROLE_HOME_PATH.employer, request.url))
     }
   }
 

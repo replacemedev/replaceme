@@ -51,9 +51,7 @@ export type { Applicant, ApplicantStatus, MatchLabel } from "./employer/applican
 
 export type { PinnedWorker } from "./employer/pinned";
 
-export type {
-  MessagingThread,
-  MessagingMessage,
-  MessagingJobRole,
-  JobRoleFilterValue,
-} from "./messaging";
+export type { MessagingThread, MessagingMessage, MessagingJobRole, JobRoleFilterValue } from "./messaging";
+
+export type { NavSession, NavProfile, UserRole } from "./nav";
+export { GUEST_NAV_SESSION } from "./nav";
