@@ -36,7 +36,7 @@ export function AuthLayout({
         {footer}
       </div>
       {sidePanelPosition === "right" && (
-        <div className="hidden lg:flex lg:w-1/2 relative bg-[#ebfdf2] items-center justify-center p-12 overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 items-center justify-center p-12">
           {sidePanel}
         </div>
       )}

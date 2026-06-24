@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminHeader } from "@/components/admin/layout/AdminHeader";
 import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
+import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function AdminShellLayout({
 
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_1fr]">
+      <AuthFlashToast />
       <AdminSidebar />
       <div className="flex flex-col min-h-screen">
         <AdminHeader />

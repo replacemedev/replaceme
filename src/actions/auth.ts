@@ -143,12 +143,22 @@ export async function signUp(formData: any) {
       };
     }
 
-    return {
-      success: true,
-      message: "Registration successful! Redirecting...",
-      redirectUrl: role === "employer" ? "/employer/dashboard" : "/worker/dashboard"
-    };
+    const destination =
+      role === "employer"
+        ? `${ROLE_HOME_PATH.employer}?welcome=signup`
+        : `${ROLE_HOME_PATH.worker}?welcome=signup`;
+
+    revalidatePath("/", "layout");
+    redirect(destination);
   } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
     safeError("signUp error:", error);
     return { success: false, error: handleAuthError(error) };
   }
@@ -231,7 +241,7 @@ export async function signIn(formData: LoginCredentials) {
     const redirectUrl = resolvePostLoginPath(finalRole);
 
     revalidatePath("/", "layout");
-    redirect(redirectUrl);
+    redirect(`${redirectUrl}?welcome=login`);
   } catch (error) {
     if (
       error &&
