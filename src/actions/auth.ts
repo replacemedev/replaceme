@@ -3,7 +3,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { employerSignUpSchema, workerSignUpSchema, loginSchema } from "@/lib/validations/auth";
+import { employerSignUpSchema, workerSignUpSchema } from "@/lib/validations/auth";
+import {
+  loginCredentialsSchema,
+  type LoginCredentials,
+} from "@/types/auth.types";
+import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
 import Stripe from "stripe";
 
@@ -149,34 +154,41 @@ export async function signUp(formData: any) {
   }
 }
 
-export async function logIn(formData: any) {
+const GENERIC_LOGIN_ERROR = "Invalid email or password. Please try again.";
+
+function resolvePostLoginPath(role: string): string {
+  if (role === "admin") return ROLE_HOME_PATH.admin;
+  if (role === "employer") return ROLE_HOME_PATH.employer;
+  if (role === "worker") return "/worker/dashboard";
+  return ROLE_HOME_PATH.worker;
+}
+
+export async function signIn(formData: LoginCredentials) {
   try {
-    safeLog("[Auth] Log-in initiated");
+    safeLog("[Auth] Sign-in initiated");
     const supabase = await createClient();
-    
-    const parsed = loginSchema.safeParse(formData);
+
+    const parsed = loginCredentialsSchema.safeParse(formData);
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
     }
 
     const { email, password } = parsed.data;
 
-    // 1. Dual username/email login lookup
     let emailToAuth = email;
     if (!email.includes("@")) {
-      const { data: profileData, error: profileErr } = await supabase
+      const { data: profileData } = await supabase
         .from("profiles")
         .select("email")
         .eq("username", email)
-        .single();
-      
-      if (profileErr || !profileData?.email) {
-        return { success: false, error: "Invalid login credentials." };
+        .maybeSingle();
+
+      if (!profileData?.email) {
+        return { success: false, error: GENERIC_LOGIN_ERROR };
       }
       emailToAuth = profileData.email;
     }
 
-    // 2. Perform authentication with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email: emailToAuth,
       password,
@@ -184,51 +196,59 @@ export async function logIn(formData: any) {
 
     if (error) {
       if (error.message.includes("Email not confirmed")) {
-        return { 
-          success: false, 
-          error: "Please confirm your email address before logging in. A confirmation link was sent to your email." 
+        return {
+          success: false,
+          error:
+            "Please confirm your email address before logging in. A confirmation link was sent to your email.",
         };
       }
-      return { success: false, error: handleAuthError(error) };
+      return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
-    // 3. Strict Email Confirmation check post-session-validation
     if (data.user && !data.user.email_confirmed_at) {
       await supabase.auth.signOut();
-      return { 
-        success: false, 
-        error: "Please confirm your email address before logging in. A confirmation link was sent to your email." 
+      return {
+        success: false,
+        error:
+          "Please confirm your email address before logging in. A confirmation link was sent to your email.",
       };
     }
 
-    // 4. Try reading the role directly from authenticated session metadata
-    let role = data.user.user_metadata?.role;
+    // Blueprint: read role from JWT app_metadata (server-controlled, not client-writable)
+    let role = data.user.app_metadata?.role as string | undefined;
 
-    // 5. Fall back to querying the database profiles table using user primary key
     if (!role) {
-      const { data: profile, error: dbError } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", data.user.id)
-        .single();
-      
-      if (!dbError && profile) {
-        role = profile.role;
-      }
+        .maybeSingle();
+
+      role = profile?.role;
     }
 
-    const finalRole = role || "worker";
+    const finalRole = role ?? "worker";
+    const redirectUrl = resolvePostLoginPath(finalRole);
 
     revalidatePath("/", "layout");
-    return {
-      success: true,
-      message: "Login successful! Redirecting...",
-      redirectUrl: finalRole === "employer" ? "/employer/dashboard" : "/worker/dashboard"
-    };
+    redirect(redirectUrl);
   } catch (error) {
-    safeError("logIn error:", error);
-    return { success: false, error: handleAuthError(error) };
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    safeError("signIn error:", error);
+    return { success: false, error: GENERIC_LOGIN_ERROR };
   }
+}
+
+/** @deprecated Use signIn */
+export async function logIn(formData: LoginCredentials) {
+  return signIn(formData);
 }
 
 export async function logOut() {

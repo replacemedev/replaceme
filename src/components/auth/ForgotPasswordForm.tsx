@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Mail } from "lucide-react"
@@ -16,13 +18,8 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 
-export function ForgotPasswordForm({
-  onSuccess,
-  onBack,
-}: {
-  onSuccess: (email: string) => void
-  onBack: () => void
-}) {
+export function ForgotPasswordForm() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -48,7 +45,9 @@ export function ForgotPasswordForm({
         toast.error(result.error)
       } else {
         toast.success(result.message)
-        onSuccess(data.email)
+        router.push(
+          `/login?view=verify_code&email=${encodeURIComponent(data.email)}`
+        )
       }
     } catch (err) {
       setErrorMsg("An unexpected error occurred. Please try again.")
@@ -88,15 +87,12 @@ export function ForgotPasswordForm({
             {isLoading ? "Sending Code..." : "Send Verification Code"}
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onBack}
-            disabled={isLoading}
-            className="w-full text-base h-12 text-slate-600 hover:text-slate-900"
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center w-full text-base h-12 rounded-xl text-sm font-body-bold font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           >
             Back to Login
-          </Button>
+          </Link>
         </div>
       </form>
     </div>

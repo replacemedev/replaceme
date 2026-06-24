@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
@@ -22,15 +24,8 @@ const verifyCodeSchema = z.object({
 
 type VerifyCodeFormValues = z.infer<typeof verifyCodeSchema>
 
-export function VerifyCodeForm({
-  email,
-  onSuccess,
-  onBack,
-}: {
-  email: string
-  onSuccess: () => void
-  onBack: () => void
-}) {
+export function VerifyCodeForm({ email }: { email: string }) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -59,7 +54,7 @@ export function VerifyCodeForm({
         toast.error(result.error)
       } else {
         toast.success(result.message)
-        onSuccess()
+        router.push("/login")
       }
     } catch (err) {
       setErrorMsg("An unexpected error occurred. Please try again.")
@@ -149,15 +144,12 @@ export function VerifyCodeForm({
             {isLoading ? "Resetting Password..." : "Reset Password"}
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onBack}
-            disabled={isLoading}
-            className="w-full text-base h-12 text-slate-600 hover:text-slate-900"
+          <Link
+            href="/login?view=forgot_password"
+            className="inline-flex items-center justify-center w-full text-base h-12 rounded-xl text-sm font-body-bold font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           >
             Back
-          </Button>
+          </Link>
         </div>
       </form>
     </div>

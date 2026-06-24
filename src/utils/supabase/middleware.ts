@@ -50,7 +50,10 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .maybeSingle()
 
-    const role = profile?.role ?? "worker"
+    const role =
+      (user.app_metadata?.role as string | undefined) ??
+      profile?.role ??
+      "worker";
     const homePath =
       role === "admin"
         ? ROLE_HOME_PATH.admin

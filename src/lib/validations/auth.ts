@@ -28,12 +28,8 @@ export const workerSignUpSchema = z.object(baseAuthSchema).strict().refine((data
 export type EmployerSignUpFormValues = z.infer<typeof employerSignUpSchema>;
 export type WorkerSignUpFormValues = z.infer<typeof workerSignUpSchema>;
 
-export const loginSchema = z.object({
-  email: z.string().min(3, "Please enter a valid email or username"),
-  password: z.string().min(1, "Password is required"),
-  rememberMe: z.boolean().optional(),
-  role: z.enum(["employer", "worker"]).optional(),
-}).strict();
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
+export {
+  loginCredentialsSchema as loginSchema,
+  type LoginCredentials as LoginFormValues,
+} from "@/types/auth.types";
 
