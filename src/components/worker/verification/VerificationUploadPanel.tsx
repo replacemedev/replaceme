@@ -53,7 +53,7 @@ export function VerificationUploadPanel({
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Complete your{" "}
           <Link href="/worker/profile" className="font-bold underline">
-            profile & resume
+            profile
           </Link>{" "}
           (name, email, professional title) before submitting verification.
         </div>

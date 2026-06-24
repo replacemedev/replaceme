@@ -46,7 +46,7 @@ The proxy middleware in [proxy.ts](file:///Users/stephen/Documents/[01] WORK/01_
 Every link within the application was audited to guarantee correct route prefixing and prevent cross-pollution:
 
 * **Worker Header & Dropdown**:
-  - `Profile & Resume` -> Links strictly to `/worker/profile`
+  - `Profile` -> Links strictly to `/worker/profile`
   - `My Applications` -> Links strictly to `/worker/applications`
   - `Dashboard` -> `/worker/dashboard`
   - `Jobs` -> `/worker/jobs`

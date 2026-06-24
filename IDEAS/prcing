@@ -20,7 +20,7 @@ Please build the following three components:
 - Layout: A vertical list of candidate cards.
 - The Teaser Effect: Each card should show high-level text info ("Applicant #402", "5 Years Experience", "Requested Salary: $500/month"). 
 - The Friction Point: The profile picture must have a heavy CSS Gaussian blur. 
-- Call to Action: On the right side of each card, place a prominent button with a Padlock Icon that says "Unlock Profile & Resume".
+- Call to Action: On the right side of each card, place a prominent button with a Padlock Icon that says "Unlock Profile".
 - Hover State: When hovering over the card, change the cursor to a pointer and display a tooltip: "Upgrade to unlock full profile".
 
 ### 3. Frictionless Upgrade Checkout Modal

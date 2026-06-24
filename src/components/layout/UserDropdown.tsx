@@ -114,7 +114,7 @@ export function UserDropdown({ profile, displayName, initials }: UserDropdownPro
             role="menuitem"
           >
             <User size={14} className="text-slate-400" />
-            Profile & Resume
+            Profile
           </Link>
 
           <Link

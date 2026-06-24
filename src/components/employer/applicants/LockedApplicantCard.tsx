@@ -56,7 +56,7 @@ export function LockedApplicantCard({
         className="w-full md:w-auto px-6 py-3 bg-[#10b981] hover:bg-[#0d9668] disabled:bg-[#10b981]/70 text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:cursor-not-allowed shrink-0"
       >
         <Lock className="w-3.5 h-3.5 stroke-[2.5]" />
-        Unlock Profile & Resume
+        Unlock Profile
       </button>
     </div>
   );

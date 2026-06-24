@@ -32,7 +32,7 @@ Per the Ponytail Doctrine, we have minimized DOM nesting and eliminated hardcode
 The `<WorkerHeader />` component has been implemented at `src/components/layout/WorkerHeader.tsx` and linked within the worker layout:
 * **Logo Branding**: Renders the brand logo and text link to `/worker/dashboard`.
 * **Desktop Middle Navigation**: Features primary links: "Dashboard" (`/worker/dashboard`), "Jobs" (`/worker/jobs`), and "Messages" (`/worker/messages`).
-* **Profile Dropdown**: Features a settings actions panel containing avatar, initials, and dropdown menu (Profile & Resume, My Applications, Sign Out).
+* **Profile Dropdown**: Features a settings actions panel containing avatar, initials, and dropdown menu (Profile, My Applications, Sign Out).
 * **Mobile Responsiveness**: Uses a menu drawer overlay triggered via a hamburger icon. The drawer contains responsive nav links styled using brand-consistent highlight states.
 
 ---

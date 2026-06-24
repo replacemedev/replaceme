@@ -68,7 +68,7 @@ Component: `src/components/shared/VerifiedBadge.tsx`
 
 `WorkerDropdown` replaces generic `UserDropdown` in `WorkerHeader`:
 
-- **Verification** link directly below **Profile & Resume**
+- **Verification** link directly below **Profile**
 - Verified badge on avatar overlay when approved
 
 ## Component architecture (ponytail)
