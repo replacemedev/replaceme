@@ -66,6 +66,7 @@ BEGIN
     );
 
     -- Insert matching profile row with admin role
+    -- USING "ON CONFLICT" TO BYPASS AUTO-CREATION TRIGGERS
     INSERT INTO public.profiles (
       id,
       role,
@@ -84,7 +85,14 @@ BEGIN
       'replacemeadmin',
       now(),
       now()
-    );
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      role = EXCLUDED.role,
+      first_name = EXCLUDED.first_name,
+      last_name = EXCLUDED.last_name,
+      email = EXCLUDED.email,
+      username = EXCLUDED.username,
+      updated_at = now();
 
     RAISE NOTICE 'Admin test account created: replacemeadmin@example.com / replacemeadmin123';
   ELSE
