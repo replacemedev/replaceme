@@ -174,7 +174,7 @@ export function SignUpForm() {
           <label className="flex items-start gap-3 cursor-pointer group">
             <Checkbox {...register("terms")} className="mt-1" />
             <span className="text-sm font-body-base text-slate-600 leading-relaxed">
-              I agree to the <a href="/terms" className="text-[#22c55e] hover:underline">Terms of Service</a> and <a href="/privacy" className="text-[#22c55e] hover:underline">Privacy Policy</a>
+              I agree to the <a href="/terms-of-service" className="text-[#22c55e] hover:underline">Terms of Service</a> and <a href="/privacy-policy" className="text-[#22c55e] hover:underline">Privacy Policy</a>
             </span>
           </label>
         </div>

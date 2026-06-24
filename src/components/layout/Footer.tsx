@@ -61,10 +61,10 @@ export function Footer() {
         {/* Legal & Support Column */}
         <div className="col-span-1 flex flex-col gap-4 text-sm">
           <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Legal &amp; Support</h4>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/privacy">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/privacy-policy">
             Privacy Policy
           </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/terms">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/terms-of-service">
             Terms of Service
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/contact">
