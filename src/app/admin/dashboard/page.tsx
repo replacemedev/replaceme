@@ -1,7 +1,15 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { Shield } from "lucide-react";
+import { StatCard } from "@/components/admin/dashboard/StatCard";
+import { UrgentAlerts } from "@/components/admin/dashboard/UrgentAlerts";
+import { RecentActions } from "@/components/admin/dashboard/RecentActions";
+import {
+  Users,
+  Briefcase,
+  FileText,
+  Handshake,
+  Building2,
+  UserCheck,
+} from "lucide-react";
 
 export const metadata = {
   title: "Admin Dashboard | ReplaceMe",
@@ -11,68 +19,126 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  const [
+    { count: totalWorkers },
+    { count: totalEmployers },
+    { count: activeJobs },
+    { count: totalApplications },
+    { count: activeContracts },
+    { count: verifiedWorkers },
+    { data: recentAuditLogs },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "worker"),
+    supabase
+      .from("company_profiles")
+      .select("*", { count: "exact", head: true }),
+    supabase
+      .from("jobs")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "Active"),
+    supabase.from("applications").select("*", { count: "exact", head: true }),
+    supabase
+      .from("contracts")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active"),
+    supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "worker")
+      .eq("is_verified", true),
+    supabase
+      .from("audit_logs")
+      .select("id, action_type, target_type, target_id, metadata, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, first_name")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "admin") {
-    redirect("/login");
-  }
-
-  const [{ count: workerCount }, { count: jobCount }, { count: applicationCount }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "worker"),
-      supabase
-        .from("job_posts")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "Active"),
-      supabase.from("applications").select("*", { count: "exact", head: true }),
-    ]);
+  const totalUsers = (totalWorkers ?? 0) + (totalEmployers ?? 0);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-        Admin Control Panel
-      </h1>
-      <p className="text-sm text-slate-500 mb-8">
-        Welcome, {profile.first_name ?? "Admin"}. Marketplace overview from live Supabase data.
-      </p>
+    <div className="space-y-8">
+      <header>
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          Platform Overview
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Real-time marketplace metrics aggregated from live data.
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-          <p className="text-xs font-bold uppercase text-slate-400">Workers</p>
-          <p className="text-3xl font-extrabold text-slate-900 mt-1">{workerCount ?? 0}</p>
-        </article>
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-          <p className="text-xs font-bold uppercase text-slate-400">Active Jobs</p>
-          <p className="text-3xl font-extrabold text-slate-900 mt-1">{jobCount ?? 0}</p>
-        </article>
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
-          <p className="text-xs font-bold uppercase text-slate-400">Applications</p>
-          <p className="text-3xl font-extrabold text-slate-900 mt-1">
-            {applicationCount ?? 0}
-          </p>
-        </article>
-      </div>
-
-      {(workerCount ?? 0) === 0 && (jobCount ?? 0) === 0 && (
-        <EmptyState
-          icon={<Shield className="h-5 w-5" aria-hidden />}
-          title="Marketplace is empty"
-          description="No workers, jobs, or applications yet. Data will appear here as users onboard."
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Users"
+          value={totalUsers}
+          icon={Users}
+          accentColor="bg-blue-50 text-blue-600"
         />
-      )}
+        <StatCard
+          label="Active Jobs"
+          value={activeJobs ?? 0}
+          icon={Briefcase}
+          accentColor="bg-emerald-50 text-emerald-600"
+        />
+        <StatCard
+          label="Applications"
+          value={totalApplications ?? 0}
+          icon={FileText}
+          accentColor="bg-violet-50 text-violet-600"
+        />
+        <StatCard
+          label="Active Contracts"
+          value={activeContracts ?? 0}
+          icon={Handshake}
+          accentColor="bg-amber-50 text-amber-600"
+        />
+        <StatCard
+          label="Employers"
+          value={totalEmployers ?? 0}
+          icon={Building2}
+          accentColor="bg-rose-50 text-rose-600"
+        />
+        <StatCard
+          label="Verified Workers"
+          value={verifiedWorkers ?? 0}
+          icon={UserCheck}
+          accentColor="bg-teal-50 text-teal-600"
+        />
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+        <div className="space-y-6">
+          <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            <h2 className="text-sm font-bold text-slate-900 mb-3">
+              User Growth Trend
+            </h2>
+            <div className="h-48 flex items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+              <p className="text-xs text-slate-400">
+                Chart placeholder — integrate when analytics data available
+              </p>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            <h2 className="text-sm font-bold text-slate-900 mb-3">
+              Job Posting Activity
+            </h2>
+            <div className="h-48 flex items-center justify-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+              <p className="text-xs text-slate-400">
+                Chart placeholder — integrate when time-series data available
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <aside className="space-y-6">
+          <UrgentAlerts alerts={[]} />
+          <RecentActions actions={recentAuditLogs ?? []} />
+        </aside>
+      </section>
     </div>
   );
 }
