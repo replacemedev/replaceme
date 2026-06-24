@@ -28,6 +28,44 @@ function AuthFlashToastInner() {
   const pathname = usePathname();
 
   useEffect(() => {
+    const confirmed = searchParams.get("confirmed");
+    if (confirmed === "email") {
+      toast.success(
+        "Email confirmed! You can now sign in with your password."
+      );
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("confirmed");
+      const query = nextParams.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+      return;
+    }
+
+    const reset = searchParams.get("reset");
+    if (reset === "success") {
+      toast.success("Password updated successfully. Please sign in.");
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("reset");
+      const query = nextParams.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+      return;
+    }
+
+    const error = searchParams.get("error");
+    if (error === "auth_callback_failed") {
+      toast.error("Authentication link expired or is invalid. Please try again.");
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("error");
+      const query = nextParams.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+      return;
+    }
+
     const welcome = searchParams.get("welcome");
     if (!welcome) return;
 

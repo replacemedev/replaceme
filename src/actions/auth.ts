@@ -10,6 +10,11 @@ import {
 } from "@/types/auth.types";
 import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
+import { authCallbackUrl } from "@/lib/auth/site-url";
+import {
+  forgotPasswordSchema,
+  updatePasswordSchema,
+} from "@/lib/validations/auth";
 import Stripe from "stripe";
 
 const stripe = process.env.STRIPE_SECRET_KEY
@@ -42,6 +47,31 @@ function handleAuthError(error: any): string {
   return message;
 }
 
+async function profileExistsByEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/server");
+    const admin = await createAdminClient();
+
+    const { data, error } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("email", normalized)
+      .maybeSingle();
+
+    if (error) {
+      safeError("[Auth] profile email lookup failed:", error);
+      return false;
+    }
+
+    return Boolean(data);
+  } catch (error) {
+    safeError("[Auth] profile email lookup unexpected error:", error);
+    return false;
+  }
+}
+
 export async function signUp(formData: any) {
   try {
     const role = formData.role;
@@ -70,6 +100,7 @@ export async function signUp(formData: any) {
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: authCallbackUrl("signup", "/login"),
         data: {
           role: data.role,
           username: data.username,
@@ -138,8 +169,9 @@ export async function signUp(formData: any) {
     if (!authData.session) {
       return {
         success: true,
-        message: "Registration successful! Please check your email to confirm your account before logging in. (This link/code expires in 10 minutes)",
-        requiresConfirmation: true
+        message:
+          "Registration successful! Check your email and click the confirmation link to activate your account.",
+        requiresConfirmation: true,
       };
     }
 
@@ -283,72 +315,106 @@ export async function logOut() {
   redirect("/login");
 }
 
-export async function sendResetPasswordOTP(email: string) {
+export async function sendPasswordResetLink(email: string) {
   try {
-    safeLog(`[Auth] Send reset password OTP requested for: ${email}`);
-    const supabase = await createClient();
+    safeLog("[Auth] Password reset link requested");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const parsed = forgotPasswordSchema.safeParse({ email });
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+
+    const normalizedEmail = parsed.data.email.trim().toLowerCase();
+    const exists = await profileExistsByEmail(normalizedEmail);
+
+    if (!exists) {
+      return {
+        success: false,
+        error: "No account found with this email address.",
+      };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      redirectTo: authCallbackUrl("recovery", "/update-password"),
+    });
 
     if (error) {
-      safeError(`[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`);
+      safeError(
+        `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
+      );
       if (error.status === 429) {
-        return { success: false, error: "Too many requests. Please wait a few minutes before trying again." };
+        return {
+          success: false,
+          error: "Too many requests. Please wait a few minutes before trying again.",
+        };
       }
       return {
-        success: true,
-        message: "If an account matches that email, a verification code has been sent."
+        success: false,
+        error: "Failed to send reset link. Please try again.",
       };
     }
 
     return {
       success: true,
-      message: "If an account matches that email, a verification code has been sent."
+      message: "Password reset link sent. Check your email to continue.",
     };
   } catch (error) {
-    safeError("[Auth] sendResetPasswordOTP unexpected error:", error);
+    safeError("[Auth] sendPasswordResetLink unexpected error:", error);
     return { success: false, error: "An unexpected error occurred. Please try again." };
   }
 }
 
-export async function verifyOTPAndResetPassword(email: string, code: string, newPassword: string) {
+export async function updatePassword(formData: {
+  password: string;
+  confirmPassword: string;
+}) {
   try {
-    safeLog(`[Auth] Verifying reset OTP for: ${email}`);
-    const supabase = await createClient();
+    safeLog("[Auth] Password update requested");
 
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: code,
-      type: "recovery",
-    });
-
-    if (error) {
-      safeError(`[Auth] verifyOtp error: ${error.message}`);
-      return { success: false, error: "Invalid or expired verification code." };
+    const parsed = updatePasswordSchema.safeParse(formData);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
     }
 
-    if (!data.user) {
-      return { success: false, error: "Verification failed. User session could not be established." };
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "Your reset link has expired. Please request a new one.",
+      };
     }
 
     const { error: updateError } = await supabase.auth.updateUser({
-      password: newPassword,
+      password: parsed.data.password,
     });
 
     if (updateError) {
       safeError(`[Auth] updateUser password error: ${updateError.message}`);
-      return { success: false, error: "Failed to reset password. Please try again." };
+      return {
+        success: false,
+        error: "Failed to update password. Please try again.",
+      };
     }
 
-    safeLog("[Auth] Password reset successful");
-    return {
-      success: true,
-      message: "Password reset successful! You have been signed in."
-    };
+    await supabase.auth.signOut();
+    revalidatePath("/", "layout");
+    redirect("/login?reset=success");
   } catch (error) {
-    safeError("[Auth] verifyOTPAndResetPassword unexpected error:", error);
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    safeError("[Auth] updatePassword unexpected error:", error);
     return { success: false, error: "An unexpected error occurred. Please try again." };
   }
 }
-
 

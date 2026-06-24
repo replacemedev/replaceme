@@ -1,100 +1,129 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Mail } from "lucide-react"
-import { sendResetPasswordOTP } from "@/actions/auth"
-import { toast } from "sonner"
-
-const forgotPasswordSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-})
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/shared/FormField";
+import { Mail, Loader2, CheckCircle2 } from "lucide-react";
+import { sendPasswordResetLink } from "@/actions/auth";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordFormValues,
+} from "@/lib/validations/auth";
 
 export function ForgotPasswordForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [emailSent, setEmailSent] = useState(false);
+  const [sentToEmail, setSentToEmail] = useState("");
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
-  })
+    defaultValues: { email: "" },
+  });
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
-    setIsLoading(true)
-    setErrorMsg(null)
+    const result = await sendPasswordResetLink(data.email);
 
-    try {
-      const result = await sendResetPasswordOTP(data.email)
-      if (result.error) {
-        setErrorMsg(result.error)
-        toast.error(result.error)
-      } else {
-        toast.success(result.message)
-        router.push(
-          `/login?view=verify_code&email=${encodeURIComponent(data.email)}`
-        )
-      }
-    } catch (err) {
-      setErrorMsg("An unexpected error occurred. Please try again.")
-      toast.error("An unexpected error occurred. Please try again.")
-    } finally {
-      setIsLoading(false)
+    if (!result.success) {
+      toast.error(result.error ?? "Failed to send reset link.");
+      return;
     }
-  }
 
-  const onError = (errors: any) => {
-    const firstErrorKey = Object.keys(errors)[0]
-    if (firstErrorKey) {
-      toast.error(errors[firstErrorKey].message)
+    setSentToEmail(data.email.trim());
+    setEmailSent(true);
+    toast.success(result.message);
+  };
+
+  const onError = () => {
+    const firstError = Object.values(errors)[0];
+    if (firstError?.message) {
+      toast.error(firstError.message);
     }
+  };
+
+  if (emailSent) {
+    return (
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+          <CheckCircle2 className="h-6 w-6" aria-hidden />
+        </div>
+        <p className="text-sm font-body-base leading-relaxed text-slate-600">
+          We sent a password reset link to{" "}
+          <span className="font-body-bold font-bold text-slate-900">
+            {sentToEmail}
+          </span>
+          . Click the link in your email to set a new password.
+        </p>
+        <Link
+          href="/login"
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl text-sm font-body-bold font-bold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+        >
+          Back to Login
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-5">
-        <div>
-          <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
-            Email Address
-          </label>
-          <Input
-            {...register("email")}
-            type="email"
-            placeholder="Enter your email"
-            icon={<Mail size={18} />}
-          />
-          <p className="text-xs text-slate-500 mt-2">
-            This code expires in 10 minutes.
-          </p>
-        </div>
+    <form
+      method="POST"
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className="space-y-1"
+      noValidate
+    >
+      <FormField
+        label="Email Address"
+        htmlFor="forgot-email"
+        required
+        error={errors.email?.message}
+      >
+        <Input
+          id="forgot-email"
+          {...register("email")}
+          type="email"
+          placeholder="Enter your email"
+          icon={<Mail size={18} />}
+          autoComplete="email"
+          error={errors.email?.message}
+          showErrorMessage={false}
+          aria-describedby="forgot-email-error"
+        />
+      </FormField>
 
-        <div className="pt-2 space-y-3">
-          <Button type="submit" disabled={isLoading} className="w-full text-base h-12">
-            {isLoading ? "Sending Code..." : "Send Verification Code"}
-          </Button>
+      <p className="pt-1 text-xs text-slate-500">
+        We&apos;ll email you a secure link to reset your password.
+      </p>
 
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center w-full text-base h-12 rounded-xl text-sm font-body-bold font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-          >
-            Back to Login
-          </Link>
-        </div>
-      </form>
-    </div>
-  )
+      <div className="space-y-3 pt-4">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-12 w-full text-base"
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+              Sending Link...
+            </span>
+          ) : (
+            "Send Reset Link"
+          )}
+        </Button>
+
+        <Link
+          href="/login"
+          className="inline-flex h-12 w-full items-center justify-center rounded-xl text-sm font-body-bold font-bold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+        >
+          Back to Login
+        </Link>
+      </div>
+    </form>
+  );
 }

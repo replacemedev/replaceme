@@ -50,6 +50,26 @@ export type EmployerSignUpFormValues = z.infer<typeof employerSignUpSchema>;
 export type WorkerSignUpFormValues = z.infer<typeof workerSignUpSchema>;
 export type SignUpFormValues = EmployerSignUpFormValues | WorkerSignUpFormValues;
 
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+});
+
+export const updatePasswordSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+export type UpdatePasswordFormValues = z.infer<typeof updatePasswordSchema>;
+
 export {
   loginCredentialsSchema as loginSchema,
   type LoginCredentials as LoginFormValues,

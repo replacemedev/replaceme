@@ -1,34 +1,50 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/auth/site-url";
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next')
+function buildRedirect(path: string, request: Request): string {
+  const origin = getSiteUrl();
+  const forwardedHost = request.headers.get("x-forwarded-host");
 
-  if (code) {
-    const supabase = await createClient()
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-    
-    if (!error && data?.user) {
-      // Fetch user profile to redirect to the correct role-based dashboard
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('auth_user_id', data.user.id)
-        .single()
-      
-      const role = profile?.role || 'worker'
-      const redirectUrl = next ?? (role === 'employer' ? '/dashboard' : '/worker/dashboard')
-      
-      const forwardedHost = request.headers.get('x-forwarded-host')
-      if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${redirectUrl}`)
-      }
-      return NextResponse.redirect(`${origin}${redirectUrl}`)
-    }
+  if (forwardedHost) {
+    return `https://${forwardedHost}${path}`;
   }
 
-  // Redirect to login with error details if exchange fails
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
+  return `${origin}${path}`;
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
+  const type = searchParams.get("type");
+  const next = searchParams.get("next");
+
+  if (!code) {
+    return NextResponse.redirect(
+      buildRedirect("/login?error=auth_callback_failed", request)
+    );
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    return NextResponse.redirect(
+      buildRedirect("/login?error=auth_callback_failed", request)
+    );
+  }
+
+  if (type === "signup" || next === "/login") {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(
+      buildRedirect("/login?confirmed=email", request)
+    );
+  }
+
+  if (type === "recovery" || next === "/update-password") {
+    return NextResponse.redirect(buildRedirect("/update-password", request));
+  }
+
+  await supabase.auth.signOut();
+  return NextResponse.redirect(buildRedirect("/login", request));
 }
