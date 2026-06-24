@@ -12,7 +12,7 @@ export default function TermsOfServicePage() {
       badge="Legal Document"
       badgeVariant="text"
       title="Terms of Service"
-      lastUpdated="October 24, 2024"
+      lastUpdated="January 24, 2026"
       wide
     >
       <TermsOfServiceContent />

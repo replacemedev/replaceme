@@ -5,31 +5,36 @@ import { NotificationsBell } from "@/components/shared/nav/NotificationsBell";
 import { WorkerDropdown } from "@/components/worker/layout/WorkerDropdown";
 import { MobileTriggerAndMenu } from "./MobileTriggerAndMenu";
 import { WorkerDesktopNav } from "./WorkerDesktopNav";
+import type { NavSession } from "@/types/nav";
 
-export async function WorkerHeader() {
-  const [session] = await Promise.all([getNavSession()]);
+interface WorkerHeaderProps {
+  session?: NavSession;
+}
 
-  const profile = session.profile;
-  const displayName = session.displayName || "Worker";
-  const initials = session.initials || "W";
+export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
+  const resolvedSession = session ?? (await getNavSession());
+
+  const profile = resolvedSession.profile;
+  const displayName = resolvedSession.displayName || "Worker";
+  const initials = resolvedSession.initials || "W";
 
   return (
     <header className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm">
       <div className="flex justify-between items-center px-4 sm:px-8 max-w-7xl mx-auto w-full h-16">
         <div className="flex items-center gap-4">
           <MobileTriggerAndMenu />
-          <NavBrand homeHref={session.homeHref} compact />
+          <NavBrand homeHref={resolvedSession.homeHref} compact />
         </div>
 
         <WorkerDesktopNav />
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <NotificationsBell unreadCount={session.unreadMessageCount} />
+          <NotificationsBell unreadCount={resolvedSession.unreadMessageCount} />
           <WorkerDropdown
             profile={profile}
             displayName={displayName}
             initials={initials}
-            isVerified={session.isVerified}
+            isVerified={resolvedSession.isVerified}
           />
         </div>
       </div>

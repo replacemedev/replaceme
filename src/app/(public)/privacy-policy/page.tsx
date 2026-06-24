@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
       badge="Legal"
       badgeVariant="pill"
       title="Privacy Policy"
-      lastUpdated="October 26, 2024"
+      lastUpdated="January 26, 2026"
     >
       <PrivacyPolicyContent />
     </LegalPageLayout>
