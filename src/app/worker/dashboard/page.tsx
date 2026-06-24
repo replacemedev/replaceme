@@ -44,9 +44,6 @@ export default async function WorkerDashboard() {
 
   const workerName = profile.first_name || user.user_metadata?.first_name || "Worker";
 
-  // Dynamically seed database statistics & relationships if worker has no prior actions
-  await supabase.rpc("seed_worker_dashboard_data", { worker_id: profile.id });
-
   // 1. Fetch live metrics counts
   const { data: apps } = await supabase
     .from("applications")
