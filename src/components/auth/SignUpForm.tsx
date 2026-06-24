@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RoleSelector } from "@/components/auth/RoleSelector";
+import { FormField } from "@/components/shared/FormField";
 import { Lock, Mail, User, Briefcase, Loader2 } from "lucide-react";
 import { signUp } from "@/actions/auth";
 import {
@@ -63,16 +64,20 @@ export function SignUpForm() {
   });
 
   useEffect(() => {
-    reset(
-      selectedRole === "employer" ? EMPLOYER_DEFAULTS : WORKER_DEFAULTS,
-      { keepDefaultValues: false }
-    );
+    reset(selectedRole === "employer" ? EMPLOYER_DEFAULTS : WORKER_DEFAULTS, {
+      keepDefaultValues: false,
+    });
   }, [selectedRole, reset]);
 
   const handleRoleChange = (role: string) => {
     setSelectedRole(role as SignUpRole);
     setValue("role", role as SignUpRole);
   };
+
+  const companyNameError =
+    "companyName" in errors
+      ? (errors as { companyName?: { message?: string } }).companyName?.message
+      : undefined;
 
   const onSubmit = async (data: SignUpValues) => {
     try {
@@ -94,9 +99,8 @@ export function SignUpForm() {
         return;
       }
 
-      toast.success(result.message);
-
       if (result.requiresConfirmation) {
+        toast.success(result.message);
         router.push("/login");
         router.refresh();
         return;
@@ -135,91 +139,124 @@ export function SignUpForm() {
       <form
         method="POST"
         onSubmit={handleSubmit(onSubmit, onError)}
-        className="space-y-3"
+        className="mt-4 space-y-1"
         noValidate
       >
         <input type="hidden" {...register("role")} />
 
-        <Field label="Username" error={errors.username?.message}>
+        <FormField
+          label="Username"
+          htmlFor="signup-username"
+          required
+          error={errors.username?.message}
+        >
           <Input
+            id="signup-username"
             {...register("username")}
             placeholder="janesmith"
             icon={<User size={18} />}
             autoComplete="username"
             error={errors.username?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-username-error"
           />
-        </Field>
+        </FormField>
 
-        <Field label="Full Name" error={errors.fullName?.message}>
+        <FormField
+          label="Full Name"
+          htmlFor="signup-fullName"
+          required
+          error={errors.fullName?.message}
+        >
           <Input
+            id="signup-fullName"
             {...register("fullName")}
             placeholder="Jane Doe"
             icon={<User size={18} />}
             autoComplete="name"
             error={errors.fullName?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-fullName-error"
           />
-        </Field>
+        </FormField>
 
-        {selectedRole === "employer" && (
-          <Field
+        {selectedRole === "employer" ? (
+          <FormField
             label="Company Name"
-            error={
-              "companyName" in errors
-                ? (errors as { companyName?: { message?: string } }).companyName
-                    ?.message
-                : undefined
-            }
+            htmlFor="signup-companyName"
+            required
+            error={companyNameError}
           >
             <Input
+              id="signup-companyName"
               {...register("companyName")}
               placeholder="TechCorp Inc."
               icon={<Briefcase size={18} />}
               autoComplete="organization"
-              error={
-                "companyName" in errors
-                  ? (errors as { companyName?: { message?: string } }).companyName
-                      ?.message
-                  : undefined
-              }
+              error={companyNameError}
+              showErrorMessage={false}
+              aria-describedby="signup-companyName-error"
             />
-          </Field>
-        )}
+          </FormField>
+        ) : null}
 
-        <Field label="Email Address" error={errors.email?.message}>
+        <FormField
+          label="Email Address"
+          htmlFor="signup-email"
+          required
+          error={errors.email?.message}
+        >
           <Input
+            id="signup-email"
             {...register("email")}
             type="email"
             placeholder="jane@example.com"
             icon={<Mail size={18} />}
             autoComplete="email"
             error={errors.email?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-email-error"
           />
-        </Field>
+        </FormField>
 
-        <Field label="Password" error={errors.password?.message}>
+        <FormField
+          label="Password"
+          htmlFor="signup-password"
+          required
+          description="Must be at least 8 characters."
+          error={errors.password?.message}
+        >
           <PasswordInput
+            id="signup-password"
             {...register("password")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
             autoComplete="new-password"
             error={errors.password?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-password-error signup-password-description"
           />
-          <p className="mt-1 text-xs text-slate-500">
-            Must be at least 8 characters.
-          </p>
-        </Field>
+        </FormField>
 
-        <Field label="Confirm Password" error={errors.confirmPassword?.message}>
+        <FormField
+          label="Confirm Password"
+          htmlFor="signup-confirmPassword"
+          required
+          error={errors.confirmPassword?.message}
+        >
           <PasswordInput
+            id="signup-confirmPassword"
             {...register("confirmPassword")}
             placeholder="Min. 8 characters"
             icon={<Lock size={18} />}
             autoComplete="new-password"
             error={errors.confirmPassword?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-confirmPassword-error"
           />
-        </Field>
+        </FormField>
 
-        <div className="pb-1.5 pt-1.5">
+        <FormField id="signup-terms" error={errors.terms?.message} className="pt-2">
           <Controller
             name="terms"
             control={control}
@@ -231,7 +268,11 @@ export function SignUpForm() {
                   onBlur={field.onBlur}
                   name={field.name}
                   ref={field.ref}
-                  className="mt-1"
+                  className="mt-0.5"
+                  aria-invalid={errors.terms ? true : undefined}
+                  aria-describedby={
+                    errors.terms ? "signup-terms-error" : undefined
+                  }
                 />
                 <span className="text-sm font-body-base leading-relaxed text-slate-600">
                   I agree to the{" "}
@@ -252,12 +293,9 @@ export function SignUpForm() {
               </label>
             )}
           />
-          {errors.terms?.message ? (
-            <p className="mt-1 text-xs text-red-500">{errors.terms.message}</p>
-          ) : null}
-        </div>
+        </FormField>
 
-        <div className="pt-1.5">
+        <div className="pt-3">
           <Button
             type="submit"
             variant="success"
@@ -275,26 +313,6 @@ export function SignUpForm() {
           </Button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-body-bold font-bold text-slate-800">
-        {label}
-      </label>
-      {children}
-      {error ? <p className="mt-1 text-xs text-red-500 sr-only">{error}</p> : null}
     </div>
   );
 }

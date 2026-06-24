@@ -145,8 +145,8 @@ export async function signUp(formData: any) {
 
     const destination =
       role === "employer"
-        ? `${ROLE_HOME_PATH.employer}?welcome=signup`
-        : `${ROLE_HOME_PATH.worker}?welcome=signup`;
+        ? `${ROLE_HOME_PATH.employer}?welcome=signup&name=${encodeURIComponent(firstName)}`
+        : `${ROLE_HOME_PATH.worker}?welcome=signup&name=${encodeURIComponent(firstName)}`;
 
     revalidatePath("/", "layout");
     redirect(destination);
@@ -226,22 +226,37 @@ export async function signIn(formData: LoginCredentials) {
 
     // Blueprint: read role from JWT app_metadata (server-controlled, not client-writable)
     let role = data.user.app_metadata?.role as string | undefined;
+    let displayName =
+      data.user.user_metadata?.first_name ??
+      data.user.user_metadata?.full_name?.trim().split(/\s+/)[0];
 
-    if (!role) {
+    if (!role || !displayName) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, first_name, full_name")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      role = profile?.role;
+      if (!role) {
+        role = profile?.role;
+      }
+
+      displayName =
+        profile?.first_name ??
+        profile?.full_name?.trim().split(/\s+/)[0] ??
+        displayName;
     }
 
     const finalRole = role ?? "worker";
     const redirectUrl = resolvePostLoginPath(finalRole);
 
+    const welcomeQuery = new URLSearchParams({ welcome: "login" });
+    if (displayName) {
+      welcomeQuery.set("name", displayName);
+    }
+
     revalidatePath("/", "layout");
-    redirect(`${redirectUrl}?welcome=login`);
+    redirect(`${redirectUrl}?${welcomeQuery.toString()}`);
   } catch (error) {
     if (
       error &&
