@@ -8,7 +8,7 @@ This guide is prepared for QA engineers to validate the implementation of the Em
 
 ### Step-by-Step Test:
 1. Log in to the application as an **Employer** user.
-2. Click the user avatar dropdown in the global header and verify that the "Profile Settings" link routes to `/settings/account`.
+2. Click the user avatar dropdown in the global header and verify that the "Account Settings" link routes to `/settings/account`.
 3. Verify that the breadcrumbs read `My Account › Account Settings`.
 4. Verify that the page header shows the title `Account Settings` and the subtitle `Manage your profile, security, and subscription plan.`.
 5. Check visual consistency on desktop:

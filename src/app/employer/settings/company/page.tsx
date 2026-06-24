@@ -5,7 +5,7 @@ import { getIndustries, getCompanyProfile } from "@/actions/employer/company";
 import { CompanyProfileForm } from "./CompanyProfileForm";
 
 export const metadata = {
-  title: "Company Profile Settings | ReplaceMe",
+  title: "Company Account Settings | ReplaceMe",
   description: "Build your brand presence to attract top remote talent.",
 };
 

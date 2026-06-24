@@ -59,7 +59,7 @@ Every link within the application was audited to guarantee correct route prefixi
   - `Pinned` -> `/employer/pinned`
   - `Hired` -> `/employer/hired`
   - `Pricing` -> `/employer/pricing`
-  - `Profile Settings` -> `/employer/settings/account`
+  - `Account Settings` -> `/employer/settings/account`
   - `Company Settings` -> `/employer/settings/company`
 * **Hired & Pinned Banner Actions**:
   - Updated to redirect to `/employer/pricing` and formatted with primary olive green styling.

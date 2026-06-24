@@ -106,7 +106,7 @@ export function EmployerDropdown({
             role="menuitem"
           >
             <User size={14} className="text-slate-400" />
-            Profile Settings
+            Account Settings
           </Link>
 
           <Link

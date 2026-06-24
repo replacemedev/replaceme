@@ -251,7 +251,7 @@ export function Header({ profile, unreadMessageCount = 0 }: HeaderProps) {
                   role="menuitem"
                 >
                   <User size={16} className="text-slate-400" />
-                  Profile Settings
+                  Account Settings
                 </Link>
 
                 <Link
