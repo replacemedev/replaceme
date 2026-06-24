@@ -79,23 +79,45 @@ export function ProfilePageSkeleton() {
 
         {/* Right Column (1/3 width) */}
         <div className="lg:col-span-1 order-1 lg:order-2">
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 -mt-16 lg:mt-10">
-            <div className="flex items-center gap-4">
-              <SkeletonBlock className="h-16 w-16 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <SkeletonBlock className="h-4 w-40" />
-                <SkeletonBlock className="h-3 w-28" />
+          <div className="relative -mt-20 lg:-mt-32 bg-white rounded-3xl border border-slate-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-6 text-center space-y-6 select-none z-10">
+            <div className="relative mx-auto w-32 h-32 rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden flex items-center justify-center">
+              <SkeletonBlock className="h-full w-full rounded-full bg-slate-200/70" />
+              <div className="absolute bottom-1 right-1 w-6 h-6 bg-emerald-200 border-2 border-white rounded-full" />
+            </div>
+
+            <div className="space-y-2">
+              <SkeletonBlock className="h-5 w-52 mx-auto" />
+              <SkeletonBlock className="h-4 w-40 mx-auto" />
+            </div>
+
+            <div className="flex justify-center items-center gap-2">
+              <SkeletonBlock className="h-5 w-24 rounded-full" />
+              <SkeletonBlock className="h-5 w-20 rounded-full" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 space-y-2 text-left">
+                <SkeletonBlock className="h-3 w-20" />
+                <SkeletonBlock className="h-4 w-24" />
+              </div>
+              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 space-y-2 text-left">
+                <SkeletonBlock className="h-3 w-20" />
+                <SkeletonBlock className="h-4 w-24" />
               </div>
             </div>
-            <div className="mt-6 space-y-3">
-              <SkeletonBlock className="h-10 w-full rounded-xl" />
-              <SkeletonBlock className="h-10 w-full rounded-xl" />
-              <SkeletonBlock className="h-10 w-full rounded-xl" />
+
+            <div className="space-y-3.5 pt-2 border-t border-slate-100 text-left">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <SkeletonBlock className="h-3 w-20" />
+                  <SkeletonBlock className="h-3 w-28" />
+                </div>
+              ))}
             </div>
-            <div className="mt-6 space-y-2">
-              <SkeletonBlock className="h-3 w-24" />
-              <SkeletonBlock className="h-3 w-40" />
-              <SkeletonBlock className="h-3 w-32" />
+
+            <div className="space-y-3 pt-4">
+              <SkeletonBlock className="h-12 w-full rounded-xl" />
+              <SkeletonBlock className="h-12 w-full rounded-xl" />
             </div>
           </div>
         </div>
