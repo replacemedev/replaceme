@@ -82,7 +82,7 @@ export async function getApplicants(jobId: string): Promise<{
         status,
         match_score,
         created_at,
-        profiles(first_name, last_name, avatar_url, email, role, bio, skills, professional_title)
+        profiles(first_name, last_name, avatar_url, email, role, bio, skills, professional_title, is_verified)
       `)
       .eq("job_id", jobId);
 
@@ -126,7 +126,7 @@ export async function getApplicants(jobId: string): Promise<{
           matchScore,
           matchLabel,
           status: app.status as ApplicationStatus,
-          skills: candidate?.skills || ["React", "TypeScript"],
+          skills: candidate?.skills || [],
           experienceYears: 3,
           isUnlocked,
           avatarUrl,
@@ -134,9 +134,15 @@ export async function getApplicants(jobId: string): Promise<{
           bio,
           resumeUrl,
           createdAt: app.created_at,
+          isVerified: Boolean(candidate?.is_verified),
         });
       }
     }
+
+    dbApplicants.sort((a, b) => {
+      if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
+      return b.matchScore - a.matchScore;
+    });
 
     return { applicants: dbApplicants, creditsBalance };
   } catch (err) {

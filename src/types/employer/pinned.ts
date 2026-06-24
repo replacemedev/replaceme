@@ -7,5 +7,6 @@ export interface PinnedWorker {
   experienceYears: number;
   hourlyRate: number;
   isPinned: boolean;
-  online: boolean; // Dynamic status indicator
+  online: boolean;
+  isVerified: boolean;
 }

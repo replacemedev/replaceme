@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { MessageSquare, Trash2, Eye } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
 
 interface ApplicantCardProps {
@@ -61,7 +62,10 @@ export function ApplicantCard({
             
             {/* Name and Professional Title */}
             <div>
-              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1">{applicant.name}</h3>
+              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1 inline-flex items-center gap-1">
+                {applicant.name}
+                <VerifiedBadge show={applicant.isVerified} size="sm" />
+              </h3>
               <p className="text-[10px] text-slate-400 font-bold leading-none">{applicant.role}</p>
             </div>
           </div>

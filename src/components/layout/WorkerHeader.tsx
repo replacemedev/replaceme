@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { UserDropdown } from "./UserDropdown";
+import { WorkerDropdown } from "@/components/worker/layout/WorkerDropdown";
 import { MobileTriggerAndMenu } from "./MobileTriggerAndMenu";
 import { WorkerDesktopNav } from "./WorkerDesktopNav";
 
@@ -15,7 +15,7 @@ export async function WorkerHeader() {
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("first_name, last_name, username, avatar_url")
+      .select("first_name, last_name, username, avatar_url, is_verified")
       .eq("id", user.id)
       .single();
     profile = data;
@@ -70,7 +70,12 @@ export async function WorkerHeader() {
           </button>
 
           {/* User Profile Dropdown (Client Component) */}
-          <UserDropdown profile={profile} displayName={displayName} initials={initials} />
+          <WorkerDropdown
+            profile={profile}
+            displayName={displayName}
+            initials={initials}
+            isVerified={Boolean(profile?.is_verified)}
+          />
         </div>
       </div>
     </header>

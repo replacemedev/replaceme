@@ -76,6 +76,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     is_top_rated: profileRow.is_top_rated,
     is_remote: profileRow.is_remote,
     created_at: profileRow.created_at,
+    is_verified: Boolean(profileRow.is_verified),
   };
 
   // 2. Fetch detailed worker skills

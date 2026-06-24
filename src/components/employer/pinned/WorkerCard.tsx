@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare, Eye, Award, DollarSign } from "lucide-react";
 import { PinnedWorker } from "@/types/employer/pinned";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { PinToggle } from "./PinToggle";
 
 interface WorkerCardProps {
@@ -51,8 +52,9 @@ export function WorkerCard({ worker, onUnpin }: WorkerCardProps) {
             </div>
 
             <div>
-              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1.5">
+              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1.5 inline-flex items-center gap-1">
                 {worker.name}
+                <VerifiedBadge show={worker.isVerified} size="sm" />
               </h3>
               <p className="text-[10px] text-slate-400 font-bold leading-none">
                 {worker.role}

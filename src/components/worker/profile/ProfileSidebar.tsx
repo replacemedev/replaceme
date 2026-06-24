@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Check, Edit, Share2, MapPin, Calendar, Clock, DollarSign, ExternalLink } from "lucide-react";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { WorkerProfile } from "@/types/worker-profile";
 
 interface ProfileSidebarProps {
@@ -56,8 +57,9 @@ export function ProfileSidebar({ profile, isOwner = false }: ProfileSidebarProps
 
       {/* Name and Professional Title */}
       <div className="space-y-1">
-        <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
+        <h3 className="text-xl font-extrabold text-slate-900 tracking-tight inline-flex items-center justify-center gap-1.5 flex-wrap">
           {fullName}
+          <VerifiedBadge show={Boolean(profile.is_verified)} size="md" />
         </h3>
         <p className="text-sm font-semibold text-slate-500">
           {profile.professional_title || "Specialized Contractor"}

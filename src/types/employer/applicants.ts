@@ -22,6 +22,7 @@ export interface Applicant {
   bio: string | null;
   resumeUrl: string | null;
   createdAt: string;
+  isVerified: boolean;
 }
 
 export interface EmployerCreditInfo {

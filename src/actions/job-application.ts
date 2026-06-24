@@ -121,7 +121,7 @@ export async function submitJobApplication(
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, role")
+      .select("id, role, is_verified")
       .eq("id", user.id)
       .single();
 
@@ -131,13 +131,21 @@ export async function submitJobApplication(
 
     const { data: job } = await supabase
       .from("job_posts")
-      .select("id, employer_id")
+      .select("id, employer_id, is_premium_path")
       .eq("id", jobId)
       .eq("status", "Active")
       .maybeSingle();
 
     if (!job) {
       return { success: false, error: "This job is no longer available." };
+    }
+
+    if (job.is_premium_path && !profile.is_verified) {
+      return {
+        success: false,
+        error:
+          "This is a verified-only job. Complete worker verification before applying.",
+      };
     }
 
     const { data: existing } = await supabase

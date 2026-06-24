@@ -40,7 +40,8 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
           professional_title,
           skills,
           experience_years,
-          hourly_rate
+          hourly_rate,
+          is_verified
         )
       `)
       .eq("employer_id", profile.id);
@@ -75,8 +76,14 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
         hourlyRate: worker.hourly_rate ? Number(worker.hourly_rate) : 0,
         isPinned: true,
         online,
+        isVerified: Boolean(worker.is_verified),
       });
     }
+
+    pinnedList.sort((a, b) => {
+      if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
 
     return pinnedList;
   } catch (err) {
