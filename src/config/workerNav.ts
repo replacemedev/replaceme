@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Briefcase,
+  Bookmark,
   FileText,
   MessageSquare,
   type LucideIcon,
@@ -15,6 +16,11 @@ export interface WorkerNavItem {
 export const WORKER_NAV_ITEMS: WorkerNavItem[] = [
   { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/worker/jobs", label: "Jobs", icon: Briefcase },
+  {
+    href: "/worker/saved-jobs",
+    label: "Saved Jobs",
+    icon: Bookmark,
+  },
   {
     href: "/worker/applications",
     label: "Applications",
