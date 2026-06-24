@@ -9,14 +9,16 @@ import {
   ShieldCheck,
   ScrollText,
   Settings,
-  BarChart3,
+  DollarSign,
+  Fingerprint,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/jobs", label: "Job Posts", icon: Briefcase },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/admin/identity", label: "Identity", icon: Fingerprint },
+  { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Security", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings },

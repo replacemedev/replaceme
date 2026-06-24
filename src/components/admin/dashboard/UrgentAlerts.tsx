@@ -1,27 +1,21 @@
+import type { UrgentAlert } from "@/types/admin.types";
 import { AlertTriangle, ShieldAlert, Clock } from "lucide-react";
 
-interface Alert {
-  id: string;
-  type: "security" | "moderation" | "system";
-  message: string;
-  created_at: string;
-}
-
 interface UrgentAlertsProps {
-  alerts: Alert[];
+  alerts: UrgentAlert[];
 }
 
-const ALERT_ICONS = {
+const ALERT_ICONS: Record<string, typeof ShieldAlert> = {
   security: ShieldAlert,
   moderation: AlertTriangle,
   system: Clock,
-} as const;
+};
 
-const ALERT_STYLES = {
+const ALERT_STYLES: Record<string, string> = {
   security: "bg-red-50 text-red-600 border-red-100",
   moderation: "bg-amber-50 text-amber-600 border-amber-100",
   system: "bg-blue-50 text-blue-600 border-blue-100",
-} as const;
+};
 
 export function UrgentAlerts({ alerts }: UrgentAlertsProps) {
   if (alerts.length === 0) {
@@ -42,8 +36,8 @@ export function UrgentAlerts({ alerts }: UrgentAlertsProps) {
       <h2 className="text-sm font-bold text-slate-900 mb-4">Urgent Alerts</h2>
       <ul className="space-y-2.5">
         {alerts.map((alert) => {
-          const Icon = ALERT_ICONS[alert.type];
-          const style = ALERT_STYLES[alert.type];
+          const Icon = ALERT_ICONS[alert.type] ?? AlertTriangle;
+          const style = ALERT_STYLES[alert.type] ?? ALERT_STYLES.moderation;
           return (
             <li
               key={alert.id}

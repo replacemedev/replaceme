@@ -1,0 +1,155 @@
+import { z } from "zod";
+
+export const timeSeriesPointSchema = z.object({
+  date: z.string(),
+  count: z.number(),
+});
+
+export const urgentAlertSchema = z.object({
+  id: z.string(),
+  type: z.enum(["security", "moderation", "system"]).or(z.string()),
+  message: z.string(),
+  created_at: z.string(),
+});
+
+export const platformMetricsSchema = z.object({
+  total_workers: z.number(),
+  total_employers: z.number(),
+  total_users: z.number(),
+  active_jobs: z.number(),
+  pending_jobs: z.number(),
+  total_applications: z.number(),
+  active_contracts: z.number(),
+  pending_verifications: z.number(),
+  verified_workers: z.number(),
+  active_subscriptions: z.number(),
+  user_growth_30d: z.array(timeSeriesPointSchema),
+  job_activity_30d: z.array(timeSeriesPointSchema),
+  urgent_alerts: z.array(urgentAlertSchema),
+});
+
+export type TimeSeriesPoint = z.infer<typeof timeSeriesPointSchema>;
+export type UrgentAlert = z.infer<typeof urgentAlertSchema>;
+export type PlatformMetrics = z.infer<typeof platformMetricsSchema>;
+
+export const EMPTY_PLATFORM_METRICS: PlatformMetrics = {
+  total_workers: 0,
+  total_employers: 0,
+  total_users: 0,
+  active_jobs: 0,
+  pending_jobs: 0,
+  total_applications: 0,
+  active_contracts: 0,
+  pending_verifications: 0,
+  verified_workers: 0,
+  active_subscriptions: 0,
+  user_growth_30d: [],
+  job_activity_30d: [],
+  urgent_alerts: [],
+};
+
+export type AccountStatus = "active" | "suspended";
+
+export type VerificationStatus =
+  | "unverified"
+  | "personal_complete"
+  | "documents_submitted"
+  | "under_review"
+  | "approved"
+  | "rejected";
+
+export interface AdminWorkerRow {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  professional_title: string | null;
+  account_status: AccountStatus;
+  verification_status: VerificationStatus;
+  is_verified: boolean;
+  created_at: string;
+}
+
+export interface AdminEmployerRow {
+  id: string;
+  employer_id: string;
+  company_name: string;
+  email: string | null;
+  industry: string | null;
+  account_status: AccountStatus;
+  subscription_status: string | null;
+  created_at: string;
+}
+
+export interface AdminJobRow {
+  id: string;
+  title: string;
+  status: string;
+  employment_type: string;
+  monthly_salary: number;
+  employer_id: string;
+  company_name: string | null;
+  created_at: string;
+}
+
+export interface AdminVerificationQueueRow {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  verification_status: VerificationStatus;
+  document_count: number;
+  created_at: string;
+}
+
+export interface AdminVerificationDocument {
+  id: string;
+  document_type: string;
+  file_name: string;
+  mime_type: string;
+  signed_url: string | null;
+  created_at: string;
+}
+
+export interface AdminSubscriptionRow {
+  id: string;
+  employer_id: string;
+  company_name: string | null;
+  employer_email: string | null;
+  plan_name: string | null;
+  plan_price: number | null;
+  status: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  current_period_end: string | null;
+  job_posts_used: number;
+  unlocks_used: number;
+  created_at: string;
+}
+
+export interface AdminAuditLogRow {
+  id: string;
+  action_type: string;
+  target_type: string | null;
+  target_id: string | null;
+  metadata: Record<string, unknown> | null;
+  ip_address: string | null;
+  created_at: string;
+  admin_email: string | null;
+}
+
+export const suspendUserSchema = z.object({
+  userId: z.string().uuid(),
+  reason: z.string().min(3).max(500),
+});
+
+export const moderateJobSchema = z.object({
+  jobId: z.string().uuid(),
+  reason: z.string().min(3).max(500).optional(),
+});
+
+export const reviewVerificationSchema = z.object({
+  workerId: z.string().uuid(),
+  decision: z.enum(["approved", "rejected"]),
+  reason: z.string().min(3).max(500).optional(),
+});

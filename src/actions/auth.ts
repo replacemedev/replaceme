@@ -159,7 +159,7 @@ const GENERIC_LOGIN_ERROR = "Invalid email or password. Please try again.";
 function resolvePostLoginPath(role: string): string {
   if (role === "admin") return ROLE_HOME_PATH.admin;
   if (role === "employer") return ROLE_HOME_PATH.employer;
-  if (role === "worker") return "/worker/dashboard";
+  if (role === "worker") return ROLE_HOME_PATH.worker;
   return ROLE_HOME_PATH.worker;
 }
 

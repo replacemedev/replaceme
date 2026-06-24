@@ -6,8 +6,8 @@ export default function AdminDashboardLoading() {
         <div className="h-4 w-80 bg-slate-200/50 rounded mt-2" />
       </header>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
             className="rounded-2xl border border-slate-200/80 bg-white p-5 h-[100px]"
