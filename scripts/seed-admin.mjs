@@ -25,7 +25,7 @@ function loadEnvFile(filename) {
   if (!existsSync(path)) return;
 
   const content = readFileSync(path, "utf8");
-  for (const line of content) {
+  for (const line of content.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
     const eq = trimmed.indexOf("=");
@@ -61,22 +61,48 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-async function findUserByEmail(email) {
-  let page = 1;
-  const perPage = 200;
+async function resolveExistingUserId() {
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .or(`email.eq.${ADMIN_EMAIL},username.eq.${ADMIN_USERNAME}`)
+    .maybeSingle();
 
-  while (true) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-    if (error) throw error;
-
-    const match = data.users.find(
-      (user) => user.email?.toLowerCase() === email.toLowerCase()
-    );
-    if (match) return match;
-
-    if (data.users.length < perPage) return null;
-    page += 1;
+  if (error) {
+    throw new Error(`Profile lookup failed: ${error.message}`);
   }
+
+  return profile?.id ?? null;
+}
+
+function formatAuthError(error) {
+  if (!error) return "unknown error";
+  const parts = [error.message, error.code, error.status, error.name].filter(Boolean);
+  if (parts.length > 0) return parts.join(" | ");
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+}
+
+async function createAdminUser(userPayload) {
+  const { data, error } = await supabase.auth.admin.createUser(userPayload);
+  if (error) {
+    throw new Error(`createUser failed: ${formatAuthError(error)}`);
+  }
+  return data.user.id;
+}
+
+async function updateAdminUser(userId, userPayload) {
+  const { data, error } = await supabase.auth.admin.updateUserById(
+    userId,
+    userPayload
+  );
+  if (error) {
+    throw new Error(`updateUserById failed: ${formatAuthError(error)}`);
+  }
+  return data.user.id;
 }
 
 async function ensureAdminProfile(userId) {
@@ -99,7 +125,7 @@ async function ensureAdminProfile(userId) {
 async function main() {
   console.log(`[seed:admin] Target: ${ADMIN_EMAIL}`);
 
-  const existing = await findUserByEmail(ADMIN_EMAIL);
+  const existingId = await resolveExistingUserId();
   const userPayload = {
     email: ADMIN_EMAIL,
     password: ADMIN_PASSWORD,
@@ -119,34 +145,29 @@ async function main() {
 
   let userId;
 
-  if (existing) {
-    console.log("[seed:admin] User exists — updating password and admin claims...");
-    const { data, error } = await supabase.auth.admin.updateUserById(
-      existing.id,
-      userPayload
+  if (existingId) {
+    console.log(
+      `[seed:admin] Found profile ${existingId} — updating auth user via Admin API...`
     );
-
-    if (error) {
+    try {
+      userId = await updateAdminUser(existingId, userPayload);
+    } catch (updateError) {
       console.warn(
-        "[seed:admin] Update failed (likely legacy SQL seed). Recreating user via Admin API..."
+        `[seed:admin] ${updateError.message}\n[seed:admin] Deleting and recreating auth user...`
       );
       const { error: deleteError } = await supabase.auth.admin.deleteUser(
-        existing.id
+        existingId
       );
-      if (deleteError) throw deleteError;
-
-      const { data: created, error: createError } =
-        await supabase.auth.admin.createUser(userPayload);
-      if (createError) throw createError;
-      userId = created.user.id;
-    } else {
-      userId = data.user.id;
+      if (deleteError) {
+        throw new Error(
+          `deleteUser failed: ${deleteError.message || JSON.stringify(deleteError)}`
+        );
+      }
+      userId = await createAdminUser(userPayload);
     }
   } else {
     console.log("[seed:admin] Creating admin user via Auth Admin API...");
-    const { data, error } = await supabase.auth.admin.createUser(userPayload);
-    if (error) throw error;
-    userId = data.user.id;
+    userId = await createAdminUser(userPayload);
   }
 
   await ensureAdminProfile(userId);
@@ -159,6 +180,10 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("[seed:admin] Failed:", error.message ?? error);
+  const message =
+    error?.message ??
+    error?.error_description ??
+    (typeof error === "object" ? JSON.stringify(error, null, 2) : String(error));
+  console.error("[seed:admin] Failed:", message);
   process.exit(1);
 });
