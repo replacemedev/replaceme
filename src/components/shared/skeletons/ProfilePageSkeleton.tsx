@@ -2,17 +2,101 @@ import { CardSkeleton, SkeletonBlock } from "./primitives";
 
 export function ProfilePageSkeleton() {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-pulse">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <CardSkeleton className="min-h-[480px]" />
-        <div className="lg:col-span-2 space-y-6">
-          <CardSkeleton minHeight="min-h-[200px]" />
-          <CardSkeleton minHeight="min-h-[160px]" />
-          <div className="space-y-3">
-            <SkeletonBlock className="h-6 w-32" />
-            {Array.from({ length: 3 }).map((_, i) => (
-              <SkeletonBlock key={i} className="h-16 w-full rounded-xl" />
-            ))}
+    <div className="min-h-screen bg-slate-50/50 pb-20 animate-pulse">
+      {/* Decorative top header banner (layout twin of /worker/profile) */}
+      <div className="relative w-full h-48 md:h-64 bg-gradient-to-r from-[#0a4a29] to-[#006e2f] select-none">
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
+        <div className="absolute -left-1/4 -top-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-3xl" />
+      </div>
+
+      {/* Main asymmetric grid layout */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Left Column (2/3 width) */}
+        <div className="lg:col-span-2 space-y-8 pt-8 lg:pt-12 order-2 lg:order-1">
+          {/* About section */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-3">
+            <SkeletonBlock className="h-4 w-40" />
+            <SkeletonBlock className="h-3 w-full max-w-[44rem]" />
+            <SkeletonBlock className="h-3 w-full max-w-[42rem]" />
+            <SkeletonBlock className="h-3 w-full max-w-[36rem]" />
+          </div>
+
+          {/* Top Skills section */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <SkeletonBlock className="h-8 w-8 rounded-lg" />
+                <SkeletonBlock className="h-4 w-28" />
+              </div>
+              <SkeletonBlock className="h-3 w-24 hidden sm:block" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <SkeletonBlock className="h-3 w-32" />
+                  <SkeletonBlock className="h-2.5 w-full rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Project Highlights section */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <SkeletonBlock className="h-8 w-8 rounded-lg" />
+                <SkeletonBlock className="h-4 w-44" />
+              </div>
+              <SkeletonBlock className="h-3 w-20 hidden sm:block" />
+            </div>
+            <div className="space-y-6">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <SkeletonBlock className="h-4 w-56" />
+                  <SkeletonBlock className="h-3 w-40" />
+                  <SkeletonBlock className="h-3 w-full max-w-[46rem]" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Testimonial Gallery section */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <SkeletonBlock className="h-8 w-8 rounded-lg" />
+                <SkeletonBlock className="h-4 w-64" />
+              </div>
+              <SkeletonBlock className="h-3 w-28 hidden sm:block" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <CardSkeleton key={i} minHeight="min-h-[160px]" className="rounded-3xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (1/3 width) */}
+        <div className="lg:col-span-1 order-1 lg:order-2">
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 -mt-16 lg:mt-10">
+            <div className="flex items-center gap-4">
+              <SkeletonBlock className="h-16 w-16 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <SkeletonBlock className="h-4 w-40" />
+                <SkeletonBlock className="h-3 w-28" />
+              </div>
+            </div>
+            <div className="mt-6 space-y-3">
+              <SkeletonBlock className="h-10 w-full rounded-xl" />
+              <SkeletonBlock className="h-10 w-full rounded-xl" />
+              <SkeletonBlock className="h-10 w-full rounded-xl" />
+            </div>
+            <div className="mt-6 space-y-2">
+              <SkeletonBlock className="h-3 w-24" />
+              <SkeletonBlock className="h-3 w-40" />
+              <SkeletonBlock className="h-3 w-32" />
+            </div>
           </div>
         </div>
       </div>
