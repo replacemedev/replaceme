@@ -11,7 +11,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RoleSelector } from "@/components/auth/RoleSelector";
 import { FormField } from "@/components/shared/FormField";
-import { Lock, Mail, User, Briefcase, Loader2 } from "lucide-react";
+import { Lock, Mail, User, Loader2 } from "lucide-react";
 import { signUp } from "@/actions/auth";
 import {
   employerSignUpSchema,
@@ -47,7 +47,6 @@ const WORKER_DEFAULTS: WorkerSignUpFormValues = {
 const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
   ...WORKER_DEFAULTS,
   role: "employer",
-  companyName: "",
 };
 
 export function SignUpForm() {
@@ -83,11 +82,6 @@ export function SignUpForm() {
     setSelectedRole(role as SignUpRole);
     setValue("role", role as SignUpRole);
   };
-
-  const companyNameError =
-    "companyName" in errors
-      ? (errors as { companyName?: { message?: string } }).companyName?.message
-      : undefined;
 
   const onSubmit = async (data: SignUpValues) => {
     try {
@@ -187,26 +181,6 @@ export function SignUpForm() {
             aria-describedby="signup-fullName-error"
           />
         </FormField>
-
-        {selectedRole === "employer" ? (
-          <FormField
-            label="Company Name"
-            htmlFor="signup-companyName"
-            required
-            error={companyNameError}
-          >
-            <Input
-              id="signup-companyName"
-              {...register("companyName")}
-              placeholder="TechCorp Inc."
-              icon={<Briefcase size={18} />}
-              autoComplete="organization"
-              error={companyNameError}
-              showErrorMessage={false}
-              aria-describedby="signup-companyName-error"
-            />
-          </FormField>
-        ) : null}
 
         <FormField
           label="Email Address"

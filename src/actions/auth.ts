@@ -49,7 +49,7 @@ function handleAuthError(error: unknown): string {
   }
 
   if (message.includes("Invalid login credentials")) {
-    return "Invalid email or password. Please try again.";
+    return "Invalid email, username, or password. Please try again.";
   }
 
   return message;
@@ -77,6 +77,62 @@ async function profileExistsByEmail(email: string): Promise<boolean> {
   } catch (error) {
     safeError("[Auth] profile email lookup unexpected error:", error);
     return false;
+  }
+}
+
+/** Login identifier → auth email. Usernames require service role (RLS blocks anon SELECT on profiles). */
+async function resolveEmailForLogin(identifier: string): Promise<string | null> {
+  const trimmed = identifier.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.includes("@")) {
+    return trimmed.toLowerCase();
+  }
+
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/server");
+    const admin = await createAdminClient();
+
+    const { data: profileRow, error: profileError } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("username", trimmed)
+      .maybeSingle();
+
+    if (profileError) {
+      safeError("[Auth] username lookup on profiles failed:", profileError);
+    } else if (profileRow?.email) {
+      return profileRow.email.trim().toLowerCase();
+    }
+
+    const { data: companyRow, error: companyError } = await admin
+      .from("company_profiles")
+      .select("employer_id")
+      .eq("username", trimmed)
+      .maybeSingle();
+
+    if (companyError) {
+      safeError("[Auth] username lookup on company_profiles failed:", companyError);
+      return null;
+    }
+
+    if (!companyRow?.employer_id) return null;
+
+    const { data: employerProfile, error: employerError } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("id", companyRow.employer_id)
+      .maybeSingle();
+
+    if (employerError) {
+      safeError("[Auth] employer email lookup failed:", employerError);
+      return null;
+    }
+
+    return employerProfile?.email?.trim().toLowerCase() ?? null;
+  } catch (error) {
+    safeError("[Auth] resolveEmailForLogin unexpected error:", error);
+    return null;
   }
 }
 
@@ -115,7 +171,6 @@ export async function signUp(formData: SignUpFormValues) {
           full_name: data.fullName,
           first_name: firstName,
           last_name: lastName,
-          company_name: "companyName" in data ? data.companyName : null,
         },
       },
     });
@@ -222,7 +277,8 @@ export async function signUp(formData: SignUpFormValues) {
   }
 }
 
-const GENERIC_LOGIN_ERROR = "Invalid email or password. Please try again.";
+const GENERIC_LOGIN_ERROR =
+  "Invalid email, username, or password. Please try again.";
 
 function resolvePostLoginPath(role: string): string {
   if (role === "admin") return ROLE_HOME_PATH.admin;
@@ -243,18 +299,9 @@ export async function signIn(formData: LoginCredentials) {
 
     const { email, password } = parsed.data;
 
-    let emailToAuth = email;
-    if (!email.includes("@")) {
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("username", email)
-        .maybeSingle();
-
-      if (!profileData?.email) {
-        return { success: false, error: GENERIC_LOGIN_ERROR };
-      }
-      emailToAuth = profileData.email;
+    const emailToAuth = await resolveEmailForLogin(email);
+    if (!emailToAuth) {
+      return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({

@@ -29,16 +29,6 @@ const passwordMatchRefine = {
   path: ["confirmPassword"] as const,
 };
 
-export const employerSignUpSchema = z
-  .object({
-    ...baseAuthSchema,
-    companyName: z.string().min(2, "Company name is required"),
-  })
-  .refine(passwordMatchRefine.refine, {
-    message: passwordMatchRefine.message,
-    path: [...passwordMatchRefine.path],
-  });
-
 export const workerSignUpSchema = z
   .object({ ...baseAuthSchema })
   .refine(passwordMatchRefine.refine, {
@@ -46,9 +36,11 @@ export const workerSignUpSchema = z
     path: [...passwordMatchRefine.path],
   });
 
-export type EmployerSignUpFormValues = z.infer<typeof employerSignUpSchema>;
+export const employerSignUpSchema = workerSignUpSchema;
+
 export type WorkerSignUpFormValues = z.infer<typeof workerSignUpSchema>;
-export type SignUpFormValues = EmployerSignUpFormValues | WorkerSignUpFormValues;
+export type EmployerSignUpFormValues = WorkerSignUpFormValues;
+export type SignUpFormValues = WorkerSignUpFormValues;
 
 export const forgotPasswordSchema = z.object({
   email: z

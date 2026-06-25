@@ -1,6 +1,6 @@
 # Feature Implementation Prompt Template (Modular)
 
-**How to use this file:** Read **Core** (including **Repository File Map** + **Auto-Profile Classifier** + **Always-On Invariants**) first. The agent **must** auto-detect the profile, apply escalations, then read **only** the resulting sections. Token savings come from the **File Map** + skipping unused section *modules* — not from skipping architecture guardrails.
+**How to use this file:** Read **Core** (including **Repository File Map** + **Agent Skills Index** + **Auto-Profile Classifier** + **Always-On Invariants**) first. The agent **must** auto-detect the profile, apply escalations, read applicable **agent skills**, then read **only** the resulting sections. Token savings come from the **File Map** + skipping unused section *modules* — not from skipping architecture guardrails or installed skills.
 
 ---
 
@@ -8,12 +8,13 @@
 
 ### Operating rules
 1. **File map first** — Use **Repository File Map** below (auto-synced from workspace). Do **not** broad-scan or `explore` the repo unless the map is stale or the user reports a novel area. After add/rename/delete/move under `src/` or `supabase/migrations/`, run `npm run prompt:sync`.
-2. **Auto-classify** the request (classifier below) → state profile + escalations + why.
-3. Fill **Feature Spec** + **Always-On Invariants** + sections for the **final** profile (after escalations).
-4. Generate a **scoped Execution Checklist** (applicable rows only).
-5. **STOP** and ask for **explicit approval** before application code.
-6. During build: update checklist live (`Done` / `Missed` / `Lacking/Incomplete`).
-7. After build: emit **Post-Build Report** (checklist with Done/Missed/Lacking per success criterion). If you added/renamed/deleted/moved files under `src/` or `supabase/migrations/`, run **`npm run prompt:sync`** before finishing.
+2. **Skills second** — Read **Agent Skills Index** below. Load every skill listed for your profile (full `SKILL.md` at the path). **Ponytail is always-on** (default: `full`).
+3. **Auto-classify** the request (classifier below) → state profile + escalations + why.
+4. Fill **Feature Spec** + **Always-On Invariants** + sections for the **final** profile (after escalations).
+5. Generate a **scoped Execution Checklist** (applicable rows only).
+6. **STOP** and ask for **explicit approval** before application code.
+7. During build: update checklist live (`Done` / `Missed` / `Lacking/Incomplete`).
+8. After build: emit **Post-Build Report** (checklist with Done/Missed/Lacking per success criterion). If you added/renamed/deleted/moved files under `src/` or `supabase/migrations/`, run **`npm run prompt:sync`** before finishing.
 
 <!-- PROMPT_SYNC:BEGIN -->
 ### Repository File Map (auto-generated from workspace)
@@ -279,12 +280,111 @@ These prevent spaghetti and debug loops regardless of profile:
 | **Types** | `src/types/database.ts` — no `any`; regen after any schema change |
 | **UI split** | RSC for pages/layouts; client components only at interaction leaves |
 | **Shared UI** | Reuse `src/components/shared/**` before creating role-specific duplicates |
-| **Ponytail** | Flat DOM, no wrapper soup, composition over boolean props |
+| **Ponytail** | Lazy senior dev: shortest working diff, YAGNI, reuse before write, root-cause fixes — see **Agent Skills Index** + `.agents/skills/ponytail/SKILL.md`. DOM: flat tree, no wrapper soup, composition over boolean props (`.cursorrules`) |
 | **Cache** | `revalidatePath` after mutations that affect rendered views |
 | **RLS** | New/changed tables must have explicit policies before UI ships |
 | **Pre-flight** | Use **Task → Files** + mirror 1–2 paths from File Map — no broad repo scan |
 
 **If a task violates an invariant, escalate the profile** (see Escalation Rules) — do not “save tokens” by breaking architecture.
+
+---
+
+### Agent Skills Index (installed in `.agents/skills/`)
+
+**Agent rule:** When a skill applies, **read the full `SKILL.md`** at the path below before implementing. Skills are local to this workspace (`SKILLS/skills-lock.json`). For Vercel skills, also use the companion `AGENTS.md` in the same folder for rule-level detail. Do not substitute memory for the skill file.
+
+#### Always-on (every profile — read first)
+
+| Skill | Path | Purpose |
+|-------|------|---------|
+| **Ponytail** | `.agents/skills/ponytail/SKILL.md` | **Default intensity: `full`.** Lazy senior dev ladder — YAGNI → reuse codebase → stdlib → existing deps → minimum code. Root-cause bug fixes (one guard in shared function, not N callers). Shortest diff after understanding the flow. Mark deliberate shortcuts with `// ponytail: …` |
+| **Workflow** | `AGENTS.md` | Plan → Build → Fix; file map first; approval gate |
+| **Stack invariants** | `.cursorrules` | Next.js App Router, Supabase, zero mock data, role routes, Ponytail DOM |
+
+**Ponytail intensity:** `lite` \| `full` (default) \| `ultra`. Off only when user says **“stop ponytail”** / **“normal mode”**.
+
+**Never simplify away (Ponytail + marketplace):** Zod + RBAC on mutations, RLS, auth inside Server Actions, `{ success, error }` returns, validation at trust boundaries, accessibility basics, anything explicitly requested.
+
+**Ponytail DOM doctrine** (`.cursorrules` + composition skill):
+
+- Shallow DOM — no div soup; use Tailwind `grid` / `flex` / `gap-*`, not margin hacks
+- RSC for pages/layouts; `'use client'` only at interaction leaves
+- No boolean prop proliferation — compound components + explicit variants (see composition skill)
+- Reuse `src/components/shared/**` before role-specific duplicates
+
+#### Profile → skills (read full `SKILL.md` for each)
+
+| Profile | Skills to read |
+|---------|----------------|
+| **A — UI** | `ponytail`, `vercel-composition-patterns`, `ui-principles`, `ui-design-system`, `web-design-guidelines` |
+| **B — Backend** | `ponytail`, `vercel-react-best-practices`, `api-rest`, `database-design` |
+| **C — Full-stack** | `ponytail`, `nextjs-typescript-tailwindcss-supabase`, `vercel-composition-patterns`, `vercel-react-best-practices`, `database-design`, `architecture-decision-records` |
+| **D — Database** | `ponytail`, `database-design`, `db-postgres` |
+| **E — Design / docs** | `ponytail`, `drawio-skill`, `ux-enhancer`, `architecture-decision-records` |
+| **F — Bug fix** | `ponytail` (root cause), `vercel-react-best-practices` (only rules relevant to the bug — e.g. `server-*`, `async-*`) |
+
+After escalation (e.g. A→C), merge skill lists from **both** profiles.
+
+#### Task area → skills (use with **Task → Files** map)
+
+| Task area | Skills |
+|-----------|--------|
+| Headers, onboarding, forms, dashboards | `ponytail`, `vercel-composition-patterns`, `ui-principles` |
+| Auth, password reset, RBAC | `ponytail`, `vercel-react-best-practices` (`server-authenticate-actions`) |
+| Worker/employer jobs, messaging | `ponytail`, `vercel-react-best-practices` (`async-*`, `server-parallel-*`) |
+| Stripe / billing | `ponytail`, `api-rest`, `nextjs-typescript-tailwindcss-supabase` |
+| RLS / schema / migrations | `ponytail`, `database-design`, `db-postgres` |
+| Admin moderation | `ponytail`, `vercel-react-best-practices`, `absolute` (security sections if touching auth) |
+| New feature / architecture | `improve-codebase-architecture`, `architecture-decision-records` |
+| Page transitions / navigation UX | `vercel-react-view-transitions` |
+| Whimsical / diagrams | `drawio-skill` |
+| UX audit / empty states | `ux-enhancer` |
+| shadcn / UI primitives | `shadcn` |
+
+#### Ponytail ladder (quick reference — full rules in skill file)
+
+1. Does this need to exist? (YAGNI)
+2. Already in this codebase? Reuse it.
+3. Stdlib / native platform?
+4. Already-installed dependency?
+5. One line?
+6. Minimum code that works.
+
+**Bug fix:** grep all callers; fix once at the shared choke point. **Output:** code first; at most three lines on what was skipped and when to add it.
+
+#### Other installed skills (use when explicitly needed)
+
+**Marketplace / stack (prefer these):**
+
+```txt
+.agents/skills/absolute/SKILL.md
+.agents/skills/api-rest/SKILL.md
+.agents/skills/architecture-decision-records/SKILL.md
+.agents/skills/database-design/SKILL.md
+.agents/skills/db-postgres/SKILL.md
+.agents/skills/drawio-skill/SKILL.md
+.agents/skills/improve/SKILL.md
+.agents/skills/improve-codebase-architecture/SKILL.md
+.agents/skills/nextjs-16/SKILL.md
+.agents/skills/nextjs-typescript-tailwindcss-supabase/SKILL.md
+.agents/skills/onboarding-guide/SKILL.md
+.agents/skills/ponytail/SKILL.md
+.agents/skills/shadcn/SKILL.md
+.agents/skills/supastarter-nextjs-skill/SKILL.md
+.agents/skills/ui-design-system/SKILL.md
+.agents/skills/ui-principles/SKILL.md
+.agents/skills/ux-enhancer/SKILL.md
+.agents/skills/vercel-composition-patterns/SKILL.md
+.agents/skills/vercel-react-best-practices/SKILL.md
+.agents/skills/vercel-react-view-transitions/SKILL.md
+.agents/skills/web-design-guidelines/SKILL.md
+```
+
+**General / tooling (optional):** `code-reviewer`, `find-docs`, `context7-mcp`, `context7-cli`, `deploy-service`, `file-indexer`, `markdown-formatter`, `state-tanstack` — under `.agents/skills/<name>/SKILL.md`.
+
+Discover more: `.agents/skills/find-skills/SKILL.md` · Full inventory: `ls .agents/skills/` · Lock file: `SKILLS/skills-lock.json`
+
+**Agent must output in the plan:** **Skills read:** list of `SKILL.md` paths for detected profile + task area.
 
 ---
 
@@ -346,16 +446,16 @@ START
 
 ### Section Router (base profiles — before escalation)
 
-| Profile | Base trigger | Section modules to read |
-|---------|--------------|-------------------------|
-| **A — UI only** | Visual/UX on existing data paths | **File Map**, **3**, **6**, **8-Figma** (if wireframes), scoped **9** |
-| **B — Backend only** | Actions/DAL/validation, no new pages | **File Map**, **4**, **5**, **7**, scoped **9** |
-| **C — Full-stack** | DB + UI + mutations and/or multi-role | **File Map**, **2**, **3**, **4**, **5**, **6**, **7**, **8**, **9** |
-| **D — Database** | Migrations/RLS/types only | **File Map**, **2**, **8-Whimsical**, scoped **9** |
-| **E — Design / docs** | Whimsical/Figma/architecture only | **File Map**, **8**, scoped **9** |
-| **F — Bug fix** | Localized fix, same feature surface | **File Map**, **Task → Files** row, scoped **9** |
+| Profile | Base trigger | Section modules to read | Skills to read (see **Agent Skills Index**) |
+|---------|--------------|-------------------------|---------------------------------------------|
+| **A — UI only** | Visual/UX on existing data paths | **File Map**, **3**, **6**, **8-Figma** (if wireframes), scoped **9** | `ponytail`, `vercel-composition-patterns`, `ui-principles`, `ui-design-system`, `web-design-guidelines` |
+| **B — Backend only** | Actions/DAL/validation, no new pages | **File Map**, **4**, **5**, **7**, scoped **9** | `ponytail`, `vercel-react-best-practices`, `api-rest`, `database-design` |
+| **C — Full-stack** | DB + UI + mutations and/or multi-role | **File Map**, **2**, **3**, **4**, **5**, **6**, **7**, **8**, **9** | `ponytail`, `nextjs-typescript-tailwindcss-supabase`, `vercel-composition-patterns`, `vercel-react-best-practices`, `database-design`, `architecture-decision-records` |
+| **D — Database** | Migrations/RLS/types only | **File Map**, **2**, **8-Whimsical**, scoped **9** | `ponytail`, `database-design`, `db-postgres` |
+| **E — Design / docs** | Whimsical/Figma/architecture only | **File Map**, **8**, scoped **9** | `ponytail`, `drawio-skill`, `ux-enhancer`, `architecture-decision-records` |
+| **F — Bug fix** | Localized fix, same feature surface | **File Map**, **Task → Files** row, scoped **9** | `ponytail`, `vercel-react-best-practices` (targeted rules only) |
 
-**Agent rule:** Read **Core (incl. File Map) + listed modules only**. Do not read unlisted section modules. Do not `explore` the repo if **Task → Files** covers the request.
+**Agent rule:** Read **Core (incl. File Map + Skills) + listed modules only**. Do not read unlisted section modules. Do not `explore` the repo if **Task → Files** covers the request.
 
 ---
 
@@ -381,6 +481,7 @@ When fixing bugs, **Phase 3 only** — no re-architecture:
 | **Detected profile** | `<A–F>` |
 | **Escalations** | `<none \| A→C because …>` |
 | **Sections to read** | `<Core, 3, 4, …>` |
+| **Skills read** | `<paths under .agents/skills/ — ponytail always>` |
 | **Primary role(s)** | `<worker \| employer \| admin \| multi-role \| public>` |
 | **Success criteria** | `<measurable outcomes>` |
 | **Non-goals** | `<out of scope>` |
@@ -583,7 +684,8 @@ Using prompt.md:
 - Feature: <one-line description>
 - Role(s): <worker|employer|admin|...>
 - Area (optional): <pick from Task → Files table, e.g. Headers, Password reset>
+- (optional) Ponytail: <full|lite|ultra|off> — default full
 - (optional) I think this is profile: <A-F> — confirm or correct via Auto-Profile Classifier
 ```
 
-The agent **must** confirm or correct the profile using the classifier — never blindly trust the user's guess if escalations apply. The agent **must** list files from **Task → Files** / **File Map** in the plan — not run a broad repo search first.
+The agent **must** confirm or correct the profile using the classifier — never blindly trust the user's guess if escalations apply. The agent **must** read **Agent Skills Index** skills for the final profile ( **`ponytail` always** ) and list **Skills read** in the plan. The agent **must** list files from **Task → Files** / **File Map** in the plan — not run a broad repo search first.

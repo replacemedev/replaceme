@@ -51,7 +51,7 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
       const result = await signIn(data);
 
       if (result && !result.success) {
-        toast.error(result.error ?? "Invalid email or password. Please try again.");
+        toast.error(result.error ?? "Invalid email, username, or password. Please try again.");
       } else if (data.rememberMe) {
         localStorage.setItem("remember_email", data.email);
       } else {
