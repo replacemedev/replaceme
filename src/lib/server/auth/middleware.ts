@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { ROLE_HOME_PATH } from "@/config/navigation";
+import { profileIdFilter, resolveRoleFromUser } from "@/lib/auth/role";
 
 const MFA_CHALLENGE_PATH = "/admin/mfa-challenge";
 
@@ -72,14 +73,12 @@ export async function updateSession(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role, professional_title, location, skills")
-      .eq("id", user.id)
+      .select("id, role, professional_title, location, skills")
+      .or(profileIdFilter(user.id))
       .maybeSingle();
 
-    const role =
-      (user.app_metadata?.role as string | undefined) ??
-      profile?.role ??
-      "worker";
+    const role = resolveRoleFromUser(user, profile?.role);
+    const profileId = profile?.id ?? user.id;
 
     const homePath =
       role === "admin"
@@ -129,12 +128,16 @@ export async function updateSession(request: NextRequest) {
     ) {
       const { data: company } = await supabase
         .from("company_profiles")
-        .select("company_name, industry")
-        .eq("employer_id", user.id)
+        .select("company_name, industry, company_size")
+        .eq("employer_id", profileId)
         .maybeSingle();
 
       const onboardingComplete = Boolean(
-        company?.company_name?.trim() && company?.industry?.trim()
+        company?.company_name?.trim() &&
+          company?.industry?.trim() &&
+          company?.company_size?.trim() &&
+          profile?.skills &&
+          profile.skills.length > 0
       );
       if (!onboardingComplete) {
         return NextResponse.redirect(

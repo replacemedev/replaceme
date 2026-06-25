@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { profileIdFilter } from "@/lib/auth/role";
 
 export type AppRole = "worker" | "employer" | "admin";
 
@@ -46,8 +47,8 @@ export async function requireRole(
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("id, role")
-    .eq("id", user.id)
-    .single();
+    .or(profileIdFilter(user.id))
+    .maybeSingle();
 
   if (error || !profile || !allowed.includes(profile.role as AppRole)) {
     throw new AuthError(

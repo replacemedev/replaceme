@@ -6,7 +6,7 @@ alwaysApply: true
 # The Optimized Cursor Agent Workflow
 
 ALWAYS start with a "Scope Prompt" for new features. To conserve context tokens and prevent hallucination, the Agent must adhere to the following:
-1. **Targeted Context:** Explicitly identify and list ONLY the required files. Do NOT scan or read the full repo indiscriminately.
+1. **Targeted Context:** Explicitly identify and list ONLY the required files. Use `prompt.md` **Repository File Map** (run `npm run prompt:sync` after structural changes). Do NOT scan or read the full repo indiscriminately.
 2. **File Limit:** Ask for user permission before reading or opening more than 5 files in a single turn.
 3. **Plan First:** Create a step-by-step implementation plan (or `plan.md`) BEFORE writing or editing any code.
 4. **Halt & Catch Fire:** Wait for user approval ("Proceed" or "Yes") before executing multi-file creations or edits.

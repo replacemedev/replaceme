@@ -15,6 +15,7 @@ import {
 import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
 import { authCallbackUrl } from "@/lib/auth/site-url";
+import { isAppRole, profileIdFilter } from "@/lib/auth/role";
 import {
   forgotPasswordSchema,
   updatePasswordSchema,
@@ -261,21 +262,25 @@ export async function signIn(formData: LoginCredentials) {
       };
     }
 
-    // Blueprint: read role from JWT app_metadata (server-controlled, not client-writable)
+    // Blueprint: app_metadata → profiles.role → signup user_metadata
     let role = data.user.app_metadata?.role as string | undefined;
     let displayName =
       data.user.user_metadata?.first_name ??
       data.user.user_metadata?.full_name?.trim().split(/\s+/)[0];
 
-    if (!role || !displayName) {
+    if (!isAppRole(role) || !displayName) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, first_name, full_name")
-        .eq("id", data.user.id)
+        .or(profileIdFilter(data.user.id))
         .maybeSingle();
 
-      if (!role) {
-        role = profile?.role;
+      if (!isAppRole(role)) {
+        role = isAppRole(profile?.role)
+          ? profile.role
+          : isAppRole(data.user.user_metadata?.role)
+            ? data.user.user_metadata.role
+            : undefined;
       }
 
       displayName =
@@ -284,7 +289,7 @@ export async function signIn(formData: LoginCredentials) {
         displayName;
     }
 
-    const finalRole = role ?? "worker";
+    const finalRole = isAppRole(role) ? role : "worker";
     const redirectUrl = resolvePostLoginPath(finalRole);
 
     const welcomeQuery = new URLSearchParams({ welcome: "login" });

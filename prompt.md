@@ -1,18 +1,268 @@
 # Feature Implementation Prompt Template (Modular)
 
-**How to use this file:** Read **Core** (including **Auto-Profile Classifier** + **Always-On Invariants**) first. The agent **must** auto-detect the profile, apply escalations, then read **only** the resulting sections. Token savings come from skipping unused section *modules* — not from skipping architecture guardrails.
+**How to use this file:** Read **Core** (including **Repository File Map** + **Auto-Profile Classifier** + **Always-On Invariants**) first. The agent **must** auto-detect the profile, apply escalations, then read **only** the resulting sections. Token savings come from the **File Map** + skipping unused section *modules* — not from skipping architecture guardrails.
 
 ---
 
 ## Core (always read)
 
 ### Operating rules
-1. **Auto-classify** the request (classifier below) → state profile + escalations + why.
-2. Fill **Feature Spec** + **Always-On Invariants** + sections for the **final** profile (after escalations).
-3. Generate a **scoped Execution Checklist** (applicable rows only).
-4. **STOP** and ask for **explicit approval** before application code.
-5. During build: update checklist live (`Done` / `Missed` / `Lacking/Incomplete`).
-6. After build: run **Definition of Done** for final profile + any escalated gates.
+1. **File map first** — Use **Repository File Map** below (auto-synced from workspace). Do **not** broad-scan or `explore` the repo unless the map is stale or the user reports a novel area. After add/rename/delete/move under `src/` or `supabase/migrations/`, run `npm run prompt:sync`.
+2. **Auto-classify** the request (classifier below) → state profile + escalations + why.
+3. Fill **Feature Spec** + **Always-On Invariants** + sections for the **final** profile (after escalations).
+4. Generate a **scoped Execution Checklist** (applicable rows only).
+5. **STOP** and ask for **explicit approval** before application code.
+6. During build: update checklist live (`Done` / `Missed` / `Lacking/Incomplete`).
+7. After build: emit **Post-Build Report** (checklist with Done/Missed/Lacking per success criterion). If you added/renamed/deleted/moved files under `src/` or `supabase/migrations/`, run **`npm run prompt:sync`** before finishing.
+
+<!-- PROMPT_SYNC:BEGIN -->
+### Repository File Map (auto-generated from workspace)
+
+**Last synced:** 2026-06-25T12:54:33.308Z · **Git:** `152dac6`
+**Regenerate:** `npm run prompt:sync` after any add, rename, delete, or move under `src/`, `supabase/migrations/`, or root entry files.
+
+**Agent rule:** Use this map + **Task → Files**. Do not broad-scan the repo. If a path is missing here, run `npm run prompt:sync` (or ask the user to).
+
+#### Repo root (non-src)
+
+```txt
+prompt.md  # This guide (auto-synced file map)
+AGENTS.md
+.cursorrules
+src/proxy.ts
+.env.example
+package.json
+supabase/migrations/*.sql  # 27 migration file(s)
+```
+
+#### `src/app/` — routes (App Router) — 88 route files
+
+```txt
+src/app/(public)/contact/loading.tsx
+src/app/(public)/contact/page.tsx
+src/app/(public)/layout.tsx
+src/app/(public)/loading.tsx
+src/app/(public)/page.tsx
+src/app/(public)/privacy-policy/loading.tsx
+src/app/(public)/privacy-policy/page.tsx
+src/app/(public)/terms-of-service/loading.tsx
+src/app/(public)/terms-of-service/page.tsx
+src/app/403/page.tsx
+src/app/admin/(shell)/audit-log/loading.tsx
+src/app/admin/(shell)/audit-log/page.tsx
+src/app/admin/(shell)/dashboard/loading.tsx
+src/app/admin/(shell)/dashboard/page.tsx
+src/app/admin/(shell)/disputes/loading.tsx
+src/app/admin/(shell)/disputes/page.tsx
+src/app/admin/(shell)/identity/loading.tsx
+src/app/admin/(shell)/identity/page.tsx
+src/app/admin/(shell)/jobs/loading.tsx
+src/app/admin/(shell)/jobs/page.tsx
+src/app/admin/(shell)/layout.tsx
+src/app/admin/(shell)/loading.tsx
+src/app/admin/(shell)/revenue/loading.tsx
+src/app/admin/(shell)/revenue/page.tsx
+src/app/admin/(shell)/security/loading.tsx
+src/app/admin/(shell)/security/page.tsx
+src/app/admin/(shell)/settings/page.tsx
+src/app/admin/(shell)/users/loading.tsx
+src/app/admin/(shell)/users/page.tsx
+src/app/admin/error.tsx
+src/app/admin/layout.tsx
+src/app/admin/mfa-challenge/layout.tsx
+src/app/admin/mfa-challenge/page.tsx
+src/app/admin/not-found.tsx
+src/app/api/webhooks/stripe/route.ts
+src/app/auth/callback/route.ts
+src/app/auth/confirm/route.ts
+src/app/employer/checkout/[planId]/loading.tsx
+src/app/employer/checkout/[planId]/page.tsx
+src/app/employer/dashboard/loading.tsx
+src/app/employer/dashboard/page.tsx
+src/app/employer/hired/loading.tsx
+src/app/employer/hired/page.tsx
+src/app/employer/jobs/[jobId]/applicants/loading.tsx
+src/app/employer/jobs/[jobId]/applicants/page.tsx
+src/app/employer/jobs/[jobId]/loading.tsx
+src/app/employer/jobs/[jobId]/page.tsx
+src/app/employer/jobs/create/loading.tsx
+src/app/employer/jobs/create/page.tsx
+src/app/employer/layout.tsx
+src/app/employer/messages/loading.tsx
+src/app/employer/messages/page.tsx
+src/app/employer/onboarding/page.tsx
+src/app/employer/pinned/loading.tsx
+src/app/employer/pinned/page.tsx
+src/app/employer/pricing/loading.tsx
+src/app/employer/pricing/page.tsx
+src/app/employer/settings/account/loading.tsx
+src/app/employer/settings/account/page.tsx
+src/app/employer/settings/company/loading.tsx
+src/app/employer/settings/company/page.tsx
+src/app/layout.tsx
+src/app/login/loading.tsx
+src/app/login/page.tsx
+src/app/signup/loading.tsx
+src/app/signup/page.tsx
+src/app/update-password/page.tsx
+src/app/worker/applications/loading.tsx
+src/app/worker/applications/page.tsx
+src/app/worker/dashboard/loading.tsx
+src/app/worker/dashboard/page.tsx
+src/app/worker/job-search/page.tsx
+src/app/worker/jobs/[id]/apply/loading.tsx
+src/app/worker/jobs/[id]/apply/page.tsx
+src/app/worker/jobs/[id]/loading.tsx
+src/app/worker/jobs/[id]/page.tsx
+src/app/worker/jobs/loading.tsx
+src/app/worker/jobs/page.tsx
+src/app/worker/layout.tsx
+src/app/worker/messages/loading.tsx
+src/app/worker/messages/page.tsx
+src/app/worker/onboarding/page.tsx
+src/app/worker/profile/loading.tsx
+src/app/worker/profile/page.tsx
+src/app/worker/saved-jobs/loading.tsx
+src/app/worker/saved-jobs/page.tsx
+src/app/worker/verification/loading.tsx
+src/app/worker/verification/page.tsx
+```
+
+#### `src/actions/` — Server Actions (21 files)
+
+```txt
+src/actions/admin-actions.ts
+src/actions/applications.ts
+src/actions/auth.ts
+src/actions/employer/applicants.ts
+src/actions/employer/billing.ts
+src/actions/employer/company.ts
+src/actions/employer/dashboard.ts
+src/actions/employer/hired.ts
+src/actions/employer/jobs.ts
+src/actions/employer/pinned.ts
+src/actions/employer/pricing.ts
+src/actions/employer/stripe.ts
+src/actions/job-application.ts
+src/actions/messaging.ts
+src/actions/notifications.ts
+src/actions/onboarding.ts
+src/actions/saved-jobs.ts
+src/actions/verification.ts
+src/actions/worker/applications.ts
+src/actions/worker/job-details.ts
+src/actions/worker/job-search.ts
+```
+
+#### `src/lib/` — infra, DAL, validations (27 files)
+
+```txt
+src/lib/auth/nav-session.ts
+src/lib/auth/role.ts
+src/lib/auth/site-url.ts
+src/lib/notifications/fetch-initial.ts
+src/lib/server/action-result.ts
+src/lib/server/auth/middleware.ts
+src/lib/server/auth/require-admin.ts
+src/lib/server/auth/session.ts
+src/lib/server/dal/applications.ts
+src/lib/server/dal/jobs.ts
+src/lib/server/dal/profiles.ts
+src/lib/server/rate-limit.ts
+src/lib/server/stripe/sync-subscription.ts
+src/lib/supabase/client.ts
+src/lib/supabase/server.ts
+src/lib/validations/applicants.ts
+src/lib/validations/applications.ts
+src/lib/validations/auth.ts
+src/lib/validations/billing.ts
+src/lib/validations/common.ts
+src/lib/validations/employer/company.ts
+src/lib/validations/employer/jobs.ts
+src/lib/validations/messaging.ts
+src/lib/validations/onboarding.ts
+src/lib/validations/pinned.ts
+src/lib/validations/stripe.ts
+src/lib/validations/verification.ts
+```
+
+#### `src/components/` — UI domains
+
+```txt
+src/components/admin/  (17 files)
+src/components/auth/  (11 files)
+src/components/dashboard/  (0 files)
+src/components/employer/  (53 files)
+src/components/landing/  (1 files)
+src/components/layout/  (8 files)
+src/components/shared/
+  shared/header/  (3 files)
+  shared/legal/  (3 files)
+  shared/messaging/  (8 files)
+  shared/nav/  (3 files)
+  shared/onboarding/  (1 files)
+  shared/skeletons/  (12 files)
+src/components/ui/  (4 files)
+src/components/worker/  (37 files)
+```
+
+#### `src/types/` (22) · `src/config/` (3) · `src/hooks/` (1)
+
+```txt
+src/types/admin.types.ts
+src/types/applications.ts
+src/types/database.ts
+src/types/employer.ts
+src/types/employer/applicants.ts
+src/types/employer/billing.ts
+src/types/employer/dashboard.ts
+src/types/employer/hired.ts
+src/types/employer/jobs.ts
+src/types/employer/messages.ts
+src/types/employer/pinned.ts
+src/types/index.ts
+src/types/job-application.ts
+src/types/job-details.ts
+src/types/job-search.ts
+src/types/messaging.ts
+src/types/nav.ts
+src/types/notifications.types.ts
+src/types/saved-jobs.ts
+src/types/verification.ts
+src/types/worker-profile.ts
+src/types/worker.ts
+src/config/navigation.ts
+src/config/onboarding.ts
+src/config/workerNav.ts
+src/hooks/useNotifications.ts
+```
+
+#### Task → Files (patterns resolved at sync — open these first)
+
+| Task area | Paths (existing in workspace) |
+|-----------|-------------------------------|
+| **Headers (bell, avatar, sign out)** | src/components/admin/layout/AdminDropdown.tsx, src/components/admin/layout/AdminHeader.tsx, src/components/employer/layout/EmployerDropdown.tsx, src/components/employer/layout/EmployerHeader.tsx, src/components/layout/PublicHeader.tsx, … (+6 more) |
+| **Password reset** | src/actions/auth.ts, src/app/auth/callback/route.ts, src/app/auth/confirm/route.ts, src/app/update-password/page.tsx, src/components/auth/ForgotPasswordForm.tsx, … (+4 more) |
+| **Login / signup** | src/actions/auth.ts, src/app/login/loading.tsx, src/app/login/page.tsx, src/app/signup/loading.tsx, src/app/signup/page.tsx, … (+3 more) |
+| **Onboarding** | src/actions/onboarding.ts, src/app/employer/onboarding/page.tsx, src/app/worker/onboarding/page.tsx, src/components/employer/onboarding/EmployerOnboardingWizard.tsx, src/components/shared/onboarding/SkillPicker.tsx, … (+4 more) |
+| **Worker jobs** | src/actions/worker/job-details.ts, src/actions/worker/job-search.ts, src/app/worker/job-search/page.tsx, src/app/worker/jobs/[id]/apply/loading.tsx, src/app/worker/jobs/[id]/apply/page.tsx, … (+16 more) |
+| **Employer jobs** | src/actions/employer/jobs.ts, src/app/employer/jobs/[jobId]/applicants/loading.tsx, src/app/employer/jobs/[jobId]/applicants/page.tsx, src/app/employer/jobs/[jobId]/loading.tsx, src/app/employer/jobs/[jobId]/page.tsx, … (+13 more) |
+| **Messaging** | src/actions/messaging.ts, src/app/employer/messages/loading.tsx, src/app/employer/messages/page.tsx, src/app/worker/messages/loading.tsx, src/app/worker/messages/page.tsx, … (+10 more) |
+| **Notifications** | src/actions/notifications.ts, src/hooks/useNotifications.ts, src/lib/notifications/fetch-initial.ts, src/types/notifications.types.ts |
+| **Admin moderation** | src/actions/admin-actions.ts, src/app/admin/(shell)/audit-log/loading.tsx, src/app/admin/(shell)/audit-log/page.tsx, src/app/admin/(shell)/dashboard/loading.tsx, src/app/admin/(shell)/dashboard/page.tsx, … (+39 more) |
+| **Stripe / billing** | src/actions/employer/billing.ts, src/actions/employer/stripe.ts, src/app/api/webhooks/stripe/route.ts, src/app/employer/checkout/[planId]/loading.tsx, src/app/employer/checkout/[planId]/page.tsx, … (+5 more) |
+| **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+23 more) |
+| **RBAC / middleware** | src/lib/server/auth/middleware.ts, src/lib/server/auth/require-admin.ts, src/lib/server/auth/session.ts, src/proxy.ts |
+
+#### Role home paths (from `src/config/navigation.ts`)
+
+| Role | Home after login |
+|------|------------------|
+| Worker | `/worker/job-search` |
+| Employer | `/employer/dashboard` |
+| Admin | `/admin/dashboard` |
+| Public | `/` |
+<!-- PROMPT_SYNC:END -->
 
 ### Always-On Invariants (every profile — never skip)
 
@@ -31,7 +281,7 @@ These prevent spaghetti and debug loops regardless of profile:
 | **Ponytail** | Flat DOM, no wrapper soup, composition over boolean props |
 | **Cache** | `revalidatePath` after mutations that affect rendered views |
 | **RLS** | New/changed tables must have explicit policies before UI ships |
-| **Pre-flight** | Locate 1–2 similar existing patterns in repo before writing new code |
+| **Pre-flight** | Use **Task → Files** + mirror 1–2 paths from File Map — no broad repo scan |
 
 **If a task violates an invariant, escalate the profile** (see Escalation Rules) — do not “save tokens” by breaking architecture.
 
@@ -70,7 +320,7 @@ START
 - **Detected profile:** `A | B | C | D | E | F`
 - **Escalations applied:** `none` or `A→C because …`
 - **Sections to read:** e.g. `Core, 3, 4, 5, 6, 7, 9`
-- **Similar patterns found:** `<file paths>`
+- **Files to open (from File Map):** explicit paths — no broad scan
 
 ---
 
@@ -97,14 +347,14 @@ START
 
 | Profile | Base trigger | Section modules to read |
 |---------|--------------|-------------------------|
-| **A — UI only** | Visual/UX on existing data paths | **3**, **6**, **8-Figma** (if wireframes), scoped **9** |
-| **B — Backend only** | Actions/DAL/validation, no new pages | **4**, **5**, **7**, scoped **9** |
-| **C — Full-stack** | DB + UI + mutations and/or multi-role | **2**, **3**, **4**, **5**, **6**, **7**, **8**, **9** |
-| **D — Database** | Migrations/RLS/types only | **2**, **8-Whimsical**, scoped **9** |
-| **E — Design / docs** | Whimsical/Figma/architecture only | **8**, scoped **9** |
-| **F — Bug fix** | Localized fix, same feature surface | **3** (touched paths), scoped **9** |
+| **A — UI only** | Visual/UX on existing data paths | **File Map**, **3**, **6**, **8-Figma** (if wireframes), scoped **9** |
+| **B — Backend only** | Actions/DAL/validation, no new pages | **File Map**, **4**, **5**, **7**, scoped **9** |
+| **C — Full-stack** | DB + UI + mutations and/or multi-role | **File Map**, **2**, **3**, **4**, **5**, **6**, **7**, **8**, **9** |
+| **D — Database** | Migrations/RLS/types only | **File Map**, **2**, **8-Whimsical**, scoped **9** |
+| **E — Design / docs** | Whimsical/Figma/architecture only | **File Map**, **8**, scoped **9** |
+| **F — Bug fix** | Localized fix, same feature surface | **File Map**, **Task → Files** row, scoped **9** |
 
-**Agent rule:** Read **Core + Always-On Invariants + listed modules only**. Do not read unlisted section modules.
+**Agent rule:** Read **Core (incl. File Map) + listed modules only**. Do not read unlisted section modules. Do not `explore` the repo if **Task → Files** covers the request.
 
 ---
 
@@ -113,7 +363,7 @@ START
 When fixing bugs, **Phase 3 only** — no re-architecture:
 
 1. **Reproduce** — exact route, role, action, error message.
-2. **Locate** — max 5 files; list them in checklist before editing.
+2. **Locate** — use **Task → Files**; max 5 files; list in checklist before editing.
 3. **Fix** — minimal diff; do not refactor unrelated code.
 4. **Verify** — `tsc` + the specific user flow; one targeted grep if mock-data risk.
 5. **Stop** — if fix requires new schema or new routes → **stop**, escalate to **C**, get approval.
@@ -139,7 +389,7 @@ When fixing bugs, **Phase 3 only** — no re-architecture:
 | **RBAC** | `<who can do what>` |
 | **DB changes** | `<none \| tables/RLS/indexes>` |
 | **Design artifacts** | `<none \| Whimsical \| Figma \| both>` |
-| **Similar patterns** | `<existing file paths to mirror>` |
+| **Similar patterns** | `<paths from File Map only>` |
 
 ### Definition of Done (final profile after escalation)
 
@@ -185,6 +435,19 @@ Reply with:
 
 No application code until approval.
 
+### Post-Build Report (mandatory after every build — including Profile F)
+
+Emit this table in the final reply. Map rows to the user's **success criteria**, not only generic gates.
+
+| Criterion | Status | Notes |
+|-----------|--------|-------|
+| `<user-facing requirement 1>` | Done / Missed / Lacking | |
+| `<requirement 2>` | … | |
+| `npx tsc --noEmit` | Done / Lacking | |
+| Manual test | Done / Lacking | route + role |
+
+If code shipped without prior approval, still emit this report retroactively.
+
 ---
 
 ## 2) Database & Type Alignment
@@ -210,9 +473,9 @@ No application code until approval.
 
 ## 3) Directory & File Architecture
 
-*Read if: **A**, **C**, **F***
+*Read if: **A**, **C**, **F** — or when adding new routes/files*
 
-List **only** paths this feature creates or modifies:
+**Do not invent paths.** Extend **Repository File Map** when creating:
 
 ```txt
 src/app/<role>/<feature>/page.tsx
@@ -221,6 +484,8 @@ src/lib/server/dal/<feature>.ts
 src/lib/validations/<feature>.ts
 src/components/<role|shared>/<feature>/*
 ```
+
+After adding a new top-level folder or route namespace, run **`npm run prompt:sync`** to refresh the File Map in this file.
 
 ---
 
@@ -302,8 +567,11 @@ For **C** after escalations. Other profiles use **Scoped Execution Checklist** i
 ## Quick reference (once per session)
 
 - Next.js `16.2.9` · React `19.2.4` · Zod `^4.4.3` · Supabase · Tailwind v4
-- Actions: `src/actions/**` · DAL: `src/lib/server/dal/**` · Auth: `src/lib/server/auth/**`
+- **File Map** (Core) — routes, actions, DAL, components; use **Task → Files** first
+- Actions: `src/actions/**` · DAL: `src/lib/server/dal/**` · Auth: `src/lib/server/auth/**` + `src/lib/auth/**`
 - Shared: `src/components/shared/**` · Types: `src/types/database.ts`
+- Middleware: `proxy.ts` → `src/lib/server/auth/middleware.ts`
+- Env: `NEXT_PUBLIC_SITE_URL`, Supabase keys, Stripe keys (see `.env.example`)
 
 ---
 
@@ -313,7 +581,8 @@ For **C** after escalations. Other profiles use **Scoped Execution Checklist** i
 Using prompt.md:
 - Feature: <one-line description>
 - Role(s): <worker|employer|admin|...>
+- Area (optional): <pick from Task → Files table, e.g. Headers, Password reset>
 - (optional) I think this is profile: <A-F> — confirm or correct via Auto-Profile Classifier
 ```
 
-The agent **must** confirm or correct the profile using the classifier — never blindly trust the user's guess if escalations apply.
+The agent **must** confirm or correct the profile using the classifier — never blindly trust the user's guess if escalations apply. The agent **must** list files from **Task → Files** / **File Map** in the plan — not run a broad repo search first.

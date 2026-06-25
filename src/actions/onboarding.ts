@@ -4,6 +4,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { profileIdFilter, resolveRoleFromUser } from "@/lib/auth/role";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import {
@@ -26,12 +27,14 @@ export const getOnboardingStatus = cache(async (): Promise<OnboardingStatus | nu
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, role, professional_title, skills, location")
-    .eq("id", user.id)
-    .single();
+    .or(profileIdFilter(user.id))
+    .maybeSingle();
 
   if (!profile) return null;
 
-  if (profile.role === "worker") {
+  const role = resolveRoleFromUser(user, profile.role);
+
+  if (role === "worker") {
     const complete = Boolean(
       profile.professional_title?.trim() &&
         profile.location?.trim() &&
@@ -41,7 +44,7 @@ export const getOnboardingStatus = cache(async (): Promise<OnboardingStatus | nu
     return { complete, role: "worker" };
   }
 
-  if (profile.role === "employer") {
+  if (role === "employer") {
     const { data: company } = await supabase
       .from("company_profiles")
       .select("id, company_name, industry, company_size")

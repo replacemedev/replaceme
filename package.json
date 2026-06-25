@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed:admin": "node scripts/seed-admin.mjs",
-    "db:seed": "npm run seed:admin"
+    "db:seed": "npm run seed:admin",
+    "prompt:sync": "node scripts/sync-prompt-file-map.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

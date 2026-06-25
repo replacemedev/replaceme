@@ -12,24 +12,7 @@ import {
   type NavSession,
   type UserRole,
 } from "@/types/nav";
-
-const VALID_ROLES: UserRole[] = ["worker", "employer", "admin"];
-
-function isUserRole(value: unknown): value is UserRole {
-  return typeof value === "string" && VALID_ROLES.includes(value as UserRole);
-}
-
-function resolveRoleFromUser(user: User, profileRole?: string | null): UserRole {
-  const appRole = user.app_metadata?.role;
-  if (isUserRole(appRole)) return appRole;
-
-  if (isUserRole(profileRole)) return profileRole;
-
-  const metaRole = user.user_metadata?.role;
-  if (isUserRole(metaRole)) return metaRole;
-
-  return "worker";
-}
+import { resolveRoleFromUser } from "@/lib/auth/role";
 
 function buildInitials(profile: NavProfile, role: UserRole): string {
   if (profile.first_name) return profile.first_name[0].toUpperCase();
