@@ -10,19 +10,19 @@ interface AdminHeaderProps {
 
 export async function AdminHeader({ session }: AdminHeaderProps = {}) {
   const resolvedSession = session ?? (await getNavSession());
+  const displayName = resolvedSession.displayName || "Admin";
+  const initials = resolvedSession.initials || "A";
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
       <div className="flex justify-between items-center px-4 sm:px-8 max-w-7xl mx-auto h-16">
         <NavBrand homeHref={resolvedSession.homeHref} compact />
         <GlobalHeaderActions session={resolvedSession}>
-          {resolvedSession.profile ? (
-            <AdminDropdown
-              profile={resolvedSession.profile}
-              displayName={resolvedSession.displayName}
-              initials={resolvedSession.initials}
-            />
-          ) : null}
+          <AdminDropdown
+            profile={resolvedSession.profile}
+            displayName={displayName}
+            initials={initials}
+          />
         </GlobalHeaderActions>
       </div>
     </header>

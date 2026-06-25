@@ -20,7 +20,11 @@ function buildInitials(profile: NavProfile, role: UserRole): string {
   return role === "employer" ? "E" : role === "admin" ? "A" : "W";
 }
 
-function buildDisplayName(profile: NavProfile, role: UserRole): string {
+function buildDisplayName(
+  profile: NavProfile,
+  role: UserRole,
+  email?: string | null
+): string {
   if (role === "employer") {
     return (
       profile.company_name ||
@@ -29,11 +33,52 @@ function buildDisplayName(profile: NavProfile, role: UserRole): string {
       "Employer"
     );
   }
+  if (role === "admin") {
+    const fullName = [profile.first_name, profile.last_name]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    return fullName || profile.username || email?.split("@")[0] || "Admin";
+  }
   const fullName = [profile.first_name, profile.last_name]
     .filter(Boolean)
     .join(" ")
     .trim();
   return fullName || profile.username || "Worker";
+}
+
+function buildFallbackProfile(
+  userId: string,
+  user: { user_metadata?: Record<string, unknown> }
+): NavProfile {
+  return {
+    id: userId,
+    first_name: (user.user_metadata?.first_name as string | null) ?? null,
+    last_name: (user.user_metadata?.last_name as string | null) ?? null,
+    username: null,
+    avatar_url: null,
+    is_verified: false,
+  };
+}
+
+function buildAuthenticatedSession(
+  user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> },
+  role: UserRole,
+  profile: NavProfile,
+  unreadMessageCount: number
+): NavSession {
+  return {
+    isAuthenticated: true,
+    role,
+    userId: user.id,
+    homeHref: getHomeHrefForRole(role),
+    displayName: buildDisplayName(profile, role, user.email),
+    initials: buildInitials(profile, role),
+    avatarUrl: profile.avatar_url,
+    isVerified: profile.is_verified,
+    unreadMessageCount,
+    profile,
+  };
 }
 
 export async function getNavSession(): Promise<NavSession> {
@@ -44,6 +89,8 @@ export async function getNavSession(): Promise<NavSession> {
   } = await supabase.auth.getUser();
 
   if (!user) return GUEST_NAV_SESSION;
+
+  const jwtRole = user.app_metadata?.role as UserRole | undefined;
 
   const { data: row } = await supabase
     .from("profiles")
@@ -64,9 +111,17 @@ export async function getNavSession(): Promise<NavSession> {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!row?.id || !row.role) return GUEST_NAV_SESSION;
+  if (!row?.id) {
+    if (jwtRole === "admin") {
+      const profile = buildFallbackProfile(user.id, user);
+      return buildAuthenticatedSession(user, "admin", profile, 0);
+    }
+    return GUEST_NAV_SESSION;
+  }
 
-  const role = row.role as UserRole;
+  const role = (jwtRole ?? row.role) as UserRole | null;
+  if (!role) return GUEST_NAV_SESSION;
+
   const companyProfiles = row.company_profiles as
     | { company_name: string | null }
     | { company_name: string | null }[]
@@ -90,16 +145,5 @@ export async function getNavSession(): Promise<NavSession> {
     unreadMessageCount = await getUnreadMessagingCount(role);
   }
 
-  return {
-    isAuthenticated: true,
-    role,
-    userId: row.id,
-    homeHref: getHomeHrefForRole(role),
-    displayName: buildDisplayName(profile, role),
-    initials: buildInitials(profile, role),
-    avatarUrl: profile.avatar_url,
-    isVerified: profile.is_verified,
-    unreadMessageCount,
-    profile,
-  };
+  return buildAuthenticatedSession(user, role, profile, unreadMessageCount);
 }

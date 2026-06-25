@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Shield } from "lucide-react";
 import { logOut } from "@/actions/auth";
 import type { NavProfile } from "@/types/nav";
 
 interface AdminDropdownProps {
-  profile: NavProfile;
+  profile: NavProfile | null;
   displayName: string;
   initials: string;
 }
@@ -32,6 +32,14 @@ export function AdminDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDropdownOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleLogout = () => {
     startTransition(async () => {
       try {
@@ -53,7 +61,7 @@ export function AdminDropdown({
         aria-label="Admin menu"
       >
         <div className="relative w-8 h-8 rounded-full shrink-0 border border-slate-100 bg-slate-900 overflow-hidden flex items-center justify-center">
-          {profile.avatar_url ? (
+          {profile?.avatar_url ? (
             <Image
               src={profile.avatar_url}
               alt={`${displayName}'s Avatar`}
@@ -62,7 +70,7 @@ export function AdminDropdown({
               sizes="32px"
             />
           ) : (
-            <span className="text-white text-xs font-bold">{initials}</span>
+            <Shield size={16} className="text-white" aria-hidden />
           )}
         </div>
         <span className="hidden sm:inline-block text-xs font-semibold text-slate-700 max-w-[120px] truncate">

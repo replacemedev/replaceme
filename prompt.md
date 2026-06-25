@@ -1,371 +1,319 @@
-# Feature Implementation Prompt Template (Blueprint + Execution Checklist)
+# Feature Implementation Prompt Template (Modular)
 
-**MANDATORY OPERATING RULES (read first):**
-- Whenever this template is used, the AI **MUST** fill out the entire architectural blueprint (Sections 1–9) **AND** generate the empty Execution Checklist (PHASE4-style).
-- The AI must then **STOP** and ask for **explicit approval** before generating a single line of application code.
-- Once coding begins, the AI must **continuously update** the Execution Checklist to reflect real-time progress (turn items into **Done**, mark gaps as **Lacking/Incomplete**, and record any misses as **Missed**).
-- After implementation is complete, the AI must **update the designated Whimsical board** to reflect the new architecture.
+**How to use this file:** Read **Core** (including **Auto-Profile Classifier** + **Always-On Invariants**) first. The agent **must** auto-detect the profile, apply escalations, then read **only** the resulting sections. Token savings come from skipping unused section *modules* — not from skipping architecture guardrails.
 
 ---
 
-## Definition of Done (PHASE4-style, per feature)
+## Core (always read)
 
-This feature is **complete** only when **all** of the following are true:
-- [ ] Done **Database + migrations** are applied (if needed), and schema aligns with feature requirements.
-- [ ] Done **Types are regenerated** (`src/types/database.ts`) after any DB change.
-- [ ] Done **All Server Actions** in scope have Zod validation + RBAC + standardized return shape.
-- [ ] Done **Server/Client split** is correct (no client-only libs in Server Components; no DB access in UI).
-- [ ] Done **Error handling** is in place (action-result pattern; route `error.tsx` where needed).
-- [ ] Done **Empty states** exist (no mock data).
-- [ ] Done **Quality gates** pass (`npx tsc --noEmit`, targeted greps, manual test plan).
-- [ ] Done **Whimsical board updated** (ERDs + backend flows + architecture maps; append-only).
-- [ ] Done **Figma file updated** (UI wireframes / UI specs; design-to-code readiness).
+### Operating rules
+1. **Auto-classify** the request (classifier below) → state profile + escalations + why.
+2. Fill **Feature Spec** + **Always-On Invariants** + sections for the **final** profile (after escalations).
+3. Generate a **scoped Execution Checklist** (applicable rows only).
+4. **STOP** and ask for **explicit approval** before application code.
+5. During build: update checklist live (`Done` / `Missed` / `Lacking/Incomplete`).
+6. After build: run **Definition of Done** for final profile + any escalated gates.
 
----
+### Always-On Invariants (every profile — never skip)
 
-## Feature Spec (you fill)
+These prevent spaghetti and debug loops regardless of profile:
 
-### Feature Name
-- **Feature**: `<NAME HERE>`
-- **Primary role(s)**: `<worker | employer | admin | multi-role>`
-- **Success criteria**: `<measurable outcomes>`
-- **Non-goals**: `<explicitly out of scope>`
-- **User stories**:
-  - `<As a … I want … so that …>`
+| Invariant | Rule |
+|-----------|------|
+| **Stack** | Next.js 16 App Router · React 19 · Tailwind v4 · TypeScript strict · Supabase |
+| **Routes** | Worker `src/app/worker/*` · Employer `src/app/employer/*` · Admin `src/app/admin/*` |
+| **No mock data** | No hardcoded arrays, seeders, or fake stats in UI |
+| **DB access** | Reads/writes only via DAL (`src/lib/server/dal/**`, `server-only`) — never in components |
+| **Mutations** | Server Actions only; Zod + RBAC + `{ success, data, error }` on every action touched |
+| **Types** | `src/types/database.ts` — no `any`; regen after any schema change |
+| **UI split** | RSC for pages/layouts; client components only at interaction leaves |
+| **Shared UI** | Reuse `src/components/shared/**` before creating role-specific duplicates |
+| **Ponytail** | Flat DOM, no wrapper soup, composition over boolean props |
+| **Cache** | `revalidatePath` after mutations that affect rendered views |
+| **RLS** | New/changed tables must have explicit policies before UI ships |
+| **Pre-flight** | Locate 1–2 similar existing patterns in repo before writing new code |
 
-### Feature Details (required)
-- **Screens/routes to add or change (exact URLs)**: `<...>`
-- **Reads needed (what each page must query)**: `<...>`
-- **Mutations needed (Server Actions list)**: `<...>`
-- **RBAC rules (who can do what)**: `<...>`
-- **Data model changes (tables/columns/RLS expectations)**: `<...>`
-- **Notifications/emails/webhooks (if any)**: `<...>`
+**If a task violates an invariant, escalate the profile** (see Escalation Rules) — do not “save tokens” by breaking architecture.
 
 ---
 
-## 1) Workspace Context, Tools & Docs (Ponytail/Agent Skills)
+### Auto-Profile Classifier (agent runs this every time)
 
-### Stack (from repo)
-- **Next.js**: `16.2.9` (App Router)
-- **React**: `19.2.4`
-- **Zod**: `^4.4.3`
-- **Supabase**: `@supabase/supabase-js` (see `SYSTEM_CONTEXT.md`)
+Answer each question in order. First match wins unless an **escalation** fires later.
 
-### Existing architecture to integrate with (no spaghetti)
-- **Routes**: strict role namespaces under `src/app/worker/*`, `src/app/employer/*`, `src/app/admin/*`
-- **Server Actions**: `src/actions/**` (Zod + RBAC via `requireRole()` / `requireAdmin()`)
-- **DAL isolation**: `src/lib/server/dal/**` (query helpers; keep DB access out of UI)
-- **Auth**: `src/lib/server/auth/**`
-- **Shared UI**: `src/components/shared/**` (messaging, StatCard, EmptyState, skeletons)
-- **Generated types**: `src/types/database.ts` (**no `any`**)
+```
+START
+│
+├─ User asks only for Whimsical / Figma / ERD / wireframes / architecture docs?
+│     └─ YES → Profile E
+│
+├─ User reports a bug / error / regression with no new feature intent?
+│     └─ YES → Profile F  (then run Escalation Rules)
+│
+├─ User asks for migration / RLS / schema / SQL only (no UI)?
+│     └─ YES → Profile D  (then run Escalation Rules)
+│
+├─ User asks for Server Actions / API / webhooks / DAL only (no new pages)?
+│     └─ YES → Profile B  (then run Escalation Rules)
+│
+├─ Request touches ANY of: new table/column/enum/RLS, new route, new mutation, multi-role?
+│     └─ YES → Profile C
+│
+├─ Request is UI-only (styling, layout, component, empty state) on existing data paths?
+│     └─ YES → Profile A  (then run Escalation Rules)
+│
+└─ Ambiguous / multi-sentence feature spec?
+      └─ Default → Profile C (safest — full plan, still skip unread section modules)
+```
 
-### Official docs (reference during build)
-- **Next.js Server Actions**: `https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions`
-- **Next.js App Router**: `https://nextjs.org/docs/app`
-- **Supabase RLS**: `https://supabase.com/docs/guides/database/postgres/row-level-security`
-- **Supabase Functions**: `https://supabase.com/docs/guides/database/functions`
-- **React**: `https://react.dev/reference/react`
-- **Zod**: `https://zod.dev/`
+**Agent must output in the plan (before approval):**
+- **Detected profile:** `A | B | C | D | E | F`
+- **Escalations applied:** `none` or `A→C because …`
+- **Sections to read:** e.g. `Core, 3, 4, 5, 6, 7, 9`
+- **Similar patterns found:** `<file paths>`
 
-### Integration strategy (anti-duplicate / anti-spaghetti)
-- **No inline DB queries in UI**: reads via Server Components calling DAL helpers; mutations via Server Actions only.
-- **No duplicated UI variants**: shared components go in `src/components/shared/`.
-- **No boolean prop soup**: prefer explicit variants/composition.
-- **Standardized Server Action return**: `{ success, data, error }` using existing `runAction()` utilities.
+---
+
+### Escalation Rules (upgrade profile — never downgrade)
+
+| Signal detected | Upgrade to | Also read sections |
+|-----------------|------------|-------------------|
+| Profile **A** but needs new/edited Server Action | **C** | 4, 5, 7 |
+| Profile **A** but needs new DAL query (not existing) | **C** | 5 (+ 4 if mutation) |
+| Profile **A** but new route under `src/app/<role>/` | **C** | 3, 4, 5, 7 |
+| Profile **B** but needs new UI route or component | **C** | 3, 6 |
+| Profile **B** or **F** but schema/RLS change needed | **C** or **D** | 2 (+ 8-Whimsical if ERD) |
+| Profile **F** but root cause is auth/RBAC/RLS | **B** or **C** | 4, 5 |
+| Profile **F** but touches 3+ files across layers | **C** | all applicable |
+| Any profile + cross-role feature (worker + employer + admin) | **C** | 8 (both if UI) |
+| User says “new feature”, “build”, “implement”, “add flow” | **C** | all applicable |
+| Design-only request but user also says “implement in code” | **C** | 8 + full stack |
+
+**Rule:** When escalated, use the **higher** profile’s checklist rows and Definition of Done gates.
+
+---
+
+### Section Router (base profiles — before escalation)
+
+| Profile | Base trigger | Section modules to read |
+|---------|--------------|-------------------------|
+| **A — UI only** | Visual/UX on existing data paths | **3**, **6**, **8-Figma** (if wireframes), scoped **9** |
+| **B — Backend only** | Actions/DAL/validation, no new pages | **4**, **5**, **7**, scoped **9** |
+| **C — Full-stack** | DB + UI + mutations and/or multi-role | **2**, **3**, **4**, **5**, **6**, **7**, **8**, **9** |
+| **D — Database** | Migrations/RLS/types only | **2**, **8-Whimsical**, scoped **9** |
+| **E — Design / docs** | Whimsical/Figma/architecture only | **8**, scoped **9** |
+| **F — Bug fix** | Localized fix, same feature surface | **3** (touched paths), scoped **9** |
+
+**Agent rule:** Read **Core + Always-On Invariants + listed modules only**. Do not read unlisted section modules.
+
+---
+
+### Loop-Proof Debug Protocol (Profile F and escalated fixes)
+
+When fixing bugs, **Phase 3 only** — no re-architecture:
+
+1. **Reproduce** — exact route, role, action, error message.
+2. **Locate** — max 5 files; list them in checklist before editing.
+3. **Fix** — minimal diff; do not refactor unrelated code.
+4. **Verify** — `tsc` + the specific user flow; one targeted grep if mock-data risk.
+5. **Stop** — if fix requires new schema or new routes → **stop**, escalate to **C**, get approval.
+
+**Forbidden in Profile F:** new abstractions, renaming unrelated files, “while I’m here” cleanup, full-system reanalysis.
+
+---
+
+### Feature Spec (fill every time)
+
+| Field | Value |
+|-------|-------|
+| **Feature** | `<NAME>` |
+| **Detected profile** | `<A–F>` |
+| **Escalations** | `<none \| A→C because …>` |
+| **Sections to read** | `<Core, 3, 4, …>` |
+| **Primary role(s)** | `<worker \| employer \| admin \| multi-role \| public>` |
+| **Success criteria** | `<measurable outcomes>` |
+| **Non-goals** | `<out of scope>` |
+| **Routes (exact URLs)** | `<...>` |
+| **Reads** | `<DAL queries per page>` |
+| **Mutations** | `<Server Actions>` |
+| **RBAC** | `<who can do what>` |
+| **DB changes** | `<none \| tables/RLS/indexes>` |
+| **Design artifacts** | `<none \| Whimsical \| Figma \| both>` |
+| **Similar patterns** | `<existing file paths to mirror>` |
+
+### Definition of Done (final profile after escalation)
+
+| Gate | Profiles |
+|------|----------|
+| Always-On Invariants satisfied | **All** |
+| DB migrated + advisors clean | C, D |
+| Types regen | C, D |
+| Zod + RBAC + safe return on touched actions | B, C, F (if action touched) |
+| Server/Client split | A, C, F (if UI touched) |
+| Empty states, no mock data | A, C |
+| `npx tsc --noEmit` + scoped greps | All except E |
+| Whimsical updated | C, D, E (when in scope) |
+| Figma updated | A, C, E (when in scope) |
+
+### Scoped Execution Checklist
+
+Status: `[ ] Done` · `[ ] Missed` · `[ ] Lacking/Incomplete`
+
+| Area | Profiles | Notes / files |
+|------|----------|---------------|
+| Auto-profile + escalations stated | **All** | in plan before code |
+| Always-On Invariants checked | **All** | |
+| Similar patterns located | **All** except E | file paths |
+| Database + RLS | C, D | `supabase/migrations/...` |
+| Types regen | C, D | `src/types/database.ts` |
+| DAL | B, C | `src/lib/server/dal/...` |
+| Server Actions | B, C | `src/actions/...` |
+| Frontend | A, C, F | `src/app/...`, `src/components/...` |
+| Cache sync | B, C | `revalidatePath` |
+| Quality gates | All except E | `tsc`, greps, manual test |
+| Whimsical | C, D, E | board sections |
+| Figma | A, C, E | frames / captures |
+
+**Per-file rule:** Every touched path must be listed. Missing path = `Lacking/Incomplete`.
+
+### STOP — Approval gate
+
+Reply with:
+1. **Feature Spec** including **Detected profile**, **Escalations**, **Sections to read**
+2. Scoped checklist (applicable rows only)
+3. Exact phrase: **“Approved to implement”**
+
+No application code until approval.
 
 ---
 
 ## 2) Database & Type Alignment
 
-### Current DB foundations (confirmed)
-- Supabase Postgres with **FORCE RLS** on `public` tables
+*Read if: **C**, **D**, or escalated from A/B/F*
+
+### Schema changes
+- **Tables**: `[ ]` `<table>` — columns, FKs, constraints
+- **Enums**: `[ ]` `<enum>` — values
+- **RLS**: `[ ]` `<table>` — SELECT/INSERT/UPDATE/DELETE rules
+- **Indexes**: `[ ]` `<index>` — why
+
+### Types
+- Source: `src/types/database.ts` (regen after migration)
+- Validation: `src/lib/validations/**` (Zod, no `any`)
+
+### DB invariants
+- FORCE RLS on `public` tables
 - Messaging: `chat_threads`, `chat_messages`
-- Billing: webhook-based activation; `service_role`-gated RPCs
-
-### Required schema changes (TO FILL)
-- **Tables**:
-  - `[ ]` `<table>`: `<columns, constraints, FKs>`
-- **Enums**:
-  - `[ ]` `<enum>`: `<values>`
-- **RLS policies**:
-  - `[ ]` `<table>`: `<select/insert/update/delete rules>`
-- **Indexes**:
-  - `[ ]` `<index>`: `<why>`
-
-### Type inference plan (strict, no any)
-- **Source of truth**: `src/types/database.ts` generated from Supabase
-- **Derived types**:
-  - `type DbX = Database["public"]["Tables"]["x"]["Row"]`
-  - `type InsertX = Database["public"]["Tables"]["x"]["Insert"]`
-- **Validation**: all external inputs validated with Zod schemas in `src/lib/validations/**`
+- Billing RPCs: `service_role`-gated where required
 
 ---
 
-## 3) Directory & File Architecture (Anti‑Spaghetti Protocol)
+## 3) Directory & File Architecture
 
-### New/modified file map (TO FILL)
+*Read if: **A**, **C**, **F***
+
+List **only** paths this feature creates or modifies:
 
 ```txt
-src/
-├── app/
-│   ├── worker/
-│   ├── employer/
-│   ├── admin/
-│   └── api/
-├── actions/
-│   └── <domain>.ts
-├── components/
-│   ├── shared/
-│   └── <role>/
-├── lib/
-│   ├── server/
-│   │   ├── auth/
-│   │   ├── dal/
-│   │   └── <domain>/
-│   └── validations/
-├── hooks/
-└── types/
+src/app/<role>/<feature>/page.tsx
+src/actions/<domain>.ts
+src/lib/server/dal/<feature>.ts
+src/lib/validations/<feature>.ts
+src/components/<role|shared>/<feature>/*
 ```
 
 ---
 
-## 4) Backend & Validation (The Bridge)
+## 4) Backend & Validation
 
-### Server Action signatures (TO FILL)
-Each mutation must:
-- Parse input via Zod
-- Enforce RBAC (`requireRole` / `requireAdmin`)
-- Use DAL for DB operations
-- Return standardized object `{ success, data, error }` (no thrown raw errors)
+*Read if: **B**, **C**, or escalated from A/F*
 
-Example shape:
+Zod → RBAC → DAL → `{ success, data, error }`.
 
 ```ts
 export async function doThing(input: unknown): Promise<
   | { success: true; data: unknown }
   | { success: false; error: string }
-> {
-  // parse -> auth -> DAL -> mutate -> revalidate -> return
-  return { success: false, error: "TODO" }
-}
+> { /* ... */ }
 ```
-
-### Zod schemas (TO FILL)
-- File: `src/lib/validations/<feature>.ts`
-  - `export const <schemaName> = z.object({ ... })`
 
 ---
 
-## 5) Data Access Layer (strict backend isolation)
+## 5) Data Access Layer
 
-### DAL rules
-- All DB queries live in `src/lib/server/dal/**`
-- Each DAL file starts with `import "server-only"`
-- DAL exports small, typed functions (no giant “god modules”)
-- UI components never call Supabase directly
+*Read if: **B**, **C**, or escalated from A/F*
 
-### DAL additions (TO FILL)
-- `src/lib/server/dal/<feature>.ts`
-  - `export async function fetchX(...)`
-  - `export async function mutateY(...)`
+- `src/lib/server/dal/**` + `import "server-only"`
+- No Supabase in UI
+- List `fetchX` / `mutateY` signatures
 
 ---
 
 ## 6) Frontend Architecture
 
-### Server vs Client split (TO FILL)
-- **Server Components**: pages/layout shells, data fetch orchestration, streaming boundaries
-- **Client Components**: forms, interactive tables, wizards, Stripe Elements, optimistic UI
+*Read if: **A**, **C***
 
-### Loading / error / empty states
-- **Loading**: `loading.tsx` where streaming is desired
-- **Errors**: route-level `error.tsx` where needed
-- **Empty states**: shared EmptyState patterns (no mock data)
+- RSC: pages, layouts, data orchestration
+- Client: forms, tables, Stripe — smallest leaf only
+- `loading.tsx` / `error.tsx` / `<EmptyState />` as needed
 
 ---
 
 ## 7) Cache & State Sync
 
-### Revalidation plan (TO FILL)
-After each mutation:
-- `revalidatePath("<route>")` for pages that must immediately reflect changes
-- Use `revalidateTag()` only if tag-based fetches exist for this feature
+*Read if: **B**, **C**, or escalated from A*
+
+- `revalidatePath("<route>")` after mutations
+- `revalidateTag()` only if tags exist
 
 ---
 
-## 8) Design Planning Tools Policy (Free-tier + MCP)
+## 8) Design Planning Tools
 
-### Whimsical = Logic / Architecture (MCP required)
+*Read if: **A**, **C**, **D**, **E** — subsection only as needed*
 
-**Purpose:** DB ERDs, backend/system flows, architecture maps.  
-**Rule:** do **not** create new Whimsical files/boards unless explicitly approved.
-
-**Existing master board (CONFIRMED):**
-- **Board**: “ReplaceMe Master Full‑Stack Architecture”
+### 8-Whimsical
+- **Board**: ReplaceMe Master Full-Stack Architecture
 - **URL**: `https://whimsical.com/FtNA62DRJqmnaHHoZJxTqY`
+- Overwrite or append per user instruction
 
-**How Whimsical will be updated (TO FILL once feature is specified):**
-- **DB ERD**: add/extend entities + RLS notes (append-only)
-- **Backend sequence diagram**: `<user action>` → `<server action>` → `<DAL>` → `<DB>` → `revalidatePath` (append-only)
-- **Architecture map**: update role routing + module ownership boundaries (append-only)
+### 8-Figma
+- **File**: ReplaceMe Current UI State · fileKey `G5wYzRzlop5X3r9AuAi9XF`
+- One collaborative file; local capture: `?figma_capture=1`
 
-### Figma = UI Wireframes + Design-to-Code (MCP preferred)
-
-**Is Figma free?** Yes — freemium. Starter plan includes **3 collaborative design files** + unlimited personal drafts.  
-**Team rule:** keep UI inside **one main Figma file** with an infinite canvas to avoid free-tier limits.
-
-**Why Figma (vs Whimsical) for UI:**
-- **Write to Canvas**: use the official Figma MCP to draw wireframes/frames/components directly on the canvas.
-- **Read to Code**: use Figma MCP to read spacing/typography/layout and generate pixel-perfect React + Tailwind.
-
-**How Figma will be updated (TO FILL once feature is specified):**
-- Add frames for the feature’s screens (Worker/Employer/Admin)
-- Add responsive breakpoints + component notes (Server vs Client boundaries)
-- Mark states: loading / empty / error / success
-- Add tokens mapping (colors, spacing, typography) where relevant
+### Free-tier lockdown
+1. Check (user URL → use it) → 2. Update in place → 3. Create once if missing
 
 ---
 
-## FREE TIER LOCKDOWN (Fortified — bulletproof conditional logic)
+## 9) Full checklist (Profile C only)
 
-This section exists to prevent the agent from burning through free-tier limits (Whimsical board count, Figma collaborative file count).
+For **C** after escalations. Other profiles use **Scoped Execution Checklist** in Core.
 
-### A) Figma Free-tier Lockdown (3 collaborative files)
-
-**Immutable rule:** UI work happens in **exactly one** collaborative Figma file for this project.
-
-**Project UI Figma file (single source of truth):**
-- **Figma file URL**: `<PASTE ONCE AND KEEP FOREVER>`
-- **File name**: `ReplaceMe UI — Master Canvas` (recommended)
-
-**Bulletproof conditional logic (MUST follow in order):**
-- **Check first**
-  - If the user provided a Figma URL → treat it as the canonical file and **do not search/create**.
-  - Else: search Figma workspace for `ReplaceMe UI`, `ReplaceMe UI — Master Canvas`, `ReplaceMe`, and `UI` (titles first).
-  - Else: list recent/available Figma files and pick the best match by title (do not create).
-- **If exists → update**
-  - Use Figma MCP to **append** new frames/pages inside the existing file.
-  - Never create a second “UI file” just to separate screens. Use pages/sections/frames on the infinite canvas.
-- **If missing → create once (guarded)**
-  - Only if **no** suitable file exists, create **one** new Figma file named `ReplaceMe UI — Master Canvas`.
-  - Immediately write the created URL back into this section (the “Figma file URL” line) and treat it as immutable thereafter.
-  - After this one-time creation, all future UI work is “exists → update”.
-
-**Absolute prohibitions:**
-- Do not create new Figma files for “v2”, “alt layout”, “scratch”, “backup”, or “temp”.
-- Do not create separate Figma files per role (Worker/Employer/Admin). Roles are pages/frames inside the single file.
-- If you are uncertain which file to use, you must **ask** before creating anything.
-
-### B) Whimsical Free-tier Lockdown (single master board)
-
-**Immutable rule:** Logic/architecture work happens in the **existing** Whimsical master board.
-
-**Project master board (single source of truth):**
-- **Whimsical board URL**: `https://whimsical.com/FtNA62DRJqmnaHHoZJxTqY`
-
-**Bulletproof conditional logic (MUST follow in order):**
-- **Check first**
-  - Search for the board by title: `ReplaceMe Master Full-Stack Architecture`.
-- **If exists → update**
-  - Fetch the canvas (optionally with image snapshot) to find safe empty space.
-  - Append new sections adjacent to existing diagrams. **Never overwrite/delete** ERDs or sequence diagrams.
-- **If missing → STOP**
-  - Do **not** create a new Whimsical file automatically.
-  - Ask for explicit approval and confirm free-tier implications before creating anything.
+- [ ] Pre-flight: patterns + design files located
+- [ ] DB: migration, advisors, types
+- [ ] Backend: validations, DAL, actions, revalidate
+- [ ] Frontend: routes, components, empty states
+- [ ] Quality: `tsc`, zero-mock grep, manual test
+- [ ] Design: Whimsical / Figma per spec
 
 ---
 
-## 9) Implementation Execution Checklist (EMPTY — status tracker)
+## Quick reference (once per session)
 
-Use only these statuses:
-- `[ ] Done`
-- `[ ] Missed`
-- `[ ] Lacking/Incomplete`
-
-### Status Table (keep updated during implementation)
-
-| Area | Status | Notes | Files/Migrations |
-|------|--------|-------|------------------|
-| Scope + UX | [ ] Lacking/Incomplete |  |  |
-| Database + RLS | [ ] Lacking/Incomplete |  | `supabase/migrations/...` |
-| Types regen | [ ] Lacking/Incomplete |  | `src/types/database.ts` |
-| DAL | [ ] Lacking/Incomplete |  | `src/lib/server/dal/...` |
-| Server Actions | [ ] Lacking/Incomplete |  | `src/actions/...` |
-| Frontend | [ ] Lacking/Incomplete |  | `src/app/...`, `src/components/...` |
-| Cache sync | [ ] Lacking/Incomplete |  | `revalidatePath`/`revalidateTag` |
-| Quality gates | [ ] Lacking/Incomplete |  | `tsc`, greps, manual tests |
-| Whimsical update | [ ] Lacking/Incomplete |  | Board sections/frames |
-| Figma update | [ ] Lacking/Incomplete |  | UI wireframes / UI specs |
-
-### Per-file / Per-migration checklist (PHASE4-style — REQUIRED)
-
-**Rule:** every file or migration that is created/modified/deleted for this feature **must** be listed here and checked off.  
-If a file is touched but missing from this table, the feature is automatically **Lacking/Incomplete**.
-
-| Path | Type | Status | Purpose | Owner checks |
-|------|------|--------|---------|-------------|
-| `supabase/migrations/<timestamp>_<feature>.sql` | migration | [ ] Lacking/Incomplete | Schema/RLS changes | advisors rerun, applied |
-| `src/types/database.ts` | types | [ ] Lacking/Incomplete | Regenerated Supabase types | `tsc` passes |
-| `src/lib/validations/<feature>.ts` | validation | [ ] Lacking/Incomplete | Zod schemas for inputs | no `any` |
-| `src/lib/server/dal/<feature>.ts` | dal | [ ] Lacking/Incomplete | Typed DB reads/writes | `server-only` |
-| `src/actions/<feature>.ts` | action | [ ] Lacking/Incomplete | Server Actions | Zod + RBAC + safe return |
-| `src/app/<role>/<feature>/page.tsx` | route | [ ] Lacking/Incomplete | Server page | RSC correct |
-| `src/app/<role>/<feature>/loading.tsx` | route | [ ] Lacking/Incomplete | Loading UI (if needed) | no layout shift abuse |
-| `src/app/<role>/<feature>/error.tsx` | route | [ ] Lacking/Incomplete | Error boundary (if needed) | no leaks |
-| `src/components/<role>/<feature>/*` | ui | [ ] Lacking/Incomplete | Client UI pieces | minimal state |
-| `src/components/shared/<feature>/*` | ui | [ ] Lacking/Incomplete | Shared UI primitives | DRY |
-
-### A) Pre-flight
-- [ ] Done `package.json` versions verified (Next 16 / React 19 / Zod)
-- [ ] Lacking/Incomplete Locate similar existing feature patterns (list file paths)
-- [ ] Done Whimsical board located (no new boards)
-
-### B) Database / migrations
-- [ ] Lacking/Incomplete Create migration: `supabase/migrations/<timestamp>_<feature>.sql`
-- [ ] Lacking/Incomplete Apply migration to Supabase (remote)
-- [ ] Lacking/Incomplete Run Supabase advisors (security + performance) and resolve ERRORs
-- [ ] Lacking/Incomplete Regenerate `src/types/database.ts`
-
-### C) Validations
-- [ ] Lacking/Incomplete Add `src/lib/validations/<feature>.ts`
-- [ ] Lacking/Incomplete Add/adjust shared validation schemas if needed
-
-### D) DAL
-- [ ] Lacking/Incomplete Add `src/lib/server/dal/<feature>.ts` (server-only)
-- [ ] Lacking/Incomplete Confirm UI does not import Supabase client directly for this feature
-
-### E) Server Actions
-- [ ] Lacking/Incomplete Add/modify `src/actions/<feature>.ts`
-- [ ] Lacking/Incomplete Ensure every export enforces RBAC + Zod + safe return object
-- [ ] Lacking/Incomplete Add `revalidatePath` / `revalidateTag` where required
-
-### F) Routes + UI
-- [ ] Lacking/Incomplete Add server page(s): `src/app/<role>/<feature>/page.tsx`
-- [ ] Lacking/Incomplete Add loading UI: `src/app/<role>/<feature>/loading.tsx` (if needed)
-- [ ] Lacking/Incomplete Add error boundary: `src/app/<role>/<feature>/error.tsx` (if needed)
-- [ ] Lacking/Incomplete Add client components: `src/components/<role>/<feature>/**`
-- [ ] Lacking/Incomplete Add shared components (if reused): `src/components/shared/<feature>/**`
-- [ ] Lacking/Incomplete Add empty states (no mock data)
-
-### G) Quality gates
-- [ ] Lacking/Incomplete `npx tsc --noEmit` passes
-- [ ] Lacking/Incomplete “Zero mock data” grep passes for feature scope
-- [ ] Lacking/Incomplete Manual test plan executed (happy path + auth failures + empty states)
-
-### H) Whimsical update (MANDATORY)
-- [ ] Lacking/Incomplete Update the existing Whimsical board with:
-  - [ ] Lacking/Incomplete UI wireframes
-  - [ ] Lacking/Incomplete Frontend component map
-  - [ ] Lacking/Incomplete Backend sequence diagram
-  - [ ] Lacking/Incomplete DB ERD updates
+- Next.js `16.2.9` · React `19.2.4` · Zod `^4.4.3` · Supabase · Tailwind v4
+- Actions: `src/actions/**` · DAL: `src/lib/server/dal/**` · Auth: `src/lib/server/auth/**`
+- Shared: `src/components/shared/**` · Types: `src/types/database.ts`
 
 ---
 
-## STOP — Approval Gate (required)
+## User prompt starter (copy into every feature request)
 
-Reply with:
-1) The filled **Feature Spec** at the top of this document, and  
-2) The exact phrase: **“Approved to implement”** (only when you’re satisfied).
+```
+Using prompt.md:
+- Feature: <one-line description>
+- Role(s): <worker|employer|admin|...>
+- (optional) I think this is profile: <A-F> — confirm or correct via Auto-Profile Classifier
+```
 
-No application code should be generated until explicit approval is given.
-
+The agent **must** confirm or correct the profile using the classifier — never blindly trust the user's guess if escalations apply.
