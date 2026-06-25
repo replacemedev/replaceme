@@ -11,3 +11,9 @@ export function authCallbackUrl(type: "signup" | "recovery", next: string): stri
   const params = new URLSearchParams({ type, next });
   return `${getSiteUrl()}/auth/callback?${params.toString()}`;
 }
+
+/** For Supabase email templates that use {{ .TokenHash }} (recommended SSR flow). */
+export function authConfirmUrl(type: "signup" | "recovery", next: string): string {
+  const params = new URLSearchParams({ type, next });
+  return `${getSiteUrl()}/auth/confirm?${params.toString()}`;
+}

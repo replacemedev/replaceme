@@ -5,8 +5,11 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthFooter } from "@/components/auth/AuthFooter";
 import { LoginTestimonial } from "@/components/auth/LoginTestimonial";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
+import { RecoveryHashHandler } from "@/components/auth/RecoveryHashHandler";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Update Password | ReplaceMe",
@@ -59,6 +62,7 @@ export default async function UpdatePasswordPage() {
       </div>
 
       <div className="w-full rounded-3xl border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <RecoveryHashHandler />
         <UpdatePasswordForm />
       </div>
     </AuthLayout>

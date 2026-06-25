@@ -35,6 +35,8 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/signup");
+  const isPasswordResetRoute =
+    pathname === "/update-password" || pathname.startsWith("/auth/");
   const isAdminRoute = pathname.startsWith("/admin");
   const isMfaChallenge = pathname === MFA_CHALLENGE_PATH;
   const isWorkerRoute = pathname.startsWith("/worker");
@@ -64,6 +66,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user) {
+    if (isPasswordResetRoute) {
+      return supabaseResponse;
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
       .select("role, professional_title, location, skills")
