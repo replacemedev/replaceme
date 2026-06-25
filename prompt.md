@@ -18,7 +18,7 @@
 <!-- PROMPT_SYNC:BEGIN -->
 ### Repository File Map (auto-generated from workspace)
 
-**Last synced:** 2026-06-25T12:54:33.308Z · **Git:** `152dac6`
+**Last synced:** 2026-06-25T13:11:58.635Z · **Git:** `927f89a`
 **Regenerate:** `npm run prompt:sync` after any add, rename, delete, or move under `src/`, `supabase/migrations/`, or root entry files.
 
 **Agent rule:** Use this map + **Task → Files**. Do not broad-scan the repo. If a path is missing here, run `npm run prompt:sync` (or ask the user to).
@@ -32,7 +32,7 @@ AGENTS.md
 src/proxy.ts
 .env.example
 package.json
-supabase/migrations/*.sql  # 27 migration file(s)
+supabase/migrations/*.sql  # 28 migration file(s)
 ```
 
 #### `src/app/` — routes (App Router) — 88 route files
@@ -154,9 +154,10 @@ src/actions/worker/job-details.ts
 src/actions/worker/job-search.ts
 ```
 
-#### `src/lib/` — infra, DAL, validations (27 files)
+#### `src/lib/` — infra, DAL, validations (28 files)
 
 ```txt
+src/lib/auth/error-message.ts
 src/lib/auth/nav-session.ts
 src/lib/auth/role.ts
 src/lib/auth/site-url.ts
@@ -251,7 +252,7 @@ src/hooks/useNotifications.ts
 | **Notifications** | src/actions/notifications.ts, src/hooks/useNotifications.ts, src/lib/notifications/fetch-initial.ts, src/types/notifications.types.ts |
 | **Admin moderation** | src/actions/admin-actions.ts, src/app/admin/(shell)/audit-log/loading.tsx, src/app/admin/(shell)/audit-log/page.tsx, src/app/admin/(shell)/dashboard/loading.tsx, src/app/admin/(shell)/dashboard/page.tsx, … (+39 more) |
 | **Stripe / billing** | src/actions/employer/billing.ts, src/actions/employer/stripe.ts, src/app/api/webhooks/stripe/route.ts, src/app/employer/checkout/[planId]/loading.tsx, src/app/employer/checkout/[planId]/page.tsx, … (+5 more) |
-| **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+23 more) |
+| **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+24 more) |
 | **RBAC / middleware** | src/lib/server/auth/middleware.ts, src/lib/server/auth/require-admin.ts, src/lib/server/auth/session.ts, src/proxy.ts |
 
 #### Role home paths (from `src/config/navigation.ts`)

@@ -22,6 +22,10 @@ import {
 } from "@/lib/validations/auth";
 import Stripe from "stripe";
 import { assertRateLimit } from "@/lib/server/rate-limit";
+import {
+  extractErrorMessage,
+  mapSignupDatabaseError,
+} from "@/lib/auth/error-message";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -29,27 +33,25 @@ const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
-function handleAuthError(error: any): string {
-  if (!error) return "An unknown error occurred.";
-  
-  const message = typeof error === "string" ? error : (error.message || "An unexpected error occurred.");
-  
+function handleAuthError(error: unknown): string {
+  const message = mapSignupDatabaseError(extractErrorMessage(error));
+
   if (
-    message.includes("fetch failed") || 
-    message.includes("ConnectTimeoutError") || 
+    message.includes("fetch failed") ||
+    message.includes("ConnectTimeoutError") ||
     message.includes("UND_ERR_CONNECT_TIMEOUT")
   ) {
     return "Network error: Connection to the authentication server timed out. Please check your internet connection and try again.";
   }
-  
+
   if (message.includes("Email not confirmed")) {
     return "Please confirm your email address before logging in. A confirmation link was sent to your email.";
   }
-  
+
   if (message.includes("Invalid login credentials")) {
     return "Invalid email or password. Please try again.";
   }
-  
+
   return message;
 }
 
@@ -119,11 +121,29 @@ export async function signUp(formData: SignUpFormValues) {
     });
 
     if (authError) {
-      const msg = authError.message;
-      if (msg.includes("profiles_username_key") || msg.includes("company_profiles_username_key") || msg.includes("username") || msg.includes("Username") || msg.includes("already exists") || msg.includes("23505")) {
+      const msg = extractErrorMessage(authError);
+      const mapped = mapSignupDatabaseError(msg);
+      if (mapped === "auth/username-already-exists") {
         return { success: false, error: "auth/username-already-exists" };
       }
-      if (msg.includes("already registered") || msg.includes("Email already exists") || (msg.includes("email") && msg.includes("already exists"))) {
+      if (mapped === "auth/email-already-exists") {
+        return { success: false, error: "auth/email-already-exists" };
+      }
+      if (
+        msg.includes("profiles_username_key") ||
+        msg.includes("company_profiles_username_key") ||
+        msg.includes("username") ||
+        msg.includes("Username") ||
+        msg.includes("already exists") ||
+        msg.includes("23505")
+      ) {
+        return { success: false, error: "auth/username-already-exists" };
+      }
+      if (
+        msg.includes("already registered") ||
+        msg.includes("Email already exists") ||
+        (msg.includes("email") && msg.includes("already exists"))
+      ) {
         return { success: false, error: "auth/email-already-exists" };
       }
       return { success: false, error: handleAuthError(authError) };

@@ -21,6 +21,16 @@ import {
 } from "@/lib/validations/auth";
 import Link from "next/link";
 
+function formatSignUpError(error: unknown): string {
+  if (typeof error === "string" && error.trim()) return error;
+  return "Failed to create user account.";
+}
+
+function formatFieldError(message: unknown): string {
+  if (typeof message === "string" && message.trim()) return message;
+  return "Please check the highlighted fields.";
+}
+
 type SignUpRole = "employer" | "worker";
 type SignUpValues = EmployerSignUpFormValues | WorkerSignUpFormValues;
 
@@ -93,9 +103,7 @@ export function SignUpForm() {
           toast.error("This email is already registered. Please log in.");
           return;
         }
-        toast.error(
-          typeof errMsg === "string" ? errMsg : "Failed to create user account."
-        );
+        toast.error(formatSignUpError(errMsg));
         return;
       }
 
@@ -121,7 +129,7 @@ export function SignUpForm() {
   const onError = () => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
-      toast.error(firstError.message);
+      toast.error(formatFieldError(firstError.message));
     }
   };
 
