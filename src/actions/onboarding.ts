@@ -44,12 +44,16 @@ export const getOnboardingStatus = cache(async (): Promise<OnboardingStatus | nu
   if (profile.role === "employer") {
     const { data: company } = await supabase
       .from("company_profiles")
-      .select("id, company_name, industry")
+      .select("id, company_name, industry, company_size")
       .eq("employer_id", profile.id)
       .maybeSingle();
 
     const complete = Boolean(
-      company?.company_name?.trim() && company?.industry?.trim()
+      company?.company_name?.trim() &&
+        company?.industry?.trim() &&
+        company?.company_size?.trim() &&
+        profile.skills &&
+        profile.skills.length > 0
     );
     return { complete, role: "employer" };
   }
@@ -88,6 +92,8 @@ export async function completeWorkerOnboarding(input: {
 export async function completeEmployerOnboarding(input: {
   companyName: string;
   industry: string;
+  companySize: string;
+  skills: string[];
   websiteUrl?: string;
   companyBio?: string;
 }) {
@@ -95,11 +101,22 @@ export async function completeEmployerOnboarding(input: {
     const parsed = employerOnboardingSchema.parse(input);
     const { supabase, profile } = await requireRole("employer");
 
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({
+        skills: parsed.skills,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", profile.id);
+
+    if (profileError) return fail("Failed to save hiring skills.");
+
     const { error } = await supabase.from("company_profiles").upsert(
       {
         employer_id: profile.id,
         company_name: parsed.companyName,
         industry: parsed.industry,
+        company_size: parsed.companySize,
         website_url: parsed.websiteUrl || null,
         company_bio: parsed.companyBio ?? null,
         updated_at: new Date().toISOString(),

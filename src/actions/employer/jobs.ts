@@ -8,6 +8,7 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { closeJobOwnedByEmployer } from "@/lib/server/dal/jobs";
 import { revalidatePath } from "next/cache";
 import { JobDetails } from "@/types/employer/jobs";
+import { DEFAULT_SKILL_OPTIONS } from "@/config/onboarding";
 
 /**
  * Fetch list of employment types. 
@@ -26,16 +27,10 @@ export async function getEmploymentTypes(): Promise<DropdownOption[]> {
  * Returns core platform skills list.
  */
 export async function getSkills(): Promise<DropdownOption[]> {
-  return [
-    { label: "React", value: "React" },
-    { label: "TypeScript", value: "TypeScript" },
-    { label: "Next.js", value: "Next.js" },
-    { label: "Tailwind CSS", value: "Tailwind CSS" },
-    { label: "Node.js", value: "Node.js" },
-    { label: "Python", value: "Python" },
-    { label: "Design", value: "Design" },
-    { label: "DevOps", value: "DevOps" },
-  ];
+  return DEFAULT_SKILL_OPTIONS.map((skill) => ({
+    label: skill,
+    value: skill,
+  }));
 }
 
 /**

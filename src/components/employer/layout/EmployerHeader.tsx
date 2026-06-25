@@ -11,6 +11,8 @@ interface EmployerHeaderProps {
 
 export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
   const resolvedSession = session ?? (await getNavSession());
+  const displayName = resolvedSession.displayName || "Employer";
+  const initials = resolvedSession.initials || "E";
 
   return (
     <header className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm">
@@ -20,13 +22,11 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         <EmployerHeaderNav unreadMessageCount={resolvedSession.unreadMessageCount} />
 
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>
-          {resolvedSession.profile ? (
-            <EmployerDropdown
-              profile={resolvedSession.profile}
-              displayName={resolvedSession.displayName}
-              initials={resolvedSession.initials}
-            />
-          ) : null}
+          <EmployerDropdown
+            profile={resolvedSession.profile}
+            displayName={displayName}
+            initials={initials}
+          />
         </GlobalHeaderActions>
         <EmployerMobileMenu unreadMessageCount={resolvedSession.unreadMessageCount} />
       </div>

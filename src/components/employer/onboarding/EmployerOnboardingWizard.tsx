@@ -4,6 +4,12 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { completeEmployerOnboarding } from "@/actions/onboarding";
 import { toast } from "sonner";
+import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import {
+  COMPANY_SIZE_OPTIONS,
+  DEFAULT_SKILL_OPTIONS,
+  ONBOARDING_SELECT_CLASS,
+} from "@/config/onboarding";
 
 const INDUSTRIES = [
   "Technology",
@@ -19,6 +25,8 @@ export function EmployerOnboardingWizard() {
   const [isPending, startTransition] = useTransition();
   const [companyName, setCompanyName] = useState("");
   const [industry, setIndustry] = useState("");
+  const [companySize, setCompanySize] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [companyBio, setCompanyBio] = useState("");
 
@@ -28,6 +36,8 @@ export function EmployerOnboardingWizard() {
       const result = await completeEmployerOnboarding({
         companyName,
         industry,
+        companySize,
+        skills,
         websiteUrl: websiteUrl || undefined,
         companyBio: companyBio || undefined,
       });
@@ -67,7 +77,7 @@ export function EmployerOnboardingWizard() {
           required
           value={industry}
           onChange={(e) => setIndustry(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          className={ONBOARDING_SELECT_CLASS}
         >
           <option value="">Select industry</option>
           {INDUSTRIES.map((item) => (
@@ -77,6 +87,33 @@ export function EmployerOnboardingWizard() {
           ))}
         </select>
       </label>
+
+      <label className="block space-y-2 text-sm font-medium text-slate-700">
+        Company size
+        <select
+          required
+          value={companySize}
+          onChange={(e) => setCompanySize(e.target.value)}
+          className={ONBOARDING_SELECT_CLASS}
+        >
+          <option value="">Select company size</option>
+          {COMPANY_SIZE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <SkillPicker
+        label="Top skills you hire for"
+        hint="Select or add the skills you most often need on your team."
+        options={DEFAULT_SKILL_OPTIONS}
+        value={skills}
+        onChange={setSkills}
+        maxSkills={8}
+        disabled={isPending}
+      />
 
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Website (optional)
@@ -101,7 +138,7 @@ export function EmployerOnboardingWizard() {
 
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isPending || skills.length === 0}
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white disabled:opacity-50"
       >
         {isPending ? "Saving…" : "Go to dashboard"}

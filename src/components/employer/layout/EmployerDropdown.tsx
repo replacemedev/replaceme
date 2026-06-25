@@ -8,7 +8,7 @@ import { logOut } from "@/actions/auth";
 import type { NavProfile } from "@/types/nav";
 
 interface EmployerDropdownProps {
-  profile: NavProfile;
+  profile: NavProfile | null;
   displayName: string;
   initials: string;
 }
@@ -61,7 +61,7 @@ export function EmployerDropdown({
         aria-label="User menu"
       >
         <div className="relative w-8 h-8 rounded-full shrink-0 border border-slate-100 bg-slate-50 overflow-hidden flex items-center justify-center">
-          {profile.avatar_url ? (
+          {profile?.avatar_url ? (
             <Image
               src={profile.avatar_url}
               alt={`${displayName}'s Avatar`}

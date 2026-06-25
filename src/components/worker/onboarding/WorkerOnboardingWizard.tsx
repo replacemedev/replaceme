@@ -4,31 +4,20 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { completeWorkerOnboarding } from "@/actions/onboarding";
 import { toast } from "sonner";
-
-const SKILL_OPTIONS = [
-  "React",
-  "TypeScript",
-  "Node.js",
-  "Python",
-  "Design",
-  "Marketing",
-  "Customer Support",
-  "Data Entry",
-];
+import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import {
+  DEFAULT_SKILL_OPTIONS,
+  ONBOARDING_SELECT_CLASS,
+  WORKER_LOCATION_OPTIONS,
+} from "@/config/onboarding";
 
 export function WorkerOnboardingWizard() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [professionalTitle, setProfessionalTitle] = useState("");
-  const [location, setLocation] = useState("Remote");
+  const [location, setLocation] = useState<string>(WORKER_LOCATION_OPTIONS[0]);
   const [skills, setSkills] = useState<string[]>([]);
   const [bio, setBio] = useState("");
-
-  const toggleSkill = (skill: string) => {
-    setSkills((prev) =>
-      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
-    );
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,33 +61,29 @@ export function WorkerOnboardingWizard() {
 
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Location
-        <input
+        <select
           required
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3"
-        />
+          className={ONBOARDING_SELECT_CLASS}
+        >
+          {WORKER_LOCATION_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </label>
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-slate-700">Top skills</legend>
-        <div className="flex flex-wrap gap-2">
-          {SKILL_OPTIONS.map((skill) => (
-            <button
-              key={skill}
-              type="button"
-              onClick={() => toggleSkill(skill)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold border ${
-                skills.includes(skill)
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-slate-200 text-slate-600"
-              }`}
-            >
-              {skill}
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <SkillPicker
+        label="Top skills"
+        hint="Pick from the list or add skills that best describe your expertise."
+        options={DEFAULT_SKILL_OPTIONS}
+        value={skills}
+        onChange={setSkills}
+        maxSkills={8}
+        disabled={isPending}
+      />
 
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Short bio (optional)
