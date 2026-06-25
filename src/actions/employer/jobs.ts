@@ -87,14 +87,15 @@ export async function createJobPost(payload: CreateJobInput) {
     }
 
     safeLog(`[Jobs] Job post successfully created with intent: ${payload.intent}`);
-    revalidatePath("/dashboard");
+    revalidatePath("/employer/dashboard");
+    revalidatePath("/employer/jobs");
 
     return {
       success: true,
       message: payload.intent === "premium" 
         ? "Job submitted and approved instantly! Redirecting..." 
         : "Job submitted for review! Redirecting...",
-      redirectUrl: "/dashboard",
+      redirectUrl: "/employer/dashboard",
     };
   } catch (err) {
     safeError("createJobPost error occurred:", err);
@@ -214,7 +215,8 @@ export async function deactivateJob(jobId: string) {
     }
 
     safeLog(`[Jobs] Job ID: ${parsed.jobId} successfully deactivated`);
-    revalidatePath("/dashboard");
+    revalidatePath("/employer/dashboard");
+    revalidatePath("/employer/jobs");
     return ok({ message: "Job post deactivated successfully!" });
   });
 

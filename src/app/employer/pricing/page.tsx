@@ -26,7 +26,7 @@ export default async function PricingPage() {
   const handleSelectPlan = async (planName: string) => {
     "use server";
     if (planName === "discovery") {
-      redirect("/jobs/create");
+      redirect("/employer/jobs/create");
     } else {
       // Redirect to the dedicated checkout screen
       redirect(`/checkout/${planName}`);

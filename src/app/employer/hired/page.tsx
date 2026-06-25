@@ -38,7 +38,7 @@ export default async function HiredPage() {
           </p>
         </div>
         <Link
-          href="/jobs/create"
+          href="/employer/jobs/create"
           className="h-11 px-5 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
         >
           <Plus size={16} />

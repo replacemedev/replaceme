@@ -4,7 +4,7 @@ import { Video, Palette, Users, Share2, Award } from "lucide-react";
 
 export function QuickAccess() {
   const actions = [
-    { label: "Find Video Editors", icon: <Video size={18} />, href: "/jobs?category=video-editing" },
+    { label: "Find Video Editors", icon: <Video size={18} />, href: "/employer/jobs" },
     { label: "Browse Designers", icon: <Palette size={18} />, href: "/talents?category=design" },
     { label: "Hire VAs", icon: <Users size={18} />, href: "/talents?category=va" },
     { label: "Social Specialists", icon: <Share2 size={18} />, href: "/talents?category=social-media" },

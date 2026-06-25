@@ -1,0 +1,156 @@
+- region "Notifications alt+T"
+- banner:
+  - link "Replace Me home Replace Me":
+    - /url: /employer/dashboard
+    - img "Replace Me home"
+    - text: Replace Me
+  - navigation:
+    - link "Dashboard":
+      - /url: /employer/dashboard
+    - button "Jobs"
+    - link "Messages":
+      - /url: /employer/messages
+    - link "Pinned":
+      - /url: /employer/pinned
+    - link "Hired":
+      - /url: /employer/hired
+    - link "Pricing":
+      - /url: /employer/pricing
+  - button "View notifications"
+  - button "User menu": R Probe Co
+- main:
+  - heading "Welcome back, Replace ME!" [level=1]
+  - paragraph: Manage your specialized job postings and review recent applications.
+  - link "Post a New Job":
+    - /url: /jobs/create
+  - heading "Your Job Posts" [level=2]
+  - text: "6"
+  - link "View All":
+    - /url: /jobs
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Lifecycle Job 1782398761253":
+    - /url: /jobs/b42f8469-3d18-4224-aaf5-d224d044c16c
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/b42f8469-3d18-4224-aaf5-d224d044c16c/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Job 1782397733447":
+    - /url: /jobs/126fb210-d174-41c8-9866-21f1bd4ed203
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/126fb210-d174-41c8-9866-21f1bd4ed203/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Applicants 1782397712799":
+    - /url: /jobs/2a0b397d-2483-4c23-8211-934efbb8f42f
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/2a0b397d-2483-4c23-8211-934efbb8f42f/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Applicants 1782397649766":
+    - /url: /jobs/7bd97414-e512-494d-ba53-1d65c342a177
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/7bd97414-e512-494d-ba53-1d65c342a177/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Job 1782397599362":
+    - /url: /jobs/16dd7c39-9fc5-4b38-acc7-00cc82afa03f
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/16dd7c39-9fc5-4b38-acc7-00cc82afa03f/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - text: ACTIVE Created on Jun 25, 2026
+  - link "E2E Job 1782397322824":
+    - /url: /jobs/9e6e3afa-a541-49f9-a3f8-3cd9b74053ef
+  - strong: "0"
+  - text: Applicants
+  - strong: "0"
+  - text: Hits
+  - link "EDIT":
+    - /url: /jobs/9e6e3afa-a541-49f9-a3f8-3cd9b74053ef/edit
+  - text: "|"
+  - button "DELETE"
+  - text: "|"
+  - button "REFRESH"
+  - heading "Recent Applications" [level=2]
+  - paragraph: Recent applicant profiles will appear here once candidates apply to your jobs.
+  - heading "Your Workers" [level=2]
+  - paragraph: Your hires will appear here
+  - link "BROWSE TALENT POOL":
+    - /url: /employer/dashboard
+  - heading "Quick Insights & Account Resources" [level=2]
+  - heading "Subscription Benefits & Usage" [level=3]
+  - text: Active Plan Candidate Unlocks 12 / 75 Used Active Job Posts 0 / 3 Used
+  - heading "Exclusive Hiring Toolkit" [level=3]
+  - list:
+    - listitem:
+      - link "📋 Download Remote Hiring Guide":
+        - /url: /hiring-guide
+    - listitem:
+      - link "💬 Read Messaging & Interview Templates":
+        - /url: /messages
+    - listitem:
+      - link "⚖️ View Contract & Compliance Checklists":
+        - /url: /hired
+- contentinfo:
+  - link "Replace Me Logo Replace Me":
+    - /url: /
+    - img "Replace Me Logo"
+    - text: Replace Me
+  - paragraph: Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
+  - heading "Employers" [level=4]
+  - link "Post a Job":
+    - /url: /signup
+  - link "Pricing":
+    - /url: /#pricing
+  - link "Employer FAQs":
+    - /url: /#faq
+  - heading "Jobseekers" [level=4]
+  - link "Browse Jobs":
+    - /url: /#find-work
+  - link "Create Profile":
+    - /url: /signup
+  - link "Worker FAQs":
+    - /url: /#faq
+  - heading "Legal & Support" [level=4]
+  - link "Privacy Policy":
+    - /url: /privacy-policy
+  - link "Terms of Service":
+    - /url: /terms-of-service
+  - link "Contact Us":
+    - /url: /contact
+  - paragraph: © 2026 Replace Me. All rights reserved.
+- alert

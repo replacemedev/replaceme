@@ -57,7 +57,7 @@ export default async function EmployerDashboard() {
           </p>
         </div>
         <Link
-          href="/jobs/create"
+          href="/employer/jobs/create"
           className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] rounded-xl transition-all duration-150 shadow-xs hover:shadow-md cursor-pointer select-none"
         >
           <Plus size={18} />
@@ -84,7 +84,7 @@ export default async function EmployerDashboard() {
                 )}
               </div>
             <Link
-              href="/jobs"
+              href="/employer/jobs"
               className="text-sm font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors"
             >
               View All
@@ -102,7 +102,7 @@ export default async function EmployerDashboard() {
                 icon={<Briefcase size={22} />}
                 description="You haven't posted any jobs yet. Create your first listing to start hiring."
                 actionLabel="Post a New Job"
-                actionHref="/jobs/create"
+                actionHref="/employer/jobs/create"
               />
             )}
           </div>

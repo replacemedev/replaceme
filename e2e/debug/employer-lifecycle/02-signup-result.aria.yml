@@ -1,0 +1,40 @@
+- region "Notifications alt+T":
+  - list:
+    - listitem:
+      - img
+      - text: Registration successful! Check your email and click the confirmation link to activate your account.
+- alert: Sign In | ReplaceMe
+- link "Replace Me Replace Me":
+  - /url: /
+  - img "Replace Me"
+  - text: Replace Me
+- heading "Welcome back" [level=1]
+- paragraph: Sign in to access your professional dashboard and manage your network.
+- text: Email or Username
+- textbox "Enter your email or username"
+- text: Password
+- textbox "Min. 8 characters"
+- button
+- checkbox "Remember me"
+- text: Remember me
+- link "Forgot password?":
+  - /url: /login?view=forgot_password
+- button "Sign In"
+- paragraph:
+  - text: Don't have an account?
+  - link "Sign up":
+    - /url: /signup
+- contentinfo:
+  - link "Terms of Service":
+    - /url: /terms-of-service
+  - text: •
+  - link "Privacy Policy":
+    - /url: /privacy-policy
+  - text: •
+  - link "Help":
+    - /url: /help
+  - paragraph: © 2026 Replace Me. All rights reserved.
+- article:
+  - blockquote: This platform has transformed how we connect with top-tier professionals. It's an indispensable tool for our daily operations.
+  - paragraph: Sarah Jenkins
+  - paragraph: Director of Operations, TechCorp

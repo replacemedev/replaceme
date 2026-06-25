@@ -58,7 +58,7 @@ export function RecommendedJobCard({ job, onApply }: RecommendedJobCardProps) {
           </button>
         ) : (
           <Link
-            href={`/jobs/${job.id}`}
+            href={`/worker/jobs/${job.id}`}
             className="inline-flex items-center justify-center px-5 py-2 text-sm font-bold text-[#006e2f] hover:text-white bg-transparent hover:bg-[#006e2f] border border-[#006e2f] rounded-xl transition-all duration-150 cursor-pointer select-none"
           >
             Apply Now

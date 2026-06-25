@@ -30,7 +30,7 @@ export function JobCard({ job }: JobCardProps) {
         </div>
 
         <Link
-          href={`/jobs/${job.id}`}
+          href={`/employer/jobs/${job.id}`}
           className="block text-lg font-bold text-[#006e2f] hover:text-[#005321] hover:underline leading-snug tracking-tight truncate-2-lines transition-colors"
         >
           {job.title}
@@ -50,10 +50,10 @@ export function JobCard({ job }: JobCardProps) {
       {/* Action Footer */}
       <div className="flex items-center gap-3 pt-1 text-xs font-bold text-slate-400 select-none">
         <Link 
-          href={`/jobs/${job.id}/edit`} 
+          href={`/employer/jobs/${job.id}`}
           className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline"
         >
-          EDIT
+          VIEW
         </Link>
         <span className="text-slate-200">|</span>
         <button 

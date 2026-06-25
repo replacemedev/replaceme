@@ -9,6 +9,12 @@
     "lint": "eslint",
     "seed:admin": "node scripts/seed-admin.mjs",
     "db:seed": "npm run seed:admin",
+    "test:e2e": "playwright test",
+    "test:e2e:employer": "playwright test --project=employer",
+    "test:e2e:worker": "playwright test --project=worker",
+    "test:e2e:admin": "playwright test --project=admin",
+    "probe:employer": "node scripts/e2e-employer-probe.mjs",
+    "probe:employer-lifecycle": "node scripts/e2e-employer-lifecycle.mjs",
     "prompt:sync": "node scripts/sync-prompt-file-map.mjs"
   },
   "dependencies": {
@@ -28,6 +34,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

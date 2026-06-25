@@ -181,7 +181,7 @@ export default async function WorkerDashboard() {
               Recommended for You
             </h2>
             <Link 
-              href="/jobs"
+              href="/worker/jobs"
               className="text-xs font-bold text-slate-500 hover:text-slate-900 hover:underline transition-colors"
             >
               View All &gt;

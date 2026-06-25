@@ -28,7 +28,7 @@ export function JobHeader({
   const [isPending, startTransition] = useTransition();
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}/jobs/${jobId}`;
+    const shareUrl = `${window.location.origin}/worker/jobs/${jobId}`;
     navigator.clipboard.writeText(shareUrl)
       .then(() => {
         toast.success("Job post link copied to clipboard!");
@@ -113,7 +113,7 @@ export function JobHeader({
 
         {/* Edit Button */}
         <Link
-          href={`/jobs/create?edit=${jobId}`}
+          href={`/employer/jobs/create?edit=${jobId}`}
           className="h-10 px-4 rounded-xl border border-emerald-200 hover:border-emerald-300 bg-white hover:bg-emerald-50/10 text-emerald-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
         >
           <Edit3 size={14} />

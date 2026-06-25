@@ -13,7 +13,7 @@ export function ActiveJobs({ jobs }: ActiveJobsProps) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold text-slate-800">Active Job Posts</h2>
         <Link 
-          href="/jobs" 
+          href="/employer/jobs" 
           className="text-sm font-bold text-[#22c55e] hover:underline flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-[#22c55e] rounded"
         >
           View All <ChevronRight size={16} />
@@ -47,7 +47,7 @@ export function ActiveJobs({ jobs }: ActiveJobsProps) {
                     {job.status}
                   </span>
                   <Link
-                    href={`/jobs/${job.id}`}
+                    href={`/employer/jobs/${job.id}`}
                     className="bg-slate-50 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all focus-visible:outline-2 focus-visible:outline-[#22c55e]"
                   >
                     Manage
@@ -66,7 +66,7 @@ export function ActiveJobs({ jobs }: ActiveJobsProps) {
               Create your first job listing to connect with remote talent across industries.
             </p>
             <Link 
-              href="/jobs/create" 
+              href="/employer/jobs/create" 
               className="mt-4 bg-[#22c55e] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all flex items-center gap-1.5 shadow-sm focus-visible:outline-2 focus-visible:outline-[#22c55e]"
             >
               <Plus size={14} />

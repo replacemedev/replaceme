@@ -52,7 +52,7 @@ export function RecentApplicantRow({ applicant }: RecentApplicantRowProps) {
           <p className="text-xs text-slate-500 font-medium">
             Applied for{" "}
             <Link 
-              href={`/jobs/${applicant.job_id}`}
+              href={`/employer/jobs/${applicant.job_id}`}
               className="text-[#006e2f] hover:text-[#005321] hover:underline font-semibold"
             >
               {applicant.applied_role}
@@ -65,13 +65,13 @@ export function RecentApplicantRow({ applicant }: RecentApplicantRowProps) {
       {/* Right Actions */}
       <div className="flex items-center gap-2">
         <Link
-          href={`/jobs/${applicant.job_id}/applicants`}
+          href={`/employer/jobs/${applicant.job_id}/applicants`}
           className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
         >
           Review Profile
         </Link>
         <Link
-          href={`/messages?candidateId=${applicant.candidate_id}`}
+          href={`/employer/messages?candidateId=${applicant.candidate_id}`}
           className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] rounded-lg transition-colors cursor-pointer"
         >
           Message
