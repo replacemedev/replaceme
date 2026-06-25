@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { safeError } from "@/utils/logger";
+import { AuthError } from "@/lib/server/auth/session";
 
 export type ActionResult<T = void> =
   | { success: true; data?: T }
@@ -35,6 +36,9 @@ export async function runAction<T>(
   } catch (err) {
     if (err instanceof ZodError) {
       return fail(formatZodError(err));
+    }
+    if (err instanceof AuthError) {
+      return fail(err.message);
     }
     safeError(`${label}:`, err);
     return fail(GENERIC_ACTION_ERROR);

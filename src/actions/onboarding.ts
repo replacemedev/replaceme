@@ -72,7 +72,7 @@ export async function completeWorkerOnboarding(input: {
 }) {
   return runAction("completeWorkerOnboarding", async () => {
     const parsed = workerOnboardingSchema.parse(input);
-    const { supabase, profile } = await requireRole("worker");
+    const { supabase, user } = await requireRole("worker");
 
     const { error } = await supabase
       .from("profiles")
@@ -83,7 +83,7 @@ export async function completeWorkerOnboarding(input: {
         bio: parsed.bio ?? null,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", profile.id);
+      .eq("id", user.id);
 
     if (error) return fail("Failed to save profile.");
 
@@ -102,7 +102,7 @@ export async function completeEmployerOnboarding(input: {
 }) {
   return runAction("completeEmployerOnboarding", async () => {
     const parsed = employerOnboardingSchema.parse(input);
-    const { supabase, profile } = await requireRole("employer");
+    const { supabase, user } = await requireRole("employer");
 
     const { error: profileError } = await supabase
       .from("profiles")
@@ -110,24 +110,38 @@ export async function completeEmployerOnboarding(input: {
         skills: parsed.skills,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", profile.id);
+      .eq("id", user.id);
 
     if (profileError) return fail("Failed to save hiring skills.");
 
-    const { error } = await supabase.from("company_profiles").upsert(
-      {
-        employer_id: profile.id,
-        company_name: parsed.companyName,
-        industry: parsed.industry,
-        company_size: parsed.companySize,
-        website_url: parsed.websiteUrl || null,
-        company_bio: parsed.companyBio ?? null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "employer_id" }
-    );
+    const companyPayload = {
+      company_name: parsed.companyName,
+      industry: parsed.industry,
+      company_size: parsed.companySize,
+      website_url: parsed.websiteUrl || null,
+      company_bio: parsed.companyBio ?? null,
+      updated_at: new Date().toISOString(),
+    };
 
-    if (error) return fail("Failed to save company profile.");
+    const { data: updatedCompany, error: companyUpdateError } = await supabase
+      .from("company_profiles")
+      .update(companyPayload)
+      .eq("employer_id", user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (companyUpdateError) return fail("Failed to save company profile.");
+
+    if (!updatedCompany) {
+      const { error: companyInsertError } = await supabase
+        .from("company_profiles")
+        .insert({
+          employer_id: user.id,
+          ...companyPayload,
+        });
+
+      if (companyInsertError) return fail("Failed to save company profile.");
+    }
 
     revalidatePath("/employer");
     return ok();
