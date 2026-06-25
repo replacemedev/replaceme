@@ -11,7 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { ApplicationStatCard } from "./ApplicationStatCard";
+import { StatCard } from "@/components/shared/StatCard";
 import { ApplicationFilterSidebar } from "./ApplicationFilterSidebar";
 import { ApplicationRow } from "./ApplicationRow";
 import {
@@ -172,7 +172,8 @@ export function ApplicationsClient({
       </header>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
-        <ApplicationStatCard
+        <StatCard
+          variant="application"
           label="Total Sent"
           value={stats.totalSent}
           badge={
@@ -181,21 +182,23 @@ export function ApplicationsClient({
               : "No new this week"
           }
           badgeIcon={TrendingUp}
-          variant="default"
+          applicationVariant="default"
           watermarkIcon={FileText}
         />
-        <ApplicationStatCard
+        <StatCard
+          variant="application"
           label="Under Review"
           value={stats.underReview}
           badge="Awaiting response"
-          variant="review"
+          applicationVariant="review"
           watermarkIcon={Hourglass}
         />
-        <ApplicationStatCard
+        <StatCard
+          variant="application"
           label="Interviews Scheduled"
           value={stats.interviewsScheduled}
           badge={interviewBadge}
-          variant="interview"
+          applicationVariant="interview"
           watermarkIcon={CalendarDays}
         />
       </section>

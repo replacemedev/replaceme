@@ -109,7 +109,7 @@ export function InboxSidebar({
       <div className="flex-1 overflow-y-auto min-h-0">
         {filtered.length === 0 ? (
           <p className="flex items-center justify-center h-full text-sm font-medium text-slate-400 px-4 text-center">
-            No conversations found
+            No threads found
           </p>
         ) : (
           filtered.map((thread) => (

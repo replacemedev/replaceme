@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
-import { revalidatePath } from "next/cache";
 import { computeJobHourlyRate } from "@/types/job-search";
 import {
   WorkerJobDetails,
@@ -97,73 +96,5 @@ export async function getWorkerJobDetails(
   } catch (err) {
     safeError("getWorkerJobDetails:", err);
     return null;
-  }
-}
-
-export async function applyForJob(
-  jobId: string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { success: false, error: "Please log in to apply." };
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "worker") {
-      return { success: false, error: "Worker account required." };
-    }
-
-    const { data: job } = await supabase
-      .from("job_posts")
-      .select("id")
-      .eq("id", jobId)
-      .eq("status", "Active")
-      .maybeSingle();
-
-    if (!job) {
-      return { success: false, error: "This job is no longer available." };
-    }
-
-    const { data: existing } = await supabase
-      .from("applications")
-      .select("id")
-      .eq("candidate_id", profile.id)
-      .eq("job_id", jobId)
-      .maybeSingle();
-
-    if (existing) {
-      return { success: false, error: "You have already applied to this job." };
-    }
-
-    const { error: insertError } = await supabase.from("applications").insert({
-      candidate_id: profile.id,
-      job_id: jobId,
-      status: "PENDING",
-    });
-
-    if (insertError) {
-      safeError("applyForJob:", insertError);
-      return { success: false, error: "Failed to submit application." };
-    }
-
-    revalidatePath(`/worker/jobs/${jobId}`);
-    revalidatePath("/worker/applications");
-    revalidatePath("/worker/dashboard");
-
-    return { success: true };
-  } catch (err) {
-    safeError("applyForJob:", err);
-    return { success: false, error: "Unexpected error." };
   }
 }

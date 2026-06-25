@@ -1,6 +1,14 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { runAction, ok, fail } from "@/lib/server/action-result";
+import { getSession } from "@/lib/server/auth/session";
+import {
+  sendMessageSchema,
+  threadActionSchema,
+  threadIdSchema,
+  togglePinSchema,
+} from "@/lib/validations/messaging";
 import { safeError } from "@/utils/logger";
 import {
   buildContextTitle,
@@ -161,6 +169,9 @@ export async function getMessagingMessages(
     const ctx = await getAuthenticatedProfile();
     if (!ctx) return [];
 
+    const parsed = threadIdSchema.safeParse({ threadId });
+    if (!parsed.success) return [];
+
     const { supabase, user } = ctx;
 
     const { data: thread, error: threadError } = await supabase
@@ -168,7 +179,7 @@ export async function getMessagingMessages(
       .select(
         `id, worker_id, company_profiles (employer_id)`
       )
-      .eq("id", threadId)
+      .eq("id", parsed.data.threadId)
       .single();
 
     if (threadError || !thread) return [];
@@ -185,7 +196,7 @@ export async function getMessagingMessages(
       .select(
         `*, sender:profiles (id, full_name, avatar_url, role)`
       )
-      .eq("thread_id", threadId)
+      .eq("thread_id", parsed.data.threadId)
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -204,23 +215,21 @@ export async function sendMessagingMessage(
   content: string,
   basePath: string
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    const ctx = await getAuthenticatedProfile();
-    if (!ctx) return { success: false, error: "Unauthorized" };
-
-    const trimmed = content.trim();
-    if (!trimmed) return { success: false, error: "Message cannot be empty" };
+  const result = await runAction("sendMessagingMessage", async () => {
+    const parsed = sendMessageSchema.parse({ threadId, content, basePath });
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
 
     const { supabase, user } = ctx;
 
     const { data: thread, error: threadError } = await supabase
       .from("chat_threads")
       .select(`id, worker_id, company_profiles (employer_id)`)
-      .eq("id", threadId)
+      .eq("id", parsed.threadId)
       .single();
 
     if (threadError || !thread) {
-      return { success: false, error: "Thread not found" };
+      return fail("Thread not found");
     }
 
     const cp = thread.company_profiles as
@@ -229,56 +238,55 @@ export async function sendMessagingMessage(
       | null;
     const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
     if (thread.worker_id !== user.id && employerId !== user.id) {
-      return { success: false, error: "Access denied" };
+      return fail("Access denied");
     }
 
     const { error: insertError } = await supabase.from("chat_messages").insert({
-      thread_id: threadId,
+      thread_id: parsed.threadId,
       sender_id: user.id,
-      content: trimmed,
+      content: parsed.content,
     });
 
     if (insertError) {
-      safeError("sendMessagingMessage:", insertError);
-      return { success: false, error: "Failed to send message" };
+      return fail("Failed to send message");
     }
 
-    revalidatePath(basePath);
-    return { success: true };
-  } catch (err) {
-    safeError("sendMessagingMessage:", err);
-    return { success: false, error: "System error" };
-  }
+    revalidatePath(parsed.basePath);
+    return ok();
+  });
+
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
 }
 
 export async function markMessagingThreadRead(
   threadId: string,
   basePath: string
 ): Promise<{ success: boolean }> {
-  try {
-    const ctx = await getAuthenticatedProfile();
-    if (!ctx) return { success: false };
+  const result = await runAction("markMessagingThreadRead", async () => {
+    const parsed = threadActionSchema.parse({ threadId, basePath });
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
 
     const { supabase, user } = ctx;
 
     const { error } = await supabase
       .from("chat_messages")
       .update({ read_at: new Date().toISOString() })
-      .eq("thread_id", threadId)
+      .eq("thread_id", parsed.threadId)
       .neq("sender_id", user.id)
       .is("read_at", null);
 
     if (error) {
-      safeError("markMessagingThreadRead:", error);
-      return { success: false };
+      return fail("Failed to mark messages as read");
     }
 
-    revalidatePath(basePath);
-    return { success: true };
-  } catch (err) {
-    safeError("markMessagingThreadRead:", err);
-    return { success: false };
-  }
+    revalidatePath(parsed.basePath);
+    return ok();
+  });
+
+  return { success: result.success };
 }
 
 export async function toggleMessagingThreadPin(
@@ -286,28 +294,46 @@ export async function toggleMessagingThreadPin(
   isPinned: boolean,
   basePath: string
 ): Promise<{ success: boolean }> {
-  try {
-    const ctx = await getAuthenticatedProfile();
-    if (!ctx) return { success: false };
+  const result = await runAction("toggleMessagingThreadPin", async () => {
+    const parsed = togglePinSchema.parse({ threadId, isPinned, basePath });
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
 
     const { supabase, user } = ctx;
 
-    const { error } = await supabase
+    const { data: thread, error: threadError } = await supabase
       .from("chat_threads")
-      .update({ is_pinned: isPinned })
-      .eq("id", threadId);
+      .select(`id, worker_id, company_profiles (employer_id)`)
+      .eq("id", parsed.threadId)
+      .single();
 
-    if (error) {
-      safeError("toggleMessagingThreadPin:", error);
-      return { success: false };
+    if (threadError || !thread) {
+      return fail("Thread not found");
     }
 
-    revalidatePath(basePath);
-    return { success: true };
-  } catch (err) {
-    safeError("toggleMessagingThreadPin:", err);
-    return { success: false };
-  }
+    const cp = thread.company_profiles as
+      | { employer_id: string }
+      | { employer_id: string }[]
+      | null;
+    const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
+    if (thread.worker_id !== user.id && employerId !== user.id) {
+      return fail("Access denied");
+    }
+
+    const { error } = await supabase
+      .from("chat_threads")
+      .update({ is_pinned: parsed.isPinned })
+      .eq("id", parsed.threadId);
+
+    if (error) {
+      return fail("Failed to update pin state");
+    }
+
+    revalidatePath(parsed.basePath);
+    return ok();
+  });
+
+  return { success: result.success };
 }
 
 /** Unique job roles from the user's active threads (jobs / job_posts via FK). */

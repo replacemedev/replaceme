@@ -12,7 +12,7 @@ import { signIn } from "@/actions/auth";
 import {
   loginCredentialsSchema,
   type LoginCredentials,
-} from "@/types/auth.types";
+} from "@/lib/validations/auth";
 import Link from "next/link";
 import { toast } from "sonner";
 

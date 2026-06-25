@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
-import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/schemas/employer/company";
+import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
 import { revalidatePath } from "next/cache";
 
 /**

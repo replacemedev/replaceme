@@ -3,11 +3,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { employerSignUpSchema, workerSignUpSchema } from "@/lib/validations/auth";
+import {
+  employerSignUpSchema,
+  workerSignUpSchema,
+  type SignUpFormValues,
+} from "@/lib/validations/auth";
 import {
   loginCredentialsSchema,
   type LoginCredentials,
-} from "@/types/auth.types";
+} from "@/lib/validations/auth";
 import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
 import { authCallbackUrl } from "@/lib/auth/site-url";
@@ -16,6 +20,7 @@ import {
   updatePasswordSchema,
 } from "@/lib/validations/auth";
 import Stripe from "stripe";
+import { assertRateLimit } from "@/lib/server/rate-limit";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -72,7 +77,7 @@ async function profileExistsByEmail(email: string): Promise<boolean> {
   }
 }
 
-export async function signUp(formData: any) {
+export async function signUp(formData: SignUpFormValues) {
   try {
     const role = formData.role;
     safeLog(`[Auth] Sign-up initiated for role: ${role}`);
@@ -319,6 +324,14 @@ export async function sendPasswordResetLink(email: string) {
   try {
     safeLog("[Auth] Password reset link requested");
 
+    const rateLimit = await assertRateLimit("password-reset", {
+      maxAttempts: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return { success: false, error: rateLimit.error };
+    }
+
     const parsed = forgotPasswordSchema.safeParse({ email });
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
@@ -327,37 +340,29 @@ export async function sendPasswordResetLink(email: string) {
     const normalizedEmail = parsed.data.email.trim().toLowerCase();
     const exists = await profileExistsByEmail(normalizedEmail);
 
-    if (!exists) {
-      return {
-        success: false,
-        error: "No account found with this email address.",
-      };
-    }
+    if (exists) {
+      const supabase = await createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: authCallbackUrl("recovery", "/update-password"),
+      });
 
-    const supabase = await createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo: authCallbackUrl("recovery", "/update-password"),
-    });
-
-    if (error) {
-      safeError(
-        `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
-      );
-      if (error.status === 429) {
-        return {
-          success: false,
-          error: "Too many requests. Please wait a few minutes before trying again.",
-        };
+      if (error) {
+        safeError(
+          `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
+        );
+        if (error.status === 429) {
+          return {
+            success: false,
+            error: "Too many requests. Please wait a few minutes before trying again.",
+          };
+        }
       }
-      return {
-        success: false,
-        error: "Failed to send reset link. Please try again.",
-      };
     }
 
     return {
       success: true,
-      message: "Password reset link sent. Check your email to continue.",
+      message:
+        "If an account exists for this email, a password reset link has been sent.",
     };
   } catch (error) {
     safeError("[Auth] sendPasswordResetLink unexpected error:", error);

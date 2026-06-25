@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Unlock } from "lucide-react";
+import { AlertCircle, Unlock, LayoutGrid, Table2 } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { ApplicantsToolbar } from "./ApplicantsToolbar";
 import { ApplicantCard } from "./ApplicantCard";
 import { LockedApplicantCard } from "./LockedApplicantCard";
+import {
+  ApplicantTrackerTable,
+  type ApplicantTrackerRow,
+} from "./ApplicantTrackerTable";
 import { unlockCandidate, getApplicants } from "@/actions/employer/applicants";
 import { toast } from "sonner";
 
@@ -27,6 +31,7 @@ export function ApplicantsClient({
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
   const [creditsBalance, setCreditsBalance] = useState<number>(initialCreditsBalance);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -89,6 +94,26 @@ export function ApplicantsClient({
     );
   });
 
+  const tableRows: ApplicantTrackerRow[] = useMemo(
+    () =>
+      filteredApplicants.map((app) => ({
+        id: app.id,
+        candidateId: app.candidateId,
+        name: app.name,
+        avatarUrl: app.avatarUrl,
+        matchScore: app.matchScore,
+        status: app.status,
+        appliedAt: app.createdAt,
+        isLocked: !app.isUnlocked,
+      })),
+    [filteredApplicants]
+  );
+
+  const handleUnlockByCandidateId = (candidateId: string) => {
+    const app = applicants.find((a) => a.candidateId === candidateId);
+    if (app) handleUnlockClick(app);
+  };
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto px-4 py-8">
       {/* Top Banner and Navigation Bar */}
@@ -130,8 +155,40 @@ export function ApplicantsClient({
         totalCount={filteredApplicants.length}
       />
 
-      {/* Candidates Column Stack List (Matches design horizontal rows layout) */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setViewMode("cards")}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            viewMode === "cards"
+              ? "bg-[#10b981] text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <LayoutGrid className="h-3.5 w-3.5" aria-hidden />
+          Cards
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("table")}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            viewMode === "table"
+              ? "bg-[#10b981] text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <Table2 className="h-3.5 w-3.5" aria-hidden />
+          Table
+        </button>
+      </div>
+
       {filteredApplicants.length > 0 ? (
+        viewMode === "table" ? (
+          <ApplicantTrackerTable
+            rows={tableRows}
+            onUnlock={handleUnlockByCandidateId}
+          />
+        ) : (
         <div className="space-y-4">
           {filteredApplicants.map((app) =>
             app.isUnlocked ? (
@@ -149,6 +206,7 @@ export function ApplicantsClient({
             )
           )}
         </div>
+        )
       ) : (
         /* Empty results state */
         <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center shadow-xs">

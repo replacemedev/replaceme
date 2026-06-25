@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { createJobSchema, CreateJobInput, DropdownOption } from "@/schemas/employer/jobs";
+import { createJobSchema, CreateJobInput, DropdownOption } from "@/lib/validations/employer/jobs";
 import { createJobPost } from "@/actions/employer/jobs";
 
 // Form Sections

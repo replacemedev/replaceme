@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { uuidSchema } from "@/lib/validations/common";
 
-const notificationIdSchema = z.string().uuid();
+const notificationIdSchema = z.object({ notificationId: uuidSchema }).strict();
 
 type ActionResult = { success: true } | { success: false; error: string };
 
@@ -25,13 +26,13 @@ export async function markNotificationRead(
   notificationId: string
 ): Promise<ActionResult> {
   try {
-    const id = notificationIdSchema.parse(notificationId);
+    const parsed = notificationIdSchema.parse({ notificationId });
     const { supabase, userId } = await verifySessionUser();
 
     const { error } = await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("id", id)
+      .eq("id", parsed.notificationId)
       .eq("user_id", userId);
 
     if (error) throw new Error(error.message);
@@ -68,13 +69,13 @@ export async function deleteNotification(
   notificationId: string
 ): Promise<ActionResult> {
   try {
-    const id = notificationIdSchema.parse(notificationId);
+    const parsed = notificationIdSchema.parse({ notificationId });
     const { supabase, userId } = await verifySessionUser();
 
     const { error } = await supabase
       .from("notifications")
       .delete()
-      .eq("id", id)
+      .eq("id", parsed.notificationId)
       .eq("user_id", userId);
 
     if (error) throw new Error(error.message);

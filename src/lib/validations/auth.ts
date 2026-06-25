@@ -70,7 +70,14 @@ export const updatePasswordSchema = z
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export type UpdatePasswordFormValues = z.infer<typeof updatePasswordSchema>;
 
-export {
-  loginCredentialsSchema as loginSchema,
-  type LoginCredentials as LoginFormValues,
-} from "@/types/auth.types";
+export const loginCredentialsSchema = z
+  .object({
+    email: z.string().min(3, "Please enter a valid email or username"),
+    password: z.string().min(1, "Password is required"),
+    rememberMe: z.boolean().optional(),
+  })
+  .strict();
+
+export type LoginCredentials = z.infer<typeof loginCredentialsSchema>;
+export const loginSchema = loginCredentialsSchema;
+export type LoginFormValues = LoginCredentials;

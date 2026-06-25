@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
-import { StatCard } from "@/components/admin/dashboard/StatCard";
+import { createAdminClient } from "@/lib/supabase/server";
+import { StatCard } from "@/components/shared/StatCard";
 import { UrgentAlerts } from "@/components/admin/dashboard/UrgentAlerts";
 import { RecentActions } from "@/components/admin/dashboard/RecentActions";
 import { MetricsChart } from "@/components/admin/dashboard/MetricsChart";
@@ -26,11 +26,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient();
+  const admin = await createAdminClient();
 
   const [{ data: rawMetrics }, { data: auditLogs }] = await Promise.all([
-    supabase.rpc("get_platform_metrics"),
-    supabase
+    admin.rpc("get_platform_metrics"),
+    admin
       .from("audit_logs")
       .select("id, action_type, target_type, target_id, metadata, created_at")
       .order("created_at", { ascending: false })

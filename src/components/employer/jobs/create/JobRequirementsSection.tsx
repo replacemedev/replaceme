@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { DropdownOption } from "@/schemas/employer/jobs";
+import { DropdownOption } from "@/lib/validations/employer/jobs";
 import { DollarSign, Clock, Plus, X } from "lucide-react";
 
 interface JobRequirementsSectionProps {

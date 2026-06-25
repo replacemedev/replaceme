@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 
-import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/schemas/employer/company";
+import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
 import { updateCompanyProfile } from "@/actions/employer/company";
 import { Button } from "@/components/ui/button";
 

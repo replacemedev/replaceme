@@ -45,16 +45,11 @@ export default async function ApplicantsPage({ params }: PageProps) {
     getApplicants(jobId),
   ]);
 
-  // If job is not found or is owned by someone else, getJobById will return null
   if (!job) {
-    // Check if checking for mock/fallbacks
-    const mockJobIds = ["senior-react-dev-id", "junior-web-dev-id", "mock-job-id"];
-    if (!mockJobIds.includes(jobId)) {
-      redirect("/jobs");
-    }
+    redirect("/employer/jobs");
   }
 
-  const jobTitle = job?.title || (jobId === "senior-react-dev-id" ? "Senior React Developer" : "Job Post");
+  const jobTitle = job.title;
   const applicants = applicantsData.applicants;
   const creditsBalance = applicantsData.creditsBalance;
 

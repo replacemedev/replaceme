@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { verifyAdmin } from "@/lib/admin/verify-admin";
+import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
   EMPTY_PLATFORM_METRICS,
@@ -31,6 +31,7 @@ const ADMIN_PATHS = [
   "/admin/jobs",
   "/admin/identity",
   "/admin/revenue",
+  "/admin/disputes",
   "/admin/audit-log",
 ] as const;
 
@@ -55,7 +56,7 @@ export async function logAdminAction(
   targetId?: string,
   metadata?: Record<string, unknown>
 ) {
-  const { supabase, user } = await verifyAdmin();
+  const { supabase, user } = await requireAdmin();
   const ip = await getClientIp();
 
   const { error } = await supabase.from("audit_logs").insert({
@@ -78,7 +79,7 @@ export async function suspendUser(
 ): Promise<ActionResult> {
   try {
     const parsed = suspendUserSchema.parse({ userId, reason });
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { error } = await supabase
       .from("profiles")
@@ -108,7 +109,7 @@ export async function suspendUser(
 export async function unsuspendUser(userId: string): Promise<ActionResult> {
   try {
     const id = z.string().uuid().parse(userId);
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { error } = await supabase
       .from("profiles")
@@ -134,7 +135,7 @@ export async function unsuspendUser(userId: string): Promise<ActionResult> {
 export async function approveJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { error } = await supabase
       .from("jobs")
@@ -160,7 +161,7 @@ export async function rejectJobPost(
 ): Promise<ActionResult> {
   try {
     const parsed = moderateJobSchema.parse({ jobId, reason });
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { error } = await supabase
       .from("jobs")
@@ -188,7 +189,7 @@ export async function deleteJobPost(
 ): Promise<ActionResult> {
   try {
     const parsed = moderateJobSchema.parse({ jobId, reason });
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { error } = await supabase.from("jobs").delete().eq("id", parsed.jobId);
 
@@ -214,7 +215,7 @@ export async function reviewWorkerVerification(
 ): Promise<ActionResult> {
   try {
     const parsed = reviewVerificationSchema.parse({ workerId, decision, reason });
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const nextStatus =
       parsed.decision === "approved" ? "approved" : "rejected";
@@ -247,9 +248,10 @@ export async function reviewWorkerVerification(
 }
 
 export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
-  const { supabase } = await verifyAdmin();
+  await requireAdmin();
+  const adminClient = await createAdminClient();
 
-  const { data, error } = await supabase.rpc("get_platform_metrics");
+  const { data, error } = await adminClient.rpc("get_platform_metrics");
 
   if (error) {
     throw new Error(`Failed to fetch platform metrics: ${error.message}`);
@@ -260,7 +262,7 @@ export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
 }
 
 export async function fetchRecentAuditLogs(limit = 10) {
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   const { data } = await supabase
     .from("audit_logs")
@@ -281,7 +283,7 @@ export async function fetchAdminWorkersSafe(): Promise<
   AdminFetchResult<AdminWorkerRow[]>
 > {
   try {
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { data, error } = await supabase
       .from("profiles")
@@ -322,7 +324,7 @@ export async function fetchAdminEmployersSafe(): Promise<
   AdminFetchResult<AdminEmployerRow[]>
 > {
   try {
-    const { supabase } = await verifyAdmin();
+    const { supabase } = await requireAdmin();
 
     const { data, error } = await supabase
       .from("company_profiles")
@@ -413,7 +415,7 @@ export async function fetchAdminUsersPageData(): Promise<
 export async function fetchAdminJobs(
   status?: string
 ): Promise<AdminJobRow[]> {
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   let query = supabase
     .from("jobs")
@@ -465,7 +467,7 @@ export async function fetchAdminJobs(
 export async function fetchVerificationQueue(): Promise<
   AdminVerificationQueueRow[]
 > {
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   const { data: workers, error } = await supabase
     .from("profiles")
@@ -499,7 +501,7 @@ export async function fetchWorkerVerificationDocuments(
   workerId: string
 ): Promise<AdminVerificationDocument[]> {
   const id = z.string().uuid().parse(workerId);
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   const { data, error } = await supabase
     .from("verification_documents")
@@ -531,7 +533,7 @@ export async function fetchWorkerVerificationDocuments(
 export async function fetchAdminSubscriptions(): Promise<
   AdminSubscriptionRow[]
 > {
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   const { data, error } = await supabase
     .from("employer_subscriptions")
@@ -591,7 +593,7 @@ export async function fetchAdminSubscriptions(): Promise<
 }
 
 export async function fetchAuditLogs(limit = 100): Promise<AdminAuditLogRow[]> {
-  const { supabase } = await verifyAdmin();
+  const { supabase } = await requireAdmin();
 
   const { data, error } = await supabase
     .from("audit_logs")

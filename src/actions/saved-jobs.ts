@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { runAction, ok, fail } from "@/lib/server/action-result";
+import { requireRole } from "@/lib/server/auth/session";
+import { uuidSchema } from "@/lib/validations/common";
 import { safeError } from "@/utils/logger";
 import { revalidatePath } from "next/cache";
 import { computeJobHourlyRate } from "@/types/job-search";
@@ -145,72 +148,38 @@ export async function getSavedJobs(
 export async function unsaveJob(
   jobId: string
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { success: false, error: "Please log in." };
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "worker") {
-      return { success: false, error: "Worker account required." };
-    }
+  const result = await runAction("unsaveJob", async () => {
+    const parsed = uuidSchema.parse(jobId);
+    const { supabase, profile } = await requireRole("worker");
 
     const { data: bookmark } = await supabase
       .from("worker_saved_jobs")
       .select("id, job_id")
       .eq("worker_id", profile.id)
-      .eq("job_id", jobId)
+      .eq("job_id", parsed)
       .maybeSingle();
 
     if (!bookmark) {
-      return { success: false, error: "Job is not in your saved list." };
-    }
-
-    const { data: job } = await supabase
-      .from("job_posts")
-      .select("id")
-      .eq("id", jobId)
-      .maybeSingle();
-
-    if (!job) {
-      await supabase
-        .from("worker_saved_jobs")
-        .delete()
-        .eq("worker_id", profile.id)
-        .eq("job_id", jobId);
-      revalidatePath("/worker/saved-jobs");
-      return { success: true };
+      return fail("Job is not in your saved list.");
     }
 
     const { error: deleteError } = await supabase
       .from("worker_saved_jobs")
       .delete()
       .eq("worker_id", profile.id)
-      .eq("job_id", jobId);
+      .eq("job_id", parsed);
 
     if (deleteError) {
-      safeError("unsaveJob:", deleteError);
-      return { success: false, error: "Failed to remove bookmark." };
+      return fail("Failed to remove bookmark.");
     }
 
     revalidatePath("/worker/saved-jobs");
     revalidatePath("/worker/jobs");
-    revalidatePath(`/worker/jobs/${jobId}`);
+    revalidatePath(`/worker/jobs/${parsed}`);
+    return ok();
+  });
 
-    return { success: true };
-  } catch (err) {
-    safeError("unsaveJob:", err);
-    return { success: false, error: "Unexpected error." };
-  }
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
 }

@@ -3,7 +3,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { DropdownOption } from "@/schemas/employer/jobs";
+import { DropdownOption } from "@/lib/validations/employer/jobs";
 
 interface JobBasicsSectionProps {
   employmentTypes: DropdownOption[];

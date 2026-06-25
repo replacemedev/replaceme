@@ -1,8 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { safeError } from "@/utils/logger";
 import { revalidatePath } from "next/cache";
+import { safeError } from "@/utils/logger";
+import { submitVerificationForReviewSchema } from "@/lib/validations/verification";
+import { requireRole } from "@/lib/server/auth/session";
+import { runAction, ok, fail } from "@/lib/server/action-result";
 import {
   VERIFICATION_DOCUMENT_TYPES,
   WorkerVerificationState,
@@ -266,46 +269,39 @@ export async function uploadVerificationDocument(
 }
 
 export async function submitVerificationForReview(): Promise<VerificationActionResult> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: "Please log in." };
-    }
+  const result = await runAction("submitVerificationForReview", async () => {
+    submitVerificationForReviewSchema.parse({});
+    const { supabase, profile } = await requireRole("worker");
 
     const state = await getWorkerVerificationState();
     if (!state) {
-      return { success: false, error: "Worker verification state not found." };
+      return fail("Worker verification state not found.");
     }
 
     if (!state.canSubmitForReview) {
-      return {
-        success: false,
-        error: "Complete your profile and upload all required documents first.",
-      };
+      return fail(
+        "Complete your profile and upload all required documents first."
+      );
     }
 
     const { error } = await supabase
       .from("profiles")
       .update({ verification_status: "under_review" })
-      .eq("id", state.workerId);
+      .eq("id", profile.id);
 
     if (error) {
       safeError("submitVerificationForReview:", error);
-      return { success: false, error: "Failed to submit for review." };
+      return fail("Failed to submit for review.");
     }
 
     revalidatePath("/worker/verification");
     revalidatePath("/worker/dashboard");
+    return ok();
+  });
 
-    return { success: true };
-  } catch (err) {
-    safeError("submitVerificationForReview:", err);
-    return { success: false, error: "Unexpected error." };
-  }
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
 }
 
 export async function isWorkerVerified(workerId: string): Promise<boolean> {

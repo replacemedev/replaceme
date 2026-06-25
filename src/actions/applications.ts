@@ -1,17 +1,15 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { safeError, safeLog } from "@/utils/logger";
-import {
-  ApplicationStatus,
-  isApplicationStatus,
-} from "@/types/applications";
 import { revalidatePath } from "next/cache";
+import { runAction, ok, fail } from "@/lib/server/action-result";
+import { requireRole } from "@/lib/server/auth/session";
+import { updateApplicationStatusSchema } from "@/lib/validations/applications";
+import type { ApplicationStatus } from "@/types/applications";
 
-export interface UpdateApplicationStatusResult {
+export type UpdateApplicationStatusResult = {
   success: boolean;
   error?: string;
-}
+};
 
 /**
  * Employer-only mutation: updates applications.status after verifying job ownership.
@@ -21,43 +19,18 @@ export async function updateApplicationStatus(
   applicationId: string,
   status: ApplicationStatus
 ): Promise<UpdateApplicationStatusResult> {
-  try {
-    if (!isApplicationStatus(status)) {
-      return { success: false, error: "Invalid application status." };
-    }
-
-    safeLog(
-      `[Auth] updateApplicationStatus app=${applicationId} status=${status}`
-    );
-
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { success: false, error: "Authentication failed. Please log in." };
-    }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile || profile.role !== "employer") {
-      return { success: false, error: "Access denied. Employer role required." };
-    }
+  const result = await runAction("updateApplicationStatus", async () => {
+    const parsed = updateApplicationStatusSchema.parse({ applicationId, status });
+    const { supabase, profile } = await requireRole("employer");
 
     const { data: application, error: appError } = await supabase
       .from("applications")
       .select("id, job_id")
-      .eq("id", applicationId)
+      .eq("id", parsed.applicationId)
       .single();
 
     if (appError || !application) {
-      return { success: false, error: "Application not found." };
+      return fail("Application not found.");
     }
 
     const { data: job, error: jobError } = await supabase
@@ -68,20 +41,18 @@ export async function updateApplicationStatus(
       .maybeSingle();
 
     if (jobError || !job) {
-      return {
-        success: false,
-        error: "Access denied. You do not own the job associated with this application.",
-      };
+      return fail(
+        "Access denied. You do not own the job associated with this application."
+      );
     }
 
     const { error: updateError } = await supabase
       .from("applications")
-      .update({ status })
-      .eq("id", applicationId);
+      .update({ status: parsed.status })
+      .eq("id", parsed.applicationId);
 
     if (updateError) {
-      safeError("updateApplicationStatus:", updateError);
-      return { success: false, error: "Failed to update status in the database." };
+      return fail("Failed to update status in the database.");
     }
 
     const jobId = application.job_id;
@@ -90,9 +61,10 @@ export async function updateApplicationStatus(
     revalidatePath("/worker/applications");
     revalidatePath("/worker/dashboard");
 
-    return { success: true };
-  } catch (err) {
-    safeError("updateApplicationStatus:", err);
-    return { success: false, error: "An unexpected error occurred." };
-  }
+    return ok();
+  });
+
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
 }

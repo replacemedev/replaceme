@@ -41,7 +41,7 @@ export interface WorkerDashboardData {
 }
 
 export interface RecentMessage {
-  conversation_id: string;
+  thread_id: string;
   latest_message: string | null;
   latest_message_time: string | null;
   sender_id: string | null;

@@ -11,7 +11,8 @@ import {
   Plus 
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardStatCard } from "@/components/worker/DashboardStatCard";
+import { getMessagingThreads } from "@/actions/messaging";
+import { StatCard } from "@/components/shared/StatCard";
 import { ProfileStrengthCard } from "@/components/worker/ProfileStrengthCard";
 import { RecommendedJobCard } from "@/components/worker/RecommendedJobCard";
 import { ProveExpertiseCard } from "@/components/worker/ProveExpertiseCard";
@@ -87,85 +88,30 @@ export default async function WorkerDashboard() {
     };
   });
 
-  // 5. Fetch recent conversations/messages for this worker
-  const { data: participantRows } = await supabase
-    .from("participants")
-    .select(`
-      conversation_id,
-      conversation:conversations (
-        id,
-        updated_at,
-        messages (
-          content,
-          created_at,
-          sender_id
-        ),
-        participants (
-          profile:profiles (
-            id,
-            first_name,
-            last_name,
-            avatar_url,
-            company_profiles (
-              company_name,
-              logo_url
-            )
-          )
-        )
-      )
-    `)
-    .eq("profile_id", profile.id);
-
-  const recentMessages: RecentMessage[] = [];
-  if (participantRows) {
-    for (const row of participantRows) {
-      const conv = row.conversation as any;
-      if (!conv) continue;
-      
-      // Get other participant (the employer)
-      const otherParticipant = conv.participants?.find(
-        (p: any) => p.profile?.id !== profile.id
-      );
-      
-      const otherProfile = otherParticipant?.profile;
-      const otherCompany = otherProfile?.company_profiles;
-      const companyName = Array.isArray(otherCompany)
-        ? otherCompany[0]?.company_name
-        : otherCompany?.company_name;
-      const companyLogo = Array.isArray(otherCompany)
-        ? otherCompany[0]?.logo_url
-        : otherCompany?.logo_url;
-
-      // Sort messages descending by created_at to find the latest
-      const msgs = conv.messages || [];
-      const sortedMsgs = [...msgs].sort(
-        (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-      const latestMsg = sortedMsgs[0];
-
-      recentMessages.push({
-        conversation_id: conv.id,
-        latest_message: latestMsg?.content || null,
-        latest_message_time: latestMsg?.created_at || null,
-        sender_id: latestMsg?.sender_id || null,
-        other_first_name: otherProfile?.first_name || null,
-        other_last_name: otherProfile?.last_name || null,
-        other_avatar_url: otherProfile?.avatar_url || null,
-        other_company_name: companyName || null,
-        other_company_logo: companyLogo || null,
-      });
-    }
-  }
-
-  // Sort conversations by latest message time, descending
-  recentMessages.sort((a, b) => {
-    const timeA = a.latest_message_time ? new Date(a.latest_message_time).getTime() : 0;
-    const timeB = b.latest_message_time ? new Date(b.latest_message_time).getTime() : 0;
-    return timeB - timeA;
-  });
-
-  // Limit to top 3 messages
-  const displayMessages = recentMessages.slice(0, 3);
+  // 5. Recent chat threads for this worker
+  const threads = await getMessagingThreads("worker");
+  const displayMessages: RecentMessage[] = threads
+    .sort((a, b) => {
+      const timeA = a.last_message?.created_at
+        ? new Date(a.last_message.created_at).getTime()
+        : 0;
+      const timeB = b.last_message?.created_at
+        ? new Date(b.last_message.created_at).getTime()
+        : 0;
+      return timeB - timeA;
+    })
+    .slice(0, 3)
+    .map((thread) => ({
+      thread_id: thread.id,
+      latest_message: thread.last_message?.content ?? null,
+      latest_message_time: thread.last_message?.created_at ?? null,
+      sender_id: thread.last_message?.sender_id ?? null,
+      other_first_name: null,
+      other_last_name: null,
+      other_avatar_url: thread.oppositeParty.avatarUrl,
+      other_company_name: thread.oppositeParty.name,
+      other_company_logo: thread.oppositeParty.avatarUrl,
+    }));
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-10">
@@ -187,7 +133,7 @@ export default async function WorkerDashboard() {
         {displayMessages.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {displayMessages.map((msg) => (
-              <RecentMessageRow key={msg.conversation_id} message={msg} />
+              <RecentMessageRow key={msg.thread_id} message={msg} />
             ))}
           </div>
         ) : (
@@ -199,21 +145,24 @@ export default async function WorkerDashboard() {
 
       {/* Top Stats Row (4 Columns Grid) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <DashboardStatCard 
+        <StatCard
+          variant="dashboard"
           title="Applied Jobs"
           value={appliedCount}
           icon={<Briefcase size={16} />}
           iconBgClass="bg-blue-50"
           iconColorClass="text-blue-600"
         />
-        <DashboardStatCard 
+        <StatCard
+          variant="dashboard"
           title="Interviews"
           value={interviewsCount}
           icon={<MessageSquare size={16} />}
           iconBgClass="bg-emerald-50"
           iconColorClass="text-[#006e2f]"
         />
-        <DashboardStatCard 
+        <StatCard
+          variant="dashboard"
           title="Hired"
           value={hiredCount}
           icon={<CheckCircle size={16} />}

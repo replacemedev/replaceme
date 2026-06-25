@@ -3,7 +3,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { DropdownOption } from "@/schemas/employer/company";
+import { DropdownOption } from "@/lib/validations/employer/company";
 import { Link2 } from "lucide-react";
 
 interface CompanyDetailsFormProps {

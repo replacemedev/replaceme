@@ -1,8 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
-import { createJobSchema, CreateJobInput, DropdownOption } from "@/schemas/employer/jobs";
+import { createJobSchema, CreateJobInput, DropdownOption, jobIdSchema } from "@/lib/validations/employer/jobs";
+import { requireRole } from "@/lib/server/auth/session";
+import { runAction, ok, fail } from "@/lib/server/action-result";
+import { closeJobOwnedByEmployer } from "@/lib/server/dal/jobs";
 import { revalidatePath } from "next/cache";
 import { JobDetails } from "@/types/employer/jobs";
 
@@ -182,10 +185,10 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
         shortlistedCount: shortlistedCount || 0,
       },
       hiringTeam: {
-        name: job.hiring_manager_name || "Sarah Jenkins",
-        role: job.hiring_manager_role || "Lead Recruiter",
+        name: job.hiring_manager_name ?? "Hiring team",
+        role: job.hiring_manager_role ?? "Recruiter",
         avatarUrl: null,
-        email: job.hiring_manager_email || "recruiting@replaceme.com",
+        email: job.hiring_manager_email ?? null,
       }
     };
   } catch (err) {
@@ -199,51 +202,32 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
  * Verifies session, role, and confirms job ownership before deactivation.
  */
 export async function deactivateJob(jobId: string) {
-  try {
-    safeLog(`[Jobs] Deactivate job action initiated for job ID: ${jobId}`);
+  const result = await runAction("deactivateJob", async () => {
+    const parsed = jobIdSchema.parse({ jobId });
+    safeLog(`[Jobs] Deactivate job action initiated for job ID: ${parsed.jobId}`);
 
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { supabase, profile } = await requireRole("employer");
 
-    if (authError || !user) {
-      return { error: "Authentication failed. Please log in again." };
-    }
-
-    // Verify role is employer
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile || profile.role !== "employer") {
-      return { error: "Access denied. Only employers can manage job posts." };
-    }
-
-    // Update job status to Closed with strict IDOR verification
-    const { data: updatedJob, error: updateError } = await supabase
-      .from("jobs")
-      .update({ status: "Closed" })
-      .eq("id", jobId)
-      .eq("employer_id", profile.id) // IDOR prevention
-      .select()
-      .single();
+    const { data: updatedJob, error: updateError } = await closeJobOwnedByEmployer(
+      supabase,
+      parsed.jobId,
+      profile.id
+    );
 
     if (updateError || !updatedJob) {
-      return { error: "Failed to deactivate job. Please check ownership and try again." };
+      return fail("Failed to deactivate job. Please check ownership and try again.");
     }
 
-    safeLog(`[Jobs] Job ID: ${jobId} successfully deactivated`);
+    safeLog(`[Jobs] Job ID: ${parsed.jobId} successfully deactivated`);
     revalidatePath("/dashboard");
+    return ok({ message: "Job post deactivated successfully!" });
+  });
 
-    return {
-      success: true,
-      message: "Job post deactivated successfully!",
-    };
-  } catch (err) {
-    safeError("deactivateJob error occurred:", err);
-    return { error: "An unexpected error occurred while deactivating the job post. Please try again." };
+  if (!result.success) {
+    return { error: result.error };
   }
+
+  return { success: true, message: result.data?.message ?? "Job post deactivated successfully!" };
 }
 
 /**
@@ -252,8 +236,9 @@ export async function deactivateJob(jobId: string) {
  */
 export async function trackJobView(jobId: string) {
   try {
-    const supabase = await createClient();
-    await supabase.rpc("increment_job_views", { target_job_id: jobId });
+    const parsed = jobIdSchema.parse({ jobId });
+    const supabase = await createAdminClient();
+    await supabase.rpc("increment_job_views", { target_job_id: parsed.jobId });
   } catch (err) {
     safeError("trackJobView error: [REDACTED]");
   }
@@ -265,8 +250,9 @@ export async function trackJobView(jobId: string) {
  */
 export async function trackJobClick(jobId: string) {
   try {
-    const supabase = await createClient();
-    await supabase.rpc("increment_job_clicks", { target_job_id: jobId });
+    const parsed = jobIdSchema.parse({ jobId });
+    const supabase = await createAdminClient();
+    await supabase.rpc("increment_job_clicks", { target_job_id: parsed.jobId });
   } catch (err) {
     safeError("trackJobClick error: [REDACTED]");
   }

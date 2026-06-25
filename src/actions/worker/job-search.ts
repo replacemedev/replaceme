@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { runAction, ok, fail } from "@/lib/server/action-result";
+import { requireRole } from "@/lib/server/auth/session";
+import { uuidSchema } from "@/lib/validations/common";
 import { safeError } from "@/utils/logger";
 import { revalidatePath } from "next/cache";
 import {
@@ -181,32 +184,15 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
 export async function toggleSavedJob(
   jobId: string
 ): Promise<{ success: boolean; saved: boolean; error?: string }> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { success: false, saved: false, error: "Please log in to save jobs." };
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "worker") {
-      return { success: false, saved: false, error: "Worker account required." };
-    }
+  const result = await runAction("toggleSavedJob", async () => {
+    const parsed = uuidSchema.parse(jobId);
+    const { supabase, profile } = await requireRole("worker");
 
     const { data: existing } = await supabase
       .from("worker_saved_jobs")
       .select("id")
       .eq("worker_id", profile.id)
-      .eq("job_id", jobId)
+      .eq("job_id", parsed)
       .maybeSingle();
 
     if (existing) {
@@ -214,35 +200,31 @@ export async function toggleSavedJob(
         .from("worker_saved_jobs")
         .delete()
         .eq("worker_id", profile.id)
-        .eq("job_id", jobId);
+        .eq("job_id", parsed);
 
-      if (error) {
-        safeError("toggleSavedJob delete:", error);
-        return { success: false, saved: true, error: "Failed to remove bookmark." };
-      }
+      if (error) return fail("Failed to remove bookmark.");
 
       revalidatePath("/worker/jobs");
       revalidatePath("/worker/saved-jobs");
-      revalidatePath(`/worker/jobs/${jobId}`);
-      return { success: true, saved: false };
+      revalidatePath(`/worker/jobs/${parsed}`);
+      return ok({ saved: false });
     }
 
     const { error } = await supabase.from("worker_saved_jobs").insert({
       worker_id: profile.id,
-      job_id: jobId,
+      job_id: parsed,
     });
 
-    if (error) {
-      safeError("toggleSavedJob insert:", error);
-      return { success: false, saved: false, error: "Failed to save job." };
-    }
+    if (error) return fail("Failed to save job.");
 
     revalidatePath("/worker/jobs");
     revalidatePath("/worker/saved-jobs");
-    revalidatePath(`/worker/jobs/${jobId}`);
-    return { success: true, saved: true };
-  } catch (err) {
-    safeError("toggleSavedJob:", err);
-    return { success: false, saved: false, error: "Unexpected error." };
+    revalidatePath(`/worker/jobs/${parsed}`);
+    return ok({ saved: true });
+  });
+
+  if (!result.success) {
+    return { success: false, saved: false, error: result.error };
   }
+  return { success: true, saved: result.data?.saved ?? false };
 }

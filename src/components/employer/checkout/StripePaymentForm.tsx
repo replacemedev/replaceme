@@ -2,9 +2,8 @@
 
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { ShieldCheck, Loader2, CreditCard, Mail, User, Globe } from "lucide-react";
-import { confirmStripeSubscriptionPayment } from "@/actions/employer/stripe";
-import { toast } from "sonner";
+import { ShieldCheck, Loader2, Mail, User, Globe } from "lucide-react";
+import { reconcilePaymentIntent } from "@/actions/employer/stripe";
 
 interface StripePaymentFormProps {
   planId: string;
@@ -14,7 +13,6 @@ interface StripePaymentFormProps {
 }
 
 export function StripePaymentForm({
-  planId,
   planPrice,
   clientSecret,
   onSuccess,
@@ -22,12 +20,9 @@ export function StripePaymentForm({
   const stripe = useStripe();
   const elements = useElements();
 
-  // Form Fields State
   const [email, setEmail] = useState("");
   const [nameOnCard, setNameOnCard] = useState("");
   const [country, setCountry] = useState("US");
-
-  // Status State
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -39,30 +34,15 @@ export function StripePaymentForm({
       return;
     }
 
-    setProcessing(true);
-    setError(null);
-
-    // Simulated flow for dev environments (missing process.env.STRIPE_SECRET_KEY / mock secret)
-    if (!stripe || !elements || !clientSecret || clientSecret.startsWith("pi_mock_secret")) {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        
-        // Confirm subscription on backend
-        const confirmRes = await confirmStripeSubscriptionPayment(planId);
-        if (!confirmRes.success) {
-          setError(confirmRes.error || "Failed to update subscription status.");
-          setProcessing(false);
-          return;
-        }
-
-        setProcessing(false);
-        onSuccess();
-      } catch (err: any) {
-        setError("An unexpected error occurred during confirmation.");
-        setProcessing(false);
-      }
+    if (!stripe || !elements || !clientSecret || !clientSecret.includes("_secret_")) {
+      setError(
+        "Stripe is not configured for this environment. Add STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, and use stripe listen for local webhooks."
+      );
       return;
     }
+
+    setProcessing(true);
+    setError(null);
 
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) {
@@ -71,7 +51,6 @@ export function StripePaymentForm({
     }
 
     try {
-      // Confirm payment with Stripe SDK client-side
       const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(
         clientSecret,
         {
@@ -79,10 +58,8 @@ export function StripePaymentForm({
             card: cardElement,
             billing_details: {
               name: nameOnCard,
-              email: email,
-              address: {
-                country: country,
-              },
+              email,
+              address: { country },
             },
           },
         }
@@ -94,22 +71,25 @@ export function StripePaymentForm({
         return;
       }
 
-      if (paymentIntent && paymentIntent.status === "succeeded") {
-        // Sync subscription backend-side
-        const confirmRes = await confirmStripeSubscriptionPayment(planId);
-        if (!confirmRes.success) {
-          setError(confirmRes.error || "Payment succeeded but failed to register subscription.");
-          setProcessing(false);
-          return;
-        }
-
-        setProcessing(false);
-        onSuccess();
-      } else {
+      if (!paymentIntent || paymentIntent.status !== "succeeded") {
         setError("Payment authorization pending or failed.");
         setProcessing(false);
+        return;
       }
-    } catch (err: any) {
+
+      const reconcile = await reconcilePaymentIntent(paymentIntent.id);
+      if (!reconcile.success) {
+        setError(
+          reconcile.error ||
+            "Payment succeeded but subscription sync is pending. Refresh in a moment."
+        );
+        setProcessing(false);
+        return;
+      }
+
+      setProcessing(false);
+      onSuccess();
+    } catch {
       setError("A network error occurred while contacting Stripe.");
       setProcessing(false);
     }
@@ -121,7 +101,6 @@ export function StripePaymentForm({
         Payment Details
       </h2>
 
-      {/* Email Address */}
       <div className="space-y-2">
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
           Email address
@@ -139,7 +118,6 @@ export function StripePaymentForm({
         </div>
       </div>
 
-      {/* Card Info */}
       <div className="space-y-2">
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
           Card Information
@@ -152,21 +130,15 @@ export function StripePaymentForm({
                   fontSize: "14px",
                   color: "#1f2937",
                   fontFamily: "Inter, sans-serif",
-                  fontSmoothing: "antialiased",
-                  "::placeholder": {
-                    color: "#9ca3af",
-                  },
+                  "::placeholder": { color: "#9ca3af" },
                 },
-                invalid: {
-                  color: "#ef4444",
-                },
+                invalid: { color: "#ef4444" },
               },
             }}
           />
         </div>
       </div>
 
-      {/* Name on Card */}
       <div className="space-y-2">
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
           Name on card
@@ -184,7 +156,6 @@ export function StripePaymentForm({
         </div>
       </div>
 
-      {/* Country or Region */}
       <div className="space-y-2">
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
           Country or region
@@ -200,23 +171,16 @@ export function StripePaymentForm({
             <option value="CA">Canada</option>
             <option value="GB">United Kingdom</option>
             <option value="AU">Australia</option>
-            <option value="DE">Germany</option>
-            <option value="FR">France</option>
           </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 font-bold text-xs">
-            ▼
-          </div>
         </div>
       </div>
 
-      {/* Error Panel */}
-      {error && (
+      {error ? (
         <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3.5 rounded-xl text-xs font-bold leading-relaxed">
           {error}
         </div>
-      )}
+      ) : null}
 
-      {/* CTA Pay Button */}
       <button
         type="submit"
         disabled={processing}
@@ -232,7 +196,6 @@ export function StripePaymentForm({
         )}
       </button>
 
-      {/* Secure badges */}
       <div className="flex flex-col items-center justify-center space-y-2 pt-4 border-t border-gray-100 text-[10px] font-bold text-gray-400">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
@@ -241,9 +204,6 @@ export function StripePaymentForm({
           </div>
           <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
           <div>Powered by Stripe</div>
-        </div>
-        <div className="text-center font-medium leading-relaxed max-w-[280px]">
-          30-day money-back guarantee. No questions asked. Cancel anytime.
         </div>
       </div>
     </form>

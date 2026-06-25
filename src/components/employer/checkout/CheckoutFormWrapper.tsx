@@ -47,7 +47,7 @@ export function CheckoutFormWrapper({
     <Elements
       stripe={stripePromise}
       options={
-        clientSecret && !clientSecret.startsWith("pi_mock_")
+        clientSecret && clientSecret.includes("_secret_")
           ? {
             clientSecret,
             appearance: {

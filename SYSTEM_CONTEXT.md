@@ -12,7 +12,7 @@ This document serves as the comprehensive technical directory and system context
 * Virtual Assistance & Admin Support
 * Social Media & Community Management
 
-The architecture is built around a split-role design (Employers vs. Workers) using Next.js App Router Server Actions for backend tasks and Supabase as the primary database, auth, and storage provider.
+The architecture is built around a split-role design (Employers vs. Workers and also the Admin) using Next.js App Router Server Actions for backend tasks and Supabase as the primary database, auth, and storage provider.
 
 ---
 
@@ -43,185 +43,110 @@ The architecture is built around a split-role design (Employers vs. Workers) usi
 
 ## 3. Codebase Structure
 
-The code is organized under a modular architecture separating presentation components, server actions, typings, database utilities, and page routes:
+Three-role routing (`/worker/*`, `/employer/*`, `/admin/*`) with shared messaging and Stripe webhook billing.
 
 ```
-├── .next/                    # Next.js build outputs
-├── public/                   # Static assets (images, favicon, etc.)
-├── supabase/                 # Supabase configuration & migrations
-├── src/
-│   ├── app/                  # Next.js App Router (pages, layouts, API routes)
-│   │   ├── (auth)/           # Authentication routes (login, register)
-│   │   ├── (employer)/       # Protected employer dashboard & settings
-│   │   └── layout.tsx        # Global layout component
-│   │
-│   ├── actions/              # Decoupled Server Actions (Data Fetching & Mutations)
-│   │   ├── auth.ts           # Session and auth mutations
-│   │   └── employer/         # Employer domain server actions
-│   │       ├── applicants.ts # Applicant state management
-│   │       ├── billing.ts    # Stripe checkout flows
-│   │       ├── company.ts    # Employer profile update actions
-│   │       ├── dashboard.ts  # Dashboard metrics fetch
-│   │       ├── jobs.ts       # Job creation, editing, & deletion actions
-│   │       └── messages.ts   # Chat & message thread database actions
-│   │
-│   ├── components/           # UI Components
-│   │   ├── ui/               # Core atomic design system elements
-│   │   ├── layout/           # Shared layout shells (Headers, Footers, Navbars)
-│   │   └── employer/         # Complex components specific to the Employer UI
-│   │
-│   ├── lib/                  # Library configs
-│   │   └── supabase/
-│   │       └── server.ts     # Supabase Server Client helper with cookie handling
-│   │
-│   ├── types/                # TypeScript interfaces and type definitions
-│   ├── utils/                # Utility helpers (e.g. logger, string formatters)
-│   └── proxy.ts              # Proxy routing configurations
+src/
+├── app/
+│   ├── worker/                 # Worker dashboard, jobs, applications, messages, onboarding
+│   ├── employer/               # Employer dashboard, jobs, applicants, billing, onboarding
+│   ├── admin/                  # Admin shell (MFA-gated), disputes scaffold, audit-log
+│   └── api/webhooks/stripe/    # Signature-verified Stripe webhooks
+├── actions/                    # Server Actions (Zod + RBAC)
+│   ├── applications.ts         # Cross-role application status mutations
+│   ├── messaging.ts            # chat_threads / chat_messages
+│   ├── admin-actions.ts        # Admin moderation & metrics
+│   ├── onboarding.ts           # Worker/employer first-login wizards
+│   └── employer/               # jobs, applicants, stripe, billing, pinned, …
+├── components/
+│   ├── shared/                 # StatCard, messaging, EmptyState, skeletons
+│   ├── worker/ | employer/ | admin/
+├── lib/
+│   ├── server/
+│   │   ├── action-result.ts    # runAction + safe errors
+│   │   ├── auth/
+│   │   │   ├── session.ts      # requireAuth / requireRole
+│   │   │   ├── require-admin.ts
+│   │   │   └── middleware.ts   # Session + onboarding redirects
+│   │   ├── dal/                # Typed Supabase query helpers
+│   │   │   ├── profiles.ts
+│   │   │   ├── jobs.ts
+│   │   │   └── applications.ts
+│   │   └── stripe/sync-subscription.ts
+│   ├── validations/            # Zod schemas (auth, jobs, stripe, messaging, …)
+│   └── supabase/               # createClient, createAdminClient
+├── types/database.ts           # Generated Supabase types
+└── proxy.ts                    # Next.js middleware entry → updateSession
 ```
+
+**Key conventions**
+- Mutations: `requireRole()` or `requireAdmin()` + Zod + `runAction()` where applicable.
+- Billing activation: **only** via `POST /api/webhooks/stripe` or server-side `reconcilePaymentIntent` (Stripe API verify).
+- Messaging: `chat_threads` + `chat_messages` (legacy `conversations` tables removed).
 
 ---
 
 ## 4. Database Schema (PostgreSQL)
 
-The database runs on Supabase (PostgreSQL) with Row Level Security (RLS) enabled on all tables to prevent IDOR (Insecure Direct Object Reference) vulnerabilities.
+Supabase PostgreSQL with **FORCE ROW LEVEL SECURITY** on all `public` tables.
 
-### Custom Enums & Roles
-```sql
-CREATE TYPE user_role AS ENUM ('employer', 'worker', 'admin');
-```
+### Core bridge tables
+| Domain | Tables |
+|--------|--------|
+| Identity | `profiles`, `company_profiles` |
+| Jobs | `jobs`, `applications`, `worker_saved_jobs` |
+| Messaging | `chat_threads`, `chat_messages` |
+| Billing | `billing_plans`, `employer_subscriptions`, `employer_credits`, `unlocked_profiles` |
+| Admin | `audit_logs`, `verification_documents` |
 
-### Profiles Table
-Maps directly to auth users and holds common user metadata.
-```sql
-CREATE TABLE public.profiles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role user_role NOT NULL DEFAULT 'worker',
-  username TEXT UNIQUE NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT,
-  email TEXT NOT NULL,
-  avatar_url TEXT,
-  stripe_customer_id TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  CONSTRAINT unique_auth_user UNIQUE (auth_user_id)
-);
-```
+### Enums
+- `user_role`: `employer` \| `worker` \| `admin`
+- `application_status`: `PENDING` \| `UNDER_REVIEW` \| `INTERVIEW_SCHEDULED` \| `REJECTED` \| `HIRED`
+- `verification_status`: worker KYC pipeline states
 
-### Role-Specific Profile Extensions
-Extends profiles with role-specific parameters for Employers and Workers.
-```sql
-CREATE TABLE public.employers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  company_name TEXT NOT NULL,
-  company_size TEXT,
-  website TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  CONSTRAINT unique_employer_profile UNIQUE (profile_id)
-);
+### Views (security invoker)
+- `job_posts`, `job_applications`, `saved_jobs`, `worker_profiles`
 
-CREATE TABLE public.workers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  professional_title TEXT,
-  bio TEXT,
-  skills TEXT[],
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  CONSTRAINT unique_worker_profile UNIQUE (profile_id)
-);
-```
-
-### Jobs Table
-Stores job advertisements posted by Employers.
-```sql
-CREATE TABLE IF NOT EXISTS public.jobs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  employer_id UUID NOT NULL REFERENCES public.employers(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  employment_type TEXT NOT NULL,
-  description TEXT NOT NULL,
-  monthly_salary NUMERIC NOT NULL,
-  hours_per_week NUMERIC NOT NULL,
-  skills TEXT[] NOT NULL,
-  notification_preference TEXT NOT NULL DEFAULT 'daily',
-  status TEXT NOT NULL DEFAULT 'Pending Review',
-  intent TEXT NOT NULL DEFAULT 'standard',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-```
-
-### Database Triggers
-A trigger automates the creation of a `profile` and a role-specific record (`employers` or `workers`) upon a successful user signup in Supabase Auth:
-```sql
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER 
-LANGUAGE plpgsql 
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  new_profile_id UUID;
-  user_role_val user_role;
-BEGIN
-  BEGIN
-    user_role_val := (new.raw_user_meta_data->>'role')::user_role;
-  EXCEPTION WHEN OTHERS THEN
-    user_role_val := 'worker'::user_role;
-  END;
-
-  INSERT INTO public.profiles (
-    auth_user_id,
-    email,
-    username,
-    first_name,
-    last_name,
-    role
-  ) VALUES (
-    new.id,
-    new.email,
-    COALESCE(new.raw_user_meta_data->>'username', 'user_' || substr(new.id::text, 1, 8)),
-    COALESCE(new.raw_user_meta_data->>'first_name', 'Unknown'),
-    new.raw_user_meta_data->>'last_name',
-    user_role_val
-  ) RETURNING id INTO new_profile_id;
-
-  IF user_role_val = 'employer'::user_role THEN
-    INSERT INTO public.employers (profile_id, company_name)
-    VALUES (new_profile_id, COALESCE(new.raw_user_meta_data->>'company_name', 'Unknown Company'));
-  ELSIF user_role_val = 'worker'::user_role THEN
-    INSERT INTO public.workers (profile_id)
-    VALUES (new_profile_id);
-  END IF;
-
-  RETURN new;
-END;
-$$;
-```
+### Recent migrations (Phase 3–4)
+- `20260624130000_security_hardening_phase3.sql` — RLS tightening, RPC lockdown
+- `20260624140000_drop_legacy_messaging_tables.sql` — removed `conversations` / `messages` / `participants`
+- `20260624150000_security_hotfixes_phase4.sql` — FORCE RLS, subscription write guard, unique email index
 
 ---
 
-## 5. Security & Row Level Security (RLS)
+## 5. Security
 
-All database queries are guarded by strict Row Level Security (RLS) policies.
+### Application layer
+- HTTP headers + CSP in `next.config.ts`
+- Admin `error.tsx` / `not-found.tsx` (no stack traces to UI)
+- Password reset: rate-limited + enumeration-safe messaging
+- `get_platform_metrics()` — `service_role` only; admin UI uses `createAdminClient()`
 
-* **Profiles:** Users can only view or update their own profile records (`auth.uid() = auth_user_id`).
-* **Employers:** Employers can only access their specific company metrics (profile joined matching `auth.uid()`).
-* **Workers:** Workers can only access their own profile detail extensions.
-* **Jobs:**
-  * Employers have full CRUD control over their own job advertisements.
-  * Public users (Workers) can only view active/approved jobs (`status = 'Active'`).
+### Database layer
+- RLS on every tenant table; employers cannot mutate subscription `status` / `plan_id` (trigger + service-role writes)
+- `profiles.email` unique (case-insensitive) when not null
+- Webhook idempotency: `audit_logs` rows with `action_type = stripe_payment_processed`
+
+### Supabase advisors (remaining WARN — next sprint)
+- Revoke `anon` EXECUTE on trigger/helper SECURITY DEFINER functions
+- Set `search_path` on legacy functions (`handle_updated_at`, compat triggers, …)
+- Enable [leaked password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection) in Auth settings
 
 ---
 
-## 6. Subscription & Payment Strategy (Stripe)
+## 6. Subscription & Payment (Stripe)
 
-Billing is separated into three tiers with localized configurations:
-1. **Discovery:** Free/starter access with limited applicant unlocks.
-2. **Essential:** Standard tier for growing teams.
-3. **Professional:** Unlimited listings, priority support, and advanced unlocks.
+1. Employer selects plan → `createStripeSubscription` creates PaymentIntent (server).
+2. Client confirms payment via Stripe Elements → `reconcilePaymentIntent` verifies status with Stripe API.
+3. **Authoritative sync:** `POST /api/webhooks/stripe` on `payment_intent.succeeded` → `syncEmployerSubscription`.
+4. Cancellation: `customer.subscription.deleted` webhook sets subscription `canceled`.
 
-* **Upgrade Flow:** Handled via Stripe Checkout. Server actions create checkout sessions returning validation redirect URLs (`checkout.stripe.com/pay/...`).
-* **State Updates:** Session updates triggers and Stripe webhooks update `stripe_customer_id` and corresponding plan values.
+**Required env (server-only):** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`
+
+**Stripe Dashboard webhook events:** `payment_intent.succeeded`, `customer.subscription.deleted`
+
+---
+
+## 7. Whimsical Architecture Board
+
+[ReplaceMe Master Full-Stack Architecture](https://whimsical.com/replaceme-master-full-stack-architecture-FtNA62DRJqmnaHHoZJxTqY)

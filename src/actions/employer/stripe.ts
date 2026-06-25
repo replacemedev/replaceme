@@ -1,6 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { requireRole } from "@/lib/server/auth/session";
+import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
+import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
 import { safeError, safeLog } from "@/utils/logger";
 import Stripe from "stripe";
 
@@ -19,56 +22,45 @@ export async function createStripeSubscription(
   planId: string
 ): Promise<{ clientSecret: string | null; planName?: string; planPrice?: number; error?: string }> {
   try {
-    safeLog(`[Stripe] Initiating subscription setup for plan: ${planId}`);
+    const parsed = planIdSchema.parse({ planId });
+    safeLog(`[Stripe] Initiating subscription setup for plan: ${parsed.planId}`);
 
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { supabase, user, profile } = await requireRole("employer");
 
-    if (authError || !user) {
-      return { clientSecret: null, error: "Authentication failed. Please log in." };
-    }
-
-    // Verify role is employer
-    const { data: profile, error: profileError } = await supabase
+    const { data: employerProfile } = await supabase
       .from("profiles")
-      .select("id, role, first_name, last_name")
-      .eq("id", user.id)
+      .select("first_name, last_name")
+      .eq("id", profile.id)
       .single();
 
-    if (profileError || !profile || profile.role !== "employer") {
-      return { clientSecret: null, error: "Access denied. Only employers can subscribe." };
-    }
-
-    // Check if the planId is a valid UUID, otherwise query by name
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId);
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        parsed.planId
+      );
     let planQuery = supabase.from("billing_plans").select("id, price, name");
 
     if (isUuid) {
-      planQuery = planQuery.eq("id", planId);
+      planQuery = planQuery.eq("id", parsed.planId);
     } else {
-      planQuery = planQuery.ilike("name", planId);
+      planQuery = planQuery.ilike("name", parsed.planId);
     }
 
     const { data: plan, error: planError } = await planQuery.maybeSingle();
 
     if (planError || !plan) {
-      safeError(`Billing plan not found in DB: ${planId}`, planError);
+      safeError(`Billing plan not found in DB: ${parsed.planId}`, planError);
       return { clientSecret: null, error: "Billing plan not found." };
     }
 
     const priceInCents = Math.round(Number(plan.price) * 100);
 
-    // If Stripe is not initialized, return simulated clientSecret for local dev flow
     if (!stripe) {
-      safeLog("[Stripe] STRIPE_SECRET_KEY is missing. Returning simulated client secret.");
       return {
-        clientSecret: "pi_mock_secret_" + Math.random().toString(36).substring(2),
-        planName: plan.name,
-        planPrice: Number(plan.price),
+        clientSecret: null,
+        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and use Stripe test mode.",
       };
     }
 
-    // Retrieve or create Stripe Customer for the current employer
     const { data: sub } = await supabase
       .from("employer_subscriptions")
       .select("stripe_customer_id")
@@ -79,32 +71,34 @@ export async function createStripeSubscription(
 
     if (!stripeCustomerId) {
       const email = user.email || "";
-      const name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "Employer";
-      
+      const name =
+        `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
+        "Employer";
+
       const customer = await stripe.customers.create({
         email,
         name,
-        metadata: {
-          employer_id: profile.id,
-        },
+        metadata: { employer_id: profile.id },
       });
       stripeCustomerId = customer.id;
 
-      // Save customer ID in the database
-      const { error: upsertError } = await supabase
+      const admin = await createAdminClient();
+      const { error: upsertError } = await admin
         .from("employer_subscriptions")
-        .upsert({
-          employer_id: profile.id,
-          stripe_customer_id: stripeCustomerId,
-          status: "inactive",
-        }, { onConflict: "employer_id" });
+        .upsert(
+          {
+            employer_id: profile.id,
+            stripe_customer_id: stripeCustomerId,
+            status: "inactive",
+          },
+          { onConflict: "employer_id" }
+        );
 
       if (upsertError) {
         safeError("Failed to save stripe_customer_id:", upsertError);
       }
     }
 
-    // Create Stripe PaymentIntent associated with the customer
     const intent = await stripe.paymentIntents.create({
       amount: priceInCents,
       currency: "usd",
@@ -114,13 +108,10 @@ export async function createStripeSubscription(
         plan_id: plan.id,
         plan_name: plan.name,
       },
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      automatic_payment_methods: { enabled: true },
     });
 
-    // Redact secret key in logs
-    safeLog(`[Stripe] Created PaymentIntent for customer [REDACTED]`);
+    safeLog("[Stripe] Created PaymentIntent for customer [REDACTED]");
 
     return {
       clientSecret: intent.client_secret,
@@ -128,7 +119,6 @@ export async function createStripeSubscription(
       planPrice: Number(plan.price),
     };
   } catch (err) {
-    // Redact Stripe ID leaks in error logs
     safeError("createStripeSubscription error occurred: [REDACTED_STRIPE_ERROR_DETAILS]");
     return {
       clientSecret: null,
@@ -185,11 +175,10 @@ export async function createStripeCheckoutIntent(
 
     const priceInCents = Math.round(Number(plan.price) * 100);
 
-    // If Stripe is not initialized, return a simulated clientSecret for dev flow
     if (!stripe) {
-      safeLog("[Stripe] STRIPE_SECRET_KEY is missing. Returning simulated client secret.");
       return {
-        clientSecret: "pi_mock_secret_" + Math.random().toString(36).substring(2),
+        clientSecret: null,
+        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and use Stripe test mode.",
       };
     }
 
@@ -221,77 +210,50 @@ export async function createStripeCheckoutIntent(
 }
 
 /**
- * Handle subscription update upon successful payment confirmation.
+ * Server-side reconciliation after client payment confirmation.
+ * Verifies PaymentIntent status with Stripe API — never trusts client alone.
+ * Webhook remains the primary sync path; this handles race conditions in UI.
  */
-export async function confirmStripeSubscriptionPayment(
-  planId: string
+export async function reconcilePaymentIntent(
+  paymentIntentId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const parsed = paymentIntentIdSchema.parse({ paymentIntentId });
+    const { profile } = await requireRole("employer");
 
-    if (authError || !user) {
-      return { success: false, error: "Authentication failed." };
+    if (!stripe) {
+      return {
+        success: false,
+        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET.",
+      };
     }
 
-    // Check if the planId is a valid UUID, otherwise query by name
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId);
-    let planQuery = supabase.from("billing_plans").select("id, name, candidate_unlocks");
+    const intent = await stripe.paymentIntents.retrieve(parsed.paymentIntentId);
 
-    if (isUuid) {
-      planQuery = planQuery.eq("id", planId);
-    } else {
-      planQuery = planQuery.ilike("name", planId);
+    if (intent.status !== "succeeded") {
+      return { success: false, error: "Payment has not completed yet." };
     }
 
-    const { data: plan, error: planError } = await planQuery.maybeSingle();
-
-    if (planError || !plan) {
-      return { success: false, error: "Plan not found." };
+    if (intent.metadata?.employer_id !== profile.id) {
+      return { success: false, error: "Payment does not belong to this account." };
     }
 
-    // 1. Update subscription status in DB
-    const { error: subError } = await supabase
-      .from("employer_subscriptions")
-      .upsert({
-        employer_id: user.id,
-        plan_id: plan.id,
-        status: "active",
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "employer_id" });
-
-    if (subError) {
-      safeError("Error updating subscription status:", subError);
-      return { success: false, error: "Failed to update subscription details." };
+    const planId = intent.metadata?.plan_id;
+    if (!planId) {
+      return { success: false, error: "Payment metadata is invalid." };
     }
 
-    // 2. Add unlock credits to employer balance
-    const { data: credits } = await supabase
-      .from("employer_credits")
-      .select("credits_balance")
-      .eq("employer_id", user.id)
-      .maybeSingle();
+    const result = await syncEmployerSubscription({
+      employerId: profile.id,
+      planId,
+      stripeCustomerId:
+        typeof intent.customer === "string" ? intent.customer : intent.customer?.id,
+      paymentIntentId: intent.id,
+    });
 
-    const currentBalance = credits?.credits_balance || 0;
-    const newBalance = currentBalance + plan.candidate_unlocks;
-
-    const { error: creditError } = await supabase
-      .from("employer_credits")
-      .upsert({
-        employer_id: user.id,
-        credits_balance: newBalance,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "employer_id" });
-
-    if (creditError) {
-      safeError("Error updating credits balance:", creditError);
-      return { success: false, error: "Failed to update credit balance." };
-    }
-
-    return { success: true };
+    return result;
   } catch (err) {
-    safeError("confirmStripeSubscriptionPayment error:", err);
-    return { success: false, error: "Unexpected error confirming payment." };
+    safeError("reconcilePaymentIntent error:", err);
+    return { success: false, error: "Failed to verify payment." };
   }
 }

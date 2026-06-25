@@ -11,6 +11,7 @@ import {
   Settings,
   DollarSign,
   Fingerprint,
+  Scale,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: "/admin/jobs", label: "Job Posts", icon: Briefcase },
   { href: "/admin/identity", label: "Identity", icon: Fingerprint },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
+  { href: "/admin/disputes", label: "Disputes", icon: Scale },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Security", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings },
