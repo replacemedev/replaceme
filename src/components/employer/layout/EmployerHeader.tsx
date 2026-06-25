@@ -1,7 +1,7 @@
 import { getNavSession } from "@/lib/auth/nav-session";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
-import { EmployerDropdown } from "@/components/employer/layout/EmployerDropdown";
+import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
 import { EmployerHeaderNav, EmployerMobileMenu } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
 
@@ -11,8 +11,6 @@ interface EmployerHeaderProps {
 
 export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
   const resolvedSession = session ?? (await getNavSession());
-  const displayName = resolvedSession.displayName || "Employer";
-  const initials = resolvedSession.initials || "E";
 
   return (
     <header className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm">
@@ -22,11 +20,7 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         <EmployerHeaderNav unreadMessageCount={resolvedSession.unreadMessageCount} />
 
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>
-          <EmployerDropdown
-            profile={resolvedSession.profile}
-            displayName={displayName}
-            initials={initials}
-          />
+          <RoleNavDropdown session={resolvedSession} />
         </GlobalHeaderActions>
         <EmployerMobileMenu unreadMessageCount={resolvedSession.unreadMessageCount} />
       </div>

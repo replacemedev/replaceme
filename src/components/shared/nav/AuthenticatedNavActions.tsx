@@ -1,9 +1,7 @@
 "use client";
 
-import { WorkerDropdown } from "@/components/worker/layout/WorkerDropdown";
-import { EmployerDropdown } from "@/components/employer/layout/EmployerDropdown";
-import { AdminDropdown } from "@/components/admin/layout/AdminDropdown";
 import { NotificationBell } from "@/components/shared/header/NotificationBell";
+import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
 import type { NavSession } from "@/types/nav";
 
 interface AuthenticatedNavActionsProps {
@@ -11,11 +9,9 @@ interface AuthenticatedNavActionsProps {
 }
 
 export function AuthenticatedNavActions({ session }: AuthenticatedNavActionsProps) {
-  if (!session.isAuthenticated || !session.role || !session.profile || !session.userId) {
+  if (!session.isAuthenticated || !session.userId) {
     return null;
   }
-
-  const profile = session.profile;
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">
@@ -23,31 +19,7 @@ export function AuthenticatedNavActions({ session }: AuthenticatedNavActionsProp
         userId={session.userId}
         initialBootstrap={{ notifications: [], unreadCount: 0 }}
       />
-
-      {session.role === "worker" && (
-        <WorkerDropdown
-          profile={profile}
-          displayName={session.displayName}
-          initials={session.initials}
-          isVerified={session.isVerified}
-        />
-      )}
-
-      {session.role === "employer" && (
-        <EmployerDropdown
-          profile={profile}
-          displayName={session.displayName}
-          initials={session.initials}
-        />
-      )}
-
-      {session.role === "admin" && (
-        <AdminDropdown
-          profile={profile}
-          displayName={session.displayName}
-          initials={session.initials}
-        />
-      )}
+      <RoleNavDropdown session={session} />
     </div>
   );
 }

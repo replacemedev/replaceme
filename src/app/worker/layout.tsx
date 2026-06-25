@@ -3,6 +3,8 @@ import { WorkerHeader } from "@/components/layout/WorkerHeader";
 import { Footer } from "@/components/layout/Footer";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 
+export const dynamic = "force-dynamic";
+
 export default async function WorkerLayout({
   children,
 }: {
