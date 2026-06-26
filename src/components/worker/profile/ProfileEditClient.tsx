@@ -26,19 +26,22 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState(initial);
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      firstName: String(data.get("firstName") ?? ""),
+      lastName: String(data.get("lastName") ?? ""),
+      professionalTitle: String(data.get("professionalTitle") ?? ""),
+      bio: String(data.get("bio") ?? "") || undefined,
+      location: String(data.get("location") ?? "") || undefined,
+      portfolioUrl: String(data.get("portfolioUrl") ?? ""),
+      resumeUrl: String(data.get("resumeUrl") ?? ""),
+      cvUrl: String(data.get("cvUrl") ?? ""),
+    };
+
     startTransition(async () => {
-      const result = await updateWorkerProfile({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        professionalTitle: form.professionalTitle,
-        bio: form.bio || undefined,
-        location: form.location || undefined,
-        portfolioUrl: form.portfolioUrl,
-        resumeUrl: form.resumeUrl,
-        cvUrl: form.cvUrl,
-      });
+      const result = await updateWorkerProfile(payload);
       if (result.error) {
         toast.error(result.error);
         return;
@@ -50,7 +53,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8" noValidate>
       <section className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
           Basic Info
@@ -60,6 +63,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
             First name
             <input
               required
+              name="firstName"
               value={form.firstName}
               onChange={(e) => setForm({ ...form, firstName: e.target.value })}
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
@@ -69,6 +73,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
             Last name
             <input
               required
+              name="lastName"
               value={form.lastName}
               onChange={(e) => setForm({ ...form, lastName: e.target.value })}
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
@@ -79,6 +84,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
           Professional title
           <input
             required
+            name="professionalTitle"
             value={form.professionalTitle}
             onChange={(e) =>
               setForm({ ...form, professionalTitle: e.target.value })
@@ -89,6 +95,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
         <label className="block text-sm font-medium text-slate-700">
           Bio
           <textarea
+            name="bio"
             value={form.bio}
             onChange={(e) => setForm({ ...form, bio: e.target.value })}
             rows={4}
@@ -98,6 +105,7 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
         <label className="block text-sm font-medium text-slate-700">
           Location
           <input
+            name="location"
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
@@ -109,32 +117,35 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
         <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
           Resume & Portfolio
         </h2>
-        <label className="block text-sm font-medium text-slate-700">
+        <label htmlFor="portfolio-url" className="block text-sm font-medium text-slate-700">
           Portfolio URL
           <input
+            id="portfolio-url"
+            name="portfolioUrl"
             type="url"
-            value={form.portfolioUrl}
-            onChange={(e) => setForm({ ...form, portfolioUrl: e.target.value })}
+            defaultValue={form.portfolioUrl}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />
         </label>
-        <label className="block text-sm font-medium text-slate-700">
+        <label htmlFor="resume-url" className="block text-sm font-medium text-slate-700">
           Resume URL
           <input
+            id="resume-url"
+            name="resumeUrl"
             type="url"
-            value={form.resumeUrl}
-            onChange={(e) => setForm({ ...form, resumeUrl: e.target.value })}
+            defaultValue={form.resumeUrl}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />
         </label>
-        <label className="block text-sm font-medium text-slate-700">
+        <label htmlFor="cv-url" className="block text-sm font-medium text-slate-700">
           CV URL
           <input
+            id="cv-url"
+            name="cvUrl"
             type="url"
-            value={form.cvUrl}
-            onChange={(e) => setForm({ ...form, cvUrl: e.target.value })}
+            defaultValue={form.cvUrl}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />

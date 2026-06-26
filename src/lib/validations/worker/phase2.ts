@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const optionalUrl = z.union([z.literal(""), z.string().url()]);
+
 export const updateWorkerProfileSchema = z
   .object({
     firstName: z.string().min(1).max(80),
@@ -7,9 +9,9 @@ export const updateWorkerProfileSchema = z
     professionalTitle: z.string().min(2).max(120),
     bio: z.string().max(2000).optional(),
     location: z.string().max(120).optional(),
-    portfolioUrl: z.string().url().optional().or(z.literal("")),
-    resumeUrl: z.string().url().optional().or(z.literal("")),
-    cvUrl: z.string().url().optional().or(z.literal("")),
+    portfolioUrl: optionalUrl,
+    resumeUrl: optionalUrl,
+    cvUrl: optionalUrl,
   })
   .strict();
 

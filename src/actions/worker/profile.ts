@@ -43,12 +43,11 @@ export async function updateWorkerProfile(payload: UpdateWorkerProfileInput) {
       portfolio_url: parsed.data.portfolioUrl || null,
       resume_url: parsed.data.resumeUrl || null,
       cv_url: parsed.data.cvUrl || null,
-      full_name: `${parsed.data.firstName} ${parsed.data.lastName}`.trim(),
       updated_at: new Date().toISOString(),
     })
     .eq("id", ctx.profile.id);
 
-  if (error) return { error: "Failed to update profile" };
+  if (error) return { error: `Failed to update profile: ${error.message}` };
 
   revalidatePath("/worker/profile");
   revalidatePath("/worker/profile/edit");
