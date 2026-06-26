@@ -217,7 +217,7 @@ export function LandingPageClient() {
       scroller.scrollTo(hash, {
         smooth: true,
         offset: -PUBLIC_HEADER_SCROLL_OFFSET,
-        duration: 350,
+        duration: 500,
         isDynamic: true,
       });
     });

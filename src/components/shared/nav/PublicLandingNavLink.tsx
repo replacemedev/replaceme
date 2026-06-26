@@ -23,7 +23,7 @@ export function PublicLandingNavLink({
       to={to}
       smooth
       offset={-PUBLIC_HEADER_SCROLL_OFFSET}
-      duration={1000}
+      duration={800}
       onClick={onClick}
       className={`group relative py-1 font-semibold text-sm transition-colors duration-200 cursor-pointer ${
         isActive ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
