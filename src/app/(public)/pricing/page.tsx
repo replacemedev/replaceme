@@ -24,7 +24,7 @@ export default async function PublicPricingPage() {
   };
 
   return (
-    <div className="bg-[#f8fafe] min-h-screen py-16 pt-28">
+    <div className="bg-[#f8fafe] min-h-screen pt-20 pb-16">
       <header className="text-center max-w-3xl mx-auto px-4 mb-12">
         <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
           {config.headline}

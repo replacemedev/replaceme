@@ -1,6 +1,6 @@
 export function LegalPageSkeleton() {
   return (
-    <main className="pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse">
+    <main className="pt-20 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10 sm:mb-12">
           <div className="h-4 w-28 bg-gray-200 rounded mx-auto mb-4" />

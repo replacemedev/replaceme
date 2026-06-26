@@ -10,7 +10,7 @@ export function PublicCompanyDirectory({
   companies,
 }: PublicCompanyDirectoryProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 pt-24">
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 pt-20">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-900">
           Company Directory

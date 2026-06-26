@@ -63,7 +63,7 @@ export default async function HiringGuidePage() {
     HIRING_GUIDE_FALLBACK_META.description;
 
   return (
-    <article className="max-w-3xl mx-auto px-4 sm:px-8 py-10 pt-24 prose prose-slate">
+    <article className="max-w-3xl mx-auto px-4 sm:px-8 py-10 pt-20 prose prose-slate">
       <Link
         href="/help"
         className="not-prose inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800 mb-8"

@@ -3,6 +3,35 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Briefcase,
+  Building2,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleDollarSign,
+  Clock,
+  CreditCard,
+  Gift,
+  Handshake,
+  Plus,
+  Quote,
+  Search,
+  Star,
+  TrendingDown,
+  User,
+  UserPlus,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
+
+const TALENT_BADGE_ICONS: Record<string, LucideIcon> = {
+  star: Star,
+  verified: BadgeCheck,
+  schedule: Clock,
+};
 
 // Talent Carousel data
 const talentList = [
@@ -238,11 +267,11 @@ export function LandingPageClient() {
                 <div className="flex flex-col sm:flex-row gap-5 pt-4">
                   <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
                     <span>Hire Talent Now</span>
-                    <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                    <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
                   </Link>
                   <Link href="/signup" className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
                     <span>Find a Job</span>
-                    <span className="material-symbols-outlined text-xl">search</span>
+                    <Search className="h-5 w-5 shrink-0" aria-hidden />
                   </Link>
                 </div>
               </div>
@@ -263,7 +292,7 @@ export function LandingPageClient() {
                   {/* Floating Card 1 */}
                   <div className="absolute -left-12 top-20 bg-white rounded-2xl p-4 shadow-xl z-20 flex items-center gap-4 border border-slate-50">
                     <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-[#22c55e] shrink-0">
-                      <span className="material-symbols-outlined text-2xl">verified</span>
+                      <BadgeCheck className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-800">Verified Talent</p>
@@ -301,21 +330,21 @@ export function LandingPageClient() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 animate-fade-in relative z-10">
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                  <span className="material-symbols-outlined text-3xl text-[#22c55e]">money_off</span>
+                  <CircleDollarSign className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
                 <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">No Middleman Fees</h3>
                 <p className="text-[#475569] text-base leading-relaxed">We don&apos;t take a cut of your worker&apos;s salary. You pay them directly, ensuring they get 100% of what they earn.</p>
               </div>
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "250ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                  <span className="material-symbols-outlined text-3xl text-[#22c55e]">handshake</span>
+                  <Handshake className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
                 <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Direct Hiring</h3>
                 <p className="text-[#475569] text-base leading-relaxed">Communicate, manage, and pay your team members directly. Build a true remote team culture.</p>
               </div>
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                  <span className="material-symbols-outlined text-3xl text-[#22c55e]">trending_down</span>
+                  <TrendingDown className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
                 <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">80% Cost Savings</h3>
                 <p className="text-[#475569] text-base leading-relaxed">Hire top-tier talent for a fraction of the cost of local hires, without sacrificing quality or reliability.</p>
@@ -339,7 +368,7 @@ export function LandingPageClient() {
                 <div className="pt-2">
                   <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                     <span>Create Your Free Profile</span>
-                    <span className="material-symbols-outlined text-lg">person_add</span>
+                    <UserPlus className="h-5 w-5 shrink-0" aria-hidden />
                   </Link>
                 </div>
               </div>
@@ -348,14 +377,14 @@ export function LandingPageClient() {
                 <div className="space-y-6">
                   <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "100ms" }}>
                     <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
-                      <span className="material-symbols-outlined text-2xl">payments</span>
+                      <CreditCard className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
                     <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Direct Payment</h3>
                     <p className="text-slate-500 text-sm leading-relaxed">Get paid directly by your employer. No waiting for platforms to process your hard-earned money.</p>
                   </div>
                   <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "200ms" }}>
                     <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
-                      <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
+                      <Wallet className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
                     <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">No Salary Markups</h3>
                     <p className="text-slate-500 text-sm leading-relaxed">You keep 100% of your agreed-upon salary. We never take a percentage of your earnings.</p>
@@ -365,12 +394,12 @@ export function LandingPageClient() {
                 <div className="md:pt-12">
                   <div className="bg-white rounded-3xl p-8 shadow-md border-2 border-emerald-500/20 group reveal-item hover:shadow-lg transition-all duration-300" style={{ transitionDelay: "300ms" }}>
                     <div className="w-12 h-12 bg-[#22c55e] text-white rounded-xl flex items-center justify-center mb-6 shadow-sm">
-                      <span className="material-symbols-outlined text-2xl">work</span>
+                      <Briefcase className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
                     <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Stable Remote Work</h3>
                     <p className="text-slate-500 text-sm leading-relaxed mb-6">Connect with serious employers looking for long-term team members, not just gig workers. Build a career, not just a side-hustle.</p>
                     <div className="pt-4 border-t border-slate-100 flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase font-label-mono">
-                      <span className="material-symbols-outlined text-base">verified</span>
+                      <BadgeCheck className="h-4 w-4 shrink-0" aria-hidden />
                       Verified Employers Only
                     </div>
                   </div>
@@ -396,7 +425,7 @@ export function LandingPageClient() {
               {/* Employer Flow */}
               <div className="bg-[#f8fafc] border border-slate-100 rounded-[28px] p-8 md:p-10 reveal-item" style={{ transitionDelay: "100ms" }}>
                 <h3 className="text-xl md:text-2xl text-[#0a4a29] font-bold mb-10 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-2xl text-[#22c55e]">business</span> For Employers
+                  <Building2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden /> For Employers
                 </h3>
                 <div className="space-y-12 relative">
                   {/* Vertical Connection Line */}
@@ -429,7 +458,7 @@ export function LandingPageClient() {
               {/* Worker Flow */}
               <div className="bg-[#f8fafc] border border-slate-100 rounded-[28px] p-8 md:p-10 reveal-item" style={{ transitionDelay: "300ms" }}>
                 <h3 className="text-xl md:text-2xl text-emerald-800 font-bold mb-10 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-2xl text-[#22c55e]">person</span> For Job Seekers
+                  <User className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden /> For Job Seekers
                 </h3>
                 <div className="space-y-12 relative">
                   {/* Vertical Connection Line */}
@@ -476,7 +505,7 @@ export function LandingPageClient() {
                 <p className="text-slate-500 font-body-base text-lg leading-relaxed">Browse a curated selection of pre-vetted professionals ready to join your team today. We handle the vetting, you handle the growth.</p>
               </div>
               <a className="group inline-flex items-center gap-2 text-[#22c55e] font-body-bold text-base hover:text-emerald-700 transition-all shrink-0" href="#">
-                View All Talent <span className="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">arrow_forward</span>
+                View All Talent <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
               </a>
             </div>
 
@@ -485,18 +514,18 @@ export function LandingPageClient() {
               <button
                 onClick={prevSlide}
                 disabled={carouselIndex === 0}
-                className="carousel-button prev material-symbols-outlined z-30"
+                className="carousel-button prev z-30"
                 aria-label="Previous Slide"
               >
-                chevron_left
+                <ChevronLeft className="h-6 w-6" aria-hidden />
               </button>
               <button
                 onClick={nextSlide}
                 disabled={carouselIndex >= maxCarouselIndex}
-                className="carousel-button next material-symbols-outlined z-30"
+                className="carousel-button next z-30"
                 aria-label="Next Slide"
               >
-                chevron_right
+                <ChevronRight className="h-6 w-6" aria-hidden />
               </button>
 
               {/* Carousel Track Container */}
@@ -524,7 +553,10 @@ export function LandingPageClient() {
                             </div>
                           </div>
                           <span className={`bg-white px-4 py-2 rounded-full text-xs font-label-mono font-bold shadow-xs flex items-center gap-1 border ${talent.badgeClass}`}>
-                            <span className="material-symbols-outlined text-sm">{talent.badgeIcon}</span>
+                            {(() => {
+                              const BadgeIcon = TALENT_BADGE_ICONS[talent.badgeIcon] ?? BadgeCheck;
+                              return <BadgeIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />;
+                            })()}
                             {talent.badge}
                           </span>
                         </div>
@@ -571,7 +603,7 @@ export function LandingPageClient() {
               {/* Large Featured Testimonial */}
               <div className="lg:col-span-7 reveal-item">
                 <div className="bg-white border border-slate-100 rounded-3xl p-10 md:p-14 shadow-md relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                  <span className="material-symbols-outlined absolute -top-4 -right-4 text-[160px] text-emerald-100/30 rotate-12 select-none pointer-events-none">format_quote</span>
+                  <Quote className="absolute -top-4 -right-4 h-40 w-40 text-emerald-100/30 rotate-12 select-none pointer-events-none" aria-hidden />
                   <div className="relative z-10">
                     <p className="text-slate-700 font-display-md text-2xl md:text-3xl italic leading-snug mb-12">
                       &quot;Finding reliable React developers used to take us months. With Replace Me, we hired two incredible senior engineers in a week. The quality of talent is unmatched.&quot;
@@ -660,7 +692,7 @@ export function LandingPageClient() {
               <p className="text-slate-300 mb-6 font-body-base text-lg">Everything you need to hire the best remote talent.</p>
               <div className="inline-block bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-2 mb-12">
                 <p className="text-[#22c55e] font-body-bold flex items-center gap-2 text-sm font-semibold uppercase tracking-wider">
-                  <span className="material-symbols-outlined text-lg">card_giftcard</span> Always 100% FREE for Job Seekers
+                  <Gift className="h-5 w-5 shrink-0" aria-hidden /> Always 100% FREE for Job Seekers
                 </p>
               </div>
             </div>
@@ -678,21 +710,21 @@ export function LandingPageClient() {
               <p className="text-slate-500 mb-10 text-base border-b border-slate-100 pb-8">Access to our entire database of vetted professionals to scale your team.</p>
               <ul className="space-y-6 mb-10 flex flex-col items-center">
                 <li className="flex items-center gap-4">
-                  <span className="material-symbols-outlined text-[#22c55e] text-2xl font-bold">check_circle</span>
+                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
                   <span className="text-slate-700 font-body-base text-base font-semibold">Post Unlimited Jobs</span>
                 </li>
                 <li className="flex items-center gap-4">
-                  <span className="material-symbols-outlined text-[#22c55e] text-2xl font-bold">check_circle</span>
+                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
                   <span className="text-slate-700 font-body-base text-base font-semibold">Message Applicants</span>
                 </li>
                 <li className="flex items-center gap-4">
-                  <span className="material-symbols-outlined text-[#22c55e] text-2xl font-bold">check_circle</span>
+                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
                   <span className="text-slate-700 font-body-base text-base font-semibold">Cancel Anytime</span>
                 </li>
               </ul>
               <Link href="/signup" className="bg-[#22c55e] text-white w-full py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 shadow-[0_12px_24px_-6px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
                 <span>Hire Talent Now</span>
-                <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
               </Link>
             </div>
           </div>
@@ -729,10 +761,10 @@ export function LandingPageClient() {
                         {faq.question}
                       </h3>
                       <span className="relative w-6 h-6 shrink-0 bg-white rounded-full flex items-center justify-center shadow-xs border border-slate-100">
-                        <span className={`material-symbols-outlined text-[#22c55e] transition duration-300 text-base font-bold ${isOpen ? "rotate-45" : ""
-                          }`}>
-                          add
-                        </span>
+                        <Plus
+                          className={`h-4 w-4 text-[#22c55e] transition duration-300 ${isOpen ? "rotate-45" : ""}`}
+                          aria-hidden
+                        />
                       </span>
                     </button>
 

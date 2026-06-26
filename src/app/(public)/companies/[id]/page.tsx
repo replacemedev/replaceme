@@ -18,7 +18,7 @@ export default async function PublicCompanyDetailPage({ params }: PageProps) {
   const { company, jobs } = data;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10 pt-24">
+    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10 pt-20">
       <Link
         href="/companies"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800 mb-6"

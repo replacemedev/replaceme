@@ -20,7 +20,7 @@ export default async function ContactPage() {
   };
 
   return (
-    <main className="pt-24 sm:pt-28 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1">
+    <main className="pt-20 pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p className="text-xs font-bold uppercase tracking-wider text-[#22c55e] mb-3">
           {config.badge}

@@ -15,7 +15,7 @@ function formatRate(hourlyRate: number) {
 
 export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 pt-24">
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 pt-20">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-900">Browse Jobs</h1>
         <p className="text-sm text-slate-500 mt-2">

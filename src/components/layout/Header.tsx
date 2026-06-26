@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
+import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 import { AuthenticatedNavActions } from "@/components/shared/nav/AuthenticatedNavActions";
 import { GUEST_NAV_SESSION, type NavSession } from "@/types/nav";
 import { PUBLIC_GROWTH_NAV } from "@/config/publicNav";
@@ -14,13 +15,20 @@ interface HeaderProps {
 
 export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
+  const [hash, setHash] = useState("");
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
 
-  const getHref = (id: string) => {
-    return isLandingPage ? `#${id}` : `/#${id}`;
-  };
+  useEffect(() => {
+    const syncHash = () => setHash(window.location.hash);
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [pathname]);
+
+  const getHref = (id: string) => (isLandingPage ? `#${id}` : `/#${id}`);
+
+  const isAnchorActive = (id: string) => isLandingPage && hash === `#${id}`;
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
@@ -30,54 +38,32 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
         {/* Desktop Navigation — marketing links for guests; compact for authenticated */}
         {!session.isAuthenticated && (
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-          {PUBLIC_GROWTH_NAV.map((item) => {
-            const active =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
-                  active ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-                }`}
-              >
-                {item.label}
-                <span
-                  className={`absolute bottom-0 left-0 w-full h-0.5 bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                    active ? "scale-x-100" : "scale-x-0"
-                  }`}
-                />
-              </Link>
-            );
-          })}
-          <Link
-            onClick={() => setActiveSection("how-it-works")}
-            className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
-              activeSection === "how-it-works" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-            }`}
+          {PUBLIC_GROWTH_NAV.map((item) => (
+            <NavUnderlineLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              variant="public"
+              className="font-body-base"
+              isActive={
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
+              }
+            />
+          ))}
+          <NavUnderlineLink
             href={getHref("how-it-works")}
-          >
-            How it Works
-            <span
-              className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                activeSection === "how-it-works" ? "scale-x-100" : "scale-x-0"
-              }`}
-            />
-          </Link>
-          <Link
-            onClick={() => setActiveSection("faq")}
-            className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
-              activeSection === "faq" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-            }`}
+            label="How it Works"
+            variant="public"
+            className="font-body-base"
+            isActive={isAnchorActive("how-it-works")}
+          />
+          <NavUnderlineLink
             href={getHref("faq")}
-          >
-            FAQ
-            <span
-              className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                activeSection === "faq" ? "scale-x-100" : "scale-x-0"
-              }`}
-            />
-          </Link>
+            label="FAQ"
+            variant="public"
+            className="font-body-base"
+            isActive={isAnchorActive("faq")}
+          />
         </nav>
         )}
 
@@ -125,7 +111,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
               key={item.href}
               onClick={() => setMobileMenuOpen(false)}
               className={`font-medium py-2 transition-colors duration-200 ${
-                pathname === item.href
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
                   ? "text-[#22c55e]"
                   : "text-slate-700 hover:text-[#22c55e]"
               }`}
@@ -135,24 +121,22 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
             </Link>
           ))}
           <Link
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setActiveSection("how-it-works");
-            }}
+            onClick={() => setMobileMenuOpen(false)}
             className={`font-medium py-2 transition-colors duration-200 ${
-              activeSection === "how-it-works" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              isAnchorActive("how-it-works")
+                ? "text-[#22c55e]"
+                : "text-slate-700 hover:text-[#22c55e]"
             }`}
             href={getHref("how-it-works")}
           >
             How it Works
           </Link>
           <Link
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setActiveSection("faq");
-            }}
+            onClick={() => setMobileMenuOpen(false)}
             className={`font-medium py-2 transition-colors duration-200 ${
-              activeSection === "faq" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
+              isAnchorActive("faq")
+                ? "text-[#22c55e]"
+                : "text-slate-700 hover:text-[#22c55e]"
             }`}
             href={getHref("faq")}
           >
