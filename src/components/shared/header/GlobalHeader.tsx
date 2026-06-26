@@ -1,5 +1,6 @@
 import type { NavSession } from "@/types/nav";
 import { NotificationBellContainer } from "@/components/shared/header/NotificationBellContainer";
+import { WORKER_NOTIFICATIONS_HREF } from "@/config/workerNav";
 
 interface GlobalHeaderActionsProps {
   session: NavSession;
@@ -22,7 +23,13 @@ export async function GlobalHeaderActions({
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">
-      <NotificationBellContainer userId={session.userId} size={bellSize} />
+      <NotificationBellContainer
+        userId={session.userId}
+        size={bellSize}
+        viewAllHref={
+          session.role === "worker" ? WORKER_NOTIFICATIONS_HREF : undefined
+        }
+      />
       {children}
     </div>
   );

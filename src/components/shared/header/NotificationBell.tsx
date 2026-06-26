@@ -27,6 +27,7 @@ interface NotificationBellProps {
   initialBootstrap: NotificationBootstrap;
   size?: number;
   className?: string;
+  viewAllHref?: string;
 }
 
 export function NotificationBell({
@@ -34,6 +35,7 @@ export function NotificationBell({
   initialBootstrap,
   size = 20,
   className = "",
+  viewAllHref,
 }: NotificationBellProps) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -198,6 +200,18 @@ export function NotificationBell({
               <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
               Refreshing…
             </div>
+          ) : null}
+
+          {viewAllHref ? (
+            <footer className="border-t border-slate-100 px-4 py-2.5">
+              <Link
+                href={viewAllHref}
+                onClick={() => setOpen(false)}
+                className="block text-center text-xs font-semibold text-[#006e2f] hover:underline"
+              >
+                View all notifications
+              </Link>
+            </footer>
           ) : null}
         </div>
       ) : null}

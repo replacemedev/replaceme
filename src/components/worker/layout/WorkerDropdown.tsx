@@ -3,14 +3,10 @@
 import React, { useState, useEffect, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ChevronDown,
-  LogOut,
-  FileText,
-  User,
-  ShieldCheck,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronDown, LogOut } from "lucide-react";
 import { logOut } from "@/actions/auth";
+import { WORKER_ACCOUNT_NAV_ITEMS } from "@/config/workerNav";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface WorkerProfile {
@@ -33,6 +29,7 @@ export function WorkerDropdown({
   initials,
   isVerified = false,
 }: WorkerDropdownProps) {
+  const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -111,7 +108,7 @@ export function WorkerDropdown({
 
       {dropdownOpen && (
         <div
-          className="absolute right-0 mt-2 w-52 bg-white border border-slate-150 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn"
+          className="absolute right-0 mt-2 w-56 max-h-[min(70vh,480px)] overflow-y-auto bg-white border border-slate-150 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn"
           role="menu"
           aria-label="User actions dropdown"
         >
@@ -123,35 +120,28 @@ export function WorkerDropdown({
             </p>
           </div>
 
-          <Link
-            href="/worker/profile"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
-            role="menuitem"
-          >
-            <User size={14} className="text-slate-400" />
-            Profile
-          </Link>
+          {WORKER_ACCOUNT_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-          <Link
-            href="/worker/verification"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
-            role="menuitem"
-          >
-            <ShieldCheck size={14} className="text-slate-400" />
-            Verification
-          </Link>
-
-          <Link
-            href="/worker/applications"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
-            role="menuitem"
-          >
-            <FileText size={14} className="text-slate-400" />
-            My Applications
-          </Link>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setDropdownOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 text-xs transition-colors w-full text-left font-semibold ${
+                  isActive
+                    ? "text-[#006e2f] bg-[#ebfdf2]/50"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                }`}
+                role="menuitem"
+              >
+                <Icon size={14} className="text-slate-400 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
 
           <div className="h-px bg-slate-100 my-1" />
 

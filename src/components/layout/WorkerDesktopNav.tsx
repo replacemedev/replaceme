@@ -8,7 +8,7 @@ export function WorkerDesktopNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex items-center gap-8">
+    <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
       {WORKER_NAV_ITEMS.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`);

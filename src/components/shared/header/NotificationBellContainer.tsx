@@ -11,12 +11,14 @@ interface NotificationBellContainerProps {
   userId: string;
   size?: number;
   className?: string;
+  viewAllHref?: string;
 }
 
 export async function NotificationBellContainer({
   userId,
   size,
   className,
+  viewAllHref,
 }: NotificationBellContainerProps) {
   let bootstrap = EMPTY_BOOTSTRAP;
 
@@ -32,6 +34,7 @@ export async function NotificationBellContainer({
       initialBootstrap={bootstrap}
       size={size}
       className={className}
+      viewAllHref={viewAllHref}
     />
   );
 }
