@@ -9,6 +9,7 @@ import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 import { PublicAuthenticatedNavActions } from "@/components/shared/nav/PublicAuthenticatedNavActions";
 import { GUEST_NAV_SESSION, type NavSession } from "@/types/nav";
 import { GUEST_HEADER_NAV } from "@/config/publicNav";
+import { scrollToPublicSection } from "@/lib/layout/public-shell";
 
 interface HeaderProps {
   session?: NavSession;
@@ -34,7 +35,12 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
 
     const syncFromHash = () => {
       const id = window.location.hash.replace("#", "");
-      setActiveSection(isGuestSectionId(id) ? id : "");
+      if (isGuestSectionId(id)) {
+        setActiveSection(id);
+        requestAnimationFrame(() => scrollToPublicSection(id));
+      } else {
+        setActiveSection("");
+      }
     };
 
     syncFromHash();
@@ -49,6 +55,16 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
     setMobileMenuOpen(false);
   };
 
+  const handleSectionNav =
+    (id: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      selectSection(id);
+      if (!isLandingPage) return;
+
+      event.preventDefault();
+      scrollToPublicSection(id);
+      window.history.pushState(null, "", `#${id}`);
+    };
+
   const isAnchorActive = (id: string) => isLandingPage && activeSection === id;
 
   const marketingNavLinks = GUEST_HEADER_NAV.map((item) => (
@@ -59,14 +75,14 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
       variant="public"
       className="font-body-base"
       isActive={isAnchorActive(item.id)}
-      onClick={() => selectSection(item.id)}
+      onClick={handleSectionNav(item.id)}
     />
   ));
 
   const marketingMobileLinks = GUEST_HEADER_NAV.map((item) => (
     <Link
       key={item.id}
-      onClick={() => selectSection(item.id)}
+      onClick={handleSectionNav(item.id)}
       className={`relative py-2 font-medium transition-colors duration-200 ${
         isAnchorActive(item.id)
           ? "text-[#22c55e]"

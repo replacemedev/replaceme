@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { PUBLIC_SCROLL_MARGIN } from "@/lib/layout/public-shell";
 import {
   ArrowRight,
   BadgeCheck,
@@ -355,14 +354,14 @@ export function LandingPageClient() {
         </section>
 
         {/* For Job Seekers */}
-        <section className={`py-24 px-margin-desktop bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="find-work">
+        <section className="py-24 px-margin-desktop bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] relative overflow-hidden">
           {/* Subtle Grid and Blob Decorators */}
           <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-emerald-100/30 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-container-max mx-auto relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-              <div className="lg:col-span-5 space-y-6 reveal-item">
+              <div className="lg:col-span-5 space-y-6 reveal-item" id="find-work">
                 <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">For Talent</div>
                 <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Elevate Your Career with <span className="text-[#22c55e]">Global Opportunities</span></h2>
                 <p className="text-slate-500 font-body-base text-lg leading-relaxed">Find stable, long-term remote work with international clients who value your expertise and dedication.</p>
@@ -411,13 +410,13 @@ export function LandingPageClient() {
         </section>
 
         {/* How it Works */}
-        <section className={`py-24 px-margin-desktop bg-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="how-it-works">
+        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
           {/* Grid dot pattern overlay */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-50 pointer-events-none z-0" />
           <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-container-max mx-auto relative z-10">
-            <div className="text-center mb-20 reveal-item">
+            <div className="text-center mb-20 reveal-item" id="how-it-works">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Outsourcing Made Simple</h2>
               <p className="text-slate-500 text-lg leading-relaxed">A streamlined process for both sides of the marketplace.</p>
             </div>
@@ -680,7 +679,7 @@ export function LandingPageClient() {
         </section>
 
         {/* Pricing Section */}
-        <section className={`py-24 px-margin-desktop bg-[#0a0f1d] text-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="pricing">
+        <section className="py-24 px-margin-desktop bg-[#0a0f1d] text-white relative overflow-hidden">
           {/* Starry Dot Grid and Glowing Orbs */}
           <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" />
           <div className="absolute -top-40 -right-40 bg-emerald-500/15 w-[600px] h-[600px] rounded-full blur-[130px] animate-float-slow-2 pointer-events-none z-0" />
@@ -688,7 +687,7 @@ export function LandingPageClient() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500/5 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none z-0" />
 
           <div className="max-w-3xl mx-auto text-center relative z-10">
-            <div className="reveal-item">
+            <div className="reveal-item" id="pricing">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
               <p className="text-slate-300 mb-6 font-body-base text-lg">Everything you need to hire the best remote talent.</p>
               <div className="inline-block bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-2 mb-12">
@@ -732,13 +731,13 @@ export function LandingPageClient() {
         </section>
 
         {/* FAQ Section */}
-        <section className={`py-24 px-margin-desktop bg-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="faq">
+        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
           {/* Subtle dot pattern and glow */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-40 pointer-events-none z-0" />
           <div className="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-3xl mx-auto relative z-10">
-            <div className="text-center mb-16 reveal-item">
+            <div className="text-center mb-16 reveal-item" id="faq">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Frequently Asked Questions</h2>
               <p className="text-slate-500 font-body-base text-lg">Everything you need to know about how Replace Me works.</p>
             </div>

@@ -23,7 +23,7 @@ interface NavUnderlineLinkProps {
   isActive: boolean;
   variant?: AccentKey;
   className?: string;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   children?: React.ReactNode;
 }
 
