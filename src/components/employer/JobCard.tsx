@@ -56,6 +56,13 @@ export function JobCard({ job }: JobCardProps) {
           VIEW
         </Link>
         <span className="text-slate-200">|</span>
+        <Link
+          href={`/employer/jobs/${job.id}/applicants`}
+          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline"
+        >
+          APPLICANTS
+        </Link>
+        <span className="text-slate-200">|</span>
         <button 
           className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline cursor-pointer"
         >

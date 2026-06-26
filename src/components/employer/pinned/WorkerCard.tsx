@@ -121,7 +121,11 @@ export function WorkerCard({ worker, onUnpin }: WorkerCardProps) {
       {/* Card Action Buttons Footer */}
       <div className="mt-5 flex gap-2 pt-4 border-t border-slate-50 items-center">
         <Link
-          href={`/workers/${worker.id}`}
+          href={
+            worker.contextJobId
+              ? `/employer/candidates/${worker.id}?jobId=${worker.contextJobId}`
+              : `/employer/candidates/${worker.id}`
+          }
           className="flex-1 h-9 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <Eye size={14} />

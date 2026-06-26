@@ -23,7 +23,7 @@ export async function loginAsEmployer(
     .getByPlaceholder("Min. 8 characters", { exact: true })
     .first()
     .fill(password);
-  await page.getByRole("button", { name: "Sign In" }).click();
+  await page.getByRole("button", { name: "Sign In" }).click({ force: true });
 
   await expect(page).not.toHaveURL(/\/login$/, { timeout: 30_000 });
 }

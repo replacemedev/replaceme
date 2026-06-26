@@ -9,4 +9,5 @@ export interface PinnedWorker {
   isPinned: boolean;
   online: boolean;
   isVerified: boolean;
+  contextJobId?: string;
 }

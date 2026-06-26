@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { MapPin, Clock, DollarSign, Share2, Edit3, X, Loader2 } from "lucide-react";
+import { MapPin, Clock, DollarSign, Share2, Edit3, X, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { deactivateJob } from "@/actions/employer/jobs";
 import { useRouter } from "next/navigation";
@@ -101,6 +101,14 @@ export function JobHeader({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3 shrink-0">
+        <Link
+          href={`/employer/jobs/${jobId}/applicants`}
+          className="h-10 px-4 rounded-xl border border-emerald-200 hover:border-emerald-300 bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <Users size={14} />
+          View Pipeline
+        </Link>
+
         {/* Share Button */}
         <button
           type="button"

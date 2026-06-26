@@ -58,7 +58,7 @@ export function PerformanceMetricsCard({ jobId, performance }: PerformanceMetric
             </p>
           </div>
           <Link
-            href={`/dashboard?filter=shortlisted&job=${jobId}`}
+            href={`/employer/jobs/${jobId}/applicants`}
             className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             View Candidates

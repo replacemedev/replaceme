@@ -63,6 +63,36 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
       return a.name.localeCompare(b.name);
     });
 
+    if (pinnedList.length > 0) {
+      const { data: jobs } = await supabase
+        .from("jobs")
+        .select("id")
+        .eq("employer_id", profile.id);
+
+      const jobIds = jobs?.map((j) => j.id) ?? [];
+      if (jobIds.length > 0) {
+        const workerIds = pinnedList.map((w) => w.id);
+        const { data: applications } = await supabase
+          .from("applications")
+          .select("candidate_id, job_id, created_at")
+          .in("candidate_id", workerIds)
+          .in("job_id", jobIds)
+          .order("created_at", { ascending: false });
+
+        const jobByCandidate = new Map<string, string>();
+        for (const app of applications ?? []) {
+          if (!jobByCandidate.has(app.candidate_id)) {
+            jobByCandidate.set(app.candidate_id, app.job_id);
+          }
+        }
+
+        const fallbackJobId = jobIds[0];
+        for (const worker of pinnedList) {
+          worker.contextJobId = jobByCandidate.get(worker.id) ?? fallbackJobId;
+        }
+      }
+    }
+
     return pinnedList;
   } catch (err) {
     safeError("getPinnedWorkers exception:", err);
