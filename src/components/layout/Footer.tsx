@@ -45,7 +45,7 @@ export function Footer() {
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/pricing">
             Pricing
           </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/#faq">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/faq/employer">
             Employer FAQs
           </Link>
         </div>
@@ -59,7 +59,7 @@ export function Footer() {
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/signup">
             Create Profile
           </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/#faq">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/faq/worker">
             Worker FAQs
           </Link>
         </div>

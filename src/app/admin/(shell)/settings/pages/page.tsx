@@ -16,8 +16,15 @@ export default async function AdminPagesListPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Public page content"
-        description="Manage legal, help, pricing, and contact copy shown on unauthenticated routes."
+        description="Manage legal, help, pricing, contact, and FAQ copy shown on unauthenticated routes."
       />
+
+      <Link
+        href="/admin/settings/pages/faq"
+        className="inline-flex px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700"
+      >
+        Manage FAQs
+      </Link>
 
       <ul className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         {rows.map((row) => {
@@ -46,7 +53,11 @@ export default async function AdminPagesListPage() {
                   </Link>
                 ) : null}
                 <Link
-                  href={`/admin/settings/pages/${row.slug}`}
+                  href={
+                    row.slug === "employer-faq" || row.slug === "worker-faq"
+                      ? "/admin/settings/pages/faq"
+                      : `/admin/settings/pages/${row.slug}`
+                  }
                   className="inline-flex px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700"
                 >
                   Edit

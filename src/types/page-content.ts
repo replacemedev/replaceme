@@ -56,6 +56,16 @@ export interface AuthScreenConfig {
 
 export type AuthScreenSlug = "auth-login" | "auth-signup";
 
+export interface FaqEntry {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface FaqPageConfig {
+  items: FaqEntry[];
+}
+
 export interface PageContentDefinition {
   slug: string;
   label: string;

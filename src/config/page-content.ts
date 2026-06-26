@@ -57,6 +57,20 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
     contentType: "json",
     description: "Sign up page headline, description, and footer prompt.",
   },
+  {
+    slug: "employer-faq",
+    label: "Employer FAQs",
+    publicPath: "/faq/employer",
+    contentType: "json",
+    description: "Employer FAQ questions and answers shown on the public site.",
+  },
+  {
+    slug: "worker-faq",
+    label: "Worker FAQs",
+    publicPath: "/faq/worker",
+    contentType: "json",
+    description: "Worker FAQ questions and answers shown on the public site.",
+  },
 ];
 
 export const PAGE_CONTENT_TAG = "page-content";
@@ -70,6 +84,8 @@ export const PAGE_CONTENT_SLUGS = [
   "contact",
   "auth-login",
   "auth-signup",
+  "employer-faq",
+  "worker-faq",
 ] as const;
 
 export type PageContentSlug = (typeof PAGE_CONTENT_SLUGS)[number];
