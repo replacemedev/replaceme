@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { updateWorkerSettings } from "@/actions/worker/profile";
 import { reportEmployer } from "@/actions/worker/phase2";
@@ -59,6 +60,11 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <p className="lg:col-span-2 text-sm">
+        <Link href="/worker/settings/notifications" className="font-bold text-[#006e2f] hover:underline">
+          Notification preferences →
+        </Link>
+      </p>
       <form
         onSubmit={saveSettings}
         className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4"

@@ -160,7 +160,7 @@ export function HiredWorkerCard({ worker }: HiredWorkerCardProps) {
         </Link>
 
         <Link
-          href={`/contracts/${worker.id}`}
+          href={`/employer/contracts/${worker.id}`}
           className="h-9 px-4 border border-slate-100 hover:bg-slate-50 text-slate-500 hover:text-slate-800 font-bold text-xs rounded-2xl transition-colors flex items-center justify-center cursor-pointer"
         >
           View Contract

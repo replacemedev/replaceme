@@ -121,6 +121,18 @@ export function EmployerHeaderNav({
           Hired
         </Link>
         <Link
+          href="/employer/credits"
+          className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
+        >
+          Credits
+        </Link>
+        <Link
+          href="/employer/reviews"
+          className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
+        >
+          Reviews
+        </Link>
+        <Link
           href="/employer/pricing"
           className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
         >
@@ -208,6 +220,20 @@ export function EmployerMobileMenu({
             className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
           >
             Hired
+          </Link>
+          <Link
+            href="/employer/credits"
+            onClick={() => setMobileMenuOpen(false)}
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
+          >
+            Credits
+          </Link>
+          <Link
+            href="/employer/reviews"
+            onClick={() => setMobileMenuOpen(false)}
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
+          >
+            Reviews
           </Link>
           <Link
             href="/employer/pricing"

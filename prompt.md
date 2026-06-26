@@ -19,7 +19,7 @@
 <!-- PROMPT_SYNC:BEGIN -->
 ### Repository File Map (auto-generated from workspace)
 
-**Last synced:** 2026-06-26T06:53:58.980Z · **Git:** `40faf8e`
+**Last synced:** 2026-06-26T07:18:53.394Z · **Git:** `8de223a`
 **Regenerate:** `npm run prompt:sync` after any add, rename, delete, or move under `src/`, `supabase/migrations/`, or root entry files.
 
 **Agent rule:** Use this map + **Task → Files**. Do not broad-scan the repo. If a path is missing here, run `npm run prompt:sync` (or ask the user to).
@@ -33,10 +33,10 @@ AGENTS.md
 src/proxy.ts
 .env.example
 package.json
-supabase/migrations/*.sql  # 31 migration file(s)
+supabase/migrations/*.sql  # 32 migration file(s)
 ```
 
-#### `src/app/` — routes (App Router) — 123 route files
+#### `src/app/` — routes (App Router) — 127 route files
 
 ```txt
 src/app/(public)/companies/[id]/page.tsx
@@ -99,6 +99,8 @@ src/app/auth/confirm/route.ts
 src/app/employer/candidates/[candidateId]/page.tsx
 src/app/employer/checkout/[planId]/loading.tsx
 src/app/employer/checkout/[planId]/page.tsx
+src/app/employer/contracts/[contractId]/page.tsx
+src/app/employer/credits/page.tsx
 src/app/employer/dashboard/loading.tsx
 src/app/employer/dashboard/page.tsx
 src/app/employer/hired/loading.tsx
@@ -121,6 +123,7 @@ src/app/employer/pinned/loading.tsx
 src/app/employer/pinned/page.tsx
 src/app/employer/pricing/loading.tsx
 src/app/employer/pricing/page.tsx
+src/app/employer/reviews/page.tsx
 src/app/employer/settings/account/loading.tsx
 src/app/employer/settings/account/page.tsx
 src/app/employer/settings/company/loading.tsx
@@ -157,6 +160,7 @@ src/app/worker/profile/loading.tsx
 src/app/worker/profile/page.tsx
 src/app/worker/saved-jobs/loading.tsx
 src/app/worker/saved-jobs/page.tsx
+src/app/worker/settings/notifications/page.tsx
 src/app/worker/settings/page.tsx
 src/app/worker/skills/edit/page.tsx
 src/app/worker/tests/page.tsx
@@ -164,7 +168,7 @@ src/app/worker/verification/loading.tsx
 src/app/worker/verification/page.tsx
 ```
 
-#### `src/actions/` — Server Actions (28 files)
+#### `src/actions/` — Server Actions (32 files)
 
 ```txt
 src/actions/admin-actions.ts
@@ -174,12 +178,15 @@ src/actions/auth.ts
 src/actions/employer/applicants.ts
 src/actions/employer/billing.ts
 src/actions/employer/company.ts
+src/actions/employer/contracts.ts
+src/actions/employer/credits.ts
 src/actions/employer/dashboard.ts
 src/actions/employer/hired.ts
 src/actions/employer/hiring.ts
 src/actions/employer/jobs.ts
 src/actions/employer/pinned.ts
 src/actions/employer/pricing.ts
+src/actions/employer/reviews.ts
 src/actions/employer/stripe.ts
 src/actions/job-application.ts
 src/actions/messaging.ts
@@ -193,6 +200,7 @@ src/actions/worker/applications.ts
 src/actions/worker/contracts.ts
 src/actions/worker/job-details.ts
 src/actions/worker/job-search.ts
+src/actions/worker/notification-preferences.ts
 src/actions/worker/phase2.ts
 src/actions/worker/profile.ts
 ```
@@ -240,7 +248,7 @@ src/lib/validations/worker/phase2.ts
 src/components/admin/  (25 files)
 src/components/auth/  (11 files)
 src/components/dashboard/  (0 files)
-src/components/employer/  (55 files)
+src/components/employer/  (58 files)
 src/components/landing/  (1 files)
 src/components/layout/  (8 files)
 src/components/public/  (4 files)
@@ -254,7 +262,7 @@ src/components/shared/
   shared/onboarding/  (1 files)
   shared/skeletons/  (12 files)
 src/components/ui/  (4 files)
-src/components/worker/  (41 files)
+src/components/worker/  (42 files)
 ```
 
 #### `src/types/` (24) · `src/config/` (7) · `src/hooks/` (1)
@@ -308,7 +316,7 @@ src/hooks/useNotifications.ts
 | **Notifications** | src/actions/notifications.ts, src/hooks/useNotifications.ts, src/lib/notifications/fetch-initial.ts, src/types/notifications.types.ts |
 | **Admin moderation** | src/actions/admin-actions.ts, src/app/admin/(shell)/applications/loading.tsx, src/app/admin/(shell)/applications/page.tsx, src/app/admin/(shell)/audit-log/loading.tsx, src/app/admin/(shell)/audit-log/page.tsx, … (+60 more) |
 | **Stripe / billing** | src/actions/employer/billing.ts, src/actions/employer/stripe.ts, src/app/api/webhooks/stripe/route.ts, src/app/employer/checkout/[planId]/loading.tsx, src/app/employer/checkout/[planId]/page.tsx, … (+5 more) |
-| **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+27 more) |
+| **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+28 more) |
 | **RBAC / middleware** | src/lib/server/auth/middleware.ts, src/lib/server/auth/require-admin.ts, src/lib/server/auth/session.ts, src/proxy.ts |
 
 #### Role home paths (from `src/config/navigation.ts`)

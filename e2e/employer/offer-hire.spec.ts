@@ -19,7 +19,7 @@ test.describe("Employer offer and hire", () => {
 
   test("loads hired workers page from nav", async ({ page }) => {
     await page.goto("/employer/dashboard");
-    await page.getByRole("link", { name: "Hired" }).click();
+    await page.locator('a[href="/employer/hired"]').filter({ visible: true }).click();
     await expect(page).toHaveURL(/\/employer\/hired/);
     await expect(page.getByText(/Hired|workers/i).first()).toBeVisible();
   });

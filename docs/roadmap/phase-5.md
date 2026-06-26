@@ -16,10 +16,10 @@
 
 ## QA ([`QA-GATE.md`](./QA-GATE.md))
 
-- [ ] `e2e/employer/contracts-lifecycle.spec.ts`
-- [ ] `e2e/employer/credits-ledger.spec.ts`
-- [ ] `e2e/worker/notifications-preferences.spec.ts`
-- [ ] `e2e/employer/reviews.spec.ts`
-- [ ] CLI: `npm run test:e2e` (cross-role)
+- [x] `e2e/employer/contracts-lifecycle.spec.ts`
+- [x] `e2e/employer/credits-ledger.spec.ts`
+- [x] `e2e/worker/notifications-preferences.spec.ts`
+- [x] `e2e/employer/reviews.spec.ts`
+- [x] CLI: `npm run test:e2e` (cross-role)
 - [ ] MCP: hire → contract → notification → review
-- [ ] Artifacts: `e2e/debug/phase-5/`
+- [x] Artifacts: `e2e/debug/phase-5/`
