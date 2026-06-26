@@ -194,3 +194,23 @@ export function AdminSecurityPageSkeleton() {
     </div>
   );
 }
+
+export function AdminNotificationsPageSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading notifications">
+      <AdminPageHeaderSkeleton withAction />
+      <div className="space-y-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div
+            key={index}
+            className="animate-pulse rounded-2xl border border-slate-200/80 bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
+          >
+            <SkeletonBlock className="h-4 w-1/3 max-w-[14rem] rounded bg-slate-200/70" />
+            <SkeletonBlock className="mt-3 h-3 w-full rounded bg-slate-100" />
+            <SkeletonBlock className="mt-2 h-3 w-4/5 rounded bg-slate-50" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

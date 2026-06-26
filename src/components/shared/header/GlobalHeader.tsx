@@ -1,6 +1,7 @@
 import type { NavSession } from "@/types/nav";
 import { NotificationBellContainer } from "@/components/shared/header/NotificationBellContainer";
 import { WORKER_NOTIFICATIONS_HREF } from "@/config/workerNav";
+import { ADMIN_NOTIFICATIONS_HREF } from "@/config/adminNav";
 
 interface GlobalHeaderActionsProps {
   session: NavSession;
@@ -27,7 +28,11 @@ export async function GlobalHeaderActions({
         userId={session.userId}
         size={bellSize}
         viewAllHref={
-          session.role === "worker" ? WORKER_NOTIFICATIONS_HREF : undefined
+          session.role === "worker"
+            ? WORKER_NOTIFICATIONS_HREF
+            : session.role === "admin"
+              ? ADMIN_NOTIFICATIONS_HREF
+              : undefined
         }
       />
       {children}

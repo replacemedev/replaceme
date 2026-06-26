@@ -9,6 +9,7 @@ import {
   Fingerprint,
   Scale,
   FileText,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,8 +26,11 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/identity", label: "Identity", icon: Fingerprint },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
   { href: "/admin/disputes", label: "Disputes", icon: Scale },
+  { href: "/admin/notifications", label: "Notifications", icon: Bell },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Security", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/settings/pages", label: "Public Pages", icon: FileText },
 ];
+
+export const ADMIN_NOTIFICATIONS_HREF = "/admin/notifications";

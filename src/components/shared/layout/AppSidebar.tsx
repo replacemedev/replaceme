@@ -23,18 +23,28 @@ interface AppSidebarProps {
   items: AppSidebarNavItem[];
   profile: AppSidebarProfile;
   footer?: React.ReactNode;
+  showBrand?: boolean;
 }
 
-export function AppSidebar({ items, profile, footer }: AppSidebarProps) {
+export function AppSidebar({
+  items,
+  profile,
+  footer,
+  showBrand = true,
+}: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
     <aside className="hidden lg:flex flex-col bg-white border-r border-slate-200/80 w-[260px] shrink-0">
-      <div className="px-5 pt-6 pb-5 border-b border-slate-100">
-        <NavBrand homeHref={profile.homeHref} compact />
-      </div>
+      {showBrand ? (
+        <div className="px-5 pt-6 pb-5 border-b border-slate-100">
+          <NavBrand homeHref={profile.homeHref} compact />
+        </div>
+      ) : null}
 
-      <div className="px-4 py-5 border-b border-slate-100">
+      <div
+        className={`px-4 py-5 border-b border-slate-100 ${showBrand ? "" : "pt-6"}`}
+      >
         <div className="flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-100 p-3">
           {profile.avatarUrl ? (
             <img

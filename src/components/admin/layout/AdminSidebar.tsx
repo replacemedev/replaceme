@@ -13,6 +13,7 @@ export function AdminSidebar({ profile }: AdminSidebarProps) {
     <AppSidebar
       items={ADMIN_NAV_ITEMS}
       profile={profile}
+      showBrand={false}
       footer={
         <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">

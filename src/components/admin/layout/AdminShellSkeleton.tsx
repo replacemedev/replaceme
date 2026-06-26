@@ -6,10 +6,6 @@ function SidebarSkeleton() {
       className="hidden w-[260px] shrink-0 border-r border-slate-200/80 bg-white px-4 py-6 lg:flex lg:flex-col"
       aria-hidden
     >
-      <div className="mb-6 flex items-center gap-2.5 px-1">
-        <div className="h-9 w-9 animate-pulse rounded-lg bg-slate-100" />
-        <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
-      </div>
       <div className="mb-6 h-16 animate-pulse rounded-2xl bg-slate-50 border border-slate-100" />
       <nav className="space-y-1.5">
         {Array.from({ length: 8 }).map((_, index) => (
