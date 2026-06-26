@@ -5,4 +5,4 @@ export const PUBLIC_HEADER_OFFSET = "pt-16";
 export const PUBLIC_PAGE_TOP = "pt-20";
 
 /** react-scroll offset: fixed header (64px) + title gap (16px). */
-export const PUBLIC_HEADER_SCROLL_OFFSET = 100;
+export const PUBLIC_HEADER_SCROLL_OFFSET = 150;
