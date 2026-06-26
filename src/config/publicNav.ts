@@ -3,13 +3,21 @@ export interface PublicNavLink {
   label: string;
 }
 
-/** Guest marketing header + footer discoverability links. */
+/** Footer / secondary discoverability — not shown in the guest header. */
 export const PUBLIC_GROWTH_NAV: PublicNavLink[] = [
   { href: "/jobs", label: "Browse Jobs" },
   { href: "/companies", label: "Companies" },
   { href: "/pricing", label: "Pricing" },
   { href: "/help", label: "Help" },
 ];
+
+/** Guest header — scroll anchors into landing page sections only. */
+export const GUEST_HEADER_NAV = [
+  { id: "how-it-works", label: "How it Works" },
+  { id: "find-work", label: "Find Work" },
+  { id: "pricing", label: "Pricing" },
+  { id: "faq", label: "FAQ" },
+] as const;
 
 export const PUBLIC_HELP_ARTICLES = [
   {

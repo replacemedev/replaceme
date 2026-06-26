@@ -3,172 +3,172 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
-import { AuthenticatedNavActions } from "@/components/shared/nav/AuthenticatedNavActions";
+import { PublicAuthenticatedNavActions } from "@/components/shared/nav/PublicAuthenticatedNavActions";
 import { GUEST_NAV_SESSION, type NavSession } from "@/types/nav";
-import { PUBLIC_GROWTH_NAV } from "@/config/publicNav";
+import { GUEST_HEADER_NAV } from "@/config/publicNav";
 
 interface HeaderProps {
   session?: NavSession;
 }
 
+const GUEST_SECTION_IDS = GUEST_HEADER_NAV.map((item) => item.id);
+
 export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [hash, setHash] = useState("");
+  const [landingSection, setLandingSection] = useState("");
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
 
   useEffect(() => {
-    const syncHash = () => setHash(window.location.hash);
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
-  }, [pathname]);
+    if (!isLandingPage) {
+      setLandingSection("");
+      return;
+    }
 
-  const getHref = (id: string) => (isLandingPage ? `#${id}` : `/#${id}`);
+    const syncFromHash = () => {
+      const id = window.location.hash.replace("#", "");
+      setLandingSection(
+        GUEST_SECTION_IDS.includes(id as (typeof GUEST_SECTION_IDS)[number]) ? id : ""
+      );
+    };
 
-  const isAnchorActive = (id: string) => isLandingPage && hash === `#${id}`;
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (window.location.hash) return;
+
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visible.length > 0) {
+          setLandingSection(visible[0].target.id);
+          return;
+        }
+
+        if (window.scrollY < 120) {
+          setLandingSection("");
+        }
+      },
+      { rootMargin: "-25% 0px -55% 0px", threshold: 0.1 }
+    );
+
+    GUEST_SECTION_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      window.removeEventListener("hashchange", syncFromHash);
+      observer.disconnect();
+    };
+  }, [isLandingPage, pathname]);
+
+  const getAnchorHref = (id: string) => (isLandingPage ? `#${id}` : `/#${id}`);
+
+  const isAnchorActive = (id: string) => isLandingPage && landingSection === id;
+
+  const marketingNavLinks = GUEST_HEADER_NAV.map((item) => (
+    <NavUnderlineLink
+      key={item.id}
+      href={getAnchorHref(item.id)}
+      label={item.label}
+      variant="public"
+      className="font-body-base"
+      isActive={isAnchorActive(item.id)}
+    />
+  ));
+
+  const marketingMobileLinks = GUEST_HEADER_NAV.map((item) => (
+    <Link
+      key={item.id}
+      onClick={() => setMobileMenuOpen(false)}
+      className={`font-medium py-2 transition-colors duration-200 ${
+        isAnchorActive(item.id)
+          ? "text-[#22c55e]"
+          : "text-slate-700 hover:text-[#22c55e]"
+      }`}
+      href={getAnchorHref(item.id)}
+    >
+      {item.label}
+    </Link>
+  ));
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
       <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16">
-        <NavBrand homeHref={session.homeHref} compact />
+        <NavBrand homeHref="/" compact />
 
-        {/* Desktop Navigation — marketing links for guests; compact for authenticated */}
-        {!session.isAuthenticated && (
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-          {PUBLIC_GROWTH_NAV.map((item) => (
-            <NavUnderlineLink
-              key={item.href}
-              href={item.href}
-              label={item.label}
-              variant="public"
-              className="font-body-base"
-              isActive={
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-              }
-            />
-          ))}
-          <NavUnderlineLink
-            href={getHref("how-it-works")}
-            label="How it Works"
-            variant="public"
-            className="font-body-base"
-            isActive={isAnchorActive("how-it-works")}
-          />
-          <NavUnderlineLink
-            href={getHref("faq")}
-            label="FAQ"
-            variant="public"
-            className="font-body-base"
-            isActive={isAnchorActive("faq")}
-          />
+          {marketingNavLinks}
         </nav>
-        )}
 
-        {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-6">
           {session.isAuthenticated ? (
-            <AuthenticatedNavActions session={session} />
+            <PublicAuthenticatedNavActions session={session} />
           ) : (
             <>
-          <Link
-            className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
-            href="/login"
-          >
-            Sign In
-          </Link>
-          <Link
-            className="bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
-            href="/signup"
-          >
-            Get Started
-          </Link>
+              <Link
+                className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
+                href="/login"
+              >
+                Sign In
+              </Link>
+              <Link
+                className="bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
+                href="/signup"
+              >
+                Get Started
+              </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Menu Toggle Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="md:hidden flex items-center p-2 text-on-surface hover:text-[#22c55e] focus:outline-none"
           aria-label="Toggle Menu"
         >
-          <span className="material-symbols-outlined text-3xl">
-            {mobileMenuOpen ? "close" : "menu"}
-          </span>
+          {mobileMenuOpen ? (
+            <X className="h-7 w-7" aria-hidden />
+          ) : (
+            <Menu className="h-7 w-7" aria-hidden />
+          )}
         </button>
       </div>
 
-      {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
-          {!session.isAuthenticated ? (
-            <>
-          {PUBLIC_GROWTH_NAV.map((item) => (
-            <Link
-              key={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`font-medium py-2 transition-colors duration-200 ${
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-                  ? "text-[#22c55e]"
-                  : "text-slate-700 hover:text-[#22c55e]"
-              }`}
-              href={item.href}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            className={`font-medium py-2 transition-colors duration-200 ${
-              isAnchorActive("how-it-works")
-                ? "text-[#22c55e]"
-                : "text-slate-700 hover:text-[#22c55e]"
-            }`}
-            href={getHref("how-it-works")}
-          >
-            How it Works
-          </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            className={`font-medium py-2 transition-colors duration-200 ${
-              isAnchorActive("faq")
-                ? "text-[#22c55e]"
-                : "text-slate-700 hover:text-[#22c55e]"
-            }`}
-            href={getHref("faq")}
-          >
-            FAQ
-          </Link>
+          {marketingMobileLinks}
           <hr className="border-slate-100 my-2" />
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-slate-700 font-body-bold py-2 text-center hover:text-[#22c55e]"
-            href="/login"
-          >
-            Sign In
-          </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            className="bg-[#22c55e] text-white text-center py-3 rounded-xl font-body-bold"
-            href="/signup"
-          >
-            Get Started
-          </Link>
-            </>
+          {session.isAuthenticated ? (
+            <PublicAuthenticatedNavActions
+              session={session}
+              layout="mobile"
+              onNavigate={() => setMobileMenuOpen(false)}
+            />
           ) : (
-            <div className="flex flex-col gap-4 py-2">
-              <AuthenticatedNavActions session={session} />
+            <>
               <Link
-                href={session.homeHref}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-center text-sm font-bold text-[#006e2f] py-2"
+                className="text-slate-700 font-body-bold py-2 text-center hover:text-[#22c55e]"
+                href="/login"
               >
-                Go to Dashboard
+                Sign In
               </Link>
-            </div>
+              <Link
+                onClick={() => setMobileMenuOpen(false)}
+                className="bg-[#22c55e] text-white text-center py-3 rounded-xl font-body-bold"
+                href="/signup"
+              >
+                Get Started
+              </Link>
+            </>
           )}
         </div>
       )}

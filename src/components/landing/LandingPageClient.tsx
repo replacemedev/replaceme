@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PUBLIC_HEADER_OFFSET, PUBLIC_SCROLL_MARGIN } from "@/lib/layout/public-shell";
 import {
   ArrowRight,
   BadgeCheck,
@@ -242,9 +243,9 @@ export function LandingPageClient() {
   };
 
   return (
-    <main className="pt-[72px]">
+    <main>
         {/* Hero Section */}
-        <section className="relative min-h-[calc(100vh-72px)] flex items-center justify-center py-16 lg:py-0 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
+        <section className={`relative min-h-svh flex items-center justify-center ${PUBLIC_HEADER_OFFSET} py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]`}>
           {/* Decorative Glowing Blobs */}
           <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
           <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
@@ -354,7 +355,7 @@ export function LandingPageClient() {
         </section>
 
         {/* For Job Seekers */}
-        <section className="py-24 px-margin-desktop bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] relative overflow-hidden" id="find-work">
+        <section className={`py-24 px-margin-desktop bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="find-work">
           {/* Subtle Grid and Blob Decorators */}
           <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-emerald-100/30 blur-3xl pointer-events-none z-0" />
@@ -410,7 +411,7 @@ export function LandingPageClient() {
         </section>
 
         {/* How it Works */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden" id="how-it-works">
+        <section className={`py-24 px-margin-desktop bg-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="how-it-works">
           {/* Grid dot pattern overlay */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-50 pointer-events-none z-0" />
           <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
@@ -679,7 +680,7 @@ export function LandingPageClient() {
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 px-margin-desktop bg-[#0a0f1d] text-white relative overflow-hidden" id="pricing">
+        <section className={`py-24 px-margin-desktop bg-[#0a0f1d] text-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="pricing">
           {/* Starry Dot Grid and Glowing Orbs */}
           <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" />
           <div className="absolute -top-40 -right-40 bg-emerald-500/15 w-[600px] h-[600px] rounded-full blur-[130px] animate-float-slow-2 pointer-events-none z-0" />
@@ -731,7 +732,7 @@ export function LandingPageClient() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden" id="faq">
+        <section className={`py-24 px-margin-desktop bg-white relative overflow-hidden ${PUBLIC_SCROLL_MARGIN}`} id="faq">
           {/* Subtle dot pattern and glow */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-40 pointer-events-none z-0" />
           <div className="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />

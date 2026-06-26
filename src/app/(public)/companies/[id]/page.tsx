@@ -1,3 +1,4 @@
+import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,7 +19,7 @@ export default async function PublicCompanyDetailPage({ params }: PageProps) {
   const { company, jobs } = data;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10 pt-20">
+    <div className={`max-w-4xl mx-auto px-4 sm:px-8 pb-10 ${PUBLIC_PAGE_TOP}`}>
       <Link
         href="/companies"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800 mb-6"

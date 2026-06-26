@@ -1,3 +1,4 @@
+import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import Link from "next/link";
 import { getPublishedPageContent } from "@/actions/public/page-content";
 import { getPricingData } from "@/actions/employer/pricing";
@@ -24,7 +25,7 @@ export default async function PublicPricingPage() {
   };
 
   return (
-    <div className="bg-[#f8fafe] min-h-screen pt-20 pb-16">
+    <div className={`bg-[#f8fafe] min-h-screen ${PUBLIC_PAGE_TOP} pb-16`}>
       <header className="text-center max-w-3xl mx-auto px-4 mb-12">
         <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
           {config.headline}

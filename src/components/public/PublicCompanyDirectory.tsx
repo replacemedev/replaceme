@@ -1,3 +1,4 @@
+import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import Link from "next/link";
 import Image from "next/image";
 import type { PublicCompanyListing } from "@/types/public-growth";
@@ -10,7 +11,7 @@ export function PublicCompanyDirectory({
   companies,
 }: PublicCompanyDirectoryProps) {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 pt-20">
+    <div className={`max-w-6xl mx-auto px-4 sm:px-8 pb-10 ${PUBLIC_PAGE_TOP}`}>
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-900">
           Company Directory

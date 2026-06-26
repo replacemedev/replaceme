@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import { getPublishedPageContent } from "@/actions/public/page-content";
 import { HELP_INDEX_FALLBACK } from "@/lib/content/page-fallbacks";
 import type { HelpIndexConfig } from "@/types/page-content";
@@ -21,7 +22,7 @@ export default async function HelpCenterPage() {
     config.articles?.length > 0 ? config.articles : HELP_INDEX_FALLBACK.articles;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-10 pt-20">
+    <div className={`max-w-3xl mx-auto px-4 sm:px-8 pb-10 ${PUBLIC_PAGE_TOP}`}>
       <h1 className="text-3xl font-extrabold text-slate-900">{config.title}</h1>
       <p className="text-sm text-slate-500 mt-2 mb-10">{config.description}</p>
 
