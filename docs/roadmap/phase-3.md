@@ -8,11 +8,11 @@
 
 | Missing screen | Status today |
 | :--- | :--- |
-| **Disputes workflow** | Scaffold only |
-| **Global applications oversight** | No cross-platform applications view |
-| **Messaging moderation** | No admin view of `chat_threads` |
-| **Platform content moderation queue** | Beyond jobs |
-| **Billing ops** | Refunds, overrides, Stripe disputes |
+| **Disputes workflow** | Live queue + status updates (`/admin/disputes`) |
+| **Global applications oversight** | `/admin/applications` |
+| **Messaging moderation** | `/admin/moderation` (chat threads) |
+| **Platform content moderation queue** | Job moderation at `/admin/jobs` (existing) |
+| **Billing ops** | `/admin/billing-ops` (usage overrides) |
 | **Feature flags / plan config UI** | Settings read-only env |
 | **Employer verification / company KYC** | Lighter than worker identity |
 | **Analytics drill-downs** | Limited operational tooling |
@@ -20,10 +20,10 @@
 
 ## QA ([`QA-GATE.md`](./QA-GATE.md))
 
-- [ ] `e2e/admin/disputes-workflow.spec.ts`
-- [ ] `e2e/admin/applications.spec.ts`
-- [ ] `e2e/admin/moderation.spec.ts`
-- [ ] `e2e/admin/billing-ops.spec.ts`
-- [ ] CLI: `npm run test:e2e:admin`
-- [ ] MCP: disputes, moderation, applications drill-down
-- [ ] Artifacts: `e2e/debug/phase-3/`
+- [x] `e2e/admin/disputes-workflow.spec.ts`
+- [x] `e2e/admin/applications.spec.ts`
+- [x] `e2e/admin/moderation.spec.ts`
+- [x] `e2e/admin/billing-ops.spec.ts`
+- [x] CLI: `npm run test:e2e:admin`
+- [ ] MCP: disputes, moderation, applications drill-down *(skipped — CLI-only gate)*
+- [x] Artifacts: `e2e/debug/phase-3/`

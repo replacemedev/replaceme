@@ -1,24 +1,23 @@
-import { EmptyState } from "@/components/shared/EmptyState";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
-import { Scale } from "lucide-react";
+import { DisputesClient } from "@/components/admin/disputes/DisputesClient";
+import { fetchAdminDisputes } from "@/actions/admin-actions";
 
 export const metadata = {
   title: "Disputes | Admin",
 };
 
-export default function AdminDisputesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminDisputesPage() {
+  const disputes = await fetchAdminDisputes();
+
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Disputes"
-        description="Mediation queue for worker–employer conflicts. Authorization and workflow wiring is planned for a future sprint."
+        description="Mediation queue for worker–employer conflicts and safety reports."
       />
-
-      <EmptyState
-        icon={<Scale className="h-8 w-8 text-slate-400" aria-hidden />}
-        title="Disputes module not yet active"
-        description="This scaffold reserves the admin route and navigation slot. No dispute data is exposed until the backend workflow is implemented."
-      />
+      <DisputesClient disputes={disputes} />
     </div>
   );
 }

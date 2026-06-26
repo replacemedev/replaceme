@@ -24,7 +24,14 @@ import {
   type AdminVerificationDocument,
   type AdminVerificationQueueRow,
   type AdminWorkerRow,
+  type AdminDisputeRow,
+  type AdminApplicationRow,
+  type AdminChatThreadRow,
   type PlatformMetrics,
+  disputeStatusSchema,
+  adminDisputeRowSchema,
+  updateDisputeStatusSchema,
+  adminSubscriptionOverrideSchema,
 } from "@/types/admin.types";
 
 const ADMIN_PATHS = [
@@ -34,6 +41,9 @@ const ADMIN_PATHS = [
   "/admin/identity",
   "/admin/revenue",
   "/admin/disputes",
+  "/admin/applications",
+  "/admin/moderation",
+  "/admin/billing-ops",
   "/admin/audit-log",
 ] as const;
 
@@ -670,4 +680,274 @@ export async function fetchAuditLogs(limit = 100): Promise<AdminAuditLogRow[]> {
     created_at: row.created_at,
     admin_email: emailById.get(row.admin_id) ?? null,
   }));
+}
+
+export async function fetchAdminDisputes(
+  status?: string
+): Promise<AdminDisputeRow[]> {
+  await requireAdmin();
+  const adminClient = await createAdminClient();
+
+  let query = adminClient
+    .from("disputes")
+    .select(
+      "id, title, description, status, worker_id, employer_id, job_id, admin_notes, created_at, updated_at"
+    )
+    .order("created_at", { ascending: false });
+
+  if (status) {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+
+  const workerIds = [
+    ...new Set((data ?? []).map((d) => d.worker_id).filter(Boolean)),
+  ] as string[];
+
+  const workerById = new Map<string, { name: string; email: string | null }>();
+  if (workerIds.length > 0) {
+    const { data: workers } = await adminClient
+      .from("profiles")
+      .select("id, first_name, last_name, email")
+      .in("id", workerIds);
+
+    for (const w of workers ?? []) {
+      const name =
+        [w.first_name, w.last_name].filter(Boolean).join(" ") || "Worker";
+      workerById.set(w.id, { name, email: w.email });
+    }
+  }
+
+  const rows = (data ?? []).map((row) => {
+    const worker = row.worker_id ? workerById.get(row.worker_id) : null;
+    return {
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      status: row.status,
+      worker_id: row.worker_id,
+      employer_id: row.employer_id,
+      job_id: row.job_id,
+      worker_name: worker?.name ?? null,
+      worker_email: worker?.email ?? null,
+      admin_notes: row.admin_notes,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    };
+  });
+
+  const parsed = z.array(adminDisputeRowSchema).safeParse(rows);
+  return parsed.success ? parsed.data : [];
+}
+
+export async function updateDisputeStatus(
+  disputeId: string,
+  status: string,
+  adminNotes?: string
+): Promise<ActionResult> {
+  try {
+    const parsed = updateDisputeStatusSchema.parse({
+      disputeId,
+      status,
+      adminNotes,
+    });
+    await requireAdmin();
+    const adminClient = await createAdminClient();
+
+    const { error } = await adminClient
+      .from("disputes")
+      .update({
+        status: parsed.status,
+        admin_notes: parsed.adminNotes ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", parsed.disputeId);
+
+    if (error) throw new Error(error.message);
+
+    await logAdminAction("update_dispute", "dispute", parsed.disputeId, {
+      status: parsed.status,
+      adminNotes: parsed.adminNotes,
+    });
+    revalidateAdminSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to update dispute",
+    };
+  }
+}
+
+export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("applications")
+    .select(
+      `
+      id,
+      job_id,
+      candidate_id,
+      status,
+      match_score,
+      created_at,
+      jobs!applications_job_id_fkey (
+        title,
+        profiles!jobs_employer_id_fkey (
+          company_profiles ( company_name )
+        )
+      ),
+      profiles!applications_candidate_id_fkey (
+        first_name,
+        last_name,
+        email
+      )
+    `
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((row) => {
+    const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
+    const worker = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+    const employerProfile = job?.profiles;
+    const employer = Array.isArray(employerProfile)
+      ? employerProfile[0]
+      : employerProfile;
+    const companyProfiles = employer?.company_profiles;
+    const company = Array.isArray(companyProfiles)
+      ? companyProfiles[0]
+      : companyProfiles;
+
+    return {
+      id: row.id,
+      job_id: row.job_id,
+      job_title: job?.title ?? null,
+      company_name: company?.company_name ?? null,
+      worker_id: row.candidate_id,
+      worker_name:
+        [worker?.first_name, worker?.last_name].filter(Boolean).join(" ") ||
+        null,
+      worker_email: worker?.email ?? null,
+      status: row.status,
+      match_score: row.match_score,
+      created_at: row.created_at,
+    };
+  });
+}
+
+export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
+  await requireAdmin();
+  const adminClient = await createAdminClient();
+
+  const { data: threads, error } = await adminClient
+    .from("chat_threads")
+    .select(
+      `
+      id,
+      worker_id,
+      updated_at,
+      jobs ( title ),
+      company_profiles ( company_name ),
+      profiles!chat_threads_worker_id_fkey ( first_name, last_name )
+    `
+    )
+    .order("updated_at", { ascending: false })
+    .limit(100);
+
+  if (error) throw new Error(error.message);
+  if (!threads?.length) return [];
+
+  const threadIds = threads.map((t) => t.id);
+  const { data: messages } = await adminClient
+    .from("chat_messages")
+    .select("thread_id, created_at")
+    .in("thread_id", threadIds)
+    .order("created_at", { ascending: false });
+
+  const stats = new Map<string, { count: number; last: string | null }>();
+  for (const msg of messages ?? []) {
+    const current = stats.get(msg.thread_id) ?? { count: 0, last: null };
+    current.count += 1;
+    if (!current.last) current.last = msg.created_at;
+    stats.set(msg.thread_id, current);
+  }
+
+  return threads.map((thread) => {
+    const worker = Array.isArray(thread.profiles)
+      ? thread.profiles[0]
+      : thread.profiles;
+    const company = Array.isArray(thread.company_profiles)
+      ? thread.company_profiles[0]
+      : thread.company_profiles;
+    const job = Array.isArray(thread.jobs) ? thread.jobs[0] : thread.jobs;
+    const meta = stats.get(thread.id);
+
+    return {
+      id: thread.id,
+      worker_id: thread.worker_id,
+      worker_name:
+        [worker?.first_name, worker?.last_name].filter(Boolean).join(" ") ||
+        null,
+      company_name: company?.company_name ?? null,
+      job_title: job?.title ?? null,
+      message_count: meta?.count ?? 0,
+      last_message_at: meta?.last ?? null,
+      updated_at: thread.updated_at,
+    };
+  });
+}
+
+export async function adminOverrideSubscriptionUsage(
+  subscriptionId: string,
+  jobPostsUsed: number,
+  unlocksUsed: number,
+  note: string
+): Promise<ActionResult> {
+  try {
+    const parsed = adminSubscriptionOverrideSchema.parse({
+      subscriptionId,
+      jobPostsUsed,
+      unlocksUsed,
+      note,
+    });
+    await requireAdmin();
+    const adminClient = await createAdminClient();
+
+    const { error } = await adminClient
+      .from("employer_subscriptions")
+      .update({
+        job_posts_used: parsed.jobPostsUsed,
+        unlocks_used: parsed.unlocksUsed,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", parsed.subscriptionId);
+
+    if (error) throw new Error(error.message);
+
+    await logAdminAction(
+      "override_subscription_usage",
+      "employer_subscription",
+      parsed.subscriptionId,
+      {
+        jobPostsUsed: parsed.jobPostsUsed,
+        unlocksUsed: parsed.unlocksUsed,
+        note: parsed.note,
+      }
+    );
+    revalidatePath("/admin/billing-ops");
+    revalidatePath("/admin/revenue");
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to override subscription",
+    };
+  }
 }

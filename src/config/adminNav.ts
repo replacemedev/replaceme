@@ -10,6 +10,9 @@ import {
   Scale,
   FileText,
   Bell,
+  ClipboardList,
+  MessageSquare,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,9 +25,12 @@ export interface AdminNavItem {
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/applications", label: "Applications", icon: ClipboardList },
   { href: "/admin/jobs", label: "Job Posts", icon: Briefcase },
   { href: "/admin/identity", label: "Identity", icon: Fingerprint },
+  { href: "/admin/moderation", label: "Moderation", icon: MessageSquare },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
+  { href: "/admin/billing-ops", label: "Billing Ops", icon: CreditCard },
   { href: "/admin/disputes", label: "Disputes", icon: Scale },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },

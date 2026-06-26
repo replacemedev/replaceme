@@ -215,3 +215,67 @@ export const reviewVerificationSchema = z.object({
   decision: z.enum(["approved", "rejected"]),
   reason: z.string().min(3).max(500).optional(),
 });
+
+export const disputeStatusSchema = z.enum([
+  "open",
+  "under_review",
+  "resolved",
+  "closed",
+]);
+
+export const adminDisputeRowSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  status: disputeStatusSchema,
+  worker_id: z.string().uuid().nullable(),
+  employer_id: z.string().uuid().nullable(),
+  job_id: z.string().uuid().nullable(),
+  worker_name: z.string().nullable(),
+  worker_email: z.string().nullable(),
+  admin_notes: z.string().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const updateDisputeStatusSchema = z.object({
+  disputeId: z.string().uuid(),
+  status: disputeStatusSchema,
+  adminNotes: z.string().max(2000).optional(),
+});
+
+export const adminApplicationRowSchema = z.object({
+  id: z.string().uuid(),
+  job_id: z.string().uuid(),
+  job_title: z.string().nullable(),
+  company_name: z.string().nullable(),
+  worker_id: z.string().uuid(),
+  worker_name: z.string().nullable(),
+  worker_email: z.string().nullable(),
+  status: z.string(),
+  match_score: z.number(),
+  created_at: z.string(),
+});
+
+export const adminChatThreadRowSchema = z.object({
+  id: z.string().uuid(),
+  worker_id: z.string().uuid(),
+  worker_name: z.string().nullable(),
+  company_name: z.string().nullable(),
+  job_title: z.string().nullable(),
+  message_count: z.number(),
+  last_message_at: z.string().nullable(),
+  updated_at: z.string(),
+});
+
+export const adminSubscriptionOverrideSchema = z.object({
+  subscriptionId: z.string().uuid(),
+  jobPostsUsed: z.number().int().min(0).max(9999),
+  unlocksUsed: z.number().int().min(0).max(9999),
+  note: z.string().min(3).max(500),
+});
+
+export type DisputeStatus = z.infer<typeof disputeStatusSchema>;
+export type AdminDisputeRow = z.infer<typeof adminDisputeRowSchema>;
+export type AdminApplicationRow = z.infer<typeof adminApplicationRowSchema>;
+export type AdminChatThreadRow = z.infer<typeof adminChatThreadRowSchema>;
