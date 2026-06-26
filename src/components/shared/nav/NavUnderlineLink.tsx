@@ -38,12 +38,15 @@ export function NavUnderlineLink({
 }: NavUnderlineLinkProps) {
   const tone = ACCENT[variant];
 
+  const hoverUnderline =
+    variant === "public" ? "group-hover:scale-x-100 group-focus-visible:scale-x-100" : "";
+
   return (
     <Link
       href={href}
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
-      className={`relative py-1 font-semibold text-sm transition-colors duration-200 ${
+      className={`group relative py-1 font-semibold text-sm transition-colors duration-200 ${
         isActive ? tone.active : tone.idle
       } ${className}`}
     >
@@ -53,7 +56,7 @@ export function NavUnderlineLink({
       </span>
       <span
         className={`absolute bottom-0 left-0 h-0.5 w-full rounded-full transition-transform duration-300 origin-left ${tone.bar} ${
-          isActive ? "scale-x-100" : "scale-x-0"
+          isActive ? "scale-x-100" : `scale-x-0 ${hoverUnderline}`
         }`}
       />
     </Link>

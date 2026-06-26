@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { PUBLIC_HEADER_OFFSET, PUBLIC_SCROLL_MARGIN } from "@/lib/layout/public-shell";
+import { PUBLIC_SCROLL_MARGIN } from "@/lib/layout/public-shell";
 import {
   ArrowRight,
   BadgeCheck,
@@ -245,7 +245,7 @@ export function LandingPageClient() {
   return (
     <main>
         {/* Hero Section */}
-        <section className={`relative min-h-svh flex items-center justify-center ${PUBLIC_HEADER_OFFSET} py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]`}>
+        <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
           {/* Decorative Glowing Blobs */}
           <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
           <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
