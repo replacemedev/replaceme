@@ -25,12 +25,12 @@
 
 ## QA ([`QA-GATE.md`](./QA-GATE.md))
 
-- [ ] `e2e/employer/job-edit.spec.ts`
-- [ ] `e2e/employer/applicants-kanban.spec.ts`
-- [ ] `e2e/employer/interviews.spec.ts`
-- [ ] `e2e/employer/offer-hire.spec.ts`
-- [ ] `e2e/employer/candidate-profile.spec.ts`
-- [ ] `e2e/employer/notifications.spec.ts`
-- [ ] CLI: `npm run test:e2e:employer`
+- [x] `e2e/employer/job-edit.spec.ts`
+- [x] `e2e/employer/applicants-kanban.spec.ts`
+- [x] `e2e/employer/interviews.spec.ts`
+- [x] `e2e/employer/offer-hire.spec.ts`
+- [x] `e2e/employer/candidate-profile.spec.ts`
+- [x] `e2e/employer/notifications.spec.ts`
+- [x] CLI: `npm run test:e2e:employer`
 - [ ] MCP: job → applicant → interview → offer → hired
-- [ ] Artifacts: `e2e/debug/phase-1/`
+- [x] Artifacts: `e2e/debug/phase-1/`

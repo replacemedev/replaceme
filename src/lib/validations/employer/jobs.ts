@@ -27,6 +27,14 @@ export const createJobSchema = z
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 
+export const updateJobSchema = createJobSchema
+  .extend({
+    jobId: uuidSchema,
+  })
+  .strict();
+
+export type UpdateJobInput = z.infer<typeof updateJobSchema>;
+
 export const jobIdSchema = z.object({ jobId: uuidSchema }).strict();
 export const trackJobViewSchema = jobIdSchema;
 

@@ -24,7 +24,15 @@ function DecorativeQuote() {
   );
 }
 
-export function LoginTestimonial() {
+export function LoginTestimonial({
+  quote = "This platform has transformed how we connect with top-tier professionals. It's an indispensable tool for our daily operations.",
+  name = "Sarah Jenkins",
+  role = "Director of Operations, TechCorp",
+}: {
+  quote?: string;
+  name?: string;
+  role?: string;
+}) {
   return (
     <div className="relative flex h-full w-full flex-col justify-center overflow-hidden px-8 py-12 md:px-16 lg:px-20 xl:px-24">
       {/* Mesh gradient base */}
@@ -70,9 +78,7 @@ export function LoginTestimonial() {
           <DecorativeQuote />
 
           <blockquote className="relative text-balance text-2xl font-semibold leading-[1.35] tracking-tight text-slate-900 md:text-[1.75rem] lg:text-3xl lg:leading-[1.3]">
-            This platform has transformed how we connect with top-tier
-            professionals. It&apos;s an indispensable tool for our daily
-            operations.
+            {quote}
           </blockquote>
 
           <footer className="mt-8 flex items-center gap-4 border-t border-emerald-900/8 pt-8">
@@ -87,11 +93,9 @@ export function LoginTestimonial() {
             </div>
             <cite className="not-italic">
               <p className="font-body-bold text-base font-bold text-slate-900">
-                Sarah Jenkins
+                {name}
               </p>
-              <p className="text-sm font-body-base text-slate-600">
-                Director of Operations, TechCorp
-              </p>
+              <p className="text-sm font-body-base text-slate-600">{role}</p>
             </cite>
           </footer>
         </div>

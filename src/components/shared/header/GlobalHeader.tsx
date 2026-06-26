@@ -2,6 +2,7 @@ import type { NavSession } from "@/types/nav";
 import { NotificationBellContainer } from "@/components/shared/header/NotificationBellContainer";
 import { WORKER_NOTIFICATIONS_HREF } from "@/config/workerNav";
 import { ADMIN_NOTIFICATIONS_HREF } from "@/config/adminNav";
+import { EMPLOYER_NOTIFICATIONS_HREF } from "@/config/employerNav";
 
 interface GlobalHeaderActionsProps {
   session: NavSession;
@@ -32,7 +33,9 @@ export async function GlobalHeaderActions({
             ? WORKER_NOTIFICATIONS_HREF
             : session.role === "admin"
               ? ADMIN_NOTIFICATIONS_HREF
-              : undefined
+              : session.role === "employer"
+                ? EMPLOYER_NOTIFICATIONS_HREF
+                : undefined
         }
       />
       {children}

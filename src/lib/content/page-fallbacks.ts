@@ -1,5 +1,6 @@
 import { PUBLIC_HELP_ARTICLES } from "@/config/publicNav";
 import type {
+  AuthScreenConfig,
   ContactPageConfig,
   HelpIndexConfig,
   PageContentMeta,
@@ -41,4 +42,23 @@ export const CONTACT_FALLBACK: ContactPageConfig = {
   title: "Contact Us",
   description: "We're here to help with account, billing, or platform questions.",
   email: "support@replaceme.com",
+};
+
+export const AUTH_LOGIN_FALLBACK: AuthScreenConfig = {
+  headline: "Welcome back",
+  description:
+    "Sign in to access your professional dashboard and manage your network.",
+  signupPrompt: "Don't have an account?",
+  signupLinkLabel: "Sign up",
+  testimonialQuote:
+    "This platform has transformed how we connect with top-tier professionals. It's an indispensable tool for our daily operations.",
+  testimonialName: "Sarah Jenkins",
+  testimonialRole: "Director of Operations, TechCorp",
+};
+
+export const AUTH_SIGNUP_FALLBACK: AuthScreenConfig = {
+  headline: "Create your account",
+  description: "Join the premier professional marketplace.",
+  signupPrompt: "Already have an account?",
+  signupLinkLabel: "Log in",
 };

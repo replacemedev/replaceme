@@ -6,10 +6,25 @@ import { Zap, ShieldCheck, Check, Sparkles } from "lucide-react";
 
 interface SubmissionCardsProps {
   isSubmitting: boolean;
+  editMode?: boolean;
 }
 
-export function SubmissionCards({ isSubmitting }: SubmissionCardsProps) {
+export function SubmissionCards({ isSubmitting, editMode = false }: SubmissionCardsProps) {
   const { setValue } = useFormContext();
+
+  if (editMode) {
+    return (
+      <div className="max-w-xl mx-auto">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#006e2f] px-6 text-sm font-bold text-white transition hover:bg-[#005c26] disabled:opacity-50"
+        >
+          {isSubmitting ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

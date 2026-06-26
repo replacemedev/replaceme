@@ -1,7 +1,5 @@
 import type { PageContentDefinition } from "@/types/page-content";
 
-export const PAGE_CONTENT_TAG = "page-content";
-
 export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
   {
     slug: "privacy-policy",
@@ -45,7 +43,23 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
     contentType: "json",
     description: "Contact page headline and support email.",
   },
+  {
+    slug: "auth-login",
+    label: "Login Screen",
+    publicPath: "/login",
+    contentType: "json",
+    description: "Login page headline, description, and testimonial copy.",
+  },
+  {
+    slug: "auth-signup",
+    label: "Sign Up Screen",
+    publicPath: "/signup",
+    contentType: "json",
+    description: "Sign up page headline, description, and footer prompt.",
+  },
 ];
+
+export const PAGE_CONTENT_TAG = "page-content";
 
 export const PAGE_CONTENT_SLUGS = [
   "privacy-policy",
@@ -54,6 +68,8 @@ export const PAGE_CONTENT_SLUGS = [
   "help-index",
   "help-hiring-guide",
   "contact",
+  "auth-login",
+  "auth-signup",
 ] as const;
 
 export type PageContentSlug = (typeof PAGE_CONTENT_SLUGS)[number];

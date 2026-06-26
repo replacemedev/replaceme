@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Unlock, LayoutGrid, Table2 } from "lucide-react";
+import { AlertCircle, Unlock, LayoutGrid, Table2, Columns3 } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { ApplicantsToolbar } from "./ApplicantsToolbar";
 import { ApplicantCard } from "./ApplicantCard";
@@ -11,6 +11,7 @@ import {
   ApplicantTrackerTable,
   type ApplicantTrackerRow,
 } from "./ApplicantTrackerTable";
+import { ApplicantKanban } from "./ApplicantKanban";
 import { unlockCandidate, getApplicants } from "@/actions/employer/applicants";
 import { toast } from "sonner";
 
@@ -31,7 +32,7 @@ export function ApplicantsClient({
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
   const [creditsBalance, setCreditsBalance] = useState<number>(initialCreditsBalance);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [viewMode, setViewMode] = useState<"cards" | "table" | "kanban">("cards");
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -180,10 +181,38 @@ export function ApplicantsClient({
           <Table2 className="h-3.5 w-3.5" aria-hidden />
           Table
         </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("kanban")}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            viewMode === "kanban"
+              ? "bg-[#10b981] text-white"
+              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          <Columns3 className="h-3.5 w-3.5" aria-hidden />
+          Kanban
+        </button>
       </div>
 
-      {filteredApplicants.length > 0 ? (
-        viewMode === "table" ? (
+      {filteredApplicants.length === 0 && viewMode !== "kanban" ? (
+        /* Empty results state */
+        <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center shadow-xs">
+          <div className="w-16 h-16 bg-gray-50 border border-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-5">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-800">No Candidates Found</h3>
+          <p className="text-sm text-gray-400 font-medium mt-2 max-w-xs mx-auto leading-relaxed">
+            No applicant matches the filter criteria or search keyword. Try modifying your search query.
+          </p>
+        </div>
+      ) : viewMode === "kanban" ? (
+          <ApplicantKanban
+            applicants={filteredApplicants}
+            jobId={jobId}
+            onMessageClick={handleChatWithCandidate}
+          />
+        ) : viewMode === "table" ? (
           <ApplicantTrackerTable
             rows={tableRows}
             onUnlock={handleUnlockByCandidateId}
@@ -195,6 +224,7 @@ export function ApplicantsClient({
               <ApplicantCard
                 key={app.id}
                 applicant={app}
+                jobId={jobId}
                 onMessageClick={() => handleChatWithCandidate(app.candidateId)}
               />
             ) : (
@@ -206,19 +236,7 @@ export function ApplicantsClient({
             )
           )}
         </div>
-        )
-      ) : (
-        /* Empty results state */
-        <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center shadow-xs">
-          <div className="w-16 h-16 bg-gray-50 border border-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-5">
-            <AlertCircle className="w-8 h-8" />
-          </div>
-          <h3 className="text-lg font-bold text-gray-800">No Candidates Found</h3>
-          <p className="text-sm text-gray-400 font-medium mt-2 max-w-xs mx-auto leading-relaxed">
-            No applicant matches the filter criteria or search keyword. Try modifying your search query.
-          </p>
-        </div>
-      )}
+        )}
 
       {/* Lightweight Confirmation Modal / Out of Credits Modal */}
       {modalOpen && targetApplicant && (

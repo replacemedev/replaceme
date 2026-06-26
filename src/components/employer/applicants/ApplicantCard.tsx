@@ -2,19 +2,23 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { MessageSquare, Trash2, Eye } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
+import { ApplicantActions } from "./ApplicantActions";
 
 interface ApplicantCardProps {
   applicant: Applicant;
+  jobId?: string;
   onMessageClick?: () => void;
   onDeleteClick?: () => void;
 }
 
 export function ApplicantCard({
   applicant,
+  jobId,
   onMessageClick,
   onDeleteClick,
 }: ApplicantCardProps) {
@@ -95,6 +99,12 @@ export function ApplicantCard({
         </div>
       </div>
 
+      <ApplicantActions
+        applicationId={applicant.id}
+        status={applicant.status}
+        isUnlocked={applicant.isUnlocked}
+      />
+
       {/* Card Action Buttons Footer */}
       <div className="mt-5 flex gap-2 pt-4 border-t border-slate-50 items-center">
         {isRejected ? (
@@ -118,13 +128,17 @@ export function ApplicantCard({
         ) : (
           /* Active state footer buttons */
           <>
-            <button
-              type="button"
-              className="flex-1 h-9 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            <Link
+              href={
+                jobId
+                  ? `/employer/candidates/${applicant.candidateId}?jobId=${jobId}`
+                  : `/employer/candidates/${applicant.candidateId}`
+              }
+              className="flex-1 h-9 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-1.5"
             >
               <Eye size={14} />
               View Profile
-            </button>
+            </Link>
             <button
               onClick={onMessageClick}
               type="button"

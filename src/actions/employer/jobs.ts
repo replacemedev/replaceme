@@ -2,7 +2,7 @@
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
-import { createJobSchema, CreateJobInput, DropdownOption, jobIdSchema } from "@/lib/validations/employer/jobs";
+import { createJobSchema, CreateJobInput, DropdownOption, jobIdSchema, updateJobSchema, UpdateJobInput } from "@/lib/validations/employer/jobs";
 import { requireRole } from "@/lib/server/auth/session";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { closeJobOwnedByEmployer } from "@/lib/server/dal/jobs";
@@ -101,6 +101,121 @@ export async function createJobPost(payload: CreateJobInput) {
     safeError("createJobPost error occurred:", err);
     return { error: "An unexpected error occurred while saving the job post. Please try again." };
   }
+}
+
+/**
+ * Server Action to update an existing job post owned by the employer.
+ */
+export async function updateJobPost(payload: UpdateJobInput) {
+  try {
+    const parsed = updateJobSchema.safeParse(payload);
+    if (!parsed.success) {
+      const errorMsg = parsed.error.issues[0]?.message || "Invalid form submission payload.";
+      return { error: errorMsg };
+    }
+
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { error: "Authentication failed. Please log in again." };
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile || profile.role !== "employer") {
+      return { error: "Access denied. Only employers can edit jobs." };
+    }
+
+    const { data: existing, error: existingError } = await supabase
+      .from("jobs")
+      .select("id, status")
+      .eq("id", parsed.data.jobId)
+      .eq("employer_id", profile.id)
+      .maybeSingle();
+
+    if (existingError || !existing) {
+      return { error: "Job not found or access denied." };
+    }
+
+    if (existing.status === "Closed") {
+      return { error: "Closed jobs cannot be edited." };
+    }
+
+    const { error: updateError } = await supabase
+      .from("jobs")
+      .update({
+        title: parsed.data.title,
+        employment_type: parsed.data.employmentType,
+        description: parsed.data.description,
+        monthly_salary: parsed.data.monthlySalary,
+        hours_per_week: parsed.data.hoursPerWeek,
+        skills: parsed.data.skills,
+      })
+      .eq("id", parsed.data.jobId)
+      .eq("employer_id", profile.id);
+
+    if (updateError) {
+      safeError("updateJobPost update error: [REDACTED_DB_ERROR]");
+      return { error: "Failed to update job post." };
+    }
+
+    revalidatePath("/employer/dashboard");
+    revalidatePath("/employer/jobs");
+    revalidatePath(`/employer/jobs/${parsed.data.jobId}`);
+
+    return {
+      success: true,
+      message: "Job updated successfully!",
+      redirectUrl: `/employer/jobs/${parsed.data.jobId}`,
+    };
+  } catch (err) {
+    safeError("updateJobPost error occurred:", err);
+    return { error: "An unexpected error occurred while updating the job post." };
+  }
+}
+
+/**
+ * Fetch raw job row for edit form prefill.
+ */
+export async function getJobForEdit(jobId: string) {
+  const parsed = jobIdSchema.safeParse({ jobId });
+  if (!parsed.success) return null;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "employer") return null;
+
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("id, title, employment_type, description, monthly_salary, hours_per_week, skills, status")
+    .eq("id", parsed.data.jobId)
+    .eq("employer_id", profile.id)
+    .maybeSingle();
+
+  if (!job || job.status === "Closed") return null;
+
+  return {
+    id: job.id,
+    title: job.title,
+    employmentType: job.employment_type,
+    description: job.description,
+    monthlySalary: Number(job.monthly_salary),
+    hoursPerWeek: Number(job.hours_per_week),
+    skills: (job.skills as string[]) ?? [],
+  };
 }
 
 /**

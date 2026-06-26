@@ -6,6 +6,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { LoginTestimonial } from "@/components/auth/LoginTestimonial";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
+import { getAuthScreenContent } from "@/lib/content/auth-screen";
 
 export const metadata = {
   title: "Sign In | ReplaceMe",
@@ -25,10 +26,17 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
+  const content = await getAuthScreenContent("auth-login");
 
   return (
     <AuthLayout
-      sidePanel={<LoginTestimonial />}
+      sidePanel={
+        <LoginTestimonial
+          quote={content.testimonialQuote}
+          name={content.testimonialName}
+          role={content.testimonialRole}
+        />
+      }
       sidePanelPosition="right"
       footer={<AuthFooter />}
     >
@@ -56,12 +64,9 @@ export default async function LoginPage({
         {view === "login" ? (
           <>
             <h1 className="text-display-lg font-display-lg mb-2 font-bold text-slate-900">
-              Welcome back
+              {content.headline}
             </h1>
-            <p className="text-body-base text-slate-600">
-              Sign in to access your professional dashboard and manage your
-              network.
-            </p>
+            <p className="text-body-base text-slate-600">{content.description}</p>
           </>
         ) : (
           <>
@@ -83,14 +88,14 @@ export default async function LoginPage({
         )}
       </div>
 
-      {view === "login" ? (
+      {view === "login" && content.signupPrompt && content.signupLinkLabel ? (
         <p className="mt-4 text-center text-sm font-body-base text-slate-600">
-          Don&apos;t have an account?{" "}
+          {content.signupPrompt}{" "}
           <Link
             href="/signup"
             className="font-body-bold font-bold text-[#006e2f] transition-colors hover:text-[#005321]"
           >
-            Sign up
+            {content.signupLinkLabel}
           </Link>
         </p>
       ) : null}

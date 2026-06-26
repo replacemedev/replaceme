@@ -19,7 +19,7 @@
 <!-- PROMPT_SYNC:BEGIN -->
 ### Repository File Map (auto-generated from workspace)
 
-**Last synced:** 2026-06-26T06:21:57.818Z · **Git:** `4a37f53`
+**Last synced:** 2026-06-26T06:53:58.980Z · **Git:** `40faf8e`
 **Regenerate:** `npm run prompt:sync` after any add, rename, delete, or move under `src/`, `supabase/migrations/`, or root entry files.
 
 **Agent rule:** Use this map + **Task → Files**. Do not broad-scan the repo. If a path is missing here, run `npm run prompt:sync` (or ask the user to).
@@ -36,7 +36,7 @@ package.json
 supabase/migrations/*.sql  # 31 migration file(s)
 ```
 
-#### `src/app/` — routes (App Router) — 120 route files
+#### `src/app/` — routes (App Router) — 123 route files
 
 ```txt
 src/app/(public)/companies/[id]/page.tsx
@@ -96,12 +96,14 @@ src/app/admin/not-found.tsx
 src/app/api/webhooks/stripe/route.ts
 src/app/auth/callback/route.ts
 src/app/auth/confirm/route.ts
+src/app/employer/candidates/[candidateId]/page.tsx
 src/app/employer/checkout/[planId]/loading.tsx
 src/app/employer/checkout/[planId]/page.tsx
 src/app/employer/dashboard/loading.tsx
 src/app/employer/dashboard/page.tsx
 src/app/employer/hired/loading.tsx
 src/app/employer/hired/page.tsx
+src/app/employer/interviews/page.tsx
 src/app/employer/jobs/[jobId]/applicants/loading.tsx
 src/app/employer/jobs/[jobId]/applicants/page.tsx
 src/app/employer/jobs/[jobId]/loading.tsx
@@ -113,6 +115,7 @@ src/app/employer/jobs/page.tsx
 src/app/employer/layout.tsx
 src/app/employer/messages/loading.tsx
 src/app/employer/messages/page.tsx
+src/app/employer/notifications/page.tsx
 src/app/employer/onboarding/page.tsx
 src/app/employer/pinned/loading.tsx
 src/app/employer/pinned/page.tsx
@@ -161,7 +164,7 @@ src/app/worker/verification/loading.tsx
 src/app/worker/verification/page.tsx
 ```
 
-#### `src/actions/` — Server Actions (27 files)
+#### `src/actions/` — Server Actions (28 files)
 
 ```txt
 src/actions/admin-actions.ts
@@ -173,6 +176,7 @@ src/actions/employer/billing.ts
 src/actions/employer/company.ts
 src/actions/employer/dashboard.ts
 src/actions/employer/hired.ts
+src/actions/employer/hiring.ts
 src/actions/employer/jobs.ts
 src/actions/employer/pinned.ts
 src/actions/employer/pricing.ts
@@ -193,13 +197,14 @@ src/actions/worker/phase2.ts
 src/actions/worker/profile.ts
 ```
 
-#### `src/lib/` — infra, DAL, validations (31 files)
+#### `src/lib/` — infra, DAL, validations (32 files)
 
 ```txt
 src/lib/auth/error-message.ts
 src/lib/auth/nav-session.ts
 src/lib/auth/role.ts
 src/lib/auth/site-url.ts
+src/lib/content/auth-screen.ts
 src/lib/content/page-fallbacks.ts
 src/lib/notifications/fetch-initial.ts
 src/lib/server/action-result.ts
@@ -235,7 +240,7 @@ src/lib/validations/worker/phase2.ts
 src/components/admin/  (25 files)
 src/components/auth/  (11 files)
 src/components/dashboard/  (0 files)
-src/components/employer/  (53 files)
+src/components/employer/  (55 files)
 src/components/landing/  (1 files)
 src/components/layout/  (8 files)
 src/components/public/  (4 files)
@@ -252,7 +257,7 @@ src/components/ui/  (4 files)
 src/components/worker/  (41 files)
 ```
 
-#### `src/types/` (24) · `src/config/` (6) · `src/hooks/` (1)
+#### `src/types/` (24) · `src/config/` (7) · `src/hooks/` (1)
 
 ```txt
 src/types/admin.types.ts
@@ -280,6 +285,7 @@ src/types/verification.ts
 src/types/worker-profile.ts
 src/types/worker.ts
 src/config/adminNav.ts
+src/config/employerNav.ts
 src/config/navigation.ts
 src/config/onboarding.ts
 src/config/page-content.ts

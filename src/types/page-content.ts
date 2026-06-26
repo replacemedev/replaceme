@@ -44,6 +44,18 @@ export interface ContactPageConfig {
   email: string;
 }
 
+export interface AuthScreenConfig {
+  headline: string;
+  description: string;
+  signupPrompt?: string;
+  signupLinkLabel?: string;
+  testimonialQuote?: string;
+  testimonialName?: string;
+  testimonialRole?: string;
+}
+
+export type AuthScreenSlug = "auth-login" | "auth-signup";
+
 export interface PageContentDefinition {
   slug: string;
   label: string;

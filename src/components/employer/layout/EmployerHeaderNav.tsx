@@ -97,6 +97,18 @@ export function EmployerHeaderNav({
           )}
         </Link>
         <Link
+          href="/employer/interviews"
+          className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
+        >
+          Interviews
+        </Link>
+        <Link
+          href="/employer/notifications"
+          className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
+        >
+          Notifications
+        </Link>
+        <Link
           href="/employer/pinned"
           className="text-slate-600 hover:text-[#006e2f] font-semibold text-sm transition-colors duration-200"
         >
@@ -168,6 +180,20 @@ export function EmployerMobileMenu({
                 {unreadMessageCount}
               </span>
             )}
+          </Link>
+          <Link
+            href="/employer/interviews"
+            onClick={() => setMobileMenuOpen(false)}
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
+          >
+            Interviews
+          </Link>
+          <Link
+            href="/employer/notifications"
+            onClick={() => setMobileMenuOpen(false)}
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
+          >
+            Notifications
           </Link>
           <Link
             href="/employer/pinned"

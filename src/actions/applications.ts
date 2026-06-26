@@ -58,6 +58,7 @@ export async function updateApplicationStatus(
     const jobId = application.job_id;
     revalidatePath(`/employer/jobs/${jobId}`);
     revalidatePath(`/employer/jobs/${jobId}/applicants`);
+    revalidatePath("/employer/interviews");
     revalidatePath("/worker/applications");
     revalidatePath("/worker/dashboard");
 
