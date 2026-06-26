@@ -37,8 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
-      data-scroll-behavior="smooth"
+      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <link
