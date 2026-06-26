@@ -191,7 +191,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
               </div>
               {isOwner && (
                 <Link
-                  href="/worker/dashboard/profile"
+                  href="/worker/skills/edit"
                   className="text-xs font-bold text-[#006e2f] hover:text-[#005321] transition-colors"
                 >
                   Manage Skills
@@ -225,7 +225,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
               </div>
               {isOwner && (
                 <Link
-                  href="/worker/dashboard/profile"
+                  href="/worker/profile/edit"
                   className="text-xs font-bold text-[#006e2f] hover:text-[#005321] flex items-center gap-1 transition-colors"
                 >
                   <Plus size={14} />

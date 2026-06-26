@@ -27,7 +27,7 @@ function loadEnvFile(filename: string) {
 loadEnvFile(".env.local");
 loadEnvFile(".env");
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -35,6 +35,7 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   workers: 1,
+  timeout: 60_000,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL,
@@ -62,9 +63,9 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined
     : {
-        command: "npm run dev",
+        command: "node scripts/playwright-web-server.mjs",
         url: baseURL,
-        reuseExistingServer: true,
-        timeout: 120_000,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
       },
 });

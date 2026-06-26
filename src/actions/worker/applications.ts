@@ -75,6 +75,44 @@ async function getAuthenticatedWorker() {
   return { supabase, profile };
 }
 
+export async function getWorkerApplicationById(applicationId: string) {
+  try {
+    const ctx = await getAuthenticatedWorker();
+    if (!ctx) return null;
+
+    const { supabase, profile } = ctx;
+
+    const { data, error } = await supabase
+      .from("applications")
+      .select(
+        `
+        id,
+        status,
+        created_at,
+        match_score,
+        job_id,
+        job_posts (
+          id,
+          title,
+          company_name,
+          logo_url,
+          monthly_salary,
+          hours_per_week
+        )
+      `
+      )
+      .eq("id", applicationId)
+      .eq("candidate_id", profile.id)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return mapApplicationRow(data);
+  } catch (err) {
+    safeError("getWorkerApplicationById:", err);
+    return null;
+  }
+}
+
 /** applications → job_posts (jobs + company_profiles via view). */
 export async function getWorkerApplications(): Promise<WorkerApplication[]> {
   try {

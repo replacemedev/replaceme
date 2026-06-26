@@ -97,7 +97,7 @@ export function ApplicationRow({ application }: ApplicationRowProps) {
         </div>
 
         <Link
-          href={`/worker/jobs`}
+          href={`/worker/applications/${application.id}`}
           className="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-[#006e2f] hover:text-[#006e2f] transition-colors shrink-0"
         >
           View Details

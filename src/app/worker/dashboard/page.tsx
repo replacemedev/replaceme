@@ -215,7 +215,7 @@ export default async function WorkerDashboard() {
             My Skills
           </h2>
           <Link 
-            href="/skills/edit"
+            href="/worker/skills/edit"
             className="inline-flex items-center gap-1 text-xs font-bold text-[#006e2f] hover:text-[#005321] transition-colors"
           >
             <Plus size={14} />
@@ -247,14 +247,14 @@ export default async function WorkerDashboard() {
             icon={<User size={20} />}
             iconBgClass="bg-blue-50"
             iconColorClass="text-blue-600"
-            href="/profile/edit"
+            href="/worker/profile/edit"
           />
           <QuickActionCard 
             title="Messages"
             icon={<MessageSquare size={20} />}
             iconBgClass="bg-rose-50"
             iconColorClass="text-rose-500"
-            href="/messages"
+            href="/worker/messages"
           />
           <QuickActionCard 
             title="Help Articles"
