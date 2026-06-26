@@ -14,64 +14,42 @@ interface HeaderProps {
   session?: NavSession;
 }
 
-const GUEST_SECTION_IDS = GUEST_HEADER_NAV.map((item) => item.id);
+const GUEST_SECTION_IDS = new Set(GUEST_HEADER_NAV.map((item) => item.id));
+
+function isGuestSectionId(id: string): id is (typeof GUEST_HEADER_NAV)[number]["id"] {
+  return GUEST_SECTION_IDS.has(id as (typeof GUEST_HEADER_NAV)[number]["id"]);
+}
 
 export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [landingSection, setLandingSection] = useState("");
+  const [activeSection, setActiveSection] = useState("");
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
 
   useEffect(() => {
     if (!isLandingPage) {
-      setLandingSection("");
+      setActiveSection("");
       return;
     }
 
     const syncFromHash = () => {
       const id = window.location.hash.replace("#", "");
-      setLandingSection(
-        GUEST_SECTION_IDS.includes(id as (typeof GUEST_SECTION_IDS)[number]) ? id : ""
-      );
+      setActiveSection(isGuestSectionId(id) ? id : "");
     };
 
     syncFromHash();
     window.addEventListener("hashchange", syncFromHash);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (window.location.hash) return;
-
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-        if (visible.length > 0) {
-          setLandingSection(visible[0].target.id);
-          return;
-        }
-
-        if (window.scrollY < 120) {
-          setLandingSection("");
-        }
-      },
-      { rootMargin: "-25% 0px -55% 0px", threshold: 0.1 }
-    );
-
-    GUEST_SECTION_IDS.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-      observer.disconnect();
-    };
+    return () => window.removeEventListener("hashchange", syncFromHash);
   }, [isLandingPage, pathname]);
 
   const getAnchorHref = (id: string) => (isLandingPage ? `#${id}` : `/#${id}`);
 
-  const isAnchorActive = (id: string) => isLandingPage && landingSection === id;
+  const selectSection = (id: string) => {
+    setActiveSection(id);
+    setMobileMenuOpen(false);
+  };
+
+  const isAnchorActive = (id: string) => isLandingPage && activeSection === id;
 
   const marketingNavLinks = GUEST_HEADER_NAV.map((item) => (
     <NavUnderlineLink
@@ -81,14 +59,15 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
       variant="public"
       className="font-body-base"
       isActive={isAnchorActive(item.id)}
+      onClick={() => selectSection(item.id)}
     />
   ));
 
   const marketingMobileLinks = GUEST_HEADER_NAV.map((item) => (
     <Link
       key={item.id}
-      onClick={() => setMobileMenuOpen(false)}
-      className={`font-medium py-2 transition-colors duration-200 ${
+      onClick={() => selectSection(item.id)}
+      className={`relative py-2 font-medium transition-colors duration-200 ${
         isAnchorActive(item.id)
           ? "text-[#22c55e]"
           : "text-slate-700 hover:text-[#22c55e]"
@@ -96,6 +75,11 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
       href={getAnchorHref(item.id)}
     >
       {item.label}
+      <span
+        className={`absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-[#22c55e] transition-transform duration-300 origin-left ${
+          isAnchorActive(item.id) ? "scale-x-100" : "scale-x-0"
+        }`}
+      />
     </Link>
   ));
 
