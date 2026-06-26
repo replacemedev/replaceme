@@ -141,19 +141,6 @@ body {
   font-family: var(--font-body-base);
 }
 
-.public-nav-link.public-nav-active {
-  color: #22c55e;
-}
-
-.public-nav-link:hover {
-  color: #22c55e;
-}
-
-.public-nav-link:hover .public-nav-underline,
-.public-nav-link.public-nav-active .public-nav-underline {
-  transform: scaleX(1);
-}
-
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;

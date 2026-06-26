@@ -54,7 +54,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
         label={item.label}
         isActive={activeSection === item.id}
         onClick={() => handleSectionClick(item.id)}
-        className="py-1 font-body-base font-semibold text-sm text-[#475569]"
+        className="py-1 font-body-base"
       />
     ) : (
       <Link

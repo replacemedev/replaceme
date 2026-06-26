@@ -9,7 +9,6 @@ interface PublicLandingNavLinkProps {
   className?: string;
   isActive?: boolean;
   onClick?: () => void;
-  showUnderline?: boolean;
 }
 
 export function PublicLandingNavLink({
@@ -18,23 +17,24 @@ export function PublicLandingNavLink({
   className = "",
   isActive = false,
   onClick,
-  showUnderline = true,
 }: PublicLandingNavLinkProps) {
   return (
     <ScrollLink
       to={to}
       smooth
       offset={-PUBLIC_HEADER_SCROLL_OFFSET}
-      duration={400}
+      duration={500}
       onClick={onClick}
-      className={`public-nav-link group relative cursor-pointer transition-colors duration-200 ${
-        isActive ? "public-nav-active" : ""
+      className={`group relative py-1 font-semibold text-sm transition-colors duration-200 cursor-pointer ${
+        isActive ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
       } ${className}`}
     >
       <span className="inline-flex items-center gap-1.5">{label}</span>
-      {showUnderline ? (
-        <span className="public-nav-underline absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-[#22c55e] transition-transform duration-300 origin-left scale-x-0" />
-      ) : null}
+      <span
+        className={`absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-[#22c55e] transition-transform duration-300 origin-left ${
+          isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+        }`}
+      />
     </ScrollLink>
   );
 }

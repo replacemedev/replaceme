@@ -217,7 +217,7 @@ export function LandingPageClient() {
       scroller.scrollTo(hash, {
         smooth: true,
         offset: -PUBLIC_HEADER_SCROLL_OFFSET,
-        duration: 400,
+        duration: 500,
         isDynamic: true,
       });
     });
@@ -385,8 +385,9 @@ export function LandingPageClient() {
           <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-emerald-100/30 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-container-max mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-              <Element name="find-work" id="find-work" className="lg:col-span-5 space-y-6 reveal-item">
+            <Element name="find-work" id="find-work" className="h-0 w-0" aria-hidden />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+              <div className="lg:col-span-5 space-y-6 reveal-item">
                 <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">For Talent</div>
                 <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Elevate Your Career with <span className="text-[#22c55e]">Global Opportunities</span></h2>
                 <p className="text-slate-500 font-body-base text-lg leading-relaxed">Find stable, long-term remote work with international clients who value your expertise and dedication.</p>
@@ -396,7 +397,7 @@ export function LandingPageClient() {
                     <UserPlus className="h-5 w-5 shrink-0" aria-hidden />
                   </Link>
                 </div>
-              </Element>
+              </div>
 
               <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-6">
@@ -441,10 +442,11 @@ export function LandingPageClient() {
           <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-container-max mx-auto relative z-10">
-            <Element name="how-it-works" id="how-it-works" className="text-center mb-20 reveal-item">
+            <Element name="how-it-works" id="how-it-works" className="h-0 w-0" aria-hidden />
+            <div className="text-center mb-20 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Outsourcing Made Simple</h2>
               <p className="text-slate-500 text-lg leading-relaxed">A streamlined process for both sides of the marketplace.</p>
-            </Element>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
               {/* Employer Flow */}
@@ -712,7 +714,8 @@ export function LandingPageClient() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500/5 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none z-0" />
 
           <div className="max-w-3xl mx-auto text-center relative z-10">
-            <Element name="pricing" id="pricing" className="reveal-item">
+            <Element name="pricing" id="pricing" className="h-0 w-0" aria-hidden />
+            <div className="reveal-item">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
               <p className="text-slate-300 mb-6 font-body-base text-lg">Everything you need to hire the best remote talent.</p>
               <div className="inline-block bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-2 mb-12">
@@ -720,7 +723,7 @@ export function LandingPageClient() {
                   <Gift className="h-5 w-5 shrink-0" aria-hidden /> Always 100% FREE for Job Seekers
                 </p>
               </div>
-            </Element>
+            </div>
 
             <div className="bg-white text-slate-800 rounded-3xl p-10 md:p-14 shadow-2xl max-w-lg mx-auto relative border-4 border-emerald-500/20 text-center reveal-item hover:shadow-[0_20px_50px_rgba(34,197,94,0.15)] transition-all duration-300" style={{ transitionDelay: "150ms" }}>
               {/* Featured Badge */}
@@ -762,10 +765,11 @@ export function LandingPageClient() {
           <div className="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
 
           <div className="max-w-3xl mx-auto relative z-10">
-            <Element name="faq" id="faq" className="text-center mb-16 reveal-item">
+            <Element name="faq" id="faq" className="h-0 w-0" aria-hidden />
+            <div className="text-center mb-16 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Frequently Asked Questions</h2>
               <p className="text-slate-500 font-body-base text-lg">Everything you need to know about how Replace Me works.</p>
-            </Element>
+            </div>
 
             <div className="space-y-4 reveal-item">
               {faqs.map((faq, index) => {
