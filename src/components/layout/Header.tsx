@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
@@ -13,52 +13,46 @@ interface HeaderProps {
 }
 
 export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const pathname = usePathname();
   const isLandingPage = pathname === "/";
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const getHref = (id: string) => {
     return isLandingPage ? `#${id}` : `/#${id}`;
   };
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 ${
-        isScrolled ? "py-2.5 shadow-sm" : "py-4"
-      }`}
-    >
-      <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full">
-        <NavBrand homeHref={session.homeHref} />
+    <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
+      <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16">
+        <NavBrand homeHref={session.homeHref} compact />
 
         {/* Desktop Navigation — marketing links for guests; compact for authenticated */}
         {!session.isAuthenticated && (
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-          {PUBLIC_GROWTH_NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-                  ? "text-[#22c55e]"
-                  : "text-[#475569] hover:text-[#22c55e]"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {PUBLIC_GROWTH_NAV.map((item) => {
+            const active =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
+                  active ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
+                }`}
+              >
+                {item.label}
+                <span
+                  className={`absolute bottom-0 left-0 w-full h-0.5 bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
+                    active ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
           <Link
             onClick={() => setActiveSection("how-it-works")}
-            className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+            className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
               activeSection === "how-it-works" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
             }`}
             href={getHref("how-it-works")}
@@ -72,7 +66,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
           </Link>
           <Link
             onClick={() => setActiveSection("faq")}
-            className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+            className={`relative py-1 font-body-base font-semibold transition-colors duration-200 ${
               activeSection === "faq" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
             }`}
             href={getHref("faq")}
@@ -100,7 +94,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
             Sign In
           </Link>
           <Link
-            className="bg-[#22c55e] text-white px-6 py-2.5 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
+            className="bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
             href="/signup"
           >
             Get Started
