@@ -115,16 +115,26 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
-      <div className="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16">
+      <div
+        className={`px-margin-desktop max-w-container-max mx-auto w-full h-16 items-center ${
+          isLandingPage
+            ? "flex justify-between md:grid md:grid-cols-[1fr_auto_1fr]"
+            : "flex justify-between"
+        }`}
+      >
         <NavBrand homeHref="/" compact />
 
         {isLandingPage ? (
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="hidden md:flex items-center justify-self-center gap-6 lg:gap-8">
             {landingNavLinks}
           </nav>
         ) : null}
 
-        <div className="hidden md:flex items-center gap-6 ml-auto">
+        <div
+          className={`hidden md:flex items-center gap-6 ${
+            isLandingPage ? "justify-self-end" : "ml-auto"
+          }`}
+        >
           {session.isAuthenticated ? (
             <PublicAuthenticatedNavActions session={session} />
           ) : (
