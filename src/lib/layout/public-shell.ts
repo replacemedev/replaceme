@@ -5,7 +5,7 @@ export const PUBLIC_HEADER_OFFSET = "pt-16";
 export const PUBLIC_PAGE_TOP = "pt-20";
 
 /** px below viewport top: h-16 header + breathing room for section titles. */
-export const PUBLIC_HEADER_SCROLL_OFFSET = 50;
+export const PUBLIC_HEADER_SCROLL_OFFSET = 30;
 
 export function scrollToPublicSection(id: string) {
   const target = document.getElementById(id);
