@@ -7,7 +7,7 @@ const buildIdPath = join(process.cwd(), ".next", "BUILD_ID");
 
 if (!existsSync(buildIdPath)) {
   console.log("[playwright] Building Next.js app…");
-  await new Promise<void>((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     const build = spawn("npm", ["run", "build"], {
       stdio: "inherit",
       shell: true,

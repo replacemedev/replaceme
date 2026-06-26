@@ -59,6 +59,11 @@ export default defineConfig({
       testDir: "./e2e/admin",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "public",
+      testDir: "./e2e/public",
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined

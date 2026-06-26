@@ -1,16 +1,9 @@
 "use client";
 
 import React from "react";
+import type { TestimonialItem } from "@/types/employer/billing";
 
-interface TestimonialItem {
-  quote: string;
-  author: string;
-  role: string;
-  company: string;
-  avatarUrl: string;
-}
-
-const testimonials: TestimonialItem[] = [
+const fallbackTestimonials: TestimonialItem[] = [
   {
     quote: "We found our lead developer within two days of upgrading to Essential. The quality of applicants and the instant posting feature saved us weeks of recruiting time.",
     author: "Sarah J.",
@@ -34,7 +27,15 @@ const testimonials: TestimonialItem[] = [
   },
 ];
 
-export function Testimonials() {
+interface TestimonialsProps {
+  items?: TestimonialItem[];
+}
+
+export function Testimonials({ items }: TestimonialsProps) {
+  const testimonials = items?.length ? items : fallbackTestimonials;
+
+  if (testimonials.length === 0) return null;
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-20 bg-[#f8fafe]">
       {/* Centered Title */}
@@ -63,11 +64,17 @@ export function Testimonials() {
 
             {/* Author Block */}
             <div className="mt-8 flex items-center gap-3.5 border-t border-gray-50 pt-6">
-              <img
-                src={item.avatarUrl}
-                alt={item.author}
-                className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm"
-              />
+              {item.avatarUrl ? (
+                <img
+                  src={item.avatarUrl}
+                  alt={item.author}
+                  className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm"
+                />
+              ) : (
+                <span className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                  {item.author.charAt(0)}
+                </span>
+              )}
               <div>
                 <h4 className="text-sm font-bold text-gray-900">{item.author}</h4>
                 <p className="text-[11px] font-bold text-gray-400">

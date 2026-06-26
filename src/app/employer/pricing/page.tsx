@@ -18,7 +18,7 @@ export const metadata = {
 
 export default async function PricingPage() {
   // Fetch pricing plans dynamically from database
-  const { plans } = await getPricingData();
+  const { plans, testimonials, faqs } = await getPricingData();
 
   // Fetch the employer's current active subscription state securely on the server
   const subscription = await getCurrentEmployerSubscription();
@@ -82,10 +82,10 @@ export default async function PricingPage() {
       <CompareTable plans={plans} />
 
       {/* Testimonials block */}
-      <Testimonials />
+      <Testimonials items={testimonials} />
 
       {/* Got Questions Accordions list */}
-      <FAQ />
+      <FAQ items={faqs} />
     </div>
   );
 }

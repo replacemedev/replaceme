@@ -49,7 +49,22 @@ export async function createClient() {
   );
 }
 
-// For accessing Supabase with elevated privileges (e.g., updating profiles after creation)
+// Cookie-less anon client for public RLS reads inside unstable_cache
+export function createPublicClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {},
+      },
+    }
+  );
+}
+
 export async function createAdminClient() {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

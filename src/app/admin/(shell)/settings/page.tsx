@@ -37,7 +37,11 @@ export default function AdminSettingsPage() {
           <p className="text-sm text-slate-500 mt-1">
             Platform-wide settings (billing plans, moderation rules, feature
             flags) are managed via database migrations and environment variables.
-            Contact engineering to change production configuration.
+            Public marketing and legal copy is editable under{" "}
+            <a href="/admin/settings/pages" className="text-emerald-600 font-semibold hover:underline">
+              Public Pages
+            </a>
+            .
           </p>
         </div>
       </div>

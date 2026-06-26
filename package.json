@@ -14,6 +14,7 @@
     "test:e2e:worker": "playwright test --project=worker",
     "test:e2e:reuse": "PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 playwright test",
     "test:e2e:admin": "playwright test --project=admin",
+    "test:e2e:public": "playwright test --project=public",
     "probe:employer": "node scripts/e2e-employer-probe.mjs",
     "probe:employer-lifecycle": "node scripts/e2e-employer-lifecycle.mjs",
     "prompt:sync": "node scripts/sync-prompt-file-map.mjs"

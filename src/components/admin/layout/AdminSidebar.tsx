@@ -12,6 +12,7 @@ import {
   DollarSign,
   Fingerprint,
   Scale,
+  FileText,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Security", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/settings/pages", label: "Public Pages", icon: FileText },
 ] as const;
 
 export function AdminSidebar() {

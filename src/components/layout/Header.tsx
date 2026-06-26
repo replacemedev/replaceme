@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { AuthenticatedNavActions } from "@/components/shared/nav/AuthenticatedNavActions";
 import { GUEST_NAV_SESSION, type NavSession } from "@/types/nav";
+import { PUBLIC_GROWTH_NAV } from "@/config/publicNav";
 
 interface HeaderProps {
   session?: NavSession;
@@ -41,35 +42,20 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
 
         {/* Desktop Navigation — marketing links for guests; compact for authenticated */}
         {!session.isAuthenticated && (
-        <nav className="hidden md:flex items-center gap-8">
-          <Link
-            onClick={() => setActiveSection("top-talent")}
-            className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-              activeSection === "top-talent" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-            }`}
-            href={getHref("top-talent")}
-          >
-            Find Talent
-            <span
-              className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                activeSection === "top-talent" ? "scale-x-100" : "scale-x-0"
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          {PUBLIC_GROWTH_NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  ? "text-[#22c55e]"
+                  : "text-[#475569] hover:text-[#22c55e]"
               }`}
-            />
-          </Link>
-          <Link
-            onClick={() => setActiveSection("find-work")}
-            className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-              activeSection === "find-work" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-            }`}
-            href={getHref("find-work")}
-          >
-            Find Work
-            <span
-              className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                activeSection === "find-work" ? "scale-x-100" : "scale-x-0"
-              }`}
-            />
-          </Link>
+            >
+              {item.label}
+            </Link>
+          ))}
           <Link
             onClick={() => setActiveSection("how-it-works")}
             className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
@@ -81,20 +67,6 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
             <span
               className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
                 activeSection === "how-it-works" ? "scale-x-100" : "scale-x-0"
-              }`}
-            />
-          </Link>
-          <Link
-            onClick={() => setActiveSection("pricing")}
-            className={`relative py-1.5 font-body-base font-semibold transition-colors duration-200 ${
-              activeSection === "pricing" ? "text-[#22c55e]" : "text-[#475569] hover:text-[#22c55e]"
-            }`}
-            href={getHref("pricing")}
-          >
-            Pricing
-            <span
-              className={`absolute bottom-0 left-0 w-full h-[2.5px] bg-[#22c55e] rounded-full transition-transform duration-300 origin-left ${
-                activeSection === "pricing" ? "scale-x-100" : "scale-x-0"
               }`}
             />
           </Link>
@@ -154,30 +126,20 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
         <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
           {!session.isAuthenticated ? (
             <>
-          <Link
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setActiveSection("top-talent");
-            }}
-            className={`font-medium py-2 transition-colors duration-200 ${
-              activeSection === "top-talent" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-            }`}
-            href={getHref("top-talent")}
-          >
-            Find Talent
-          </Link>
-          <Link
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setActiveSection("find-work");
-            }}
-            className={`font-medium py-2 transition-colors duration-200 ${
-              activeSection === "find-work" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-            }`}
-            href={getHref("find-work")}
-          >
-            Find Work
-          </Link>
+          {PUBLIC_GROWTH_NAV.map((item) => (
+            <Link
+              key={item.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`font-medium py-2 transition-colors duration-200 ${
+                pathname === item.href
+                  ? "text-[#22c55e]"
+                  : "text-slate-700 hover:text-[#22c55e]"
+              }`}
+              href={item.href}
+            >
+              {item.label}
+            </Link>
+          ))}
           <Link
             onClick={() => {
               setMobileMenuOpen(false);
@@ -189,18 +151,6 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
             href={getHref("how-it-works")}
           >
             How it Works
-          </Link>
-          <Link
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setActiveSection("pricing");
-            }}
-            className={`font-medium py-2 transition-colors duration-200 ${
-              activeSection === "pricing" ? "text-[#22c55e]" : "text-slate-700 hover:text-[#22c55e]"
-            }`}
-            href={getHref("pricing")}
-          >
-            Pricing
           </Link>
           <Link
             onClick={() => {

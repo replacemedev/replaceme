@@ -36,7 +36,13 @@ export function Footer() {
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/signup">
             Post a Job
           </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/#pricing">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/help/hiring-guide">
+            Hiring Guide
+          </Link>
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/companies">
+            Browse Companies
+          </Link>
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/pricing">
             Pricing
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/#faq">
@@ -47,7 +53,7 @@ export function Footer() {
         {/* Jobseeker Links Column */}
         <div className="col-span-1 flex flex-col gap-4 text-sm">
           <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Jobseekers</h4>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/#find-work">
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/jobs">
             Browse Jobs
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/signup">
@@ -66,6 +72,9 @@ export function Footer() {
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/terms-of-service">
             Terms of Service
+          </Link>
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/help">
+            Help Center
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/contact">
             Contact Us

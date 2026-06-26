@@ -192,7 +192,7 @@ export default async function EmployerDashboard() {
             <ul className="space-y-3 text-xs font-semibold text-slate-600">
               <li>
                 <Link 
-                  href="/hiring-guide"
+                  href="/help/hiring-guide"
                   className="flex items-center gap-2 hover:text-[#006e2f] transition-colors"
                 >
                   <span>📋</span>

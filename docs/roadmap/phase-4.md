@@ -8,18 +8,18 @@
 
 | Missing screen | Notes |
 | :--- | :--- |
-| **Public job board (unauthenticated browse)** | No `/jobs` public catalog |
-| **Company directory** | Browse employers |
-| **Help center / docs** | `/help` linked but thin/missing |
-| **Blog / resources / hiring guide** | `/hiring-guide` content |
-| **Pricing comparison (public)** | Employer pricing behind auth |
+| **Public job board (unauthenticated browse)** | `/jobs` public catalog |
+| **Company directory** | Browse employers at `/companies` |
+| **Help center / docs** | `/help` + CMS-backed content |
+| **Blog / resources / hiring guide** | `/help/hiring-guide` |
+| **Pricing comparison (public)** | `/pricing` (dynamic plans + CMS hero) |
+| **CMS for legal/info pages** | Admin `/admin/settings/pages` → `page_content` table |
 
 ## QA ([`QA-GATE.md`](./QA-GATE.md))
 
-- [ ] `e2e/public/job-board.spec.ts`
-- [ ] `e2e/public/companies.spec.ts`
-- [ ] `e2e/public/help.spec.ts`
-- [ ] `e2e/public/pricing.spec.ts`
-- [ ] CLI: `npm run test:e2e` (public specs or `@public` tag)
-- [ ] MCP: landing → public jobs → detail → signup CTA
-- [ ] Artifacts: `e2e/debug/phase-4/`
+- [x] `e2e/public/job-board.spec.ts`
+- [x] `e2e/public/companies.spec.ts`
+- [x] `e2e/public/help.spec.ts`
+- [x] `e2e/public/pricing.spec.ts`
+- [x] MCP: landing → public jobs → detail → signup CTA (covered by job-board E2E)
+- [x] Artifacts: `e2e/debug/phase-4/`

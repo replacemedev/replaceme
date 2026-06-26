@@ -1,13 +1,9 @@
 "use client";
 
 import React from "react";
+import type { FAQItem } from "@/types/employer/billing";
 
-interface FAQItem {
-  question: string;
-  answer: string;
-}
-
-const faqs: FAQItem[] = [
+const fallbackFaqs: FAQItem[] = [
   {
     question: "Can I change plans later?",
     answer: "Yes! You can upgrade or downgrade your plan at any time from your account settings. Prorated charges or credits will automatically be applied to your account.",
@@ -22,7 +18,15 @@ const faqs: FAQItem[] = [
   },
 ];
 
-export function FAQ() {
+interface FAQProps {
+  items?: FAQItem[];
+}
+
+export function FAQ({ items }: FAQProps) {
+  const faqs = items?.length ? items : fallbackFaqs;
+
+  if (faqs.length === 0) return null;
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-20">
       {/* Centered Got questions? */}
