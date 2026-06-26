@@ -12,7 +12,9 @@ import {
   reviewVerificationSchema,
   suspendUserSchema,
   adminEmployerListSchema,
+  adminAdminListSchema,
   adminWorkerListSchema,
+  type AdminAdminRow,
   type AdminAuditLogRow,
   type AdminEmployerRow,
   type AdminFetchResult,
@@ -387,12 +389,46 @@ export async function fetchAdminEmployersSafe(): Promise<
   }
 }
 
+export async function fetchAdminAdminsSafe(): Promise<
+  AdminFetchResult<AdminAdminRow[]>
+> {
+  try {
+    const { supabase } = await requireAdmin();
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, first_name, last_name, email, account_status, created_at")
+      .eq("role", "admin")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    const parsed = adminAdminListSchema.safeParse(data ?? []);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: "Admin records failed validation. Check database schema alignment.",
+      };
+    }
+
+    return { success: true, data: parsed.data };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to load admins",
+    };
+  }
+}
+
 export async function fetchAdminUsersPageData(): Promise<
   AdminFetchResult<AdminUsersPageData>
 > {
-  const [workersResult, employersResult] = await Promise.all([
+  const [workersResult, employersResult, adminsResult] = await Promise.all([
     fetchAdminWorkersSafe(),
     fetchAdminEmployersSafe(),
+    fetchAdminAdminsSafe(),
   ]);
 
   if (!workersResult.success) {
@@ -403,11 +439,16 @@ export async function fetchAdminUsersPageData(): Promise<
     return employersResult;
   }
 
+  if (!adminsResult.success) {
+    return adminsResult;
+  }
+
   return {
     success: true,
     data: {
       workers: workersResult.data,
       employers: employersResult.data,
+      admins: adminsResult.data,
     },
   };
 }

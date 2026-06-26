@@ -2,20 +2,24 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Search, UserX, UserCheck } from "lucide-react";
+import { Search, UserX, UserCheck, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { suspendUser, unsuspendUser } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
-import type { AdminEmployerRow, AdminWorkerRow } from "@/types/admin.types";
-
-type UserTab = "workers" | "employers";
+import type {
+  AdminAdminRow,
+  AdminEmployerRow,
+  AdminUserTab,
+  AdminWorkerRow,
+} from "@/types/admin.types";
 
 interface UsersClientProps {
-  tab: UserTab;
+  tab: AdminUserTab;
   workers: AdminWorkerRow[];
   employers: AdminEmployerRow[];
+  admins: AdminAdminRow[];
 }
 
 function displayName(
@@ -27,7 +31,18 @@ function displayName(
   return name || fallback;
 }
 
-export function UsersClient({ tab, workers, employers }: UsersClientProps) {
+const TAB_LABELS: Record<AdminUserTab, string> = {
+  workers: "workers",
+  employers: "employers",
+  admins: "admins",
+};
+
+export function UsersClient({
+  tab,
+  workers,
+  employers,
+  admins,
+}: UsersClientProps) {
   const [search, setSearch] = useState("");
   const [pending, startTransition] = useTransition();
   const [confirm, setConfirm] = useState<{
@@ -38,13 +53,11 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
   const [reason, setReason] = useState("");
   const router = useRouter();
 
-  const rows = tab === "workers" ? workers : employers;
-
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
-    if (!q) return rows;
     if (tab === "workers") {
-      return (rows as AdminWorkerRow[]).filter((w) => {
+      if (!q) return workers;
+      return workers.filter((w) => {
         const name = displayName(w.first_name, w.last_name, "");
         return (
           name.toLowerCase().includes(q) ||
@@ -53,14 +66,25 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
         );
       });
     }
-    return (rows as AdminEmployerRow[]).filter((e) => {
+    if (tab === "employers") {
+      if (!q) return employers;
+      return employers.filter((e) => {
+        return (
+          e.company_name.toLowerCase().includes(q) ||
+          (e.email?.toLowerCase().includes(q) ?? false) ||
+          (e.industry?.toLowerCase().includes(q) ?? false)
+        );
+      });
+    }
+    if (!q) return admins;
+    return admins.filter((a) => {
+      const name = displayName(a.first_name, a.last_name, "");
       return (
-        e.company_name.toLowerCase().includes(q) ||
-        (e.email?.toLowerCase().includes(q) ?? false) ||
-        (e.industry?.toLowerCase().includes(q) ?? false)
+        name.toLowerCase().includes(q) ||
+        (a.email?.toLowerCase().includes(q) ?? false)
       );
     });
-  }, [rows, search, tab]);
+  }, [tab, search, workers, employers, admins]);
 
   const handleConfirm = () => {
     if (!confirm) return;
@@ -72,9 +96,7 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
 
       if (result.success) {
         toast.success(
-          confirm.action === "suspend"
-            ? "User suspended"
-            : "User reactivated"
+          confirm.action === "suspend" ? "User suspended" : "User reactivated"
         );
         setConfirm(null);
         setReason("");
@@ -88,14 +110,20 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
   if (filtered.length === 0) {
     return (
       <div className="space-y-4">
-        <SearchBar value={search} onChange={setSearch} />
+        <SearchBar value={search} onChange={setSearch} tab={tab} />
         <EmptyState
-          icon={<Search className="h-5 w-5" aria-hidden />}
-          title={search ? "No matches" : `No ${tab} yet`}
+          icon={
+            tab === "admins" ? (
+              <ShieldCheck className="h-5 w-5" aria-hidden />
+            ) : (
+              <Search className="h-5 w-5" aria-hidden />
+            )
+          }
+          title={search ? "No matches" : `No ${TAB_LABELS[tab]} yet`}
           description={
             search
               ? "Try a different search term."
-              : `Registered ${tab} will appear here.`
+              : `Registered ${TAB_LABELS[tab]} will appear here.`
           }
         />
       </div>
@@ -104,7 +132,7 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
 
   return (
     <div className="space-y-4">
-      <SearchBar value={search} onChange={setSearch} />
+      <SearchBar value={search} onChange={setSearch} tab={tab} />
 
       <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         <table className="w-full text-sm">
@@ -116,13 +144,20 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
                   <th className="px-4 py-3">Title</th>
                   <th className="px-4 py-3">Verification</th>
                 </>
-              ) : (
+              ) : null}
+              {tab === "employers" ? (
                 <>
                   <th className="px-4 py-3">Company</th>
                   <th className="px-4 py-3">Industry</th>
                   <th className="px-4 py-3">Subscription</th>
                 </>
-              )}
+              ) : null}
+              {tab === "admins" ? (
+                <>
+                  <th className="px-4 py-3">Admin</th>
+                  <th className="px-4 py-3">Role</th>
+                </>
+              ) : null}
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Joined</th>
               <th className="px-4 py-3 text-right">Actions</th>
@@ -183,7 +218,9 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
                     </td>
                   </tr>
                 ))
-              : (filtered as AdminEmployerRow[]).map((employer) => (
+              : null}
+            {tab === "employers"
+              ? (filtered as AdminEmployerRow[]).map((employer) => (
                   <tr key={employer.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-900">
@@ -225,7 +262,63 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
                       />
                     </td>
                   </tr>
-                ))}
+                ))
+              : null}
+            {tab === "admins"
+              ? (filtered as AdminAdminRow[]).map((admin) => (
+                  <tr key={admin.id} className="hover:bg-slate-50/50">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-slate-900">
+                        {displayName(
+                          admin.first_name,
+                          admin.last_name,
+                          "Unnamed"
+                        )}
+                      </p>
+                      <p className="text-xs text-slate-400">{admin.email}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-semibold text-[#006e2f]">
+                        <ShieldCheck className="h-3 w-3" aria-hidden />
+                        Platform Admin
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={admin.account_status} />
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      {formatDate(admin.created_at)}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <UserActionButton
+                        status={admin.account_status}
+                        onSuspend={() =>
+                          setConfirm({
+                            userId: admin.id,
+                            action: "suspend",
+                            label: displayName(
+                              admin.first_name,
+                              admin.last_name,
+                              admin.email ?? "admin"
+                            ),
+                          })
+                        }
+                        onUnsuspend={() =>
+                          setConfirm({
+                            userId: admin.id,
+                            action: "unsuspend",
+                            label: displayName(
+                              admin.first_name,
+                              admin.last_name,
+                              admin.email ?? "admin"
+                            ),
+                          })
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))
+              : null}
           </tbody>
         </table>
       </div>
@@ -271,10 +364,19 @@ export function UsersClient({ tab, workers, employers }: UsersClientProps) {
 function SearchBar({
   value,
   onChange,
+  tab,
 }: {
   value: string;
   onChange: (v: string) => void;
+  tab: AdminUserTab;
 }) {
+  const placeholder =
+    tab === "employers"
+      ? "Search by company, email, or industry…"
+      : tab === "admins"
+        ? "Search by admin name or email…"
+        : "Search by name, email, or title…";
+
   return (
     <div className="relative max-w-md">
       <Search
@@ -285,8 +387,8 @@ function SearchBar({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search by name, email, or company…"
-        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30"
       />
     </div>
   );
@@ -306,7 +408,7 @@ function UserActionButton({
       <button
         type="button"
         onClick={onUnsuspend}
-        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#006e2f] hover:bg-[#ebfdf2]"
       >
         <UserCheck className="h-3.5 w-3.5" aria-hidden />
         Reactivate

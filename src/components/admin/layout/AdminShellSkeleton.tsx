@@ -3,18 +3,19 @@ import { DashboardSkeleton } from "@/components/admin/dashboard/DashboardSkeleto
 function SidebarSkeleton() {
   return (
     <aside
-      className="hidden border-r border-slate-800 bg-slate-900 px-4 py-6 lg:flex lg:flex-col"
+      className="hidden w-[260px] shrink-0 border-r border-slate-200/80 bg-white px-4 py-6 lg:flex lg:flex-col"
       aria-hidden
     >
-      <div className="mb-8 flex items-center gap-2.5 px-3">
-        <div className="h-8 w-8 animate-pulse rounded-lg bg-slate-700" />
-        <div className="h-4 w-24 animate-pulse rounded bg-slate-700" />
+      <div className="mb-6 flex items-center gap-2.5 px-1">
+        <div className="h-9 w-9 animate-pulse rounded-lg bg-slate-100" />
+        <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
       </div>
+      <div className="mb-6 h-16 animate-pulse rounded-2xl bg-slate-50 border border-slate-100" />
       <nav className="space-y-1.5">
         {Array.from({ length: 8 }).map((_, index) => (
           <div
             key={index}
-            className="h-10 animate-pulse rounded-lg bg-slate-800/80"
+            className="h-10 animate-pulse rounded-xl bg-slate-50"
           />
         ))}
       </nav>
@@ -41,12 +42,12 @@ function HeaderSkeleton() {
 export function AdminShellSkeleton() {
   return (
     <div
-      className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_1fr]"
+      className="flex min-h-screen bg-slate-50"
       aria-busy="true"
       aria-label="Loading admin panel"
     >
       <SidebarSkeleton />
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-1 flex-col min-w-0">
         <HeaderSkeleton />
         <main className="flex-1 bg-[#f8fafe] p-6 lg:p-8">
           <DashboardSkeleton />

@@ -11,6 +11,7 @@ import {
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import type { AdminJobRow } from "@/types/admin.types";
 
@@ -88,24 +89,23 @@ export function JobsModerationClient({
     });
   };
 
+  const filterCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: jobs.length };
+    for (const status of STATUS_FILTERS) {
+      if (status === "All") continue;
+      counts[status] = jobs.filter((j) => j.status === status).length;
+    }
+    return counts;
+  }, [jobs]);
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((status) => (
-          <button
-            key={status}
-            type="button"
-            onClick={() => setFilter(status)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              filter === status
-                ? "bg-emerald-500 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
+      <AdminFilterPills
+        options={STATUS_FILTERS}
+        value={filter}
+        onChange={setFilter}
+        counts={filterCounts}
+      />
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -117,7 +117,7 @@ export function JobsModerationClient({
         <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 <th className="px-4 py-3">Job</th>
                 <th className="px-4 py-3">Employer</th>
                 <th className="px-4 py-3">Type</th>
@@ -154,7 +154,7 @@ export function JobsModerationClient({
                           <ActionBtn
                             label="Approve"
                             icon={Check}
-                            className="text-emerald-700 hover:bg-emerald-50"
+                            className="text-[#006e2f] hover:bg-[#ebfdf2]"
                             disabled={pending}
                             onClick={() => handleApprove(job.id)}
                           />

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Shield, KeyRound, Smartphone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
+import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
+import { StatCard } from "@/components/shared/StatCard";
 import { fetchAuditLogs } from "@/actions/admin-actions";
 
 export const metadata = {
@@ -37,37 +39,42 @@ export default async function AdminSecurityPage() {
         description="MFA status, session assurance, and security-related audit events."
       />
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SecurityCard
-          icon={KeyRound}
-          title="Session AAL"
-          value={
-            aal?.currentLevel === "aal2"
-              ? "AAL2 (MFA verified)"
-              : "AAL1 (password only)"
-          }
-          detail={
-            aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2"
-              ? "Step-up required for sensitive actions"
-              : "Session meets admin assurance requirements"
-          }
-        />
-        <SecurityCard
-          icon={Smartphone}
-          title="TOTP MFA"
-          value={mfaEnrolled ? "Enrolled" : "Not enrolled"}
-          detail={
-            mfaEnrolled
-              ? `${totpFactors.filter((f) => f.status === "verified").length} verified factor(s)`
-              : "Enroll TOTP for production admin accounts"
-          }
-        />
-        <SecurityCard
-          icon={Shield}
-          title="Admin account"
-          value={user?.email ?? "—"}
-          detail="Role verified via JWT app_metadata"
-        />
+      <section className="space-y-4">
+        <AdminSectionLabel>Session & access</AdminSectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard
+            variant="dashboard"
+            title="Session AAL"
+            value={aal?.currentLevel === "aal2" ? "AAL2" : "AAL1"}
+            icon={<KeyRound className="h-4 w-4" aria-hidden />}
+            iconBgClass="bg-[#ebfdf2]"
+            iconColorClass="text-[#006e2f]"
+          />
+          <StatCard
+            variant="dashboard"
+            title="TOTP MFA"
+            value={mfaEnrolled ? "Enrolled" : "Not enrolled"}
+            icon={<Smartphone className="h-4 w-4" aria-hidden />}
+            iconBgClass={mfaEnrolled ? "bg-[#ebfdf2]" : "bg-amber-50"}
+            iconColorClass={mfaEnrolled ? "text-[#006e2f]" : "text-amber-600"}
+          />
+          <StatCard
+            variant="dashboard"
+            title="Admin Account"
+            value={user?.email?.split("@")[0] ?? "—"}
+            icon={<Shield className="h-4 w-4" aria-hidden />}
+            iconBgClass="bg-blue-50"
+            iconColorClass="text-blue-600"
+          />
+        </div>
+        <p className="text-xs text-slate-500">
+          {aal?.currentLevel === "aal2"
+            ? "Session meets admin assurance requirements (MFA verified)."
+            : "Step-up MFA may be required for sensitive actions."}
+          {mfaEnrolled
+            ? ` · ${totpFactors.filter((f) => f.status === "verified").length} verified TOTP factor(s).`
+            : " · Enroll TOTP for production admin accounts."}
+        </p>
       </section>
 
       {!mfaEnrolled ? (
@@ -86,10 +93,9 @@ export default async function AdminSecurityPage() {
         </div>
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-        <h2 className="text-sm font-bold text-slate-900 mb-4">
-          Recent security actions
-        </h2>
+      <section className="space-y-4">
+        <AdminSectionLabel>Recent security actions</AdminSectionLabel>
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         {securityLogs.length === 0 ? (
           <p className="text-sm text-slate-400">No security events recorded.</p>
         ) : (
@@ -109,32 +115,8 @@ export default async function AdminSecurityPage() {
             ))}
           </ul>
         )}
+        </div>
       </section>
-    </div>
-  );
-}
-
-function SecurityCard({
-  icon: Icon,
-  title,
-  value,
-  detail,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  value: string;
-  detail: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-      <div className="flex items-center gap-2 text-slate-500 mb-2">
-        <Icon className="h-4 w-4" aria-hidden />
-        <span className="text-xs font-semibold uppercase tracking-wide">
-          {title}
-        </span>
-      </div>
-      <p className="text-lg font-bold text-slate-900">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{detail}</p>
     </div>
   );
 }

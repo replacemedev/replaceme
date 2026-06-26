@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getNavSession } from "@/lib/auth/nav-session";
 import { AdminHeader } from "@/components/admin/layout/AdminHeader";
 import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
@@ -28,13 +29,25 @@ export default async function AdminShellLayout({
     redirect("/admin/mfa-challenge");
   }
 
+  const session = await getNavSession();
+
+  const sidebarProfile = {
+    displayName: session.displayName,
+    roleLabel: "Platform Admin",
+    initials: session.initials,
+    avatarUrl: session.profile?.avatar_url ?? null,
+    homeHref: session.homeHref,
+  };
+
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_1fr]">
+    <div className="min-h-screen bg-slate-50">
       <AuthFlashToast />
-      <AdminSidebar />
-      <div className="flex flex-col min-h-screen">
-        <AdminHeader />
-        <main className="flex-1 bg-[#f8fafe] p-6 lg:p-8">{children}</main>
+      <div className="flex min-h-screen">
+        <AdminSidebar profile={sidebarProfile} />
+        <div className="flex flex-1 flex-col min-w-0 min-h-screen">
+          <AdminHeader session={session} />
+          <main className="flex-1 bg-[#f8fafe] p-6 lg:p-8">{children}</main>
+        </div>
       </div>
     </div>
   );

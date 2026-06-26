@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { StatCard } from "@/components/shared/StatCard";
+import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { UrgentAlerts } from "@/components/admin/dashboard/UrgentAlerts";
 import { RecentActions } from "@/components/admin/dashboard/RecentActions";
 import { MetricsChart } from "@/components/admin/dashboard/MetricsChart";
@@ -49,60 +50,75 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Platform Overview
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Live marketplace metrics from Workers, Employers, and Jobs.
-        </p>
-      </header>
+      <AdminPageHeader
+        title="Platform Overview"
+        description="Live marketplace metrics from workers, employers, and jobs."
+      />
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <section className="space-y-4">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Key metrics
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
-          label="Total Users"
+          variant="dashboard"
+          title="Total Users"
           value={metrics.total_users}
-          icon={Users}
-          accentColor="bg-blue-50 text-blue-600"
+          icon={<Users className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-blue-50"
+          iconColorClass="text-blue-600"
         />
         <StatCard
-          label="Active Jobs"
+          variant="dashboard"
+          title="Active Jobs"
           value={metrics.active_jobs}
-          icon={Briefcase}
-          accentColor="bg-emerald-50 text-emerald-600"
+          icon={<Briefcase className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-[#ebfdf2]"
+          iconColorClass="text-[#006e2f]"
         />
         <StatCard
-          label="Pending Verifications"
+          variant="dashboard"
+          title="Pending Verifications"
           value={metrics.pending_verifications}
-          icon={ShieldAlert}
-          accentColor="bg-amber-50 text-amber-600"
+          icon={<ShieldAlert className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-amber-50"
+          iconColorClass="text-amber-600"
         />
         <StatCard
-          label="Active Subscriptions"
+          variant="dashboard"
+          title="Active Subscriptions"
           value={metrics.active_subscriptions}
-          icon={DollarSign}
-          accentColor="bg-violet-50 text-violet-600"
+          icon={<DollarSign className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-violet-50"
+          iconColorClass="text-violet-600"
         />
+        </div>
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         <StatCard
-          label="Applications"
+          variant="dashboard"
+          title="Applications"
           value={metrics.total_applications}
-          icon={FileText}
-          accentColor="bg-violet-50 text-violet-600"
+          icon={<FileText className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-violet-50"
+          iconColorClass="text-violet-600"
         />
         <StatCard
-          label="Active Contracts"
+          variant="dashboard"
+          title="Active Contracts"
           value={metrics.active_contracts}
-          icon={Handshake}
-          accentColor="bg-amber-50 text-amber-600"
+          icon={<Handshake className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-amber-50"
+          iconColorClass="text-amber-600"
         />
         <StatCard
-          label="Verified Workers"
+          variant="dashboard"
+          title="Verified Workers"
           value={metrics.verified_workers}
-          icon={UserCheck}
-          accentColor="bg-teal-50 text-teal-600"
+          icon={<UserCheck className="h-4 w-4" aria-hidden />}
+          iconBgClass="bg-teal-50"
+          iconColorClass="text-teal-600"
         />
       </section>
 
@@ -113,21 +129,27 @@ export default async function AdminDashboardPage() {
           description="Metrics will populate as workers and employers onboard."
         />
       ) : (
-        <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
-          <div className="space-y-6">
-            <MetricsChart
-              title="User Growth (30d)"
-              data={metrics.user_growth_30d}
-            />
-            <MetricsChart
-              title="Job Posting Activity (30d)"
-              data={metrics.job_activity_30d}
-            />
+        <section className="space-y-4">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Analytics & activity
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+            <div className="space-y-6">
+              <MetricsChart
+                title="User Growth"
+                data={metrics.user_growth_30d}
+              />
+              <MetricsChart
+                title="Job Posting Activity"
+                data={metrics.job_activity_30d}
+                accentClass="from-emerald-400 to-teal-600"
+              />
+            </div>
+            <aside className="space-y-6 lg:sticky lg:top-24">
+              <UrgentAlerts alerts={metrics.urgent_alerts} />
+              <RecentActions actions={auditLogs ?? []} />
+            </aside>
           </div>
-          <aside className="space-y-6">
-            <UrgentAlerts alerts={metrics.urgent_alerts} />
-            <RecentActions actions={auditLogs ?? []} />
-          </aside>
         </section>
       )}
     </div>

@@ -84,12 +84,25 @@ export const adminEmployerRowSchema = z.object({
   created_at: z.string(),
 });
 
+export const adminAdminRowSchema = z.object({
+  id: z.string().uuid(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
+  email: z.string().nullable(),
+  account_status: accountStatusSchema.catch("active"),
+  created_at: z.string(),
+});
+
 export const adminWorkerListSchema = z.array(adminWorkerRowSchema);
 export const adminEmployerListSchema = z.array(adminEmployerRowSchema);
+export const adminAdminListSchema = z.array(adminAdminRowSchema);
+
+export type AdminUserTab = "workers" | "employers" | "admins";
 
 export type AdminUsersPageData = {
   workers: AdminWorkerRow[];
   employers: AdminEmployerRow[];
+  admins: AdminAdminRow[];
 };
 
 export type AdminFetchResult<T> =
@@ -118,6 +131,15 @@ export interface AdminEmployerRow {
   industry: string | null;
   account_status: AccountStatus;
   subscription_status: string | null;
+  created_at: string;
+}
+
+export interface AdminAdminRow {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  account_status: AccountStatus;
   created_at: string;
 }
 

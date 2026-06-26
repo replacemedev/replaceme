@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Fingerprint, Check, X, FileImage, ChevronDown, ChevronUp } from "lucide-react";
+import { Fingerprint, Check, X, FileImage, ChevronDown, ChevronUp, Clock, Files } from "lucide-react";
 import { toast } from "sonner";
 import {
   fetchWorkerVerificationDocuments,
@@ -10,6 +10,8 @@ import {
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { StatCard } from "@/components/shared/StatCard";
+import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import type {
   AdminVerificationDocument,
@@ -78,6 +80,8 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
     });
   };
 
+  const totalDocuments = queue.reduce((sum, w) => sum + w.document_count, 0);
+
   if (queue.length === 0) {
     return (
       <EmptyState
@@ -89,7 +93,40 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   }
 
   return (
-    <ul className="space-y-3">
+    <div className="space-y-6">
+      <section className="space-y-4">
+        <AdminSectionLabel>Review queue</AdminSectionLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            variant="dashboard"
+            title="Pending Review"
+            value={queue.length}
+            icon={<Clock className="h-4 w-4" aria-hidden />}
+            iconBgClass="bg-amber-50"
+            iconColorClass="text-amber-600"
+          />
+          <StatCard
+            variant="dashboard"
+            title="Documents Submitted"
+            value={totalDocuments}
+            icon={<Files className="h-4 w-4" aria-hidden />}
+            iconBgClass="bg-blue-50"
+            iconColorClass="text-blue-600"
+          />
+          <StatCard
+            variant="dashboard"
+            title="Workers in Queue"
+            value={queue.length}
+            icon={<Fingerprint className="h-4 w-4" aria-hidden />}
+            iconBgClass="bg-[#ebfdf2]"
+            iconColorClass="text-[#006e2f]"
+          />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <AdminSectionLabel>Pending submissions</AdminSectionLabel>
+        <ul className="space-y-3">
       {queue.map((worker) => {
         const name =
           [worker.first_name, worker.last_name].filter(Boolean).join(" ") ||
@@ -138,7 +175,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                       type: "approved",
                     })
                   }
-                  className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-50"
+                  className="inline-flex items-center gap-1 rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" aria-hidden />
                   Approve
@@ -186,7 +223,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                             href={doc.signed_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-2 inline-block text-xs font-semibold text-emerald-600 hover:underline"
+                            className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
                           >
                             View file
                           </a>
@@ -204,6 +241,8 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           </li>
         );
       })}
+      </ul>
+      </section>
 
       <ConfirmDialog
         open={decision !== null}
@@ -240,6 +279,6 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           />
         </label>
       ) : null}
-    </ul>
+    </div>
   );
 }
