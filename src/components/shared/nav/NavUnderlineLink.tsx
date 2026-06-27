@@ -23,6 +23,7 @@ interface NavUnderlineLinkProps {
   isActive: boolean;
   variant?: AccentKey;
   className?: string;
+  ariaLabel?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   children?: React.ReactNode;
 }
@@ -33,6 +34,7 @@ export function NavUnderlineLink({
   isActive,
   variant = "brand",
   className = "",
+  ariaLabel,
   onClick,
   children,
 }: NavUnderlineLinkProps) {
@@ -46,7 +48,8 @@ export function NavUnderlineLink({
       href={href}
       onClick={onClick}
       aria-current={isActive ? "page" : undefined}
-      className={`group relative py-1 font-semibold text-sm transition-colors duration-200 ${
+      aria-label={ariaLabel}
+      className={`group relative py-1 font-semibold text-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm ${
         isActive ? tone.active : tone.idle
       } ${className}`}
     >

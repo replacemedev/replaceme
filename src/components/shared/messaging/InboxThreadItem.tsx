@@ -99,9 +99,9 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
 
         <div className="flex items-center justify-between gap-2">
           {thread.jobTitle ? (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-violet-50 border border-violet-100 text-[11px] font-semibold text-violet-700 truncate max-w-[85%]">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#ebfdf2] border border-[#006e2f]/15 text-[11px] font-semibold text-[#006e2f] truncate max-w-[85%]">
               <span className="truncate">{thread.jobTitle}</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#006e2f] shrink-0" />
             </span>
           ) : (
             <span />

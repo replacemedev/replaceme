@@ -5,9 +5,12 @@ import {
   ALL_JOB_ROLES,
   JobRoleFilterValue,
   MessagingJobRole,
+  MessagingRole,
   MessagingThread,
 } from "@/types/messaging";
 import { InboxThreadItem } from "./InboxThreadItem";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Inbox } from "lucide-react";
 
 interface InboxSidebarProps {
   threads: MessagingThread[];
@@ -20,6 +23,7 @@ interface InboxSidebarProps {
   selectedJobRole: JobRoleFilterValue;
   onJobRoleChange: (jobRoleId: JobRoleFilterValue) => void;
   onSelectThread: (threadId: string) => void;
+  role?: MessagingRole;
 }
 
 export function InboxSidebar({
@@ -33,6 +37,7 @@ export function InboxSidebar({
   selectedJobRole,
   onJobRoleChange,
   onSelectThread,
+  role = "worker",
 }: InboxSidebarProps) {
   const filtered = threads.filter((t) => {
     if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
@@ -54,7 +59,7 @@ export function InboxSidebar({
     <aside className="w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full">
       <div className="p-4 border-b border-slate-100 shrink-0">
         <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
-          Inbox
+          {role === "employer" ? "Candidate Inbox" : "Inbox"}
         </h2>
 
         <div className="relative mb-3">
@@ -107,9 +112,27 @@ export function InboxSidebar({
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
-        {filtered.length === 0 ? (
+        {threads.length === 0 ? (
+          <div className="flex items-center justify-center h-full p-4">
+            <EmptyState
+              icon={<Inbox size={22} aria-hidden />}
+              title={
+                role === "employer"
+                  ? "No conversations yet"
+                  : "Your inbox is empty"
+              }
+              description={
+                role === "employer"
+                  ? "When you message candidates from applications, threads appear here."
+                  : "When employers reach out about your applications, conversations show up here."
+              }
+              actionLabel={role === "employer" ? "View job posts" : undefined}
+              actionHref={role === "employer" ? "/employer/jobs" : undefined}
+            />
+          </div>
+        ) : filtered.length === 0 ? (
           <p className="flex items-center justify-center h-full text-sm font-medium text-slate-400 px-4 text-center">
-            No threads found
+            No threads match your filters
           </p>
         ) : (
           filtered.map((thread) => (

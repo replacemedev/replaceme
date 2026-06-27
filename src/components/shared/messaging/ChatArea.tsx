@@ -99,19 +99,13 @@ export function ChatArea({
   }, [messages]);
 
   if (!thread) {
-    if (role === "employer" && !messagingEnabled) {
-      return (
-        <section className="flex flex-1 items-center justify-center bg-slate-50/50 p-8 min-w-0">
-          <div className="w-full max-w-md">
-            <UnlockOverlay feature="messaging" currentPlan={planSlug} />
-          </div>
-        </section>
-      );
-    }
-
     return (
-      <section className="flex-1 flex items-center justify-center bg-slate-50/50 min-w-0">
-        <MessagingEmptyState />
+      <section className="flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8">
+        <MessagingEmptyState
+          role={role}
+          messagingEnabled={messagingEnabled}
+          planSlug={planSlug}
+        />
       </section>
     );
   }
@@ -164,7 +158,7 @@ export function ChatArea({
               setIsPinning(false);
             }}
             disabled={isPinning}
-            className={`p-2 rounded-lg cursor-pointer disabled:opacity-50 ${
+            className={`p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
               thread.is_pinned
                 ? "text-[#006e2f]"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"

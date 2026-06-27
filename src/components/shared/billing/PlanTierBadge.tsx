@@ -10,7 +10,7 @@ const TIER_LABELS: Record<SubscriptionTier, string> = {
 const TIER_STYLES: Record<SubscriptionTier, string> = {
   discovery: "bg-slate-100 text-slate-600 border-slate-200",
   starter: "bg-blue-50 text-blue-700 border-blue-200",
-  growth: "bg-[#e6fbf2] text-[#10b981] border-[#10b981]/25",
+  growth: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
   scale: "bg-violet-50 text-violet-700 border-violet-200",
 };
 

@@ -139,6 +139,7 @@ export function MessagingClient({
         selectedJobRole={selectedJobRole}
         onJobRoleChange={setSelectedJobRole}
         onSelectThread={handleSelectThread}
+        role={role}
       />
       <ChatArea
         thread={activeThread}

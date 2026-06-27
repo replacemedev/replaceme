@@ -7,8 +7,8 @@ interface MessagingCenterShellProps {
 /** Centered, bounded messaging container — no global header/footer. */
 export function MessagingCenterShell({ children }: MessagingCenterShellProps) {
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="flex max-w-7xl mx-auto my-8 h-[75vh] min-h-[600px] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="w-full">
+      <div className="flex w-full h-[70vh] min-h-[560px] bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         {children}
       </div>
     </div>

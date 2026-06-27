@@ -84,6 +84,7 @@ export function EmployerHeaderNav({
           }`}
           aria-expanded={jobsDropdownOpen}
           aria-haspopup="true"
+          aria-label="Jobs menu"
         >
           Jobs
           <ChevronDown
@@ -126,6 +127,11 @@ export function EmployerHeaderNav({
         href="/employer/messages"
         label="Messages"
         isActive={isActive(pathname, "/employer/messages")}
+        ariaLabel={
+          unreadMessageCount > 0
+            ? `Messages, ${unreadMessageCount} unread`
+            : undefined
+        }
       >
         {unreadMessageCount > 0 ? (
           <span className="px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
@@ -236,7 +242,12 @@ export function EmployerMobileMenu({
           <Link
             href="/employer/messages"
             onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] flex items-center gap-2"
+            aria-label={
+              unreadMessageCount > 0
+                ? `Messages, ${unreadMessageCount} unread`
+                : "Messages"
+            }
+            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
           >
             Messages
             {unreadMessageCount > 0 ? (
@@ -295,6 +306,15 @@ export function EmployerMobileMenu({
             onNavigate={() => setMobileMenuOpen(false)}
             className="font-medium py-1.5 pl-6 text-[#006e2f] border-l-2 border-[#006e2f] w-full text-left"
           />
+          {planUsage && planUsage.planSlug !== "scale" ? (
+            <Link
+              href="/employer/pricing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mt-2 inline-flex items-center justify-center rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
+            >
+              Upgrade plan
+            </Link>
+          ) : null}
         </div>
       ) : null}
     </>
