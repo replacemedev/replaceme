@@ -1,72 +1,81 @@
 import React from "react";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 import { getHiredData } from "@/actions/employer/hired";
-import { getCurrentEmployerSubscription } from "@/actions/employer/billing";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { StatsOverview } from "@/components/employer/hired/StatsOverview";
-import { UpgradeBanner } from "@/components/employer/hired/UpgradeBanner";
 import { HiredWorkerList } from "@/components/employer/hired/HiredWorkerList";
 import { UpsellFooter } from "@/components/employer/hired/UpsellFooter";
+import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
+import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Users } from "lucide-react";
+import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 
 export const metadata = {
   title: "Hired Workers - Team Management | ReplaceMe",
-  description: "Manage your active team members, view contract terms, and monitor monthly payroll statistics.",
+  description:
+    "Manage your active team members, view contract terms, and monitor monthly payroll statistics.",
 };
 
 export default async function HiredPage() {
-  // Fetch dynamic contracts and aggregated statistics from database securely on the server
-  const { workers, stats } = await getHiredData();
+  const [{ workers, stats }, planUsage] = await Promise.all([
+    getHiredData(),
+    getEmployerPlanUsage(),
+  ]);
 
-  // Fetch the employer's current active subscription state
-  const subscription = await getCurrentEmployerSubscription();
-  const planSlug = subscription?.planName?.toLowerCase() ?? "discovery";
-  const isScale =
-    subscription?.active &&
-    (planSlug === "scale" || planSlug === "professional");
+  const planSlug = normalizePlanSlug(planUsage?.planSlug ?? "discovery");
+  const messagingEnabled = planUsage?.messagingEnabled ?? false;
+  const isScale = planSlug === "scale";
 
   return (
     <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-8">
-      {/* Top Header Area */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Hired Workers
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Manage your active team members and their contracts.
+          <p className="text-sm text-slate-500 mt-1 font-medium max-w-2xl">
+            {planSlug === "scale"
+              ? "Scale plan — manage active contracts, messaging, and team payroll in one place."
+              : planSlug === "discovery"
+                ? "Discovery plan — review active hires. Upgrade for messaging and unlimited capacity."
+                : `${planSlug.charAt(0).toUpperCase() + planSlug.slice(1)} plan — manage active team members and their contracts.`}
           </p>
         </div>
-        <Link
-          href="/employer/jobs/create"
-          className="h-11 px-5 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
-        >
-          <Plus size={16} />
-          Post New Role
-        </Link>
+        <PostJobCTA planUsage={planUsage} />
       </div>
 
-      {/* Conditionally display the upgrade banner if not on the Professional tier */}
-      {!isScale && <UpgradeBanner />}
+      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
-      {/* Stats Overview Cards */}
+      {!isScale ? (
+        <ContextualUpgradeBanner
+          feature="priority_support"
+          currentPlan={planSlug}
+        />
+      ) : null}
+
+      {!messagingEnabled && workers.length > 0 ? (
+        <ContextualUpgradeBanner feature="messaging" currentPlan={planSlug} />
+      ) : null}
+
       <StatsOverview stats={stats} />
 
-      {/* Hired Workers List */}
       {workers.length > 0 ? (
-        <HiredWorkerList workers={workers} />
+        <HiredWorkerList
+          workers={workers}
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+        />
       ) : (
-        /* Empty State */
-        <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center shadow-sm max-w-lg mx-auto">
-          <h3 className="text-sm font-extrabold text-slate-800 mb-2">
-            No hired workers yet
-          </h3>
-          <p className="text-xs text-slate-500 leading-relaxed mb-6 font-medium">
-            You don't have any active contracts. Once you hire a candidate from your applicant pipeline, their contract details will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Users size={22} />}
+          title="No hired workers yet"
+          description="When you hire a candidate from your applicant pipeline, their contract details will appear here."
+          actionLabel="View job posts"
+          actionHref="/employer/jobs"
+        />
       )}
 
-      {/* Upsell Footer (Need more talent?) */}
       <UpsellFooter />
     </div>
   );

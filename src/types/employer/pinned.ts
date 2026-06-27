@@ -10,4 +10,5 @@ export interface PinnedWorker {
   online: boolean;
   isVerified: boolean;
   contextJobId?: string;
+  isPreview?: boolean;
 }

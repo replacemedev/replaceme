@@ -46,7 +46,7 @@ export function EmployerOnboardingWizard() {
         return;
       }
       toast.success("Company profile created!");
-      router.replace("/employer/dashboard");
+      router.replace("/employer/dashboard?onboarded=1");
       router.refresh();
     });
   };
@@ -54,8 +54,10 @@ export function EmployerOnboardingWizard() {
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <header className="space-y-1">
-        <p className="text-xs font-bold uppercase tracking-wider text-primary">Step 1 of 1</p>
-        <h1 className="text-2xl font-bold text-slate-900">Tell us about your company</h1>
+        <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
+          Company profile
+        </p>
+        <h2 className="text-2xl font-bold text-slate-900">Tell us about your company</h2>
         <p className="text-sm text-slate-600">
           Workers see this when you post jobs and review applicants.
         </p>

@@ -107,13 +107,18 @@ export async function sendJobOffer(applicationId: string) {
 export interface EmployerInterviewRow {
   applicationId: string;
   jobId: string;
+  candidateId: string;
   jobTitle: string;
   candidateName: string;
   scheduledAt: string;
+  isPreview: boolean;
 }
 
 export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
   const { supabase, profile } = await requireRole("employer");
+
+  const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+  const isPreview = entitlements?.identityMode === "anonymous_preview";
 
   const { data: jobs } = await supabase
     .from("jobs")
@@ -141,9 +146,13 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
     return {
       applicationId: app.id,
       jobId: app.job_id,
+      candidateId: app.candidate_id,
       jobTitle: jobTitleById.get(app.job_id) ?? "Job",
-      candidateName: name || "Candidate",
+      candidateName: isPreview
+        ? previewDisplayName(app.candidate_id)
+        : name || "Candidate",
       scheduledAt: app.updated_at,
+      isPreview,
     };
   });
 }

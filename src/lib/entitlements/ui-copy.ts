@@ -6,7 +6,8 @@ export type EntitlementFeature =
   | "resume"
   | "job_limit"
   | "applicant_cap"
-  | "priority_listing";
+  | "priority_listing"
+  | "priority_support";
 
 export const TIER_PRICES: Record<SubscriptionTier, number> = {
   discovery: 0,
@@ -159,6 +160,15 @@ export function featureGateCopy(
         price,
         tierLabel,
       };
+    case "priority_support":
+      return {
+        title: "Upgrade to Scale",
+        description:
+          "Unlimited jobs and applicants, plus priority support for teams managing active contracts and payroll.",
+        tier: "scale",
+        price: TIER_PRICES.scale,
+        tierLabel: TIER_LABELS.scale,
+      };
     default:
       return {
         title: "Upgrade your plan",
@@ -197,4 +207,38 @@ export function planDashboardSubhead(
   }
 
   return `${tier} plan — ${jobsPart}. Manage listings and review applicants below.`;
+}
+
+export function pinnedPageSubhead(
+  planSlug: string,
+  pinnedCount: number,
+  identityMode: string
+): string {
+  const tier = TIER_LABELS[normalizePlanSlug(planSlug)];
+  const countLabel =
+    pinnedCount === 1 ? "1 pinned worker" : `${pinnedCount} pinned workers`;
+
+  if (identityMode === "anonymous_preview") {
+    return `${tier} plan — ${countLabel}. Profiles show preview names until you upgrade.`;
+  }
+
+  return `${tier} plan — ${countLabel}. Compare bookmarked talent and message from one place.`;
+}
+
+export function interviewsPageSubhead(
+  planSlug: string,
+  interviewCount: number,
+  messagingEnabled: boolean
+): string {
+  const tier = TIER_LABELS[normalizePlanSlug(planSlug)];
+  const countLabel =
+    interviewCount === 1
+      ? "1 interview scheduled"
+      : `${interviewCount} interviews scheduled`;
+
+  if (!messagingEnabled) {
+    return `${tier} plan — ${countLabel}. Upgrade to message candidates directly.`;
+  }
+
+  return `${tier} plan — ${countLabel}. Coordinate next steps from your applicant pipelines.`;
 }

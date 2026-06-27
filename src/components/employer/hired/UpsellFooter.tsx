@@ -14,14 +14,23 @@ export function UpsellFooter() {
         Need more talent?
       </h3>
       <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto mb-6 font-medium">
-        Scale your operations instantly by browsing our curated list of world-class professionals ready to start.
+        Post another role or review applicants in your pipelines to grow your
+        remote team.
       </p>
-      <Link
-        href="/dashboard"
-        className="inline-flex h-11 px-8 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl items-center justify-center transition-colors shadow-sm cursor-pointer"
-      >
-        Browse Candidates
-      </Link>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link
+          href="/employer/jobs/create"
+          className="inline-flex h-11 px-8 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl items-center justify-center transition-colors shadow-sm cursor-pointer"
+        >
+          Post a job
+        </Link>
+        <Link
+          href="/employer/jobs"
+          className="inline-flex h-11 px-8 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl items-center justify-center transition-colors"
+        >
+          View pipelines
+        </Link>
+      </div>
     </div>
   );
 }

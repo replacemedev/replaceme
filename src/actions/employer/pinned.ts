@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
+import { fetchEmployerEntitlements } from "@/lib/server/entitlements";
+import { previewDisplayName } from "@/lib/entitlements/ui-copy";
 import { togglePinSchema } from "@/lib/validations/pinned";
 import { safeError, safeLog } from "@/utils/logger";
 import { PinnedWorker } from "@/types/employer/pinned";
@@ -11,6 +13,9 @@ import { assertEmployerCanPinWorker } from "@/lib/server/entitlements";
 export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
   try {
     const { supabase, profile } = await requireRole("employer");
+
+    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+    const isPreview = entitlements?.identityMode === "anonymous_preview";
 
     const { data, error } = await supabase
       .from("pinned_workers")
@@ -47,8 +52,8 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
 
       pinnedList.push({
         id: worker.id,
-        name,
-        avatarUrl: worker.avatar_url,
+        name: isPreview ? previewDisplayName(worker.id) : name,
+        avatarUrl: isPreview ? null : worker.avatar_url,
         role: worker.professional_title || "Developer",
         skills: worker.skills || [],
         experienceYears: worker.experience_years || 0,
@@ -56,6 +61,7 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
         isPinned: true,
         online: false,
         isVerified: Boolean(worker.is_verified),
+        isPreview,
       });
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Search, SlidersHorizontal, ArrowUpDown, Bookmark } from "lucide-react";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { WorkerCard } from "./WorkerCard";
@@ -9,9 +10,15 @@ import { toast } from "sonner";
 
 interface PinnedWorkerGridProps {
   initialPinnedWorkers: PinnedWorker[];
+  planSlug: string;
+  messagingEnabled?: boolean;
 }
 
-export function PinnedWorkerGrid({ initialPinnedWorkers }: PinnedWorkerGridProps) {
+export function PinnedWorkerGrid({
+  initialPinnedWorkers,
+  planSlug,
+  messagingEnabled = true,
+}: PinnedWorkerGridProps) {
   const [workers, setWorkers] = useState<PinnedWorker[]>(initialPinnedWorkers);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -99,6 +106,8 @@ export function PinnedWorkerGrid({ initialPinnedWorkers }: PinnedWorkerGridProps
             <WorkerCard
               key={worker.id}
               worker={worker}
+              planSlug={planSlug}
+              messagingEnabled={messagingEnabled}
               onUnpin={() => handleUnpin(worker.id)}
             />
           ))}
@@ -117,14 +126,14 @@ export function PinnedWorkerGrid({ initialPinnedWorkers }: PinnedWorkerGridProps
               ? "We couldn't find any results matching your search terms. Try refining your keywords."
               : "Keep track of top talent by bookmarking professionals during search or review."}
           </p>
-          {!searchQuery && (
-            <a
-              href="/dashboard"
+          {!searchQuery ? (
+            <Link
+              href="/employer/jobs"
               className="inline-flex h-10 px-6 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-xl items-center transition-colors shadow-sm"
             >
-              Find Talent
-            </a>
-          )}
+              View job pipelines
+            </Link>
+          ) : null}
         </div>
       )}
     </div>

@@ -1,29 +1,36 @@
 import React from "react";
 import { getPinnedWorkers } from "@/actions/employer/pinned";
-import { getCurrentEmployerSubscription } from "@/actions/employer/billing";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { PinnedWorkerGrid } from "@/components/employer/pinned/PinnedWorkerGrid";
-import { UpgradeBanner } from "@/components/employer/pinned/UpgradeBanner";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
+import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { pinnedPageSubhead, normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 
 export const metadata = {
   title: "Pinned Workers - Manage Bookmarked Talent | ReplaceMe",
-  description: "Review, compare, and manage candidate profiles pinned during your remote talent search.",
+  description:
+    "Review, compare, and manage candidate profiles pinned during your remote talent search.",
 };
 
 export default async function PinnedPage() {
-  // Fetch bookmarked workers for the currently authenticated employer
-  const pinnedWorkers = await getPinnedWorkers();
+  const [pinnedWorkers, planUsage] = await Promise.all([
+    getPinnedWorkers(),
+    getEmployerPlanUsage(),
+  ]);
 
-  // Fetch the employer's current active subscription state
-  const subscription = await getCurrentEmployerSubscription();
-  const planSlug = subscription?.planName?.toLowerCase() ?? "discovery";
-  const isScale =
-    subscription?.active &&
-    (planSlug === "scale" || planSlug === "professional");
+  const planSlug = normalizePlanSlug(planUsage?.planSlug ?? "discovery");
+  const messagingEnabled = planUsage?.messagingEnabled ?? false;
+  const isPreview = planUsage?.identityMode === "anonymous_preview";
+  const showIdentityBanner = isPreview;
+  const showPriorityBanner =
+    !showIdentityBanner &&
+    planSlug !== "growth" &&
+    planSlug !== "scale" &&
+    pinnedWorkers.length > 0;
 
   return (
-    <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
             Pinned Workers
@@ -31,17 +38,34 @@ export default async function PinnedPage() {
               {pinnedWorkers.length}
             </span>
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Review and organize top candidates bookmarked during your talent search.
+          <p className="text-sm text-slate-500 mt-1 font-medium max-w-2xl">
+            {pinnedPageSubhead(
+              planSlug,
+              pinnedWorkers.length,
+              planUsage?.identityMode ?? "anonymous_preview"
+            )}
           </p>
         </div>
       </div>
 
-      {/* Conditionally display the upgrade banner if not on the Professional tier */}
-      {!isScale && <UpgradeBanner />}
+      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
-      {/* Interactive Grid List with client side optimistic filtering */}
-      <PinnedWorkerGrid initialPinnedWorkers={pinnedWorkers} />
+      {showIdentityBanner ? (
+        <ContextualUpgradeBanner feature="identity" currentPlan={planSlug} />
+      ) : null}
+
+      {showPriorityBanner ? (
+        <ContextualUpgradeBanner
+          feature="priority_listing"
+          currentPlan={planSlug}
+        />
+      ) : null}
+
+      <PinnedWorkerGrid
+        initialPinnedWorkers={pinnedWorkers}
+        planSlug={planSlug}
+        messagingEnabled={messagingEnabled}
+      />
     </div>
   );
 }

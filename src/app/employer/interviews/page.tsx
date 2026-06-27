@@ -1,54 +1,92 @@
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { getEmployerInterviews } from "@/actions/employer/hiring";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
+import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { InterviewCard } from "@/components/employer/interviews/InterviewCard";
+import {
+  interviewsPageSubhead,
+  normalizePlanSlug,
+} from "@/lib/entitlements/ui-copy";
 
 export const metadata = {
   title: "Interviews | ReplaceMe",
+  description:
+    "Candidates you have moved to interview stage across all jobs.",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function EmployerInterviewsPage() {
-  const interviews = await getEmployerInterviews();
+  const [interviews, planUsage] = await Promise.all([
+    getEmployerInterviews(),
+    getEmployerPlanUsage(),
+  ]);
+
+  const planSlug = normalizePlanSlug(planUsage?.planSlug ?? "discovery");
+  const messagingEnabled = planUsage?.messagingEnabled ?? false;
+  const isPreview = planUsage?.identityMode === "anonymous_preview";
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-10">
-      <h1 className="text-2xl font-extrabold text-slate-900">Interviews</h1>
-      <p className="text-sm text-slate-500 mt-1 mb-8">
-        Candidates you have moved to interview stage across all jobs.
-      </p>
+    <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-6">
+      <div>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          Interviews
+        </h1>
+        <p className="text-sm text-slate-500 mt-1 font-medium max-w-2xl">
+          {interviewsPageSubhead(
+            planSlug,
+            interviews.length,
+            messagingEnabled
+          )}
+        </p>
+      </div>
+
+      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
+
+      {!messagingEnabled && interviews.length > 0 ? (
+        <ContextualUpgradeBanner feature="messaging" currentPlan={planSlug} />
+      ) : null}
+
+      {isPreview && interviews.length > 0 ? (
+        <ContextualUpgradeBanner feature="identity" currentPlan={planSlug} />
+      ) : null}
 
       {interviews.length === 0 ? (
         <EmptyState
           icon={<Calendar size={22} />}
           title="No interviews scheduled"
-          description="Schedule interviews from an applicant pipeline to see them here."
+          description="Move candidates to Interview Scheduled in an applicant pipeline to see them here."
           actionLabel="View jobs"
           actionHref="/employer/jobs"
         />
       ) : (
         <ul className="space-y-4">
           {interviews.map((item) => (
-            <li
+            <InterviewCard
               key={item.applicationId}
-              className="bg-white border border-slate-200 rounded-2xl p-5"
-            >
-              <p className="text-sm font-bold text-slate-900">{item.candidateName}</p>
-              <p className="text-sm text-slate-500">{item.jobTitle}</p>
-              <p className="text-xs text-slate-400 mt-2">
-                Scheduled: {new Date(item.scheduledAt).toLocaleString()}
-              </p>
-              <Link
-                href={`/employer/jobs/${item.jobId}/applicants`}
-                className="inline-flex mt-3 text-xs font-bold text-[#006e2f] hover:underline"
-              >
-                View pipeline
-              </Link>
-            </li>
+              interview={item}
+              planSlug={planSlug}
+              messagingEnabled={messagingEnabled}
+            />
           ))}
         </ul>
       )}
+
+      {interviews.length > 0 ? (
+        <p className="text-center text-xs font-medium text-slate-400 pt-2">
+          Need to schedule more? Open a{" "}
+          <Link
+            href="/employer/jobs"
+            className="font-bold text-[#006e2f] hover:underline"
+          >
+            job pipeline
+          </Link>{" "}
+          and update applicant status.
+        </p>
+      ) : null}
     </div>
   );
 }

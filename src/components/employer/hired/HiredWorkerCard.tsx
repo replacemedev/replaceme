@@ -6,11 +6,19 @@ import Link from "next/link";
 import { MessageSquare, Eye, Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
 
+import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
+
 interface HiredWorkerCardProps {
   worker: HiredWorker;
+  planSlug: string;
+  messagingEnabled?: boolean;
 }
 
-export function HiredWorkerCard({ worker }: HiredWorkerCardProps) {
+export function HiredWorkerCard({
+  worker,
+  planSlug,
+  messagingEnabled = true,
+}: HiredWorkerCardProps) {
   const initials = worker.name
     .split(" ")
     .map((n) => n[0])
@@ -151,13 +159,23 @@ export function HiredWorkerCard({ worker }: HiredWorkerCardProps) {
 
       {/* Right Area: Action Buttons */}
       <div className="flex items-center gap-2.5 shrink-0">
-        <Link
-          href={`/messages?id=${worker.id}`}
-          className="h-9 px-4 border border-emerald-100 bg-[#f0fdf4]/50 hover:bg-[#f0fdf4] text-[#006e2f] font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer"
-        >
-          <MessageSquare size={13} className="fill-[#f0fdf4]" />
-          Message
-        </Link>
+        {messagingEnabled ? (
+          <Link
+            href="/employer/messages"
+            className="h-9 px-4 border border-emerald-100 bg-[#f0fdf4]/50 hover:bg-[#f0fdf4] text-[#006e2f] font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <MessageSquare size={13} className="fill-[#f0fdf4]" />
+            Message
+          </Link>
+        ) : (
+          <Link
+            href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
+            className="h-9 px-4 border border-[#006e2f]/20 bg-[#ebfdf2] hover:bg-[#d4f8e4] text-[#006e2f] font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5"
+          >
+            <MessageSquare size={13} />
+            Upgrade to message
+          </Link>
+        )}
 
         <Link
           href={`/employer/contracts/${worker.id}`}
