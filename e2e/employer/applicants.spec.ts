@@ -1,19 +1,13 @@
 import { test, expect } from "@playwright/test";
 import {
-  EMPLOYER_TEST_PASSWORD,
-  loginAsEmployer,
+  loginAsStarterEmployer,
   completeEmployerOnboardingIfPresent,
 } from "./helpers/auth";
 import { createEmployerJob } from "./helpers/jobs";
 
 test.describe("Employer applicant pipeline", () => {
-  test.skip(
-    !EMPLOYER_TEST_PASSWORD,
-    "Set E2E_EMPLOYER_PASSWORD for live employer auth"
-  );
-
   test.beforeEach(async ({ page }) => {
-    await loginAsEmployer(page);
+    await loginAsStarterEmployer(page);
     await completeEmployerOnboardingIfPresent(page);
   });
 
@@ -34,7 +28,6 @@ test.describe("Employer applicant pipeline", () => {
       page.getByRole("heading", { name: `Job: ${title}` })
     ).toBeVisible();
     await expect(page.getByText(/Applicants Active/i)).toBeVisible();
-    await expect(page.getByText(/Credits Remaining/i)).toBeVisible();
 
     await page.getByRole("button", { name: "Table" }).click();
     await expect(page.getByRole("button", { name: "Table" })).toHaveClass(

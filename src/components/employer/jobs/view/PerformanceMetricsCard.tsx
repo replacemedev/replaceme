@@ -4,13 +4,27 @@ import React from "react";
 import Link from "next/link";
 import { TrendingUp, ArrowUpRight } from "lucide-react";
 import { JobPerformance } from "@/types/employer/jobs";
+import { isApplicantCapNear } from "@/lib/entitlements/limits";
+import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 
 interface PerformanceMetricsCardProps {
   jobId: string;
   performance: JobPerformance;
+  planSlug?: string;
+  applicantsPerJobLimit?: number | null;
 }
 
-export function PerformanceMetricsCard({ jobId, performance }: PerformanceMetricsCardProps) {
+export function PerformanceMetricsCard({
+  jobId,
+  performance,
+  planSlug = "discovery",
+  applicantsPerJobLimit = null,
+}: PerformanceMetricsCardProps) {
+  const nearCap = isApplicantCapNear(
+    performance.totalApplications,
+    applicantsPerJobLimit
+  );
+
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-6">
       <div className="flex items-center gap-2">
@@ -20,8 +34,14 @@ export function PerformanceMetricsCard({ jobId, performance }: PerformanceMetric
         <h2 className="text-sm font-bold text-slate-800">Performance</h2>
       </div>
 
+      {nearCap ? (
+        <ContextualUpgradeBanner
+          feature="applicant_cap"
+          currentPlan={planSlug}
+        />
+      ) : null}
+
       <div className="space-y-4">
-        {/* Total Views */}
         <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-400 font-medium">Total Views</p>
@@ -35,10 +55,17 @@ export function PerformanceMetricsCard({ jobId, performance }: PerformanceMetric
           </span>
         </div>
 
-        {/* Total Applications */}
         <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs text-slate-400 font-medium">Total Applications</p>
+            <p className="text-xs text-slate-400 font-medium">
+              Total Applications
+              {applicantsPerJobLimit !== null ? (
+                <span className="text-slate-500">
+                  {" "}
+                  · cap {applicantsPerJobLimit}
+                </span>
+              ) : null}
+            </p>
             <p className="text-xl font-extrabold text-slate-800 mt-1">
               {performance.totalApplications}
             </p>
@@ -49,7 +76,6 @@ export function PerformanceMetricsCard({ jobId, performance }: PerformanceMetric
           </span>
         </div>
 
-        {/* Shortlisted */}
         <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-xs text-slate-400 font-medium">Shortlisted</p>

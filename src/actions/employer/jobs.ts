@@ -9,6 +9,12 @@ import { closeJobOwnedByEmployer } from "@/lib/server/dal/jobs";
 import { revalidatePath } from "next/cache";
 import { JobDetails } from "@/types/employer/jobs";
 import { DEFAULT_SKILL_OPTIONS } from "@/config/onboarding";
+import {
+  assertEmployerCanPostJob,
+  fetchEmployerEntitlements,
+  jobStatusForApprovalMode,
+  priorityScoreForPlan,
+} from "@/lib/server/entitlements";
 
 /**
  * Fetch list of employment types. 
@@ -66,6 +72,21 @@ export async function createJobPost(payload: CreateJobInput) {
       return { error: errorMsg };
     }
 
+    const entitlementCheck = await assertEmployerCanPostJob(profile.id, supabase);
+    if (!entitlementCheck.allowed) {
+      return {
+        error: entitlementCheck.error,
+        denialType: entitlementCheck.denialType,
+        suggestedPlan: entitlementCheck.suggestedPlan,
+      };
+    }
+
+    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+    const jobStatus = jobStatusForApprovalMode(
+      entitlements?.approvalMode ?? "queued_2d",
+      parsed.data.intent === "premium" ? "premium" : "standard"
+    );
+
     // Write the job to the database table
     const { error: insertError } = await supabase
       .from("jobs")
@@ -77,8 +98,12 @@ export async function createJobPost(payload: CreateJobInput) {
         monthly_salary: parsed.data.monthlySalary,
         hours_per_week: parsed.data.hoursPerWeek,
         skills: parsed.data.skills,
-        status: parsed.data.intent === "premium" ? "Active" : "Pending Review",
+        status: jobStatus,
         is_premium_path: parsed.data.intent === "premium",
+        priority_score: entitlements ? priorityScoreForPlan(entitlements) : 0,
+        submitted_for_review_at:
+          jobStatus === "Pending Review" ? new Date().toISOString() : null,
+        approved_at: jobStatus === "Active" ? new Date().toISOString() : null,
       });
 
     if (insertError) {
@@ -92,9 +117,10 @@ export async function createJobPost(payload: CreateJobInput) {
 
     return {
       success: true,
-      message: payload.intent === "premium" 
-        ? "Job submitted and approved instantly! Redirecting..." 
-        : "Job submitted for review! Redirecting...",
+      message:
+        jobStatus === "Active"
+          ? "Job submitted and approved instantly! Redirecting..."
+          : "Job submitted for review! Redirecting...",
       redirectUrl: "/employer/dashboard",
     };
   } catch (err) {

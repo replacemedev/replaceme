@@ -10,6 +10,8 @@ import {
   jobApplicationFormSchema,
   type JobApplicationFormValues,
 } from "@/types/job-application";
+import { createAdminClient } from "@/lib/supabase/server";
+import { resolveApplicantCapForJob } from "@/lib/server/entitlements";
 
 export interface SubmitJobApplicationResult {
   success: boolean;
@@ -159,7 +161,11 @@ export async function submitJobApplication(
       return { success: false, error: "You have already applied to this job." };
     }
 
-    const { data: inserted, error: insertError } = await supabase
+    const admin = await createAdminClient();
+    const cap = await resolveApplicantCapForJob(job.employer_id, jobId, admin);
+    const withinPlanCap = cap.withinCap;
+
+    const { data: inserted, error: insertError } = await admin
       .from("applications")
       .insert({
         candidate_id: profile.id,
@@ -168,6 +174,8 @@ export async function submitJobApplication(
         application_subject: applicationSubject,
         cover_letter: coverLetter,
         contact_methods: contactMethods,
+        is_within_plan_cap: withinPlanCap,
+        received_at: new Date().toISOString(),
       })
       .select("id")
       .single();

@@ -19,7 +19,7 @@
 <!-- PROMPT_SYNC:BEGIN -->
 ### Repository File Map (auto-generated from workspace)
 
-**Last synced:** 2026-06-26T07:18:53.394Z · **Git:** `8de223a`
+**Last synced:** 2026-06-26T14:41:32.550Z · **Git:** `0c05353`
 **Regenerate:** `npm run prompt:sync` after any add, rename, delete, or move under `src/`, `supabase/migrations/`, or root entry files.
 
 **Agent rule:** Use this map + **Task → Files**. Do not broad-scan the repo. If a path is missing here, run `npm run prompt:sync` (or ask the user to).
@@ -36,13 +36,15 @@ package.json
 supabase/migrations/*.sql  # 32 migration file(s)
 ```
 
-#### `src/app/` — routes (App Router) — 127 route files
+#### `src/app/` — routes (App Router) — 130 route files
 
 ```txt
 src/app/(public)/companies/[id]/page.tsx
 src/app/(public)/companies/page.tsx
 src/app/(public)/contact/loading.tsx
 src/app/(public)/contact/page.tsx
+src/app/(public)/faq/employer/page.tsx
+src/app/(public)/faq/worker/page.tsx
 src/app/(public)/help/hiring-guide/page.tsx
 src/app/(public)/help/page.tsx
 src/app/(public)/jobs/[id]/page.tsx
@@ -84,6 +86,7 @@ src/app/admin/(shell)/settings/loading.tsx
 src/app/admin/(shell)/settings/page.tsx
 src/app/admin/(shell)/settings/pages/[slug]/loading.tsx
 src/app/admin/(shell)/settings/pages/[slug]/page.tsx
+src/app/admin/(shell)/settings/pages/faq/page.tsx
 src/app/admin/(shell)/settings/pages/loading.tsx
 src/app/admin/(shell)/settings/pages/page.tsx
 src/app/admin/(shell)/users/loading.tsx
@@ -168,10 +171,11 @@ src/app/worker/verification/loading.tsx
 src/app/worker/verification/page.tsx
 ```
 
-#### `src/actions/` — Server Actions (32 files)
+#### `src/actions/` — Server Actions (33 files)
 
 ```txt
 src/actions/admin-actions.ts
+src/actions/admin/faq.ts
 src/actions/admin/page-content.ts
 src/actions/applications.ts
 src/actions/auth.ts
@@ -205,7 +209,7 @@ src/actions/worker/phase2.ts
 src/actions/worker/profile.ts
 ```
 
-#### `src/lib/` — infra, DAL, validations (32 files)
+#### `src/lib/` — infra, DAL, validations (36 files)
 
 ```txt
 src/lib/auth/error-message.ts
@@ -213,7 +217,10 @@ src/lib/auth/nav-session.ts
 src/lib/auth/role.ts
 src/lib/auth/site-url.ts
 src/lib/content/auth-screen.ts
+src/lib/content/faq-fallbacks.ts
 src/lib/content/page-fallbacks.ts
+src/lib/faq/parse-faq-config.ts
+src/lib/layout/public-shell.ts
 src/lib/notifications/fetch-initial.ts
 src/lib/server/action-result.ts
 src/lib/server/auth/middleware.ts
@@ -227,6 +234,7 @@ src/lib/server/rate-limit.ts
 src/lib/server/stripe/sync-subscription.ts
 src/lib/supabase/client.ts
 src/lib/supabase/server.ts
+src/lib/validations/admin/faq.ts
 src/lib/validations/applicants.ts
 src/lib/validations/applications.ts
 src/lib/validations/auth.ts
@@ -245,7 +253,7 @@ src/lib/validations/worker/phase2.ts
 #### `src/components/` — UI domains
 
 ```txt
-src/components/admin/  (25 files)
+src/components/admin/  (26 files)
 src/components/auth/  (11 files)
 src/components/dashboard/  (0 files)
 src/components/employer/  (58 files)
@@ -254,11 +262,12 @@ src/components/layout/  (8 files)
 src/components/public/  (4 files)
 src/components/shared/
   shared/cms/  (1 files)
+  shared/faq/  (2 files)
   shared/header/  (3 files)
   shared/layout/  (1 files)
   shared/legal/  (3 files)
   shared/messaging/  (8 files)
-  shared/nav/  (3 files)
+  shared/nav/  (6 files)
   shared/onboarding/  (1 files)
   shared/skeletons/  (12 files)
 src/components/ui/  (4 files)
@@ -314,9 +323,10 @@ src/hooks/useNotifications.ts
 | **Employer jobs** | src/actions/employer/jobs.ts, src/app/employer/jobs/[jobId]/applicants/loading.tsx, src/app/employer/jobs/[jobId]/applicants/page.tsx, src/app/employer/jobs/[jobId]/loading.tsx, src/app/employer/jobs/[jobId]/page.tsx, … (+15 more) |
 | **Messaging** | src/actions/messaging.ts, src/app/employer/messages/loading.tsx, src/app/employer/messages/page.tsx, src/app/worker/messages/loading.tsx, src/app/worker/messages/page.tsx, … (+10 more) |
 | **Notifications** | src/actions/notifications.ts, src/hooks/useNotifications.ts, src/lib/notifications/fetch-initial.ts, src/types/notifications.types.ts |
-| **Admin moderation** | src/actions/admin-actions.ts, src/app/admin/(shell)/applications/loading.tsx, src/app/admin/(shell)/applications/page.tsx, src/app/admin/(shell)/audit-log/loading.tsx, src/app/admin/(shell)/audit-log/page.tsx, … (+60 more) |
+| **Admin moderation** | src/actions/admin-actions.ts, src/app/admin/(shell)/applications/loading.tsx, src/app/admin/(shell)/applications/page.tsx, src/app/admin/(shell)/audit-log/loading.tsx, src/app/admin/(shell)/audit-log/page.tsx, … (+62 more) |
 | **Stripe / billing** | src/actions/employer/billing.ts, src/actions/employer/stripe.ts, src/app/api/webhooks/stripe/route.ts, src/app/employer/checkout/[planId]/loading.tsx, src/app/employer/checkout/[planId]/page.tsx, … (+5 more) |
 | **RLS / schema** | src/types/database.ts, supabase/migrations/0000_complete_monolithic_schema.sql, supabase/migrations/00_initial_schema.sql, supabase/migrations/20260621000000_create_messaging_schema.sql, supabase/migrations/20260621000100_create_applicants_schema.sql, … (+28 more) |
+| **Pricing migration** | docs/pricing-migration/api-endpoint-matrix.md, docs/pricing-migration/cross-role-matrix.md, docs/pricing-migration/data-migration.md, docs/pricing-migration/e2e-fixture-spec.md, docs/pricing-migration/entitlement-matrix.md, … (+13 more) |
 | **RBAC / middleware** | src/lib/server/auth/middleware.ts, src/lib/server/auth/require-admin.ts, src/lib/server/auth/session.ts, src/proxy.ts |
 
 #### Role home paths (from `src/config/navigation.ts`)

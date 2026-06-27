@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
 import { JobPost, RecentApplicant } from "@/types/employer";
+import { employerHasFullIdentity } from "@/lib/server/entitlements";
 
 /**
  * Helper function to verify that the active session belongs to an employer
@@ -144,6 +145,7 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
         )
       `)
       .in("job_id", jobIds)
+      .eq("is_within_plan_cap", true)
       .order("created_at", { ascending: false })
       .limit(5);
 
@@ -156,32 +158,20 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
       return [];
     }
 
-    // 3. Fetch unlocked profiles to handle candidate privacy masking
-    const { data: unlocks, error: unlocksError } = await supabase
-      .from("unlocked_profiles")
-      .select("candidate_id")
-      .eq("employer_id", employerProfileId);
-
-    if (unlocksError) {
-      safeError("getRecentApplicants fetching unlocks failed", unlocksError);
-    }
-
-    const unlockedSet = new Set(unlocks?.map((u) => u.candidate_id) || []);
+    const hasFullIdentity = await employerHasFullIdentity(employerProfileId, supabase);
 
     return apps.map((app: any) => {
-      const isUnlocked = unlockedSet.has(app.candidate_id);
       const candidate = app.profiles;
       const job = app.jobs;
-      
-      // Mask candidate details if profile is locked
+
       const idClean = app.candidate_id.replace(/[^0-9]/g, "");
       const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
-      
-      const name = isUnlocked
+
+      const name = hasFullIdentity
         ? `${candidate?.first_name || ""} ${candidate?.last_name || ""}`.trim()
         : `Applicant #${appCode}`;
-        
-      const avatarUrl = isUnlocked ? candidate?.avatar_url || null : null;
+
+      const avatarUrl = hasFullIdentity ? candidate?.avatar_url || null : null;
 
       return {
         id: app.id,
@@ -190,7 +180,7 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
         applied_role: job?.title || candidate?.professional_title || "Specialist",
         created_at: app.created_at,
         avatar_url: avatarUrl,
-        is_unlocked: isUnlocked,
+        is_unlocked: hasFullIdentity,
         job_id: app.job_id,
       };
     });

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ApplicationStatus } from "@/types/applications";
 import { APPLICATION_STATUS_LABELS } from "@/types/applications";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
@@ -10,18 +11,15 @@ export type ApplicantTrackerRow = {
   matchScore: number;
   status: ApplicationStatus;
   appliedAt: string;
-  isLocked: boolean;
+  isPreview: boolean;
+  jobId: string;
 };
 
 type ApplicantTrackerTableProps = {
   rows: ApplicantTrackerRow[];
-  onUnlock?: (candidateId: string) => void;
 };
 
-export function ApplicantTrackerTable({
-  rows,
-  onUnlock,
-}: ApplicantTrackerTableProps) {
+export function ApplicantTrackerTable({ rows }: ApplicantTrackerTableProps) {
   if (rows.length === 0) {
     return (
       <p className="text-sm text-slate-500 py-8 text-center">
@@ -39,7 +37,6 @@ export function ApplicantTrackerTable({
             <th className="px-4 py-3 font-medium">Match</th>
             <th className="px-4 py-3 font-medium">Status</th>
             <th className="px-4 py-3 font-medium">Applied</th>
-            <th className="px-4 py-3 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -54,14 +51,26 @@ export function ApplicantTrackerTable({
                       className="h-9 w-9 rounded-full object-cover"
                     />
                   ) : (
-                    <span className="h-9 w-9 rounded-full bg-slate-200 inline-block" />
+                    <span className="relative h-9 w-9 rounded-full bg-slate-200 inline-flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-slate-400">?</span>
+                    </span>
                   )}
-                  <span className="font-medium text-slate-900">{row.name}</span>
+                  <Link
+                    href={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
+                    className="font-medium text-slate-900 hover:text-[#006e2f] hover:underline"
+                  >
+                    {row.name}
+                  </Link>
+                  {row.isPreview ? (
+                    <span className="text-[10px] font-bold uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                      Preview
+                    </span>
+                  ) : null}
                 </div>
               </td>
               <td className="px-4 py-3">{row.matchScore}%</td>
               <td className="px-4 py-3">
-                {row.isLocked ? (
+                {row.isPreview ? (
                   <span className="text-slate-500">
                     {APPLICATION_STATUS_LABELS[row.status]}
                   </span>
@@ -74,17 +83,6 @@ export function ApplicantTrackerTable({
               </td>
               <td className="px-4 py-3 text-slate-600">
                 {new Date(row.appliedAt).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-3">
-                {row.isLocked && onUnlock ? (
-                  <button
-                    type="button"
-                    onClick={() => onUnlock(row.candidateId)}
-                    className="text-primary font-medium hover:underline"
-                  >
-                    Unlock profile
-                  </button>
-                ) : null}
               </td>
             </tr>
           ))}

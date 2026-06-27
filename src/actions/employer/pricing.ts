@@ -3,6 +3,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import { PricingPlan, FAQItem, TestimonialItem } from "@/types/employer/billing";
+import {
+  mapBillingPlanToPricingPlan,
+  type BillingPlanRow,
+} from "@/lib/pricing/map-billing-plan";
+
+const PLAN_SELECT =
+  "id, name, slug, price, job_post_limit, applicants_per_job_limit, approval_mode, messaging_enabled, resume_download_enabled, identity_mode, priority_listing, priority_support, early_access, is_popular, display_order";
 
 /**
  * Fetch dynamic pricing tiers from the database, and testimonials/FAQs.
@@ -16,51 +23,19 @@ export async function getPricingData(): Promise<{
   try {
     const supabase = await createClient();
 
-    // Query billing_plans from database
     const { data: dbPlans, error: plansError } = await supabase
       .from("billing_plans")
-      .select("id, name, price, job_post_limit, candidate_unlocks")
-      .order("price", { ascending: true });
+      .select(PLAN_SELECT)
+      .order("display_order", { ascending: true });
 
     if (plansError) {
       safeError("Error fetching billing plans:", plansError);
     }
 
-    const plans: PricingPlan[] = (dbPlans || []).map((p) => {
-      const nameLower = p.name.toLowerCase();
-      
-      // Construct feature list and comparative limits dynamically based on DB record attributes
-      const features: string[] = [];
-      const limits = {
-        jobs: p.job_post_limit === 0 ? "0" : p.job_post_limit >= 10 ? "Unlimited" : `Up to ${p.job_post_limit}`,
-        applicants: nameLower === "professional" ? "Unlimited" : nameLower === "essential" ? "200" : "15",
-        approval: nameLower === "discovery" ? "2-Day" : "Instant",
-        candidateContact: nameLower === "professional" ? "Unlimited" : nameLower === "essential" ? "75/mo" : "No",
-        viewIdentities: nameLower === "discovery" ? "No" : "Yes",
-        prioritySupport: nameLower === "professional" ? "Yes" : "No",
-      };
+    const plans: PricingPlan[] = (dbPlans ?? []).map((p) =>
+      mapBillingPlanToPricingPlan(p as BillingPlanRow)
+    );
 
-      if (nameLower === "discovery") {
-        features.push("1 Active Job Post", "Up to 15 Applicants", "2-Day Approval", "Anonymized Applicant Previews");
-      } else if (nameLower === "essential") {
-        features.push("Up to 3 Job Posts", "Up to 200 Applicants", "Contact 75 Candidates/mo", "Full Identities & Resumes", "Instant Approval");
-      } else if (nameLower === "professional") {
-        features.push("Unlimited Job Posts", "Unlimited Applicants", "Unlimited Messaging", "Full Identities & Resumes", "Instant Approval", "Priority Support");
-      }
-
-      return {
-        id: p.id,
-        name: p.name,
-        price: Number(p.price),
-        features,
-        ctaText: nameLower === "discovery" ? "Post a Job for Free" : nameLower === "essential" ? "Start Hiring" : "Scale Your Team",
-        ctaStyle: nameLower === "essential" ? "primary" : nameLower === "professional" ? "accent" : "secondary" as any,
-        popular: nameLower === "essential",
-        limits,
-      };
-    });
-
-    // Query FAQs and testimonials dynamically from database tables
     const { data: dbFaqs, error: faqsError } = await supabase
       .from("faqs")
       .select("question, answer")
@@ -79,12 +54,12 @@ export async function getPricingData(): Promise<{
       safeError("Error fetching testimonials:", testimonialsError);
     }
 
-    const faqs: FAQItem[] = (dbFaqs || []).map(f => ({
+    const faqs: FAQItem[] = (dbFaqs || []).map((f) => ({
       question: f.question,
       answer: f.answer,
     }));
 
-    const testimonials: TestimonialItem[] = (dbTestimonials || []).map(t => ({
+    const testimonials: TestimonialItem[] = (dbTestimonials || []).map((t) => ({
       quote: t.quote,
       author: t.author_name,
       role: t.author_title,
@@ -109,15 +84,17 @@ export async function getPricingData(): Promise<{
 export async function getPlanDetails(planId: string): Promise<PricingPlan | null> {
   try {
     const supabase = await createClient();
-    
-    // Check if the planId is a valid UUID, otherwise query by name
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId);
-    let query = supabase.from("billing_plans").select("id, name, price, job_post_limit, candidate_unlocks");
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      planId
+    );
+    let query = supabase.from("billing_plans").select(PLAN_SELECT);
 
     if (isUuid) {
       query = query.eq("id", planId);
     } else {
-      query = query.ilike("name", planId);
+      const slug = planId.toLowerCase();
+      query = query.or(`slug.eq.${slug},name.ilike.${slug}`);
     }
 
     const { data: p, error } = await query.maybeSingle();
@@ -127,35 +104,7 @@ export async function getPlanDetails(planId: string): Promise<PricingPlan | null
       return null;
     }
 
-    const nameLower = p.name.toLowerCase();
-    const features: string[] = [];
-    const limits = {
-      jobs: p.job_post_limit === 0 ? "0" : p.job_post_limit >= 10 ? "Unlimited" : `Up to ${p.job_post_limit}`,
-      applicants: nameLower === "professional" ? "Unlimited" : nameLower === "essential" ? "200" : "15",
-      approval: nameLower === "discovery" ? "2-Day" : "Instant",
-      candidateContact: nameLower === "professional" ? "Unlimited" : nameLower === "essential" ? "75/mo" : "No",
-      viewIdentities: nameLower === "discovery" ? "No" : "Yes",
-      prioritySupport: nameLower === "professional" ? "Yes" : "No",
-    };
-
-    if (nameLower === "discovery") {
-      features.push("1 Active Job Post", "Up to 15 Applicants", "2-Day Approval", "Anonymized Applicant Previews");
-    } else if (nameLower === "essential") {
-      features.push("Up to 3 Job Posts", "Up to 200 Applicants", "Contact 75 Candidates/mo", "Full Identities & Resumes", "Instant Approval");
-    } else if (nameLower === "professional") {
-      features.push("Unlimited Job Posts", "Unlimited Applicants", "Unlimited Messaging", "Full Identities & Resumes", "Instant Approval", "Priority Support");
-    }
-
-    return {
-      id: p.id,
-      name: p.name,
-      price: Number(p.price),
-      features,
-      ctaText: nameLower === "discovery" ? "Post a Job for Free" : nameLower === "essential" ? "Start Hiring" : "Scale Your Team",
-      ctaStyle: nameLower === "essential" ? "primary" : nameLower === "professional" ? "accent" : "secondary" as any,
-      popular: nameLower === "essential",
-      limits,
-    };
+    return mapBillingPlanToPricingPlan(p as BillingPlanRow);
   } catch (err) {
     safeError("getPlanDetails error occurred:", err);
     return null;

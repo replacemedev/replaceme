@@ -27,6 +27,8 @@ interface MessagingClientProps {
   initialMessages: MessagingMessage[];
   selectedThreadId: string | null;
   currentUserId: string;
+  messagingEnabled?: boolean;
+  planSlug?: string;
 }
 
 export function MessagingClient({
@@ -37,6 +39,8 @@ export function MessagingClient({
   initialMessages,
   selectedThreadId,
   currentUserId,
+  messagingEnabled = true,
+  planSlug = "discovery",
 }: MessagingClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -140,6 +144,9 @@ export function MessagingClient({
         thread={activeThread}
         messages={messages}
         currentUserId={currentUserId}
+        role={role}
+        messagingEnabled={messagingEnabled}
+        planSlug={planSlug}
         onSendMessage={handleSendMessage}
         onTogglePin={handleTogglePin}
       />

@@ -6,6 +6,7 @@ import {
   getMessagingJobRoles,
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 
 export const metadata = {
   title: "Messaging Center | ReplaceMe",
@@ -36,9 +37,10 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   if (!profile || profile.role !== "employer") redirect("/dashboard");
 
   const { threadId } = await searchParams;
-  const [threads, availableJobRoles] = await Promise.all([
+  const [threads, availableJobRoles, planUsage] = await Promise.all([
     getMessagingThreads("employer"),
     getMessagingJobRoles("employer"),
+    getEmployerPlanUsage(),
   ]);
   const initialMessages = threadId
     ? await getMessagingMessages(threadId)
@@ -53,6 +55,8 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
       initialMessages={initialMessages}
       selectedThreadId={threadId ?? null}
       currentUserId={profile.id}
+      messagingEnabled={planUsage?.messagingEnabled ?? false}
+      planSlug={planUsage?.planSlug ?? "discovery"}
     />
   );
 }

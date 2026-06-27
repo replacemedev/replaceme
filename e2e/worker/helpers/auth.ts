@@ -3,10 +3,18 @@ import {
   WORKER_NAV_ITEMS,
   WORKER_ACCOUNT_NAV_ITEMS,
 } from "../../../src/config/workerNav";
+import { E2E_PERSONAS, personaPassword } from "../../shared/personas";
 
+/** @deprecated Use E2E_PERSONAS.workers.maya.email */
 export const WORKER_TEST_EMAIL =
-  process.env.E2E_WORKER_EMAIL ?? "worker1";
-export const WORKER_TEST_PASSWORD = process.env.E2E_WORKER_PASSWORD ?? "";
+  process.env.E2E_WORKER_EMAIL ?? E2E_PERSONAS.workers.maya.email;
+
+/** @deprecated Use personaPassword(E2E_PERSONAS.workers.maya.passwordEnv) */
+export const WORKER_TEST_PASSWORD =
+  process.env.E2E_WORKER_PASSWORD ??
+  personaPassword(E2E_PERSONAS.workers.maya.passwordEnv);
+
+export type WorkerPersona = keyof typeof E2E_PERSONAS.workers;
 
 export async function loginAsWorker(
   page: Page,
@@ -28,6 +36,21 @@ export async function loginAsWorker(
   await expect(page).not.toHaveURL(/\/login$/, { timeout: 30_000 });
   await completeWorkerOnboardingIfPresent(page);
 }
+
+export async function loginAsWorkerPersona(page: Page, persona: WorkerPersona) {
+  const creds = E2E_PERSONAS.workers[persona];
+  const password = personaPassword(creds.passwordEnv);
+  if (!password) {
+    throw new Error(
+      `Missing ${creds.passwordEnv} — set in .env.local for E2E fixtures.`
+    );
+  }
+  await loginAsWorker(page, creds.email, password);
+}
+
+export const loginAsMaya = (page: Page) => loginAsWorkerPersona(page, "maya");
+export const loginAsJames = (page: Page) => loginAsWorkerPersona(page, "james");
+export const loginAsSofia = (page: Page) => loginAsWorkerPersona(page, "sofia");
 
 /** Complete worker onboarding when redirected to /worker/onboarding. */
 export async function completeWorkerOnboardingIfPresent(page: Page) {

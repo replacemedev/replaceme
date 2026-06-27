@@ -39,7 +39,7 @@ export function CheckoutFormWrapper({
 
   const handleSuccess = () => {
     toast.success("Subscription upgraded successfully!");
-    router.push("/pricing");
+    router.push("/employer/settings/account?checkout=success");
     router.refresh();
   };
 

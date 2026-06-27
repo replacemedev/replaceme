@@ -1,31 +1,34 @@
 "use server";
 
-import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/server/auth/session";
-import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
+import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
+import { getStripe } from "@/lib/server/stripe/client";
 import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
+import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
 import { safeError, safeLog } from "@/utils/logger";
-import Stripe from "stripe";
 
-// Initialize Stripe gracefully
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-12-18.acacia" as any,
-    })
-  : null;
+export type StripeCheckoutResult = {
+  checkoutUrl?: string;
+  planName?: string;
+  planPrice?: number;
+  error?: string;
+};
 
 /**
- * Creates a Stripe Subscription PaymentIntent.
- * Returns the clientSecret and verified plan price/name details.
+ * Creates a Stripe Checkout Session (subscription mode).
+ * Returns a hosted checkout URL — activation happens via webhook after payment.
  */
-export async function createStripeSubscription(
+export async function createStripeCheckoutSession(
   planId: string
-): Promise<{ clientSecret: string | null; planName?: string; planPrice?: number; error?: string }> {
+): Promise<StripeCheckoutResult> {
   try {
     const parsed = planIdSchema.parse({ planId });
-    safeLog(`[Stripe] Initiating subscription setup for plan: ${parsed.planId}`);
+    safeLog(`[Stripe] Initiating checkout session for plan: ${parsed.planId}`);
 
-    const { supabase, user, profile } = await requireRole("employer");
+    const { user, profile } = await requireRole("employer");
+
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
 
     const { data: employerProfile } = await supabase
       .from("profiles")
@@ -33,186 +36,71 @@ export async function createStripeSubscription(
       .eq("id", profile.id)
       .single();
 
-    const isUuid =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        parsed.planId
-      );
-    let planQuery = supabase.from("billing_plans").select("id, price, name");
+    const { resolveBillingPlan } = await import("@/lib/server/stripe/plan");
+    const plan = await resolveBillingPlan(parsed.planId);
 
-    if (isUuid) {
-      planQuery = planQuery.eq("id", parsed.planId);
-    } else {
-      planQuery = planQuery.ilike("name", parsed.planId);
+    if (!plan) {
+      return { error: "Billing plan not found." };
     }
 
-    const { data: plan, error: planError } = await planQuery.maybeSingle();
-
-    if (planError || !plan) {
-      safeError(`Billing plan not found in DB: ${parsed.planId}`, planError);
-      return { clientSecret: null, error: "Billing plan not found." };
-    }
-
-    const priceInCents = Math.round(Number(plan.price) * 100);
-
-    if (!stripe) {
+    if (!getStripe()) {
       return {
-        clientSecret: null,
-        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and use Stripe test mode.",
+        error:
+          "Stripe is not configured. Set STRIPE_SECRET_KEY and use Stripe test mode.",
       };
     }
 
-    const { data: sub } = await supabase
-      .from("employer_subscriptions")
-      .select("stripe_customer_id")
-      .eq("employer_id", profile.id)
-      .maybeSingle();
+    const name =
+      `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
+      "Employer";
 
-    let stripeCustomerId = sub?.stripe_customer_id;
-
-    if (!stripeCustomerId) {
-      const email = user.email || "";
-      const name =
-        `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
-        "Employer";
-
-      const customer = await stripe.customers.create({
-        email,
-        name,
-        metadata: { employer_id: profile.id },
-      });
-      stripeCustomerId = customer.id;
-
-      const admin = await createAdminClient();
-      const { error: upsertError } = await admin
-        .from("employer_subscriptions")
-        .upsert(
-          {
-            employer_id: profile.id,
-            stripe_customer_id: stripeCustomerId,
-            status: "inactive",
-          },
-          { onConflict: "employer_id" }
-        );
-
-      if (upsertError) {
-        safeError("Failed to save stripe_customer_id:", upsertError);
-      }
-    }
-
-    const intent = await stripe.paymentIntents.create({
-      amount: priceInCents,
-      currency: "usd",
-      customer: stripeCustomerId,
-      metadata: {
-        employer_id: profile.id,
-        plan_id: plan.id,
-        plan_name: plan.name,
-      },
-      automatic_payment_methods: { enabled: true },
+    const session = await createSubscriptionCheckoutSession({
+      employerId: profile.id,
+      email: user.email || "",
+      name,
+      planRef: parsed.planId,
     });
 
-    safeLog("[Stripe] Created PaymentIntent for customer [REDACTED]");
+    if ("error" in session) {
+      return { error: session.error };
+    }
 
     return {
-      clientSecret: intent.client_secret,
+      checkoutUrl: session.checkoutUrl,
       planName: plan.name,
       planPrice: Number(plan.price),
     };
   } catch (err) {
-    safeError("createStripeSubscription error occurred: [REDACTED_STRIPE_ERROR_DETAILS]");
+    safeError("createStripeCheckoutSession error:", err);
     return {
-      clientSecret: null,
-      error: "An unexpected error occurred while setting up the checkout payment.",
+      error: "An unexpected error occurred while setting up checkout.",
     };
   }
 }
 
-/**
- * Creates a Stripe PaymentIntent for plan upgrade.
- * Supports linking checkout to a target applicant profile for immediate unlock post-payment.
- */
-export async function createStripeCheckoutIntent(
-  planId: string,
-  targetApplicantId?: string
-): Promise<{ clientSecret: string | null; error?: string }> {
-  try {
-    safeLog(`[Stripe] Initiating checkout intent for plan: ${planId}`);
-
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return { clientSecret: null, error: "Authentication failed. Please log in." };
-    }
-
-    // Verify role is employer
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile || profile.role !== "employer") {
-      return { clientSecret: null, error: "Access denied. Only employers can upgrade." };
-    }
-
-    // Check if the planId is a valid UUID, otherwise query by name
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(planId);
-    let planQuery = supabase.from("billing_plans").select("id, price, name");
-
-    if (isUuid) {
-      planQuery = planQuery.eq("id", planId);
-    } else {
-      planQuery = planQuery.ilike("name", planId);
-    }
-
-    const { data: plan, error: planError } = await planQuery.maybeSingle();
-
-    if (planError || !plan) {
-      safeError("Billing plan not found in DB:", planError);
-      return { clientSecret: null, error: "Billing plan not found." };
-    }
-
-    const priceInCents = Math.round(Number(plan.price) * 100);
-
-    if (!stripe) {
-      return {
-        clientSecret: null,
-        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and use Stripe test mode.",
-      };
-    }
-
-    // Create real Stripe PaymentIntent
-    const intent = await stripe.paymentIntents.create({
-      amount: priceInCents,
-      currency: "usd",
-      metadata: {
-        employer_id: profile.id,
-        plan_id: plan.id,
-        plan_name: plan.name,
-        target_applicant_id: targetApplicantId || "",
-      },
-      automatic_payment_methods: {
-        enabled: true,
-      },
-    });
-
-    return {
-      clientSecret: intent.client_secret,
-    };
-  } catch (err) {
-    safeError("createStripeCheckoutIntent error occurred: [REDACTED_STRIPE_ERROR_DETAILS]");
-    return {
-      clientSecret: null,
-      error: "An unexpected error occurred while setting up the checkout payment.",
-    };
-  }
+/** @deprecated Use createStripeCheckoutSession — kept for existing imports. */
+export async function createStripeSubscription(
+  planId: string
+): Promise<{
+  clientSecret: string | null;
+  checkoutUrl?: string;
+  planName?: string;
+  planPrice?: number;
+  error?: string;
+}> {
+  const result = await createStripeCheckoutSession(planId);
+  return {
+    clientSecret: null,
+    checkoutUrl: result.checkoutUrl,
+    planName: result.planName,
+    planPrice: result.planPrice,
+    error: result.error,
+  };
 }
 
 /**
- * Server-side reconciliation after client payment confirmation.
- * Verifies PaymentIntent status with Stripe API — never trusts client alone.
- * Webhook remains the primary sync path; this handles race conditions in UI.
+ * Server-side reconciliation after legacy PaymentIntent confirmation.
+ * New checkouts use Stripe Checkout + webhooks instead.
  */
 export async function reconcilePaymentIntent(
   paymentIntentId: string
@@ -221,6 +109,7 @@ export async function reconcilePaymentIntent(
     const parsed = paymentIntentIdSchema.parse({ paymentIntentId });
     const { profile } = await requireRole("employer");
 
+    const stripe = getStripe();
     if (!stripe) {
       return {
         success: false,
@@ -243,15 +132,13 @@ export async function reconcilePaymentIntent(
       return { success: false, error: "Payment metadata is invalid." };
     }
 
-    const result = await syncEmployerSubscription({
+    return syncEmployerSubscription({
       employerId: profile.id,
       planId,
       stripeCustomerId:
         typeof intent.customer === "string" ? intent.customer : intent.customer?.id,
       paymentIntentId: intent.id,
     });
-
-    return result;
   } catch (err) {
     safeError("reconcilePaymentIntent error:", err);
     return { success: false, error: "Failed to verify payment." };

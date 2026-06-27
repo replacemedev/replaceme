@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/server/auth/session";
 import { togglePinSchema } from "@/lib/validations/pinned";
 import { safeError, safeLog } from "@/utils/logger";
 import { PinnedWorker } from "@/types/employer/pinned";
+import { assertEmployerCanPinWorker } from "@/lib/server/entitlements";
 
 export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
   try {
@@ -139,6 +140,11 @@ export async function togglePin(
 
       if (deleteError) return fail("Failed to remove worker bookmark.");
       return ok({ pinned: false });
+    }
+
+    const pinCheck = await assertEmployerCanPinWorker(profile.id);
+    if (!pinCheck.allowed) {
+      return fail(pinCheck.error);
     }
 
     const { error: insertError } = await supabase.from("pinned_workers").insert({

@@ -18,12 +18,16 @@ interface ApplicantKanbanProps {
   applicants: Applicant[];
   jobId: string;
   onMessageClick: (candidateId: string) => void;
+  messagingEnabled?: boolean;
+  planSlug: string;
 }
 
 export function ApplicantKanban({
   applicants,
   jobId,
   onMessageClick,
+  messagingEnabled = true,
+  planSlug,
 }: ApplicantKanbanProps) {
   return (
     <div
@@ -54,26 +58,20 @@ export function ApplicantKanban({
                   No candidates
                 </p>
               ) : (
-                columnApps.map((app) =>
-                  app.isUnlocked ? (
+                columnApps.map((app) => (
                     <ApplicantCard
                       key={app.id}
                       applicant={app}
                       jobId={jobId}
-                      onMessageClick={() => onMessageClick(app.candidateId)}
+                      planSlug={planSlug}
+                      messagingEnabled={messagingEnabled}
+                      onMessageClick={
+                        messagingEnabled
+                          ? () => onMessageClick(app.candidateId)
+                          : undefined
+                      }
                     />
-                  ) : (
-                    <div
-                      key={app.id}
-                      className="rounded-2xl border border-dashed border-slate-200 bg-white p-4 text-center text-[11px] font-semibold text-slate-500"
-                    >
-                      {app.name}
-                      <p className="mt-1 text-[10px] font-normal text-slate-400">
-                        Unlock to manage in pipeline
-                      </p>
-                    </div>
-                  )
-                )
+                  ))
               )}
             </div>
           </section>

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getApplicants } from "@/actions/employer/applicants";
 import { getJobById } from "@/actions/employer/jobs";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { ApplicantsClient } from "@/components/employer/applicants/ApplicantsClient";
 
 interface PageProps {
@@ -40,9 +41,10 @@ export default async function ApplicantsPage({ params }: PageProps) {
   const { jobId } = await params;
 
   // Parallel fetch: Job Details (for metadata/title) and Applicants
-  const [job, applicantsData] = await Promise.all([
+  const [job, applicantsData, planUsage] = await Promise.all([
     getJobById(jobId),
     getApplicants(jobId),
+    getEmployerPlanUsage(),
   ]);
 
   if (!job) {
@@ -51,15 +53,19 @@ export default async function ApplicantsPage({ params }: PageProps) {
 
   const jobTitle = job.title;
   const applicants = applicantsData.applicants;
-  const creditsBalance = applicantsData.creditsBalance;
+  const identityMode = applicantsData.identityMode;
 
   return (
     <div className="max-w-6xl mx-auto px-margin-desktop py-12">
       <ApplicantsClient
         initialApplicants={applicants}
-        initialCreditsBalance={creditsBalance}
+        identityMode={identityMode}
         jobId={jobId}
         jobTitle={jobTitle}
+        planUsage={planUsage}
+        messagingEnabled={applicantsData.messagingEnabled}
+        resumeDownloadEnabled={applicantsData.resumeDownloadEnabled}
+        applicantsPerJobLimit={applicantsData.applicantsPerJobLimit}
       />
     </div>
   );

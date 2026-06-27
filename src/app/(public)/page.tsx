@@ -1,5 +1,10 @@
 import { LandingPageClient } from "@/components/landing/LandingPageClient";
+import { getPricingData } from "@/actions/employer/pricing";
 
-export default function HomePage() {
-  return <LandingPageClient />;
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { plans, faqs } = await getPricingData();
+
+  return <LandingPageClient pricingPlans={plans} faqs={faqs} />;
 }

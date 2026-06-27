@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireRole } from "@/lib/server/auth/session";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { uuidSchema } from "@/lib/validations/common";
+import { assertEmployerCanReview } from "@/lib/server/entitlements";
 
 const submitReviewSchema = z
   .object({
@@ -60,6 +61,11 @@ export async function submitEmployerReview(payload: unknown) {
   const result = await runAction("submitEmployerReview", async () => {
     const parsed = submitReviewSchema.parse(payload);
     const { supabase, profile } = await requireRole("employer");
+
+    const reviewCheck = await assertEmployerCanReview(profile.id);
+    if (!reviewCheck.allowed) {
+      return fail(reviewCheck.error);
+    }
 
     const { data: contract } = await supabase
       .from("contracts")

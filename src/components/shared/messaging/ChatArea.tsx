@@ -7,11 +7,16 @@ import { MessagingMessage, MessagingThread } from "@/types/messaging";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInputArea } from "./ChatInputArea";
 import { MessagingEmptyState } from "./MessagingEmptyState";
+import { MessagingThreadStatus } from "./MessagingThreadStatus";
+import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 
 interface ChatAreaProps {
   thread: MessagingThread | null;
   messages: MessagingMessage[];
   currentUserId: string;
+  role: "worker" | "employer";
+  messagingEnabled?: boolean;
+  planSlug?: string;
   onSendMessage: (content: string) => Promise<void>;
   onTogglePin: () => Promise<void>;
 }
@@ -78,6 +83,9 @@ export function ChatArea({
   thread,
   messages,
   currentUserId,
+  role,
+  messagingEnabled = true,
+  planSlug = "discovery",
   onSendMessage,
   onTogglePin,
 }: ChatAreaProps) {
@@ -91,6 +99,16 @@ export function ChatArea({
   }, [messages]);
 
   if (!thread) {
+    if (role === "employer" && !messagingEnabled) {
+      return (
+        <section className="flex flex-1 items-center justify-center bg-slate-50/50 p-8 min-w-0">
+          <div className="w-full max-w-md">
+            <UnlockOverlay feature="messaging" currentPlan={planSlug} />
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section className="flex-1 flex items-center justify-center bg-slate-50/50 min-w-0">
         <MessagingEmptyState />
@@ -100,6 +118,9 @@ export function ChatArea({
 
   const { oppositeParty, contextTitle } = thread;
   const initials = partyInitials(oppositeParty.name);
+  const isBlocked =
+    Boolean(thread.blocked_reason) ||
+    (role === "employer" && !messagingEnabled);
 
   return (
     <section className="flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0">
@@ -176,6 +197,14 @@ export function ChatArea({
         </div>
       </header>
 
+      {isBlocked && role === "worker" ? (
+        <MessagingThreadStatus
+          blockedReason={thread.blocked_reason ?? "messaging_disabled"}
+          role={role}
+          planSlug={planSlug}
+        />
+      ) : null}
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
         {messages.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-12">
@@ -199,7 +228,19 @@ export function ChatArea({
         )}
       </div>
 
-      <ChatInputArea onSendMessage={onSendMessage} />
+      {isBlocked ? (
+        <div className="shrink-0 border-t border-slate-200 bg-slate-50/80 px-4 py-4">
+          {role === "employer" ? (
+            <UnlockOverlay feature="messaging" currentPlan={planSlug} />
+          ) : (
+            <p className="text-center text-xs font-medium text-slate-500">
+              This employer cannot reply until they upgrade their plan.
+            </p>
+          )}
+        </div>
+      ) : (
+        <ChatInputArea onSendMessage={onSendMessage} />
+      )}
     </section>
   );
 }

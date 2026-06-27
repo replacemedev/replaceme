@@ -24,9 +24,9 @@ export const EMPLOYER_FAQ_FALLBACK: FaqPageConfig = {
     },
     {
       id: "employer-faq-2",
-      question: "How does applicant unlocking work?",
+      question: "What do I get on the free Discovery plan?",
       answer:
-        "Candidate contact details stay masked until you spend a credit to unlock a profile from the applicant pipeline.",
+        "Discovery includes 1 active job, up to 10 applicants per job, and anonymous candidate previews (skills, experience, and salary visible). Names, contact details, resumes, and messaging require a paid plan.",
     },
     {
       id: "employer-faq-3",
@@ -55,7 +55,7 @@ export const WORKER_FAQ_FALLBACK: FaqPageConfig = {
       id: "worker-faq-3",
       question: "When will employers see my full profile?",
       answer:
-        "Employers see your public profile fields immediately. Contact details may unlock after they review your application.",
+        "On the free Discovery plan, employers see an anonymous preview of your skills and experience. Full profiles, resumes, and messaging unlock when they upgrade to Starter or above.",
     },
   ],
 };

@@ -21,7 +21,7 @@ export default async function CompanySettingsPage() {
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
-    .eq("auth_user_id", user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile || profile.role !== "employer") {

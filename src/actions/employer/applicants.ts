@@ -8,20 +8,123 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { unlockCandidateSchema } from "@/lib/validations/applicants";
 import { jobIdSchema } from "@/lib/validations/employer/jobs";
-import {
-  getApplicationsForJob,
-  getUnlockedCandidateIds,
-} from "@/lib/server/dal/applications";
 import { getJobOwnedByEmployer } from "@/lib/server/dal/jobs";
+import {
+  assertEmployerFullIdentity,
+  assertEmployerResumeDownload,
+  fetchApplicantPreview,
+  fetchEmployerEntitlements,
+} from "@/lib/server/entitlements";
+import type { BillingIdentityMode } from "@/lib/server/entitlements";
+
+function matchLabelFromScore(matchScore: number): MatchLabel {
+  if (matchScore >= 90) return "high";
+  if (matchScore < 70) return "low";
+  return "mid";
+}
+
+import { previewDisplayName } from "@/lib/entitlements/ui-copy";
+
+function mapPreviewToApplicant(
+  app: {
+    id: string;
+    job_id: string;
+    candidate_id: string;
+    status: string;
+    match_score: number | null;
+    created_at: string;
+  },
+  preview: Awaited<ReturnType<typeof fetchApplicantPreview>>,
+  identityMode: BillingIdentityMode
+): Applicant | null {
+  if (!preview) return null;
+
+  const candidate = preview.candidate;
+  const isFull = identityMode === "full";
+  const skills = Array.isArray(candidate.skills)
+    ? (candidate.skills as string[])
+    : [];
+  const matchScore = preview.match_score ?? app.match_score ?? 0;
+
+  if (isFull) {
+    const firstName = String(candidate.first_name ?? "");
+    const lastName = String(candidate.last_name ?? "");
+    return {
+      id: app.id,
+      jobId: app.job_id,
+      candidateId: app.candidate_id,
+      name: `${firstName} ${lastName}`.trim() || previewDisplayName(app.candidate_id),
+      role: String(candidate.professional_title ?? "Developer"),
+      matchScore,
+      matchLabel: matchLabelFromScore(matchScore),
+      status: app.status as ApplicationStatus,
+      skills,
+      experienceYears: Number(candidate.experience_years ?? 0),
+      isUnlocked: true,
+      identityMode: "full",
+      avatarUrl: (candidate.avatar_url as string | null) ?? null,
+      email: (candidate.email as string | null) ?? null,
+      bio: (candidate.bio as string | null) ?? null,
+      resumeUrl: (candidate.resume_url as string | null) ?? null,
+      expectedSalaryMin:
+        candidate.expected_salary_min === null ||
+        candidate.expected_salary_min === undefined
+          ? null
+          : Number(candidate.expected_salary_min),
+      expectedSalaryMax:
+        candidate.expected_salary_max === null ||
+        candidate.expected_salary_max === undefined
+          ? null
+          : Number(candidate.expected_salary_max),
+      salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
+      createdAt: app.created_at,
+      isVerified: Boolean(candidate.is_verified),
+    };
+  }
+
+  return {
+    id: app.id,
+    jobId: app.job_id,
+    candidateId: app.candidate_id,
+    name: previewDisplayName(app.candidate_id),
+    role: String(candidate.professional_title ?? "Candidate"),
+    matchScore,
+    matchLabel: matchLabelFromScore(matchScore),
+    status: app.status as ApplicationStatus,
+    skills,
+    experienceYears: Number(candidate.experience_years ?? 0),
+    isUnlocked: false,
+    identityMode: "anonymous_preview",
+    avatarUrl: null,
+    email: null,
+    bio: null,
+    resumeUrl: null,
+    expectedSalaryMin:
+      candidate.expected_salary_min === null ||
+      candidate.expected_salary_min === undefined
+        ? null
+        : Number(candidate.expected_salary_min),
+    expectedSalaryMax:
+      candidate.expected_salary_max === null ||
+      candidate.expected_salary_max === undefined
+        ? null
+        : Number(candidate.expected_salary_max),
+    salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
+    createdAt: app.created_at,
+    isVerified: false,
+  };
+}
 
 /**
- * Fetch applicants for a specific jobId securely.
- * Checks session, confirms role, verifies job ownership (IDOR protection),
- * checks unlock status, masks locked profiles, and relies on DB queries.
+ * Fetch applicants for a job with entitlement-aware identity (preview vs full).
  */
 export async function getApplicants(jobId: string): Promise<{
   applicants: Applicant[];
   creditsBalance: number;
+  identityMode: BillingIdentityMode;
+  resumeDownloadEnabled: boolean;
+  messagingEnabled: boolean;
+  applicantsPerJobLimit: number | null;
   error?: string;
 }> {
   try {
@@ -35,76 +138,42 @@ export async function getApplicants(jobId: string): Promise<{
     );
 
     if (jobError || !job) {
-      return { applicants: [], creditsBalance: 0, error: "Access denied. You do not own this job posting." };
+      return {
+        applicants: [],
+        creditsBalance: 0,
+        identityMode: "anonymous_preview",
+        resumeDownloadEnabled: false,
+        messagingEnabled: false,
+        applicantsPerJobLimit: null,
+        error: "Access denied. You do not own this job posting.",
+      };
     }
 
-    const { data: credits, error: creditsError } = await supabase
-      .from("employer_credits")
-      .select("credits_balance")
-      .eq("employer_id", profile.id)
-      .maybeSingle();
+    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+    const identityMode = entitlements?.identityMode ?? "anonymous_preview";
 
-    if (creditsError) {
-      safeError("Error fetching credits:", creditsError);
-    }
-
-    const creditsBalance = credits?.credits_balance ?? 0;
-
-    const dbApplicants: Applicant[] = [];
-    const { data: applications, error: appsError } = await getApplicationsForJob(
-      supabase,
-      parsed.jobId
-    );
+    const { data: applications, error: appsError } = await supabase
+      .from("applications")
+      .select("id, job_id, candidate_id, status, match_score, created_at")
+      .eq("job_id", parsed.jobId)
+      .eq("is_within_plan_cap", true)
+      .order("created_at", { ascending: false });
 
     if (appsError) {
       safeError("Error fetching applications:", appsError);
-    } else if (applications) {
-      const { data: unlocks } = await getUnlockedCandidateIds(
+    }
+
+    const dbApplicants: Applicant[] = [];
+
+    for (const app of applications ?? []) {
+      const preview = await fetchApplicantPreview(
         supabase,
+        app.id,
         profile.id
       );
-
-      const unlockedCandidateIds = new Set(unlocks?.map((u) => u.candidate_id) || []);
-
-      for (const app of applications) {
-        const isUnlocked = unlockedCandidateIds.has(app.candidate_id);
-        const candidate = app.profiles as any;
-
-        // Mask details if locked
-        const idClean = app.candidate_id.replace(/[^0-9]/g, "");
-        const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
-        const name = isUnlocked
-          ? `${candidate?.first_name || ""} ${candidate?.last_name || ""}`.trim()
-          : `Applicant #${appCode}`;
-        const email = isUnlocked ? candidate?.email || null : null;
-        const bio = isUnlocked ? candidate?.bio || null : null;
-        const resumeUrl = isUnlocked ? candidate?.resume_url ?? null : null;
-        const avatarUrl = isUnlocked ? candidate?.avatar_url || null : null;
-
-        const matchScore = app.match_score;
-        let matchLabel: MatchLabel = "mid";
-        if (matchScore >= 90) matchLabel = "high";
-        else if (matchScore < 70) matchLabel = "low";
-
-        dbApplicants.push({
-          id: app.id,
-          jobId: app.job_id,
-          candidateId: app.candidate_id,
-          name,
-          role: candidate?.professional_title || "Developer",
-          matchScore,
-          matchLabel,
-          status: app.status as ApplicationStatus,
-          skills: candidate?.skills || [],
-          experienceYears: candidate?.experience_years ?? 0,
-          isUnlocked,
-          avatarUrl,
-          email,
-          bio,
-          resumeUrl,
-          createdAt: app.created_at,
-          isVerified: Boolean(candidate?.is_verified),
-        });
+      const mapped = mapPreviewToApplicant(app, preview, identityMode);
+      if (mapped) {
+        dbApplicants.push(mapped);
       }
     }
 
@@ -113,104 +182,54 @@ export async function getApplicants(jobId: string): Promise<{
       return b.matchScore - a.matchScore;
     });
 
-    return { applicants: dbApplicants, creditsBalance };
+    return {
+      applicants: dbApplicants,
+      creditsBalance: 0,
+      identityMode,
+      resumeDownloadEnabled: entitlements?.resumeDownloadEnabled ?? false,
+      messagingEnabled: entitlements?.messagingEnabled ?? false,
+      applicantsPerJobLimit: entitlements?.applicantsPerJobLimit ?? null,
+    };
   } catch (err) {
     safeError("getApplicants error occurred:", err);
-    return { applicants: [], creditsBalance: 0, error: "An unexpected error occurred." };
+    return {
+      applicants: [],
+      creditsBalance: 0,
+      identityMode: "anonymous_preview",
+      resumeDownloadEnabled: false,
+      messagingEnabled: false,
+      applicantsPerJobLimit: null,
+      error: "An unexpected error occurred.",
+    };
   }
 }
 
 /**
- * Safely unlocks candidate profile details, deducting 1 credit from balance.
- * Implements strict IDOR validation (job ownership) and transactional integrity checks.
+ * @deprecated Credit unlocks replaced by plan entitlements (Starter+ includes full identity).
  */
 export async function unlockCandidate(
   applicationId: string
 ): Promise<{ success?: boolean; error?: string }> {
   const result = await runAction("unlockCandidate", async () => {
     const parsed = unlockCandidateSchema.parse({ applicationId });
-    safeLog(`[Auth] Unlock candidate for app: ${parsed.applicationId}`);
+    safeLog(`[Applicants] Deprecated unlock for app: ${parsed.applicationId}`);
 
-    const { supabase, profile } = await requireRole("employer");
+    const { profile } = await requireRole("employer");
+    const identityCheck = await assertEmployerFullIdentity(profile.id);
 
-    const { data: application, error: appError } = await supabase
-      .from("applications")
-      .select("job_id, candidate_id")
-      .eq("id", parsed.applicationId)
-      .single();
-
-    if (appError || !application) {
-      return fail("Application not found.");
-    }
-
-    const candidateId = application.candidate_id;
-
-    const { data: job, error: jobError } = await supabase
-      .from("jobs")
-      .select("id")
-      .eq("id", application.job_id)
-      .eq("employer_id", profile.id)
-      .maybeSingle();
-
-    if (jobError || !job) {
-      return fail(
-        "Access denied. You do not own the job associated with this applicant."
-      );
-    }
-
-    const { data: existingUnlock } = await supabase
-      .from("unlocked_profiles")
-      .select("id")
-      .eq("employer_id", profile.id)
-      .eq("candidate_id", candidateId)
-      .maybeSingle();
-
-    if (existingUnlock) {
+    if (identityCheck.allowed) {
       return ok();
     }
 
-    const { data: credits, error: creditsError } = await supabase
-      .from("employer_credits")
-      .select("id, credits_balance")
-      .eq("employer_id", profile.id)
-      .maybeSingle();
-
-    if (creditsError || !credits || credits.credits_balance < 1) {
-      return fail("Insufficient credits. Please upgrade your plan.");
-    }
-
-    const newBalance = credits.credits_balance - 1;
-
-    const { error: deductError } = await supabase
-      .from("employer_credits")
-      .update({ credits_balance: newBalance })
-      .eq("id", credits.id);
-
-    if (deductError) {
-      return fail("Transaction failed. Could not deduct credits.");
-    }
-
-    const { error: insertError } = await supabase
-      .from("unlocked_profiles")
-      .insert({
-        employer_id: profile.id,
-        candidate_id: candidateId,
-        application_id: parsed.applicationId,
-      });
-
-    if (insertError) {
-      await supabase
-        .from("employer_credits")
-        .update({ credits_balance: credits.credits_balance })
-        .eq("id", credits.id);
-      return fail("Transaction failed. Could not record profile unlock.");
-    }
-
-    revalidatePath(`/employer/jobs/${application.job_id}/applicants`);
-    return ok();
+    return fail(identityCheck.error);
   });
 
-  return result.success
-    ? { success: true }
-    : { error: result.error };
+  return result.success ? { success: true } : { error: result.error };
+}
+
+export async function assertResumeDownloadAllowed(
+  employerId: string
+): Promise<{ allowed: boolean; error?: string }> {
+  const check = await assertEmployerResumeDownload(employerId);
+  return check.allowed ? { allowed: true } : { allowed: false, error: check.error };
 }

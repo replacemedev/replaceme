@@ -2,13 +2,8 @@ import { test, expect } from "@playwright/test";
 import { EMPLOYER_TEST_PASSWORD, loginAsEmployer } from "./helpers/auth";
 
 test.describe("Employer onboarding", () => {
-  test.skip(
-    !EMPLOYER_TEST_PASSWORD,
-    "Set E2E_EMPLOYER_PASSWORD for live employer auth"
-  );
-
   test("completes onboarding when gate is shown", async ({ page }) => {
-    await loginAsEmployer(page);
+    await loginAsStarterEmployer(page);
 
     if (!page.url().includes("/employer/onboarding")) {
       test.skip(true, "Employer onboarding already completed for this account");

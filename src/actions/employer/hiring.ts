@@ -6,6 +6,13 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { uuidSchema } from "@/lib/validations/common";
 import { updateApplicationStatus } from "@/actions/applications";
+import {
+  assertEmployerResumeDownload,
+  fetchApplicantPreview,
+  fetchEmployerEntitlements,
+  type BillingIdentityMode,
+} from "@/lib/server/entitlements";
+import { previewDisplayName } from "@/lib/entitlements/ui-copy";
 
 const scheduleInterviewSchema = z
   .object({ applicationId: uuidSchema })
@@ -166,39 +173,99 @@ export async function getEmployerCandidateProfile(
 
   if (!job) return null;
 
-  const { data: unlock } = await supabase
-    .from("unlocked_profiles")
+  const { data: application } = await supabase
+    .from("applications")
     .select("id")
-    .eq("employer_id", profile.id)
+    .eq("job_id", parsed.data.jobId)
     .eq("candidate_id", parsed.data.candidateId)
+    .eq("is_within_plan_cap", true)
     .maybeSingle();
 
-  if (!unlock) return null;
+  if (!application) return null;
 
-  const { data: candidate } = await supabase
-    .from("profiles")
-    .select(
-      "id, first_name, last_name, professional_title, bio, skills, experience_years, avatar_url, email, is_verified, resume_url"
-    )
-    .eq("id", parsed.data.candidateId)
-    .maybeSingle();
+  const [entitlements, preview] = await Promise.all([
+    fetchEmployerEntitlements(profile.id, supabase),
+    fetchApplicantPreview(supabase, application.id, profile.id),
+  ]);
 
-  if (!candidate) return null;
+  if (!preview) {
+    return null;
+  }
+
+  const identityMode: BillingIdentityMode =
+    entitlements?.identityMode ?? preview.identity_mode;
+  const planSlug = entitlements?.planSlug ?? "discovery";
+  const resumeDownloadEnabled = entitlements?.resumeDownloadEnabled ?? false;
+  const candidate = preview.candidate;
+  const skills = Array.isArray(candidate.skills)
+    ? (candidate.skills as string[])
+    : [];
+
+  if (identityMode === "full" && preview.identity_mode === "full") {
+    const resumeCheck = await assertEmployerResumeDownload(profile.id);
+
+    return {
+      jobTitle: job.title,
+      jobId: job.id,
+      identityMode: "full" as const,
+      planSlug,
+      resumeDownloadEnabled,
+      candidate: {
+        id: String(candidate.id ?? parsed.data.candidateId),
+        name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
+        title: String(candidate.professional_title ?? "Professional"),
+        bio: (candidate.bio as string | null) ?? null,
+        skills,
+        experienceYears: Number(candidate.experience_years ?? 0),
+        avatarUrl: (candidate.avatar_url as string | null) ?? null,
+        email: (candidate.email as string | null) ?? null,
+        isVerified: Boolean(candidate.is_verified),
+        resumeUrl: resumeCheck.allowed
+          ? ((candidate.resume_url as string | null) ?? null)
+          : null,
+        expectedSalaryMin:
+          candidate.expected_salary_min === null ||
+          candidate.expected_salary_min === undefined
+            ? null
+            : Number(candidate.expected_salary_min),
+        expectedSalaryMax:
+          candidate.expected_salary_max === null ||
+          candidate.expected_salary_max === undefined
+            ? null
+            : Number(candidate.expected_salary_max),
+        salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
+      },
+    };
+  }
 
   return {
     jobTitle: job.title,
     jobId: job.id,
+    identityMode: "anonymous_preview" as const,
+    planSlug,
+    resumeDownloadEnabled,
     candidate: {
-      id: candidate.id,
-      name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
-      title: candidate.professional_title ?? "Professional",
-      bio: candidate.bio,
-      skills: (candidate.skills as string[]) ?? [],
-      experienceYears: candidate.experience_years ?? 0,
-      avatarUrl: candidate.avatar_url,
-      email: candidate.email,
-      isVerified: Boolean(candidate.is_verified),
-      resumeUrl: candidate.resume_url,
+      id: String(candidate.id ?? parsed.data.candidateId),
+      name: previewDisplayName(parsed.data.candidateId),
+      title: String(candidate.professional_title ?? "Professional"),
+      bio: null,
+      skills,
+      experienceYears: Number(candidate.experience_years ?? 0),
+      avatarUrl: null,
+      email: null,
+      isVerified: false,
+      resumeUrl: null,
+      expectedSalaryMin:
+        candidate.expected_salary_min === null ||
+        candidate.expected_salary_min === undefined
+          ? null
+          : Number(candidate.expected_salary_min),
+      expectedSalaryMax:
+        candidate.expected_salary_max === null ||
+        candidate.expected_salary_max === undefined
+          ? null
+          : Number(candidate.expected_salary_max),
+      salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
     },
   };
 }

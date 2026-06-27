@@ -17,10 +17,14 @@ export interface Applicant {
   skills: string[];
   experienceYears: number;
   isUnlocked: boolean;
+  identityMode?: "full" | "anonymous_preview";
   avatarUrl: string | null;
   email: string | null;
   bio: string | null;
   resumeUrl: string | null;
+  expectedSalaryMin?: number | null;
+  expectedSalaryMax?: number | null;
+  salaryCurrency?: string | null;
   createdAt: string;
   isVerified: boolean;
 }

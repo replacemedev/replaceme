@@ -1,19 +1,13 @@
 import { test, expect } from "@playwright/test";
 import {
-  EMPLOYER_TEST_PASSWORD,
-  loginAsEmployer,
+  loginAsStarterEmployer,
   completeEmployerOnboardingIfPresent,
 } from "./helpers/auth";
 import { createEmployerJob } from "./helpers/jobs";
 
 test.describe("Employer job creation", () => {
-  test.skip(
-    !EMPLOYER_TEST_PASSWORD,
-    "Set E2E_EMPLOYER_PASSWORD for live employer auth"
-  );
-
   test.beforeEach(async ({ page }) => {
-    await loginAsEmployer(page);
+    await loginAsStarterEmployer(page);
     await completeEmployerOnboardingIfPresent(page);
   });
 

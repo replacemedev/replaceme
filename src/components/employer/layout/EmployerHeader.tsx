@@ -1,7 +1,10 @@
 import { getNavSession } from "@/lib/auth/nav-session";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { EmployerHeaderNav, EmployerMobileMenu } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
 
@@ -11,19 +14,44 @@ interface EmployerHeaderProps {
 
 export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
   const resolvedSession = session ?? (await getNavSession());
+  const planUsage = await getEmployerPlanUsage();
 
   return (
-    <header className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm">
-      <div className="relative flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16">
-        <NavBrand homeHref={resolvedSession.homeHref} compact />
+    <header
+      className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm"
+      style={{ viewTransitionName: "employer-header" }}
+    >
+      <div className="relative flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16 gap-3">
+        <div className="flex items-center gap-2 shrink-0">
+          <NavBrand homeHref={resolvedSession.homeHref} compact />
+          {planUsage ? (
+            <span className="md:hidden">
+              <PlanTierBadge tier={planUsage.planSlug} />
+            </span>
+          ) : null}
+        </div>
 
-        <EmployerHeaderNav unreadMessageCount={resolvedSession.unreadMessageCount} />
+        <EmployerHeaderNav
+          unreadMessageCount={resolvedSession.unreadMessageCount}
+          planUsage={planUsage}
+        />
 
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>
           <RoleNavDropdown session={resolvedSession} />
         </GlobalHeaderActions>
-        <EmployerMobileMenu unreadMessageCount={resolvedSession.unreadMessageCount} />
+        <EmployerMobileMenu
+          unreadMessageCount={resolvedSession.unreadMessageCount}
+          planUsage={planUsage}
+        />
       </div>
+
+      {planUsage ? (
+        <div className="hidden md:block border-t border-slate-100 bg-slate-50/60 px-margin-desktop py-2">
+          <div className="max-w-container-max mx-auto w-full">
+            <PlanUsageStrip usage={planUsage} compact />
+          </div>
+        </div>
+      ) : null}
     </header>
   );
 }

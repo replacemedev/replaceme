@@ -19,6 +19,7 @@ import {
   MessagingThread,
 } from "@/types/messaging";
 import { revalidatePath } from "next/cache";
+import { assertEmployerMessaging } from "@/lib/server/entitlements";
 
 async function getAuthenticatedProfile() {
   const supabase = await createClient();
@@ -101,6 +102,7 @@ async function enrichThreads(
       oppositeParty,
       jobTitle,
       contextTitle: buildContextTitle(jobTitle),
+      blocked_reason: (t.blocked_reason as string | null) ?? null,
       last_message: lastMessages?.[0] ?? null,
       unread_count: unreadCount ?? 0,
     });
@@ -224,12 +226,16 @@ export async function sendMessagingMessage(
 
     const { data: thread, error: threadError } = await supabase
       .from("chat_threads")
-      .select(`id, worker_id, company_profiles (employer_id)`)
+      .select(`id, worker_id, blocked_reason, company_profiles (employer_id)`)
       .eq("id", parsed.threadId)
       .single();
 
     if (threadError || !thread) {
       return fail("Thread not found");
+    }
+
+    if (thread.blocked_reason) {
+      return fail("Messaging is not available on this thread.");
     }
 
     const cp = thread.company_profiles as
@@ -239,6 +245,13 @@ export async function sendMessagingMessage(
     const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
     if (thread.worker_id !== user.id && employerId !== user.id) {
       return fail("Access denied");
+    }
+
+    if (employerId) {
+      const messagingCheck = await assertEmployerMessaging(employerId);
+      if (!messagingCheck.allowed) {
+        return fail(messagingCheck.error);
+      }
     }
 
     const { error: insertError } = await supabase.from("chat_messages").insert({

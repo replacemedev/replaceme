@@ -13,10 +13,11 @@ export function UpgradeBanner() {
         </div>
         <div>
           <h3 className="text-sm font-extrabold text-slate-800 mb-1">
-            Upgrade to Professional Plan
+            Upgrade to Growth or Scale
           </h3>
           <p className="text-xs text-slate-500 leading-relaxed max-w-2xl font-medium">
-            Unlock unlimited pinned profiles, full candidate contact details, direct messaging without restrictions, and premium support. Elevate your hiring experience.
+            Unlock more active jobs, higher applicant caps, full candidate profiles, direct
+            messaging, and priority listing. Growth starts at $39/mo.
           </p>
         </div>
       </div>
@@ -24,7 +25,7 @@ export function UpgradeBanner() {
         href="/employer/pricing"
         className="h-11 px-5 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center gap-2 shrink-0 shadow-sm cursor-pointer"
       >
-        Upgrade Now
+        View Plans
         <ArrowRight size={14} />
       </Link>
     </div>

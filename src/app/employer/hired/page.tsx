@@ -19,11 +19,10 @@ export default async function HiredPage() {
 
   // Fetch the employer's current active subscription state
   const subscription = await getCurrentEmployerSubscription();
-
-  // Check if they need to be shown the upgrade professional banner
-  const isProfessional = 
-    subscription?.active && 
-    subscription.planName.toLowerCase() === "professional";
+  const planSlug = subscription?.planName?.toLowerCase() ?? "discovery";
+  const isScale =
+    subscription?.active &&
+    (planSlug === "scale" || planSlug === "professional");
 
   return (
     <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-8">
@@ -47,7 +46,7 @@ export default async function HiredPage() {
       </div>
 
       {/* Conditionally display the upgrade banner if not on the Professional tier */}
-      {!isProfessional && <UpgradeBanner />}
+      {!isScale && <UpgradeBanner />}
 
       {/* Stats Overview Cards */}
       <StatsOverview stats={stats} />

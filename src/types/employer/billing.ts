@@ -1,4 +1,8 @@
-export type SubscriptionTier = "discovery" | "essential" | "professional";
+export type SubscriptionTier =
+  | "discovery"
+  | "starter"
+  | "growth"
+  | "scale";
 
 export interface AccountSettings {
   plan: SubscriptionTier;
@@ -7,10 +11,13 @@ export interface AccountSettings {
   active: boolean;
   nextBillingDate: string | null;
   status: string;
+  cancelAtPeriodEnd: boolean;
+  hasStripeSubscription: boolean;
 }
 
 export interface PricingPlan {
   id: string;
+  slug: string;
   name: string;
   price: number;
   features: string[];
@@ -21,8 +28,10 @@ export interface PricingPlan {
     jobs: string;
     applicants: string;
     approval: string;
-    candidateContact: string;
+    messaging: string;
+    resumeDownload: string;
     viewIdentities: string;
+    priorityListing: string;
     prioritySupport: string;
   };
 }

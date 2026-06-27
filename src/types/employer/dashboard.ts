@@ -39,7 +39,7 @@ export type BillingUsageItem = {
 
 export type BillingPlan = {
   name: string; // e.g. "Essential Plan"
-  price: string; // e.g. "$30/mo"
+  price: string; // e.g. "$19/mo"
   status: "ACTIVE" | "PAST_DUE" | "CANCELED";
   usage: {
     candidateUnlocks: BillingUsageItem;

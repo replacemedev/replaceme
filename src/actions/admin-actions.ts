@@ -599,7 +599,7 @@ export async function fetchAdminSubscriptions(): Promise<
       job_posts_used,
       unlocks_used,
       created_at,
-      billing_plans (
+      billing_plans!employer_subscriptions_plan_id_fkey (
         name,
         price
       ),

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccountSettings } from "@/actions/employer/billing";
+import { getAccountSettings, getEmployerPlanUsage } from "@/actions/employer/billing";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 
 export const metadata = {
@@ -21,16 +21,18 @@ export default async function AccountSettingsPage() {
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
-    .eq("auth_user_id", user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile || profile.role !== "employer") {
     redirect("/dashboard");
   }
 
-  const initialSettings = await getAccountSettings();
+  const [initialSettings, planUsage] = await Promise.all([
+    getAccountSettings(),
+    getEmployerPlanUsage(),
+  ]);
 
-  // Fallback default settings if none returned
   const defaultSettings = initialSettings || {
     plan: "discovery" as const,
     unlocksUsed: 0,
@@ -38,6 +40,8 @@ export default async function AccountSettingsPage() {
     active: false,
     nextBillingDate: null,
     status: "Inactive",
+    cancelAtPeriodEnd: false,
+    hasStripeSubscription: false,
   };
 
   return (
@@ -58,7 +62,12 @@ export default async function AccountSettingsPage() {
       </div>
 
       {/* Main Interactive Client Grid */}
-      <AccountSettingsClient initialSettings={defaultSettings} />
+      <Suspense fallback={null}>
+        <AccountSettingsClient
+          initialSettings={defaultSettings}
+          planUsage={planUsage}
+        />
+      </Suspense>
     </div>
   );
 }

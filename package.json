@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed:admin": "node scripts/seed-admin.mjs",
+    "seed:e2e": "node scripts/seed-e2e-fixtures.mjs",
+    "seed:e2e:verify": "node scripts/verify-e2e-fixtures.mjs",
     "db:seed": "npm run seed:admin",
     "test:e2e": "playwright test",
     "test:e2e:employer": "playwright test --project=employer",
@@ -15,6 +17,8 @@
     "test:e2e:reuse": "PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 playwright test",
     "test:e2e:admin": "playwright test --project=admin",
     "test:e2e:public": "playwright test --project=public",
+    "test:e2e:cross-role": "playwright test --project=cross-role",
+    "test:e2e:tier": "playwright test e2e/employer/tier-entitlements.spec.ts e2e/cross-role/billing-entitlements.spec.ts e2e/employer/pricing-tiers.spec.ts",
     "probe:employer": "node scripts/e2e-employer-probe.mjs",
     "probe:employer-lifecycle": "node scripts/e2e-employer-lifecycle.mjs",
     "prompt:sync": "node scripts/sync-prompt-file-map.mjs"

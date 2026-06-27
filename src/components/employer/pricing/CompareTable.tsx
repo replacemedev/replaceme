@@ -2,67 +2,92 @@
 
 import React from "react";
 import { Check, X } from "lucide-react";
-import { PricingPlan } from "@/types/employer/billing";
+import { PricingPlan, SubscriptionTier } from "@/types/employer/billing";
+import { isCurrentTier } from "@/lib/entitlements/ui-copy";
 
 interface CompareTableProps {
   plans: PricingPlan[];
+  currentPlanSlug?: SubscriptionTier | null;
 }
 
-export function CompareTable({ plans }: CompareTableProps) {
+export function CompareTable({
+  plans,
+  currentPlanSlug = null,
+}: CompareTableProps) {
   if (!plans || plans.length === 0) {
     return null;
   }
 
-  // Find limits for each plan dynamically by matching name
-  const getPlanData = (planName: string) => {
-    return plans.find((p) => p.name.toLowerCase() === planName.toLowerCase());
-  };
+  const ordered = [...plans].sort((a, b) => a.price - b.price);
 
-  const discovery = getPlanData("discovery");
-  const essential = getPlanData("essential");
-  const professional = getPlanData("professional");
-
-  if (!discovery || !essential || !professional) {
-    return null;
-  }
-
-  const rows = [
+  const rows: {
+    feature: string;
+    values: Record<string, string>;
+    highlight?: boolean;
+  }[] = [
     {
       feature: "Job Posts",
-      discovery: discovery.limits.jobs,
-      essential: essential.limits.jobs,
-      professional: professional.limits.jobs,
+      values: Object.fromEntries(
+        ordered.map((p) => [
+          p.slug,
+          p.limits.jobs === "1" ? "1" : p.limits.jobs,
+        ])
+      ),
     },
     {
       feature: "Applicants per Job",
-      discovery: discovery.limits.applicants,
-      essential: essential.limits.applicants,
-      professional: professional.limits.applicants,
+      values: Object.fromEntries(
+        ordered.map((p) => [p.slug, p.limits.applicants])
+      ),
     },
     {
       feature: "Approval Time",
-      discovery: discovery.limits.approval,
-      essential: essential.limits.approval,
-      professional: professional.limits.approval,
-      highlight: true, // green highlight for instant
+      values: Object.fromEntries(
+        ordered.map((p) => [p.slug, p.limits.approval])
+      ),
+      highlight: true,
     },
     {
-      feature: "Candidate Contact",
-      discovery: "x",
-      essential: essential.limits.candidateContact,
-      professional: professional.limits.candidateContact,
+      feature: "Candidate Profiles",
+      values: Object.fromEntries(
+        ordered.map((p) => [p.slug, p.limits.viewIdentities])
+      ),
     },
     {
-      feature: "View Identities",
-      discovery: "x",
-      essential: "check",
-      professional: "check",
+      feature: "Messaging",
+      values: Object.fromEntries(
+        ordered.map((p) => [
+          p.slug,
+          p.limits.messaging === "Yes" ? "check" : "x",
+        ])
+      ),
+    },
+    {
+      feature: "Resume Downloads",
+      values: Object.fromEntries(
+        ordered.map((p) => [
+          p.slug,
+          p.limits.resumeDownload === "Yes" ? "check" : "x",
+        ])
+      ),
+    },
+    {
+      feature: "Priority Listing",
+      values: Object.fromEntries(
+        ordered.map((p) => [
+          p.slug,
+          p.limits.priorityListing === "Yes" ? "check" : "x",
+        ])
+      ),
     },
     {
       feature: "Priority Support",
-      discovery: "x",
-      essential: "x",
-      professional: "check",
+      values: Object.fromEntries(
+        ordered.map((p) => [
+          p.slug,
+          p.limits.prioritySupport === "Yes" ? "check" : "x",
+        ])
+      ),
     },
   ];
 
@@ -88,31 +113,72 @@ export function CompareTable({ plans }: CompareTableProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h3 className="text-2xl font-bold text-gray-900 text-center mb-10">Compare Features</h3>
-      <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm bg-white">
+    <div className="max-w-6xl mx-auto px-4 py-12 overflow-x-auto">
+      <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
+        Compare Features
+      </h3>
+      <p className="text-center text-sm text-slate-500 font-medium mb-10 max-w-xl mx-auto">
+        {currentPlanSlug
+          ? "All paid plans bill monthly in USD through Stripe. Your current plan is highlighted below."
+          : "All paid plans bill monthly in USD through Stripe. Compare tiers and sign up when you're ready."}
+      </p>
+      <div className="rounded-2xl border border-gray-100 shadow-sm bg-white min-w-[640px]">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-100">
-              <th className="p-5 text-sm font-semibold text-gray-500 w-1/4">Feature</th>
-              <th className="p-5 text-sm font-semibold text-gray-900 text-center w-1/4">Discovery</th>
-              <th className="p-5 text-sm font-semibold text-[#10b981] text-center w-1/4">Essential</th>
-              <th className="p-5 text-sm font-semibold text-gray-900 text-center w-1/4">Professional</th>
+              <th className="p-4 text-sm font-semibold text-gray-500 w-[18%]">
+                Feature
+              </th>
+              {ordered.map((plan) => {
+                const isCurrent = currentPlanSlug
+                  ? isCurrentTier(plan.slug, currentPlanSlug)
+                  : false;
+                return (
+                  <th
+                    key={plan.id}
+                    className={`p-4 text-sm font-semibold text-center ${
+                      isCurrent
+                        ? "text-[#006e2f] bg-[#fafdfb]"
+                        : plan.popular
+                          ? "text-[#10b981]"
+                          : "text-gray-900"
+                    }`}
+                  >
+                    <span className="block">{plan.name}</span>
+                    {isCurrent ? (
+                      <span className="mt-1 inline-block rounded-full bg-[#006e2f] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                        Current
+                      </span>
+                    ) : null}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {rows.map((row, idx) => (
-              <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                <td className="p-5 text-sm font-semibold text-gray-600">{row.feature}</td>
-                <td className="p-5 text-sm text-center">
-                  {renderCell(row.discovery, row.highlight)}
+            {rows.map((row) => (
+              <tr
+                key={row.feature}
+                className="hover:bg-gray-50/50 transition-colors"
+              >
+                <td className="p-4 text-sm font-semibold text-gray-600">
+                  {row.feature}
                 </td>
-                <td className="p-5 text-sm text-center">
-                  {renderCell(row.essential, row.highlight)}
-                </td>
-                <td className="p-5 text-sm text-center">
-                  {renderCell(row.professional, row.highlight)}
-                </td>
+                {ordered.map((plan) => {
+                  const isCurrent = currentPlanSlug
+                  ? isCurrentTier(plan.slug, currentPlanSlug)
+                  : false;
+                  return (
+                    <td
+                      key={plan.id}
+                      className={`p-4 text-sm text-center ${
+                        isCurrent ? "bg-[#fafdfb]/60" : ""
+                      }`}
+                    >
+                      {renderCell(row.values[plan.slug] ?? "—", row.highlight)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

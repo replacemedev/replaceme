@@ -23,7 +23,7 @@ export const TERMS_FALLBACK_META: PageContentMeta = {
 export const PRICING_FALLBACK: PricingPageConfig = {
   headline: "Simple, Transparent Pricing",
   description:
-    "Compare plans and create a free employer account to post jobs. Workers always join for free.",
+    "Discovery is free ($0). Starter $19/mo, Growth $39/mo, Scale $79/mo — workers always join for free.",
 };
 
 export const HELP_INDEX_FALLBACK: HelpIndexConfig = {

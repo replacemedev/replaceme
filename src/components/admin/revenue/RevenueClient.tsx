@@ -3,6 +3,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { StatCard } from "@/components/shared/StatCard";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import type { AdminSubscriptionRow } from "@/types/admin.types";
 
 interface RevenueClientProps {
@@ -81,9 +82,14 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
                     <p className="text-xs text-slate-400">{sub.employer_email}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-slate-700 font-medium">{sub.plan_name ?? "—"}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-slate-700 font-medium">{sub.plan_name ?? "—"}</p>
+                      {sub.plan_name ? (
+                        <PlanTierBadge tier={sub.plan_name} />
+                      ) : null}
+                    </div>
                     {sub.plan_price != null ? (
-                      <p className="text-xs text-slate-400 font-mono">
+                      <p className="text-xs text-slate-400 font-mono mt-1">
                         ${sub.plan_price}/mo
                       </p>
                     ) : null}
@@ -92,7 +98,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
                     <StatusBadge status={sub.status} />
                   </td>
                   <td className="px-4 py-3 text-xs text-slate-500">
-                    {sub.job_posts_used} posts · {sub.unlocks_used} unlocks
+                    {sub.job_posts_used} active jobs
                   </td>
                   <td className="px-4 py-3 text-xs text-slate-500">
                     {sub.current_period_end

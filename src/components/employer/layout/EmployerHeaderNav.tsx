@@ -5,10 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, X, Briefcase } from "lucide-react";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
+import { PostJobNavLink } from "@/components/employer/jobs/PostJobNavLink";
+import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 
 const MORE_LINKS = [
+  { href: "/employer/settings/account", label: "Account & Billing" },
   { href: "/employer/notifications", label: "Notifications" },
-  { href: "/employer/credits", label: "Credits" },
   { href: "/employer/reviews", label: "Reviews" },
   { href: "/employer/pricing", label: "Pricing" },
 ];
@@ -19,10 +21,12 @@ function isActive(pathname: string, href: string) {
 
 interface EmployerHeaderNavProps {
   unreadMessageCount?: number;
+  planUsage?: EmployerPlanUsage | null;
 }
 
 export function EmployerHeaderNav({
   unreadMessageCount = 0,
+  planUsage = null,
 }: EmployerHeaderNavProps) {
   const pathname = usePathname();
   const [jobsDropdownOpen, setJobsDropdownOpen] = useState(false);
@@ -108,14 +112,13 @@ export function EmployerHeaderNav({
             >
               All Job Posts
             </Link>
-            <Link
-              href="/employer/jobs/create"
-              onClick={() => setJobsDropdownOpen(false)}
+            <PostJobNavLink
+              planSlug={planUsage?.planSlug ?? "discovery"}
+              activeJobsCount={planUsage?.activeJobsCount ?? 0}
+              activeJobsLimit={planUsage?.activeJobsLimit ?? null}
+              onNavigate={() => setJobsDropdownOpen(false)}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#006e2f] hover:bg-slate-50 w-full text-left"
-              role="menuitem"
-            >
-              Create a Job Post
-            </Link>
+            />
           </div>
         ) : null}
       </div>
@@ -192,10 +195,12 @@ export function EmployerHeaderNav({
 
 interface EmployerMobileMenuProps {
   unreadMessageCount?: number;
+  planUsage?: EmployerPlanUsage | null;
 }
 
 export function EmployerMobileMenu({
   unreadMessageCount = 0,
+  planUsage = null,
 }: EmployerMobileMenuProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -283,13 +288,13 @@ export function EmployerMobileMenu({
           >
             All Job Posts
           </Link>
-          <Link
-            href="/employer/jobs/create"
-            onClick={() => setMobileMenuOpen(false)}
-            className="font-medium py-1.5 pl-6 text-[#006e2f] border-l-2 border-[#006e2f]"
-          >
-            Create a Job Post
-          </Link>
+          <PostJobNavLink
+            planSlug={planUsage?.planSlug ?? "discovery"}
+            activeJobsCount={planUsage?.activeJobsCount ?? 0}
+            activeJobsLimit={planUsage?.activeJobsLimit ?? null}
+            onNavigate={() => setMobileMenuOpen(false)}
+            className="font-medium py-1.5 pl-6 text-[#006e2f] border-l-2 border-[#006e2f] w-full text-left"
+          />
         </div>
       ) : null}
     </>

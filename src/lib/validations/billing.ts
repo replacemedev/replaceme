@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const subscriptionTierSchema = z.enum(
-  ["discovery", "essential", "professional"],
+  ["discovery", "starter", "growth", "scale"],
   { message: "Invalid subscription plan selected." }
 );
 

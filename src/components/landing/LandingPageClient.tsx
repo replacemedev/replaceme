@@ -11,7 +11,6 @@ import {
   BadgeCheck,
   Briefcase,
   Building2,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   CircleDollarSign,
@@ -130,31 +129,35 @@ const talentList = [
   }
 ];
 
-// FAQs data
-const faqs = [
+import type { FAQItem, PricingPlan } from "@/types/employer/billing";
+
+interface LandingPageClientProps {
+  pricingPlans: PricingPlan[];
+  faqs: FAQItem[];
+}
+
+const LANDING_FAQ_FALLBACK: FAQItem[] = [
   {
-    question: "What is Replace Me?",
-    answer: "Replace Me is a direct hiring platform that connects businesses with Filipino virtual assistants and remote workers. Employers can hire and manage talent directly, with no agency fees, salary markups, or ongoing commissions."
+    question: "What is included in the free Discovery plan?",
+    answer:
+      "Discovery ($0/mo) includes 1 active job, up to 10 applicants per job, 2-day approval, and anonymous candidate previews. Upgrade to Starter or above for messaging and full profiles.",
   },
   {
-    question: "Can I unsubscribe after hiring?",
-    answer: "Yes, you can unsubscribe at anytime! There are no contracts, so once you’ve hired someone, you can cancel your subscription and restart it later if you need to find another worker."
+    question: "How do Starter, Growth, and Scale compare?",
+    answer:
+      "Starter is $19/mo (3 jobs, 20 applicants). Growth is $39/mo (10 jobs, 50 applicants, priority listing). Scale is $79/mo (unlimited jobs and applicants).",
   },
   {
-    question: "Do I pay monthly fees for my worker?",
-    answer: "Nope! Since we’re not an agency, you hire and pay your remote worker directly (with no on-going fees!). Even if you unsubscribe, you still have complete control and management over your hire."
+    question: "Is Replace Me free for job seekers?",
+    answer: "Yes — workers browse, apply, and message employers at no cost.",
   },
-  {
-    question: "What is the refund policy?",
-    answer: "We have a 30-day money back guarantee! So if for any reason you are not 100% satisfied or don’t find the perfect match within 30 days, we will give you a full refund."
-  },
-  {
-    question: "What can I do with a FREE account?",
-    answer: "You can post job listings and review applications to get an idea of potential candidates. However, you won’t be able to message and hire them until you subscribe to a paid account."
-  }
 ];
 
-export function LandingPageClient() {
+export function LandingPageClient({
+  pricingPlans,
+  faqs: faqsProp,
+}: LandingPageClientProps) {
+  const faqs = faqsProp.length > 0 ? faqsProp : LANDING_FAQ_FALLBACK;
 
   // States for Carousel
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -717,7 +720,9 @@ export function LandingPageClient() {
             <Element name="pricing" id="pricing" className="h-0 w-0" aria-hidden />
             <div className="reveal-item">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
-              <p className="text-slate-300 mb-6 font-body-base text-lg">Everything you need to hire the best remote talent.</p>
+              <p className="text-slate-300 mb-6 font-body-base text-lg">
+                Discovery is free. Upgrade when you need full profiles, messaging, and instant approval.
+              </p>
               <div className="inline-block bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-2 mb-12">
                 <p className="text-[#22c55e] font-body-bold flex items-center gap-2 text-sm font-semibold uppercase tracking-wider">
                   <Gift className="h-5 w-5 shrink-0" aria-hidden /> Always 100% FREE for Job Seekers
@@ -725,36 +730,49 @@ export function LandingPageClient() {
               </div>
             </div>
 
-            <div className="bg-white text-slate-800 rounded-3xl p-10 md:p-14 shadow-2xl max-w-lg mx-auto relative border-4 border-emerald-500/20 text-center reveal-item hover:shadow-[0_20px_50px_rgba(34,197,94,0.15)] transition-all duration-300" style={{ transitionDelay: "150ms" }}>
-              {/* Featured Badge */}
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#22c55e] text-white text-xs font-bold tracking-wider px-6 py-2 rounded-full uppercase shadow-lg border-2 border-white">
-                Most Popular
-              </div>
-              <h3 className="text-2xl text-slate-800 mb-4 mt-2 font-bold">Standard Plan</h3>
-              <div className="flex items-baseline gap-2 mb-8 justify-center">
-                <span className="text-6xl font-display-xl font-extrabold text-slate-900">$30</span>
-                <span className="text-slate-400 font-body-base text-lg">/mo</span>
-              </div>
-              <p className="text-slate-500 mb-10 text-base border-b border-slate-100 pb-8">Access to our entire database of vetted professionals to scale your team.</p>
-              <ul className="space-y-6 mb-10 flex flex-col items-center">
-                <li className="flex items-center gap-4">
-                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
-                  <span className="text-slate-700 font-body-base text-base font-semibold">Post Unlimited Jobs</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
-                  <span className="text-slate-700 font-body-base text-base font-semibold">Message Applicants</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <CheckCircle2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden />
-                  <span className="text-slate-700 font-body-base text-base font-semibold">Cancel Anytime</span>
-                </li>
-              </ul>
-              <Link href="/signup" className="bg-[#22c55e] text-white w-full py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 shadow-[0_12px_24px_-6px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
-                <span>Hire Talent Now</span>
-                <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
-              </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 max-w-6xl mx-auto text-left reveal-item" style={{ transitionDelay: "150ms" }}>
+              {pricingPlans.length > 0 ? (
+                pricingPlans.map((plan) => (
+                  <div
+                    key={plan.id}
+                    className={`rounded-2xl p-5 border relative ${
+                      plan.popular
+                        ? "bg-white text-slate-800 border-4 border-emerald-500/40 shadow-lg"
+                        : "bg-white/95 text-slate-800 border border-white/20"
+                    }`}
+                  >
+                    {plan.popular ? (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#22c55e] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase whitespace-nowrap">
+                        Most Popular
+                      </div>
+                    ) : null}
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      {plan.slug === "discovery" ? "Free" : plan.name}
+                    </p>
+                    <h3 className="text-lg font-bold mt-1 capitalize">{plan.name}</h3>
+                    <p className="text-3xl font-extrabold mt-2">
+                      ${plan.price}
+                      <span className="text-sm font-medium text-slate-400">/mo</span>
+                    </p>
+                    <p className="text-sm text-slate-500 mt-3 line-clamp-3">
+                      {plan.features.slice(0, 3).join(" · ")}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="col-span-full text-center text-slate-300 text-sm">
+                  Plans load from your account database — see full comparison below.
+                </p>
+              )}
             </div>
+            <Link
+              href="/pricing"
+              className="inline-flex mt-8 items-center gap-2 bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] transition-all text-lg reveal-item"
+              style={{ transitionDelay: "200ms" }}
+            >
+              Compare all plans
+              <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
+            </Link>
           </div>
         </section>
 

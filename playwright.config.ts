@@ -64,6 +64,11 @@ export default defineConfig({
       testDir: "./e2e/public",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "cross-role",
+      testDir: "./e2e/cross-role",
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined

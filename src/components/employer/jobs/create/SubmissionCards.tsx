@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useFormContext } from "react-hook-form";
 import { Zap, ShieldCheck, Check, Sparkles } from "lucide-react";
 
@@ -84,12 +85,11 @@ export function SubmissionCards({ isSubmitting, editMode = false }: SubmissionCa
           </div>
         </div>
 
-        {/* Premium Option */}
+        {/* Paid plan instant approval */}
         <div className="relative bg-[#fafdfb] border-2 border-emerald-500 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 shadow-md shadow-emerald-50/20 overflow-hidden">
-          {/* Recommended Badge */}
           <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1 shadow-sm">
             <Sparkles size={10} />
-            Recommended
+            Paid plans
           </div>
 
           <div className="space-y-4">
@@ -98,8 +98,8 @@ export function SubmissionCards({ isSubmitting, editMode = false }: SubmissionCa
                 <Zap size={18} />
               </span>
               <div>
-                <h3 className="text-lg font-bold text-slate-800">Premium Boost</h3>
-                <p className="text-xs text-emerald-600 font-semibold">Instant verification & reach</p>
+                <h3 className="text-lg font-bold text-slate-800">Instant Approval</h3>
+                <p className="text-xs text-emerald-600 font-semibold">Starter, Growth & Scale</p>
               </div>
             </div>
 
@@ -108,33 +108,31 @@ export function SubmissionCards({ isSubmitting, editMode = false }: SubmissionCa
             <ul className="space-y-3 text-sm text-slate-600">
               <li className="flex items-start gap-2.5">
                 <Check size={16} className="text-[#22c55e] shrink-0 mt-0.5" />
-                <span className="font-semibold text-slate-800">Instant approval (skip the queue)</span>
+                <span className="font-semibold text-slate-800">Skip the 2-day review queue</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Check size={16} className="text-[#22c55e] shrink-0 mt-0.5" />
-                <span className="font-semibold text-slate-800">Highlighted listing badge (3x views)</span>
+                <span className="font-semibold text-slate-800">Priority listing on Growth & Scale</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Check size={16} className="text-[#22c55e] shrink-0 mt-0.5" />
-                <span>Pushed to top of worker matching feeds</span>
+                <span>Full profiles, messaging & resume downloads</span>
               </li>
             </ul>
           </div>
 
           <div className="mt-8 pt-6 border-t border-emerald-100/50">
             <div className="mb-4">
-              <span className="text-2xl font-extrabold text-slate-800">$49</span>
-              <span className="text-xs text-slate-400 font-medium ml-1">per post</span>
+              <span className="text-2xl font-extrabold text-slate-800">From $19</span>
+              <span className="text-xs text-slate-400 font-medium ml-1">/mo</span>
             </div>
 
-            <button
-              type="submit"
-              onClick={() => setValue("intent", "premium")}
-              disabled={isSubmitting}
-              className="inline-flex items-center justify-center h-12 w-full px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-lg shadow-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/30 disabled:opacity-50"
+            <Link
+              href="/employer/pricing"
+              className="inline-flex items-center justify-center h-12 w-full px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-lg shadow-emerald-600/20"
             >
-              {isSubmitting ? "Submitting..." : "Get Premium Placement"}
-            </button>
+              View Plans & Upgrade
+            </Link>
           </div>
         </div>
       </div>

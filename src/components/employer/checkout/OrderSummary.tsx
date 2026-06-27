@@ -65,6 +65,9 @@ export function OrderSummary({
             </span>
             <span className="text-gray-400 text-sm font-bold">per month</span>
           </div>
+          <p className="text-xs font-semibold text-slate-500 mt-2">
+            Billed monthly in USD · Cancel anytime
+          </p>
         </div>
 
         {/* Divider */}

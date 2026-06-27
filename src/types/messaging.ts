@@ -36,6 +36,7 @@ export interface MessagingThread {
   jobTitle: string | null;
   /** Header context, e.g. "Application for Shopify Developer". */
   contextTitle: string;
+  blocked_reason: string | null;
   last_message: {
     content: string;
     created_at: string;

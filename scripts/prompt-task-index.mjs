@@ -127,6 +127,20 @@ export const TASK_INDEX = [
     patterns: ["supabase/migrations/*.sql", "src/types/database.ts"],
   },
   {
+    area: "Pricing migration",
+    patterns: [
+      "docs/pricing-migration/**",
+      "scripts/seed-e2e-fixtures.mjs",
+      "scripts/e2e-fixtures/**",
+      "scripts/verify-e2e-fixtures.mjs",
+      "src/lib/server/billing/**",
+      "src/actions/employer/billing.ts",
+      "src/actions/employer/stripe.ts",
+      "src/actions/employer/pricing.ts",
+      "src/app/api/webhooks/stripe/**",
+    ],
+  },
+  {
     area: "RBAC / middleware",
     patterns: [
       "src/proxy.ts",
