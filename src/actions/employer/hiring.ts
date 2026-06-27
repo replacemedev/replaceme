@@ -197,6 +197,16 @@ export async function getEmployerCandidateProfile(
     fetchApplicantPreview(supabase, application.id, profile.id),
   ]);
 
+  const { data: pinRow } = await supabase
+    .from("pinned_workers")
+    .select("worker_id")
+    .eq("employer_id", profile.id)
+    .eq("worker_id", parsed.data.candidateId)
+    .maybeSingle();
+
+  const isPinned = Boolean(pinRow);
+  const messagingEnabled = entitlements?.messagingEnabled ?? false;
+
   if (!preview) {
     return null;
   }
@@ -219,6 +229,8 @@ export async function getEmployerCandidateProfile(
       identityMode: "full" as const,
       planSlug,
       resumeDownloadEnabled,
+      messagingEnabled,
+      isPinned,
       candidate: {
         id: String(candidate.id ?? parsed.data.candidateId),
         name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
@@ -253,6 +265,8 @@ export async function getEmployerCandidateProfile(
     identityMode: "anonymous_preview" as const,
     planSlug,
     resumeDownloadEnabled,
+    messagingEnabled,
+    isPinned,
     candidate: {
       id: String(candidate.id ?? parsed.data.candidateId),
       name: previewDisplayName(parsed.data.candidateId),

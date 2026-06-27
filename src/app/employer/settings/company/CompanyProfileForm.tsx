@@ -13,13 +13,20 @@ import { Button } from "@/components/ui/button";
 
 import { LogoUpload } from "@/components/employer/settings/company/LogoUpload";
 import { CompanyDetailsForm } from "@/components/employer/settings/company/CompanyDetailsForm";
+import { CompanyJobPostPreview } from "@/components/employer/settings/company/CompanyJobPostPreview";
+import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 interface CompanyProfileFormProps {
   initialData: CompanyProfileInput | null;
   industries: DropdownOption[];
+  isProfileComplete?: boolean;
 }
 
-export function CompanyProfileForm({ initialData, industries }: CompanyProfileFormProps) {
+export function CompanyProfileForm({
+  initialData,
+  industries,
+  isProfileComplete = false,
+}: CompanyProfileFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,7 +54,7 @@ export function CompanyProfileForm({ initialData, industries }: CompanyProfileFo
         toast.success(result.message, { id: toastId });
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred. Please try again.", { id: toastId });
     } finally {
       setIsSubmitting(false);
@@ -56,36 +63,38 @@ export function CompanyProfileForm({ initialData, industries }: CompanyProfileFo
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8">
-        
-        {/* Logo Upload Section */}
-        <LogoUpload />
+      <form
+        onSubmit={methods.handleSubmit(onSubmit)}
+        className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 items-start"
+      >
+        <div className={`${EMPLOYER_CARD} p-6 sm:p-8 space-y-8`}>
+          <LogoUpload />
 
-        {/* Divider line matching reference */}
-        <div className="h-px bg-slate-100" />
+          <div className="h-px bg-slate-100" />
 
-        {/* Text Form Details */}
-        <CompanyDetailsForm industries={industries} />
+          <CompanyDetailsForm industries={industries} />
 
-        {/* Form Footer Actions */}
-        <div className="flex justify-end items-center gap-4 pt-6 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={() => router.push("/dashboard")}
-            className="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            Cancel
-          </button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            variant="success"
-            className="w-auto px-6 h-12 flex items-center gap-2"
-          >
-            <Save size={16} />
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
+          <div className="flex justify-end items-center gap-4 pt-6 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => router.push("/employer/dashboard")}
+              className="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              Cancel
+            </button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              variant="success"
+              className="w-auto px-6 h-12 flex items-center gap-2"
+            >
+              <Save size={16} aria-hidden />
+              {isSubmitting ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
         </div>
+
+        <CompanyJobPostPreview isProfileComplete={isProfileComplete} />
       </form>
     </FormProvider>
   );

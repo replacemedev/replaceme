@@ -95,7 +95,7 @@ export function LogoUpload() {
 
         {isUploading && (
           <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
-            <Loader2 className="h-6 w-6 text-[#22c55e] animate-spin" />
+            <Loader2 className="h-6 w-6 text-[#006e2f] animate-spin" />
           </div>
         )}
       </div>
@@ -121,7 +121,7 @@ export function LogoUpload() {
           type="button"
           disabled={isUploading}
           onClick={handleButtonClick}
-          className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/10 text-slate-700 hover:text-[#22c55e] font-bold text-xs rounded-xl transition-all duration-200 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 hover:border-[#006e2f]/30 hover:bg-[#fafdfb] text-slate-700 hover:text-[#006e2f] font-bold text-xs rounded-xl transition-all duration-200 disabled:opacity-50"
         >
           <Upload size={14} />
           {logoUrl ? "Change Image" : "Upload Image"}

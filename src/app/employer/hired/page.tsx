@@ -1,9 +1,9 @@
 import React from "react";
+import Link from "next/link";
 import { getHiredData } from "@/actions/employer/hired";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { StatsOverview } from "@/components/employer/hired/StatsOverview";
+import { HiredStatsStrip } from "@/components/employer/hired/HiredStatsStrip";
 import { HiredWorkerList } from "@/components/employer/hired/HiredWorkerList";
-import { UpsellFooter } from "@/components/employer/hired/UpsellFooter";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
@@ -13,6 +13,7 @@ import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 import {
   EmployerPageHeader,
   EmployerPageShell,
+  EmployerSectionCard,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -59,7 +60,7 @@ export default async function HiredPage() {
         <ContextualUpgradeBanner feature="messaging" currentPlan={planSlug} />
       ) : null}
 
-      <StatsOverview stats={stats} />
+      <HiredStatsStrip stats={stats} />
 
       {workers.length > 0 ? (
         <HiredWorkerList
@@ -68,16 +69,43 @@ export default async function HiredPage() {
           messagingEnabled={messagingEnabled}
         />
       ) : (
-        <EmptyState
-          icon={<Users size={22} />}
-          title="No hired workers yet"
-          description="When you hire a candidate from your applicant pipeline, their contract details will appear here."
-          actionLabel="View job posts"
-          actionHref="/employer/jobs"
-        />
+        <div className="space-y-4">
+          <EmptyState
+            icon={<Users size={22} />}
+            title="No hired workers yet"
+            description="When you hire a candidate from your applicant pipeline, their contract details will appear here."
+            actionLabel="Post a job"
+            actionHref="/employer/jobs/create"
+          />
+          <p className="text-center text-sm text-slate-500 font-medium">
+            Or review applicants in your existing pipelines.{" "}
+            <Link
+              href="/employer/jobs"
+              className="font-bold text-[#006e2f] hover:underline"
+            >
+              View job posts
+            </Link>
+          </p>
+        </div>
       )}
 
-      <UpsellFooter />
+      {workers.length > 0 ? (
+        <EmployerSectionCard
+          title="Grow your team"
+          description="Post another role or review applicants in your pipelines."
+          padded
+        >
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <PostJobCTA planUsage={planUsage} />
+            <Link
+              href="/employer/jobs"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              View pipelines
+            </Link>
+          </div>
+        </EmployerSectionCard>
+      ) : null}
     </EmployerPageShell>
   );
 }

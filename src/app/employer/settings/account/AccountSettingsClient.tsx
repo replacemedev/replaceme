@@ -10,7 +10,7 @@ import {
   createCustomerPortalSession,
 } from "@/actions/employer/billing";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 
 import Link from "next/link";
 import { AccountDetailsList } from "@/components/employer/settings/account/AccountDetailsList";
@@ -112,12 +112,22 @@ export function AccountSettingsClient({
               </p>
             </div>
           </div>
-          <Link
-            href="/employer/dashboard"
-            className="shrink-0 inline-flex items-center justify-center rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] transition-colors"
-          >
-            Go to dashboard
-          </Link>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => router.refresh()}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-white/70 px-4 py-2 text-xs font-bold text-[#006e2f] hover:bg-white transition-colors"
+            >
+              <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+              Refresh plan status
+            </button>
+            <Link
+              href="/employer/dashboard"
+              className="inline-flex items-center justify-center rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] transition-colors"
+            >
+              Go to dashboard
+            </Link>
+          </div>
         </div>
       ) : null}
 

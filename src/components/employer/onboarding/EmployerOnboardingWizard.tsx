@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { completeEmployerOnboarding } from "@/actions/onboarding";
 import { toast } from "sonner";
 import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import { OnboardingStepDots } from "@/components/employer/onboarding/OnboardingStepDots";
 import {
   COMPANY_SIZE_OPTIONS,
   DEFAULT_SKILL_OPTIONS,
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
+import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 const INDUSTRIES = [
   "Technology",
@@ -29,6 +31,13 @@ export function EmployerOnboardingWizard() {
   const [skills, setSkills] = useState<string[]>([]);
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [companyBio, setCompanyBio] = useState("");
+
+  const activeStep =
+    companyName && industry && companySize
+      ? skills.length > 0
+        ? 2
+        : 1
+      : 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,15 +61,25 @@ export function EmployerOnboardingWizard() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-      <header className="space-y-1">
-        <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
-          Company profile
-        </p>
-        <h2 className="text-2xl font-bold text-slate-900">Tell us about your company</h2>
-        <p className="text-sm text-slate-600">
-          Workers see this when you post jobs and review applicants.
-        </p>
+    <form
+      onSubmit={handleSubmit}
+      className={`mx-auto max-w-lg space-y-6 ${EMPLOYER_CARD} p-8`}
+    >
+      <header className="space-y-4">
+        <div className="lg:hidden">
+          <OnboardingStepDots activeStep={activeStep} />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
+            Company profile
+          </p>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Tell us about your company
+          </h2>
+          <p className="text-sm text-slate-600 font-medium">
+            Workers see this when you post jobs and review applicants.
+          </p>
+        </div>
       </header>
 
       <label className="block space-y-2 text-sm font-medium text-slate-700">
@@ -69,7 +88,7 @@ export function EmployerOnboardingWizard() {
           required
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
         />
       </label>
 
@@ -123,7 +142,7 @@ export function EmployerOnboardingWizard() {
           type="url"
           value={websiteUrl}
           onChange={(e) => setWebsiteUrl(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
           placeholder="https://"
         />
       </label>
@@ -134,14 +153,14 @@ export function EmployerOnboardingWizard() {
           value={companyBio}
           onChange={(e) => setCompanyBio(e.target.value)}
           rows={3}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
         />
       </label>
 
       <button
         type="submit"
         disabled={isPending || skills.length === 0}
-        className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white disabled:opacity-50"
+        className="w-full rounded-xl bg-[#006e2f] py-3 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50 transition-colors"
       >
         {isPending ? "Saving…" : "Go to dashboard"}
       </button>

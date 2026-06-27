@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getIndustries, getCompanyProfile } from "@/actions/employer/company";
 import { CompanyProfileForm } from "./CompanyProfileForm";
+import {
+  EmployerBreadcrumb,
+  EmployerPageHeader,
+  EmployerPageShell,
+} from "@/components/employer/layout";
 
 export const metadata = {
   title: "Company Account Settings | ReplaceMe",
@@ -17,7 +22,6 @@ export default async function CompanySettingsPage() {
     redirect("/login");
   }
 
-  // Verify employer role in database
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -28,22 +32,36 @@ export default async function CompanySettingsPage() {
     redirect("/dashboard");
   }
 
-  // Load backend stubs
-  const industries = await getIndustries();
-  const initialData = await getCompanyProfile();
+  const [industries, initialData] = await Promise.all([
+    getIndustries(),
+    getCompanyProfile(),
+  ]);
+
+  const isProfileComplete = Boolean(
+    initialData?.companyName?.trim() &&
+      initialData?.industry?.trim() &&
+      initialData?.companyBio?.trim()
+  );
 
   return (
-    <div className="max-w-4xl mx-auto px-margin-desktop py-12">
-      {/* Page Header */}
-      <div className="mb-10 text-center sm:text-left">
-        <h1 className="text-3xl font-extrabold text-slate-900 leading-tight">Company Profile</h1>
-        <p className="text-slate-500 font-medium text-sm mt-1.5 leading-relaxed">
-          Build your brand presence to attract top talent. This information will be visible on your job postings.
-        </p>
-      </div>
+    <EmployerPageShell width="wide" className="gap-8">
+      <EmployerBreadcrumb
+        items={[
+          { label: "Settings", href: "/employer/settings/account" },
+          { label: "Company profile" },
+        ]}
+      />
 
-      {/* Render Client Form Wrapper */}
-      <CompanyProfileForm initialData={initialData} industries={industries} />
-    </div>
+      <EmployerPageHeader
+        title="Company profile"
+        subhead="Build your brand presence to attract top talent. This information is visible on your job postings."
+      />
+
+      <CompanyProfileForm
+        initialData={initialData}
+        industries={industries}
+        isProfileComplete={isProfileComplete}
+      />
+    </EmployerPageShell>
   );
 }

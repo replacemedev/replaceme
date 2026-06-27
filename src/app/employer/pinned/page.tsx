@@ -37,7 +37,7 @@ export default async function PinnedPage() {
       <EmployerPageHeader
         title="Pinned workers"
         badge={
-          <span className="text-sm font-black bg-emerald-100 text-emerald-800 py-1 px-3 rounded-full">
+          <span className="text-sm font-black bg-[#ebfdf2] text-[#006e2f] border border-[#006e2f]/15 py-1 px-3 rounded-full">
             {pinnedWorkers.length}
           </span>
         }

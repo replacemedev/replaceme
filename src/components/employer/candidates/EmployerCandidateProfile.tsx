@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, FileDown, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
+import { CandidateProfileActions } from "./CandidateProfileActions";
+import {
+  EmployerBreadcrumb,
+  EmployerPageShell,
+} from "@/components/employer/layout";
+import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 export type EmployerCandidateProfileData = {
   jobTitle: string;
@@ -14,6 +20,8 @@ export type EmployerCandidateProfileData = {
   identityMode: "full" | "anonymous_preview";
   planSlug: string;
   resumeDownloadEnabled: boolean;
+  messagingEnabled: boolean;
+  isPinned: boolean;
   candidate: {
     id: string;
     name: string;
@@ -54,8 +62,16 @@ export function EmployerCandidateProfile({
 }: {
   profile: EmployerCandidateProfileData;
 }) {
-  const { candidate, jobId, jobTitle, identityMode, planSlug, resumeDownloadEnabled } =
-    profile;
+  const {
+    candidate,
+    jobId,
+    jobTitle,
+    identityMode,
+    planSlug,
+    resumeDownloadEnabled,
+    messagingEnabled,
+    isPinned,
+  } = profile;
   const isPreview = identityMode === "anonymous_preview";
   const salary = formatSalaryRange(
     candidate.expectedSalaryMin,
@@ -71,14 +87,14 @@ export function EmployerCandidateProfile({
     .toUpperCase();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10">
-      <Link
-        href={`/employer/jobs/${jobId}/applicants`}
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#006e2f] hover:underline mb-6"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to {jobTitle}
-      </Link>
+    <EmployerPageShell width="content" className="gap-6">
+      <EmployerBreadcrumb
+        items={[
+          { label: "Jobs", href: "/employer/jobs" },
+          { label: jobTitle, href: `/employer/jobs/${jobId}/applicants` },
+          { label: isPreview ? "Candidate preview" : candidate.name },
+        ]}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
@@ -87,8 +103,8 @@ export function EmployerCandidateProfile({
             feature="identity"
             currentPlan={planSlug}
             preview={
-              <header className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5">
-                <div className="h-16 w-16 rounded-2xl bg-emerald-100" />
+              <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
+                <div className="h-16 w-16 rounded-2xl bg-slate-200" />
                 <div className="space-y-2 flex-1">
                   <div className="h-6 w-40 rounded bg-slate-200" />
                   <div className="h-4 w-28 rounded bg-slate-100" />
@@ -97,8 +113,8 @@ export function EmployerCandidateProfile({
               </header>
             }
           >
-            <header className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
+            <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2]">
                 {candidate.avatarUrl ? (
                   <Image
                     src={candidate.avatarUrl}
@@ -108,17 +124,19 @@ export function EmployerCandidateProfile({
                     sizes="64px"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-lg font-bold text-emerald-800">
+                  <div className="flex h-full w-full items-center justify-center text-lg font-bold text-[#006e2f]">
                     {initials}
                   </div>
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 inline-flex items-center gap-2">
+                <h1 className="text-2xl font-extrabold text-slate-900 inline-flex items-center gap-2 flex-wrap">
                   {candidate.name}
                   <VerifiedBadge show={candidate.isVerified} />
                 </h1>
-                <p className="text-sm text-slate-500 mt-1">{candidate.title}</p>
+                <p className="text-sm text-slate-500 mt-1 font-medium">
+                  {candidate.title}
+                </p>
                 {candidate.email ? (
                   <p className="text-xs text-slate-400 mt-1">{candidate.email}</p>
                 ) : null}
@@ -127,7 +145,7 @@ export function EmployerCandidateProfile({
           </FeatureGate>
 
           {salary ? (
-            <section className="rounded-2xl border border-slate-100 bg-white p-5">
+            <section className={`${EMPLOYER_CARD} p-5`}>
               <h2 className="text-sm font-bold text-slate-900 mb-1">
                 Expected compensation
               </h2>
@@ -135,7 +153,7 @@ export function EmployerCandidateProfile({
             </section>
           ) : null}
 
-          <section className="rounded-2xl border border-slate-100 bg-white p-5">
+          <section className={`${EMPLOYER_CARD} p-5`}>
             <h2 className="text-sm font-bold text-slate-900 mb-3">Skills</h2>
             {candidate.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
@@ -151,7 +169,7 @@ export function EmployerCandidateProfile({
             ) : (
               <p className="text-sm text-slate-500">No skills listed.</p>
             )}
-            <p className="text-xs text-slate-400 mt-4">
+            <p className="text-xs text-slate-400 mt-4 font-medium">
               {candidate.experienceYears} years experience
             </p>
           </section>
@@ -159,47 +177,26 @@ export function EmployerCandidateProfile({
           {isPreview ? (
             <UnlockOverlay feature="identity" currentPlan={planSlug} />
           ) : candidate.bio ? (
-            <section className="rounded-2xl border border-slate-100 bg-white p-5">
+            <section className={`${EMPLOYER_CARD} p-5`}>
               <h2 className="text-sm font-bold text-slate-900 mb-2">About</h2>
-              <p className="text-sm text-slate-600 leading-relaxed">{candidate.bio}</p>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {candidate.bio}
+              </p>
             </section>
           ) : null}
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          {isPreview ? (
-            <div className="hidden lg:block">
-              <UnlockOverlay feature="identity" currentPlan={planSlug} />
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-3">
-              <h2 className="text-sm font-bold text-slate-900">Actions</h2>
-              <Link
-                href={`/employer/messages?candidateId=${candidate.id}`}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#005c26]"
-              >
-                <MessageSquare className="h-4 w-4" />
-                Message candidate
-              </Link>
-              {resumeDownloadEnabled && candidate.resumeUrl ? (
-                <a
-                  href={candidate.resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
-                >
-                  <FileDown className="h-4 w-4" />
-                  Download resume
-                </a>
-              ) : !resumeDownloadEnabled ? (
-                <UnlockOverlay
-                  feature="resume"
-                  currentPlan={planSlug}
-                  compact
-                />
-              ) : null}
-            </div>
-          )}
+        <aside>
+          <CandidateProfileActions
+            candidateId={candidate.id}
+            jobId={jobId}
+            planSlug={planSlug}
+            messagingEnabled={messagingEnabled}
+            resumeDownloadEnabled={resumeDownloadEnabled}
+            resumeUrl={candidate.resumeUrl}
+            isPreview={isPreview}
+            isPinned={isPinned}
+          />
         </aside>
       </div>
 
@@ -212,6 +209,6 @@ export function EmployerCandidateProfile({
           />
         </div>
       ) : null}
-    </div>
+    </EmployerPageShell>
   );
 }
