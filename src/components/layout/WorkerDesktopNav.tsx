@@ -9,14 +9,16 @@ import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 const PRIMARY = [
   { href: "/worker/dashboard", label: "Dashboard" },
   { href: "/worker/jobs", label: "Jobs" },
+  { href: "/worker/saved-jobs", label: "Saved" },
   { href: "/worker/applications", label: "Applications" },
   { href: "/worker/messages", label: "Messages" },
-  { href: "/worker/interviews", label: "Interviews" },
+  { href: "/worker/contracts", label: "Offers" },
 ];
 
 const MORE = [
-  { href: "/worker/saved-jobs", label: "Saved Jobs" },
-  { href: "/worker/contracts", label: "Offers" },
+  { href: "/worker/interviews", label: "Interviews" },
+  { href: "/worker/earnings", label: "Earnings" },
+  { href: "/worker/job-alerts", label: "Job Alerts" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -46,7 +48,7 @@ export function WorkerDesktopNav({
   }, []);
 
   return (
-    <nav className="hidden lg:flex items-center gap-6">
+    <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
       {PRIMARY.map((item) => (
         <NavUnderlineLink
           key={item.href}
@@ -70,7 +72,7 @@ export function WorkerDesktopNav({
         <button
           type="button"
           onClick={() => setMoreOpen((open) => !open)}
-          className={`relative py-1 font-semibold text-sm transition-colors duration-200 flex items-center gap-1 cursor-pointer ${
+          className={`relative py-1 font-semibold text-sm transition-colors duration-200 flex items-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm ${
             moreActive || moreOpen ? "text-[#006e2f]" : "text-slate-600 hover:text-[#006e2f]"
           }`}
           aria-expanded={moreOpen}

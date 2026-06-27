@@ -12,6 +12,7 @@ import {
   WorkerBreadcrumb,
   WorkerSectionCard,
 } from "@/components/worker/layout";
+import { ApplicationTimeline } from "@/components/worker/applications/ApplicationTimeline";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const dynamic = "force-dynamic";
@@ -79,21 +80,7 @@ export default async function WorkerApplicationDetailPage({ params }: PageProps)
         </div>
 
         <WorkerSectionCard title="Timeline" className="border-0 shadow-none p-0">
-          <ol className="space-y-4">
-            {timeline.map((event, index) => (
-              <li key={index} className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#006e2f]" />
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    {event.label}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {new Date(event.at).toLocaleString()}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <ApplicationTimeline events={timeline} />
         </WorkerSectionCard>
       </article>
     </WorkerPageShell>

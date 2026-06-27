@@ -5,6 +5,7 @@ import { getApplyJobPageData } from "@/actions/job-application";
 import { ApplyJobHero } from "@/components/worker/jobs/apply/ApplyJobHero";
 import { ApplicationForm } from "@/components/worker/jobs/apply/ApplicationForm";
 import { ApplySidebarCards } from "@/components/worker/jobs/apply/ApplySidebarCards";
+import { WorkerPageShell } from "@/components/worker/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -49,10 +50,13 @@ export default async function WorkerApplyJobPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6]">
+    <>
       <ApplyJobHero job={pageData.job} />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 pb-12 relative z-10">
+      <WorkerPageShell
+        width="content"
+        className="-mt-12 sm:-mt-16 relative z-10 pb-24 lg:pb-12"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <ApplicationForm
@@ -68,12 +72,12 @@ export default async function WorkerApplyJobPage({ params }: PageProps) {
           Need to update your resume or portfolio?{" "}
           <Link
             href="/worker/profile"
-            className="font-semibold text-[#006e2f] hover:underline"
+            className="font-semibold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
           >
             Edit your profile
           </Link>
         </p>
-      </main>
-    </div>
+      </WorkerPageShell>
+    </>
   );
 }

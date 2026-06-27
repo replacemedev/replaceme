@@ -8,6 +8,7 @@ import { ApplicationsClient } from "@/components/worker/applications/Application
 import {
   WorkerPageShell,
   WorkerBreadcrumb,
+  WorkerPageHeader,
 } from "@/components/worker/layout";
 
 export const metadata = {
@@ -46,6 +47,10 @@ export default async function WorkerApplicationsPage() {
           { label: "Dashboard", href: "/worker/dashboard" },
           { label: "Applications" },
         ]}
+      />
+      <WorkerPageHeader
+        title="My Applications"
+        subhead="Track your sent proposals and interview statuses."
       />
       <ApplicationsClient applications={applications} stats={stats} />
     </WorkerPageShell>

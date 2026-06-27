@@ -20,7 +20,7 @@ interface JobFilterSidebarProps {
   onMobileClose: () => void;
 }
 
-function FilterPanel({
+export function JobFilterPanel({
   skillQuery,
   onSkillQueryChange,
   selectedSkills,
@@ -169,27 +169,12 @@ function FilterPanel({
 }
 
 export function JobFilterSidebar(props: JobFilterSidebarProps) {
-  const { mobileOpen, onMobileClose, ...panelProps } = props;
+  const { mobileOpen: _mobileOpen, onMobileClose: _onMobileClose, ...panelProps } =
+    props;
 
   return (
-    <>
-      <div className="hidden lg:block">
-        <FilterPanel {...panelProps} />
-      </div>
-
-      {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex" role="dialog" aria-modal>
-          <button
-            type="button"
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
-            onClick={onMobileClose}
-            aria-label="Close filters"
-          />
-          <div className="relative ml-auto w-full max-w-sm h-full bg-white p-4 overflow-y-auto shadow-2xl">
-            <FilterPanel {...panelProps} />
-          </div>
-        </div>
-      )}
-    </>
+    <div className="hidden lg:block">
+      <JobFilterPanel {...panelProps} />
+    </div>
   );
 }

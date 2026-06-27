@@ -37,11 +37,13 @@ export function JobDetailsHero({ job }: JobDetailsHeroProps) {
             </p>
           </div>
 
-          <ApplyActionButtons
-            jobId={job.id}
-            isSaved={job.isSaved}
-            hasApplied={job.hasApplied}
-          />
+          <div className="hidden lg:block shrink-0">
+            <ApplyActionButtons
+              jobId={job.id}
+              isSaved={job.isSaved}
+              hasApplied={job.hasApplied}
+            />
+          </div>
         </div>
       </div>
     </header>

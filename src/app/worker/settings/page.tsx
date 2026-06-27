@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSettingsClient";
+import {
+  WorkerPageShell,
+  WorkerPageHeader,
+  WorkerBreadcrumb,
+} from "@/components/worker/layout";
 
 export const metadata = {
   title: "Account Settings | ReplaceMe",
@@ -24,11 +29,17 @@ export default async function WorkerSettingsPage() {
   if (!profile || profile.role !== "worker") redirect("/login");
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
-      <h1 className="text-2xl font-extrabold text-slate-900">Account Settings</h1>
-      <p className="text-sm text-slate-500 mt-1 mb-8">
-        Manage availability, hourly rate, and trust & safety reports.
-      </p>
+    <WorkerPageShell width="content">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Settings" },
+        ]}
+      />
+      <WorkerPageHeader
+        title="Account settings"
+        subhead="Manage availability, hourly rate, and trust & safety reports."
+      />
       <WorkerSettingsClient
         initial={{
           availability: profile.availability ?? "Full-time",
@@ -36,6 +47,6 @@ export default async function WorkerSettingsPage() {
           isRemote: Boolean(profile.is_remote),
         }}
       />
-    </div>
+    </WorkerPageShell>
   );
 }

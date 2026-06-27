@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import {
+  WorkerPageShell,
+  WorkerPageHeader,
+  WorkerBreadcrumb,
+} from "@/components/worker/layout";
+import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
   title: "Manage Skills | ReplaceMe",
@@ -22,18 +28,25 @@ export default async function WorkerSkillsEditPage() {
     .order("proficiency", { ascending: false });
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-10">
-      <h1 className="text-2xl font-extrabold text-slate-900">Manage Skills</h1>
-      <p className="text-sm text-slate-500 mt-1 mb-8">
-        View and update skills on your worker profile.
-      </p>
+    <WorkerPageShell width="narrow">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Profile", href: "/worker/profile" },
+          { label: "Skills" },
+        ]}
+      />
+      <WorkerPageHeader
+        title="Manage skills"
+        subhead="View and update skills on your worker profile."
+      />
 
       {skills && skills.length > 0 ? (
         <ul className="space-y-3 mb-6">
           {skills.map((s) => (
             <li
               key={s.id}
-              className="bg-white border border-slate-200 rounded-xl px-4 py-3 flex justify-between"
+              className={`${WORKER_CARD} flex items-center justify-between px-4 py-3`}
             >
               <span className="text-sm font-bold text-slate-900">{s.skill_name}</span>
               <span className="text-xs text-slate-500">{s.proficiency_label}</span>
@@ -46,10 +59,10 @@ export default async function WorkerSkillsEditPage() {
 
       <Link
         href="/worker/profile"
-        className="text-sm font-semibold text-[#006e2f] hover:underline"
+        className="text-sm font-semibold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
       >
         Back to profile
       </Link>
-    </div>
+    </WorkerPageShell>
   );
 }

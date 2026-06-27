@@ -11,12 +11,14 @@ interface ApplyActionButtonsProps {
   jobId: string;
   isSaved: boolean;
   hasApplied: boolean;
+  variant?: "hero" | "bar";
 }
 
 export function ApplyActionButtons({
   jobId,
   isSaved: initialSaved,
   hasApplied: initialApplied,
+  variant = "hero",
 }: ApplyActionButtonsProps) {
   const router = useRouter();
   const [isSaving, startSave] = useTransition();
@@ -33,16 +35,34 @@ export function ApplyActionButtons({
     });
   };
 
+  const isBar = variant === "bar";
+
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+    <div
+      className={
+        isBar
+          ? "flex items-center gap-2 w-full"
+          : "flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0"
+      }
+    >
       {initialApplied ? (
-        <span className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/20 text-white text-sm font-extrabold uppercase tracking-wide">
+        <span
+          className={
+            isBar
+              ? "inline-flex flex-1 items-center justify-center px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-bold"
+              : "inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/20 text-white text-sm font-extrabold uppercase tracking-wide"
+          }
+        >
           Applied
         </span>
       ) : (
         <Link
           href={`/worker/jobs/${jobId}/apply`}
-          className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#4ade80] hover:bg-[#22c55e] text-[#0a4a29] text-sm font-extrabold uppercase tracking-wide shadow-[0_0_24px_rgba(74,222,128,0.45)] transition-colors text-center"
+          className={
+            isBar
+              ? "inline-flex flex-1 items-center justify-center px-4 py-2.5 rounded-xl bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-bold transition-colors text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
+              : "inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#4ade80] hover:bg-[#22c55e] text-[#0a4a29] text-sm font-extrabold uppercase tracking-wide shadow-[0_0_24px_rgba(74,222,128,0.45)] transition-colors text-center"
+          }
         >
           Apply for this job
         </Link>
@@ -52,13 +72,17 @@ export function ApplyActionButtons({
         type="button"
         onClick={handleSave}
         disabled={isSaving}
-        className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors disabled:opacity-60 cursor-pointer"
+        className={
+          isBar
+            ? "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-bold transition-colors disabled:opacity-60 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
+            : "inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl border border-white/30 bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors disabled:opacity-60 cursor-pointer"
+        }
       >
         {isSaving ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Bookmark
-            className={`h-4 w-4 ${initialSaved ? "fill-white" : ""}`}
+            className={`h-4 w-4 ${initialSaved ? (isBar ? "fill-[#006e2f] text-[#006e2f]" : "fill-white") : ""}`}
             aria-hidden
           />
         )}

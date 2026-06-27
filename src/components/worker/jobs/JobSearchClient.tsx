@@ -5,9 +5,14 @@ import { Filter } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Briefcase } from "lucide-react";
 import { JobSearchHero } from "./JobSearchHero";
-import { JobFilterSidebar } from "./JobFilterSidebar";
+import { JobFilterSidebar, JobFilterPanel } from "./JobFilterSidebar";
 import { JobCard } from "./JobCard";
 import { JobCardGrid } from "./JobCardGrid";
+import {
+  WorkerPageShell,
+  WorkerBreadcrumb,
+  WorkerFilterSheet,
+} from "@/components/worker/layout";
 import {
   JobSearchFacets,
   JobSearchResult,
@@ -152,6 +157,27 @@ export function JobSearchClient({
     );
   };
 
+  const filterPanelProps = {
+    skillQuery,
+    onSkillQueryChange: setSkillQuery,
+    selectedSkills,
+    onSkillToggle: handleSkillToggle,
+    skillSuggestions: facets.skillSuggestions,
+    employmentTypes: facets.employmentTypes,
+    selectedEmploymentTypes,
+    onEmploymentTypeToggle: (type: string) => {
+      setSelectedEmploymentTypes((prev) =>
+        prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+      );
+      setVisibleCount(PAGE_SIZE);
+    },
+    salaryMin,
+    salaryMax,
+    onSalaryMinChange: setSalaryMin,
+    onSalaryMaxChange: setSalaryMax,
+    onClearAll: handleClearAll,
+  };
+
   return (
     <>
       <JobSearchHero
@@ -162,32 +188,27 @@ export function JobSearchClient({
         onSearch={() => setVisibleCount(PAGE_SIZE)}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <WorkerPageShell width="wide" className="py-8 gap-6">
+        <WorkerBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/worker/dashboard" },
+            { label: "Jobs" },
+          ]}
+        />
+
         <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
           <JobFilterSidebar
-            skillQuery={skillQuery}
-            onSkillQueryChange={setSkillQuery}
-            selectedSkills={selectedSkills}
-            onSkillToggle={handleSkillToggle}
-            skillSuggestions={facets.skillSuggestions}
-            employmentTypes={facets.employmentTypes}
-            selectedEmploymentTypes={selectedEmploymentTypes}
-            onEmploymentTypeToggle={(type) => {
-              setSelectedEmploymentTypes((prev) =>
-                prev.includes(type)
-                  ? prev.filter((t) => t !== type)
-                  : [...prev, type]
-              );
-              setVisibleCount(PAGE_SIZE);
-            }}
-            salaryMin={salaryMin}
-            salaryMax={salaryMax}
-            onSalaryMinChange={setSalaryMin}
-            onSalaryMaxChange={setSalaryMax}
-            onClearAll={handleClearAll}
+            {...filterPanelProps}
             mobileOpen={mobileFiltersOpen}
             onMobileClose={() => setMobileFiltersOpen(false)}
           />
+
+          <WorkerFilterSheet
+            open={mobileFiltersOpen}
+            onClose={() => setMobileFiltersOpen(false)}
+          >
+            <JobFilterPanel {...filterPanelProps} />
+          </WorkerFilterSheet>
 
           <section className="min-w-0 mt-6 lg:mt-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
@@ -252,7 +273,7 @@ export function JobSearchClient({
             )}
           </section>
         </div>
-      </div>
+      </WorkerPageShell>
     </>
   );
 }

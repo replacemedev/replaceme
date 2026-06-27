@@ -9,6 +9,7 @@ import { SkillProgressBar } from "@/components/worker/profile/SkillProgressBar";
 import { ProjectHighlightItem } from "@/components/worker/profile/ProjectHighlightItem";
 import { TestimonialCard } from "@/components/worker/profile/TestimonialCard";
 import { WorkerProfile, WorkerSkillDetailed, WorkerProject, EmployerTestimonial } from "@/types/worker-profile";
+import { WorkerPageShell, WorkerBreadcrumb } from "@/components/worker/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -162,6 +163,14 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
+      <WorkerPageShell width="wide" className="py-4">
+        <WorkerBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/worker/dashboard" },
+            { label: isOwner ? "My profile" : "Profile" },
+          ]}
+        />
+      </WorkerPageShell>
       
       {/* Decorative top header banner */}
       <div className="relative w-full h-48 md:h-64 bg-gradient-to-r from-[#0a4a29] to-[#006e2f] select-none">

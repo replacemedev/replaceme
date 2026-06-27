@@ -9,6 +9,7 @@ import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import {
   WorkerPageShell,
   WorkerBreadcrumb,
+  WorkerPageHeader,
 } from "@/components/worker/layout";
 
 export const metadata = {
@@ -57,12 +58,11 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
         ]}
       />
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Messages
-        </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">
-          Conversations with employers about your applications.
-        </p>
+        <WorkerPageHeader
+          title="Messages"
+          subhead="Conversations with employers about your applications."
+          bordered={false}
+        />
       </div>
       <MessagingClient
         role="worker"

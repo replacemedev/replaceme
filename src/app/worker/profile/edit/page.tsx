@@ -5,6 +5,11 @@ import {
   getWorkerProjects,
 } from "@/actions/worker/profile";
 import { ProfileEditClient } from "@/components/worker/profile/ProfileEditClient";
+import {
+  WorkerPageShell,
+  WorkerPageHeader,
+  WorkerBreadcrumb,
+} from "@/components/worker/layout";
 
 export const metadata = {
   title: "Edit Profile | ReplaceMe",
@@ -19,19 +24,18 @@ export default async function WorkerProfileEditPage() {
   const projects = await getWorkerProjects();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-10">
-      <div className="mb-8">
-        <p className="text-xs font-semibold text-slate-400 mb-1">
-          <Link href="/worker/profile" className="hover:text-slate-600">
-            Profile
-          </Link>
-          <span> &rsaquo; Edit</span>
-        </p>
-        <h1 className="text-2xl font-extrabold text-slate-900">Edit Profile</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Update your bio, resume links, and portfolio details.
-        </p>
-      </div>
+    <WorkerPageShell width="narrow">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Profile", href: "/worker/profile" },
+          { label: "Edit" },
+        ]}
+      />
+      <WorkerPageHeader
+        title="Edit profile"
+        subhead="Update your bio, resume links, and portfolio details."
+      />
       <ProfileEditClient
         initial={{
           firstName: profile.first_name ?? "",
@@ -45,6 +49,12 @@ export default async function WorkerProfileEditPage() {
         }}
         projects={projects}
       />
-    </div>
+      <Link
+        href="/worker/profile"
+        className="text-sm font-semibold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
+      >
+        Back to profile
+      </Link>
+    </WorkerPageShell>
   );
 }

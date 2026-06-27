@@ -4,6 +4,8 @@ import { getWorkerJobDetails } from "@/actions/worker/job-details";
 import { JobDetailsHero } from "@/components/worker/jobs/details/JobDetailsHero";
 import { JobOverviewCard } from "@/components/worker/jobs/details/JobOverviewCard";
 import { JobSidebarCards } from "@/components/worker/jobs/details/JobSidebarCards";
+import { JobDetailStickyActions } from "@/components/worker/jobs/details/JobDetailStickyActions";
+import { WorkerPageShell } from "@/components/worker/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -43,17 +45,26 @@ export default async function WorkerJobDetailsPage({ params }: PageProps) {
   if (!job) notFound();
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6]">
+    <>
       <JobDetailsHero job={job} />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-16 pb-12 relative z-10">
+      <WorkerPageShell
+        width="content"
+        className="-mt-12 sm:-mt-16 relative z-10 pb-24 lg:pb-12"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <JobOverviewCard job={job} />
           </div>
           <JobSidebarCards job={job} />
         </div>
-      </main>
-    </div>
+      </WorkerPageShell>
+
+      <JobDetailStickyActions
+        jobId={job.id}
+        isSaved={job.isSaved}
+        hasApplied={job.hasApplied}
+      />
+    </>
   );
 }
