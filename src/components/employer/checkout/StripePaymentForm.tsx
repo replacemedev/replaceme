@@ -113,7 +113,7 @@ export function StripePaymentForm({
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
             required
-            className="w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981]/20 transition-all"
+            className="w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f]/20 transition-all"
           />
         </div>
       </div>
@@ -122,7 +122,7 @@ export function StripePaymentForm({
         <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
           Card Information
         </label>
-        <div className="border border-gray-200 rounded-xl p-4 bg-white focus-within:border-[#10b981] focus-within:ring-1 focus-within:ring-[#10b981]/20 transition-all duration-200">
+        <div className="border border-gray-200 rounded-xl p-4 bg-white focus-within:border-[#006e2f] focus-within:ring-1 focus-within:ring-[#006e2f]/20 transition-all duration-200">
           <CardElement
             options={{
               style: {
@@ -151,7 +151,7 @@ export function StripePaymentForm({
             onChange={(e) => setNameOnCard(e.target.value)}
             placeholder="Full Name"
             required
-            className="w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981]/20 transition-all"
+            className="w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f]/20 transition-all"
           />
         </div>
       </div>
@@ -165,7 +165,7 @@ export function StripePaymentForm({
           <select
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full pl-11 pr-10 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981]/20 transition-all appearance-none cursor-pointer"
+            className="w-full pl-11 pr-10 py-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 focus:outline-none focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f]/20 transition-all appearance-none cursor-pointer"
           >
             <option value="US">United States</option>
             <option value="CA">Canada</option>
@@ -184,7 +184,7 @@ export function StripePaymentForm({
       <button
         type="submit"
         disabled={processing}
-        className="w-full py-4 bg-[#10b981] text-white font-bold text-sm rounded-xl hover:bg-[#0d9668] focus:outline-none focus:ring-4 focus:ring-[#10b981]/20 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+        className="w-full py-4 bg-[#006e2f] text-white font-bold text-sm rounded-xl hover:bg-[#0d9668] focus:outline-none focus:ring-4 focus:ring-[#006e2f]/20 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
       >
         {processing ? (
           <>

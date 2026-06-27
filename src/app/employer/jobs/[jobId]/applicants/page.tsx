@@ -5,6 +5,7 @@ import { getApplicants } from "@/actions/employer/applicants";
 import { getJobById } from "@/actions/employer/jobs";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { ApplicantsClient } from "@/components/employer/applicants/ApplicantsClient";
+import { EmployerPageShell } from "@/components/employer/layout/EmployerPageShell";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -56,7 +57,7 @@ export default async function ApplicantsPage({ params }: PageProps) {
   const identityMode = applicantsData.identityMode;
 
   return (
-    <div className="max-w-6xl mx-auto px-margin-desktop py-12">
+    <EmployerPageShell width="content">
       <ApplicantsClient
         initialApplicants={applicants}
         identityMode={identityMode}
@@ -67,6 +68,6 @@ export default async function ApplicantsPage({ params }: PageProps) {
         resumeDownloadEnabled={applicantsData.resumeDownloadEnabled}
         applicantsPerJobLimit={applicantsData.applicantsPerJobLimit}
       />
-    </div>
+    </EmployerPageShell>
   );
 }

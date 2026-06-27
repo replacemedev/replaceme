@@ -1,16 +1,9 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import {
-  Calendar,
-  MessageSquare,
-  Eye,
-  Lock,
-  ArrowRight,
-} from "lucide-react";
+import { Calendar, Lock } from "lucide-react";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
-import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
+import { EmployerInlineActions } from "@/components/employer/layout/EmployerInlineActions";
 
 interface InterviewCardProps {
   interview: EmployerInterviewRow;
@@ -26,7 +19,7 @@ export function InterviewCard({
   const scheduledDate = new Date(interview.scheduledAt);
 
   return (
-    <li className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all">
+    <li className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-slate-200/60 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ebfdf2] text-[#006e2f]">
@@ -61,39 +54,13 @@ export function InterviewCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <Link
-            href={`/employer/candidates/${interview.candidateId}?jobId=${interview.jobId}`}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#006e2f] px-4 text-xs font-bold text-white hover:bg-[#005c26] transition-colors"
-          >
-            <Eye size={14} aria-hidden />
-            {interview.isPreview ? "Preview" : "Profile"}
-          </Link>
-          <Link
-            href={`/employer/jobs/${interview.jobId}/applicants`}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
-          >
-            Pipeline
-            <ArrowRight size={14} aria-hidden />
-          </Link>
-          {messagingEnabled ? (
-            <Link
-              href="/employer/messages"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors"
-              title="Message candidate"
-            >
-              <MessageSquare size={15} aria-hidden />
-            </Link>
-          ) : (
-            <Link
-              href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#006e2f]/20 bg-[#ebfdf2] text-[#006e2f] hover:bg-[#d4f8e4] transition-colors"
-              title="Upgrade to message"
-            >
-              <MessageSquare size={15} aria-hidden />
-            </Link>
-          )}
-        </div>
+        <EmployerInlineActions
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+          profileHref={`/employer/candidates/${interview.candidateId}?jobId=${interview.jobId}`}
+          profileLabel={interview.isPreview ? "Preview" : "Profile"}
+          pipelineHref={`/employer/jobs/${interview.jobId}/applicants`}
+        />
       </div>
     </li>
   );

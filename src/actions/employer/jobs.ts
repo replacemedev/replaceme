@@ -88,7 +88,7 @@ export async function createJobPost(payload: CreateJobInput) {
     );
 
     // Write the job to the database table
-    const { error: insertError } = await supabase
+    const { data: newJob, error: insertError } = await supabase
       .from("jobs")
       .insert({
         employer_id: profile.id,
@@ -104,9 +104,11 @@ export async function createJobPost(payload: CreateJobInput) {
         submitted_for_review_at:
           jobStatus === "Pending Review" ? new Date().toISOString() : null,
         approved_at: jobStatus === "Active" ? new Date().toISOString() : null,
-      });
+      })
+      .select("id")
+      .single();
 
-    if (insertError) {
+    if (insertError || !newJob) {
       safeError("createJobPost insert error: [REDACTED_DB_ERROR]");
       return { error: "Failed to save job post to the database." };
     }
@@ -114,6 +116,7 @@ export async function createJobPost(payload: CreateJobInput) {
     safeLog(`[Jobs] Job post successfully created with intent: ${payload.intent}`);
     revalidatePath("/employer/dashboard");
     revalidatePath("/employer/jobs");
+    revalidatePath(`/employer/jobs/${newJob.id}`);
 
     return {
       success: true,
@@ -121,7 +124,7 @@ export async function createJobPost(payload: CreateJobInput) {
         jobStatus === "Active"
           ? "Job submitted and approved instantly! Redirecting..."
           : "Job submitted for review! Redirecting...",
-      redirectUrl: "/employer/dashboard",
+      redirectUrl: `/employer/jobs/${newJob.id}`,
     };
   } catch (err) {
     safeError("createJobPost error occurred:", err);

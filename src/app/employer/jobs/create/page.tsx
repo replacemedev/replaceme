@@ -10,7 +10,12 @@ import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { CreateJobForm } from "./CreateJobForm";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
+import { JobCreateStepIndicator } from "@/components/employer/jobs/create/JobCreateStepIndicator";
 import { isActiveJobLimitReached } from "@/lib/entitlements/limits";
+import {
+  EmployerPageHeader,
+  EmployerPageShell,
+} from "@/components/employer/layout";
 
 export const metadata = {
   title: "Create a Job Post | ReplaceMe",
@@ -66,29 +71,44 @@ export default async function CreateJobPage({
     );
 
   return (
-    <div className="max-w-4xl mx-auto px-margin-desktop py-12 space-y-8">
-      <div className="text-center sm:text-left">
-        <h1 className="text-3xl font-extrabold text-slate-900 leading-tight">
-          {editJob ? "Edit Job Post" : "Create a Job Post"}
-        </h1>
-        <p className="text-slate-500 font-medium text-sm mt-1.5 leading-relaxed">
-          {editJob
+    <EmployerPageShell width="wide" className="gap-8">
+      <EmployerPageHeader
+        title={editJob ? "Edit job post" : "Create a job post"}
+        subhead={
+          editJob
             ? "Update your listing details. Changes apply immediately to active jobs."
-            : "Fill out the details below to list your open position and match with verified remote talent."}
-        </p>
+            : "Fill out each section below to list your open position and match with verified remote talent."
+        }
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-8 items-start">
+        <div className="space-y-6 min-w-0">
+          {planUsage && !editJob ? (
+            <div className="lg:hidden">
+              <PlanUsageStrip usage={planUsage} />
+            </div>
+          ) : null}
+
+          {atJobLimit && planUsage ? (
+            <UnlockOverlay feature="job_limit" currentPlan={planUsage.planSlug} />
+          ) : (
+            <CreateJobForm
+              employmentTypes={employmentTypes}
+              skillsOptions={skillsOptions}
+              editJob={editJob}
+            />
+          )}
+        </div>
+
+        <aside className="space-y-4 lg:sticky lg:top-28">
+          {planUsage && !editJob ? (
+            <div className="hidden lg:block">
+              <PlanUsageStrip usage={planUsage} />
+            </div>
+          ) : null}
+          <JobCreateStepIndicator isEditMode={Boolean(editJob)} />
+        </aside>
       </div>
-
-      {planUsage && !editJob ? <PlanUsageStrip usage={planUsage} /> : null}
-
-      {atJobLimit && planUsage ? (
-        <UnlockOverlay feature="job_limit" currentPlan={planUsage.planSlug} />
-      ) : (
-        <CreateJobForm
-          employmentTypes={employmentTypes}
-          skillsOptions={skillsOptions}
-          editJob={editJob}
-        />
-      )}
-    </div>
+    </EmployerPageShell>
   );
 }

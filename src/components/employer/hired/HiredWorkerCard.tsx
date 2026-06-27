@@ -3,10 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare, Eye, Receipt } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
-
-import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
+import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
 
 interface HiredWorkerCardProps {
   worker: HiredWorker;
@@ -159,23 +158,11 @@ export function HiredWorkerCard({
 
       {/* Right Area: Action Buttons */}
       <div className="flex items-center gap-2.5 shrink-0">
-        {messagingEnabled ? (
-          <Link
-            href="/employer/messages"
-            className="h-9 px-4 border border-emerald-100 bg-[#f0fdf4]/50 hover:bg-[#f0fdf4] text-[#006e2f] font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <MessageSquare size={13} className="fill-[#f0fdf4]" />
-            Message
-          </Link>
-        ) : (
-          <Link
-            href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
-            className="h-9 px-4 border border-[#006e2f]/20 bg-[#ebfdf2] hover:bg-[#d4f8e4] text-[#006e2f] font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5"
-          >
-            <MessageSquare size={13} />
-            Upgrade to message
-          </Link>
-        )}
+        <EmployerMessageAction
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+          variant="button"
+        />
 
         <Link
           href={`/employer/contracts/${worker.id}`}

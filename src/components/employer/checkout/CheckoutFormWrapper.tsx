@@ -53,7 +53,7 @@ export function CheckoutFormWrapper({
             appearance: {
               theme: "stripe",
               variables: {
-                colorPrimary: "#10b981",
+                colorPrimary: "#006e2f",
                 fontFamily: "Inter, sans-serif",
               },
             },

@@ -10,6 +10,8 @@ import { PerformanceMetricsCard } from "@/components/employer/jobs/view/Performa
 import { CompensationCard } from "@/components/employer/jobs/view/CompensationCard";
 import { HiringTeamCard } from "@/components/employer/jobs/view/HiringTeamCard";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
+import { EmployerPageShell } from "@/components/employer/layout";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -51,7 +53,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
   const isPendingReview = job.status === "Pending Review";
 
   return (
-    <div className="max-w-6xl mx-auto px-margin-desktop py-12 space-y-8">
+    <EmployerPageShell width="content" className="gap-8">
       <JobHeader
         jobId={job.id}
         title={job.title}
@@ -60,6 +62,8 @@ export default async function JobListingViewPage({ params }: PageProps) {
         employmentType={job.employmentType}
         monthlySalary={job.monthlySalary}
       />
+
+      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
       {isPendingReview ? (
         <div className="flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -97,7 +101,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="lg:col-span-1 space-y-8">
+        <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-28">
           <PerformanceMetricsCard
             jobId={job.id}
             performance={job.performance}
@@ -111,6 +115,6 @@ export default async function JobListingViewPage({ params }: PageProps) {
           <HiringTeamCard hiringTeam={job.hiringTeam} />
         </div>
       </div>
-    </div>
+    </EmployerPageShell>
   );
 }

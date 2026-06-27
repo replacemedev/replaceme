@@ -72,78 +72,79 @@ export function JobHeader({
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
-      {/* Title & Info */}
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{title}</h1>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border ${statusBadgeClasses}`}>
-            {status}
-          </span>
+    <div className="space-y-6">
+      <div className="sticky top-20 z-20 -mx-1 px-1 py-3 bg-[#fafdfb]/95 backdrop-blur-sm border-b border-slate-100/80 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        {/* Title & Info */}
+        <div className="space-y-3 min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight truncate">
+              {title}
+            </h1>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border shrink-0 ${statusBadgeClasses}`}>
+              {status}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm font-semibold text-slate-500">
+            <div className="flex items-center gap-1.5">
+              <MapPin size={16} className="text-slate-400" aria-hidden />
+              <span>{location}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock size={16} className="text-slate-400" aria-hidden />
+              <span>{employmentType}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <DollarSign size={16} className="text-slate-400" aria-hidden />
+              <span>${monthlySalary.toLocaleString()}/mo</span>
+            </div>
+          </div>
         </div>
 
-        {/* Metadata info row */}
-        <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-slate-500">
-          <div className="flex items-center gap-1.5">
-            <MapPin size={16} className="text-slate-400" />
-            <span>{location}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Clock size={16} className="text-slate-400" />
-            <span>{employmentType}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <DollarSign size={16} className="text-slate-400" />
-            <span>${monthlySalary.toLocaleString()}/mo</span>
-          </div>
-        </div>
-      </div>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Link
+            href={`/employer/jobs/${jobId}/applicants`}
+            className="h-10 px-4 rounded-xl bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <Users size={14} aria-hidden />
+            View Pipeline
+          </Link>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-3 shrink-0">
-        <Link
-          href={`/employer/jobs/${jobId}/applicants`}
-          className="h-10 px-4 rounded-xl border border-emerald-200 hover:border-emerald-300 bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          <Users size={14} />
-          View Pipeline
-        </Link>
+          <Link
+            href={`/employer/jobs/create?edit=${jobId}`}
+            className="h-10 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <Edit3 size={14} aria-hidden />
+            Edit Job
+          </Link>
 
-        {/* Share Button */}
-        <button
-          type="button"
-          onClick={handleShare}
-          className="h-10 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          <Share2 size={14} className="text-slate-400" />
-          Share
-        </button>
-
-        {/* Edit Button */}
-        <Link
-          href={`/employer/jobs/create?edit=${jobId}`}
-          className="h-10 px-4 rounded-xl border border-emerald-200 hover:border-emerald-300 bg-white hover:bg-emerald-50/10 text-emerald-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          <Edit3 size={14} />
-          Edit Job
-        </Link>
-
-        {/* Deactivate Button */}
-        {status !== "Closed" && (
           <button
             type="button"
-            disabled={isPending}
-            onClick={handleDeactivate}
-            className="h-10 w-10 rounded-xl border border-red-150 hover:border-red-200 bg-white hover:bg-red-50/30 text-red-600 transition-all duration-200 flex items-center justify-center disabled:opacity-50"
-            aria-label="Deactivate job listing"
+            onClick={handleShare}
+            className="h-10 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
           >
-            {isPending ? (
-              <Loader2 size={16} className="animate-spin text-red-400" />
-            ) : (
-              <X size={16} />
-            )}
+            <Share2 size={14} className="text-slate-400" aria-hidden />
+            Share
           </button>
-        )}
+
+          {status !== "Closed" && (
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={handleDeactivate}
+              className="h-10 px-4 rounded-xl border border-red-200 hover:border-red-300 bg-white hover:bg-red-50/50 text-red-600 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50"
+              aria-label="Pause job listing"
+            >
+              {isPending ? (
+                <Loader2 size={14} className="animate-spin" aria-hidden />
+              ) : (
+                <X size={14} aria-hidden />
+              )}
+              Pause
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

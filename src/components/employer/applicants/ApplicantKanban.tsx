@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { GripVertical } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { ApplicationStatus } from "@/types/applications";
 import { ApplicantCard } from "./ApplicantCard";
+import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 const KANBAN_COLUMNS: { status: ApplicationStatus; label: string }[] = [
   { status: "PENDING", label: "New" },
@@ -20,6 +21,7 @@ interface ApplicantKanbanProps {
   onMessageClick: (candidateId: string) => void;
   messagingEnabled?: boolean;
   planSlug: string;
+  resumeDownloadEnabled?: boolean;
 }
 
 export function ApplicantKanban({
@@ -28,6 +30,7 @@ export function ApplicantKanban({
   onMessageClick,
   messagingEnabled = true,
   planSlug,
+  resumeDownloadEnabled = true,
 }: ApplicantKanbanProps) {
   return (
     <div
@@ -40,38 +43,50 @@ export function ApplicantKanban({
         return (
           <section
             key={column.status}
-            className="min-w-[220px] rounded-2xl border border-slate-100 bg-slate-50/80 p-3"
+            className={`min-w-[220px] ${EMPLOYER_CARD} bg-slate-50/80 p-3 rounded-2xl`}
             aria-label={column.label}
           >
             <header className="mb-3 flex items-center justify-between px-1">
               <h3 className="text-xs font-black uppercase tracking-wide text-slate-600">
                 {column.label}
               </h3>
-              <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500">
+              <span className="rounded-full bg-white border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 tabular-nums">
                 {columnApps.length}
               </span>
             </header>
 
-            <div className="space-y-3">
+            <div className="space-y-3 min-h-[80px]">
               {columnApps.length === 0 ? (
                 <p className="px-1 text-[11px] font-medium text-slate-400">
                   No candidates
                 </p>
               ) : (
                 columnApps.map((app) => (
+                  <div
+                    key={app.id}
+                    className="group relative cursor-grab active:cursor-grabbing"
+                    title="Drag to reorder (coming soon)"
+                  >
+                    <span
+                      className="absolute left-1 top-3 z-10 opacity-0 group-hover:opacity-60 text-slate-400 pointer-events-none"
+                      aria-hidden
+                    >
+                      <GripVertical className="h-4 w-4" />
+                    </span>
                     <ApplicantCard
-                      key={app.id}
                       applicant={app}
                       jobId={jobId}
                       planSlug={planSlug}
                       messagingEnabled={messagingEnabled}
+                      resumeDownloadEnabled={resumeDownloadEnabled}
                       onMessageClick={
                         messagingEnabled
                           ? () => onMessageClick(app.candidateId)
                           : undefined
                       }
                     />
-                  ))
+                  </div>
+                ))
               )}
             </div>
           </section>

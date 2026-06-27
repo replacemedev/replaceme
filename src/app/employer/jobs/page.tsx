@@ -1,19 +1,20 @@
 import React from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentJobs } from "@/actions/employer/dashboard";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { JobCard } from "@/components/employer/JobCard";
+import { JobsListClient } from "@/components/employer/jobs/JobsListClient";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
-import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import {
   hasPriorityListing,
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
+import {
+  EmployerPageHeader,
+  EmployerPageShell,
+} from "@/components/employer/layout";
 
 export const metadata = {
   title: "Job Posts | ReplaceMe",
@@ -59,22 +60,18 @@ export default async function EmployerJobsPage() {
     : false;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-            Your Job Posts
-          </h1>
-          <p className="text-slate-500 font-medium text-sm mt-2 leading-relaxed">
-            {planUsage
-              ? planUsage.activeJobsLimit === null
-                ? `${planUsage.activeJobsCount} active listings on your plan.`
-                : `${planUsage.activeJobsCount} of ${planUsage.activeJobsLimit} active job slots used.`
-              : "View and manage every listing you have published."}
-          </p>
-        </div>
-        <PostJobCTA planUsage={planUsage} />
-      </div>
+    <EmployerPageShell width="wide">
+      <EmployerPageHeader
+        title="Your job posts"
+        subhead={
+          planUsage
+            ? planUsage.activeJobsLimit === null
+              ? `${planUsage.activeJobsCount} active listings on your plan.`
+              : `${planUsage.activeJobsCount} of ${planUsage.activeJobsLimit} active job slots used.`
+            : "View and manage every listing you have published."
+        }
+        actions={<PostJobCTA planUsage={planUsage} />}
+      />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
@@ -85,25 +82,12 @@ export default async function EmployerJobsPage() {
         />
       ) : null}
 
-      {jobs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              showPriorityBadge={showPriority}
-              applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
-            />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          icon={<Briefcase size={22} />}
-          description="You haven't posted any jobs yet. Create your first listing to start hiring."
-          actionLabel="Post a New Job"
-          actionHref="/employer/jobs/create"
-        />
-      )}
-    </div>
+      <JobsListClient
+        jobs={jobs}
+        planUsage={planUsage}
+        showPriorityBadge={showPriority}
+        applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
+      />
+    </EmployerPageShell>
   );
 }

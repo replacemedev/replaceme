@@ -3,12 +3,12 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare, Eye, Award, DollarSign, Lock } from "lucide-react";
+import { Eye, Award, DollarSign, Lock } from "lucide-react";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { PinToggle } from "./PinToggle";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
-import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
+import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
 
 interface WorkerCardProps {
   worker: PinnedWorker;
@@ -154,23 +154,11 @@ export function WorkerCard({
           <Eye size={14} />
           {isPreview ? "Preview profile" : "View profile"}
         </Link>
-        {messagingEnabled ? (
-          <Link
-            href="/employer/messages"
-            className="w-9 h-9 bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-500 hover:text-slate-800 rounded-2xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
-            title="Chat with candidate"
-          >
-            <MessageSquare size={15} />
-          </Link>
-        ) : (
-          <Link
-            href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
-            className="w-9 h-9 bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 text-[#006e2f] rounded-2xl flex items-center justify-center shrink-0 transition-colors"
-            title="Upgrade to message"
-          >
-            <MessageSquare size={15} />
-          </Link>
-        )}
+        <EmployerMessageAction
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+          variant="icon"
+        />
       </div>
     </div>
   );

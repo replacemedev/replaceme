@@ -15,6 +15,7 @@ import { ApplicantKanban } from "./ApplicantKanban";
 import { EntitlementProvider } from "@/components/shared/entitlements/EntitlementProvider";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
 
 interface ApplicantsClientProps {
   initialApplicants: Applicant[];
@@ -83,24 +84,21 @@ export function ApplicantsClient({
     applicants.length >= Math.ceil(applicantsPerJobLimit * 0.8);
 
   const content = (
-    <div className="space-y-8 max-w-5xl mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b border-gray-100 pb-6">
-        <div>
-          <div className="text-xs font-black tracking-wider text-[#10b981] mb-1.5 uppercase">
-            Applicant Pipeline
-          </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">
-            Job: {jobTitle}
-          </h1>
-        </div>
-        <div className="bg-[#e6fbf2] text-[#10b981] font-bold text-sm px-4 py-2 rounded-full shadow-xs shrink-0 self-start md:self-auto">
-          {applicants.length}
-          {applicantsPerJobLimit !== null
-            ? ` / ${applicantsPerJobLimit}`
-            : ""}{" "}
-          Applicants
-        </div>
-      </div>
+    <div className="space-y-6">
+      <EmployerPageHeader
+        bordered
+        title={`Job: ${jobTitle}`}
+        badge={
+          <span className="text-sm font-black bg-[#ebfdf2] text-[#006e2f] border border-[#006e2f]/15 py-1 px-3 rounded-full shrink-0">
+            {applicants.length}
+            {applicantsPerJobLimit !== null
+              ? ` / ${applicantsPerJobLimit}`
+              : ""}{" "}
+            applicants
+          </span>
+        }
+        subhead="Applicant pipeline — review, shortlist, and move candidates through your hiring stages."
+      />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
@@ -124,8 +122,8 @@ export function ApplicantsClient({
           onClick={() => setViewMode("cards")}
           className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             viewMode === "cards"
-              ? "bg-[#10b981] text-white"
-              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              ? "bg-[#006e2f] text-white"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
           }`}
         >
           <LayoutGrid className="h-3.5 w-3.5" aria-hidden />
@@ -136,8 +134,8 @@ export function ApplicantsClient({
           onClick={() => setViewMode("table")}
           className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             viewMode === "table"
-              ? "bg-[#10b981] text-white"
-              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              ? "bg-[#006e2f] text-white"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
           }`}
         >
           <Table2 className="h-3.5 w-3.5" aria-hidden />
@@ -148,8 +146,8 @@ export function ApplicantsClient({
           onClick={() => setViewMode("kanban")}
           className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             viewMode === "kanban"
-              ? "bg-[#10b981] text-white"
-              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              ? "bg-[#006e2f] text-white"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
           }`}
         >
           <Columns3 className="h-3.5 w-3.5" aria-hidden />
@@ -158,12 +156,12 @@ export function ApplicantsClient({
       </div>
 
       {filteredApplicants.length === 0 && viewMode !== "kanban" ? (
-        <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center shadow-xs">
-          <div className="w-16 h-16 bg-gray-50 border border-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-5">
+        <div className="rounded-3xl border border-slate-100 bg-white p-16 text-center shadow-sm">
+          <div className="w-16 h-16 bg-slate-50 border border-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-5">
             <AlertCircle className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-gray-800">No Candidates Found</h3>
-          <p className="text-sm text-gray-400 font-medium mt-2 max-w-xs mx-auto leading-relaxed">
+          <h3 className="text-lg font-bold text-slate-800">No candidates found</h3>
+          <p className="text-sm text-slate-500 font-medium mt-2 max-w-xs mx-auto leading-relaxed">
             No applicant matches the filter criteria or search keyword.
           </p>
         </div>
@@ -174,9 +172,14 @@ export function ApplicantsClient({
           onMessageClick={handleChatWithCandidate}
           messagingEnabled={messagingEnabled}
           planSlug={planSlug}
+          resumeDownloadEnabled={resumeDownloadEnabled}
         />
       ) : viewMode === "table" ? (
-        <ApplicantTrackerTable rows={tableRows} />
+        <ApplicantTrackerTable
+          rows={tableRows}
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+        />
       ) : (
         <div className="space-y-4">
           {filteredApplicants.map((app) => (

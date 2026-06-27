@@ -5,6 +5,10 @@ import { PinnedWorkerGrid } from "@/components/employer/pinned/PinnedWorkerGrid"
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import { pinnedPageSubhead, normalizePlanSlug } from "@/lib/entitlements/ui-copy";
+import {
+  EmployerPageHeader,
+  EmployerPageShell,
+} from "@/components/employer/layout";
 
 export const metadata = {
   title: "Pinned Workers - Manage Bookmarked Talent | ReplaceMe",
@@ -29,24 +33,20 @@ export default async function PinnedPage() {
     pinnedWorkers.length > 0;
 
   return (
-    <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            Pinned Workers
-            <span className="text-sm font-black bg-emerald-100 text-emerald-800 py-1 px-3 rounded-full">
-              {pinnedWorkers.length}
-            </span>
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium max-w-2xl">
-            {pinnedPageSubhead(
-              planSlug,
-              pinnedWorkers.length,
-              planUsage?.identityMode ?? "anonymous_preview"
-            )}
-          </p>
-        </div>
-      </div>
+    <EmployerPageShell>
+      <EmployerPageHeader
+        title="Pinned workers"
+        badge={
+          <span className="text-sm font-black bg-emerald-100 text-emerald-800 py-1 px-3 rounded-full">
+            {pinnedWorkers.length}
+          </span>
+        }
+        subhead={pinnedPageSubhead(
+          planSlug,
+          pinnedWorkers.length,
+          planUsage?.identityMode ?? "anonymous_preview"
+        )}
+      />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
@@ -66,6 +66,6 @@ export default async function PinnedPage() {
         planSlug={planSlug}
         messagingEnabled={messagingEnabled}
       />
-    </div>
+    </EmployerPageShell>
   );
 }

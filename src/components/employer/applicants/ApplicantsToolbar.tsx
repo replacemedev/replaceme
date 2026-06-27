@@ -24,7 +24,7 @@ export function ApplicantsToolbar({
           placeholder="Search candidates..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#22c55e] focus:bg-white transition-all font-body-base"
+          className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30 focus:bg-white transition-all font-body-base"
         />
       </div>
 

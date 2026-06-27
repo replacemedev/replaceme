@@ -1,21 +1,38 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Briefcase, FileUser } from "lucide-react";
+import {
+  Briefcase,
+  FileUser,
+  Calendar,
+  Users,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentJobs, getRecentApplicants } from "@/actions/employer/dashboard";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
+import { getEmployerInterviews } from "@/actions/employer/hiring";
+import { getHiredData } from "@/actions/employer/hired";
 import { JobCard } from "@/components/employer/JobCard";
 import { RecentApplicantRow } from "@/components/employer/RecentApplicantRow";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
+import { DashboardQuickLinks } from "@/components/employer/dashboard/DashboardQuickLinks";
+import { DashboardOnboardedBanner } from "@/components/employer/dashboard/DashboardOnboardedBanner";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
+import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import { planDashboardSubhead } from "@/lib/entitlements/ui-copy";
 import {
   hasPriorityListing,
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
+import {
+  EmployerPageHeader,
+  EmployerPageShell,
+  EmployerSectionCard,
+  EmployerKpiStrip,
+} from "@/components/employer/layout";
+import type { EmployerKpiItem } from "@/components/employer/layout";
 
 export const dynamic = "force-dynamic";
 
@@ -46,11 +63,14 @@ export default async function EmployerDashboard() {
       : profile.first_name
     : "Employer";
 
-  const [jobs, recentApplicants, planUsage] = await Promise.all([
-    getRecentJobs(profile.id),
-    getRecentApplicants(profile.id),
-    getEmployerPlanUsage(),
-  ]);
+  const [jobs, recentApplicants, planUsage, interviews, hiredData] =
+    await Promise.all([
+      getRecentJobs(profile.id),
+      getRecentApplicants(profile.id),
+      getEmployerPlanUsage(),
+      getEmployerInterviews(),
+      getHiredData(),
+    ]);
 
   const messagingEnabled = planUsage?.messagingEnabled ?? false;
   const atJobLimit =
@@ -63,26 +83,78 @@ export default async function EmployerDashboard() {
     ? hasPriorityListing(planUsage.planSlug)
     : false;
 
+  const totalApplicants = jobs.reduce(
+    (sum, job) => sum + (job.applicants_count ?? 0),
+    0
+  );
+
+  const activeJobsValue =
+    planUsage?.activeJobsLimit === null
+      ? planUsage?.activeJobsCount ?? jobs.length
+      : `${planUsage?.activeJobsCount ?? jobs.length} / ${planUsage?.activeJobsLimit}`;
+
+  const activeJobsHint =
+    planUsage?.activeJobsLimit === null
+      ? "Unlimited on your plan"
+      : planUsage
+        ? `${planUsage.activeJobsLimit - planUsage.activeJobsCount} slots left`
+        : undefined;
+
+  const kpiItems: EmployerKpiItem[] = [
+    {
+      label: "Active jobs",
+      value: activeJobsValue,
+      hint: activeJobsHint,
+      icon: Briefcase,
+      href: "/employer/jobs",
+    },
+    {
+      label: "Applicants",
+      value: totalApplicants,
+      hint: "Across all job posts",
+      icon: FileUser,
+      href: "/employer/jobs",
+    },
+    {
+      label: "Interviews",
+      value: interviews.length,
+      hint: "Scheduled stage",
+      icon: Calendar,
+      href: "/employer/interviews",
+    },
+    {
+      label: "Active hires",
+      value: hiredData.stats.totalActive,
+      hint: "Current contracts",
+      icon: Users,
+      href: "/employer/hired",
+    },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">
-            Welcome back, {employerName}!
-          </h1>
-          <p className="text-slate-500 font-medium text-sm mt-2 leading-relaxed max-w-2xl">
-            {planUsage
-              ? planDashboardSubhead(
-                  planUsage.planSlug,
-                  planUsage.activeJobsCount,
-                  planUsage.activeJobsLimit,
-                  planUsage.identityMode
-                )
-              : "Manage your job posts and review candidates who applied to work with you."}
-          </p>
-        </div>
-        <PostJobCTA planUsage={planUsage} />
-      </div>
+    <EmployerPageShell width="wide" className="gap-6">
+      <EmployerPageHeader
+        title={`Welcome back, ${employerName}!`}
+        subhead={
+          planUsage
+            ? planDashboardSubhead(
+                planUsage.planSlug,
+                planUsage.activeJobsCount,
+                planUsage.activeJobsLimit,
+                planUsage.identityMode
+              )
+            : "Manage your job posts and review candidates who applied to work with you."
+        }
+        actions={<PostJobCTA planUsage={planUsage} />}
+      />
+
+      <Suspense fallback={null}>
+        <DashboardOnboardedBanner planUsage={planUsage} />
+      </Suspense>
+
+      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
+
+      <EmployerKpiStrip items={kpiItems} />
 
       {atJobLimit && planUsage ? (
         <ContextualUpgradeBanner
@@ -91,12 +163,21 @@ export default async function EmployerDashboard() {
         />
       ) : null}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      {!messagingEnabled && totalApplicants > 0 ? (
+        <ContextualUpgradeBanner
+          feature="messaging"
+          currentPlan={planUsage?.planSlug ?? "discovery"}
+        />
+      ) : null}
+
+      <DashboardQuickLinks />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start pt-2">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Your Job Posts
+                Your job posts
               </h2>
               {jobs.length > 0 ? (
                 <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-[11px] font-extrabold text-white bg-red-500 rounded-full select-none">
@@ -108,7 +189,7 @@ export default async function EmployerDashboard() {
               href="/employer/jobs"
               className="text-sm font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors"
             >
-              View All
+              View all
             </Link>
           </div>
 
@@ -136,21 +217,16 @@ export default async function EmployerDashboard() {
         <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-28">
           {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
 
-          <section className="bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <FileUser className="h-5 w-5 text-[#006e2f]" aria-hidden />
-                <h2 className="text-base font-bold text-slate-900">
-                  Job Applications
-                </h2>
-              </div>
-              {recentApplicants.length > 0 ? (
-                <span className="text-[11px] font-bold text-slate-500 tabular-nums">
-                  {recentApplicants.length} recent
-                </span>
-              ) : null}
-            </div>
-
+          <EmployerSectionCard
+            title="Recent applications"
+            description={
+              recentApplicants.length > 0
+                ? `${recentApplicants.length} latest`
+                : undefined
+            }
+            padded={false}
+            bodyClassName=""
+          >
             {recentApplicants.length > 0 ? (
               <ul className="divide-y divide-slate-100 max-h-[min(50vh,480px)] overflow-y-auto">
                 {recentApplicants.map((applicant) => (
@@ -173,39 +249,9 @@ export default async function EmployerDashboard() {
                 />
               </div>
             )}
-          </section>
-
-          <nav
-            className="flex flex-wrap gap-3 text-[11px] font-semibold text-slate-600"
-            aria-label="Hiring resources"
-          >
-            <Link
-              href="/help/hiring-guide"
-              className="hover:text-[#006e2f] transition-colors"
-            >
-              Hiring guide
-            </Link>
-            <span className="text-slate-300" aria-hidden>
-              ·
-            </span>
-            <Link
-              href="/employer/messages"
-              className="hover:text-[#006e2f] transition-colors"
-            >
-              Messages
-            </Link>
-            <span className="text-slate-300" aria-hidden>
-              ·
-            </span>
-            <Link
-              href="/employer/hired"
-              className="hover:text-[#006e2f] transition-colors"
-            >
-              Hired team
-            </Link>
-          </nav>
+          </EmployerSectionCard>
         </aside>
       </div>
-    </div>
+    </EmployerPageShell>
   );
 }

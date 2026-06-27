@@ -1,0 +1,64 @@
+import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
+
+export interface EmployerKpiItem {
+  label: string;
+  value: string | number;
+  hint?: string;
+  icon?: LucideIcon;
+  href?: string;
+}
+
+interface EmployerKpiStripProps {
+  items: EmployerKpiItem[];
+  className?: string;
+}
+
+export function EmployerKpiStrip({ items, className = "" }: EmployerKpiStripProps) {
+  if (items.length === 0) return null;
+
+  return (
+    <div
+      className={`grid grid-cols-2 md:grid-cols-4 gap-3 ${className}`}
+    >
+      {items.map((item) => {
+        const Icon = item.icon;
+        const card = (
+          <div
+            className={`${EMPLOYER_CARD} flex flex-col gap-1 p-4 ${
+              item.href
+                ? "transition-colors hover:border-[#006e2f]/20 hover:bg-[#fafdfb]"
+                : ""
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {item.label}
+              </span>
+              {Icon ? (
+                <Icon className="h-4 w-4 text-[#006e2f]/70 shrink-0" aria-hidden />
+              ) : null}
+            </div>
+            <span className="text-xl font-extrabold text-slate-900 tabular-nums leading-none">
+              {item.value}
+            </span>
+            {item.hint ? (
+              <span className="text-[11px] font-medium text-slate-500">
+                {item.hint}
+              </span>
+            ) : null}
+          </div>
+        );
+
+        return item.href ? (
+          <Link key={item.label} href={item.href} className="block">
+            {card}
+          </Link>
+        ) : (
+          <div key={item.label}>{card}</div>
+        );
+      })}
+    </div>
+  );
+}

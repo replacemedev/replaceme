@@ -10,6 +10,10 @@ import { ContextualUpgradeBanner } from "@/components/shared/entitlements/Contex
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Users } from "lucide-react";
 import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
+import {
+  EmployerPageHeader,
+  EmployerPageShell,
+} from "@/components/employer/layout";
 
 export const metadata = {
   title: "Hired Workers - Team Management | ReplaceMe",
@@ -27,23 +31,20 @@ export default async function HiredPage() {
   const messagingEnabled = planUsage?.messagingEnabled ?? false;
   const isScale = planSlug === "scale";
 
+  const subhead =
+    planSlug === "scale"
+      ? "Scale plan — manage active contracts, messaging, and team payroll in one place."
+      : planSlug === "discovery"
+        ? "Discovery plan — review active hires. Upgrade for messaging and unlimited capacity."
+        : `${planSlug.charAt(0).toUpperCase() + planSlug.slice(1)} plan — manage active team members and their contracts.`;
+
   return (
-    <div className="py-12 px-margin-desktop max-w-container-max mx-auto w-full space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Hired Workers
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium max-w-2xl">
-            {planSlug === "scale"
-              ? "Scale plan — manage active contracts, messaging, and team payroll in one place."
-              : planSlug === "discovery"
-                ? "Discovery plan — review active hires. Upgrade for messaging and unlimited capacity."
-                : `${planSlug.charAt(0).toUpperCase() + planSlug.slice(1)} plan — manage active team members and their contracts.`}
-          </p>
-        </div>
-        <PostJobCTA planUsage={planUsage} />
-      </div>
+    <EmployerPageShell className="gap-8">
+      <EmployerPageHeader
+        title="Hired workers"
+        subhead={subhead}
+        actions={<PostJobCTA planUsage={planUsage} />}
+      />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
@@ -77,6 +78,6 @@ export default async function HiredPage() {
       )}
 
       <UpsellFooter />
-    </div>
+    </EmployerPageShell>
   );
 }
