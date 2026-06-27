@@ -8,6 +8,7 @@ import { pinnedPageSubhead, normalizePlanSlug } from "@/lib/entitlements/ui-copy
 import {
   EmployerPageHeader,
   EmployerPageShell,
+  EmployerBreadcrumb,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -34,6 +35,12 @@ export default async function PinnedPage() {
 
   return (
     <EmployerPageShell>
+      <EmployerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/employer/dashboard" },
+          { label: "Pinned workers" },
+        ]}
+      />
       <EmployerPageHeader
         title="Pinned workers"
         badge={

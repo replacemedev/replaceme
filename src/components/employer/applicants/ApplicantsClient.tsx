@@ -50,6 +50,18 @@ export function ApplicantsClient({
     setApplicants(initialApplicants);
   }, [initialApplicants]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const enforceMobileView = () => {
+      if (mq.matches && viewMode === "kanban") {
+        setViewMode("cards");
+      }
+    };
+    enforceMobileView();
+    mq.addEventListener("change", enforceMobileView);
+    return () => mq.removeEventListener("change", enforceMobileView);
+  }, [viewMode]);
+
   const handleChatWithCandidate = (candidateId: string) => {
     router.push(`/employer/messages?threadId=${candidateId}`);
   };
@@ -144,7 +156,7 @@ export function ApplicantsClient({
         <button
           type="button"
           onClick={() => setViewMode("kanban")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+          className={`hidden lg:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             viewMode === "kanban"
               ? "bg-[#006e2f] text-white"
               : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -155,7 +167,7 @@ export function ApplicantsClient({
         </button>
       </div>
 
-      {filteredApplicants.length === 0 && viewMode !== "kanban" ? (
+      {filteredApplicants.length === 0 ? (
         <div className="rounded-3xl border border-slate-100 bg-white p-16 text-center shadow-sm">
           <div className="w-16 h-16 bg-slate-50 border border-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-5">
             <AlertCircle className="w-8 h-8" />
@@ -166,22 +178,35 @@ export function ApplicantsClient({
           </p>
         </div>
       ) : viewMode === "kanban" ? (
-        <ApplicantKanban
-          applicants={filteredApplicants}
-          jobId={jobId}
-          onMessageClick={handleChatWithCandidate}
-          messagingEnabled={messagingEnabled}
-          planSlug={planSlug}
-          resumeDownloadEnabled={resumeDownloadEnabled}
-        />
+        <div className="hidden lg:block">
+          <ApplicantKanban
+            applicants={filteredApplicants}
+            jobId={jobId}
+            onMessageClick={handleChatWithCandidate}
+            messagingEnabled={messagingEnabled}
+            planSlug={planSlug}
+            resumeDownloadEnabled={resumeDownloadEnabled}
+          />
+        </div>
       ) : viewMode === "table" ? (
-        <ApplicantTrackerTable
-          rows={tableRows}
-          planSlug={planSlug}
-          messagingEnabled={messagingEnabled}
-        />
-      ) : (
-        <div className="space-y-4">
+        <div className="hidden lg:block overflow-x-auto">
+          <ApplicantTrackerTable
+            rows={tableRows}
+            planSlug={planSlug}
+            messagingEnabled={messagingEnabled}
+          />
+        </div>
+      ) : null}
+
+      {(viewMode === "cards" ||
+        viewMode === "kanban" ||
+        viewMode === "table") &&
+      filteredApplicants.length > 0 ? (
+        <div
+          className={`space-y-4 ${
+            viewMode === "cards" ? "" : "lg:hidden"
+          }`}
+        >
           {filteredApplicants.map((app) => (
             <ApplicantCard
               key={app.id}
@@ -198,7 +223,7 @@ export function ApplicantsClient({
             />
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 

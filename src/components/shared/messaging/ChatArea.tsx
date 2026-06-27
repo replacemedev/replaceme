@@ -9,6 +9,7 @@ import { ChatInputArea } from "./ChatInputArea";
 import { MessagingEmptyState } from "./MessagingEmptyState";
 import { MessagingThreadStatus } from "./MessagingThreadStatus";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
+import { MobileChatBackButton } from "./MobileChatBackButton";
 
 interface ChatAreaProps {
   thread: MessagingThread | null;
@@ -19,6 +20,9 @@ interface ChatAreaProps {
   planSlug?: string;
   onSendMessage: (content: string) => Promise<void>;
   onTogglePin: () => Promise<void>;
+  onBack?: () => void;
+  /** Hide chat pane on mobile until a thread is selected. */
+  mobileHidden?: boolean;
 }
 
 function formatDateSeparator(isoString: string) {
@@ -88,6 +92,8 @@ export function ChatArea({
   planSlug = "discovery",
   onSendMessage,
   onTogglePin,
+  onBack,
+  mobileHidden = false,
 }: ChatAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPinning, setIsPinning] = useState(false);
@@ -100,7 +106,11 @@ export function ChatArea({
 
   if (!thread) {
     return (
-      <section className="flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8">
+      <section
+        className={`flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8 ${
+          mobileHidden ? "hidden lg:flex" : ""
+        }`}
+      >
         <MessagingEmptyState
           role={role}
           messagingEnabled={messagingEnabled}
@@ -117,9 +127,15 @@ export function ChatArea({
     (role === "employer" && !messagingEnabled);
 
   return (
-    <section className="flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0">
-      <header className="shrink-0 h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between">
-        <div className="flex items-center gap-3 min-w-0">
+    <section
+      className={`flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0 ${
+        mobileHidden ? "hidden lg:flex" : ""
+      }`}
+    >
+      <header className="shrink-0 h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
+          <div className="flex items-center gap-3 min-w-0">
           <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
             {oppositeParty.avatarUrl ? (
               <Image
@@ -146,6 +162,7 @@ export function ChatArea({
                 Online
               </span>
             </div>
+          </div>
           </div>
         </div>
 

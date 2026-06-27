@@ -11,7 +11,8 @@ import { CompensationCard } from "@/components/employer/jobs/view/CompensationCa
 import { HiringTeamCard } from "@/components/employer/jobs/view/HiringTeamCard";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
-import { EmployerPageShell } from "@/components/employer/layout";
+import { EmployerPageShell, EmployerBreadcrumb } from "@/components/employer/layout";
+import { JobDetailStickyActions } from "@/components/employer/jobs/view/JobDetailStickyActions";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -53,8 +54,16 @@ export default async function JobListingViewPage({ params }: PageProps) {
   const isPendingReview = job.status === "Pending Review";
 
   return (
-    <EmployerPageShell width="content" className="gap-8">
-      <JobHeader
+    <>
+      <EmployerPageShell width="content" className="gap-8 pb-24 lg:pb-12">
+        <EmployerBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/employer/dashboard" },
+            { label: "Jobs", href: "/employer/jobs" },
+            { label: job.title },
+          ]}
+        />
+        <JobHeader
         jobId={job.id}
         title={job.title}
         status={job.status}
@@ -115,6 +124,8 @@ export default async function JobListingViewPage({ params }: PageProps) {
           <HiringTeamCard hiringTeam={job.hiringTeam} />
         </div>
       </div>
-    </EmployerPageShell>
+      </EmployerPageShell>
+      <JobDetailStickyActions jobId={job.id} />
+    </>
   );
 }

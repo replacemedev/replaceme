@@ -7,8 +7,7 @@ import {
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { EmployerPageShell } from "@/components/employer/layout/EmployerPageShell";
-import { EmployerBreadcrumb } from "@/components/employer/layout/EmployerBreadcrumb";
+import { EmployerPageShell, EmployerBreadcrumb, EmployerPageHeader } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
@@ -84,14 +83,11 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
           { label: "Messages" },
         ]}
       />
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Messaging
-        </h1>
-        <p className="text-sm text-slate-500 font-medium mt-1">
-          Chat with candidates across your active job posts.
-        </p>
-      </div>
+      <EmployerPageHeader
+        title="Messaging"
+        subhead="Chat with candidates across your active job posts."
+        bordered={false}
+      />
       <MessagingClient
         role="employer"
         basePath="/employer/messages"

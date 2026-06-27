@@ -10,6 +10,7 @@ import {
 } from "@/actions/employer/contracts";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
+import { ContractStickyActions } from "./ContractStickyActions";
 
 export function ContractDetailClient({
   contract,
@@ -100,12 +101,12 @@ export function ContractDetailClient({
           </select>
         </label>
 
-        <div className="flex flex-wrap gap-3 pt-2">
+        <div className="hidden lg:flex flex-wrap gap-3 pt-2">
           <button
             type="button"
             disabled={isPending}
             onClick={save}
-            className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50"
+            className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
           >
             Save changes
           </button>
@@ -121,6 +122,8 @@ export function ContractDetailClient({
           ) : null}
         </div>
       </div>
+
+      <ContractStickyActions isPending={isPending} onSave={save} />
 
       <ConfirmDialog
         open={showTerminateDialog}

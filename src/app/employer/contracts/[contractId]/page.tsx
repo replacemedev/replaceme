@@ -33,7 +33,7 @@ export default async function EmployerContractPage({
   const isScale = planSlug === "scale";
 
   return (
-    <EmployerPageShell width="content" className="gap-6">
+    <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
       <EmployerBreadcrumb
         items={[
           { label: "Hired workers", href: "/employer/hired" },

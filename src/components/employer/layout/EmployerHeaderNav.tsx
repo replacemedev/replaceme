@@ -7,17 +7,12 @@ import { ChevronDown, Menu, X, Briefcase } from "lucide-react";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 import { PostJobNavLink } from "@/components/employer/jobs/PostJobNavLink";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
-
-const MORE_LINKS = [
-  { href: "/employer/settings/account", label: "Account & Billing" },
-  { href: "/employer/notifications", label: "Notifications" },
-  { href: "/employer/reviews", label: "Reviews" },
-  { href: "/employer/pricing", label: "Pricing" },
-];
-
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
+import {
+  EMPLOYER_HEADER_MORE_LINKS,
+  EMPLOYER_MORE_NAV_ITEMS,
+  isEmployerJobsActive,
+  isEmployerNavActive,
+} from "@/config/employerNav";
 
 interface EmployerHeaderNavProps {
   unreadMessageCount?: number;
@@ -34,10 +29,10 @@ export function EmployerHeaderNav({
   const jobsDropdownRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
 
-  const jobsActive =
-    isActive(pathname, "/employer/jobs") ||
-    isActive(pathname, "/employer/jobs/create");
-  const moreActive = MORE_LINKS.some((item) => isActive(pathname, item.href));
+  const jobsActive = isEmployerJobsActive(pathname);
+  const moreActive = EMPLOYER_HEADER_MORE_LINKS.some((item) =>
+    isEmployerNavActive(pathname, item.href)
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,7 +66,7 @@ export function EmployerHeaderNav({
       <NavUnderlineLink
         href="/employer/dashboard"
         label="Dashboard"
-        isActive={isActive(pathname, "/employer/dashboard")}
+        isActive={isEmployerNavActive(pathname, "/employer/dashboard")}
       />
       <div className="relative" ref={jobsDropdownRef}>
         <button
@@ -126,7 +121,7 @@ export function EmployerHeaderNav({
       <NavUnderlineLink
         href="/employer/messages"
         label="Messages"
-        isActive={isActive(pathname, "/employer/messages")}
+        isActive={isEmployerNavActive(pathname, "/employer/messages")}
         ariaLabel={
           unreadMessageCount > 0
             ? `Messages, ${unreadMessageCount} unread`
@@ -142,17 +137,17 @@ export function EmployerHeaderNav({
       <NavUnderlineLink
         href="/employer/interviews"
         label="Interviews"
-        isActive={isActive(pathname, "/employer/interviews")}
+        isActive={isEmployerNavActive(pathname, "/employer/interviews")}
       />
       <NavUnderlineLink
         href="/employer/hired"
         label="Hired"
-        isActive={isActive(pathname, "/employer/hired")}
+        isActive={isEmployerNavActive(pathname, "/employer/hired")}
       />
       <NavUnderlineLink
         href="/employer/pinned"
         label="Pinned"
-        isActive={isActive(pathname, "/employer/pinned")}
+        isActive={isEmployerNavActive(pathname, "/employer/pinned")}
       />
       <div className="relative" ref={moreRef}>
         <button
@@ -177,13 +172,13 @@ export function EmployerHeaderNav({
         </button>
         {moreOpen ? (
           <div className="absolute left-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 max-h-[70vh] overflow-y-auto">
-            {MORE_LINKS.map((item) => (
+            {EMPLOYER_HEADER_MORE_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMoreOpen(false)}
                 className={`block px-4 py-2 text-sm hover:bg-slate-50 ${
-                  isActive(pathname, item.href)
+                  isEmployerNavActive(pathname, item.href)
                     ? "text-[#006e2f] font-semibold"
                     : "text-slate-600"
                 }`}
@@ -256,33 +251,12 @@ export function EmployerMobileMenu({
               </span>
             ) : null}
           </Link>
-          <Link
-            href="/employer/interviews"
-            onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
-          >
-            Interviews
-          </Link>
-          <Link
-            href="/employer/hired"
-            onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
-          >
-            Hired
-          </Link>
-          <Link
-            href="/employer/pinned"
-            onClick={() => setMobileMenuOpen(false)}
-            className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
-          >
-            Pinned
-          </Link>
-          {MORE_LINKS.map((item) => (
+          {EMPLOYER_MORE_NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="font-semibold py-2 text-slate-700 hover:text-[#006e2f]"
+              className="font-semibold py-2 text-slate-700 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
             >
               {item.label}
             </Link>

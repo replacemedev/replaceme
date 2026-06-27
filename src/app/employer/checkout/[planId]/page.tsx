@@ -6,6 +6,11 @@ import { getPlanDetails } from "@/actions/employer/pricing";
 import { getAccountSettings } from "@/actions/employer/billing";
 import { EmployerCheckoutClient } from "@/components/employer/checkout/EmployerCheckoutClient";
 import {
+  EmployerPageShell,
+  EmployerBreadcrumb,
+  EmployerPageHeader,
+} from "@/components/employer/layout";
+import {
   isHigherTier,
   isLowerTier,
   normalizePlanSlug,
@@ -80,6 +85,20 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   return (
-    <EmployerCheckoutClient plan={plan} checkoutUrl={checkout.checkoutUrl} />
+    <EmployerPageShell width="content" className="gap-8">
+      <EmployerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/employer/dashboard" },
+          { label: "Pricing", href: "/employer/pricing" },
+          { label: "Checkout" },
+        ]}
+      />
+      <EmployerPageHeader
+        title={`Upgrade to ${plan.name}`}
+        subhead="Review your order and continue to secure Stripe checkout."
+        bordered={false}
+      />
+      <EmployerCheckoutClient plan={plan} checkoutUrl={checkout.checkoutUrl} />
+    </EmployerPageShell>
   );
 }

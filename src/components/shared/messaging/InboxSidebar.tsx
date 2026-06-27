@@ -24,6 +24,8 @@ interface InboxSidebarProps {
   onJobRoleChange: (jobRoleId: JobRoleFilterValue) => void;
   onSelectThread: (threadId: string) => void;
   role?: MessagingRole;
+  /** Hide inbox on mobile when a thread is open (master-detail). */
+  mobileHidden?: boolean;
 }
 
 export function InboxSidebar({
@@ -38,6 +40,7 @@ export function InboxSidebar({
   onJobRoleChange,
   onSelectThread,
   role = "worker",
+  mobileHidden = false,
 }: InboxSidebarProps) {
   const filtered = threads.filter((t) => {
     if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
@@ -56,7 +59,11 @@ export function InboxSidebar({
   });
 
   return (
-    <aside className="w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full">
+    <aside
+      className={`w-full lg:w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full ${
+        mobileHidden ? "hidden lg:flex" : ""
+      }`}
+    >
       <div className="p-4 border-b border-slate-100 shrink-0">
         <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
           {role === "employer" ? "Candidate Inbox" : "Inbox"}

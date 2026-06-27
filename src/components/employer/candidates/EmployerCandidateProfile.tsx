@@ -11,6 +11,7 @@ import { CandidateProfileActions } from "./CandidateProfileActions";
 import {
   EmployerBreadcrumb,
   EmployerPageShell,
+  EmployerStickyActionBar,
 } from "@/components/employer/layout";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
@@ -87,7 +88,7 @@ export function EmployerCandidateProfile({
     .toUpperCase();
 
   return (
-    <EmployerPageShell width="content" className="gap-6">
+    <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
       <EmployerBreadcrumb
         items={[
           { label: "Jobs", href: "/employer/jobs" },
@@ -201,13 +202,13 @@ export function EmployerCandidateProfile({
       </div>
 
       {isPreview ? (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 p-4 backdrop-blur-md lg:hidden">
+        <EmployerStickyActionBar>
           <UpgradeCTA
             feature="identity"
             currentPlan={planSlug}
             className="w-full justify-center"
           />
-        </div>
+        </EmployerStickyActionBar>
       ) : null}
     </EmployerPageShell>
   );

@@ -15,8 +15,7 @@ export function EmployerCheckoutClient({
   checkoutUrl,
 }: EmployerCheckoutClientProps) {
   return (
-    <div className="min-h-screen bg-[#f8fafe] py-12 px-4">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <OrderSummary
           planName={plan.name}
           planPrice={plan.price}
@@ -65,7 +64,6 @@ export function EmployerCheckoutClient({
             .
           </p>
         </div>
-      </div>
     </div>
   );
 }

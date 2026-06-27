@@ -61,20 +61,9 @@ export function EmployerPricingClient({
   };
 
   return (
-    <div className="bg-[#f8fafe] min-h-screen py-16">
-      <div className="text-center max-w-3xl mx-auto px-4 mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
-          Scale Your Remote Team. Simple, Transparent Pricing.
-        </h1>
-        <p className="text-gray-500 font-medium text-lg mt-4 leading-relaxed">
-          From your first hire to an entire remote department — Discovery is
-          free, then upgrade when you need full profiles, messaging, and instant
-          approval.
-        </p>
-      </div>
-
+    <div className="space-y-10">
       {isPaid ? (
-        <div className="max-w-3xl mx-auto px-4 mb-10">
+        <div className="max-w-3xl mx-auto mb-10">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-2xl border border-[#006e2f]/20 bg-white px-5 py-4 shadow-sm">
             <div>
               <p className="text-sm font-bold text-slate-900">

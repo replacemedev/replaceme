@@ -101,8 +101,8 @@ export function JobHeader({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        {/* Action Buttons — desktop only; mobile uses JobDetailStickyActions */}
+        <div className="hidden lg:flex flex-wrap items-center gap-2 shrink-0">
           <Link
             href={`/employer/jobs/${jobId}/applicants`}
             className="h-10 px-4 rounded-xl bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"

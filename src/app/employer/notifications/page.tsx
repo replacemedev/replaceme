@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { EmployerNotificationsClient } from "@/components/employer/notifications/EmployerNotificationsClient";
-import { EmployerPageShell } from "@/components/employer/layout";
+import { EmployerPageShell, EmployerBreadcrumb, EmployerPageHeader } from "@/components/employer/layout";
 
 export const metadata = {
   title: "Notifications | ReplaceMe",
@@ -21,6 +21,17 @@ export default async function EmployerNotificationsPage() {
 
   return (
     <EmployerPageShell width="content">
+      <EmployerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/employer/dashboard" },
+          { label: "Notifications" },
+        ]}
+      />
+      <EmployerPageHeader
+        title="Notifications"
+        subhead="Application updates, messages, and platform alerts."
+        bordered={false}
+      />
       <EmployerNotificationsClient
         userId={user.id}
         initialBootstrap={bootstrap}

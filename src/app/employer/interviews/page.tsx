@@ -19,6 +19,7 @@ import {
 import {
   EmployerPageHeader,
   EmployerPageShell,
+  EmployerBreadcrumb,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -48,6 +49,12 @@ export default async function EmployerInterviewsPage() {
 
   return (
     <EmployerPageShell>
+      <EmployerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/employer/dashboard" },
+          { label: "Interviews" },
+        ]}
+      />
       <EmployerPageHeader
         title="Interviews"
         subhead={interviewsPageSubhead(

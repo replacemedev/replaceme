@@ -2,6 +2,11 @@ import { getPricingData } from "@/actions/employer/pricing";
 import { getAccountSettings } from "@/actions/employer/billing";
 import { EmployerPricingClient } from "@/components/employer/pricing/EmployerPricingClient";
 import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
+import {
+  EmployerPageShell,
+  EmployerBreadcrumb,
+  EmployerPageHeader,
+} from "@/components/employer/layout";
 
 export const runtime = "edge";
 
@@ -20,11 +25,24 @@ export default async function PricingPage() {
   const currentPlanSlug = normalizePlanSlug(accountSettings?.plan ?? "discovery");
 
   return (
-    <EmployerPricingClient
-      plans={plans}
-      testimonials={testimonials}
-      faqs={faqs}
-      currentPlanSlug={currentPlanSlug}
-    />
+    <EmployerPageShell width="wide" className="gap-10">
+      <EmployerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/employer/dashboard" },
+          { label: "Pricing" },
+        ]}
+      />
+      <EmployerPageHeader
+        title="Scale your remote team"
+        subhead="Simple, transparent pricing — Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."
+        bordered={false}
+      />
+      <EmployerPricingClient
+        plans={plans}
+        testimonials={testimonials}
+        faqs={faqs}
+        currentPlanSlug={currentPlanSlug}
+      />
+    </EmployerPageShell>
   );
 }

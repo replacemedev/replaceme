@@ -64,6 +64,15 @@ export function MessagingClient({
     });
   }, [selectedThreadId, basePath, router]);
 
+  const handleBackToInbox = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("threadId");
+    const qs = params.toString();
+    startTransition(() => {
+      router.push(qs ? `${pathname}?${qs}` : pathname);
+    });
+  };
+
   const handleSelectThread = (threadId: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("threadId", threadId);
@@ -126,6 +135,8 @@ export function MessagingClient({
   const activeThread =
     threads.find((t) => t.id === selectedThreadId) ?? null;
 
+  const mobileChatOpen = Boolean(selectedThreadId);
+
   return (
     <MessagingCenterShell>
       <InboxSidebar
@@ -140,6 +151,7 @@ export function MessagingClient({
         onJobRoleChange={setSelectedJobRole}
         onSelectThread={handleSelectThread}
         role={role}
+        mobileHidden={mobileChatOpen}
       />
       <ChatArea
         thread={activeThread}
@@ -150,6 +162,8 @@ export function MessagingClient({
         planSlug={planSlug}
         onSendMessage={handleSendMessage}
         onTogglePin={handleTogglePin}
+        onBack={mobileChatOpen ? handleBackToInbox : undefined}
+        mobileHidden={!mobileChatOpen}
       />
     </MessagingCenterShell>
   );

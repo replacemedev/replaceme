@@ -10,7 +10,10 @@ export const EMPLOYER_SHELL_WIDTH = {
   narrow: "max-w-3xl",
 } as const;
 
-export const EMPLOYER_SHELL_PADDING = "px-margin-desktop py-12";
+export const EMPLOYER_SHELL_PADDING = "px-4 sm:px-6 lg:px-margin-desktop py-6 lg:py-12";
+
+export const EMPLOYER_SAFE_BOTTOM =
+  "pb-[calc(56px+env(safe-area-inset-bottom))] lg:pb-0";
 
 export const EMPLOYER_CARD =
   "rounded-3xl border border-slate-100 bg-white shadow-sm";
