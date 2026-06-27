@@ -3,6 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Bell } from "lucide-react";
+import {
+  WorkerPageShell,
+  WorkerPageHeader,
+  WorkerBreadcrumb,
+} from "@/components/worker/layout";
+import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
   title: "Notifications | ReplaceMe",
@@ -20,15 +26,21 @@ export default async function WorkerNotificationsPage() {
   const { notifications } = await fetchNotificationBootstrap(user.id, 50);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-10">
-      <h1 className="text-2xl font-extrabold text-slate-900">Notifications</h1>
-      <p className="text-sm text-slate-500 mt-1 mb-8">
-        All updates about applications, messages, and offers.
-      </p>
+    <WorkerPageShell width="content">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Notifications" },
+        ]}
+      />
+      <WorkerPageHeader
+        title="Notifications"
+        subhead="Updates about applications, messages, and offers."
+      />
 
       {notifications.length === 0 ? (
         <EmptyState
-          icon={<Bell size={22} />}
+          icon={<Bell size={22} aria-hidden />}
           title="No notifications"
           description="You're all caught up. New alerts will appear here."
         />
@@ -37,8 +49,8 @@ export default async function WorkerNotificationsPage() {
           {notifications.map((n) => (
             <li
               key={n.id}
-              className={`bg-white border rounded-xl px-4 py-3 ${
-                n.is_read ? "border-slate-200" : "border-[#006e2f]/30 bg-[#ebfdf2]/30"
+              className={`${WORKER_CARD} px-4 py-3 ${
+                n.is_read ? "" : "border-[#006e2f]/30 bg-[#ebfdf2]/30"
               }`}
             >
               <p className="text-sm font-bold text-slate-900">{n.title}</p>
@@ -50,6 +62,6 @@ export default async function WorkerNotificationsPage() {
           ))}
         </ul>
       )}
-    </div>
+    </WorkerPageShell>
   );
 }

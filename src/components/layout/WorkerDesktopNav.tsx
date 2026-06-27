@@ -23,7 +23,13 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function WorkerDesktopNav() {
+interface WorkerDesktopNavProps {
+  unreadMessageCount?: number;
+}
+
+export function WorkerDesktopNav({
+  unreadMessageCount = 0,
+}: WorkerDesktopNavProps) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
@@ -47,7 +53,18 @@ export function WorkerDesktopNav() {
           href={item.href}
           label={item.label}
           isActive={isActive(pathname, item.href)}
-        />
+          ariaLabel={
+            item.href === "/worker/messages" && unreadMessageCount > 0
+              ? `Messages, ${unreadMessageCount} unread`
+              : undefined
+          }
+        >
+          {item.href === "/worker/messages" && unreadMessageCount > 0 ? (
+            <span className="px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
+              {unreadMessageCount}
+            </span>
+          ) : null}
+        </NavUnderlineLink>
       ))}
       <div className="relative" ref={moreRef}>
         <button
@@ -58,6 +75,7 @@ export function WorkerDesktopNav() {
           }`}
           aria-expanded={moreOpen}
           aria-haspopup="true"
+          aria-label="More menu"
         >
           More
           <ChevronDown

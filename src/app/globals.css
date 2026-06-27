@@ -455,6 +455,11 @@ body {
   z-index: 100;
 }
 
+::view-transition-group(worker-header) {
+  animation: none;
+  z-index: 100;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),

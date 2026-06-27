@@ -5,6 +5,10 @@ import {
   getWorkerApplicationStats,
 } from "@/actions/worker/applications";
 import { ApplicationsClient } from "@/components/worker/applications/ApplicationsClient";
+import {
+  WorkerPageShell,
+  WorkerBreadcrumb,
+} from "@/components/worker/layout";
 
 export const metadata = {
   title: "My Applications | ReplaceMe",
@@ -36,6 +40,14 @@ export default async function WorkerApplicationsPage() {
   ]);
 
   return (
-    <ApplicationsClient applications={applications} stats={stats} />
+    <WorkerPageShell width="wide" className="py-8 gap-4">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Applications" },
+        ]}
+      />
+      <ApplicationsClient applications={applications} stats={stats} />
+    </WorkerPageShell>
   );
 }

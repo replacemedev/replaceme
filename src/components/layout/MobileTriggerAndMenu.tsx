@@ -4,7 +4,13 @@ import React, { useState } from "react";
 import { Menu } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 
-export function MobileTriggerAndMenu() {
+interface MobileTriggerAndMenuProps {
+  unreadMessageCount?: number;
+}
+
+export function MobileTriggerAndMenu({
+  unreadMessageCount = 0,
+}: MobileTriggerAndMenuProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -18,7 +24,11 @@ export function MobileTriggerAndMenu() {
         <Menu size={22} />
       </button>
 
-      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        unreadMessageCount={unreadMessageCount}
+      />
     </>
   );
 }

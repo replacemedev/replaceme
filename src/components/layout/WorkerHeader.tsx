@@ -15,14 +15,21 @@ export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
   const resolvedSession = session ?? (await getNavSession());
 
   return (
-    <header className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm">
+    <header
+      className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm"
+      style={{ viewTransitionName: "worker-header" }}
+    >
       <div className="flex justify-between items-center px-4 sm:px-8 max-w-7xl mx-auto w-full h-16">
         <div className="flex items-center gap-4">
-          <MobileTriggerAndMenu />
+          <MobileTriggerAndMenu
+            unreadMessageCount={resolvedSession.unreadMessageCount}
+          />
           <NavBrand homeHref={resolvedSession.homeHref} compact />
         </div>
 
-        <WorkerDesktopNav />
+        <WorkerDesktopNav
+          unreadMessageCount={resolvedSession.unreadMessageCount}
+        />
 
         <GlobalHeaderActions session={resolvedSession}>
           <RoleNavDropdown session={resolvedSession} />

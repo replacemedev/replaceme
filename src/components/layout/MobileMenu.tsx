@@ -10,9 +10,14 @@ import { WORKER_NAV_ITEMS } from "@/config/workerNav";
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  unreadMessageCount?: number;
 }
 
-export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+export function MobileMenu({
+  isOpen,
+  onClose,
+  unreadMessageCount = 0,
+}: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -84,12 +89,22 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     : "text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50"
                 }`}
                 aria-current={isActive ? "page" : undefined}
+                aria-label={
+                  item.href === "/worker/messages" && unreadMessageCount > 0
+                    ? `Messages, ${unreadMessageCount} unread`
+                    : item.label
+                }
               >
                 <Icon
                   size={18}
                   className={isActive ? "text-[#006e2f]" : "text-slate-400"}
                 />
                 {item.label}
+                {item.href === "/worker/messages" && unreadMessageCount > 0 ? (
+                  <span className="ml-auto px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
+                    {unreadMessageCount}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

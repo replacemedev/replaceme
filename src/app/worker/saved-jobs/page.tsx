@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { SavedJobsHeader } from "@/components/worker/saved-jobs/SavedJobsHeader";
 import { SavedJobCard } from "@/components/worker/saved-jobs/SavedJobCard";
 import { parseSavedJobsQuery } from "@/types/saved-jobs";
+import { WorkerPageShell, WorkerBreadcrumb } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Saved Jobs | ReplaceMe",
@@ -40,11 +41,16 @@ export default async function WorkerSavedJobsPage({ searchParams }: PageProps) {
   const jobs = await getSavedJobs(query);
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <SavedJobsHeader q={query.q} sort={query.sort} />
+    <WorkerPageShell width="content" className="gap-6">
+      <WorkerBreadcrumb
+        items={[
+          { label: "Dashboard", href: "/worker/dashboard" },
+          { label: "Saved jobs" },
+        ]}
+      />
+      <SavedJobsHeader q={query.q} sort={query.sort} />
 
-        {jobs.length === 0 ? (
+      {jobs.length === 0 ? (
           <EmptyState
             icon={<Bookmark className="h-5 w-5" aria-hidden />}
             title="No saved jobs yet"
@@ -65,7 +71,6 @@ export default async function WorkerSavedJobsPage({ searchParams }: PageProps) {
             ))}
           </ul>
         )}
-      </div>
-    </div>
+    </WorkerPageShell>
   );
 }
