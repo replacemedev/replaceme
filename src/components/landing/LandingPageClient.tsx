@@ -360,29 +360,29 @@ export function LandingPageClient({
           <div className={`${LANDING_INNER} relative z-10`}>
             <div className="text-center mb-16 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Why Employers Choose Replace Me</h2>
-              <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Scale your team without the traditional agency overhead.</p>
+              <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Post jobs, review applicants, and hire Filipino talent without agency markups or salary skims.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 animate-fade-in relative z-10">
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
                   <CircleDollarSign className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
-                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">No Middleman Fees</h3>
-                <p className="text-[#475569] text-base leading-relaxed">We don&apos;t take a cut of your worker&apos;s salary. You pay them directly, ensuring they get 100% of what they earn.</p>
+                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">No Salary Cut</h3>
+                <p className="text-[#475569] text-base leading-relaxed">Your subscription pays for platform access — not a percentage of payroll. Workers receive 100% of what you agree on.</p>
               </div>
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "250ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
                   <Handshake className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
-                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Direct Hiring</h3>
-                <p className="text-[#475569] text-base leading-relaxed">Communicate, manage, and pay your team members directly. Build a true remote team culture.</p>
+                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Built-In Hiring Flow</h3>
+                <p className="text-[#475569] text-base leading-relaxed">Job posts, applicant pipelines, messaging, and offers live in one employer dashboard — not spreadsheets and inbox threads.</p>
               </div>
               <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
                 <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
                   <TrendingDown className="h-8 w-8 text-[#22c55e]" aria-hidden />
                 </div>
-                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">80% Cost Savings</h3>
-                <p className="text-[#475569] text-base leading-relaxed">Hire top-tier talent for a fraction of the cost of local hires, without sacrificing quality or reliability.</p>
+                <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Huge Cost Savings</h3>
+                <p className="text-[#475569] text-base leading-relaxed">Hire senior engineers, designers, and operators at a fraction of local costs — with strong English and US-hours availability.</p>
               </div>
             </div>
           </div>
@@ -399,7 +399,7 @@ export function LandingPageClient({
               <div className="lg:col-span-5 space-y-6 reveal-item">
                 <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">For Talent</div>
                 <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Elevate Your Career with <span className="text-[#22c55e]">Global Opportunities</span></h2>
-                <p className="text-slate-500 font-body-base text-lg leading-relaxed">Find stable, long-term remote work with international clients who value your expertise and dedication.</p>
+                <p className="text-slate-500 font-body-base text-lg leading-relaxed">Build a real remote career with global employers — not one-off gigs and endless bidding.</p>
                 <div className="pt-2">
                   <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                     <span>Create Your Free Profile</span>
@@ -414,15 +414,15 @@ export function LandingPageClient({
                     <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
                       <CreditCard className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
-                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Direct Payment</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed">Get paid directly by your employer. No waiting for platforms to process your hard-earned money.</p>
+                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Get Paid Direct</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">Agree on rate and payout with your employer. We don’t hold your salary.</p>
                   </div>
                   <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "200ms" }}>
                     <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
                       <Wallet className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
-                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">No Salary Markups</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed">You keep 100% of your agreed-upon salary. We never take a percentage of your earnings.</p>
+                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Zero Worker Fees</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">Create a profile, apply, and connect with employers for free — always.</p>
                   </div>
                 </div>
 
@@ -431,11 +431,11 @@ export function LandingPageClient({
                     <div className="w-12 h-12 bg-[#22c55e] text-white rounded-xl flex items-center justify-center mb-6 shadow-sm">
                       <Briefcase className="h-6 w-6 shrink-0" aria-hidden />
                     </div>
-                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Stable Remote Work</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed mb-6">Connect with serious employers looking for long-term team members, not just gig workers. Build a career, not just a side-hustle.</p>
+                    <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Long-Term Roles</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-6">Find full-time and long-term contracts across tech, design, marketing, and ops — built for real teams.</p>
                     <div className="pt-4 border-t border-slate-100 flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase font-label-mono">
                       <BadgeCheck className="h-4 w-4 shrink-0" aria-hidden />
-                      Verified Employers Only
+                      Vetted Global Employers
                     </div>
                   </div>
                 </div>
@@ -452,8 +452,8 @@ export function LandingPageClient({
           <div className={`${LANDING_INNER} relative z-10`}>
             <Element name="how-it-works" id="how-it-works" className="h-0 w-0" aria-hidden />
             <div className="text-center mb-20 reveal-item">
-              <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Outsourcing Made Simple</h2>
-              <p className="text-slate-500 text-lg leading-relaxed">A streamlined process for both sides of the marketplace.</p>
+              <h2 className="text-display-lg text-slate-900 mb-4 font-bold">How Remote Hiring Works on Replace Me</h2>
+              <p className="text-slate-500 text-lg leading-relaxed">From job post to signed contract — no agency in the middle.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
@@ -469,22 +469,29 @@ export function LandingPageClient({
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">1</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Post a Job</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Create a detailed job listing outlining your requirements and budget.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Publish a Remote Role</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Define skills, compensation, and timezone. Discovery posts go through a 2-day quality review; paid plans go live instantly.</p>
                     </div>
                   </div>
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">2</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Message Applicants</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Review profiles, portfolios, and communicate directly with candidates.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Review Applicants &amp; Match Signals</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">See who applied in your applicant pipeline. Discovery shows anonymous previews; upgrade for full profiles, resumes, and downloads.</p>
                     </div>
                   </div>
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">3</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Hire &amp; Pay Directly</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Make your hire and set up payment terms directly with your new team member.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Hire on Your Terms</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Select your hire, agree on schedule and rate, and work directly — Replace Me never takes a cut of wages.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6 items-start relative z-10">
+                    <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">4</div>
+                    <div>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Shortlist, Message &amp; Send Offers</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Move candidates through your pipeline, chat on paid plans, and send offers/contracts — you pay talent directly with zero salary markup.</p>
                     </div>
                   </div>
                 </div>
@@ -502,22 +509,29 @@ export function LandingPageClient({
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">1</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Sign Up (Free)</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Create a comprehensive profile highlighting your skills and experience.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Build Your Profile</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Add skills, experience, portfolio links, and availability.</p>
                     </div>
                   </div>
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">2</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Apply for Jobs</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Browse listings and apply directly to roles that match your expertise.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Apply to Remote Roles</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Browse job posts from global employers and apply directly — your application goes straight into their pipeline.</p>
                     </div>
                   </div>
                   <div className="flex gap-6 items-start relative z-10">
                     <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">3</div>
                     <div>
-                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Get Hired &amp; Paid</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">Work directly with international clients and keep 100% of your earnings.</p>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Interview &amp; Chat</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">When an employer unlocks messaging, you can coordinate interviews and role details in platform chat.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6 items-start relative z-10">
+                    <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">4</div>
+                    <div>
+                      <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Accept Offers &amp; Get Paid Direct</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">Review offer details, agree on terms with your employer, and receive 100% of your pay — no platform fee on your salary.</p>
                     </div>
                   </div>
                 </div>
@@ -538,7 +552,7 @@ export function LandingPageClient({
             <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-8 reveal-item">
               <div className="max-w-2xl text-left">
                 <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Immediate Value, <span className="text-[#22c55e]">Top Talent</span></h2>
-                <p className="text-slate-500 font-body-base text-lg leading-relaxed">Browse a curated selection of pre-vetted professionals ready to join your team today. We handle the vetting, you handle the growth.</p>
+                <p className="text-slate-500 font-body-base text-lg leading-relaxed">A quick look at the kind of specialists employers hire on Replace Me — remote-ready and focused on long-term work.</p>
               </div>
               <a className="group inline-flex items-center gap-2 text-[#22c55e] font-body-bold text-base hover:text-emerald-700 transition-all shrink-0" href="#">
                 View All Talent <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
@@ -631,7 +645,7 @@ export function LandingPageClient({
           <div className={`${LANDING_INNER} relative z-10`}>
             <div className="text-center mb-20 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Voices of <span className="text-[#22c55e]">Success</span></h2>
-              <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg leading-relaxed">Discover how forward-thinking companies are transforming their operations with elite Filipino talent.</p>
+              <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg leading-relaxed">How real teams scale with dedicated Filipino hires on Replace Me.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -724,7 +738,7 @@ export function LandingPageClient({
             <div className="reveal-item">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
               <p className="text-slate-300 mb-6 font-body-base text-lg">
-                Discovery is free. Upgrade when you need full profiles, messaging, and instant approval.
+                Workers join free. Employers start on Discovery, then unlock messaging, full profiles, and instant approval when ready.
               </p>
             </div>
 
@@ -749,7 +763,7 @@ export function LandingPageClient({
             <Element name="faq" id="faq" className="h-0 w-0" aria-hidden />
             <div className="text-center mb-16 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Frequently Asked Questions</h2>
-              <p className="text-slate-500 font-body-base text-lg">Everything you need to know about how Replace Me works.</p>
+              <p className="text-slate-500 font-body-base text-lg">Plans, hiring flow, and payments — answered for employers and job seekers.</p>
             </div>
 
             <div className="space-y-4 reveal-item">

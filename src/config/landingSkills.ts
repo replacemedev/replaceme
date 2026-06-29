@@ -19,7 +19,7 @@ export const LANDING_SKILL_CATEGORIES: LandingSkillCategory[] = [
   {
     id: "tech",
     label: "Software & Engineering",
-    description: "Full-stack, mobile, DevOps, and QA talent.",
+    description: "Full-stack, mobile, cloud, and QA specialists for product teams.",
     icon: Code2,
     skills: [
       "React",
@@ -35,7 +35,7 @@ export const LANDING_SKILL_CATEGORIES: LandingSkillCategory[] = [
   {
     id: "creative",
     label: "Design & Creative",
-    description: "Brand, UI/UX, and production-ready assets.",
+    description: "UI/UX, brand systems, and production assets for global brands.",
     icon: Palette,
     skills: [
       "UI/UX",
@@ -49,7 +49,7 @@ export const LANDING_SKILL_CATEGORIES: LandingSkillCategory[] = [
   {
     id: "marketing",
     label: "Growth & Marketing",
-    description: "Performance, content, and revenue operations.",
+    description: "SEO, paid media, content, and analytics for revenue teams.",
     icon: Megaphone,
     skills: [
       "SEO",
@@ -63,7 +63,7 @@ export const LANDING_SKILL_CATEGORIES: LandingSkillCategory[] = [
   {
     id: "ops",
     label: "Operations & Support",
-    description: "Executive assistance and customer success.",
+    description: "Executive assistants, support leads, and PMs for daily operations.",
     icon: Headphones,
     skills: [
       "Virtual Assistant",

@@ -56,18 +56,17 @@ export function LandingSkillsShowcase() {
       <div className={`${LANDING_INNER} relative z-10 space-y-10`}>
         <div className="text-center max-w-2xl mx-auto reveal-item space-y-4">
           <p className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">
-            Depth of talent
+            Platform skill coverage
           </p>
           <h2
             id="landing-skills-heading"
             className="text-display-lg text-slate-900 font-bold tracking-tight text-balance"
           >
-            Hire across <span className="text-[#22c55e]">high-demand</span>{" "}
-            skill categories
+            Roles employers post <span className="text-[#22c55e]">every day</span>
           </h2>
           <p className="text-slate-500 font-body-base text-lg leading-relaxed text-pretty">
-            From engineering to creative and virtual assistance — browse
-            specialists vetted for remote collaboration with global employers.
+            Engineering, design, growth, and operations — the same categories used
+            across job posts, applicant filters, and worker profiles.
           </p>
         </div>
 
