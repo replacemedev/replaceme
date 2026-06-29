@@ -1,52 +1,30 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { loginAsWorker, WORKER_TEST_PASSWORD } from "./helpers/auth";
 
-async function fillControlledField(page: Page, label: string, value: string) {
-  const field = page.getByLabel(label);
-  await field.click();
-  await field.fill(value);
-  await expect(field).toHaveValue(value);
-}
-
-test.describe("Worker profile edit", () => {
+test.describe("Worker inline profile editing", () => {
   test.skip(!WORKER_TEST_PASSWORD, "E2E_WORKER_PASSWORD not set");
 
   test.beforeEach(async ({ page }) => {
     await loginAsWorker(page);
   });
 
-  test("loads edit profile form and saves bio", async ({ page }) => {
-    await page.goto("/worker/profile/edit");
-    await expect(
-      page.getByRole("heading", { name: "Edit Profile" })
-    ).toBeVisible();
-
-    await page.getByLabel("Bio").fill("E2E profile bio update");
-    await page.getByRole("button", { name: "Save Profile" }).click();
-
-    await expect(page).toHaveURL(/\/worker\/profile\/?$/, { timeout: 15_000 });
+  test("edits bio inline on profile page", async ({ page }) => {
+    await page.goto("/worker/profile");
+    await page.getByRole("button", { name: "Edit" }).first().click();
+    await page.locator("textarea").fill("E2E inline bio update");
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText("E2E inline bio update")).toBeVisible();
   });
 
-  test("saves portfolio and resume URLs", async ({ page }) => {
-    await page.goto("/worker/profile/edit");
-    const portfolio = "https://example.com/e2e-portfolio";
-    const resume = "https://example.com/e2e-resume.pdf";
+  test("opens rate and availability modal from profile", async ({ page }) => {
+    await page.goto("/worker/profile");
+    await page.getByText("Rate", { exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Rate & availability" })).toBeVisible();
+  });
 
-    await fillControlledField(page, "Portfolio URL", portfolio);
-    await fillControlledField(page, "Resume URL", resume);
-
-    const formPortfolio = await page.evaluate(() => {
-      const form = document.querySelector("form");
-      return form ? new FormData(form).get("portfolioUrl") : null;
-    });
-    expect(formPortfolio).toBe(portfolio);
-
-    await page.getByRole("button", { name: "Save Profile" }).click();
-
-    await expect(page).toHaveURL(/\/worker\/profile\/?$/, { timeout: 15_000 });
-    await expect(page.getByRole("link", { name: "View Site" })).toHaveAttribute(
-      "href",
-      portfolio
-    );
+  test("opens manage skills modal", async ({ page }) => {
+    await page.goto("/worker/profile");
+    await page.getByRole("button", { name: "Manage" }).click();
+    await expect(page.getByRole("heading", { name: "Manage top skills" })).toBeVisible();
   });
 });

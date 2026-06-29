@@ -23,7 +23,6 @@ const ACCOUNT_EXPECTATIONS: Record<
   { level?: 1 | 2 | 3; name: string } | null
 > = {
   "/worker/profile": { name: "About Me" },
-  "/worker/profile/edit": { level: 1, name: "Edit Profile" },
   "/worker/settings": { level: 1, name: "Account Settings" },
   "/worker/earnings": { level: 1, name: "Earnings" },
   "/worker/job-alerts": { level: 1, name: "Job Alerts" },

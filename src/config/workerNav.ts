@@ -7,7 +7,6 @@ import {
   Calendar,
   Handshake,
   User,
-  Pencil,
   Settings,
   DollarSign,
   Bell,
@@ -35,7 +34,6 @@ export const WORKER_NAV_ITEMS: WorkerNavItem[] = [
 /** Account menu items (avatar dropdown). */
 export const WORKER_ACCOUNT_NAV_ITEMS: WorkerNavItem[] = [
   { href: "/worker/profile", label: "Profile", icon: User },
-  { href: "/worker/profile/edit", label: "Edit Profile", icon: Pencil },
   { href: "/worker/settings", label: "Account Settings", icon: Settings },
   { href: "/worker/earnings", label: "Earnings", icon: DollarSign },
   { href: "/worker/job-alerts", label: "Job Alerts", icon: Bell },

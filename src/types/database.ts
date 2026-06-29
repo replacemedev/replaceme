@@ -2014,7 +2014,9 @@ export type Database = {
           description: string
           id: string
           role: string
+          skills_used: string[]
           title: string
+          updated_at: string
           worker_id: string
           year: number
         }
@@ -2023,7 +2025,9 @@ export type Database = {
           description: string
           id?: string
           role: string
+          skills_used?: string[]
           title: string
+          updated_at?: string
           worker_id: string
           year: number
         }
@@ -2032,7 +2036,9 @@ export type Database = {
           description?: string
           id?: string
           role?: string
+          skills_used?: string[]
           title?: string
+          updated_at?: string
           worker_id?: string
           year?: number
         }
@@ -2121,6 +2127,7 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          display_order: number
           experience_duration: string | null
           id: string
           proficiency: number
@@ -2134,6 +2141,7 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          display_order?: number
           experience_duration?: string | null
           id?: string
           proficiency: number
@@ -2147,6 +2155,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          display_order?: number
           experience_duration?: string | null
           id?: string
           proficiency?: number

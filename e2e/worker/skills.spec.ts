@@ -8,10 +8,11 @@ test.describe("Worker skills", () => {
     await loginAsWorker(page);
   });
 
-  test("loads manage skills page", async ({ page }) => {
-    await page.goto("/worker/skills/edit");
+  test("opens manage skills from profile", async ({ page }) => {
+    await page.goto("/worker/profile");
+    await page.getByRole("button", { name: "Manage" }).click();
     await expect(
-      page.getByRole("heading", { name: "Manage Skills" })
+      page.getByRole("heading", { name: "Manage top skills" })
     ).toBeVisible();
   });
 });

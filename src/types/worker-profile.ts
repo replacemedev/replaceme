@@ -37,6 +37,7 @@ export interface WorkerProject {
   role: string;
   year: number;
   description: string;
+  skills_used: string[];
 }
 
 export interface EmployerTestimonial {

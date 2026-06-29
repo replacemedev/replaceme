@@ -26,6 +26,19 @@ export function ProjectHighlightItem({ project }: ProjectHighlightItemProps) {
       <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-2xl pt-1">
         {project.description}
       </p>
+
+      {project.skills_used.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5 pt-2">
+          {project.skills_used.map((skill) => (
+            <span
+              key={skill}
+              className="rounded-md border border-slate-100 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-600"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
