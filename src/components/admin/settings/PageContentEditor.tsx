@@ -4,6 +4,9 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
 import { upsertPageContent } from "@/actions/admin/page-content";
+import { AdminPageShell } from "@/components/admin/layout";
+import { AdminLayoutPageHeader } from "@/components/admin/layout/AdminPageHeader";
+import { ADMIN_CARD } from "@/lib/admin/ui-tokens";
 import type { PageContentRow } from "@/types/page-content";
 import type { PageContentDefinition } from "@/types/page-content";
 
@@ -65,22 +68,26 @@ export function PageContentEditor({ definition, initial }: PageContentEditorProp
   }
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <Link
         href="/admin/settings/pages"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 w-fit"
       >
         <ArrowLeft className="h-4 w-4" />
         All pages
       </Link>
 
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">{definition.label}</h1>
-        <p className="text-sm text-slate-500 mt-1">{definition.description}</p>
-        <p className="text-xs text-emerald-600 font-mono mt-2">{definition.publicPath}</p>
-      </header>
+      <AdminLayoutPageHeader
+        title={definition.label}
+        subhead={definition.description}
+        badge={
+          <span className="text-xs text-[#006e2f] font-mono">
+            {definition.publicPath}
+          </span>
+        }
+      />
 
-      <div className="rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100">
+      <div className={`${ADMIN_CARD} divide-y divide-slate-100`}>
         <Field label="Title">
           <input
             value={title}
@@ -144,7 +151,7 @@ export function PageContentEditor({ definition, initial }: PageContentEditorProp
           <p className="text-sm text-slate-600">{message}</p>
         ) : null}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

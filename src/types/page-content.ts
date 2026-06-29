@@ -54,7 +54,11 @@ export interface AuthScreenConfig {
   testimonialRole?: string;
 }
 
-export type AuthScreenSlug = "auth-login" | "auth-signup";
+export type AuthScreenSlug =
+  | "auth-login"
+  | "auth-signup"
+  | "auth-forgot-password"
+  | "auth-update-password";
 
 export interface FaqEntry {
   id: string;

@@ -1,4 +1,5 @@
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
+import { AdminPageShell } from "@/components/admin/layout";
 import { JobsModerationClient } from "@/components/admin/jobs/JobsModerationClient";
 import { fetchAdminJobs } from "@/actions/admin-actions";
 
@@ -16,12 +17,12 @@ export default async function AdminJobsPage() {
   ).length;
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <AdminPageHeader
         title="Job Moderation"
         description={`Review and approve employer job posts before they go live.${pendingCount > 0 ? ` ${pendingCount} awaiting review.` : ""}`}
       />
       <JobsModerationClient jobs={jobs} />
-    </div>
+    </AdminPageShell>
   );
 }

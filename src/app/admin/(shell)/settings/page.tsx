@@ -1,4 +1,5 @@
 import { Settings } from "lucide-react";
+import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 
 export const metadata = {
@@ -11,7 +12,7 @@ export default function AdminSettingsPage() {
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <AdminPageHeader
         title="Platform Settings"
         description="Read-only environment configuration for the admin panel."
@@ -45,7 +46,7 @@ export default function AdminSettingsPage() {
           </p>
         </div>
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 

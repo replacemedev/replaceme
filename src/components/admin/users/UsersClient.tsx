@@ -2,8 +2,17 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Search, UserX, UserCheck, ShieldCheck } from "lucide-react";
+import { UserX, UserCheck, ShieldCheck, Search } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AdminDataTable,
+  AdminMobileCard,
+  ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_ROW,
+  ADMIN_TABLE_TD,
+  ADMIN_TABLE_TH,
+} from "@/components/admin/shared/AdminDataTable";
+import { AdminFilterBar } from "@/components/admin/shared/AdminFilterBar";
 import { suspendUser, unsuspendUser } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -110,7 +119,17 @@ export function UsersClient({
   if (filtered.length === 0) {
     return (
       <div className="space-y-4">
-        <SearchBar value={search} onChange={setSearch} tab={tab} />
+        <AdminFilterBar
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={
+            tab === "employers"
+              ? "Search by company, email, or industry…"
+              : tab === "admins"
+                ? "Search by admin name or email…"
+                : "Search by name, email, or title…"
+          }
+        />
         <EmptyState
           icon={
             tab === "admins" ? (
@@ -132,42 +151,171 @@ export function UsersClient({
 
   return (
     <div className="space-y-4">
-      <SearchBar value={search} onChange={setSearch} tab={tab} />
+      <AdminFilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder={
+          tab === "employers"
+            ? "Search by company, email, or industry…"
+            : tab === "admins"
+              ? "Search by admin name or email…"
+              : "Search by name, email, or title…"
+        }
+      />
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+      <AdminDataTable
+        mobileCards={filtered.map((row) => {
+          if (tab === "workers") {
+            const worker = row as AdminWorkerRow;
+            const name = displayName(
+              worker.first_name,
+              worker.last_name,
+              "Unnamed"
+            );
+            return (
+              <AdminMobileCard
+                key={worker.id}
+                actions={
+                  <UserActionButton
+                    status={worker.account_status}
+                    onSuspend={() =>
+                      setConfirm({
+                        userId: worker.id,
+                        action: "suspend",
+                        label: name,
+                      })
+                    }
+                    onUnsuspend={() =>
+                      setConfirm({
+                        userId: worker.id,
+                        action: "unsuspend",
+                        label: name,
+                      })
+                    }
+                  />
+                }
+              >
+                <p className="font-semibold text-slate-900">{name}</p>
+                <p className="text-xs text-slate-500">{worker.email}</p>
+                <p className="text-sm text-slate-600">
+                  {worker.professional_title ?? "—"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <StatusBadge status={worker.verification_status} />
+                  <StatusBadge status={worker.account_status} />
+                </div>
+                <p className="text-xs text-slate-400">
+                  Joined {formatDate(worker.created_at)}
+                </p>
+              </AdminMobileCard>
+            );
+          }
+          if (tab === "employers") {
+            const employer = row as AdminEmployerRow;
+            return (
+              <AdminMobileCard
+                key={employer.id}
+                actions={
+                  <UserActionButton
+                    status={employer.account_status}
+                    onSuspend={() =>
+                      setConfirm({
+                        userId: employer.employer_id,
+                        action: "suspend",
+                        label: employer.company_name,
+                      })
+                    }
+                    onUnsuspend={() =>
+                      setConfirm({
+                        userId: employer.employer_id,
+                        action: "unsuspend",
+                        label: employer.company_name,
+                      })
+                    }
+                  />
+                }
+              >
+                <p className="font-semibold text-slate-900">
+                  {employer.company_name}
+                </p>
+                <p className="text-xs text-slate-500">{employer.email}</p>
+                <p className="text-sm text-slate-600">
+                  {employer.industry ?? "—"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <StatusBadge
+                    status={employer.subscription_status ?? "inactive"}
+                  />
+                  <StatusBadge status={employer.account_status} />
+                </div>
+              </AdminMobileCard>
+            );
+          }
+          const admin = row as AdminAdminRow;
+          const name = displayName(admin.first_name, admin.last_name, "Unnamed");
+          return (
+            <AdminMobileCard
+              key={admin.id}
+              actions={
+                <UserActionButton
+                  status={admin.account_status}
+                  onSuspend={() =>
+                    setConfirm({
+                      userId: admin.id,
+                      action: "suspend",
+                      label: name,
+                    })
+                  }
+                  onUnsuspend={() =>
+                    setConfirm({
+                      userId: admin.id,
+                      action: "unsuspend",
+                      label: name,
+                    })
+                  }
+                />
+              }
+            >
+              <p className="font-semibold text-slate-900">{name}</p>
+              <p className="text-xs text-slate-500">{admin.email}</p>
+              <StatusBadge status={admin.account_status} />
+            </AdminMobileCard>
+          );
+        })}
+      >
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            <tr className={ADMIN_TABLE_HEAD}>
               {tab === "workers" ? (
                 <>
-                  <th className="px-4 py-3">Worker</th>
-                  <th className="px-4 py-3">Title</th>
-                  <th className="px-4 py-3">Verification</th>
+                  <th className={ADMIN_TABLE_TH}>Worker</th>
+                  <th className={ADMIN_TABLE_TH}>Title</th>
+                  <th className={ADMIN_TABLE_TH}>Verification</th>
                 </>
               ) : null}
               {tab === "employers" ? (
                 <>
-                  <th className="px-4 py-3">Company</th>
-                  <th className="px-4 py-3">Industry</th>
-                  <th className="px-4 py-3">Subscription</th>
+                  <th className={ADMIN_TABLE_TH}>Company</th>
+                  <th className={ADMIN_TABLE_TH}>Industry</th>
+                  <th className={ADMIN_TABLE_TH}>Subscription</th>
                 </>
               ) : null}
               {tab === "admins" ? (
                 <>
-                  <th className="px-4 py-3">Admin</th>
-                  <th className="px-4 py-3">Role</th>
+                  <th className={ADMIN_TABLE_TH}>Admin</th>
+                  <th className={ADMIN_TABLE_TH}>Role</th>
                 </>
               ) : null}
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Joined</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className={ADMIN_TABLE_TH}>Status</th>
+              <th className={ADMIN_TABLE_TH}>Joined</th>
+              <th className={`${ADMIN_TABLE_TH} text-right`}>Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {tab === "workers"
               ? (filtered as AdminWorkerRow[]).map((worker) => (
-                  <tr key={worker.id} className="hover:bg-slate-50/50">
-                    <td className="px-4 py-3">
+                  <tr key={worker.id} className={ADMIN_TABLE_ROW}>
+                    <td className={ADMIN_TABLE_TD}>
                       <p className="font-medium text-slate-900">
                         {displayName(
                           worker.first_name,
@@ -321,7 +469,7 @@ export function UsersClient({
               : null}
           </tbody>
         </table>
-      </div>
+      </AdminDataTable>
 
       <ConfirmDialog
         open={confirm !== null}
@@ -357,39 +505,6 @@ export function UsersClient({
           />
         </label>
       ) : null}
-    </div>
-  );
-}
-
-function SearchBar({
-  value,
-  onChange,
-  tab,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  tab: AdminUserTab;
-}) {
-  const placeholder =
-    tab === "employers"
-      ? "Search by company, email, or industry…"
-      : tab === "admins"
-        ? "Search by admin name or email…"
-        : "Search by name, email, or title…";
-
-  return (
-    <div className="relative max-w-md">
-      <Search
-        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-        aria-hidden
-      />
-      <input
-        type="search"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30"
-      />
     </div>
   );
 }

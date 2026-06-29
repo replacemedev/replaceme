@@ -6,7 +6,7 @@ import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
-import { EmployerHeaderNav, EmployerMobileMenu } from "./EmployerHeaderNav";
+import { EmployerHeaderNav } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
 
 interface EmployerHeaderProps {
@@ -48,10 +48,6 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>
           <RoleNavDropdown session={resolvedSession} />
         </GlobalHeaderActions>
-        <EmployerMobileMenu
-          unreadMessageCount={resolvedSession.unreadMessageCount}
-          planUsage={planUsage}
-        />
       </div>
 
       {planUsage ? (

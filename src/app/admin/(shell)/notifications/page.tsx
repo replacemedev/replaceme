@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { AdminPageShell } from "@/components/admin/layout";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { AdminNotificationsClient } from "@/components/admin/notifications/AdminNotificationsClient";
 
@@ -20,6 +21,8 @@ export default async function AdminNotificationsPage() {
   const bootstrap = await fetchNotificationBootstrap(user.id, 50);
 
   return (
-    <AdminNotificationsClient userId={user.id} initialBootstrap={bootstrap} />
+    <AdminPageShell>
+      <AdminNotificationsClient userId={user.id} initialBootstrap={bootstrap} />
+    </AdminPageShell>
   );
 }

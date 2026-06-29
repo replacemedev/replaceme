@@ -1,12 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
 import { AuthFooter } from "@/components/auth/AuthFooter";
-import { LoginTestimonial } from "@/components/auth/LoginTestimonial";
+import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { RecoveryHashHandler } from "@/components/auth/RecoveryHashHandler";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
+import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
+import { getAuthScreenContent } from "@/lib/content/auth-screen";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -26,45 +26,29 @@ export default async function UpdatePasswordPage() {
     redirect("/login?view=forgot_password");
   }
 
+  const content = await getAuthScreenContent("auth-update-password");
+  const headline = content.headline?.trim() || "Set a new password";
+  const description =
+    content.description?.trim() ||
+    "Choose a strong password for your account.";
+
   return (
-    <AuthLayout
-      sidePanel={<LoginTestimonial />}
-      sidePanelPosition="right"
+    <AuthPageShell
+      marketing={<AuthMarketingPanel content={content} variant="testimonial" />}
+      marketingPosition="right"
       footer={<AuthFooter />}
     >
       <AuthFlashToast />
 
-      <div className="mb-6">
-        <Link
-          href="/"
-          className="mb-4 inline-flex items-center gap-2 transition-opacity hover:opacity-90"
-        >
-          <div className="relative h-8 w-8">
-            <Image
-              src="/images/logo_favicon.png"
-              alt="Replace Me"
-              fill
-              className="object-contain"
-              sizes="32px"
-            />
-          </div>
-          <span className="relative top-[-1px] font-display-md text-xl font-bold leading-none text-slate-900">
-            Replace Me
-          </span>
-        </Link>
+      <header className="mb-6 space-y-2">
+        <h1 className={AUTH_TITLE}>{headline}</h1>
+        <p className={AUTH_SUBTITLE}>{description}</p>
+      </header>
 
-        <h1 className="text-display-lg font-display-lg mb-2 font-bold text-slate-900">
-          Set a new password
-        </h1>
-        <p className="text-body-base text-slate-600">
-          Choose a strong password for your account.
-        </p>
-      </div>
-
-      <div className="w-full rounded-3xl border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <AuthFormCard>
         <RecoveryHashHandler />
         <UpdatePasswordForm />
-      </div>
-    </AuthLayout>
+      </AuthFormCard>
+    </AuthPageShell>
   );
 }

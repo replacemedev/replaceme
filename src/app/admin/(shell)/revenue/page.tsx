@@ -1,4 +1,5 @@
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
+import { AdminPageShell } from "@/components/admin/layout";
 import { RevenueClient } from "@/components/admin/revenue/RevenueClient";
 import { fetchAdminSubscriptions } from "@/actions/admin-actions";
 
@@ -12,12 +13,12 @@ export default async function AdminRevenuePage() {
   const subscriptions = await fetchAdminSubscriptions();
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <AdminPageHeader
         title="Revenue & Billing"
         description="Monitor employer subscriptions and Stripe billing status."
       />
       <RevenueClient subscriptions={subscriptions} />
-    </div>
+    </AdminPageShell>
   );
 }

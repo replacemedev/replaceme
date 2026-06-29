@@ -46,7 +46,13 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body-base bg-background text-on-background antialiased min-h-screen flex flex-col">
-        <Toaster position="top-right" richColors />
+        <Toaster
+          position="top-right"
+          richColors
+          offset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12 }}
+          mobileOffset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12, left: 12 }}
+          toastOptions={{ className: "max-w-[calc(100vw-24px)]" }}
+        />
         {children}
       </body>
     </html>

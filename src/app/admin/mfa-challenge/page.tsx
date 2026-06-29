@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminMfaChallengeForm } from "@/components/admin/auth/AdminMfaChallengeForm";
+import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
+import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +28,17 @@ export default async function AdminMfaChallengePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafe] flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8">
-        <h1 className="text-xl font-extrabold text-slate-900 mb-2">
-          Two-factor authentication
-        </h1>
-        <p className="text-sm text-slate-500 mb-6">
+    <AuthPageShell brandHref="/admin/dashboard">
+      <header className="mb-6 space-y-2">
+        <h1 className={AUTH_TITLE}>Two-factor authentication</h1>
+        <p className={AUTH_SUBTITLE}>
           Enter the 6-digit code from your authenticator app to access the admin
           panel.
         </p>
+      </header>
+      <AuthFormCard>
         <AdminMfaChallengeForm />
-      </div>
-    </main>
+      </AuthFormCard>
+    </AuthPageShell>
   );
 }

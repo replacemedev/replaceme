@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminPageShell } from "@/components/admin/layout";
 import { ArrowLeft } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { FaqAudienceEditor } from "@/components/admin/settings/FaqAudienceEditor";
@@ -23,7 +24,7 @@ export default async function AdminFaqPagesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <Link
         href="/admin/settings/pages"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800"
@@ -51,6 +52,6 @@ export default async function AdminFaqPagesPage() {
           fallback={WORKER_FAQ_FALLBACK}
         />
       </div>
-    </div>
+    </AdminPageShell>
   );
 }

@@ -1,11 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
-import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
 import { AuthFooter } from "@/components/auth/AuthFooter";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { LoginTestimonial } from "@/components/auth/LoginTestimonial";
+import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
+import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { getAuthScreenContent } from "@/lib/content/auth-screen";
 
 export const metadata = {
@@ -26,70 +26,42 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
-  const content = await getAuthScreenContent("auth-login");
+  const contentSlug =
+    view === "forgot_password" ? "auth-forgot-password" : "auth-login";
+  const content = await getAuthScreenContent(contentSlug);
+
+  const headline =
+    content.headline?.trim() ||
+    (view === "login" ? "Sign in" : "Reset password");
+  const description =
+    content.description?.trim() ||
+    (view === "login"
+      ? "Access your professional dashboard."
+      : "Enter your email and we'll send you a secure reset link.");
 
   return (
-    <AuthLayout
-      sidePanel={
-        <LoginTestimonial
-          quote={content.testimonialQuote}
-          name={content.testimonialName}
-          role={content.testimonialRole}
-        />
-      }
-      sidePanelPosition="right"
+    <AuthPageShell
+      marketing={<AuthMarketingPanel content={content} variant="testimonial" />}
+      marketingPosition="right"
       footer={<AuthFooter />}
     >
       <AuthFlashToast />
 
-      <div className="mb-6">
-        <Link
-          href="/"
-          className="mb-4 inline-flex items-center gap-2 transition-opacity hover:opacity-90"
-        >
-          <div className="relative h-8 w-8">
-            <Image
-              src="/images/logo_favicon.png"
-              alt="Replace Me"
-              fill
-              className="object-contain"
-              sizes="32px"
-            />
-          </div>
-          <span className="relative top-[-1px] font-display-md text-xl font-bold leading-none text-slate-900">
-            Replace Me
-          </span>
-        </Link>
+      <header className="mb-6 space-y-2">
+        <h1 className={AUTH_TITLE}>{headline}</h1>
+        <p className={AUTH_SUBTITLE}>{description}</p>
+      </header>
 
-        {view === "login" ? (
-          <>
-            <h1 className="text-display-lg font-display-lg mb-2 font-bold text-slate-900">
-              {content.headline}
-            </h1>
-            <p className="text-body-base text-slate-600">{content.description}</p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-display-lg font-display-lg mb-2 font-bold text-slate-900">
-              Reset password
-            </h1>
-            <p className="text-body-base text-slate-600">
-              Enter your email and we&apos;ll send you a secure reset link.
-            </p>
-          </>
-        )}
-      </div>
-
-      <div className="w-full rounded-3xl border border-slate-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <AuthFormCard>
         {view === "login" ? (
           <LoginForm forgotPasswordHref="/login?view=forgot_password" />
         ) : (
           <ForgotPasswordForm />
         )}
-      </div>
+      </AuthFormCard>
 
       {view === "login" && content.signupPrompt && content.signupLinkLabel ? (
-        <p className="mt-4 text-center text-sm font-body-base text-slate-600">
+        <p className="mt-4 text-center text-sm font-body-base text-slate-600 leading-relaxed">
           {content.signupPrompt}{" "}
           <Link
             href="/signup"
@@ -99,6 +71,6 @@ export default async function LoginPage({
           </Link>
         </p>
       ) : null}
-    </AuthLayout>
+    </AuthPageShell>
   );
 }

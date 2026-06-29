@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminPageShell } from "@/components/admin/layout";
 import { Shield, KeyRound, Smartphone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
@@ -33,7 +34,7 @@ export default async function AdminSecurityPage() {
   const mfaEnrolled = totpFactors.some((f) => f.status === "verified");
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <AdminPageHeader
         title="Security Center"
         description="MFA status, session assurance, and security-related audit events."
@@ -117,6 +118,6 @@ export default async function AdminSecurityPage() {
         )}
         </div>
       </section>
-    </div>
+    </AdminPageShell>
   );
 }

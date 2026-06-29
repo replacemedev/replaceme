@@ -40,3 +40,54 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 ];
 
 export const ADMIN_NOTIFICATIONS_HREF = "/admin/notifications";
+
+export interface AdminNavGroup {
+  label: string;
+  items: AdminNavItem[];
+}
+
+export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
+  {
+    label: "Operations",
+    items: ADMIN_NAV_ITEMS.filter((item) =>
+      [
+        "/admin/dashboard",
+        "/admin/users",
+        "/admin/applications",
+        "/admin/jobs",
+      ].includes(item.href)
+    ),
+  },
+  {
+    label: "Trust & Safety",
+    items: ADMIN_NAV_ITEMS.filter((item) =>
+      [
+        "/admin/identity",
+        "/admin/moderation",
+        "/admin/disputes",
+        "/admin/notifications",
+      ].includes(item.href)
+    ),
+  },
+  {
+    label: "Revenue",
+    items: ADMIN_NAV_ITEMS.filter((item) =>
+      ["/admin/revenue", "/admin/billing-ops"].includes(item.href)
+    ),
+  },
+  {
+    label: "Platform",
+    items: ADMIN_NAV_ITEMS.filter((item) =>
+      [
+        "/admin/audit-log",
+        "/admin/security",
+        "/admin/settings",
+        "/admin/settings/pages",
+      ].includes(item.href)
+    ),
+  },
+];
+
+export function isAdminNavActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getNavSession } from "@/lib/auth/nav-session";
 import { AdminHeader } from "@/components/admin/layout/AdminHeader";
 import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
+import { AdminLayoutChrome } from "@/components/admin/layout/AdminLayoutChrome";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
+import { ADMIN_MAIN_BG } from "@/lib/admin/ui-tokens";
 
 export const dynamic = "force-dynamic";
 
@@ -40,15 +42,17 @@ export default async function AdminShellLayout({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <AuthFlashToast />
-      <div className="flex min-h-screen">
-        <AdminSidebar profile={sidebarProfile} />
-        <div className="flex flex-1 flex-col min-w-0 min-h-screen">
-          <AdminHeader session={session} />
-          <main className="flex-1 bg-[#f8fafe] p-6 lg:p-8">{children}</main>
+    <AdminLayoutChrome profile={sidebarProfile}>
+      <div className="min-h-screen bg-slate-50">
+        <AuthFlashToast />
+        <div className="flex min-h-screen">
+          <AdminSidebar profile={sidebarProfile} />
+          <div className="flex flex-1 flex-col min-w-0 min-h-screen">
+            <AdminHeader session={session} />
+            <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>
+          </div>
         </div>
       </div>
-    </div>
+    </AdminLayoutChrome>
   );
 }

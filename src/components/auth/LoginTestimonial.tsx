@@ -25,16 +25,24 @@ function DecorativeQuote() {
 }
 
 export function LoginTestimonial({
-  quote = "This platform has transformed how we connect with top-tier professionals. It's an indispensable tool for our daily operations.",
-  name = "Sarah Jenkins",
-  role = "Director of Operations, TechCorp",
+  quote = "",
+  name = "",
+  role = "",
+  compact = false,
 }: {
   quote?: string;
   name?: string;
   role?: string;
+  compact?: boolean;
 }) {
+  if (!quote?.trim()) return null;
+
   return (
-    <div className="relative flex h-full w-full flex-col justify-center overflow-hidden px-8 py-12 md:px-16 lg:px-20 xl:px-24">
+    <div
+      className={`relative flex h-full w-full flex-col justify-center overflow-hidden ${
+        compact ? "px-0 py-0" : "px-8 py-12 md:px-16 lg:px-20 xl:px-24"
+      }`}
+    >
       {/* Mesh gradient base */}
       <div
         className="pointer-events-none absolute inset-0 -z-30"
@@ -74,10 +82,20 @@ export function LoginTestimonial({
       />
 
       <article className="relative z-10 mx-auto w-full max-w-xl">
-        <div className="relative rounded-3xl border border-white/70 bg-white/45 p-8 shadow-[0_8px_32px_rgb(16_185_129/0.08),inset_0_1px_0_0_rgb(255_255_255/0.75)] backdrop-blur-md md:p-10 lg:p-12">
-          <DecorativeQuote />
+        <div
+          className={`relative rounded-3xl border border-white/70 bg-white/45 shadow-[0_8px_32px_rgb(16_185_129/0.08),inset_0_1px_0_0_rgb(255_255_255/0.75)] backdrop-blur-md ${
+            compact ? "p-5 sm:p-6" : "p-8 md:p-10 lg:p-12"
+          }`}
+        >
+          {!compact ? <DecorativeQuote /> : null}
 
-          <blockquote className="relative text-balance text-2xl font-semibold leading-[1.35] tracking-tight text-slate-900 md:text-[1.75rem] lg:text-3xl lg:leading-[1.3]">
+          <blockquote
+            className={`relative text-balance font-semibold tracking-tight text-slate-900 ${
+              compact
+                ? "text-base leading-relaxed"
+                : "text-2xl leading-[1.35] md:text-[1.75rem] lg:text-3xl lg:leading-[1.3]"
+            }`}
+          >
             {quote}
           </blockquote>
 

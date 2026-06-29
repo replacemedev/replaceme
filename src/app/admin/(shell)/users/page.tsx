@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminTabs } from "@/components/admin/shared/AdminTabs";
 import { AdminTabsSkeleton } from "@/components/admin/shared/AdminSkeletons";
@@ -32,7 +33,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   if (!result.success) {
     return (
-      <div className="space-y-6">
+      <AdminPageShell>
         <AdminPageHeader
           title="User Management"
           description="Moderate worker, employer, and admin accounts across the marketplace."
@@ -42,14 +43,14 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           description={result.error}
           retryHref="/admin/users"
         />
-      </div>
+      </AdminPageShell>
     );
   }
 
   const { workers, employers, admins } = result.data;
 
   return (
-    <div className="space-y-6">
+    <AdminPageShell>
       <AdminPageHeader
         title="User Management"
         description="Browse and moderate accounts by role — workers, employers, and platform admins."
@@ -71,6 +72,6 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         employers={employers}
         admins={admins}
       />
-    </div>
+    </AdminPageShell>
   );
 }

@@ -2,18 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Briefcase, FileText, MessageSquare } from "lucide-react";
-
-const TABS = [
-  { href: "/worker/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/worker/jobs", label: "Jobs", icon: Briefcase },
-  { href: "/worker/applications", label: "Apply", icon: FileText },
-  { href: "/worker/messages", label: "Chat", icon: MessageSquare },
-] as const;
-
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
+import {
+  WORKER_TAB_ITEMS,
+  isWorkerNavActive,
+} from "@/config/workerNav";
 
 interface WorkerBottomTabBarProps {
   unreadMessageCount?: number;
@@ -30,9 +22,9 @@ export function WorkerBottomTabBar({
       className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-slate-100 bg-white/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="grid grid-cols-4">
-        {TABS.map((tab) => {
+        {WORKER_TAB_ITEMS.map((tab) => {
           const Icon = tab.icon;
-          const active = isActive(pathname, tab.href);
+          const active = isWorkerNavActive(pathname, tab.href);
           const showBadge =
             tab.href === "/worker/messages" && unreadMessageCount > 0;
 

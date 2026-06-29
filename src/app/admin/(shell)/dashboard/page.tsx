@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { AdminPageShell } from "@/components/admin/layout";
+import { ADMIN_SECTION_LABEL } from "@/lib/admin/ui-tokens";
 import { StatCard } from "@/components/shared/StatCard";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { UrgentAlerts } from "@/components/admin/dashboard/UrgentAlerts";
@@ -49,14 +51,14 @@ export default async function AdminDashboardPage() {
     metrics.total_applications === 0;
 
   return (
-    <div className="space-y-8">
+    <AdminPageShell className="gap-8">
       <AdminPageHeader
         title="Platform Overview"
         description="Live marketplace metrics from workers, employers, and jobs."
       />
 
       <section className="space-y-4">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <h2 className={ADMIN_SECTION_LABEL}>
           Key metrics
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -130,7 +132,7 @@ export default async function AdminDashboardPage() {
         />
       ) : (
         <section className="space-y-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <h2 className={ADMIN_SECTION_LABEL}>
             Analytics & activity
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
@@ -152,6 +154,6 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
       )}
-    </div>
+    </AdminPageShell>
   );
 }

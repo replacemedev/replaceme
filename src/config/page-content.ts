@@ -58,6 +58,20 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
     description: "Sign up page headline, description, and footer prompt.",
   },
   {
+    slug: "auth-forgot-password",
+    label: "Forgot Password Screen",
+    publicPath: "/login?view=forgot_password",
+    contentType: "json",
+    description: "Forgot-password view headline, description, and optional testimonial.",
+  },
+  {
+    slug: "auth-update-password",
+    label: "Update Password Screen",
+    publicPath: "/update-password",
+    contentType: "json",
+    description: "Password reset form headline, description, and optional testimonial.",
+  },
+  {
     slug: "employer-faq",
     label: "Employer FAQs",
     publicPath: "/faq/employer",
@@ -84,6 +98,8 @@ export const PAGE_CONTENT_SLUGS = [
   "contact",
   "auth-login",
   "auth-signup",
+  "auth-forgot-password",
+  "auth-update-password",
   "employer-faq",
   "worker-faq",
 ] as const;

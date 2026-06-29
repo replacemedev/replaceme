@@ -1,50 +1,41 @@
-import { AuthLayout } from "@/components/auth/AuthLayout";
-import { SignUpForm } from "@/components/auth/SignUpForm";
-import { AuthAnimatedSidebar } from "@/components/auth/AuthAnimatedSidebar";
-import { AuthFooter } from "@/components/auth/AuthFooter";
-import Image from "next/image";
 import Link from "next/link";
+import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
+import { SignUpForm } from "@/components/auth/SignUpForm";
+import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
+import { AuthFooter } from "@/components/auth/AuthFooter";
+import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { getAuthScreenContent } from "@/lib/content/auth-screen";
+
+export const metadata = {
+  title: "Sign Up | ReplaceMe",
+  description: "Create your ReplaceMe account.",
+};
 
 export default async function SignUpPage() {
   const content = await getAuthScreenContent("auth-signup");
 
+  const headline = content.headline?.trim() || "Create your account";
+  const description =
+    content.description?.trim() ||
+    "Join the premier professional marketplace.";
+
   return (
-    <AuthLayout
-      sidePanel={<AuthAnimatedSidebar />}
-      sidePanelPosition="left"
+    <AuthPageShell
+      marketing={<AuthMarketingPanel content={content} variant="brand" />}
+      marketingPosition="left"
       footer={<AuthFooter />}
     >
-      <div className="mb-4 flex flex-col items-center">
-        <Link
-          href="/"
-          className="mb-2 inline-flex select-none items-center gap-2 transition-opacity hover:opacity-90"
-        >
-          <div className="relative h-8 w-8">
-            <Image
-              src="/images/logo_favicon.png"
-              alt="Replace Me"
-              fill
-              className="object-contain"
-              sizes="32px"
-              priority
-            />
-          </div>
-          <span className="relative top-[-1px] font-display-md text-xl font-bold leading-none text-slate-900">
-            {content.headline}
-          </span>
-        </Link>
-        <p className="mb-0 text-center text-body-base text-sm text-slate-500 md:text-base">
-          {content.description}
-        </p>
-      </div>
+      <header className="mb-6 space-y-2 text-center lg:text-left">
+        <h1 className={AUTH_TITLE}>{headline}</h1>
+        <p className={AUTH_SUBTITLE}>{description}</p>
+      </header>
 
-      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-8">
+      <AuthFormCard>
         <SignUpForm />
 
         {content.signupPrompt && content.signupLinkLabel ? (
           <div className="mt-6 text-center">
-            <p className="text-sm font-body-base text-slate-600">
+            <p className="text-sm font-body-base text-slate-600 leading-relaxed">
               {content.signupPrompt}{" "}
               <Link
                 href="/login"
@@ -55,7 +46,7 @@ export default async function SignUpPage() {
             </p>
           </div>
         ) : null}
-      </div>
-    </AuthLayout>
+      </AuthFormCard>
+    </AuthPageShell>
   );
 }
