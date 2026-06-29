@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSettingsClient";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Account Settings | ReplaceMe",
@@ -30,12 +26,6 @@ export default async function WorkerSettingsPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Settings" },
-        ]}
-      />
       <WorkerPageHeader
         title="Account settings"
         subhead="Manage availability, hourly rate, and trust & safety reports."

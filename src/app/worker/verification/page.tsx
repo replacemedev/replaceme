@@ -4,11 +4,7 @@ import { getWorkerVerificationState } from "@/actions/verification";
 import { VerificationStepper } from "@/components/worker/verification/VerificationStepper";
 import { VerificationUploadPanel } from "@/components/worker/verification/VerificationUploadPanel";
 import { VerificationSidebar } from "@/components/worker/verification/VerificationSidebar";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Worker Verification | ReplaceMe",
@@ -40,12 +36,6 @@ export default async function WorkerVerificationPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Verification" },
-        ]}
-      />
       <WorkerPageHeader
         title="Worker verification"
         subhead="Verify your identity to unlock premium job posts, boost your visibility in employer searches, and display a trusted badge across the platform."

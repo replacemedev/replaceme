@@ -3,11 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Bell } from "lucide-react";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
@@ -27,12 +23,6 @@ export default async function WorkerNotificationsPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Notifications" },
-        ]}
-      />
       <WorkerPageHeader
         title="Notifications"
         subhead="Updates about applications, messages, and offers."

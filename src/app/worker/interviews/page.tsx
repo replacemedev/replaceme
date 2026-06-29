@@ -1,11 +1,7 @@
 import { Calendar } from "lucide-react";
 import { getWorkerInterviews } from "@/actions/worker/phase2";
 import { EmptyState } from "@/components/shared/EmptyState";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { WorkerInterviewsList } from "@/components/worker/interviews/WorkerInterviewsList";
 import { groupWorkerInterviewsByWeek } from "@/lib/worker/interviews";
 
@@ -21,12 +17,6 @@ export default async function WorkerInterviewsPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Interviews" },
-        ]}
-      />
       <WorkerPageHeader
         title="Interviews"
         subhead="Upcoming interview invites and scheduling details from employers."

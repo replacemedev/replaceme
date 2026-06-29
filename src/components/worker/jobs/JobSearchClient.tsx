@@ -8,11 +8,7 @@ import { JobSearchHero } from "./JobSearchHero";
 import { JobFilterSidebar, JobFilterPanel } from "./JobFilterSidebar";
 import { JobCard } from "./JobCard";
 import { JobCardGrid } from "./JobCardGrid";
-import {
-  WorkerPageShell,
-  WorkerBreadcrumb,
-  WorkerFilterSheet,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerFilterSheet } from "@/components/worker/layout";
 import {
   JobSearchFacets,
   JobSearchResult,
@@ -195,12 +191,6 @@ export function JobSearchClient({
       />
 
       <WorkerPageShell width="wide" className="py-8 gap-6">
-        <WorkerBreadcrumb
-          items={[
-            { label: "Dashboard", href: "/worker/dashboard" },
-            { label: "Jobs" },
-          ]}
-        />
 
         <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
           <JobFilterSidebar

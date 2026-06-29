@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
@@ -29,13 +25,6 @@ export default async function WorkerSkillsEditPage() {
 
   return (
     <WorkerPageShell width="narrow">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Profile", href: "/worker/profile" },
-          { label: "Skills" },
-        ]}
-      />
       <WorkerPageHeader
         title="Manage skills"
         subhead="View and update skills on your worker profile."

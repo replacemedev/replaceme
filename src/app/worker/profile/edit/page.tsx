@@ -5,11 +5,7 @@ import {
   getWorkerProjects,
 } from "@/actions/worker/profile";
 import { ProfileEditClient } from "@/components/worker/profile/ProfileEditClient";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Edit Profile | ReplaceMe",
@@ -25,13 +21,6 @@ export default async function WorkerProfileEditPage() {
 
   return (
     <WorkerPageShell width="narrow">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Profile", href: "/worker/profile" },
-          { label: "Edit" },
-        ]}
-      />
       <WorkerPageHeader
         title="Edit profile"
         subhead="Update your bio, resume links, and portfolio details."

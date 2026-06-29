@@ -7,12 +7,7 @@ import {
   formatHourlyRate,
   getStatusBadge,
 } from "@/types/applications";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-  WorkerSectionCard,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader, WorkerSectionCard } from "@/components/worker/layout";
 import { ApplicationTimeline } from "@/components/worker/applications/ApplicationTimeline";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
@@ -39,13 +34,6 @@ export default async function WorkerApplicationDetailPage({ params }: PageProps)
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Applications", href: "/worker/applications" },
-          { label: application.jobTitle },
-        ]}
-      />
 
       <WorkerPageHeader
         title={application.jobTitle}

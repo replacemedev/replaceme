@@ -7,11 +7,7 @@ import {
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
-import {
-  WorkerPageShell,
-  WorkerBreadcrumb,
-  WorkerPageHeader,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
@@ -63,12 +59,6 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   if (loadError) {
     return (
       <WorkerPageShell width="wide" className="py-8 gap-4">
-        <WorkerBreadcrumb
-          items={[
-            { label: "Dashboard", href: "/worker/dashboard" },
-            { label: "Messages" },
-          ]}
-        />
         <ErrorState description={loadError} retryHref="/worker/messages" />
       </WorkerPageShell>
     );
@@ -76,12 +66,6 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
 
   return (
     <WorkerPageShell width="wide" className="py-8 gap-4">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Messages" },
-        ]}
-      />
       <div>
         <WorkerPageHeader
           title="Messages"

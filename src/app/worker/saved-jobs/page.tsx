@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { SavedJobsHeader } from "@/components/worker/saved-jobs/SavedJobsHeader";
 import { SavedJobCard } from "@/components/worker/saved-jobs/SavedJobCard";
 import { parseSavedJobsQuery } from "@/types/saved-jobs";
-import { WorkerPageShell, WorkerBreadcrumb } from "@/components/worker/layout";
+import { WorkerPageShell } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Saved Jobs | ReplaceMe",
@@ -42,12 +42,6 @@ export default async function WorkerSavedJobsPage({ searchParams }: PageProps) {
 
   return (
     <WorkerPageShell width="content" className="gap-6">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Saved jobs" },
-        ]}
-      />
       <SavedJobsHeader q={query.q} sort={query.sort} />
 
       {jobs.length === 0 ? (

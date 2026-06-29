@@ -3,11 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getNotificationPreferences } from "@/actions/worker/notification-preferences";
 import { NotificationPreferencesClient } from "@/components/worker/settings/NotificationPreferencesClient";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = { title: "Notification Preferences | ReplaceMe" };
 export const dynamic = "force-dynamic";
@@ -23,13 +19,6 @@ export default async function WorkerNotificationPreferencesPage() {
 
   return (
     <WorkerPageShell width="narrow">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Settings", href: "/worker/settings" },
-          { label: "Notifications" },
-        ]}
-      />
       <WorkerPageHeader
         title="Notification preferences"
         subhead="Choose how you want to be notified about applications, messages, and offers."

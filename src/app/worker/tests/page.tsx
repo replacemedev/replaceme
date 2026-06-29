@@ -2,11 +2,7 @@ import { redirect } from "next/navigation";
 import { Award } from "lucide-react";
 import { getSkillAssessments } from "@/actions/worker/phase2";
 import { EmptyState } from "@/components/shared/EmptyState";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
@@ -20,12 +16,6 @@ export default async function WorkerTestsPage() {
 
   return (
     <WorkerPageShell width="narrow">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Skill assessments" },
-        ]}
-      />
       <WorkerPageHeader
         title="Skill assessments"
         subhead="Prove your expertise with free assessments employers trust."

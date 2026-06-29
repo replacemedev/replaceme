@@ -3,11 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getWorkerEarnings } from "@/actions/worker/phase2";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { DollarSign } from "lucide-react";
-import {
-  WorkerPageShell,
-  WorkerPageHeader,
-  WorkerBreadcrumb,
-} from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const metadata = {
@@ -28,12 +24,6 @@ export default async function WorkerEarningsPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/worker/dashboard" },
-          { label: "Earnings" },
-        ]}
-      />
       <WorkerPageHeader
         title="Earnings"
         subhead="Payment history and projected income from completed work."
