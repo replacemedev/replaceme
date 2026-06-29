@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Calendar, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { EmployerOpenMessagingThreadButton } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
 import { togglePin } from "@/actions/employer/pinned";
 import { PinToggle } from "@/components/employer/pinned/PinToggle";
 import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
@@ -73,17 +74,14 @@ export function CandidateProfileActions({
       </div>
 
       {messagingEnabled ? (
-        <Link
-          href={
-            messagingThreadId
-              ? `/employer/messages?threadId=${messagingThreadId}`
-              : "/employer/messages"
-          }
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#006e2f] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
+        <EmployerOpenMessagingThreadButton
+          jobId={jobId}
+          candidateId={candidateId}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#006e2f] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#005c26] disabled:opacity-60"
         >
           <MessageSquare className="h-4 w-4" aria-hidden />
           Message candidate
-        </Link>
+        </EmployerOpenMessagingThreadButton>
       ) : (
         <UpgradeCTA
           feature="messaging"

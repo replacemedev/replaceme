@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { AlertCircle, LayoutGrid, Table2 } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
+import { useOpenEmployerMessagingThread } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
 import {
   ApplicantsToolbar,
   type ApplicantSortKey,
@@ -45,7 +45,7 @@ export function ApplicantsClient({
   applicantsPerJobLimit,
   hiddenApplicantCount,
 }: ApplicantsClientProps) {
-  const router = useRouter();
+  const { openThread } = useOpenEmployerMessagingThread();
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ApplicantStatusFilter>("all");
@@ -62,13 +62,7 @@ export function ApplicantsClient({
   const visibleApplicantCount = initialApplicants.length;
 
   const handleChatWithCandidate = (candidateId: string) => {
-    const applicant = applicants.find((a) => a.candidateId === candidateId);
-    const threadId = applicant?.messagingThreadId;
-    router.push(
-      threadId
-        ? `/employer/messages?threadId=${threadId}`
-        : "/employer/messages"
-    );
+    openThread(jobId, candidateId);
   };
 
   const filteredApplicants = useMemo(() => {

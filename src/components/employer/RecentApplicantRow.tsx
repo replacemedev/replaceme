@@ -84,7 +84,7 @@ export function RecentApplicantRow({
         </Link>
         {messagingEnabled ? (
           <Link
-            href={`/employer/messages?candidateId=${applicant.candidate_id}`}
+            href={`/employer/messages?jobId=${applicant.job_id}&candidateId=${applicant.candidate_id}`}
             className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] rounded-lg transition-colors cursor-pointer"
           >
             Message

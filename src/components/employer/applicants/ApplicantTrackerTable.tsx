@@ -112,6 +112,8 @@ export function ApplicantTrackerTable({
                   messagingEnabled={messagingEnabled}
                   profileHref={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
                   profileLabel={row.isPreview ? "Preview" : "Profile"}
+                  jobId={row.jobId}
+                  candidateId={row.candidateId}
                   className="justify-end"
                 />
               </td>

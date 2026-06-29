@@ -4,6 +4,7 @@ import {
   getMessagingThreads,
   getMessagingMessages,
   getMessagingJobRoles,
+  ensureMessagingThread,
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
@@ -20,7 +21,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ threadId?: string }>;
+  searchParams: Promise<{ threadId?: string; jobId?: string; candidateId?: string }>;
 }
 
 export default async function EmployerMessagesPage({ searchParams }: PageProps) {
@@ -40,7 +41,16 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
 
   if (!profile || profile.role !== "employer") redirect("/dashboard");
 
-  const { threadId } = await searchParams;
+  const { threadId, jobId, candidateId } = await searchParams;
+
+  if (!threadId && jobId && candidateId) {
+    const ensured = await ensureMessagingThread({ jobId, candidateId });
+    if (ensured.success && ensured.data.threadId) {
+      redirect(`/employer/messages?threadId=${ensured.data.threadId}`);
+    }
+  }
+
+  let resolvedThreadId = threadId;
 
   let threads: MessagingThread[] = [];
   let availableJobRoles: MessagingJobRole[] = [];
@@ -57,8 +67,8 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
     loadError = "We couldn't load your messaging inbox. Please refresh and try again.";
   }
 
-  const initialMessages = threadId
-    ? await getMessagingMessages(threadId)
+  const initialMessages = resolvedThreadId
+    ? await getMessagingMessages(resolvedThreadId)
     : [];
 
   if (loadError) {
@@ -82,7 +92,7 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
         threads={threads}
         availableJobRoles={availableJobRoles}
         initialMessages={initialMessages}
-        selectedThreadId={threadId ?? null}
+        selectedThreadId={resolvedThreadId ?? null}
         currentUserId={profile.id}
         messagingEnabled={planUsage?.messagingEnabled ?? false}
         planSlug={planUsage?.planSlug ?? "discovery"}

@@ -8,6 +8,7 @@ import {
   threadActionSchema,
   threadIdSchema,
   togglePinSchema,
+  ensureMessagingThreadSchema,
 } from "@/lib/validations/messaging";
 import { safeError } from "@/utils/logger";
 import {
@@ -30,6 +31,10 @@ import {
   invalidateMessagingThreadMessages,
   invalidateWorkerMessagingCache,
 } from "@/lib/server/redis-cache";
+import {
+  employerHasMessagedThread,
+  ensureEmployerMessagingThread,
+} from "@/lib/server/messaging/ensure-thread";
 
 async function getAuthenticatedProfile() {
   const supabase = await createClient();
@@ -134,7 +139,7 @@ async function loadMessagingThreads(
     const { data: threads, error } = await supabase
       .from("chat_threads")
       .select(
-        `*, company_profiles (id, company_name, logo_url), jobs (id, title)`
+        `*, company_profiles (id, company_name, logo_url, employer_id), jobs (id, title)`
       )
       .eq("worker_id", profile.id)
       .order("updated_at", { ascending: false });
@@ -143,7 +148,25 @@ async function loadMessagingThreads(
       safeError("getMessagingThreads worker:", error);
       return [];
     }
-    return enrichThreads(supabase, threads ?? [], role, profile.id);
+
+    const activeThreads: Array<Record<string, unknown>> = [];
+    for (const thread of threads ?? []) {
+      const company = thread.company_profiles as {
+        employer_id: string;
+      } | null;
+      if (!company?.employer_id) continue;
+
+      const hasEmployerMessage = await employerHasMessagedThread(
+        supabase,
+        thread.id as string,
+        company.employer_id
+      );
+      if (hasEmployerMessage) {
+        activeThreads.push(thread);
+      }
+    }
+
+    return enrichThreads(supabase, activeThreads, role, profile.id);
   }
 
   const { data: company } = await supabase
@@ -290,6 +313,17 @@ export async function sendMessagingMessage(
       return fail("Access denied");
     }
 
+    if (thread.worker_id === user.id && employerId) {
+      const employerMessaged = await employerHasMessagedThread(
+        supabase,
+        parsed.threadId,
+        employerId
+      );
+      if (!employerMessaged) {
+        return fail("You can reply after the employer sends the first message.");
+      }
+    }
+
     if (employerId) {
       const messagingCheck = await assertEmployerMessaging(employerId);
       if (!messagingCheck.allowed) {
@@ -429,6 +463,116 @@ export async function toggleMessagingThreadPin(
   });
 
   return { success: result.success };
+}
+
+export async function ensureMessagingThread(
+  payload: unknown
+): Promise<{ success: true; data: { threadId: string } } | { success: false; error: string }> {
+  const result = await runAction("ensureMessagingThread", async () => {
+    const parsed = ensureMessagingThreadSchema.parse(payload);
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
+
+    const { supabase, user } = ctx;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile || profile.role !== "employer") {
+      return fail("Only employers can start a conversation.");
+    }
+
+    if (!parsed.candidateId) {
+      return fail("Candidate is required to start a conversation.");
+    }
+
+    const ensured = await ensureEmployerMessagingThread(
+      supabase,
+      profile.id,
+      parsed.jobId,
+      parsed.candidateId
+    );
+
+    if (!ensured.success || !ensured.data) {
+      return ensured.success ? fail("Failed to start conversation.") : ensured;
+    }
+
+    await invalidateEmployerMessagingCache(profile.id);
+    await invalidateWorkerMessagingCache(parsed.candidateId);
+
+    revalidatePath("/employer/messages");
+    return ok({ threadId: ensured.data.threadId });
+  });
+
+  return result.success && result.data
+    ? { success: true, data: result.data }
+    : {
+        success: false,
+        error:
+          !result.success && "error" in result
+            ? result.error
+            : "Failed to start conversation.",
+      };
+}
+
+/** Worker: thread is available only after the employer has sent the first message. */
+export async function getWorkerApplicationMessaging(jobId: string): Promise<{
+  threadId: string | null;
+  employerHasMessaged: boolean;
+} | null> {
+  try {
+    const ctx = await getAuthenticatedProfile();
+    if (!ctx || ctx.profile.role !== "worker") return null;
+
+    const { supabase, profile } = ctx;
+
+    const { data: application } = await supabase
+      .from("applications")
+      .select("id")
+      .eq("job_id", jobId)
+      .eq("candidate_id", profile.id)
+      .maybeSingle();
+
+    if (!application) return null;
+
+    const { data: thread } = await supabase
+      .from("chat_threads")
+      .select("id, company_profiles (employer_id)")
+      .eq("worker_id", profile.id)
+      .eq("job_id", jobId)
+      .maybeSingle();
+
+    if (!thread) {
+      return { threadId: null, employerHasMessaged: false };
+    }
+
+    const cp = thread.company_profiles as
+      | { employer_id: string }
+      | { employer_id: string }[]
+      | null;
+    const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
+
+    if (!employerId) {
+      return { threadId: null, employerHasMessaged: false };
+    }
+
+    const employerHasMessaged = await employerHasMessagedThread(
+      supabase,
+      thread.id,
+      employerId
+    );
+
+    return {
+      threadId: employerHasMessaged ? thread.id : null,
+      employerHasMessaged,
+    };
+  } catch (err) {
+    safeError("getWorkerApplicationMessaging:", err);
+    return null;
+  }
 }
 
 /** Unique job roles from the user's active threads (jobs / job_posts via FK). */

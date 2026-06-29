@@ -125,6 +125,12 @@ export function ChatArea({
   const isBlocked =
     Boolean(thread.blocked_reason) ||
     (role === "employer" && !messagingEnabled);
+  const employerHasMessaged = messages.some(
+    (message) => message.sender_id !== currentUserId
+  );
+  const waitingForEmployer =
+    role === "worker" && !isBlocked && !employerHasMessaged;
+  const canCompose = !isBlocked && !waitingForEmployer;
 
   return (
     <section
@@ -216,10 +222,25 @@ export function ChatArea({
         />
       ) : null}
 
+      {waitingForEmployer ? (
+        <div
+          className="mx-4 mt-4 rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 backdrop-blur-sm"
+          role="status"
+        >
+          <p className="text-sm font-bold text-slate-900">Waiting for employer</p>
+          <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">
+            The employer will message you first about this application. You can reply
+            here once they send the opening message.
+          </p>
+        </div>
+      ) : null}
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
         {messages.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-12">
-            No messages yet. Send one below to start the conversation.
+            {role === "employer"
+              ? "Send the first message below to start the conversation."
+              : "No messages yet."}
           </p>
         ) : (
           messageGroups.map((group) => (
@@ -239,7 +260,9 @@ export function ChatArea({
         )}
       </div>
 
-      {isBlocked ? (
+      {canCompose ? (
+        <ChatInputArea onSendMessage={onSendMessage} />
+      ) : isBlocked ? (
         <div className="shrink-0 border-t border-slate-200 bg-slate-50/80 px-4 py-4">
           {role === "employer" ? (
             <UnlockOverlay feature="messaging" currentPlan={planSlug} />
@@ -250,7 +273,11 @@ export function ChatArea({
           )}
         </div>
       ) : (
-        <ChatInputArea onSendMessage={onSendMessage} />
+        <div className="shrink-0 border-t border-slate-200 bg-slate-50/80 px-4 py-4">
+          <p className="text-center text-xs font-medium text-slate-500">
+            Reply unlocks after the employer sends the first message.
+          </p>
+        </div>
       )}
     </section>
   );

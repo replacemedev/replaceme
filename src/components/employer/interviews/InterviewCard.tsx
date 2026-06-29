@@ -60,6 +60,8 @@ export function InterviewCard({
           profileHref={`/employer/candidates/${interview.candidateId}?jobId=${interview.jobId}`}
           profileLabel={interview.isPreview ? "Preview" : "Profile"}
           pipelineHref={`/employer/jobs/${interview.jobId}/applicants`}
+          jobId={interview.jobId}
+          candidateId={interview.candidateId}
         />
       </div>
     </li>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Calendar, MessageSquare } from "lucide-react";
 import { getWorkerApplicationById } from "@/actions/worker/applications";
+import { getWorkerApplicationMessaging } from "@/actions/messaging";
 import {
   formatHourlyRate,
   getStatusBadge,
@@ -27,6 +28,8 @@ export default async function WorkerApplicationDetailPage({ params }: PageProps)
 
   if (!application) notFound();
 
+  const messaging = await getWorkerApplicationMessaging(application.jobId);
+
   const { label } = getStatusBadge(application.status);
 
   const timeline = [
@@ -49,13 +52,23 @@ export default async function WorkerApplicationDetailPage({ params }: PageProps)
         subhead={application.companyName}
         actions={
           <div className="flex flex-wrap gap-2">
-            <Link
-              href="/worker/messages"
-              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:border-[#006e2f]/30 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
-            >
-              <MessageSquare size={14} aria-hidden />
-              Messages
-            </Link>
+            {messaging?.threadId ? (
+              <Link
+                href={`/worker/messages?threadId=${messaging.threadId}`}
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:border-[#006e2f]/30 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
+              >
+                <MessageSquare size={14} aria-hidden />
+                Messages
+              </Link>
+            ) : (
+              <span
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 px-4 text-xs font-bold text-slate-400"
+                title="Available after the employer sends the first message"
+              >
+                <MessageSquare size={14} aria-hidden />
+                Awaiting employer message
+              </span>
+            )}
             {application.status === "INTERVIEW_SCHEDULED" ? (
               <Link
                 href="/worker/interviews"

@@ -1,11 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
 import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
+import { EmployerOpenMessagingThreadButton } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
 
 interface EmployerMessageActionProps {
   planSlug: string;
   messagingEnabled: boolean;
+  jobId?: string;
+  candidateId?: string;
   variant?: "icon" | "button";
   className?: string;
 }
@@ -13,10 +18,38 @@ interface EmployerMessageActionProps {
 export function EmployerMessageAction({
   planSlug,
   messagingEnabled,
+  jobId,
+  candidateId,
   variant = "icon",
   className = "",
 }: EmployerMessageActionProps) {
+  const canOpenThread = Boolean(jobId && candidateId);
+
   if (messagingEnabled) {
+    if (canOpenThread) {
+      const buttonClass =
+        variant === "button"
+          ? `inline-flex h-9 items-center gap-1.5 rounded-2xl border border-emerald-100 bg-[#f0fdf4]/50 px-4 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#f0fdf4] disabled:opacity-60 ${className}`
+          : `inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-60 ${className}`;
+
+      return (
+        <EmployerOpenMessagingThreadButton
+          jobId={jobId!}
+          candidateId={candidateId!}
+          className={buttonClass}
+        >
+          {variant === "button" ? (
+            <>
+              <MessageSquare size={13} aria-hidden />
+              Message
+            </>
+          ) : (
+            <MessageSquare size={15} aria-hidden />
+          )}
+        </EmployerOpenMessagingThreadButton>
+      );
+    }
+
     if (variant === "button") {
       return (
         <Link
@@ -72,6 +105,8 @@ interface EmployerInlineActionsProps {
   profileLabel?: string;
   pipelineHref?: string;
   pipelineLabel?: string;
+  jobId?: string;
+  candidateId?: string;
   className?: string;
 }
 
@@ -82,6 +117,8 @@ export function EmployerInlineActions({
   profileLabel = "Profile",
   pipelineHref,
   pipelineLabel = "Pipeline",
+  jobId,
+  candidateId,
   className = "",
 }: EmployerInlineActionsProps) {
   return (
@@ -103,6 +140,8 @@ export function EmployerInlineActions({
       <EmployerMessageAction
         planSlug={planSlug}
         messagingEnabled={messagingEnabled}
+        jobId={jobId}
+        candidateId={candidateId}
         variant="icon"
       />
     </div>

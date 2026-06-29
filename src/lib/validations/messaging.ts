@@ -19,3 +19,10 @@ export const togglePinSchema = threadActionSchema.extend({
 export const threadIdSchema = z.object({
   threadId: uuidSchema,
 });
+
+export const ensureMessagingThreadSchema = z
+  .object({
+    jobId: uuidSchema,
+    candidateId: uuidSchema,
+  })
+  .strict();

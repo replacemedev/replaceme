@@ -44,8 +44,10 @@ export function MessagingEmptyState({
   return (
     <EmptyState
       icon={<MessageSquare size={22} aria-hidden />}
-      title="No conversation selected"
-      description="Select a thread from the sidebar to view messages and schedule meetings."
+      title="No conversations yet"
+      description="When an employer messages you about an application, the thread will appear here for you to reply."
+      actionLabel="View applications"
+      actionHref="/worker/applications"
     />
   );
 }
