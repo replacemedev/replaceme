@@ -97,6 +97,7 @@ export function ChatArea({
 }: ChatAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPinning, setIsPinning] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const messageGroups = useMemo(() => groupMessagesByDay(messages), [messages]);
 
   useEffect(() => {
@@ -138,10 +139,10 @@ export function ChatArea({
         mobileHidden ? "hidden lg:flex" : ""
       }`}
     >
-      <header className="shrink-0 h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 min-w-0">
+      <header className="relative shrink-0 h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
           <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
             {oppositeParty.avatarUrl ? (
               <Image
@@ -155,15 +156,15 @@ export function ChatArea({
               <span>{initials}</span>
             )}
           </div>
-          <div className="min-w-0">
+          <div className="flex-1 min-w-0">
             <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
               {contextTitle}
             </h3>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
               <span className="text-xs text-slate-500 font-semibold truncate">
                 {oppositeParty.name}
               </span>
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold uppercase tracking-wide">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold uppercase tracking-wide w-fit">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#006e2f]" />
                 Online
               </span>
@@ -172,7 +173,7 @@ export function ChatArea({
           </div>
         </div>
 
-        <div className="flex items-center gap-0.5 shrink-0">
+        <div className="flex items-center gap-0.5 shrink-0 relative">
           <button
             type="button"
             onClick={async () => {
@@ -181,7 +182,7 @@ export function ChatArea({
               setIsPinning(false);
             }}
             disabled={isPinning}
-            className={`p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
+            className={`hidden sm:inline-flex p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
               thread.is_pinned
                 ? "text-[#006e2f]"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
@@ -192,25 +193,79 @@ export function ChatArea({
           </button>
           <button
             type="button"
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
+            className="hidden sm:inline-flex p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
             aria-label="Tag conversation"
           >
             <Tag className="h-4.5 w-4.5" />
           </button>
           <button
             type="button"
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
+            className="hidden sm:inline-flex p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
             aria-label="Archive conversation"
           >
             <Archive className="h-4.5 w-4.5" />
           </button>
           <button
             type="button"
+            onClick={() => setShowMenu(!showMenu)}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
             aria-label="More options"
           >
             <MoreVertical className="h-4.5 w-4.5" />
           </button>
+
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+              <div className="absolute right-0 top-10 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setShowMenu(false);
+                    setIsPinning(true);
+                    await onTogglePin();
+                    setIsPinning(false);
+                  }}
+                  disabled={isPinning}
+                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer disabled:opacity-50"
+                >
+                  <Pin className={`h-3.5 w-3.5 ${thread.is_pinned ? "fill-current text-[#006e2f]" : ""}`} />
+                  {thread.is_pinned ? "Unpin conversation" : "Pin conversation"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMenu(false)}
+                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer"
+                >
+                  <Tag className="h-3.5 w-3.5" />
+                  Tag conversation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMenu(false)}
+                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer"
+                >
+                  <Archive className="h-3.5 w-3.5" />
+                  Archive conversation
+                </button>
+                <div className="h-px bg-slate-100 my-1 sm:hidden" />
+                <button
+                  type="button"
+                  onClick={() => setShowMenu(false)}
+                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                >
+                  Mark as unread
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMenu(false)}
+                  className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer font-semibold"
+                >
+                  Block user
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </header>
 

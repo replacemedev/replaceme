@@ -80,15 +80,18 @@ export function ApplicantsToolbar({
           ))}
         </div>
 
-        <div className="flex items-center gap-3 justify-between sm:justify-end">
-          <label className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-slate-100 bg-white px-3 text-xs font-bold text-slate-600">
-            <ArrowUpDown size={14} className="text-slate-400" aria-hidden />
+        <div className="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
+          <label className="inline-flex h-10 w-full sm:w-auto items-center justify-between sm:justify-start gap-1.5 rounded-lg border border-slate-100 bg-white px-3 text-xs font-bold text-slate-600">
+            <span className="flex items-center gap-1.5">
+              <ArrowUpDown size={14} className="text-slate-400" aria-hidden />
+              <span>Sort by:</span>
+            </span>
             <select
               value={sortKey}
               onChange={(e) =>
                 onSortKeyChange(e.target.value as ApplicantSortKey)
               }
-              className="cursor-pointer bg-transparent focus:outline-none"
+              className="cursor-pointer bg-transparent focus:outline-none text-right sm:text-left flex-1 sm:flex-initial"
               aria-label="Sort applicants"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -99,7 +102,7 @@ export function ApplicantsToolbar({
             </select>
           </label>
 
-          <div className="flex h-6 items-center border-l border-slate-100 pl-4 text-xs font-semibold text-slate-400">
+          <div className="flex h-6 items-center border-l border-slate-100 pl-4 text-xs font-semibold text-slate-400 shrink-0">
             <span className="mr-1 font-bold text-slate-700">{totalCount}</span>
             Total
           </div>

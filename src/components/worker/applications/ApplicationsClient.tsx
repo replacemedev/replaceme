@@ -211,11 +211,11 @@ export function ApplicationsClient({
 
         <section className="min-w-0 mt-6 lg:mt-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
-                className="lg:hidden inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg cursor-pointer"
+                className="lg:hidden inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg cursor-pointer shrink-0"
               >
                 <Filter className="h-4 w-4" aria-hidden />
                 Filters
@@ -229,7 +229,7 @@ export function ApplicationsClient({
               </p>
             </div>
 
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+            <label className="flex items-center justify-between sm:justify-start gap-2 text-sm text-slate-600 w-full sm:w-auto">
               <span className="font-medium shrink-0">Sort by:</span>
               <select
                 value={sortBy}
@@ -237,7 +237,7 @@ export function ApplicationsClient({
                   setSortBy(e.target.value as ApplicationSortOption);
                   setVisibleCount(PAGE_SIZE);
                 }}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] cursor-pointer"
+                className="w-full sm:w-auto rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] cursor-pointer"
               >
                 <option value="most_recent">Most Recent</option>
                 <option value="oldest">Oldest First</option>

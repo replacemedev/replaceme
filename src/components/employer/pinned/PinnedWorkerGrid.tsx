@@ -107,12 +107,15 @@ export function PinnedWorkerGrid({
             Verified only
           </button>
 
-          <label className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600">
-            <ArrowUpDown size={13} className="text-slate-400" aria-hidden />
+          <label className="inline-flex w-full sm:w-auto items-center justify-between sm:justify-start gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600">
+            <span className="flex items-center gap-1.5">
+              <ArrowUpDown size={13} className="text-slate-400" aria-hidden />
+              <span>Sort by:</span>
+            </span>
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
-              className="bg-transparent focus:outline-none cursor-pointer"
+              className="bg-transparent focus:outline-none cursor-pointer text-right sm:text-left flex-1 sm:flex-initial"
               aria-label="Sort talent pool"
             >
               <option value="name">Name</option>
