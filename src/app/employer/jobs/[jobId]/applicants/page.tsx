@@ -5,7 +5,7 @@ import { getApplicants } from "@/actions/employer/applicants";
 import { getJobById } from "@/actions/employer/jobs";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { ApplicantsClient } from "@/components/employer/applicants/ApplicantsClient";
-import { EmployerPageShell, EmployerBreadcrumb } from "@/components/employer/layout";
+import { EmployerPageShell } from "@/components/employer/layout";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
@@ -58,14 +58,6 @@ export default async function ApplicantsPage({ params }: PageProps) {
 
   return (
     <EmployerPageShell width="content">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Jobs", href: "/employer/jobs" },
-          { label: jobTitle, href: `/employer/jobs/${jobId}` },
-          { label: "Applicants" },
-        ]}
-      />
       <ApplicantsClient
         initialApplicants={applicants}
         identityMode={identityMode}

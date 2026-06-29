@@ -27,6 +27,7 @@ export interface Applicant {
   salaryCurrency?: string | null;
   createdAt: string;
   isVerified: boolean;
+  messagingThreadId?: string | null;
 }
 
 export interface EmployerCreditInfo {

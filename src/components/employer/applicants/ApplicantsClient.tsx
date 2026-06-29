@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, LayoutGrid, Table2, Columns3 } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
-import { ApplicantsToolbar } from "./ApplicantsToolbar";
+import {
+  ApplicantsToolbar,
+  type ApplicantSortKey,
+  type ApplicantStatusFilter,
+} from "./ApplicantsToolbar";
 import { ApplicantCard } from "./ApplicantCard";
 import {
   ApplicantTrackerTable,
@@ -41,6 +45,8 @@ export function ApplicantsClient({
   const router = useRouter();
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ApplicantStatusFilter>("all");
+  const [sortKey, setSortKey] = useState<ApplicantSortKey>("newest");
   const [viewMode, setViewMode] = useState<"cards" | "table" | "kanban">("cards");
 
   const isDiscoveryPreview = identityMode === "anonymous_preview";
@@ -63,17 +69,49 @@ export function ApplicantsClient({
   }, [viewMode]);
 
   const handleChatWithCandidate = (candidateId: string) => {
-    router.push(`/employer/messages?threadId=${candidateId}`);
+    const applicant = applicants.find((a) => a.candidateId === candidateId);
+    const threadId = applicant?.messagingThreadId;
+    router.push(
+      threadId
+        ? `/employer/messages?threadId=${threadId}`
+        : "/employer/messages"
+    );
   };
 
-  const filteredApplicants = applicants.filter((app) => {
+  const filteredApplicants = useMemo(() => {
     const query = searchQuery.toLowerCase();
-    return (
-      app.name.toLowerCase().includes(query) ||
-      app.role.toLowerCase().includes(query) ||
-      app.skills.some((s) => s.toLowerCase().includes(query))
-    );
-  });
+
+    let result = applicants.filter((app) => {
+      const matchesSearch =
+        !query ||
+        app.name.toLowerCase().includes(query) ||
+        app.role.toLowerCase().includes(query) ||
+        app.skills.some((s) => s.toLowerCase().includes(query));
+      const matchesStatus =
+        statusFilter === "all" || app.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+
+    result = [...result].sort((a, b) => {
+      switch (sortKey) {
+        case "oldest":
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        case "match":
+          return b.matchScore - a.matchScore;
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "newest":
+        default:
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+      }
+    });
+
+    return result;
+  }, [applicants, searchQuery, statusFilter, sortKey]);
 
   const tableRows: ApplicantTrackerRow[] = useMemo(
     () =>
@@ -126,6 +164,10 @@ export function ApplicantsClient({
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         totalCount={filteredApplicants.length}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        sortKey={sortKey}
+        onSortKeyChange={setSortKey}
       />
 
       <div className="flex items-center gap-2">
@@ -199,13 +241,13 @@ export function ApplicantsClient({
       ) : null}
 
       {(viewMode === "cards" ||
-        viewMode === "kanban" ||
-        viewMode === "table") &&
+        viewMode === "table" ||
+        viewMode === "kanban") &&
       filteredApplicants.length > 0 ? (
         <div
-          className={`space-y-4 ${
-            viewMode === "cards" ? "" : "lg:hidden"
-          }`}
+          className={
+            viewMode === "cards" ? "space-y-4" : "space-y-4 lg:hidden"
+          }
         >
           {filteredApplicants.map((app) => (
             <ApplicantCard

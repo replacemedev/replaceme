@@ -34,7 +34,7 @@ export function MessagingEmptyState({
       <EmptyState
         icon={<MessageSquare size={22} aria-hidden />}
         title="Select a conversation"
-        description="Choose a candidate thread from your inbox to reply, share files, and move hiring forward."
+        description="Choose a candidate thread from your inbox to reply and move hiring forward."
         actionLabel="View job posts"
         actionHref="/employer/jobs"
       />
@@ -45,7 +45,7 @@ export function MessagingEmptyState({
     <EmptyState
       icon={<MessageSquare size={22} aria-hidden />}
       title="No conversation selected"
-      description="Select a thread from the sidebar to view messages, share files, and schedule meetings."
+      description="Select a thread from the sidebar to view messages and schedule meetings."
     />
   );
 }

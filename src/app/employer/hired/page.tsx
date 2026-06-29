@@ -14,7 +14,6 @@ import {
   EmployerPageHeader,
   EmployerPageShell,
   EmployerSectionCard,
-  EmployerBreadcrumb,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -42,12 +41,6 @@ export default async function HiredPage() {
 
   return (
     <EmployerPageShell className="gap-8">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Hired workers" },
-        ]}
-      />
       <EmployerPageHeader
         title="Hired workers"
         subhead={subhead}

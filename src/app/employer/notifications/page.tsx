@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { EmployerNotificationsClient } from "@/components/employer/notifications/EmployerNotificationsClient";
-import { EmployerPageShell, EmployerBreadcrumb } from "@/components/employer/layout";
+import { EmployerPageShell } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
@@ -31,12 +31,6 @@ export default async function EmployerNotificationsPage() {
 
   return (
     <EmployerPageShell width="content">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Notifications" },
-        ]}
-      />
       {loadError || !bootstrap ? (
         <ErrorState description={loadError ?? "Failed to load notifications."} retryHref="/employer/notifications" />
       ) : (

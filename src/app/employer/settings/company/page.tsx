@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getIndustries, getCompanyProfile } from "@/actions/employer/company";
 import { CompanyProfileForm } from "./CompanyProfileForm";
 import {
-  EmployerBreadcrumb,
   EmployerPageHeader,
   EmployerPageShell,
 } from "@/components/employer/layout";
@@ -45,13 +44,6 @@ export default async function CompanySettingsPage() {
 
   return (
     <EmployerPageShell width="wide" className="gap-8">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Settings", href: "/employer/settings/account" },
-          { label: "Company profile" },
-        ]}
-      />
-
       <EmployerPageHeader
         title="Company profile"
         subhead="Build your brand presence to attract top talent. This information is visible on your job postings."

@@ -8,11 +8,6 @@ const STEPS = [
     label: "Requirements",
     description: "Skills and compensation",
   },
-  {
-    id: "preferences",
-    label: "Preferences",
-    description: "Notifications and visibility",
-  },
 ] as const;
 
 interface JobCreateStepIndicatorProps {

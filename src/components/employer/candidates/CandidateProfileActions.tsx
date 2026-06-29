@@ -16,6 +16,7 @@ interface CandidateProfileActionsProps {
   jobId: string;
   planSlug: string;
   messagingEnabled: boolean;
+  messagingThreadId?: string | null;
   resumeDownloadEnabled: boolean;
   resumeUrl: string | null;
   isPreview: boolean;
@@ -27,6 +28,7 @@ export function CandidateProfileActions({
   jobId,
   planSlug,
   messagingEnabled,
+  messagingThreadId,
   resumeDownloadEnabled,
   resumeUrl,
   isPreview,
@@ -72,8 +74,12 @@ export function CandidateProfileActions({
 
       {messagingEnabled ? (
         <Link
-          href={`/employer/messages?candidateId=${candidateId}`}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#005c26] transition-colors"
+          href={
+            messagingThreadId
+              ? `/employer/messages?threadId=${messagingThreadId}`
+              : "/employer/messages"
+          }
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#006e2f] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
         >
           <MessageSquare className="h-4 w-4" aria-hidden />
           Message candidate

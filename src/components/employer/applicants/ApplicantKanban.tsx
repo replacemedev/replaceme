@@ -34,7 +34,7 @@ export function ApplicantKanban({
 }: ApplicantKanbanProps) {
   return (
     <div
-      className="grid gap-4 overflow-x-auto pb-2 md:grid-cols-5"
+      className="flex gap-4 overflow-x-auto pb-4"
       data-testid="applicant-kanban"
     >
       {KANBAN_COLUMNS.map((column) => {
@@ -43,7 +43,7 @@ export function ApplicantKanban({
         return (
           <section
             key={column.status}
-            className={`min-w-[220px] ${EMPLOYER_CARD} bg-slate-50/80 p-3 rounded-2xl`}
+            className={`w-[min(100%,280px)] shrink-0 ${EMPLOYER_CARD} rounded-lg bg-slate-50/80 p-3`}
             aria-label={column.label}
           >
             <header className="mb-3 flex items-center justify-between px-1">

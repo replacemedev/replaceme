@@ -7,7 +7,7 @@ import {
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { EmployerPageShell, EmployerBreadcrumb, EmployerPageHeader } from "@/components/employer/layout";
+import { EmployerPageShell, EmployerPageHeader } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
@@ -64,12 +64,6 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   if (loadError) {
     return (
       <EmployerPageShell width="content">
-        <EmployerBreadcrumb
-          items={[
-            { label: "Dashboard", href: "/employer/dashboard" },
-            { label: "Messages" },
-          ]}
-        />
         <ErrorState description={loadError} retryHref="/employer/messages" />
       </EmployerPageShell>
     );
@@ -77,12 +71,6 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
 
   return (
     <EmployerPageShell width="wide" className="py-8 gap-4">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Messages" },
-        ]}
-      />
       <EmployerPageHeader
         title="Messaging"
         subhead="Chat with candidates across your active job posts."

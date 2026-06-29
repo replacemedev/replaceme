@@ -56,34 +56,37 @@ export function ManagePlanGrid({
   nextBillingDate,
 }: ManagePlanGridProps) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+    <section
+      id="manage-plan"
+      className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm scroll-mt-24"
+    >
       <div className="border-b border-slate-100 bg-gradient-to-br from-[#fafdfb] to-white p-6 sm:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700">
-            Billing
-          </p>
-          <h2 className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
-            Manage plan
-          </h2>
-          <p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed max-w-xl">
-            Upgrades take effect immediately. Downgrades apply at the end of your
-            billing period via the Stripe billing portal.
-          </p>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700">
+              Billing
+            </p>
+            <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
+              Manage plan
+            </h2>
+            <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
+              Upgrades take effect immediately. Downgrades apply at the end of
+              your billing period via the Stripe billing portal.
+            </p>
+          </div>
+          {nextBillingDate && currentPlan !== "discovery" ? (
+            <p className="shrink-0 text-xs font-semibold text-slate-500 lg:text-right">
+              Next billing:{" "}
+              <span className="whitespace-nowrap text-slate-800">
+                {new Date(nextBillingDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </p>
+          ) : null}
         </div>
-        {nextBillingDate && currentPlan !== "discovery" ? (
-          <p className="text-xs font-semibold text-slate-500">
-            Next billing:{" "}
-            <span className="text-slate-800">
-              {new Date(nextBillingDate).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
-          </p>
-        ) : null}
-      </div>
       </div>
 
       <div className="p-6 sm:p-8">
@@ -97,7 +100,7 @@ export function ManagePlanGrid({
           return (
             <div
               key={plan.slug}
-              className={`relative rounded-2xl p-5 border flex flex-col justify-between min-h-[176px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+              className={`relative flex min-h-0 flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                 isCurrent
                   ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
                   : "border-slate-100 bg-white hover:border-slate-200"

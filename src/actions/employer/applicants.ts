@@ -163,6 +163,15 @@ export async function getApplicants(jobId: string): Promise<{
       safeError("Error fetching applications:", appsError);
     }
 
+    const { data: threads } = await supabase
+      .from("chat_threads")
+      .select("id, worker_id")
+      .eq("job_id", parsed.jobId);
+
+    const threadByWorker = new Map(
+      (threads ?? []).map((thread) => [thread.worker_id, thread.id])
+    );
+
     const dbApplicants: Applicant[] = [];
 
     for (const app of applications ?? []) {
@@ -173,7 +182,10 @@ export async function getApplicants(jobId: string): Promise<{
       );
       const mapped = mapPreviewToApplicant(app, preview, identityMode);
       if (mapped) {
-        dbApplicants.push(mapped);
+        dbApplicants.push({
+          ...mapped,
+          messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
+        });
       }
     }
 

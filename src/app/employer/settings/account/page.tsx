@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccountSettings, getEmployerPlanUsage } from "@/actions/employer/billing";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 import {
-  EmployerBreadcrumb,
   EmployerPageHeader,
   EmployerPageShell,
 } from "@/components/employer/layout";
@@ -50,13 +49,6 @@ export default async function AccountSettingsPage() {
 
   return (
     <EmployerPageShell width="wide" className="gap-8">
-      <EmployerBreadcrumb
-        items={[
-          { label: "My account" },
-          { label: "Account settings" },
-        ]}
-      />
-
       <EmployerPageHeader
         title="Account settings"
         subhead="Manage your profile, security, and subscription plan."

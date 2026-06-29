@@ -7,7 +7,6 @@ import { getAccountSettings } from "@/actions/employer/billing";
 import { EmployerCheckoutClient } from "@/components/employer/checkout/EmployerCheckoutClient";
 import {
   EmployerPageShell,
-  EmployerBreadcrumb,
   EmployerPageHeader,
 } from "@/components/employer/layout";
 import {
@@ -86,13 +85,6 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   return (
     <EmployerPageShell width="content" className="gap-8">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Pricing", href: "/employer/pricing" },
-          { label: "Checkout" },
-        ]}
-      />
       <EmployerPageHeader
         title={`Upgrade to ${plan.name}`}
         subhead="Review your order and continue to secure Stripe checkout."

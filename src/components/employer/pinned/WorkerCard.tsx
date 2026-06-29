@@ -147,7 +147,7 @@ export function WorkerCard({
           href={
             worker.contextJobId
               ? `/employer/candidates/${worker.id}?jobId=${worker.contextJobId}`
-              : `/employer/candidates/${worker.id}`
+              : "/employer/jobs"
           }
           className="flex-1 h-9 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
         >

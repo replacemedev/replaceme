@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
-type StatusFilter = "all" | "Active" | "Pending Review" | "Closed";
+type StatusFilter = "all" | "Active" | "Pending Review" | "Closed" | "Draft";
 type SortKey = "newest" | "oldest" | "applicants" | "views";
 
 interface JobsListClientProps {
@@ -25,6 +25,7 @@ const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: "Active", label: "Active" },
   { value: "Pending Review", label: "Pending" },
   { value: "Closed", label: "Closed" },
+  { value: "Draft", label: "Draft" },
 ];
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -121,9 +122,9 @@ export function JobsListClient({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
           <div
-            className="flex flex-wrap gap-1"
+            className="flex gap-1 overflow-x-auto pb-1 sm:pb-0"
             role="group"
             aria-label="Filter by status"
           >

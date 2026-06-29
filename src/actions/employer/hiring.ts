@@ -207,6 +207,15 @@ export async function getEmployerCandidateProfile(
   const isPinned = Boolean(pinRow);
   const messagingEnabled = entitlements?.messagingEnabled ?? false;
 
+  const { data: threadRow } = await supabase
+    .from("chat_threads")
+    .select("id")
+    .eq("job_id", parsed.data.jobId)
+    .eq("worker_id", parsed.data.candidateId)
+    .maybeSingle();
+
+  const messagingThreadId = threadRow?.id ?? null;
+
   if (!preview) {
     return null;
   }
@@ -231,6 +240,7 @@ export async function getEmployerCandidateProfile(
       resumeDownloadEnabled,
       messagingEnabled,
       isPinned,
+      messagingThreadId,
       candidate: {
         id: String(candidate.id ?? parsed.data.candidateId),
         name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
@@ -267,6 +277,7 @@ export async function getEmployerCandidateProfile(
     resumeDownloadEnabled,
     messagingEnabled,
     isPinned,
+    messagingThreadId,
     candidate: {
       id: String(candidate.id ?? parsed.data.candidateId),
       name: previewDisplayName(parsed.data.candidateId),

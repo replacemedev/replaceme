@@ -5,7 +5,6 @@ import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { ContractDetailClient } from "@/components/employer/contracts/ContractDetailClient";
 import { ContractStatusTimeline } from "@/components/employer/contracts/ContractStatusTimeline";
 import {
-  EmployerBreadcrumb,
   EmployerPageHeader,
   EmployerPageShell,
   EmployerSectionCard,
@@ -34,13 +33,6 @@ export default async function EmployerContractPage({
 
   return (
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Hired workers", href: "/employer/hired" },
-          { label: contract.workerName },
-        ]}
-      />
-
       <EmployerPageHeader
         title="Manage contract"
         subhead={`${contract.workerName} · ${contract.workerRole}${

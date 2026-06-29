@@ -152,17 +152,15 @@ export function ApplicantCard({
           </>
         ) : (
           <>
+            {jobId ? (
             <Link
-              href={
-                jobId
-                  ? `/employer/candidates/${applicant.candidateId}?jobId=${jobId}`
-                  : `/employer/candidates/${applicant.candidateId}`
-              }
-              className="flex-1 h-9 bg-[#006e2f] hover:bg-[#005c26] text-white font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-1.5"
+              href={`/employer/candidates/${applicant.candidateId}?jobId=${jobId}`}
+              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
             >
               <Eye size={14} />
               {isPreview ? "Preview profile" : "View profile"}
             </Link>
+            ) : null}
             {messagingEnabled ? (
               <button
                 onClick={onMessageClick}

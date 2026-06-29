@@ -23,17 +23,20 @@ export function UnlockOverlay({
   if (compact) {
     return (
       <div
-        className={`flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white/70 px-3 py-2 backdrop-blur-md ${className}`}
+        className={`flex flex-col gap-2 rounded-lg border border-slate-200/80 bg-white/70 p-3 backdrop-blur-md sm:flex-row sm:items-center ${className}`}
       >
-        <Lock className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden />
-        <p className="min-w-0 flex-1 text-[11px] font-semibold text-slate-600">
-          {copy.title}
-        </p>
+        <div className="flex min-w-0 flex-1 items-start gap-2 sm:items-center">
+          <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500 sm:mt-0" aria-hidden />
+          <p className="min-w-0 flex-1 text-[11px] font-semibold leading-snug text-slate-600">
+            {copy.title}
+          </p>
+        </div>
         <UpgradeCTA
           feature={feature}
           currentPlan={currentPlan}
           variant="inline"
-          label={`Unlock`}
+          label="Unlock"
+          className="shrink-0 self-start sm:self-center"
         />
       </div>
     );

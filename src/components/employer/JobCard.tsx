@@ -28,7 +28,7 @@ export function JobCard({
   );
 
   return (
-    <div className="group relative flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)] gap-5 overflow-hidden">
+    <div className="group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)]">
       <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#006e2f] via-emerald-500 to-[#006e2f] opacity-70 group-hover:opacity-100 transition-opacity" />
 
       {showPriorityBadge ? (
@@ -103,13 +103,13 @@ export function JobCard({
       <div className="flex items-center gap-2 pt-1 text-xs font-bold text-slate-500 select-none">
         <Link
           href={`/employer/jobs/${job.id}`}
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
         >
           View job
         </Link>
         <Link
           href={`/employer/jobs/${job.id}/applicants`}
-          className="inline-flex flex-1 items-center justify-center rounded-xl bg-[#006e2f] px-3.5 py-2 text-xs font-extrabold text-white hover:bg-[#005c26] transition-colors"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#006e2f] px-3.5 py-2 text-xs font-extrabold text-white transition-colors hover:bg-[#005c26]"
         >
           View applicants
         </Link>

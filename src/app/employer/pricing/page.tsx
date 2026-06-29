@@ -4,7 +4,6 @@ import { EmployerPricingClient } from "@/components/employer/pricing/EmployerPri
 import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 import {
   EmployerPageShell,
-  EmployerBreadcrumb,
   EmployerPageHeader,
 } from "@/components/employer/layout";
 
@@ -26,12 +25,6 @@ export default async function PricingPage() {
 
   return (
     <EmployerPageShell width="wide" className="gap-10">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Pricing" },
-        ]}
-      />
       <EmployerPageHeader
         title="Scale your remote team"
         subhead="Simple, transparent pricing — Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."

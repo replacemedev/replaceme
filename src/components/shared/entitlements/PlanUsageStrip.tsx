@@ -35,27 +35,36 @@ export function PlanUsageStrip({
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white ${
-        compact ? "px-3 py-2 sm:flex-row sm:items-center" : "px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      className={`flex flex-col gap-3 rounded-lg border border-slate-200 bg-white ${
+        compact ? "px-3 py-3" : "px-4 py-4"
       } ${className}`}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <PlanTierBadge tier={usage.planSlug} />
-        {!compact ? (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-            Billed monthly in USD
-          </span>
-        ) : null}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
+          <PlanTierBadge tier={usage.planSlug} />
+          {!compact ? (
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 whitespace-nowrap">
+              Billed monthly in USD
+            </span>
+          ) : null}
+        </div>
+
+        <Link
+          href={
+            usage.planSlug === "discovery"
+              ? "/employer/pricing"
+              : "/employer/settings/account"
+          }
+          className="shrink-0 text-xs font-bold text-[#006e2f] hover:underline self-start sm:self-center"
+        >
+          {usage.planSlug === "discovery" ? "Upgrade plan" : "Manage plan"}
+        </Link>
       </div>
 
-      <div
-        className={`flex min-w-0 flex-1 flex-col gap-1.5 ${
-          compact ? "sm:max-w-[200px]" : "sm:max-w-xs"
-        }`}
-      >
+      <div className="flex min-w-0 flex-col gap-1.5">
         <div className="flex justify-between text-[11px] font-semibold text-slate-600">
           <span>Active jobs</span>
-          <span>{jobsLabel}</span>
+          <span className="tabular-nums">{jobsLabel}</span>
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
@@ -64,17 +73,6 @@ export function PlanUsageStrip({
           />
         </div>
       </div>
-
-      <Link
-        href={
-          usage.planSlug === "discovery"
-            ? "/employer/pricing"
-            : "/employer/settings/account"
-        }
-        className="shrink-0 text-xs font-bold text-[#006e2f] hover:underline"
-      >
-        {usage.planSlug === "discovery" ? "Upgrade plan" : "Manage plan"}
-      </Link>
     </div>
   );
 }

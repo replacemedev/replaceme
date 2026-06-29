@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Paperclip, Smile, Send, Lock } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Send, Lock } from "lucide-react";
 
 interface ChatInputAreaProps {
   onSendMessage: (content: string) => Promise<void>;
@@ -20,13 +20,12 @@ export function ChatInputArea({ onSendMessage, disabled }: ChatInputAreaProps) {
     try {
       setIsSending(true);
       const textToSend = message;
-      setMessage(""); // Clear input early for responsive UI
+      setMessage("");
       await onSendMessage(textToSend);
     } catch (err) {
       console.error("Failed to send message:", err);
     } finally {
       setIsSending(false);
-      // Keep focus on input
       inputRef.current?.focus();
     }
   };
@@ -39,22 +38,9 @@ export function ChatInputArea({ onSendMessage, disabled }: ChatInputAreaProps) {
   };
 
   return (
-    <div className="shrink-0 p-4 border-t border-slate-200 bg-white">
+    <div className="shrink-0 border-t border-slate-200 bg-white p-4 sm:p-5">
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        {/* Input Bar Container */}
-        <div className="relative flex items-center bg-[#f8fafd] border border-slate-200 rounded-xl px-4 py-2.5 transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
-          
-          {/* Attachment Icon */}
-          <button
-            type="button"
-            disabled={disabled}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-md cursor-pointer disabled:opacity-50"
-            aria-label="Attach files"
-          >
-            <Paperclip className="h-5 w-5" />
-          </button>
-
-          {/* Text Input */}
+        <div className="relative flex items-center rounded-lg border border-slate-200 bg-[#f8fafd] px-4 py-3 transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
           <input
             type="text"
             ref={inputRef}
@@ -63,33 +49,20 @@ export function ChatInputArea({ onSendMessage, disabled }: ChatInputAreaProps) {
             onKeyDown={handleKeyDown}
             disabled={disabled || isSending}
             placeholder="Type a message..."
-            className="flex-1 bg-transparent border-0 outline-hidden focus:ring-0 text-sm text-slate-800 placeholder-slate-400 px-3 py-1"
+            className="flex-1 border-0 bg-transparent px-0 py-1 text-sm text-slate-800 outline-hidden placeholder:text-slate-400 focus:ring-0"
           />
 
-          {/* Emoji button */}
-          <button
-            type="button"
-            disabled={disabled}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-md mr-2 cursor-pointer disabled:opacity-50"
-            aria-label="Add emoji"
-          >
-            <Smile className="h-5 w-5" />
-          </button>
-
-          {/* Send Button */}
           <button
             type="submit"
             disabled={disabled || isSending || !message.trim()}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shrink-0"
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md bg-[#006e2f] text-white transition-colors hover:bg-[#005c26] active:bg-[#00421a] disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Send message"
           >
-            <Send className="h-4.5 w-4.5" />
+            <Send className="h-4 w-4" />
           </button>
-
         </div>
 
-        {/* Footer info row */}
-        <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 font-medium select-none">
+        <div className="flex select-none items-center justify-between px-1 text-[11px] font-medium text-slate-400">
           <div className="flex items-center gap-1">
             <Lock className="h-3 w-3" />
             <span>End-to-end encrypted</span>

@@ -9,7 +9,6 @@ import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
 import { CandidateProfileActions } from "./CandidateProfileActions";
 import {
-  EmployerBreadcrumb,
   EmployerPageShell,
   EmployerStickyActionBar,
 } from "@/components/employer/layout";
@@ -23,6 +22,7 @@ export type EmployerCandidateProfileData = {
   resumeDownloadEnabled: boolean;
   messagingEnabled: boolean;
   isPinned: boolean;
+  messagingThreadId?: string | null;
   candidate: {
     id: string;
     name: string;
@@ -72,6 +72,7 @@ export function EmployerCandidateProfile({
     resumeDownloadEnabled,
     messagingEnabled,
     isPinned,
+    messagingThreadId,
   } = profile;
   const isPreview = identityMode === "anonymous_preview";
   const salary = formatSalaryRange(
@@ -89,14 +90,6 @@ export function EmployerCandidateProfile({
 
   return (
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Jobs", href: "/employer/jobs" },
-          { label: jobTitle, href: `/employer/jobs/${jobId}/applicants` },
-          { label: isPreview ? "Candidate preview" : candidate.name },
-        ]}
-      />
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
           <FeatureGate
@@ -193,6 +186,7 @@ export function EmployerCandidateProfile({
             jobId={jobId}
             planSlug={planSlug}
             messagingEnabled={messagingEnabled}
+            messagingThreadId={messagingThreadId}
             resumeDownloadEnabled={resumeDownloadEnabled}
             resumeUrl={candidate.resumeUrl}
             isPreview={isPreview}

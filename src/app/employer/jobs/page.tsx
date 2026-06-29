@@ -14,7 +14,6 @@ import {
 import {
   EmployerPageHeader,
   EmployerPageShell,
-  EmployerBreadcrumb,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -62,12 +61,6 @@ export default async function EmployerJobsPage() {
 
   return (
     <EmployerPageShell width="wide">
-      <EmployerBreadcrumb
-        items={[
-          { label: "Dashboard", href: "/employer/dashboard" },
-          { label: "Jobs" },
-        ]}
-      />
       <EmployerPageHeader
         title="Your job posts"
         subhead={

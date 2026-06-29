@@ -15,8 +15,6 @@ import { createJobPost, updateJobPost } from "@/actions/employer/jobs";
 
 import { JobBasicsSection } from "@/components/employer/jobs/create/JobBasicsSection";
 import { JobRequirementsSection } from "@/components/employer/jobs/create/JobRequirementsSection";
-import { JobPreferencesSection } from "@/components/employer/jobs/create/JobPreferencesSection";
-import { SubmissionCards } from "@/components/employer/jobs/create/SubmissionCards";
 
 interface EditJobValues {
   id: string;
@@ -102,8 +100,21 @@ export function CreateJobForm({
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-10">
         <JobBasicsSection employmentTypes={employmentTypes} />
         <JobRequirementsSection skillsOptions={skillsOptions} />
-        {!isEditMode ? <JobPreferencesSection /> : null}
-        <SubmissionCards isSubmitting={isSubmitting} editMode={isEditMode} />
+        <div className="max-w-xl">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-[#006e2f] px-6 text-sm font-bold text-white transition hover:bg-[#005c26] disabled:opacity-50 sm:w-auto sm:min-w-[220px]"
+          >
+            {isSubmitting
+              ? isEditMode
+                ? "Saving..."
+                : "Submitting..."
+              : isEditMode
+                ? "Save changes"
+                : "Submit job post"}
+          </button>
+        </div>
       </form>
     </FormProvider>
   );
