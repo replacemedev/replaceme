@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { EmployerBackButton } from "./EmployerBackButton";
 
 export type EmployerBreadcrumbItem = {
   label: string;
