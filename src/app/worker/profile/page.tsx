@@ -29,7 +29,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
   let workerId = targetId;
   if (!workerId) {
     if (!user) {
-      redirect("/login");
+      redirect("/signin");
     }
     workerId = user.id;
   }

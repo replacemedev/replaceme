@@ -15,17 +15,15 @@ import { getHiredData } from "@/actions/employer/hired";
 import { JobCard } from "@/components/employer/JobCard";
 import { RecentApplicantRow } from "@/components/employer/RecentApplicantRow";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
-import { DashboardQuickLinks } from "@/components/employer/dashboard/DashboardQuickLinks";
 import { DashboardOnboardedBanner } from "@/components/employer/dashboard/DashboardOnboardedBanner";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
-import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
-import { planDashboardSubhead } from "@/lib/entitlements/ui-copy";
 import {
   hasPriorityListing,
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
+import { DashboardHiringSummary } from "@/components/employer/dashboard/DashboardHiringSummary";
 import {
   EmployerPageHeader,
   EmployerPageShell,
@@ -44,7 +42,7 @@ export default async function EmployerDashboard() {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: profile } = await supabase
@@ -54,7 +52,7 @@ export default async function EmployerDashboard() {
     .single();
 
   if (!profile || profile.role !== "employer") {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const employerName = profile.first_name
@@ -136,14 +134,7 @@ export default async function EmployerDashboard() {
       <EmployerPageHeader
         title={`Welcome back, ${employerName}!`}
         subhead={
-          planUsage
-            ? planDashboardSubhead(
-                planUsage.planSlug,
-                planUsage.activeJobsCount,
-                planUsage.activeJobsLimit,
-                planUsage.identityMode
-              )
-            : "Manage your job posts and review candidates who applied to work with you."
+          "Manage your job posts and review candidates."
         }
         actions={<PostJobCTA planUsage={planUsage} />}
       />
@@ -151,8 +142,6 @@ export default async function EmployerDashboard() {
       <Suspense fallback={null}>
         <DashboardOnboardedBanner planUsage={planUsage} />
       </Suspense>
-
-      {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
       <EmployerKpiStrip items={kpiItems} />
 
@@ -169,8 +158,6 @@ export default async function EmployerDashboard() {
           currentPlan={planUsage?.planSlug ?? "discovery"}
         />
       ) : null}
-
-      <DashboardQuickLinks />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start pt-2">
         <div className="lg:col-span-2 space-y-4">
@@ -215,8 +202,6 @@ export default async function EmployerDashboard() {
         </div>
 
         <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-28">
-          {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
-
           <EmployerSectionCard
             title="Recent applications"
             description={
@@ -250,6 +235,14 @@ export default async function EmployerDashboard() {
               </div>
             )}
           </EmployerSectionCard>
+
+          <DashboardHiringSummary
+            interviewCount={interviews.length}
+            activeHires={hiredData.stats.totalActive}
+            upcomingInterviews={interviews}
+          />
+
+          {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
         </aside>
       </div>
     </EmployerPageShell>

@@ -38,7 +38,7 @@ export default async function SignUpPage() {
             <p className="text-sm font-body-base text-slate-600 leading-relaxed">
               {content.signupPrompt}{" "}
               <Link
-                href="/login"
+                href="/signin"
                 className="font-body-bold font-bold text-[#006e2f] transition-colors hover:text-[#005321]"
               >
                 {content.signupLinkLabel}

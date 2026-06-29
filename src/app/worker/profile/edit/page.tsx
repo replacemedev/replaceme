@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 
 export default async function WorkerProfileEditPage() {
   const profile = await getWorkerProfileForEdit();
-  if (!profile) redirect("/login");
+  if (!profile) redirect("/signin");
 
   const projects = await getWorkerProjects();
 

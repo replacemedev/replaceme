@@ -17,7 +17,7 @@ export default async function WorkerNotificationPreferencesPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const prefs = await getNotificationPreferences();
 

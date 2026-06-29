@@ -30,7 +30,7 @@ export default async function WorkerApplyJobPage({ params }: PageProps) {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) redirect("/login");
+  if (authError || !user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -38,7 +38,7 @@ export default async function WorkerApplyJobPage({ params }: PageProps) {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "worker") redirect("/login");
+  if (!profile || profile.role !== "worker") redirect("/signin");
 
   const { id } = await params;
   const pageData = await getApplyJobPageData(id);

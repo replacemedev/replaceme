@@ -30,7 +30,7 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) redirect("/login");
+  if (authError || !user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")

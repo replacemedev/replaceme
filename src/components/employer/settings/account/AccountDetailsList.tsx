@@ -71,7 +71,7 @@ export function AccountDetailsList() {
             </div>
           </div>
           <Link
-            href="/login?view=forgot_password"
+            href="/signin?view=forgot_password"
             className="text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             Reset password

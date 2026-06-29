@@ -13,13 +13,13 @@ export const EMPLOYER_TEST_PASSWORD =
 
 export type EmployerPlanPersona = keyof typeof E2E_PERSONAS.employers;
 
-/** Log in as employer via /login (email or username field). */
+/** Log in as employer via /signin (email or username field). */
 export async function loginAsEmployer(
   page: Page,
   email = EMPLOYER_TEST_EMAIL,
   password = EMPLOYER_TEST_PASSWORD
 ) {
-  await page.goto("/login");
+  await page.goto("/signin");
   await expect(
     page.getByRole("heading", { name: "Welcome back" })
   ).toBeVisible();
@@ -33,7 +33,7 @@ export async function loginAsEmployer(
     .fill(password);
   await page.getByRole("button", { name: "Sign In" }).click({ force: true });
 
-  await expect(page).not.toHaveURL(/\/login$/, { timeout: 30_000 });
+  await expect(page).not.toHaveURL(/\/signin$/, { timeout: 30_000 });
 }
 
 /** Log in as a tier-specific employer persona (Discovery / Starter / Growth / Scale). */

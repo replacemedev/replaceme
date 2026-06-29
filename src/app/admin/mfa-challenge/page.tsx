@@ -17,7 +17,7 @@ export default async function AdminMfaChallengePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
   if (user.app_metadata?.role !== "admin") redirect("/403");
 
   const { data: aalData } =

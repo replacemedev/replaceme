@@ -13,13 +13,13 @@ export const metadata = {
   description: "Sign in to your ReplaceMe account.",
 };
 
-type LoginView = "login" | "forgot_password";
+type SignInView = "login" | "forgot_password";
 
-function resolveView(raw?: string): LoginView {
+function resolveView(raw?: string): SignInView {
   return raw === "forgot_password" ? "forgot_password" : "login";
 }
 
-export default async function LoginPage({
+export default async function SignInPage({
   searchParams,
 }: {
   searchParams: Promise<{ view?: string }>;
@@ -54,7 +54,7 @@ export default async function LoginPage({
 
       <AuthFormCard>
         {view === "login" ? (
-          <LoginForm forgotPasswordHref="/login?view=forgot_password" />
+          <LoginForm forgotPasswordHref="/signin?view=forgot_password" />
         ) : (
           <ForgotPasswordForm />
         )}

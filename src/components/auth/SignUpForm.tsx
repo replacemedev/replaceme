@@ -103,7 +103,7 @@ export function SignUpForm() {
 
       if (result.requiresConfirmation) {
         toast.success(result.message);
-        router.push("/login");
+        router.push("/signin");
         router.refresh();
         return;
       }

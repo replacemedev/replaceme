@@ -13,7 +13,7 @@ test.describe("Worker route security", () => {
     page,
   }) => {
     await page.goto("/worker/dashboard");
-    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/signin/, { timeout: 15_000 });
   });
 
   test.describe("cross-role access", () => {

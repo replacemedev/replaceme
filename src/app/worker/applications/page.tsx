@@ -25,7 +25,7 @@ export default async function WorkerApplicationsPage() {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) redirect("/login");
+  if (authError || !user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -33,7 +33,7 @@ export default async function WorkerApplicationsPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "worker") redirect("/login");
+  if (!profile || profile.role !== "worker") redirect("/signin");
 
   const [applications, stats] = await Promise.all([
     getWorkerApplications(),

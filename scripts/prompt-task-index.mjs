@@ -37,7 +37,7 @@ export const TASK_INDEX = [
   {
     area: "Login / signup",
     patterns: [
-      "src/app/login/**",
+      "src/app/signin/**",
       "src/app/signup/**",
       "src/components/auth/LoginForm.tsx",
       "src/components/auth/SignUpForm.tsx",

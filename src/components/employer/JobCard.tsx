@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Eye, Sparkles, Users } from "lucide-react";
 import { JobPost } from "@/types/employer";
 import { ApprovalStatusBadge } from "@/components/shared/entitlements/ApprovalStatusBadge";
 import { isApplicantCapNear } from "@/lib/entitlements/limits";
@@ -28,11 +28,11 @@ export function JobCard({
   );
 
   return (
-    <div className="group flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.06)] hover:border-slate-300 transition-all duration-300 gap-5 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-[#006e2f] transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+    <div className="group relative flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)] gap-5 overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#006e2f] via-emerald-500 to-[#006e2f] opacity-70 group-hover:opacity-100 transition-opacity" />
 
       {showPriorityBadge ? (
-        <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full bg-violet-50 border border-violet-200 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-violet-700">
+        <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full bg-violet-50 border border-violet-200 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-violet-700 shadow-sm">
           <Sparkles className="h-3 w-3" aria-hidden />
           Priority
         </div>
@@ -41,56 +41,77 @@ export function JobCard({
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2 pr-20">
           <ApprovalStatusBadge status={job.status} />
-          <span className="text-xs text-slate-400 font-medium shrink-0">
+          <span className="inline-flex items-center rounded-full border border-slate-100 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500 shrink-0">
             {formattedDate}
           </span>
         </div>
 
         <Link
           href={`/employer/jobs/${job.id}`}
-          className="block text-lg font-bold text-[#006e2f] hover:text-[#005321] hover:underline leading-snug tracking-tight transition-colors"
+          className="block text-xl font-extrabold text-slate-900 leading-snug tracking-tight transition-colors hover:text-[#006e2f]"
         >
           {job.title}
         </Link>
       </div>
 
-      <div className="flex items-center gap-6 text-sm py-1 border-y border-slate-50 select-none">
-        <span className="text-slate-500 font-medium">
-          <strong className="text-slate-900 font-extrabold text-base mr-1">
-            {job.applicants_count}
-            {applicantsPerJobLimit !== null
-              ? ` / ${applicantsPerJobLimit}`
-              : ""}
-          </strong>
-          Applicants
-        </span>
-        <span className="text-slate-500 font-medium">
-          <strong className="text-slate-900 font-extrabold text-base mr-1">
-            {job.hits_count}
-          </strong>
-          Views
-        </span>
+      <div className="grid grid-cols-2 gap-3 select-none">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+              Applicants
+            </p>
+            <p className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
+              {job.applicants_count}
+              {applicantsPerJobLimit !== null ? (
+                <span className="text-xs font-bold text-slate-500 ml-1">
+                  / {applicantsPerJobLimit}
+                </span>
+              ) : null}
+            </p>
+          </div>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 border border-slate-100">
+            <Users className="h-4 w-4" aria-hidden />
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+              Views
+            </p>
+            <p className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
+              {job.hits_count}
+            </p>
+          </div>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 border border-slate-100">
+            <Eye className="h-4 w-4" aria-hidden />
+          </span>
+        </div>
       </div>
 
       {nearApplicantCap ? (
-        <p className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5">
-          Approaching applicant cap for this job
-        </p>
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
+          <p className="text-[11px] font-bold text-amber-800">
+            Near applicant limit
+          </p>
+          <p className="text-[11px] font-medium text-amber-800/80 mt-0.5 leading-snug">
+            Upgrade to keep receiving applicants on this job.
+          </p>
+        </div>
       ) : null}
 
-      <div className="flex items-center gap-3 pt-1 text-xs font-bold text-slate-400 select-none">
+      <div className="flex items-center gap-2 pt-1 text-xs font-bold text-slate-500 select-none">
         <Link
           href={`/employer/jobs/${job.id}`}
-          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline"
+          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
         >
-          View
+          View job
         </Link>
-        <span className="text-slate-200">|</span>
         <Link
           href={`/employer/jobs/${job.id}/applicants`}
-          className="text-[#006e2f] hover:text-[#005321] transition-colors uppercase hover:underline"
+          className="inline-flex flex-1 items-center justify-center rounded-xl bg-[#006e2f] px-3.5 py-2 text-xs font-extrabold text-white hover:bg-[#005c26] transition-colors"
         >
-          Applicants
+          View applicants
         </Link>
       </div>
     </div>

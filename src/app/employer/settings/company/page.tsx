@@ -19,7 +19,7 @@ export default async function CompanySettingsPage() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: profile } = await supabase

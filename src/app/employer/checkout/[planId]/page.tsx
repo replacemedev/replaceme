@@ -40,7 +40,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: profile } = await supabase

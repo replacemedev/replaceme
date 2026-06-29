@@ -20,7 +20,7 @@ export default async function AdminShellLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   if (user.app_metadata?.role !== "admin") redirect("/403");
 

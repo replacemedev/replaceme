@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
       ? "/update-password"
       : next?.startsWith("/")
         ? next
-        : "/login";
+        : "/signin";
 
   const successUrl = new URL(destinationPath, origin);
-  const failureUrl = new URL("/login", origin);
+  const failureUrl = new URL("/signin", origin);
   failureUrl.searchParams.set("error", "auth_callback_failed");
 
   if (!tokenHash || !type) {
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
   if (type === "signup") {
     await supabase.auth.signOut();
     const signedOut = NextResponse.redirect(
-      new URL("/login?confirmed=email", origin)
+      new URL("/signin?confirmed=email", origin)
     );
     return signedOut;
   }

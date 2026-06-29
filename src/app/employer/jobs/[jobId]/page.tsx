@@ -28,7 +28,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: profile } = await supabase

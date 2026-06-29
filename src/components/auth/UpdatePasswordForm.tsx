@@ -116,7 +116,7 @@ export function UpdatePasswordForm() {
         </Button>
 
         <Link
-          href="/login"
+          href="/signin"
           className="inline-flex h-12 w-full items-center justify-center rounded-xl text-sm font-body-bold font-bold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
         >
           Back to Login

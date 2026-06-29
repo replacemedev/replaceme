@@ -21,7 +21,7 @@ export default async function WorkerEarningsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const earnings = await getWorkerEarnings();
   const total = earnings.reduce((sum, row) => sum + Number(row.amount ?? 0), 0);

@@ -35,7 +35,9 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isAuthRoute =
-    pathname.startsWith("/login") || pathname.startsWith("/signup");
+    pathname.startsWith("/signin") ||
+    pathname.startsWith("/signin") ||
+    pathname.startsWith("/signup");
   const isPasswordResetRoute =
     pathname === "/update-password" || pathname.startsWith("/auth/");
   const isAdminRoute = pathname.startsWith("/admin");
@@ -46,7 +48,7 @@ export async function updateSession(request: NextRequest) {
 
   if (isAdminRoute && !isMfaChallenge) {
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/signin", request.url));
     }
     if (user.app_metadata?.role !== "admin") {
       return NextResponse.redirect(new URL("/403", request.url));
@@ -55,7 +57,7 @@ export async function updateSession(request: NextRequest) {
 
   if (isMfaChallenge) {
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/signin", request.url));
     }
     if (user.app_metadata?.role !== "admin") {
       return NextResponse.redirect(new URL("/403", request.url));
@@ -63,7 +65,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!user && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/signin", request.url));
   }
 
   if (user) {

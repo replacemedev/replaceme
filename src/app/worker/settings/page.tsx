@@ -18,7 +18,7 @@ export default async function WorkerSettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -26,7 +26,7 @@ export default async function WorkerSettingsPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "worker") redirect("/login");
+  if (!profile || profile.role !== "worker") redirect("/signin");
 
   return (
     <WorkerPageShell width="content">

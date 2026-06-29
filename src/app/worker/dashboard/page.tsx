@@ -37,7 +37,7 @@ export default async function WorkerDashboard() {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) redirect("/login");
+  if (authError || !user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -47,7 +47,7 @@ export default async function WorkerDashboard() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "worker") redirect("/login");
+  if (!profile || profile.role !== "worker") redirect("/signin");
 
   const workerName = profile.first_name || user.user_metadata?.first_name || "Worker";
 

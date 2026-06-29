@@ -45,10 +45,10 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
   },
   {
     slug: "auth-login",
-    label: "Login Screen",
-    publicPath: "/login",
+    label: "Sign In Screen",
+    publicPath: "/signin",
     contentType: "json",
-    description: "Login page headline, description, and testimonial copy.",
+    description: "Sign in page headline, description, and testimonial copy.",
   },
   {
     slug: "auth-signup",
@@ -60,7 +60,7 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
   {
     slug: "auth-forgot-password",
     label: "Forgot Password Screen",
-    publicPath: "/login?view=forgot_password",
+    publicPath: "/signin?view=forgot_password",
     contentType: "json",
     description: "Forgot-password view headline, description, and optional testimonial.",
   },

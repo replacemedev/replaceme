@@ -32,7 +32,7 @@ export default async function EmployerJobsPage() {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: profile } = await supabase
@@ -42,7 +42,7 @@ export default async function EmployerJobsPage() {
     .single();
 
   if (!profile || profile.role !== "employer") {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const [jobs, planUsage] = await Promise.all([

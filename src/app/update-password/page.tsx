@@ -23,7 +23,7 @@ export default async function UpdatePasswordPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?view=forgot_password");
+    redirect("/signin?view=forgot_password");
   }
 
   const content = await getAuthScreenContent("auth-update-password");

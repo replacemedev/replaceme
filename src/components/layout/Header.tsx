@@ -76,7 +76,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
     <>
       <Link
         className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
-        href="/login"
+        href="/signin"
         onClick={closeMobileMenu}
       >
         Sign In
@@ -96,7 +96,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
       <Link
         onClick={closeMobileMenu}
         className="text-slate-700 font-body-bold py-2 text-center hover:text-[#22c55e]"
-        href="/login"
+        href="/signin"
       >
         Sign In
       </Link>

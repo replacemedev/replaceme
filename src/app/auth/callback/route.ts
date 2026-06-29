@@ -12,7 +12,7 @@ function resolveRedirectOrigin(request: NextRequest): string {
 }
 
 function authFailureRedirect(request: NextRequest): NextResponse {
-  const url = new URL("/login", resolveRedirectOrigin(request));
+  const url = new URL("/signin", resolveRedirectOrigin(request));
   url.searchParams.set("error", "auth_callback_failed");
   return NextResponse.redirect(url);
 }
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
   }
 
   const origin = resolveRedirectOrigin(request);
-  const isSignup = type === "signup" || next === "/login";
+  const isSignup = type === "signup" || next === "/signin";
   const isRecovery = type === "recovery" || next === "/update-password";
 
   const cookieStore = await cookies();
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
   if (isSignup) {
     await supabase.auth.signOut();
-    return attachRedirect(`${origin}/login?confirmed=email`);
+    return attachRedirect(`${origin}/signin?confirmed=email`);
   }
 
   if (isRecovery) {
@@ -88,5 +88,5 @@ export async function GET(request: NextRequest) {
   }
 
   await supabase.auth.signOut();
-  return attachRedirect(`${origin}/login`);
+  return attachRedirect(`${origin}/signin`);
 }

@@ -51,11 +51,11 @@ try {
   await snap(page, "01-home");
 
   append("Phase 1: Login");
-  await page.goto("/login");
+  await page.goto("/signin");
   await page.getByPlaceholder("Enter your email or username").fill(EMAIL);
   await page.getByPlaceholder("Min. 8 characters").first().fill(PASS);
   await page.getByRole("button", { name: "Sign In" }).click();
-  await page.waitForURL((url) => !url.pathname.endsWith("/login"), {
+  await page.waitForURL((url) => !url.pathname.endsWith("/signin"), {
     timeout: 30_000,
   });
   append(`Post-login URL: ${page.url()}`);

@@ -15,7 +15,7 @@ export default async function EmployerNotificationsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const bootstrap = await fetchNotificationBootstrap(user.id, 50);
 

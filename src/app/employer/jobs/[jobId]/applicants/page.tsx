@@ -25,7 +25,7 @@ export default async function ApplicantsPage({ params }: PageProps) {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   // Verify role is employer

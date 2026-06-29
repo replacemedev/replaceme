@@ -20,7 +20,7 @@ export default function ForbiddenPage() {
           an error, contact your administrator.
         </p>
         <Link
-          href="/login"
+          href="/signin"
           className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] rounded-lg transition-colors"
         >
           Return to login

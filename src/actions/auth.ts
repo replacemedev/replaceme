@@ -164,7 +164,7 @@ export async function signUp(formData: SignUpFormValues) {
       email: data.email,
       password: data.password,
       options: {
-        emailRedirectTo: authCallbackUrl("signup", "/login"),
+        emailRedirectTo: authCallbackUrl("signup", "/signin"),
         data: {
           role: data.role,
           username: data.username,
@@ -389,7 +389,7 @@ export async function logOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  redirect("/login");
+  redirect("/signin");
 }
 
 export async function sendPasswordResetLink(email: string) {
@@ -480,7 +480,7 @@ export async function updatePassword(formData: {
 
     await supabase.auth.signOut();
     revalidatePath("/", "layout");
-    redirect("/login?reset=success");
+    redirect("/signin?reset=success");
   } catch (error) {
     if (
       error &&

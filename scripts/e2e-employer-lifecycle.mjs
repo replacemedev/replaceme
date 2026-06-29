@@ -61,11 +61,11 @@ async function snap(page, name) {
 }
 
 async function login(page) {
-  await page.goto("/login");
+  await page.goto("/signin");
   await page.getByPlaceholder("Enter your email or username").fill(EMAIL);
   await page.getByPlaceholder("Min. 8 characters", { exact: true }).first().fill(PASS);
   await page.getByRole("button", { name: "Sign In" }).click();
-  await page.waitForURL((u) => !u.pathname.endsWith("/login"), { timeout: 30_000 });
+  await page.waitForURL((u) => !u.pathname.endsWith("/signin"), { timeout: 30_000 });
 }
 
 const browser = await chromium.launch({ headless: true });
@@ -106,7 +106,7 @@ try {
   append(`Signup toasts: ${JSON.stringify(signupToast)}`);
   if (
     signupToast.some((t) => /already registered/i.test(t)) ||
-    page.url().includes("/login")
+    page.url().includes("/signin")
   ) {
     results.signup = "pass";
     append("Signup phase PASS — duplicate email handled (expected for existing account)");
@@ -243,7 +243,7 @@ Employer core flows (auth, onboarding, jobs, applicants, dashboard, billing page
 
 ### Spec files (final)
 - \`e2e/employer/signup.spec.ts\`
-- \`e2e/employer/login.spec.ts\`
+- \`e2e/employer/signin.spec.ts\`
 - \`e2e/employer/onboarding.spec.ts\`
 - \`e2e/employer/job-creation.spec.ts\`
 - \`e2e/employer/applicants.spec.ts\`

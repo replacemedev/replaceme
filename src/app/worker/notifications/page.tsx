@@ -21,7 +21,7 @@ export default async function WorkerNotificationsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const { notifications } = await fetchNotificationBootstrap(user.id, 50);
 

@@ -21,7 +21,7 @@ export async function loginAsWorker(
   email = WORKER_TEST_EMAIL,
   password = WORKER_TEST_PASSWORD
 ) {
-  await page.goto("/login");
+  await page.goto("/signin");
   await expect(
     page.getByRole("heading", { name: "Welcome back" })
   ).toBeVisible();
@@ -33,7 +33,7 @@ export async function loginAsWorker(
     .fill(password);
   await page.getByRole("button", { name: "Sign In" }).click();
 
-  await expect(page).not.toHaveURL(/\/login$/, { timeout: 30_000 });
+  await expect(page).not.toHaveURL(/\/signin$/, { timeout: 30_000 });
   await completeWorkerOnboardingIfPresent(page);
 }
 

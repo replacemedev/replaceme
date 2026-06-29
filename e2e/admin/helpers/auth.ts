@@ -17,7 +17,7 @@ export async function loginAsAdmin(
   email = ADMIN_TEST_EMAIL,
   password = ADMIN_TEST_PASSWORD
 ) {
-  await page.goto("/login");
+  await page.goto("/signin");
   await expect(
     page.getByRole("heading", { name: "Welcome back" })
   ).toBeVisible();
@@ -29,7 +29,7 @@ export async function loginAsAdmin(
     .fill(password);
   await page.getByRole("button", { name: "Sign In" }).click({ force: true });
 
-  await expect(page).not.toHaveURL(/\/login$/, { timeout: 30_000 });
+  await expect(page).not.toHaveURL(/\/signin$/, { timeout: 30_000 });
 }
 
 export async function loginAsAdminPersona(page: Page, persona: AdminPersona) {

@@ -25,7 +25,7 @@ export default async function WorkerVerificationPage() {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) redirect("/login");
+  if (authError || !user) redirect("/signin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -33,10 +33,10 @@ export default async function WorkerVerificationPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "worker") redirect("/login");
+  if (!profile || profile.role !== "worker") redirect("/signin");
 
   const state = await getWorkerVerificationState();
-  if (!state) redirect("/login");
+  if (!state) redirect("/signin");
 
   return (
     <WorkerPageShell width="content">
