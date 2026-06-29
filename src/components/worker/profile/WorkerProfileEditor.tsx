@@ -398,8 +398,8 @@ export function WorkerProfileEditor({
               )}
             </div>
 
-            <div className="space-y-1">
-              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight inline-flex items-center justify-center gap-1.5 flex-wrap">
+            <div className="space-y-2 flex flex-col items-center">
+              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
                 {fullName}
                 <VerifiedBadge show={Boolean(profile.is_verified)} size="md" />
               </h3>
@@ -418,7 +418,7 @@ export function WorkerProfileEditor({
                   </button>
                 </div>
               ) : (
-                <p className="text-sm font-semibold text-slate-500 inline-flex items-center gap-1 justify-center">
+                <p className="text-sm font-semibold text-slate-500 flex items-center gap-1 justify-center">
                   {profile.professional_title || "Specialized Contractor"}
                   {isOwner ? (
                     <button
