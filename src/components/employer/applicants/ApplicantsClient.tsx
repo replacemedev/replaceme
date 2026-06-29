@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, LayoutGrid, Table2, Columns3 } from "lucide-react";
+import { AlertCircle, LayoutGrid, Table2 } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import {
@@ -15,7 +15,7 @@ import {
   ApplicantTrackerTable,
   type ApplicantTrackerRow,
 } from "./ApplicantTrackerTable";
-import { ApplicantKanban } from "./ApplicantKanban";
+import { JobApplicantUsageBar } from "@/components/shared/entitlements/JobApplicantUsageBar";
 import { EntitlementProvider } from "@/components/shared/entitlements/EntitlementProvider";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
@@ -50,7 +50,7 @@ export function ApplicantsClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<ApplicantStatusFilter>("all");
   const [sortKey, setSortKey] = useState<ApplicantSortKey>("newest");
-  const [viewMode, setViewMode] = useState<"cards" | "table" | "kanban">("cards");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   const isDiscoveryPreview = identityMode === "anonymous_preview";
   const planSlug = planUsage?.planSlug ?? "discovery";
@@ -59,17 +59,7 @@ export function ApplicantsClient({
     setApplicants(initialApplicants);
   }, [initialApplicants]);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
-    const enforceMobileView = () => {
-      if (mq.matches && viewMode === "kanban") {
-        setViewMode("cards");
-      }
-    };
-    enforceMobileView();
-    mq.addEventListener("change", enforceMobileView);
-    return () => mq.removeEventListener("change", enforceMobileView);
-  }, [viewMode]);
+  const visibleApplicantCount = initialApplicants.length;
 
   const handleChatWithCandidate = (candidateId: string) => {
     const applicant = applicants.find((a) => a.candidateId === candidateId);
@@ -155,6 +145,15 @@ export function ApplicantsClient({
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 
+      {applicantsPerJobLimit !== null ? (
+        <JobApplicantUsageBar
+          visibleCount={visibleApplicantCount}
+          hiddenCount={hiddenApplicantCount}
+          capLimit={applicantsPerJobLimit}
+          currentPlan={planSlug}
+        />
+      ) : null}
+
       {hiddenApplicantCount > 0 ? (
         <HiddenApplicantsBanner
           hiddenCount={hiddenApplicantCount}
@@ -207,18 +206,6 @@ export function ApplicantsClient({
           <Table2 className="h-3.5 w-3.5" aria-hidden />
           Table
         </button>
-        <button
-          type="button"
-          onClick={() => setViewMode("kanban")}
-          className={`hidden lg:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-            viewMode === "kanban"
-              ? "bg-[#006e2f] text-white"
-              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          <Columns3 className="h-3.5 w-3.5" aria-hidden />
-          Kanban
-        </button>
       </div>
 
       {filteredApplicants.length === 0 ? (
@@ -231,17 +218,6 @@ export function ApplicantsClient({
             No applicant matches the filter criteria or search keyword.
           </p>
         </div>
-      ) : viewMode === "kanban" ? (
-        <div className="hidden lg:block">
-          <ApplicantKanban
-            applicants={filteredApplicants}
-            jobId={jobId}
-            onMessageClick={handleChatWithCandidate}
-            messagingEnabled={messagingEnabled}
-            planSlug={planSlug}
-            resumeDownloadEnabled={resumeDownloadEnabled}
-          />
-        </div>
       ) : viewMode === "table" ? (
         <div className="hidden lg:block overflow-x-auto">
           <ApplicantTrackerTable
@@ -252,10 +228,7 @@ export function ApplicantsClient({
         </div>
       ) : null}
 
-      {(viewMode === "cards" ||
-        viewMode === "table" ||
-        viewMode === "kanban") &&
-      filteredApplicants.length > 0 ? (
+      {filteredApplicants.length > 0 ? (
         <div
           className={
             viewMode === "cards" ? "space-y-4" : "space-y-4 lg:hidden"

@@ -3,12 +3,17 @@ import {
   notificationSchema,
   type NotificationBootstrap,
 } from "@/types/notifications.types";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+} from "@/lib/server/redis-cache";
 
 const DEFAULT_LIMIT = 30;
 
-export async function fetchNotificationBootstrap(
+async function loadNotificationBootstrap(
   userId: string,
-  limit = DEFAULT_LIMIT
+  limit: number
 ): Promise<NotificationBootstrap> {
   const supabase = await createClient();
 
@@ -34,4 +39,15 @@ export async function fetchNotificationBootstrap(
     notifications,
     unreadCount: notifications.filter((n) => !n.is_read).length,
   };
+}
+
+export async function fetchNotificationBootstrap(
+  userId: string,
+  limit = DEFAULT_LIMIT
+): Promise<NotificationBootstrap> {
+  return getOrSet(
+    CacheKeys.notificationsBootstrap(userId),
+    CACHE_TTL_SECONDS.notifications,
+    () => loadNotificationBootstrap(userId, limit)
+  );
 }

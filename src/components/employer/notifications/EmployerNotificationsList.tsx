@@ -2,27 +2,24 @@
 
 import { useTransition } from "react";
 import Link from "next/link";
-import { Bell, CheckCheck, Loader2, RefreshCw } from "lucide-react";
+import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/actions/notifications";
-import { useNotifications } from "@/hooks/useNotifications";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { ErrorState } from "@/components/shared/ErrorState";
 import {
   getNotificationHref,
   NOTIFICATION_TYPE_LABELS,
   type Notification,
-  type NotificationBootstrap,
 } from "@/types/notifications.types";
 import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
-interface EmployerNotificationsClientProps {
-  userId: string;
-  initialBootstrap: NotificationBootstrap;
+interface EmployerNotificationsListProps {
+  notifications: Notification[];
+  unreadCount: number;
 }
 
 type DateBucket = "Today" | "Yesterday" | "Earlier";
@@ -41,6 +38,10 @@ function groupByDate(notifications: Notification[]) {
 
   for (const notification of notifications) {
     const date = new Date(notification.created_at);
+    if (Number.isNaN(date.getTime())) {
+      groups.Earlier.push(notification);
+      continue;
+    }
     date.setHours(0, 0, 0, 0);
 
     if (date.getTime() === today.getTime()) {
@@ -57,31 +58,22 @@ function groupByDate(notifications: Notification[]) {
 
 const BUCKET_ORDER: DateBucket[] = ["Today", "Yesterday", "Earlier"];
 
-export function EmployerNotificationsClient({
-  userId,
-  initialBootstrap,
-}: EmployerNotificationsClientProps) {
+export function EmployerNotificationsList({
+  notifications,
+  unreadCount,
+}: EmployerNotificationsListProps) {
   const [pending, startTransition] = useTransition();
-  const { notifications, unreadCount, error, markReadLocal, markAllReadLocal } =
-    useNotifications(userId, initialBootstrap);
-
   const grouped = groupByDate(notifications);
 
   const handleMarkAllRead = () => {
     startTransition(async () => {
       const result = await markAllNotificationsRead();
       if (result.success) {
-        markAllReadLocal();
         toast.success("All notifications marked as read");
       } else {
         toast.error(result.error);
       }
     });
-  };
-
-  const handleMarkRead = (notificationId: string) => {
-    markReadLocal(notificationId);
-    void markNotificationRead(notificationId);
   };
 
   return (
@@ -108,20 +100,13 @@ export function EmployerNotificationsClient({
         }
       />
 
-      {error ? (
-        <ErrorState
-          description={error}
-          retryHref="/employer/notifications"
-        />
-      ) : null}
-
-      {!error && notifications.length === 0 ? (
+      {notifications.length === 0 ? (
         <EmptyState
           icon={<Bell size={22} />}
           title="No notifications"
           description="You're all caught up. New alerts will appear here."
         />
-      ) : !error ? (
+      ) : (
         <div className="space-y-8">
           {unreadCount > 0 ? (
             <p className="text-xs font-bold text-[#006e2f]">
@@ -143,7 +128,6 @@ export function EmployerNotificationsClient({
                     <NotificationRow
                       key={notification.id}
                       notification={notification}
-                      onMarkRead={() => handleMarkRead(notification.id)}
                     />
                   ))}
                 </ul>
@@ -151,21 +135,19 @@ export function EmployerNotificationsClient({
             );
           })}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
 
-function NotificationRow({
-  notification,
-  onMarkRead,
-}: {
-  notification: Notification;
-  onMarkRead: () => void;
-}) {
+function NotificationRow({ notification }: { notification: Notification }) {
   const href = getNotificationHref(notification);
   const typeLabel =
     NOTIFICATION_TYPE_LABELS[notification.type] ?? notification.type;
+
+  const handleMarkRead = () => {
+    void markNotificationRead(notification.id);
+  };
 
   const card = (
     <article
@@ -200,7 +182,7 @@ function NotificationRow({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onMarkRead();
+              handleMarkRead();
             }}
             className="shrink-0 text-[11px] font-bold text-[#006e2f] hover:underline"
           >
@@ -217,7 +199,7 @@ function NotificationRow({
         <Link
           href={href}
           onClick={() => {
-            if (!notification.is_read) onMarkRead();
+            if (!notification.is_read) handleMarkRead();
           }}
           className="block"
         >
@@ -229,7 +211,11 @@ function NotificationRow({
 
   return (
     <li>
-      <button type="button" onClick={onMarkRead} className="block w-full text-left">
+      <button
+        type="button"
+        onClick={handleMarkRead}
+        className="block w-full text-left"
+      >
         {card}
       </button>
     </li>

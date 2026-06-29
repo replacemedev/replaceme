@@ -6,6 +6,7 @@ import {
   resolveBillingPlanByStripePriceId,
 } from "@/lib/server/stripe/plan";
 import { safeError, safeLog } from "@/utils/logger";
+import { invalidateEmployerCache } from "@/lib/server/entitlements";
 
 function stripeTimestampToIso(value: number | null | undefined): string | null {
   if (!value) return null;
@@ -135,6 +136,8 @@ export async function syncEmployerSubscription(
     `[Stripe] Legacy PI subscription synced for employer [REDACTED] plan=${plan.slug}`
   );
 
+  await invalidateEmployerCache(input.employerId);
+
   return { success: true };
 }
 
@@ -211,6 +214,8 @@ export async function syncEmployerSubscriptionFromStripe(
     `[Stripe] Subscription synced employer=[REDACTED] plan=${planSlug} status=${status}`
   );
 
+  await invalidateEmployerCache(employerId);
+
   return { success: true };
 }
 
@@ -242,6 +247,8 @@ export async function downgradeEmployerToDiscovery(
     safeError("downgradeEmployerToDiscovery failed", error);
     return { success: false, error: "Failed to downgrade subscription." };
   }
+
+  await invalidateEmployerCache(employerId);
 
   return { success: true };
 }

@@ -12,6 +12,7 @@ import {
 } from "@/types/messaging";
 import { InboxSidebar } from "./InboxSidebar";
 import { ChatArea } from "./ChatArea";
+import { ChatAreaSkeleton } from "./ChatAreaSkeleton";
 import { MessagingCenterShell } from "./MessagingCenterShell";
 import {
   sendMessagingMessage,
@@ -45,22 +46,25 @@ export function MessagingClient({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [, startTransition] = useTransition();
+  const [, startRefresh] = useTransition();
+  const [isNavigating, startNavigation] = useTransition();
 
   const [messages, setMessages] = useState(initialMessages);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "unread" | "pinned">("all");
   const [selectedJobRole, setSelectedJobRole] =
     useState<JobRoleFilterValue>(ALL_JOB_ROLES);
+  const [pendingThreadId, setPendingThreadId] = useState<string | null>(null);
 
   useEffect(() => {
     setMessages(initialMessages);
+    setPendingThreadId(null);
   }, [initialMessages]);
 
   useEffect(() => {
     if (!selectedThreadId) return;
     markMessagingThreadRead(selectedThreadId, basePath).then(() => {
-      startTransition(() => router.refresh());
+      startRefresh(() => router.refresh());
     });
   }, [selectedThreadId, basePath, router]);
 
@@ -68,15 +72,18 @@ export function MessagingClient({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("threadId");
     const qs = params.toString();
-    startTransition(() => {
+    setPendingThreadId(null);
+    startNavigation(() => {
       router.push(qs ? `${pathname}?${qs}` : pathname);
     });
   };
 
   const handleSelectThread = (threadId: string) => {
+    if (threadId === selectedThreadId) return;
+    setPendingThreadId(threadId);
     const params = new URLSearchParams(searchParams.toString());
     params.set("threadId", threadId);
-    startTransition(() => {
+    startNavigation(() => {
       router.push(`${pathname}?${params.toString()}`);
     });
   };
@@ -114,7 +121,7 @@ export function MessagingClient({
       return;
     }
 
-    startTransition(() => router.refresh());
+    startRefresh(() => router.refresh());
   };
 
   const handleTogglePin = async () => {
@@ -128,7 +135,7 @@ export function MessagingClient({
       basePath
     );
     if (result.success) {
-      startTransition(() => router.refresh());
+      startRefresh(() => router.refresh());
     }
   };
 
@@ -136,6 +143,9 @@ export function MessagingClient({
     threads.find((t) => t.id === selectedThreadId) ?? null;
 
   const mobileChatOpen = Boolean(selectedThreadId);
+  const isLoadingThread =
+    Boolean(selectedThreadId) &&
+    (isNavigating || pendingThreadId === selectedThreadId);
 
   return (
     <MessagingCenterShell>
@@ -153,18 +163,22 @@ export function MessagingClient({
         role={role}
         mobileHidden={mobileChatOpen}
       />
-      <ChatArea
-        thread={activeThread}
-        messages={messages}
-        currentUserId={currentUserId}
-        role={role}
-        messagingEnabled={messagingEnabled}
-        planSlug={planSlug}
-        onSendMessage={handleSendMessage}
-        onTogglePin={handleTogglePin}
-        onBack={mobileChatOpen ? handleBackToInbox : undefined}
-        mobileHidden={!mobileChatOpen}
-      />
+      {isLoadingThread ? (
+        <ChatAreaSkeleton mobileHidden={!mobileChatOpen} />
+      ) : (
+        <ChatArea
+          thread={activeThread}
+          messages={messages}
+          currentUserId={currentUserId}
+          role={role}
+          messagingEnabled={messagingEnabled}
+          planSlug={planSlug}
+          onSendMessage={handleSendMessage}
+          onTogglePin={handleTogglePin}
+          onBack={mobileChatOpen ? handleBackToInbox : undefined}
+          mobileHidden={!mobileChatOpen}
+        />
+      )}
     </MessagingCenterShell>
   );
 }

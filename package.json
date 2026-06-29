@@ -29,6 +29,8 @@
     "@stripe/stripe-js": "^9.8.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "autoskills": "^0.3.6",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",

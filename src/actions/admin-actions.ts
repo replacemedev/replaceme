@@ -147,14 +147,31 @@ export async function unsuspendUser(userId: string): Promise<ActionResult> {
 export async function approveJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
-    const { supabase } = await requireAdmin();
+    const { supabase, user } = await requireAdmin();
 
     const { error } = await supabase
       .from("jobs")
-      .update({ status: "Active" })
+      .update({
+        status: "Active",
+        approved_at: new Date().toISOString(),
+        approved_by: user.id,
+      })
       .eq("id", id);
 
     if (error) throw new Error(error.message);
+
+    const { data: job } = await supabase
+      .from("jobs")
+      .select("employer_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (job?.employer_id) {
+      const { invalidateEmployerCache } = await import(
+        "@/lib/server/entitlements"
+      );
+      await invalidateEmployerCache(job.employer_id);
+    }
 
     await logAdminAction("approve_job", "job", id);
     revalidateAdminSurfaces();
@@ -479,9 +496,13 @@ export async function fetchAdminJobs(
       monthly_salary,
       employer_id,
       created_at,
+      submitted_for_review_at,
       profiles!jobs_employer_id_fkey (
         company_profiles (
           company_name
+        ),
+        employer_subscriptions (
+          plan_slug
         )
       )
     `
@@ -501,6 +522,11 @@ export async function fetchAdminJobs(
     const company = Array.isArray(companyProfiles)
       ? companyProfiles[0]
       : companyProfiles;
+    const subscriptions = profile?.employer_subscriptions;
+    const subscription = Array.isArray(subscriptions)
+      ? subscriptions[0]
+      : subscriptions;
+    const planSlug = subscription?.plan_slug ?? "discovery";
 
     return {
       id: row.id,
@@ -511,6 +537,9 @@ export async function fetchAdminJobs(
       employer_id: row.employer_id,
       company_name: company?.company_name ?? null,
       created_at: row.created_at,
+      plan_slug: planSlug,
+      submitted_for_review_at: row.submitted_for_review_at,
+      requires_manual_approval: planSlug === "discovery",
     };
   });
 }

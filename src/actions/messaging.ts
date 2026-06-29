@@ -263,6 +263,12 @@ export async function sendMessagingMessage(
       }
     }
 
+    const { rateLimitMessaging } = await import("@/lib/server/rate-limit");
+    const rateCheck = await rateLimitMessaging(user.id);
+    if (!rateCheck.success) {
+      return fail(rateCheck.error);
+    }
+
     const { error: insertError } = await supabase.from("chat_messages").insert({
       thread_id: parsed.threadId,
       sender_id: user.id,

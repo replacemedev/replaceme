@@ -6,11 +6,13 @@ import {
   getMessagingJobRoles,
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
+import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
 import {
   WorkerPageShell,
   WorkerBreadcrumb,
   WorkerPageHeader,
 } from "@/components/worker/layout";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
   title: "Messages | ReplaceMe",
@@ -41,13 +43,36 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   if (!profile || profile.role !== "worker") redirect("/signin");
 
   const { threadId } = await searchParams;
-  const [threads, availableJobRoles] = await Promise.all([
-    getMessagingThreads("worker"),
-    getMessagingJobRoles("worker"),
-  ]);
-  const initialMessages = threadId
-    ? await getMessagingMessages(threadId)
-    : [];
+
+  let threads: MessagingThread[] = [];
+  let availableJobRoles: MessagingJobRole[] = [];
+  let loadError: string | null = null;
+
+  try {
+    [threads, availableJobRoles] = await Promise.all([
+      getMessagingThreads("worker"),
+      getMessagingJobRoles("worker"),
+    ]);
+  } catch {
+    loadError = "We couldn't load your messaging inbox. Please refresh and try again.";
+  }
+
+  const initialMessages =
+    threadId && !loadError ? await getMessagingMessages(threadId) : [];
+
+  if (loadError) {
+    return (
+      <WorkerPageShell width="wide" className="py-8 gap-4">
+        <WorkerBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/worker/dashboard" },
+            { label: "Messages" },
+          ]}
+        />
+        <ErrorState description={loadError} retryHref="/worker/messages" />
+      </WorkerPageShell>
+    );
+  }
 
   return (
     <WorkerPageShell width="wide" className="py-8 gap-4">

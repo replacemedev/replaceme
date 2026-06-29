@@ -152,6 +152,9 @@ export interface AdminJobRow {
   employer_id: string;
   company_name: string | null;
   created_at: string;
+  plan_slug: string | null;
+  submitted_for_review_at: string | null;
+  requires_manual_approval: boolean;
 }
 
 export interface AdminVerificationQueueRow {

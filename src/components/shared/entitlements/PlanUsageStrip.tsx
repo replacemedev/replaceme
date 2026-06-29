@@ -73,6 +73,20 @@ export function PlanUsageStrip({
           />
         </div>
       </div>
+
+      {usage.applicantsPerJobLimit !== null ? (
+        <p className="text-[11px] font-medium text-slate-500 leading-relaxed">
+          Up to{" "}
+          <span className="font-bold text-slate-700 tabular-nums">
+            {usage.applicantsPerJobLimit}
+          </span>{" "}
+          applicants visible per job on your plan.
+        </p>
+      ) : (
+        <p className="text-[11px] font-medium text-slate-500">
+          Unlimited applicants per job on your plan.
+        </p>
+      )}
     </div>
   );
 }

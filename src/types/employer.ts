@@ -6,6 +6,7 @@ export interface JobPost {
   hits_count: number; // mapped to views_count
   status: string;
   priority_score: number;
+  visible_applicants_count: number;
 }
 
 export interface RecentApplicant {

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validations/common";
+import { invalidateUserCache } from "@/lib/server/redis-cache";
 
 const notificationIdSchema = z.object({ notificationId: uuidSchema }).strict();
 
@@ -36,6 +37,9 @@ export async function markNotificationRead(
       .eq("user_id", userId);
 
     if (error) throw new Error(error.message);
+    await invalidateUserCache(userId);
+    revalidatePath("/employer/notifications");
+    revalidatePath("/worker/notifications");
     return { success: true };
   } catch (err) {
     return {
@@ -56,6 +60,9 @@ export async function markAllNotificationsRead(): Promise<ActionResult> {
       .eq("is_read", false);
 
     if (error) throw new Error(error.message);
+    await invalidateUserCache(userId);
+    revalidatePath("/employer/notifications");
+    revalidatePath("/worker/notifications");
     return { success: true };
   } catch (err) {
     return {
@@ -79,6 +86,9 @@ export async function deleteNotification(
       .eq("user_id", userId);
 
     if (error) throw new Error(error.message);
+    await invalidateUserCache(userId);
+    revalidatePath("/employer/notifications");
+    revalidatePath("/worker/notifications");
     return { success: true };
   } catch (err) {
     return {

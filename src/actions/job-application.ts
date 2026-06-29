@@ -161,6 +161,12 @@ export async function submitJobApplication(
       return { success: false, error: "You have already applied to this job." };
     }
 
+    const { rateLimitJobApplication } = await import("@/lib/server/rate-limit");
+    const rateCheck = await rateLimitJobApplication(profile.id);
+    if (!rateCheck.success) {
+      return { success: false, error: rateCheck.error };
+    }
+
     const admin = await createAdminClient();
     const cap = await resolveApplicantCapForJob(job.employer_id, jobId, admin);
     const withinPlanCap = cap.withinCap;

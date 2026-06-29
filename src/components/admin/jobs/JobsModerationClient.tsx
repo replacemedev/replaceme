@@ -23,6 +23,38 @@ const STATUS_FILTERS = [
   "Draft",
 ] as const;
 
+const PLAN_LABELS: Record<string, string> = {
+  discovery: "Discovery",
+  starter: "Starter",
+  growth: "Growth",
+  scale: "Scale",
+};
+
+function PlanTierBadge({ planSlug, requiresManualApproval }: {
+  planSlug: string | null;
+  requiresManualApproval: boolean;
+}) {
+  const slug = planSlug ?? "discovery";
+  const label = PLAN_LABELS[slug] ?? slug;
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+        {label}
+      </span>
+      {requiresManualApproval ? (
+        <span className="text-[10px] font-semibold text-amber-700">
+          2-day approval queue
+        </span>
+      ) : (
+        <span className="text-[10px] font-medium text-emerald-700">
+          Instant publish
+        </span>
+      )}
+    </div>
+  );
+}
+
 interface JobsModerationClientProps {
   jobs: AdminJobRow[];
   initialFilter?: string;
@@ -120,6 +152,7 @@ export function JobsModerationClient({
               <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 <th className="px-4 py-3">Job</th>
                 <th className="px-4 py-3">Employer</th>
+                <th className="px-4 py-3">Plan</th>
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Salary</th>
                 <th className="px-4 py-3">Status</th>
@@ -137,6 +170,18 @@ export function JobsModerationClient({
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {job.company_name ?? "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <PlanTierBadge
+                      planSlug={job.plan_slug}
+                      requiresManualApproval={job.requires_manual_approval}
+                    />
+                    {job.submitted_for_review_at ? (
+                      <p className="mt-1 text-[10px] text-slate-400">
+                        Submitted{" "}
+                        {new Date(job.submitted_for_review_at).toLocaleDateString()}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {job.employment_type}

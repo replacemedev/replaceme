@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
-import { EmployerNotificationsClient } from "@/components/employer/notifications/EmployerNotificationsClient";
+import { EmployerNotificationsList } from "@/components/employer/notifications/EmployerNotificationsList";
 import { EmployerPageShell } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
@@ -25,7 +25,7 @@ export default async function EmployerNotificationsPage() {
     .single();
 
   if (!profile || profile.role !== "employer") {
-    redirect("/dashboard");
+    redirect("/employer/dashboard");
   }
 
   let bootstrap: Awaited<ReturnType<typeof fetchNotificationBootstrap>> | null =
@@ -34,19 +34,24 @@ export default async function EmployerNotificationsPage() {
 
   try {
     bootstrap = await fetchNotificationBootstrap(user.id, 50);
-  } catch {
+  } catch (err) {
     loadError =
-      "We couldn't load notifications right now. Please refresh and try again.";
+      err instanceof Error
+        ? err.message
+        : "We couldn't load notifications right now. Please refresh and try again.";
   }
 
   return (
     <EmployerPageShell width="content">
       {loadError || !bootstrap ? (
-        <ErrorState description={loadError ?? "Failed to load notifications."} retryHref="/employer/notifications" />
+        <ErrorState
+          description={loadError ?? "Failed to load notifications."}
+          retryHref="/employer/notifications"
+        />
       ) : (
-        <EmployerNotificationsClient
-          userId={user.id}
-          initialBootstrap={bootstrap}
+        <EmployerNotificationsList
+          notifications={bootstrap.notifications}
+          unreadCount={bootstrap.unreadCount}
         />
       )}
     </EmployerPageShell>

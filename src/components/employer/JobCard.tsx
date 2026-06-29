@@ -21,8 +21,11 @@ export function JobCard({
     year: "numeric",
   });
 
+  const visibleCount = job.visible_applicants_count ?? job.applicants_count;
+  const hiddenCount = Math.max(0, job.applicants_count - visibleCount);
+
   const nearApplicantCap = isApplicantCapNear(
-    job.applicants_count,
+    visibleCount,
     applicantsPerJobLimit
   );
 
@@ -59,13 +62,18 @@ export function JobCard({
               Applicants
             </p>
             <p className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
-              {job.applicants_count}
+              {visibleCount}
               {applicantsPerJobLimit !== null ? (
                 <span className="text-xs font-bold text-slate-500 ml-1">
                   / {applicantsPerJobLimit}
                 </span>
               ) : null}
             </p>
+            {hiddenCount > 0 ? (
+              <p className="text-[10px] font-bold text-amber-700 mt-0.5">
+                +{hiddenCount} hidden
+              </p>
+            ) : null}
           </div>
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 border border-slate-100">
             <Users className="h-4 w-4" aria-hidden />

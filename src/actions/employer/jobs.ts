@@ -14,6 +14,7 @@ import {
   countHiddenApplicantsForJob,
   countVisibleApplicantsForJob,
   fetchEmployerEntitlements,
+  invalidateEmployerCache,
   jobStatusForApprovalMode,
   priorityScoreForPlan,
 } from "@/lib/server/entitlements";
@@ -116,6 +117,7 @@ export async function createJobPost(payload: CreateJobInput) {
     }
 
     safeLog(`[Jobs] Job post successfully created with intent: ${payload.intent}`);
+    await invalidateEmployerCache(profile.id);
     revalidatePath("/employer/dashboard");
     revalidatePath("/employer/jobs");
     revalidatePath(`/employer/jobs/${newJob.id}`);

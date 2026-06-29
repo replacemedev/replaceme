@@ -2,6 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { Database, Json } from "@/types/database";
 import { safeError } from "@/utils/logger";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateEmployerCache,
+} from "@/lib/server/redis-cache";
+
+export { invalidateEmployerCache };
 
 export type EntitlementDenialType =
   Database["public"]["Enums"]["entitlement_denial_type"];
@@ -100,6 +108,21 @@ export function formatLimit(value: number | null): string {
 }
 
 export async function fetchEmployerEntitlements(
+  employerId: string,
+  supabase?: SupabaseClient<Database>
+): Promise<EmployerEntitlements | null> {
+  if (supabase) {
+    return loadEmployerEntitlementsFromDb(employerId, supabase);
+  }
+
+  return getOrSet(
+    CacheKeys.employerEntitlements(employerId),
+    CACHE_TTL_SECONDS.entitlements,
+    () => loadEmployerEntitlementsFromDb(employerId)
+  );
+}
+
+async function loadEmployerEntitlementsFromDb(
   employerId: string,
   supabase?: SupabaseClient<Database>
 ): Promise<EmployerEntitlements | null> {
@@ -211,8 +234,18 @@ export async function logEntitlementDenial(input: {
 export async function getEmployerPlanUsage(
   employerId: string
 ): Promise<EmployerPlanUsage | null> {
+  return getOrSet(
+    CacheKeys.employerPlanUsage(employerId),
+    CACHE_TTL_SECONDS.planUsage,
+    () => loadEmployerPlanUsageFromDb(employerId)
+  );
+}
+
+async function loadEmployerPlanUsageFromDb(
+  employerId: string
+): Promise<EmployerPlanUsage | null> {
   const supabase = await createClient();
-  const entitlements = await fetchEmployerEntitlements(employerId, supabase);
+  const entitlements = await loadEmployerEntitlementsFromDb(employerId, supabase);
 
   if (!entitlements) {
     return null;
