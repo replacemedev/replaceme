@@ -63,11 +63,13 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
         created_at,
         status,
         views_count,
+        priority_score,
         applications (
           id
         )
       `)
       .eq("employer_id", employerProfileId)
+      .order("priority_score", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -86,6 +88,7 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
       applicants_count: job.applications ? job.applications.length : 0,
       hits_count: job.views_count || 0,
       status: job.status,
+      priority_score: Number(job.priority_score ?? 0),
     }));
   } catch (err) {
     safeError("getRecentJobs unexpected error", err);

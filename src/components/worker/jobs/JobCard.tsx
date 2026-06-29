@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
-import { Bookmark, Clock, Loader2 } from "lucide-react";
+import { Bookmark, Clock, Loader2, Sparkles } from "lucide-react";
 import { toggleSavedJob } from "@/actions/worker/job-search";
 import {
   JobSearchResult,
@@ -40,6 +40,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
   const locationLabel = job.location.toLowerCase().includes("remote")
     ? `REMOTE (${job.location.replace(/remote/i, "").trim() || "PH"})`.toUpperCase()
     : job.location.toUpperCase();
+  const isPriorityListing = (job.priorityScore ?? 0) > 0;
 
   const handleSave = () => {
     startTransition(async () => {
@@ -99,6 +100,12 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
       </header>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
+        {isPriorityListing ? (
+          <span className="inline-flex items-center gap-1 rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700 uppercase tracking-wide">
+            <Sparkles className="h-3 w-3" aria-hidden />
+            Priority
+          </span>
+        ) : null}
         <span className="inline-flex items-center rounded-md bg-blue-50 border border-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 uppercase tracking-wide">
           {formatEmploymentBadge(job.employmentType)}
         </span>

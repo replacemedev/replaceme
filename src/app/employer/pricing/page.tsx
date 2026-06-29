@@ -1,5 +1,5 @@
 import { getPricingData } from "@/actions/employer/pricing";
-import { getAccountSettings } from "@/actions/employer/billing";
+import { getAccountSettings, getEmployerPlanUsage } from "@/actions/employer/billing";
 import { EmployerPricingClient } from "@/components/employer/pricing/EmployerPricingClient";
 import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 import {
@@ -16,10 +16,12 @@ export const metadata = {
 };
 
 export default async function PricingPage() {
-  const [{ plans, testimonials, faqs }, accountSettings] = await Promise.all([
-    getPricingData(),
-    getAccountSettings(),
-  ]);
+  const [{ plans, testimonials, faqs }, accountSettings, planUsage] =
+    await Promise.all([
+      getPricingData(),
+      getAccountSettings(),
+      getEmployerPlanUsage(),
+    ]);
 
   const currentPlanSlug = normalizePlanSlug(accountSettings?.plan ?? "discovery");
 
@@ -35,6 +37,7 @@ export default async function PricingPage() {
         testimonials={testimonials}
         faqs={faqs}
         currentPlanSlug={currentPlanSlug}
+        planUsage={planUsage}
       />
     </EmployerPageShell>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getIndustries, getCompanyProfile } from "@/actions/employer/company";
+import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { CompanyProfileForm } from "./CompanyProfileForm";
 import {
   EmployerPageHeader,
@@ -31,9 +32,10 @@ export default async function CompanySettingsPage() {
     redirect("/dashboard");
   }
 
-  const [industries, initialData] = await Promise.all([
+  const [industries, initialData, planUsage] = await Promise.all([
     getIndustries(),
     getCompanyProfile(),
+    getEmployerPlanUsage(),
   ]);
 
   const isProfileComplete = Boolean(
@@ -53,6 +55,7 @@ export default async function CompanySettingsPage() {
         initialData={initialData}
         industries={industries}
         isProfileComplete={isProfileComplete}
+        planUsage={planUsage}
       />
     </EmployerPageShell>
   );

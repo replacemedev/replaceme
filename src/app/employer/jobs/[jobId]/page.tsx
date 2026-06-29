@@ -63,6 +63,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
         location={job.location}
         employmentType={job.employmentType}
         monthlySalary={job.monthlySalary}
+        isPriorityListing={(job.priorityScore ?? 0) > 0}
       />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
@@ -109,6 +110,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
             performance={job.performance}
             planSlug={planSlug}
             applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
+            priorityScore={job.priorityScore}
           />
           <CompensationCard
             monthlySalary={job.monthlySalary}

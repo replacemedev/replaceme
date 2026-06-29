@@ -8,7 +8,6 @@ import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import {
-  hasPriorityListing,
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
 import {
@@ -55,9 +54,6 @@ export default async function EmployerJobsPage() {
       planUsage.activeJobsCount,
       planUsage.activeJobsLimit
     );
-  const showPriority = planUsage
-    ? hasPriorityListing(planUsage.planSlug)
-    : false;
 
   return (
     <EmployerPageShell width="wide">
@@ -85,7 +81,6 @@ export default async function EmployerJobsPage() {
       <JobsListClient
         jobs={jobs}
         planUsage={planUsage}
-        showPriorityBadge={showPriority}
         applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
       />
     </EmployerPageShell>

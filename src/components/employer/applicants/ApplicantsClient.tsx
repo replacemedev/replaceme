@@ -19,6 +19,7 @@ import { ApplicantKanban } from "./ApplicantKanban";
 import { EntitlementProvider } from "@/components/shared/entitlements/EntitlementProvider";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { HiddenApplicantsBanner } from "@/components/shared/entitlements/HiddenApplicantsBanner";
 import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
 
 interface ApplicantsClientProps {
@@ -30,6 +31,7 @@ interface ApplicantsClientProps {
   messagingEnabled: boolean;
   resumeDownloadEnabled: boolean;
   applicantsPerJobLimit: number | null;
+  hiddenApplicantCount: number;
 }
 
 export function ApplicantsClient({
@@ -41,6 +43,7 @@ export function ApplicantsClient({
   messagingEnabled,
   resumeDownloadEnabled,
   applicantsPerJobLimit,
+  hiddenApplicantCount,
 }: ApplicantsClientProps) {
   const router = useRouter();
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
@@ -151,6 +154,15 @@ export function ApplicantsClient({
       />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
+
+      {hiddenApplicantCount > 0 ? (
+        <HiddenApplicantsBanner
+          hiddenCount={hiddenApplicantCount}
+          visibleCount={applicants.length}
+          capLimit={applicantsPerJobLimit}
+          currentPlan={planSlug}
+        />
+      ) : null}
 
       {isDiscoveryPreview ? (
         <ContextualUpgradeBanner feature="identity" currentPlan={planSlug} />

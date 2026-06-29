@@ -19,8 +19,6 @@ function mapJobRow(
     id: string | null;
     employer_id: string | null;
     title: string | null;
-    company_name: string | null;
-    logo_url: string | null;
     employment_type: string | null;
     description: string | null;
     monthly_salary: number | null;
@@ -28,11 +26,19 @@ function mapJobRow(
     location: string | null;
     skills: string[] | null;
     created_at: string | null;
+    priority_score?: number | null;
   },
-  savedJobIds: Set<string>
+  savedJobIds: Set<string>,
+  companyByEmployer: Map<
+    string,
+    { company_name: string | null; logo_url: string | null }
+  >
 ): JobSearchResult | null {
   if (!row.id || !row.title) return null;
 
+  const company = row.employer_id
+    ? companyByEmployer.get(row.employer_id)
+    : undefined;
   const monthlySalary = Number(row.monthly_salary ?? 0);
   const hoursPerWeek = Number(row.hours_per_week ?? 0);
 
@@ -40,8 +46,8 @@ function mapJobRow(
     id: row.id,
     employerId: row.employer_id ?? "",
     title: row.title,
-    companyName: row.company_name ?? "Unknown Company",
-    companyLogoUrl: row.logo_url ?? null,
+    companyName: company?.company_name ?? "Unknown Company",
+    companyLogoUrl: company?.logo_url ?? null,
     employmentType: row.employment_type ?? "Full-time",
     description: row.description ?? "",
     monthlySalary,
@@ -51,6 +57,7 @@ function mapJobRow(
     skills: row.skills ?? [],
     createdAt: row.created_at ?? new Date().toISOString(),
     isSaved: savedJobIds.has(row.id),
+    priorityScore: Number(row.priority_score ?? 0),
   };
 }
 
@@ -121,24 +128,24 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
     }
 
     const { data, error } = await supabase
-      .from("job_posts")
+      .from("jobs")
       .select(
         `
         id,
         employer_id,
         title,
-        company_name,
-        logo_url,
         employment_type,
         description,
         monthly_salary,
         hours_per_week,
         location,
         skills,
-        created_at
+        created_at,
+        priority_score
       `
       )
       .eq("status", "Active")
+      .order("priority_score", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -156,8 +163,35 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
       };
     }
 
+    const employerIds = [
+      ...new Set(
+        (data ?? [])
+          .map((row) => row.employer_id)
+          .filter((id): id is string => Boolean(id))
+      ),
+    ];
+
+    const companyByEmployer = new Map<
+      string,
+      { company_name: string | null; logo_url: string | null }
+    >();
+
+    if (employerIds.length > 0) {
+      const { data: companies } = await supabase
+        .from("company_profiles")
+        .select("employer_id, company_name, logo_url")
+        .in("employer_id", employerIds);
+
+      for (const company of companies ?? []) {
+        companyByEmployer.set(company.employer_id, {
+          company_name: company.company_name,
+          logo_url: company.logo_url,
+        });
+      }
+    }
+
     const jobs = (data ?? [])
-      .map((row) => mapJobRow(row, savedJobIds))
+      .map((row) => mapJobRow(row, savedJobIds, companyByEmployer))
       .filter((j): j is JobSearchResult => j !== null);
 
     return {

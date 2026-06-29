@@ -7,15 +7,14 @@ import { isApplicantCapNear } from "@/lib/entitlements/limits";
 
 interface JobCardProps {
   job: JobPost;
-  showPriorityBadge?: boolean;
   applicantsPerJobLimit?: number | null;
 }
 
 export function JobCard({
   job,
-  showPriorityBadge = false,
   applicantsPerJobLimit = null,
 }: JobCardProps) {
+  const isPriorityListing = (job.priority_score ?? 0) > 0;
   const formattedDate = new Date(job.created_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -37,7 +36,7 @@ export function JobCard({
           <span className="inline-flex items-center rounded-full border border-slate-100 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500">
             {formattedDate}
           </span>
-          {showPriorityBadge ? (
+          {isPriorityListing ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-violet-700 shadow-sm">
               <Sparkles className="h-3 w-3" aria-hidden />
               Priority

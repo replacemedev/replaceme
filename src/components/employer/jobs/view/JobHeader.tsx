@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { MapPin, Clock, DollarSign, Share2, Edit3, X, Loader2, Users } from "lucide-react";
+import { MapPin, Clock, DollarSign, Share2, Edit3, X, Loader2, Users, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { deactivateJob } from "@/actions/employer/jobs";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ interface JobHeaderProps {
   location: string;
   employmentType: string;
   monthlySalary: number;
+  isPriorityListing?: boolean;
 }
 
 export function JobHeader({
@@ -23,6 +24,7 @@ export function JobHeader({
   location,
   employmentType,
   monthlySalary,
+  isPriorityListing = false,
 }: JobHeaderProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -83,6 +85,12 @@ export function JobHeader({
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border shrink-0 ${statusBadgeClasses}`}>
               {status}
             </span>
+            {isPriorityListing ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-violet-700 shadow-sm shrink-0">
+                <Sparkles className="h-3 w-3" aria-hidden />
+                Priority listing
+              </span>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm font-semibold text-slate-500">

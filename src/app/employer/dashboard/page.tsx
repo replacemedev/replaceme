@@ -20,7 +20,6 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import {
-  hasPriorityListing,
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
 import { DashboardHiringSummary } from "@/components/employer/dashboard/DashboardHiringSummary";
@@ -77,9 +76,6 @@ export default async function EmployerDashboard() {
       planUsage.activeJobsCount,
       planUsage.activeJobsLimit
     );
-  const showPriority = planUsage
-    ? hasPriorityListing(planUsage.planSlug)
-    : false;
 
   const totalApplicants = jobs.reduce(
     (sum, job) => sum + (job.applicants_count ?? 0),
@@ -186,7 +182,6 @@ export default async function EmployerDashboard() {
                 <JobCard
                   key={job.id}
                   job={job}
-                  showPriorityBadge={showPriority}
                   applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
                 />
               ))}
@@ -195,8 +190,13 @@ export default async function EmployerDashboard() {
             <EmptyState
               icon={<Briefcase size={22} />}
               description="You haven't posted any jobs yet. Create your first listing to start hiring."
-              actionLabel="Post a New Job"
-              actionHref="/employer/jobs/create"
+              action={
+                <PostJobCTA
+                  planUsage={planUsage}
+                  label="Post a New Job"
+                  compact
+                />
+              }
             />
           )}
         </div>

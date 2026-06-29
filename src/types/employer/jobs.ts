@@ -2,6 +2,8 @@ export interface JobPerformance {
   totalViews: number;
   viewsTrend: string; // e.g. "+12%"
   totalApplications: number;
+  visibleApplications: number;
+  hiddenApplications: number;
   applicationsTrend: string; // e.g. "+5%"
   shortlistedCount: number;
 }
@@ -27,4 +29,5 @@ export interface JobDetails {
   experienceAndEducation: string[];
   performance: JobPerformance;
   hiringTeam: HiringTeamMember;
+  priorityScore: number;
 }

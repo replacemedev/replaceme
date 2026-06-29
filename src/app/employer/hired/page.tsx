@@ -74,8 +74,13 @@ export default async function HiredPage() {
             icon={<Users size={22} />}
             title="No hired workers yet"
             description="When you hire a candidate from your applicant pipeline, their contract details will appear here."
-            actionLabel="Post a job"
-            actionHref="/employer/jobs/create"
+            action={
+              <PostJobCTA
+                planUsage={planUsage}
+                label="Post a job"
+                compact
+              />
+            }
           />
           <p className="text-center text-sm text-slate-500 font-medium">
             Or review applicants in your existing pipelines.{" "}

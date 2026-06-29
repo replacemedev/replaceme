@@ -11,16 +11,21 @@ interface PostJobCTAProps {
   planUsage: EmployerPlanUsage | null;
   className?: string;
   label?: string;
+  compact?: boolean;
 }
 
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold rounded-xl transition-all duration-150 shadow-xs select-none shrink-0";
+  "inline-flex w-full sm:w-auto items-center justify-center gap-2 transition-all duration-150 shadow-xs select-none shrink-0";
 
 export function PostJobCTA({
   planUsage,
   className = "",
   label = "Post a New Job",
+  compact = false,
 }: PostJobCTAProps) {
+  const sizeClasses = compact
+    ? "px-5 py-2.5 text-sm font-semibold rounded-lg"
+    : "px-5 py-3 text-sm font-bold rounded-xl";
   const [gateOpen, setGateOpen] = useState(false);
   const atLimit =
     planUsage !== null &&
@@ -33,7 +38,7 @@ export function PostJobCTA({
     return (
       <Link
         href="/employer/jobs/create"
-        className={`${BASE_CLASSES} text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] hover:shadow-md cursor-pointer ${className}`}
+        className={`${BASE_CLASSES} ${sizeClasses} text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] hover:shadow-md cursor-pointer ${className}`}
       >
         <Plus size={18} aria-hidden />
         {label}
@@ -48,7 +53,7 @@ export function PostJobCTA({
       <button
         type="button"
         onClick={() => setGateOpen(true)}
-        className={`${BASE_CLASSES} text-slate-500 bg-slate-100 border border-slate-200 cursor-pointer hover:bg-slate-50 ${className}`}
+        className={`${BASE_CLASSES} ${sizeClasses} text-slate-500 bg-slate-100 border border-slate-200 cursor-pointer hover:bg-slate-50 ${className}`}
         aria-haspopup="dialog"
         aria-expanded={gateOpen}
       >

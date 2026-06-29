@@ -19,7 +19,9 @@ import {
   MessagingThread,
 } from "@/types/messaging";
 import { revalidatePath } from "next/cache";
-import { assertEmployerMessaging } from "@/lib/server/entitlements";
+import { assertEmployerMessaging, fetchEmployerEntitlements } from "@/lib/server/entitlements";
+import type { BillingIdentityMode } from "@/lib/server/entitlements";
+import { previewDisplayName } from "@/lib/entitlements/ui-copy";
 
 async function getAuthenticatedProfile() {
   const supabase = await createClient();
@@ -44,7 +46,8 @@ async function enrichThreads(
   supabase: Awaited<ReturnType<typeof createClient>>,
   threads: Array<Record<string, unknown>>,
   role: MessagingRole,
-  currentUserId: string
+  currentUserId: string,
+  employerIdentityMode: BillingIdentityMode | null = null
 ): Promise<MessagingThread[]> {
   const result: MessagingThread[] = [];
 
@@ -84,10 +87,13 @@ async function enrichThreads(
         full_name: string | null;
         avatar_url: string | null;
       };
+      const maskIdentity = employerIdentityMode !== "full";
       oppositeParty = {
         id: worker.id,
-        name: worker.full_name?.trim() || "Worker",
-        avatarUrl: worker.avatar_url,
+        name: maskIdentity
+          ? previewDisplayName(worker.id)
+          : worker.full_name?.trim() || "Worker",
+        avatarUrl: maskIdentity ? null : worker.avatar_url,
       };
     }
 
@@ -145,6 +151,9 @@ export async function getMessagingThreads(
 
     if (!company) return [];
 
+    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+    const identityMode = entitlements?.identityMode ?? "anonymous_preview";
+
     const { data: threads, error } = await supabase
       .from("chat_threads")
       .select(
@@ -157,7 +166,7 @@ export async function getMessagingThreads(
       safeError("getMessagingThreads employer:", error);
       return [];
     }
-    return enrichThreads(supabase, threads ?? [], role, profile.id);
+    return enrichThreads(supabase, threads ?? [], role, profile.id, identityMode);
   } catch (err) {
     safeError("getMessagingThreads:", err);
     return [];

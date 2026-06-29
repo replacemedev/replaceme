@@ -12,6 +12,7 @@ import { getJobOwnedByEmployer } from "@/lib/server/dal/jobs";
 import {
   assertEmployerFullIdentity,
   assertEmployerResumeDownload,
+  countHiddenApplicantsForJob,
   fetchApplicantPreview,
   fetchEmployerEntitlements,
 } from "@/lib/server/entitlements";
@@ -125,6 +126,7 @@ export async function getApplicants(jobId: string): Promise<{
   resumeDownloadEnabled: boolean;
   messagingEnabled: boolean;
   applicantsPerJobLimit: number | null;
+  hiddenApplicantCount: number;
   error?: string;
 }> {
   try {
@@ -145,12 +147,17 @@ export async function getApplicants(jobId: string): Promise<{
         resumeDownloadEnabled: false,
         messagingEnabled: false,
         applicantsPerJobLimit: null,
+        hiddenApplicantCount: 0,
         error: "Access denied. You do not own this job posting.",
       };
     }
 
     const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
     const identityMode = entitlements?.identityMode ?? "anonymous_preview";
+    const hiddenApplicantCount = await countHiddenApplicantsForJob(
+      supabase,
+      parsed.jobId
+    );
 
     const { data: applications, error: appsError } = await supabase
       .from("applications")
@@ -201,6 +208,7 @@ export async function getApplicants(jobId: string): Promise<{
       resumeDownloadEnabled: entitlements?.resumeDownloadEnabled ?? false,
       messagingEnabled: entitlements?.messagingEnabled ?? false,
       applicantsPerJobLimit: entitlements?.applicantsPerJobLimit ?? null,
+      hiddenApplicantCount,
     };
   } catch (err) {
     safeError("getApplicants error occurred:", err);
@@ -211,6 +219,7 @@ export async function getApplicants(jobId: string): Promise<{
       resumeDownloadEnabled: false,
       messagingEnabled: false,
       applicantsPerJobLimit: null,
+      hiddenApplicantCount: 0,
       error: "An unexpected error occurred.",
     };
   }

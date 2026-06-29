@@ -271,6 +271,30 @@ export async function assertEmployerCanPostJob(
   return { allowed: true };
 }
 
+export async function countHiddenApplicantsForJob(
+  supabase: SupabaseClient<Database>,
+  jobId: string
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("applications")
+    .select("id", { count: "exact", head: true })
+    .eq("job_id", jobId)
+    .eq("is_within_plan_cap", false);
+
+  if (error) {
+    safeError("countHiddenApplicantsForJob:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+export async function assertEmployerCanAdvanceApplication(
+  employerId: string
+): Promise<EntitlementCheckResult> {
+  return assertEmployerFullIdentity(employerId);
+}
+
 export async function resolveApplicantCapForJob(
   employerId: string,
   jobId: string,
@@ -458,9 +482,9 @@ export async function fetchApplicantPreview(
 
 export function jobStatusForApprovalMode(
   approvalMode: BillingApprovalMode,
-  intent?: "standard" | "premium"
+  _intent?: "standard" | "premium"
 ): "Active" | "Pending Review" {
-  if (approvalMode === "instant" || intent === "premium") {
+  if (approvalMode === "instant") {
     return "Active";
   }
   return "Pending Review";

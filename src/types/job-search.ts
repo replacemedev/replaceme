@@ -19,6 +19,7 @@ export interface JobSearchResult {
   skills: string[];
   createdAt: string;
   isSaved: boolean;
+  priorityScore?: number;
 }
 
 export interface EmploymentTypeFacet {

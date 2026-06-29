@@ -1,18 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useFormContext } from "react-hook-form";
 import { Building2, Briefcase } from "lucide-react";
 import type { CompanyProfileInput } from "@/lib/validations/employer/company";
+import type { EmployerPlanUsage } from "@/lib/server/entitlements";
+import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 interface CompanyJobPostPreviewProps {
   isProfileComplete?: boolean;
+  planUsage?: EmployerPlanUsage | null;
 }
 
 export function CompanyJobPostPreview({
   isProfileComplete = false,
+  planUsage = null,
 }: CompanyJobPostPreviewProps) {
   const { watch } = useFormContext<CompanyProfileInput>();
   const companyName = watch("companyName");
@@ -77,12 +80,12 @@ export function CompanyJobPostPreview({
             Profile looks good — post your first job to start receiving
             applicants.
           </p>
-          <Link
-            href="/employer/jobs/create"
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-[#006e2f] px-5 text-xs font-bold text-white hover:bg-[#005c26] transition-colors"
-          >
-            Post your first job
-          </Link>
+          <PostJobCTA
+            planUsage={planUsage}
+            label="Post your first job"
+            compact
+            className="mx-auto"
+          />
         </div>
       ) : null}
     </aside>

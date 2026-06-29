@@ -5,6 +5,13 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { updateApplicationStatusSchema } from "@/lib/validations/applications";
 import type { ApplicationStatus } from "@/types/applications";
+import { assertEmployerCanAdvanceApplication } from "@/lib/server/entitlements";
+
+const ADVANCE_STATUSES = new Set<ApplicationStatus>([
+  "UNDER_REVIEW",
+  "INTERVIEW_SCHEDULED",
+  "HIRED",
+]);
 
 export type UpdateApplicationStatusResult = {
   success: boolean;
@@ -44,6 +51,13 @@ export async function updateApplicationStatus(
       return fail(
         "Access denied. You do not own the job associated with this application."
       );
+    }
+
+    if (ADVANCE_STATUSES.has(parsed.status)) {
+      const identityCheck = await assertEmployerCanAdvanceApplication(profile.id);
+      if (!identityCheck.allowed) {
+        return fail(identityCheck.error);
+      }
     }
 
     const { error: updateError } = await supabase

@@ -2,16 +2,18 @@
 
 import React from "react";
 import Link from "next/link";
-import { TrendingUp, ArrowUpRight } from "lucide-react";
+import { TrendingUp, ArrowUpRight, Sparkles } from "lucide-react";
 import { JobPerformance } from "@/types/employer/jobs";
 import { isApplicantCapNear } from "@/lib/entitlements/limits";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
+import { HiddenApplicantsBanner } from "@/components/shared/entitlements/HiddenApplicantsBanner";
 
 interface PerformanceMetricsCardProps {
   jobId: string;
   performance: JobPerformance;
   planSlug?: string;
   applicantsPerJobLimit?: number | null;
+  priorityScore?: number;
 }
 
 export function PerformanceMetricsCard({
@@ -19,46 +21,59 @@ export function PerformanceMetricsCard({
   performance,
   planSlug = "discovery",
   applicantsPerJobLimit = null,
+  priorityScore = 0,
 }: PerformanceMetricsCardProps) {
-  const nearCap = isApplicantCapNear(
-    performance.totalApplications,
-    applicantsPerJobLimit
-  );
+  const isPriorityListing = priorityScore > 0;
+  const visibleCount = performance.visibleApplications;
+  const hiddenCount = performance.hiddenApplications;
+  const nearCap = isApplicantCapNear(visibleCount, applicantsPerJobLimit);
 
   const capPercent =
     applicantsPerJobLimit !== null && applicantsPerJobLimit > 0
       ? Math.min(
           100,
-          Math.round(
-            (performance.totalApplications / applicantsPerJobLimit) * 100
-          )
+          Math.round((visibleCount / applicantsPerJobLimit) * 100)
         )
       : 0;
 
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-6">
-      <div className="flex items-center gap-2">
-        <span className="text-[#006e2f]">
-          <TrendingUp size={20} aria-hidden />
-        </span>
-        <h2 className="text-sm font-bold text-slate-800">Performance</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-[#006e2f]">
+            <TrendingUp size={20} aria-hidden />
+          </span>
+          <h2 className="text-sm font-bold text-slate-800">Performance</h2>
+        </div>
+        {isPriorityListing ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-violet-700">
+            <Sparkles className="h-3 w-3" aria-hidden />
+            Boosted in search
+          </span>
+        ) : null}
       </div>
 
       {applicantsPerJobLimit !== null ? (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-slate-500">Applicant cap</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+            <span className="text-slate-500">Visible applicant cap</span>
             <span className="text-slate-700 tabular-nums">
-              {performance.totalApplications} / {applicantsPerJobLimit}
+              {visibleCount} / {applicantsPerJobLimit}
+              {hiddenCount > 0 ? (
+                <span className="text-amber-700 font-bold">
+                  {" "}
+                  · +{hiddenCount} hidden
+                </span>
+              ) : null}
             </span>
           </div>
           <div
             className="h-2 rounded-full bg-slate-100 overflow-hidden"
             role="progressbar"
-            aria-valuenow={performance.totalApplications}
+            aria-valuenow={visibleCount}
             aria-valuemin={0}
             aria-valuemax={applicantsPerJobLimit}
-            aria-label="Applicant cap usage"
+            aria-label="Visible applicant cap usage"
           >
             <div
               className={`h-full rounded-full transition-all ${
@@ -70,7 +85,16 @@ export function PerformanceMetricsCard({
         </div>
       ) : null}
 
-      {nearCap ? (
+      {hiddenCount > 0 ? (
+        <HiddenApplicantsBanner
+          hiddenCount={hiddenCount}
+          visibleCount={visibleCount}
+          capLimit={applicantsPerJobLimit}
+          currentPlan={planSlug}
+        />
+      ) : null}
+
+      {nearCap && hiddenCount === 0 ? (
         <ContextualUpgradeBanner
           feature="applicant_cap"
           currentPlan={planSlug}
@@ -98,7 +122,8 @@ export function PerformanceMetricsCard({
               {applicantsPerJobLimit !== null ? (
                 <span className="text-slate-500">
                   {" "}
-                  · cap {applicantsPerJobLimit}
+                  · {visibleCount} visible
+                  {hiddenCount > 0 ? ` · ${hiddenCount} hidden` : ""}
                 </span>
               ) : null}
             </p>

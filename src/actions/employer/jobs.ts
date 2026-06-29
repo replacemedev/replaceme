@@ -11,6 +11,8 @@ import { JobDetails } from "@/types/employer/jobs";
 import { DEFAULT_SKILL_OPTIONS } from "@/config/onboarding";
 import {
   assertEmployerCanPostJob,
+  countHiddenApplicantsForJob,
+  countVisibleApplicantsForJob,
   fetchEmployerEntitlements,
   jobStatusForApprovalMode,
   priorityScoreForPlan,
@@ -289,6 +291,15 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
       .select("*", { count: "exact", head: true })
       .eq("job_id", jobId);
 
+    const visibleApplications = await countVisibleApplicantsForJob(
+      supabase,
+      jobId
+    );
+    const hiddenApplications = await countHiddenApplicantsForJob(
+      supabase,
+      jobId
+    );
+
     const { count: shortlistedCount } = await supabase
       .from("applications")
       .select("*", { count: "exact", head: true })
@@ -321,9 +332,12 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
         totalViews: job.views_count || 0,
         viewsTrend: "+12%",
         totalApplications: totalApplications || 0,
+        visibleApplications,
+        hiddenApplications,
         applicationsTrend: "+5%",
         shortlistedCount: shortlistedCount || 0,
       },
+      priorityScore: Number(job.priority_score ?? 0),
       hiringTeam: {
         name: job.hiring_manager_name ?? "Hiring team",
         role: job.hiring_manager_role ?? "Recruiter",

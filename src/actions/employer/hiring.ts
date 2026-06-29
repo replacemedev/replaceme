@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/server/auth/session";
 import { uuidSchema } from "@/lib/validations/common";
 import { updateApplicationStatus } from "@/actions/applications";
 import {
+  assertEmployerFullIdentity,
   assertEmployerResumeDownload,
   fetchApplicantPreview,
   fetchEmployerEntitlements,
@@ -19,6 +20,11 @@ const scheduleInterviewSchema = z
   .strict();
 
 export async function scheduleInterview(applicationId: string) {
+  const { profile } = await requireRole("employer");
+  const identityCheck = await assertEmployerFullIdentity(profile.id);
+  if (!identityCheck.allowed) {
+    return { success: false, error: identityCheck.error };
+  }
   return updateApplicationStatus(applicationId, "INTERVIEW_SCHEDULED");
 }
 
@@ -30,6 +36,11 @@ export async function sendJobOffer(applicationId: string) {
   const result = await runAction("sendJobOffer", async () => {
     const parsed = sendOfferSchema.parse({ applicationId });
     const { supabase, profile } = await requireRole("employer");
+
+    const identityCheck = await assertEmployerFullIdentity(profile.id);
+    if (!identityCheck.allowed) {
+      return fail(identityCheck.error);
+    }
 
     const { data: application, error: appError } = await supabase
       .from("applications")

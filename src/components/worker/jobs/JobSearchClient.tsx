@@ -41,7 +41,13 @@ function sortJobs(jobs: JobSearchResult[], sort: JobSortOption) {
       return copy.sort((a, b) => a.monthlySalary - b.monthlySalary);
     case "most_relevant":
     default:
-      return copy;
+      return copy.sort((a, b) => {
+        const priorityDiff = (b.priorityScore ?? 0) - (a.priorityScore ?? 0);
+        if (priorityDiff !== 0) return priorityDiff;
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
   }
 }
 

@@ -16,16 +16,20 @@ import { CompanyDetailsForm } from "@/components/employer/settings/company/Compa
 import { CompanyJobPostPreview } from "@/components/employer/settings/company/CompanyJobPostPreview";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
+import type { EmployerPlanUsage } from "@/lib/server/entitlements";
+
 interface CompanyProfileFormProps {
   initialData: CompanyProfileInput | null;
   industries: DropdownOption[];
   isProfileComplete?: boolean;
+  planUsage?: EmployerPlanUsage | null;
 }
 
 export function CompanyProfileForm({
   initialData,
   industries,
   isProfileComplete = false,
+  planUsage = null,
 }: CompanyProfileFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,7 +98,10 @@ export function CompanyProfileForm({
           </div>
         </div>
 
-        <CompanyJobPostPreview isProfileComplete={isProfileComplete} />
+        <CompanyJobPostPreview
+          isProfileComplete={isProfileComplete}
+          planUsage={planUsage}
+        />
       </form>
     </FormProvider>
   );

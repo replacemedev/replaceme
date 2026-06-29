@@ -67,6 +67,7 @@ export default async function ApplicantsPage({ params }: PageProps) {
         messagingEnabled={applicantsData.messagingEnabled}
         resumeDownloadEnabled={applicantsData.resumeDownloadEnabled}
         applicantsPerJobLimit={applicantsData.applicantsPerJobLimit}
+        hiddenApplicantCount={applicantsData.hiddenApplicantCount}
       />
     </EmployerPageShell>
   );

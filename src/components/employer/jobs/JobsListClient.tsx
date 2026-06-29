@@ -16,7 +16,6 @@ type SortKey = "newest" | "oldest" | "applicants" | "views";
 interface JobsListClientProps {
   jobs: JobPost[];
   planUsage: EmployerPlanUsage | null;
-  showPriorityBadge: boolean;
   applicantsPerJobLimit: number | null;
 }
 
@@ -38,7 +37,6 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 export function JobsListClient({
   jobs,
   planUsage,
-  showPriorityBadge,
   applicantsPerJobLimit,
 }: JobsListClientProps) {
   const [search, setSearch] = useState("");
@@ -85,8 +83,13 @@ export function JobsListClient({
         <EmptyState
           icon={<Briefcase size={22} />}
           description="You haven't posted any jobs yet. Create your first listing to start hiring."
-          actionLabel="Post a New Job"
-          actionHref="/employer/jobs/create"
+          action={
+            <PostJobCTA
+              planUsage={planUsage}
+              label="Post a New Job"
+              compact
+            />
+          }
         />
         <p className="text-center text-sm text-slate-500 font-medium">
           Compare plans and unlock messaging, full profiles, and instant
@@ -174,12 +177,11 @@ export function JobsListClient({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              showPriorityBadge={showPriorityBadge}
-              applicantsPerJobLimit={applicantsPerJobLimit}
-            />
+              <JobCard
+                key={job.id}
+                job={job}
+                applicantsPerJobLimit={applicantsPerJobLimit}
+              />
           ))}
         </div>
       )}
