@@ -13,6 +13,12 @@ import {
   filterSavedJobs,
   sortSavedJobs,
 } from "@/types/saved-jobs";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 type JobPostEmbed = {
   id: string;
@@ -67,6 +73,58 @@ function mapSavedJobRow(
   };
 }
 
+async function loadSavedJobsForWorker(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  workerId: string
+): Promise<SavedJob[]> {
+  const { data: rows, error } = await supabase
+    .from("worker_saved_jobs")
+    .select(
+      `
+        id,
+        created_at,
+        job_id,
+        job_posts!inner (
+          id,
+          title,
+          company_name,
+          logo_url,
+          employment_type,
+          monthly_salary,
+          hours_per_week,
+          location,
+          status
+        )
+      `
+    )
+    .eq("worker_id", workerId)
+    .eq("job_posts.status", "Active");
+
+  if (error) {
+    safeError("getSavedJobs:", error);
+    return [];
+  }
+
+  const jobIds = (rows ?? [])
+    .map((r) => resolveJobPost((r as SavedJobRow).job_posts)?.id)
+    .filter((id): id is string => Boolean(id));
+
+  let appliedJobIds = new Set<string>();
+  if (jobIds.length > 0) {
+    const { data: applications } = await supabase
+      .from("applications")
+      .select("job_id")
+      .eq("candidate_id", workerId)
+      .in("job_id", jobIds);
+
+    appliedJobIds = new Set((applications ?? []).map((a) => a.job_id));
+  }
+
+  return (rows ?? [])
+    .map((row) => mapSavedJobRow(row as SavedJobRow, appliedJobIds))
+    .filter((j): j is SavedJob => j !== null);
+}
+
 /**
  * worker_saved_jobs → job_posts (jobs + company_profiles via view).
  * Inactive or deleted jobs are excluded (CASCADE removes deleted; inner Active filter).
@@ -90,54 +148,13 @@ export async function getSavedJobs(
 
     if (!profile || profile.role !== "worker") return [];
 
-    const { data: rows, error } = await supabase
-      .from("worker_saved_jobs")
-      .select(
-        `
-        id,
-        created_at,
-        job_id,
-        job_posts!inner (
-          id,
-          title,
-          company_name,
-          logo_url,
-          employment_type,
-          monthly_salary,
-          hours_per_week,
-          location,
-          status
-        )
-      `
-      )
-      .eq("worker_id", profile.id)
-      .eq("job_posts.status", "Active");
+    const saved = await getOrSet(
+      CacheKeys.workerSavedJobs(profile.id),
+      CACHE_TTL_SECONDS.savedJobs,
+      () => loadSavedJobsForWorker(supabase, profile.id)
+    );
 
-    if (error) {
-      safeError("getSavedJobs:", error);
-      return [];
-    }
-
-    const jobIds = (rows ?? [])
-      .map((r) => resolveJobPost((r as SavedJobRow).job_posts)?.id)
-      .filter((id): id is string => Boolean(id));
-
-    let appliedJobIds = new Set<string>();
-    if (jobIds.length > 0) {
-      const { data: applications } = await supabase
-        .from("applications")
-        .select("job_id")
-        .eq("candidate_id", profile.id)
-        .in("job_id", jobIds);
-
-      appliedJobIds = new Set((applications ?? []).map((a) => a.job_id));
-    }
-
-    const mapped = (rows ?? [])
-      .map((row) => mapSavedJobRow(row as SavedJobRow, appliedJobIds))
-      .filter((j): j is SavedJob => j !== null);
-
-    const filtered = filterSavedJobs(mapped, query.q);
+    const filtered = filterSavedJobs(saved, query.q);
     return sortSavedJobs(filtered, query.sort);
   } catch (err) {
     safeError("getSavedJobs:", err);
@@ -172,6 +189,8 @@ export async function unsaveJob(
     if (deleteError) {
       return fail("Failed to remove bookmark.");
     }
+
+    await invalidateWorkerCache(profile.id);
 
     revalidatePath("/worker/saved-jobs");
     revalidatePath("/worker/jobs");

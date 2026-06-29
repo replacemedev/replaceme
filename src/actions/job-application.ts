@@ -12,6 +12,10 @@ import {
 } from "@/types/job-application";
 import { createAdminClient } from "@/lib/supabase/server";
 import { resolveApplicantCapForJob } from "@/lib/server/entitlements";
+import {
+  invalidateEmployerApplicantsCache,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 export interface SubmitJobApplicationResult {
   success: boolean;
@@ -190,6 +194,9 @@ export async function submitJobApplication(
       safeError("submitJobApplication:", insertError);
       return { success: false, error: "Failed to submit application." };
     }
+
+    await invalidateWorkerCache(profile.id);
+    await invalidateEmployerApplicantsCache(job.employer_id, jobId);
 
     revalidatePath(`/worker/jobs/${jobId}`);
     revalidatePath(`/worker/jobs/${jobId}/apply`);

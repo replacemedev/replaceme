@@ -22,6 +22,14 @@ import { revalidatePath } from "next/cache";
 import { assertEmployerMessaging, fetchEmployerEntitlements } from "@/lib/server/entitlements";
 import type { BillingIdentityMode } from "@/lib/server/entitlements";
 import { previewDisplayName } from "@/lib/entitlements/ui-copy";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateEmployerMessagingCache,
+  invalidateMessagingThreadMessages,
+  invalidateWorkerMessagingCache,
+} from "@/lib/server/redis-cache";
 
 async function getAuthenticatedProfile() {
   const supabase = await createClient();
@@ -117,6 +125,59 @@ async function enrichThreads(
   return result;
 }
 
+async function loadMessagingThreads(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  profile: { id: string; role: string },
+  role: MessagingRole
+): Promise<MessagingThread[]> {
+  if (role === "worker") {
+    const { data: threads, error } = await supabase
+      .from("chat_threads")
+      .select(
+        `*, company_profiles (id, company_name, logo_url), jobs (id, title)`
+      )
+      .eq("worker_id", profile.id)
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      safeError("getMessagingThreads worker:", error);
+      return [];
+    }
+    return enrichThreads(supabase, threads ?? [], role, profile.id);
+  }
+
+  const { data: company } = await supabase
+    .from("company_profiles")
+    .select("id")
+    .eq("employer_id", profile.id)
+    .single();
+
+  if (!company) return [];
+
+  const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+  const identityMode = entitlements?.identityMode ?? "anonymous_preview";
+
+  const { data: threads, error } = await supabase
+    .from("chat_threads")
+    .select(
+      `*, worker:profiles!chat_threads_worker_id_fkey (id, full_name, avatar_url), jobs (id, title)`
+    )
+    .eq("company_profile_id", company.id)
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    safeError("getMessagingThreads employer:", error);
+    return [];
+  }
+  return enrichThreads(
+    supabase,
+    threads ?? [],
+    role,
+    profile.id,
+    identityMode
+  );
+}
+
 /** Fetch threads for worker (joins company_profiles) or employer (joins profiles). */
 export async function getMessagingThreads(
   role: MessagingRole
@@ -126,47 +187,14 @@ export async function getMessagingThreads(
     if (!ctx || ctx.profile.role !== role) return [];
 
     const { supabase, profile } = ctx;
+    const cacheKey =
+      role === "employer"
+        ? CacheKeys.employerMessagingThreads(profile.id)
+        : CacheKeys.workerMessagingThreads(profile.id);
 
-    if (role === "worker") {
-      const { data: threads, error } = await supabase
-        .from("chat_threads")
-        .select(
-          `*, company_profiles (id, company_name, logo_url), jobs (id, title)`
-        )
-        .eq("worker_id", profile.id)
-        .order("updated_at", { ascending: false });
-
-      if (error) {
-        safeError("getMessagingThreads worker:", error);
-        return [];
-      }
-      return enrichThreads(supabase, threads ?? [], role, profile.id);
-    }
-
-    const { data: company } = await supabase
-      .from("company_profiles")
-      .select("id")
-      .eq("employer_id", profile.id)
-      .single();
-
-    if (!company) return [];
-
-    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
-    const identityMode = entitlements?.identityMode ?? "anonymous_preview";
-
-    const { data: threads, error } = await supabase
-      .from("chat_threads")
-      .select(
-        `*, worker:profiles!chat_threads_worker_id_fkey (id, full_name, avatar_url), jobs (id, title)`
-      )
-      .eq("company_profile_id", company.id)
-      .order("updated_at", { ascending: false });
-
-    if (error) {
-      safeError("getMessagingThreads employer:", error);
-      return [];
-    }
-    return enrichThreads(supabase, threads ?? [], role, profile.id, identityMode);
+    return getOrSet(cacheKey, CACHE_TTL_SECONDS.messagingThreads, () =>
+      loadMessagingThreads(supabase, profile, role)
+    );
   } catch (err) {
     safeError("getMessagingThreads:", err);
     return [];
@@ -202,19 +230,25 @@ export async function getMessagingMessages(
     const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
     if (thread.worker_id !== user.id && employerId !== user.id) return [];
 
-    const { data: messages, error } = await supabase
-      .from("chat_messages")
-      .select(
-        `*, sender:profiles (id, full_name, avatar_url, role)`
-      )
-      .eq("thread_id", parsed.data.threadId)
-      .order("created_at", { ascending: true });
+    return getOrSet(
+      CacheKeys.messagingMessages(user.id, parsed.data.threadId),
+      CACHE_TTL_SECONDS.messagingMessages,
+      async () => {
+        const { data: messages, error } = await supabase
+          .from("chat_messages")
+          .select(
+            `*, sender:profiles (id, full_name, avatar_url, role)`
+          )
+          .eq("thread_id", parsed.data.threadId)
+          .order("created_at", { ascending: true });
 
-    if (error) {
-      safeError("getMessagingMessages:", error);
-      return [];
-    }
-    return (messages ?? []) as MessagingMessage[];
+        if (error) {
+          safeError("getMessagingMessages:", error);
+          return [];
+        }
+        return (messages ?? []) as MessagingMessage[];
+      }
+    );
   } catch (err) {
     safeError("getMessagingMessages:", err);
     return [];
@@ -279,6 +313,14 @@ export async function sendMessagingMessage(
       return fail("Failed to send message");
     }
 
+    await invalidateMessagingThreadMessages(user.id, parsed.threadId);
+    if (employerId) {
+      await invalidateEmployerMessagingCache(employerId);
+      await invalidateWorkerMessagingCache(thread.worker_id);
+    } else if (thread.worker_id === user.id) {
+      await invalidateWorkerMessagingCache(user.id);
+    }
+
     revalidatePath(parsed.basePath);
     return ok();
   });
@@ -308,6 +350,25 @@ export async function markMessagingThreadRead(
 
     if (error) {
       return fail("Failed to mark messages as read");
+    }
+
+    const { data: thread } = await supabase
+      .from("chat_threads")
+      .select(`worker_id, company_profiles (employer_id)`)
+      .eq("id", parsed.threadId)
+      .maybeSingle();
+
+    await invalidateMessagingThreadMessages(user.id, parsed.threadId);
+    if (thread) {
+      const cp = thread.company_profiles as
+        | { employer_id: string }
+        | { employer_id: string }[]
+        | null;
+      const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
+      if (employerId) {
+        await invalidateEmployerMessagingCache(employerId);
+      }
+      await invalidateWorkerMessagingCache(thread.worker_id);
     }
 
     revalidatePath(parsed.basePath);
@@ -356,6 +417,12 @@ export async function toggleMessagingThreadPin(
     if (error) {
       return fail("Failed to update pin state");
     }
+
+    await invalidateMessagingThreadMessages(user.id, parsed.threadId);
+    if (employerId) {
+      await invalidateEmployerMessagingCache(employerId);
+    }
+    await invalidateWorkerMessagingCache(thread.worker_id);
 
     revalidatePath(parsed.basePath);
     return ok();

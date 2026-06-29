@@ -6,6 +6,10 @@ import { requireRole } from "@/lib/server/auth/session";
 import { updateApplicationStatusSchema } from "@/lib/validations/applications";
 import type { ApplicationStatus } from "@/types/applications";
 import { assertEmployerCanAdvanceApplication } from "@/lib/server/entitlements";
+import {
+  invalidateEmployerApplicantsCache,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 const ADVANCE_STATUSES = new Set<ApplicationStatus>([
   "UNDER_REVIEW",
@@ -32,7 +36,7 @@ export async function updateApplicationStatus(
 
     const { data: application, error: appError } = await supabase
       .from("applications")
-      .select("id, job_id")
+      .select("id, job_id, candidate_id")
       .eq("id", parsed.applicationId)
       .single();
 
@@ -68,6 +72,9 @@ export async function updateApplicationStatus(
     if (updateError) {
       return fail("Failed to update status in the database.");
     }
+
+    await invalidateEmployerApplicantsCache(profile.id, application.job_id);
+    await invalidateWorkerCache(application.candidate_id);
 
     const jobId = application.job_id;
     revalidatePath(`/employer/jobs/${jobId}`);

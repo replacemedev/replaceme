@@ -10,6 +10,11 @@ import {
   ApplicationStatus,
   isApplicationStatus,
 } from "@/types/applications";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+} from "@/lib/server/redis-cache";
 
 type JobPostJoin = {
   id: string | null;
@@ -121,10 +126,14 @@ export async function getWorkerApplications(): Promise<WorkerApplication[]> {
 
     const { supabase, profile } = ctx;
 
-    const { data, error } = await supabase
-      .from("applications")
-      .select(
-        `
+    return getOrSet(
+      CacheKeys.workerApplications(profile.id),
+      CACHE_TTL_SECONDS.workerApplications,
+      async () => {
+        const { data, error } = await supabase
+          .from("applications")
+          .select(
+            `
         id,
         status,
         created_at,
@@ -139,18 +148,20 @@ export async function getWorkerApplications(): Promise<WorkerApplication[]> {
           hours_per_week
         )
       `
-      )
-      .eq("candidate_id", profile.id)
-      .order("created_at", { ascending: false });
+          )
+          .eq("candidate_id", profile.id)
+          .order("created_at", { ascending: false });
 
-    if (error) {
-      safeError("getWorkerApplications:", error);
-      return [];
-    }
+        if (error) {
+          safeError("getWorkerApplications:", error);
+          return [];
+        }
 
-    return (data ?? [])
-      .map(mapApplicationRow)
-      .filter((row): row is WorkerApplication => row !== null);
+        return (data ?? [])
+          .map(mapApplicationRow)
+          .filter((row): row is WorkerApplication => row !== null);
+      }
+    );
   } catch (err) {
     safeError("getWorkerApplications:", err);
     return [];

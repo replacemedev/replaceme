@@ -3,11 +3,12 @@ import {
   CACHE_VERSION,
   CacheKeys,
   employerCacheKeys,
+  workerCacheKeys,
   CACHE_TTL_SECONDS,
 } from "@/lib/server/cache-keys";
 import { getRedis } from "@/lib/server/redis";
 
-export { CacheKeys, CACHE_TTL_SECONDS, employerCacheKeys };
+export { CacheKeys, CACHE_TTL_SECONDS, employerCacheKeys, workerCacheKeys };
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
   const redis = getRedis();
@@ -63,17 +64,53 @@ export async function getOrSet<T>(
   return fresh;
 }
 
-/** Drop all entitlement-related keys for one employer (after plan/job mutations). */
+/** Drop entitlement + dashboard + messaging keys for one employer. */
 export async function invalidateEmployerCache(employerId: string): Promise<void> {
   await cacheDel(...employerCacheKeys(employerId));
 }
 
-/** Drop user-scoped keys (notifications, worker profile). */
-export async function invalidateUserCache(userId: string): Promise<void> {
+/** Drop applicant list + dashboard slices after apply or status change. */
+export async function invalidateEmployerApplicantsCache(
+  employerId: string,
+  jobId: string
+): Promise<void> {
   await cacheDel(
-    CacheKeys.notificationsBootstrap(userId),
-    CacheKeys.workerProfile(userId)
+    CacheKeys.employerApplicants(employerId, jobId),
+    CacheKeys.employerRecentJobs(employerId),
+    CacheKeys.employerRecentApplicants(employerId)
   );
+}
+
+/** Drop all worker-scoped keys (applications, search, saved jobs, messaging, profile). */
+export async function invalidateWorkerCache(workerId: string): Promise<void> {
+  await cacheDel(...workerCacheKeys(workerId));
+}
+
+/** Drop notifications bootstrap only (mark read / delete). */
+export async function invalidateUserCache(userId: string): Promise<void> {
+  await cacheDel(CacheKeys.notificationsBootstrap(userId));
+}
+
+export async function invalidateEmployerMessagingCache(
+  employerId: string
+): Promise<void> {
+  await cacheDel(CacheKeys.employerMessagingThreads(employerId));
+}
+
+export async function invalidateWorkerMessagingCache(
+  workerId: string
+): Promise<void> {
+  await cacheDel(
+    CacheKeys.workerMessagingThreads(workerId),
+    CacheKeys.workerApplications(workerId)
+  );
+}
+
+export async function invalidateMessagingThreadMessages(
+  userId: string,
+  threadId: string
+): Promise<void> {
+  await cacheDel(CacheKeys.messagingMessages(userId, threadId));
 }
 
 export function cacheVersion(): string {

@@ -17,6 +17,13 @@ import {
   fetchEmployerEntitlements,
 } from "@/lib/server/entitlements";
 import type { BillingIdentityMode } from "@/lib/server/entitlements";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+} from "@/lib/server/redis-cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 function matchLabelFromScore(matchScore: number): MatchLabel {
   if (matchScore >= 90) return "high";
@@ -116,6 +123,74 @@ function mapPreviewToApplicant(
   };
 }
 
+type ApplicantsPayload = {
+  applicants: Applicant[];
+  creditsBalance: number;
+  identityMode: BillingIdentityMode;
+  resumeDownloadEnabled: boolean;
+  messagingEnabled: boolean;
+  applicantsPerJobLimit: number | null;
+  hiddenApplicantCount: number;
+};
+
+async function loadApplicantsForJob(
+  supabase: SupabaseClient<Database>,
+  employerId: string,
+  jobId: string
+): Promise<ApplicantsPayload> {
+  const entitlements = await fetchEmployerEntitlements(employerId, supabase);
+  const identityMode = entitlements?.identityMode ?? "anonymous_preview";
+  const hiddenApplicantCount = await countHiddenApplicantsForJob(supabase, jobId);
+
+  const { data: applications, error: appsError } = await supabase
+    .from("applications")
+    .select("id, job_id, candidate_id, status, match_score, created_at")
+    .eq("job_id", jobId)
+    .eq("is_within_plan_cap", true)
+    .order("created_at", { ascending: false });
+
+  if (appsError) {
+    safeError("Error fetching applications:", appsError);
+  }
+
+  const { data: threads } = await supabase
+    .from("chat_threads")
+    .select("id, worker_id")
+    .eq("job_id", jobId);
+
+  const threadByWorker = new Map(
+    (threads ?? []).map((thread) => [thread.worker_id, thread.id])
+  );
+
+  const dbApplicants: Applicant[] = [];
+
+  for (const app of applications ?? []) {
+    const preview = await fetchApplicantPreview(supabase, app.id, employerId);
+    const mapped = mapPreviewToApplicant(app, preview, identityMode);
+    if (mapped) {
+      dbApplicants.push({
+        ...mapped,
+        messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
+      });
+    }
+  }
+
+  dbApplicants.sort((a, b) => {
+    if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
+    return b.matchScore - a.matchScore;
+  });
+
+  return {
+    applicants: dbApplicants,
+    creditsBalance: 0,
+    identityMode,
+    resumeDownloadEnabled: entitlements?.resumeDownloadEnabled ?? false,
+    messagingEnabled: entitlements?.messagingEnabled ?? false,
+    applicantsPerJobLimit: entitlements?.applicantsPerJobLimit ?? null,
+    hiddenApplicantCount,
+  };
+}
+
 /**
  * Fetch applicants for a job with entitlement-aware identity (preview vs full).
  */
@@ -152,64 +227,11 @@ export async function getApplicants(jobId: string): Promise<{
       };
     }
 
-    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
-    const identityMode = entitlements?.identityMode ?? "anonymous_preview";
-    const hiddenApplicantCount = await countHiddenApplicantsForJob(
-      supabase,
-      parsed.jobId
+    return getOrSet(
+      CacheKeys.employerApplicants(profile.id, parsed.jobId),
+      CACHE_TTL_SECONDS.applicants,
+      () => loadApplicantsForJob(supabase, profile.id, parsed.jobId)
     );
-
-    const { data: applications, error: appsError } = await supabase
-      .from("applications")
-      .select("id, job_id, candidate_id, status, match_score, created_at")
-      .eq("job_id", parsed.jobId)
-      .eq("is_within_plan_cap", true)
-      .order("created_at", { ascending: false });
-
-    if (appsError) {
-      safeError("Error fetching applications:", appsError);
-    }
-
-    const { data: threads } = await supabase
-      .from("chat_threads")
-      .select("id, worker_id")
-      .eq("job_id", parsed.jobId);
-
-    const threadByWorker = new Map(
-      (threads ?? []).map((thread) => [thread.worker_id, thread.id])
-    );
-
-    const dbApplicants: Applicant[] = [];
-
-    for (const app of applications ?? []) {
-      const preview = await fetchApplicantPreview(
-        supabase,
-        app.id,
-        profile.id
-      );
-      const mapped = mapPreviewToApplicant(app, preview, identityMode);
-      if (mapped) {
-        dbApplicants.push({
-          ...mapped,
-          messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
-        });
-      }
-    }
-
-    dbApplicants.sort((a, b) => {
-      if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
-      return b.matchScore - a.matchScore;
-    });
-
-    return {
-      applicants: dbApplicants,
-      creditsBalance: 0,
-      identityMode,
-      resumeDownloadEnabled: entitlements?.resumeDownloadEnabled ?? false,
-      messagingEnabled: entitlements?.messagingEnabled ?? false,
-      applicantsPerJobLimit: entitlements?.applicantsPerJobLimit ?? null,
-      hiddenApplicantCount,
-    };
   } catch (err) {
     safeError("getApplicants error occurred:", err);
     return {

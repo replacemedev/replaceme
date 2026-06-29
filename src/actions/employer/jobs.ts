@@ -197,6 +197,8 @@ export async function updateJobPost(payload: UpdateJobInput) {
       return { error: "Failed to update job post." };
     }
 
+    await invalidateEmployerCache(profile.id);
+
     revalidatePath("/employer/dashboard");
     revalidatePath("/employer/jobs");
     revalidatePath(`/employer/jobs/${parsed.data.jobId}`);
@@ -375,6 +377,7 @@ export async function deactivateJob(jobId: string) {
     }
 
     safeLog(`[Jobs] Job ID: ${parsed.jobId} successfully deactivated`);
+    await invalidateEmployerCache(profile.id);
     revalidatePath("/employer/dashboard");
     revalidatePath("/employer/jobs");
     return ok({ message: "Job post deactivated successfully!" });

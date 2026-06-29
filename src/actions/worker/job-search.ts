@@ -13,6 +13,12 @@ import {
   JobSearchResult,
   computeJobHourlyRate,
 } from "@/types/job-search";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 function mapJobRow(
   row: {
@@ -114,7 +120,7 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
       data: { user },
     } = await supabase.auth.getUser();
 
-    let savedJobIds = new Set<string>();
+    let workerId = "guest";
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
@@ -123,14 +129,23 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
         .maybeSingle();
 
       if (profile?.role === "worker") {
-        savedJobIds = await getWorkerSavedJobIds(supabase, profile.id);
+        workerId = profile.id;
       }
     }
 
-    const { data, error } = await supabase
-      .from("jobs")
-      .select(
-        `
+    return getOrSet(
+      CacheKeys.workerJobSearch(workerId),
+      CACHE_TTL_SECONDS.jobSearch,
+      async () => {
+        let savedJobIds = new Set<string>();
+        if (workerId !== "guest") {
+          savedJobIds = await getWorkerSavedJobIds(supabase, workerId);
+        }
+
+        const { data, error } = await supabase
+          .from("jobs")
+          .select(
+            `
         id,
         employer_id,
         title,
@@ -143,62 +158,64 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
         created_at,
         priority_score
       `
-      )
-      .eq("status", "Active")
-      .order("priority_score", { ascending: false })
-      .order("created_at", { ascending: false });
+          )
+          .eq("status", "Active")
+          .order("priority_score", { ascending: false })
+          .order("created_at", { ascending: false });
 
-    if (error) {
-      safeError("getJobSearchData:", error);
-      return {
-        jobs: [],
-        facets: {
-          employmentTypes: [],
-          skillSuggestions: [],
-          salaryMin: 0,
-          salaryMax: 200_000,
-          totalActiveJobs: 0,
-        },
-        savedJobIds: [],
-      };
-    }
+        if (error) {
+          safeError("getJobSearchData:", error);
+          return {
+            jobs: [],
+            facets: {
+              employmentTypes: [],
+              skillSuggestions: [],
+              salaryMin: 0,
+              salaryMax: 200_000,
+              totalActiveJobs: 0,
+            },
+            savedJobIds: [],
+          };
+        }
 
-    const employerIds = [
-      ...new Set(
-        (data ?? [])
-          .map((row) => row.employer_id)
-          .filter((id): id is string => Boolean(id))
-      ),
-    ];
+        const employerIds = [
+          ...new Set(
+            (data ?? [])
+              .map((row) => row.employer_id)
+              .filter((id): id is string => Boolean(id))
+          ),
+        ];
 
-    const companyByEmployer = new Map<
-      string,
-      { company_name: string | null; logo_url: string | null }
-    >();
+        const companyByEmployer = new Map<
+          string,
+          { company_name: string | null; logo_url: string | null }
+        >();
 
-    if (employerIds.length > 0) {
-      const { data: companies } = await supabase
-        .from("company_profiles")
-        .select("employer_id, company_name, logo_url")
-        .in("employer_id", employerIds);
+        if (employerIds.length > 0) {
+          const { data: companies } = await supabase
+            .from("company_profiles")
+            .select("employer_id, company_name, logo_url")
+            .in("employer_id", employerIds);
 
-      for (const company of companies ?? []) {
-        companyByEmployer.set(company.employer_id, {
-          company_name: company.company_name,
-          logo_url: company.logo_url,
-        });
+          for (const company of companies ?? []) {
+            companyByEmployer.set(company.employer_id, {
+              company_name: company.company_name,
+              logo_url: company.logo_url,
+            });
+          }
+        }
+
+        const jobs = (data ?? [])
+          .map((row) => mapJobRow(row, savedJobIds, companyByEmployer))
+          .filter((j): j is JobSearchResult => j !== null);
+
+        return {
+          jobs,
+          facets: buildFacets(jobs),
+          savedJobIds: Array.from(savedJobIds),
+        };
       }
-    }
-
-    const jobs = (data ?? [])
-      .map((row) => mapJobRow(row, savedJobIds, companyByEmployer))
-      .filter((j): j is JobSearchResult => j !== null);
-
-    return {
-      jobs,
-      facets: buildFacets(jobs),
-      savedJobIds: Array.from(savedJobIds),
-    };
+    );
   } catch (err) {
     safeError("getJobSearchData:", err);
     return {
@@ -238,6 +255,8 @@ export async function toggleSavedJob(
 
       if (error) return fail("Failed to remove bookmark.");
 
+      await invalidateWorkerCache(profile.id);
+
       revalidatePath("/worker/jobs");
       revalidatePath("/worker/saved-jobs");
       revalidatePath(`/worker/jobs/${parsed}`);
@@ -250,6 +269,8 @@ export async function toggleSavedJob(
     });
 
     if (error) return fail("Failed to save job.");
+
+    await invalidateWorkerCache(profile.id);
 
     revalidatePath("/worker/jobs");
     revalidatePath("/worker/saved-jobs");

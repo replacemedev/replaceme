@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
 import { JobPost, RecentApplicant } from "@/types/employer";
 import { employerHasFullIdentity } from "@/lib/server/entitlements";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+} from "@/lib/server/redis-cache";
 
 /**
  * Helper function to verify that the active session belongs to an employer
@@ -52,12 +57,15 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
   }
 
   try {
-    const supabase = await createClient();
-    
-    // Query jobs joined with applications to calculate applicants count
-    const { data: jobs, error } = await supabase
-      .from("jobs")
-      .select(`
+    return getOrSet(
+      CacheKeys.employerRecentJobs(employerProfileId),
+      CACHE_TTL_SECONDS.employerDashboard,
+      async () => {
+        const supabase = await createClient();
+
+        const { data: jobs, error } = await supabase
+          .from("jobs")
+          .select(`
         id,
         title,
         created_at,
@@ -69,29 +77,31 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
           id
         )
       `)
-      .eq("employer_id", employerProfileId)
-      .order("priority_score", { ascending: false })
-      .order("created_at", { ascending: false });
+          .eq("employer_id", employerProfileId)
+          .order("priority_score", { ascending: false })
+          .order("created_at", { ascending: false });
 
-    if (error) {
-      safeError("getRecentJobs query failed", error);
-      return [];
-    }
+        if (error) {
+          safeError("getRecentJobs query failed", error);
+          return [];
+        }
 
-    if (!jobs) {
-      return [];
-    }
+        if (!jobs) {
+          return [];
+        }
 
-    return jobs.map((job: any) => ({
-      id: job.id,
-      title: job.title,
-      created_at: job.created_at,
-      applicants_count: job.applications ? job.applications.length : 0,
-      visible_applicants_count: Number(job.visible_applicant_count ?? 0),
-      hits_count: job.views_count || 0,
-      status: job.status,
-      priority_score: Number(job.priority_score ?? 0),
-    }));
+        return jobs.map((job: any) => ({
+          id: job.id,
+          title: job.title,
+          created_at: job.created_at,
+          applicants_count: job.applications ? job.applications.length : 0,
+          visible_applicants_count: Number(job.visible_applicant_count ?? 0),
+          hits_count: job.views_count || 0,
+          status: job.status,
+          priority_score: Number(job.priority_score ?? 0),
+        }));
+      }
+    );
   } catch (err) {
     safeError("getRecentJobs unexpected error", err);
     return [];
@@ -109,29 +119,31 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
   }
 
   try {
-    const supabase = await createClient();
+    return getOrSet(
+      CacheKeys.employerRecentApplicants(employerProfileId),
+      CACHE_TTL_SECONDS.employerDashboard,
+      async () => {
+        const supabase = await createClient();
 
-    // 1. Fetch employer's jobs list first to obtain IDs
-    const { data: jobs, error: jobsError } = await supabase
-      .from("jobs")
-      .select("id")
-      .eq("employer_id", employerProfileId);
+        const { data: jobs, error: jobsError } = await supabase
+          .from("jobs")
+          .select("id")
+          .eq("employer_id", employerProfileId);
 
-    if (jobsError) {
-      safeError("getRecentApplicants fetching jobs failed", jobsError);
-      return [];
-    }
+        if (jobsError) {
+          safeError("getRecentApplicants fetching jobs failed", jobsError);
+          return [];
+        }
 
-    if (!jobs || jobs.length === 0) {
-      return [];
-    }
+        if (!jobs || jobs.length === 0) {
+          return [];
+        }
 
-    const jobIds = jobs.map((j) => j.id);
+        const jobIds = jobs.map((j) => j.id);
 
-    // 2. Fetch recent applications for these jobs
-    const { data: apps, error: appsError } = await supabase
-      .from("applications")
-      .select(`
+        const { data: apps, error: appsError } = await supabase
+          .from("applications")
+          .select(`
         id,
         candidate_id,
         created_at,
@@ -149,46 +161,54 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
           professional_title
         )
       `)
-      .in("job_id", jobIds)
-      .eq("is_within_plan_cap", true)
-      .order("created_at", { ascending: false })
-      .limit(5);
+          .in("job_id", jobIds)
+          .eq("is_within_plan_cap", true)
+          .order("created_at", { ascending: false })
+          .limit(5);
 
-    if (appsError) {
-      safeError("getRecentApplicants query failed", appsError);
-      return [];
-    }
+        if (appsError) {
+          safeError("getRecentApplicants query failed", appsError);
+          return [];
+        }
 
-    if (!apps || apps.length === 0) {
-      return [];
-    }
+        if (!apps || apps.length === 0) {
+          return [];
+        }
 
-    const hasFullIdentity = await employerHasFullIdentity(employerProfileId, supabase);
+        const hasFullIdentity = await employerHasFullIdentity(
+          employerProfileId,
+          supabase
+        );
 
-    return apps.map((app: any) => {
-      const candidate = app.profiles;
-      const job = app.jobs;
+        return apps.map((app: any) => {
+          const candidate = app.profiles;
+          const job = app.jobs;
 
-      const idClean = app.candidate_id.replace(/[^0-9]/g, "");
-      const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
+          const idClean = app.candidate_id.replace(/[^0-9]/g, "");
+          const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
 
-      const name = hasFullIdentity
-        ? `${candidate?.first_name || ""} ${candidate?.last_name || ""}`.trim()
-        : `Applicant #${appCode}`;
+          const name = hasFullIdentity
+            ? `${candidate?.first_name || ""} ${candidate?.last_name || ""}`.trim()
+            : `Applicant #${appCode}`;
 
-      const avatarUrl = hasFullIdentity ? candidate?.avatar_url || null : null;
+          const avatarUrl = hasFullIdentity
+            ? candidate?.avatar_url || null
+            : null;
 
-      return {
-        id: app.id,
-        candidate_id: app.candidate_id,
-        name,
-        applied_role: job?.title || candidate?.professional_title || "Specialist",
-        created_at: app.created_at,
-        avatar_url: avatarUrl,
-        is_unlocked: hasFullIdentity,
-        job_id: app.job_id,
-      };
-    });
+          return {
+            id: app.id,
+            candidate_id: app.candidate_id,
+            name,
+            applied_role:
+              job?.title || candidate?.professional_title || "Specialist",
+            created_at: app.created_at,
+            avatar_url: avatarUrl,
+            is_unlocked: hasFullIdentity,
+            job_id: app.job_id,
+          };
+        });
+      }
+    );
   } catch (err) {
     safeError("getRecentApplicants unexpected error", err);
     return [];

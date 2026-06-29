@@ -7,20 +7,32 @@ import {
   updateWorkerSettingsSchema,
   type UpdateWorkerProfileInput,
 } from "@/lib/validations/worker/phase2";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 export async function getWorkerProfileForEdit() {
   const ctx = await requireWorker();
   if (!ctx) return null;
 
-  const { data } = await ctx.supabase
-    .from("profiles")
-    .select(
-      "first_name, last_name, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, is_remote"
-    )
-    .eq("id", ctx.profile.id)
-    .single();
+  return getOrSet(
+    CacheKeys.workerProfile(ctx.profile.id),
+    CACHE_TTL_SECONDS.workerProfile,
+    async () => {
+      const { data } = await ctx.supabase
+        .from("profiles")
+        .select(
+          "first_name, last_name, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, is_remote"
+        )
+        .eq("id", ctx.profile.id)
+        .single();
 
-  return data;
+      return data;
+    }
+  );
 }
 
 export async function updateWorkerProfile(payload: UpdateWorkerProfileInput) {
@@ -49,6 +61,8 @@ export async function updateWorkerProfile(payload: UpdateWorkerProfileInput) {
 
   if (error) return { error: `Failed to update profile: ${error.message}` };
 
+  await invalidateWorkerCache(ctx.profile.id);
+
   revalidatePath("/worker/profile");
   revalidatePath("/worker/profile/edit");
   return { success: true };
@@ -74,6 +88,8 @@ export async function updateWorkerSettings(payload: unknown) {
     .eq("id", ctx.profile.id);
 
   if (error) return { error: "Failed to update settings" };
+
+  await invalidateWorkerCache(ctx.profile.id);
 
   revalidatePath("/worker/settings");
   revalidatePath("/worker/profile");
