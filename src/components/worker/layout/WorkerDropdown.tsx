@@ -88,8 +88,9 @@ export function WorkerDropdown({
           )}
         </div>
 
-        <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-700 max-w-[120px] truncate select-none">
-          {displayName}
+        <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-700 select-none">
+          <span className="max-w-[100px] truncate">{displayName}</span>
+          <VerifiedBadge show={isVerified} size="sm" />
         </span>
 
         <ChevronDown
