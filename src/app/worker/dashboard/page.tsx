@@ -24,7 +24,6 @@ import {
   WorkerKpiStrip,
   WorkerSectionCard,
 } from "@/components/worker/layout";
-import { WorkerDashboardQuickLinks } from "@/components/worker/dashboard/WorkerDashboardQuickLinks";
 import { WorkerDashboardOnboardedBanner } from "@/components/worker/dashboard/WorkerDashboardOnboardedBanner";
 import { computeWorkerProfileStrength } from "@/lib/worker/profile-strength";
 
@@ -180,8 +179,6 @@ export default async function WorkerDashboard() {
           },
         ]}
       />
-
-      <WorkerDashboardQuickLinks />
 
       <WorkerSectionCard title="Recent messages">
         {displayMessages.length > 0 ? (

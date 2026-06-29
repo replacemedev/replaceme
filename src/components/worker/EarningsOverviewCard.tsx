@@ -36,17 +36,20 @@ export function EarningsOverviewCard({ earnings }: EarningsOverviewCardProps) {
                   ₱{item.amount.toLocaleString()}
                 </span>
                 
-                <div 
-                  className={`w-full rounded-t-lg transition-all duration-300 ${
-                    item.is_highlighted 
-                      ? "bg-[#22c55e] hover:bg-[#16a34a]" 
-                      : "bg-[#e2e8f0] hover:bg-[#cbd5e1]"
-                  }`}
-                  style={{ height: `${pctHeight}%` }}
-                />
+                {/* Faint background container track to provide scale */}
+                <div className="w-full h-full bg-slate-100/70 border border-slate-200/20 rounded-t-lg relative flex flex-col justify-end overflow-hidden">
+                  <div 
+                    className={`w-full rounded-t-md transition-all duration-300 shadow-xs hover:shadow-sm ${
+                      item.is_highlighted 
+                        ? "bg-gradient-to-t from-green-600 to-green-400 hover:from-green-700 hover:to-green-500" 
+                        : "bg-gradient-to-t from-slate-200 to-slate-150 hover:from-slate-300 hover:to-slate-200"
+                    }`}
+                    style={{ height: `${pctHeight}%` }}
+                  />
+                </div>
               </div>
               
-              <span className="text-[10px] font-bold text-slate-400">
+              <span className="text-[10px] md:text-xs text-slate-500 font-medium uppercase tracking-wider">
                 {item.month_name}
               </span>
             </div>

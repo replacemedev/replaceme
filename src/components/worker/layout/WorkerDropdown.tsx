@@ -86,16 +86,10 @@ export function WorkerDropdown({
               {initials}
             </div>
           )}
-          {isVerified && (
-            <span className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5">
-              <VerifiedBadge size="sm" showTooltip={false} />
-            </span>
-          )}
         </div>
 
         <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-700 max-w-[120px] truncate select-none">
           {displayName}
-          <VerifiedBadge show={isVerified} size="sm" />
         </span>
 
         <ChevronDown
