@@ -65,6 +65,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     bio: profileRow.bio,
     avatar_url: profileRow.avatar_url,
     hourly_rate: profileRow.hourly_rate,
+    salary_currency: profileRow.salary_currency ?? "PHP",
     experience_years: profileRow.experience_years,
     location: profileRow.location,
     availability: profileRow.availability,

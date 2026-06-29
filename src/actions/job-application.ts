@@ -16,6 +16,7 @@ import {
   invalidateEmployerApplicantsCache,
   invalidateWorkerCache,
 } from "@/lib/server/redis-cache";
+import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 
 export interface SubmitJobApplicationResult {
   success: boolean;
@@ -197,6 +198,11 @@ export async function submitJobApplication(
 
     await invalidateWorkerCache(profile.id);
     await invalidateEmployerApplicantsCache(job.employer_id, jobId);
+
+    await emitWorkerAuditLog(profile.id, "worker.application_submitted", {
+      application_id: inserted.id,
+      job_id: jobId,
+    });
 
     revalidatePath(`/worker/jobs/${jobId}`);
     revalidatePath(`/worker/jobs/${jobId}/apply`);

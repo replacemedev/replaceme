@@ -198,6 +198,29 @@ const candidateViewSchema = z
   })
   .strict();
 
+type WorkerSkillPreview = {
+  id?: string;
+  skill_name?: string;
+  proficiency_label?: string;
+};
+
+type WorkerProjectPreview = {
+  id?: string;
+  title?: string;
+  role?: string;
+  year?: number;
+  description?: string;
+  skills_used?: string[];
+};
+
+function asWorkerSkills(value: unknown): WorkerSkillPreview[] {
+  return Array.isArray(value) ? (value as WorkerSkillPreview[]) : [];
+}
+
+function asWorkerProjects(value: unknown): WorkerProjectPreview[] {
+  return Array.isArray(value) ? (value as WorkerProjectPreview[]) : [];
+}
+
 export async function getEmployerCandidateProfile(
   candidateId: string,
   jobId: string
@@ -265,6 +288,9 @@ export async function getEmployerCandidateProfile(
 
   if (identityMode === "full" && preview.identity_mode === "full") {
     const resumeCheck = await assertEmployerResumeDownload(profile.id);
+    const workerSkills = asWorkerSkills(candidate.worker_skills);
+    const workerProjects = asWorkerProjects(candidate.worker_projects);
+    const showHourly = planSlug !== "discovery";
 
     return {
       jobTitle: job.title,
@@ -281,6 +307,8 @@ export async function getEmployerCandidateProfile(
         title: String(candidate.professional_title ?? "Professional"),
         bio: (candidate.bio as string | null) ?? null,
         skills,
+        workerSkills,
+        workerProjects,
         experienceYears: Number(candidate.experience_years ?? 0),
         avatarUrl: (candidate.avatar_url as string | null) ?? null,
         email: (candidate.email as string | null) ?? null,
@@ -304,7 +332,14 @@ export async function getEmployerCandidateProfile(
           candidate.expected_salary_max === undefined
             ? null
             : Number(candidate.expected_salary_max),
-        salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
+        salaryCurrency: (candidate.salary_currency as string | null) ?? "PHP",
+        hourlyRate:
+          showHourly && candidate.hourly_rate != null
+            ? Number(candidate.hourly_rate)
+            : null,
+        availability: showHourly
+          ? ((candidate.availability as string | null) ?? null)
+          : null,
       },
     };
   }
@@ -324,6 +359,8 @@ export async function getEmployerCandidateProfile(
       title: String(candidate.professional_title ?? "Professional"),
       bio: null,
       skills,
+      workerSkills: [],
+      workerProjects: [],
       experienceYears: Number(candidate.experience_years ?? 0),
       avatarUrl: null,
       email: null,
@@ -343,7 +380,9 @@ export async function getEmployerCandidateProfile(
         candidate.expected_salary_max === undefined
           ? null
           : Number(candidate.expected_salary_max),
-      salaryCurrency: (candidate.salary_currency as string | null) ?? "USD",
+      salaryCurrency: (candidate.salary_currency as string | null) ?? "PHP",
+      hourlyRate: null,
+      availability: null,
     },
   };
 }

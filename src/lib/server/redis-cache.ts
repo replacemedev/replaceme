@@ -2,13 +2,15 @@ import { safeError } from "@/utils/logger";
 import {
   CACHE_VERSION,
   CacheKeys,
+  adminCacheKeys,
   employerCacheKeys,
   workerCacheKeys,
   CACHE_TTL_SECONDS,
 } from "@/lib/server/cache-keys";
 import { getRedis } from "@/lib/server/redis";
+import { createClient } from "@/lib/supabase/server";
 
-export { CacheKeys, CACHE_TTL_SECONDS, employerCacheKeys, workerCacheKeys };
+export { CacheKeys, CACHE_TTL_SECONDS, employerCacheKeys, workerCacheKeys, adminCacheKeys };
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
   const redis = getRedis();
@@ -130,6 +132,37 @@ export async function invalidateMessagingThreadMessages(
   threadId: string
 ): Promise<void> {
   await cacheDel(CacheKeys.messagingMessages(userId, threadId));
+}
+
+/** Drop admin dashboard metrics and audit log slices. */
+export async function invalidateAdminCache(): Promise<void> {
+  await cacheDel(...adminCacheKeys());
+}
+
+/** Invalidate employer applicant caches for every job this worker has applied to. */
+export async function invalidateEmployerCachesForWorker(
+  workerId: string
+): Promise<void> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("applications")
+    .select("job_id, jobs(employer_id)")
+    .eq("candidate_id", workerId);
+
+  const pairs = new Set<string>();
+  for (const row of data ?? []) {
+    const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
+    if (job?.employer_id) {
+      pairs.add(`${job.employer_id}:${row.job_id}`);
+    }
+  }
+
+  await Promise.all(
+    [...pairs].map((key) => {
+      const [employerId, jobId] = key.split(":");
+      return invalidateEmployerApplicantsCache(employerId, jobId);
+    })
+  );
 }
 
 export function cacheVersion(): string {

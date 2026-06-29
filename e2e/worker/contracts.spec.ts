@@ -11,7 +11,7 @@ test.describe("Worker contracts", () => {
   test("loads contract offers inbox", async ({ page }) => {
     await page.goto("/worker/contracts");
     await expect(
-      page.getByRole("heading", { name: "Contract Offers", exact: true })
+      page.getByRole("heading", { name: "Contract offers", exact: true })
     ).toBeVisible();
   });
 });

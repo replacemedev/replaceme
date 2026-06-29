@@ -16,7 +16,9 @@ import {
   CACHE_TTL_SECONDS,
   getOrSet,
   invalidateWorkerCache,
+  invalidateEmployerCachesForWorker,
 } from "@/lib/server/redis-cache";
+import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 
 function emptyToNull(value: string | undefined) {
   if (value === undefined) return undefined;
@@ -59,6 +61,8 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   if (error) return { error: `Failed to update profile: ${error.message}` };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  await emitWorkerAuditLog(ctx.profile.id, "worker.profile_updated");
   revalidatePath("/worker/profile");
   return { success: true };
 }
@@ -83,6 +87,9 @@ export async function updateWorkerSettings(payload: unknown) {
       availability: parsed.data.availability,
       hourly_rate: parsed.data.hourlyRate,
       is_remote: parsed.data.isRemote,
+      ...(parsed.data.salaryCurrency
+        ? { salary_currency: parsed.data.salaryCurrency }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", ctx.profile.id);
@@ -90,6 +97,8 @@ export async function updateWorkerSettings(payload: unknown) {
   if (error) return { error: "Failed to update settings" };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  await emitWorkerAuditLog(ctx.profile.id, "worker.settings_updated");
   revalidatePath("/worker/settings");
   revalidatePath("/worker/profile");
   return { success: true };
@@ -120,6 +129,7 @@ export async function createWorkerSkill(payload: unknown) {
   }
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true, id: data.id };
 }
@@ -149,6 +159,7 @@ export async function updateWorkerSkill(payload: unknown) {
   if (error) return { error: "Failed to update skill." };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true };
 }
@@ -166,6 +177,7 @@ export async function deleteWorkerSkill(skillId: string) {
   if (error) return { error: "Failed to delete skill." };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true };
 }
@@ -191,6 +203,7 @@ export async function createWorkerProject(payload: unknown) {
   if (error) return { error: "Failed to add project." };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true, id: data.id };
 }
@@ -220,6 +233,7 @@ export async function updateWorkerProject(payload: unknown) {
   if (error) return { error: "Failed to update project." };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true };
 }
@@ -237,6 +251,7 @@ export async function deleteWorkerProject(projectId: string) {
   if (error) return { error: "Failed to delete project." };
 
   await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   return { success: true };
 }

@@ -6,6 +6,12 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateAdminCache,
+} from "@/lib/server/redis-cache";
+import {
   EMPTY_PLATFORM_METRICS,
   moderateJobSchema,
   platformMetricsSchema,
@@ -60,6 +66,7 @@ function revalidateAdminSurfaces() {
   for (const path of ADMIN_PATHS) {
     revalidatePath(path);
   }
+  void invalidateAdminCache();
 }
 
 export async function logAdminAction(
@@ -81,6 +88,7 @@ export async function logAdminAction(
   });
 
   if (error) throw new Error(`Failed to log admin action: ${error.message}`);
+  await invalidateAdminCache();
 }
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -278,28 +286,42 @@ export async function reviewWorkerVerification(
 
 export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
   await requireAdmin();
-  const adminClient = await createAdminClient();
 
-  const { data, error } = await adminClient.rpc("get_platform_metrics");
+  return getOrSet(
+    CacheKeys.adminPlatformMetrics(),
+    CACHE_TTL_SECONDS.adminMetrics,
+    async () => {
+      const adminClient = await createAdminClient();
+      const { data, error } = await adminClient.rpc("get_platform_metrics");
 
-  if (error) {
-    throw new Error(`Failed to fetch platform metrics: ${error.message}`);
-  }
+      if (error) {
+        throw new Error(`Failed to fetch platform metrics: ${error.message}`);
+      }
 
-  const parsed = platformMetricsSchema.safeParse(data);
-  return parsed.success ? parsed.data : EMPTY_PLATFORM_METRICS;
+      const parsed = platformMetricsSchema.safeParse(data);
+      return parsed.success ? parsed.data : EMPTY_PLATFORM_METRICS;
+    }
+  );
 }
 
 export async function fetchRecentAuditLogs(limit = 10) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
 
-  const { data } = await supabase
-    .from("audit_logs")
-    .select("id, action_type, target_type, target_id, metadata, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  return getOrSet(
+    CacheKeys.adminRecentAuditLogs(limit),
+    CACHE_TTL_SECONDS.adminAuditLogs,
+    async () => {
+      const { supabase } = await requireAdmin();
 
-  return data ?? [];
+      const { data } = await supabase
+        .from("audit_logs")
+        .select("id, action_type, target_type, target_id, metadata, created_at")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      return data ?? [];
+    }
+  );
 }
 
 export async function fetchAdminWorkers(): Promise<AdminWorkerRow[]> {

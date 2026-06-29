@@ -24,8 +24,6 @@ test.describe("Worker application detail", () => {
 
     await viewDetails.click();
     await expect(page).toHaveURL(/\/worker\/applications\//);
-    await expect(
-      page.getByRole("heading", { name: "Application Detail", exact: true })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });

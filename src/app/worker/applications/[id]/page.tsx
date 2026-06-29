@@ -1,14 +1,23 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Calendar, MessageSquare } from "lucide-react";
-import { getWorkerApplicationById } from "@/actions/worker/applications";
+import {
+  getWorkerApplicationById,
+  getApplicationStageHistory,
+} from "@/actions/worker/applications";
 import { getWorkerApplicationMessaging } from "@/actions/messaging";
 import {
+  APPLICATION_STATUS_LABELS,
   formatHourlyRate,
   getStatusBadge,
 } from "@/types/applications";
-import { WorkerPageShell, WorkerPageHeader, WorkerSectionCard } from "@/components/worker/layout";
+import {
+  WorkerPageShell,
+  WorkerPageHeader,
+  WorkerSectionCard,
+} from "@/components/worker/layout";
 import { ApplicationTimeline } from "@/components/worker/applications/ApplicationTimeline";
+import { WithdrawApplicationButton } from "@/components/worker/applications/WithdrawApplicationButton";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +26,14 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function WorkerApplicationDetailPage({ params }: PageProps) {
+export default async function WorkerApplicationDetailPage({
+  params,
+}: PageProps) {
   const { id } = await params;
-  const application = await getWorkerApplicationById(id);
+  const [application, stageHistory] = await Promise.all([
+    getWorkerApplicationById(id),
+    getApplicationStageHistory(id),
+  ]);
 
   if (!application) notFound();
 
@@ -27,19 +41,28 @@ export default async function WorkerApplicationDetailPage({ params }: PageProps)
 
   const { label } = getStatusBadge(application.status);
 
-  const timeline = [
-    { label: "Application submitted", at: application.createdAt },
-    { label: `Status: ${label}`, at: application.createdAt },
-  ];
+  const timeline =
+    stageHistory.length > 0
+      ? stageHistory.map((event) => ({
+          label: `Status: ${APPLICATION_STATUS_LABELS[event.status]}`,
+          at: event.createdAt,
+        }))
+      : [
+          { label: "Application submitted", at: application.createdAt },
+          { label: `Status: ${label}`, at: application.createdAt },
+        ];
 
   return (
     <WorkerPageShell width="content">
-
       <WorkerPageHeader
         title={application.jobTitle}
         subhead={application.companyName}
         actions={
           <div className="flex flex-wrap gap-2">
+            <WithdrawApplicationButton
+              applicationId={application.id}
+              status={application.status}
+            />
             {messaging?.threadId ? (
               <Link
                 href={`/worker/messages?threadId=${messaging.threadId}`}

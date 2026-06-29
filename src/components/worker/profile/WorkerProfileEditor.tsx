@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
+import { formatMoney } from "@/lib/format/currency";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { SkillProgressBar } from "@/components/worker/profile/SkillProgressBar";
@@ -74,6 +75,26 @@ export function WorkerProfileEditor({
   const [titleEditing, setTitleEditing] = useState(false);
   const [titleDraft, setTitleDraft] = useState(profile.professional_title ?? "");
   const [, startTransition] = useTransition();
+
+  function shareProfile() {
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/worker/profile?id=${profile.id}`
+        : "";
+    if (!url) return;
+
+    if (navigator.share) {
+      void navigator.share({ title: "My profile", url }).catch(() => {
+        void navigator.clipboard.writeText(url);
+        toast.success("Profile link copied");
+      });
+      return;
+    }
+
+    void navigator.clipboard.writeText(url).then(() => {
+      toast.success("Profile link copied");
+    });
+  }
 
   const memberSince = profile.created_at
     ? new Date(profile.created_at).toLocaleDateString("en-US", {
@@ -464,7 +485,11 @@ export function WorkerProfileEditor({
                   {isOwner ? <Edit size={10} className="ml-auto" /> : null}
                 </div>
                 <p className="text-sm font-extrabold text-slate-800">
-                  ₱{profile.hourly_rate || 0}/hr
+                  {formatMoney(
+                    profile.hourly_rate ?? 0,
+                    profile.salary_currency ?? "PHP",
+                    { perHour: true }
+                  )}
                 </p>
               </div>
               <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 space-y-0.5">
@@ -611,6 +636,7 @@ export function WorkerProfileEditor({
               ) : null}
               <button
                 type="button"
+                onClick={shareProfile}
                 className="flex items-center justify-center gap-2 w-full py-3 px-4 font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl"
               >
                 <Share2 size={14} className="text-slate-400" />
@@ -630,6 +656,7 @@ export function WorkerProfileEditor({
               availability: profile.availability ?? "Full-time",
               hourlyRate: Number(profile.hourly_rate ?? 0),
               isRemote: Boolean(profile.is_remote),
+              salaryCurrency: profile.salary_currency ?? "PHP",
             }}
             onSaved={(data) =>
               setProfile((prev) => ({
@@ -637,6 +664,7 @@ export function WorkerProfileEditor({
                 availability: data.availability,
                 hourly_rate: data.hourlyRate,
                 is_remote: data.isRemote,
+                salary_currency: data.salaryCurrency,
               }))
             }
           />

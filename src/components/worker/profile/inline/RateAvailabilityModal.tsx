@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateWorkerSettings } from "@/actions/worker/profile";
+import { COMPENSATION_CURRENCIES, type CompensationCurrency } from "@/lib/format/currency";
 import { ProfileModal } from "./ProfileModal";
 
 const AVAILABILITY = [
@@ -19,11 +20,13 @@ interface RateAvailabilityModalProps {
     availability: string;
     hourlyRate: number;
     isRemote: boolean;
+    salaryCurrency: string;
   };
   onSaved: (data: {
     availability: string;
     hourlyRate: number;
     isRemote: boolean;
+    salaryCurrency: string;
   }) => void;
 }
 
@@ -35,6 +38,9 @@ export function RateAvailabilityModal({
 }: RateAvailabilityModalProps) {
   const [availability, setAvailability] = useState(initial.availability);
   const [hourlyRate, setHourlyRate] = useState(String(initial.hourlyRate));
+  const [salaryCurrency, setSalaryCurrency] = useState(
+    initial.salaryCurrency as CompensationCurrency
+  );
   const [isRemote, setIsRemote] = useState(initial.isRemote);
   const [isPending, startTransition] = useTransition();
 
@@ -45,6 +51,7 @@ export function RateAvailabilityModal({
         availability: availability as (typeof AVAILABILITY)[number],
         hourlyRate: Number(hourlyRate),
         isRemote,
+        salaryCurrency,
       };
       const result = await updateWorkerSettings(payload);
       if (result.error) {
@@ -98,7 +105,23 @@ export function RateAvailabilityModal({
           </select>
         </label>
         <label className="block text-sm font-medium text-slate-700">
-          Hourly rate (₱)
+          Compensation currency
+          <select
+            value={salaryCurrency}
+            onChange={(e) =>
+              setSalaryCurrency(e.target.value as CompensationCurrency)
+            }
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          >
+            {COMPENSATION_CURRENCIES.map((currency) => (
+              <option key={currency.code} value={currency.code}>
+                {currency.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm font-medium text-slate-700">
+          Hourly rate
           <input
             type="number"
             min={0}

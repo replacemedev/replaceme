@@ -57,6 +57,10 @@ export async function updateApplicationStatus(
       );
     }
 
+    if (parsed.status === "WITHDRAWN") {
+      return fail("Only workers can withdraw applications.");
+    }
+
     if (ADVANCE_STATUSES.has(parsed.status)) {
       const identityCheck = await assertEmployerCanAdvanceApplication(profile.id);
       if (!identityCheck.allowed) {

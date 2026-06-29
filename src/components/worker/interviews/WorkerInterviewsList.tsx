@@ -18,7 +18,7 @@ export function WorkerInterviewsList({ groups }: WorkerInterviewsListProps) {
           </h2>
           <ul className="space-y-3">
             {group.items.map((item) => (
-              <li key={item.applicationId}>
+              <li key={item.interviewId}>
                 <InterviewCard item={item} />
               </li>
             ))}
@@ -42,6 +42,16 @@ function InterviewCard({ item }: { item: WorkerInterviewRow }) {
           <p className="text-xs text-slate-400 mt-2">
             Scheduled: {new Date(item.scheduledAt).toLocaleString()}
           </p>
+          {item.meetingUrl ? (
+            <a
+              href={item.meetingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex mt-2 text-xs font-bold text-[#006e2f] hover:underline"
+            >
+              Join meeting
+            </a>
+          ) : null}
           <Link
             href={`/worker/applications/${item.applicationId}`}
             className="inline-flex mt-3 text-xs font-bold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"

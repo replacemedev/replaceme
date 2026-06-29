@@ -8,55 +8,88 @@ import {
   type WorkerJobAlertRow,
   type WorkerInterviewRow,
 } from "@/lib/validations/worker/phase2";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  cacheDel,
+  getOrSet,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
   const ctx = await requireWorker();
   if (!ctx) return [];
 
-  const { data } = await ctx.supabase
-    .from("applications")
-    .select(
-      `
-      id,
-      status,
-      created_at,
-      job_posts ( title, company_name )
-    `
-    )
-    .eq("candidate_id", ctx.profile.id)
-    .eq("status", "INTERVIEW_SCHEDULED")
-    .order("created_at", { ascending: false });
+  return getOrSet(
+    CacheKeys.workerInterviews(ctx.profile.id),
+    CACHE_TTL_SECONDS.workerInterviews,
+    async () => {
+      const { data } = await ctx.supabase
+        .from("interviews")
+        .select(
+          `
+          id,
+          scheduled_at,
+          meeting_url,
+          status,
+          application_id,
+          applications!inner (
+            id,
+            status,
+            job_posts ( title, company_name )
+          )
+        `
+        )
+        .eq("worker_id", ctx.profile.id)
+        .in("status", ["scheduled"])
+        .order("scheduled_at", { ascending: true });
 
-  return (data ?? []).map((row) => {
-    const job = Array.isArray(row.job_posts) ? row.job_posts[0] : row.job_posts;
-    return {
-      applicationId: row.id,
-      jobTitle: job?.title ?? "Interview",
-      companyName: job?.company_name ?? "Employer",
-      scheduledAt: row.created_at,
-      status: row.status,
-    };
-  });
+      return (data ?? []).map((row) => {
+        const app = Array.isArray(row.applications)
+          ? row.applications[0]
+          : row.applications;
+        const job = Array.isArray(app?.job_posts)
+          ? app.job_posts[0]
+          : app?.job_posts;
+
+        return {
+          interviewId: row.id,
+          applicationId: row.application_id,
+          jobTitle: job?.title ?? "Interview",
+          companyName: job?.company_name ?? "Employer",
+          scheduledAt: row.scheduled_at,
+          meetingUrl: row.meeting_url,
+          status: row.status,
+        };
+      });
+    }
+  );
 }
 
 export async function getWorkerJobAlerts(): Promise<WorkerJobAlertRow[]> {
   const ctx = await requireWorker();
   if (!ctx) return [];
 
-  const { data } = await ctx.supabase
-    .from("worker_job_alerts")
-    .select("id, label, search_query, frequency, is_active, created_at")
-    .eq("worker_id", ctx.profile.id)
-    .order("created_at", { ascending: false });
+  return getOrSet(
+    CacheKeys.workerJobAlerts(ctx.profile.id),
+    CACHE_TTL_SECONDS.workerJobAlerts,
+    async () => {
+      const { data } = await ctx.supabase
+        .from("worker_job_alerts")
+        .select("id, label, search_query, frequency, is_active, created_at")
+        .eq("worker_id", ctx.profile.id)
+        .order("created_at", { ascending: false });
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    label: row.label,
-    searchQuery: row.search_query,
-    frequency: row.frequency,
-    isActive: row.is_active,
-    createdAt: row.created_at,
-  }));
+      return (data ?? []).map((row) => ({
+        id: row.id,
+        label: row.label,
+        searchQuery: row.search_query,
+        frequency: row.frequency,
+        isActive: row.is_active,
+        createdAt: row.created_at,
+      }));
+    }
+  );
 }
 
 export async function createWorkerJobAlert(payload: unknown) {
@@ -68,15 +101,67 @@ export async function createWorkerJobAlert(payload: unknown) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid alert" };
   }
 
-  const { error } = await ctx.supabase.from("worker_job_alerts").insert({
-    worker_id: ctx.profile.id,
-    label: parsed.data.label,
-    search_query: parsed.data.searchQuery,
-    frequency: parsed.data.frequency,
-  });
+  const { data, error } = await ctx.supabase
+    .from("worker_job_alerts")
+    .insert({
+      worker_id: ctx.profile.id,
+      label: parsed.data.label,
+      search_query: parsed.data.searchQuery,
+      frequency: parsed.data.frequency,
+    })
+    .select("id, label, search_query, frequency, is_active, created_at")
+    .single();
 
-  if (error) return { error: "Failed to create job alert" };
+  if (error || !data) return { error: "Failed to create job alert" };
 
+  await cacheDel(CacheKeys.workerJobAlerts(ctx.profile.id));
+  revalidatePath("/worker/job-alerts");
+
+  const alert: WorkerJobAlertRow = {
+    id: data.id,
+    label: data.label,
+    searchQuery: data.search_query,
+    frequency: data.frequency,
+    isActive: data.is_active,
+    createdAt: data.created_at,
+  };
+
+  return { success: true, alert };
+}
+
+export async function toggleWorkerJobAlert(
+  alertId: string,
+  isActive: boolean
+) {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const { error } = await ctx.supabase
+    .from("worker_job_alerts")
+    .update({ is_active: isActive })
+    .eq("id", alertId)
+    .eq("worker_id", ctx.profile.id);
+
+  if (error) return { error: "Failed to update alert" };
+
+  await cacheDel(CacheKeys.workerJobAlerts(ctx.profile.id));
+  revalidatePath("/worker/job-alerts");
+  return { success: true };
+}
+
+export async function deleteWorkerJobAlert(alertId: string) {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const { error } = await ctx.supabase
+    .from("worker_job_alerts")
+    .delete()
+    .eq("id", alertId)
+    .eq("worker_id", ctx.profile.id);
+
+  if (error) return { error: "Failed to delete alert" };
+
+  await cacheDel(CacheKeys.workerJobAlerts(ctx.profile.id));
   revalidatePath("/worker/job-alerts");
   return { success: true };
 }
@@ -109,11 +194,17 @@ export async function getWorkerEarnings() {
   const ctx = await requireWorker();
   if (!ctx) return [];
 
-  const { data } = await ctx.supabase
-    .from("earnings_overview")
-    .select("id, month_name, amount, is_highlighted")
-    .eq("worker_id", ctx.profile.id)
-    .order("created_at", { ascending: true });
+  return getOrSet(
+    CacheKeys.workerEarnings(ctx.profile.id),
+    CACHE_TTL_SECONDS.workerEarnings,
+    async () => {
+      const { data } = await ctx.supabase
+        .from("earnings_overview")
+        .select("id, month_name, amount, is_highlighted")
+        .eq("worker_id", ctx.profile.id)
+        .order("created_at", { ascending: true });
 
-  return data ?? [];
+      return data ?? [];
+    }
+  );
 }

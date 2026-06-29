@@ -18,7 +18,7 @@ export default async function WorkerSettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("availability, hourly_rate, is_remote, role")
+    .select("availability, hourly_rate, is_remote, salary_currency, role")
     .eq("id", user.id)
     .single();
 
@@ -35,6 +35,7 @@ export default async function WorkerSettingsPage() {
           availability: profile.availability ?? "Full-time",
           hourlyRate: Number(profile.hourly_rate ?? 0),
           isRemote: Boolean(profile.is_remote),
+          salaryCurrency: profile.salary_currency ?? "PHP",
         }}
       />
     </WorkerPageShell>

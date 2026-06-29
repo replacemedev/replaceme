@@ -2,6 +2,16 @@ import { z } from "zod";
 
 const optionalUrl = z.union([z.literal(""), z.string().url()]);
 
+const compensationCurrencySchema = z.enum([
+  "PHP",
+  "USD",
+  "EUR",
+  "GBP",
+  "AUD",
+  "SGD",
+  "CAD",
+]);
+
 export const updateWorkerProfileSchema = z
   .object({
     firstName: z.string().min(1).max(80),
@@ -22,6 +32,7 @@ export const updateWorkerSettingsSchema = z
     availability: z.enum(["Full-time", "Part-time", "Contract", "Not available"]),
     hourlyRate: z.number().min(0).max(500),
     isRemote: z.boolean(),
+    salaryCurrency: compensationCurrencySchema.optional(),
   })
   .strict();
 
@@ -70,10 +81,12 @@ export interface WorkerContractRow {
 }
 
 export interface WorkerInterviewRow {
+  interviewId: string;
   applicationId: string;
   jobTitle: string;
   companyName: string;
   scheduledAt: string;
+  meetingUrl: string | null;
   status: string;
 }
 

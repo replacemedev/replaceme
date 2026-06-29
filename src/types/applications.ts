@@ -8,6 +8,7 @@ export const APPLICATION_STATUSES = [
   "INTERVIEW_SCHEDULED",
   "REJECTED",
   "HIRED",
+  "WITHDRAWN",
 ] as const;
 
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
@@ -23,6 +24,7 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   INTERVIEW_SCHEDULED: "Interview Scheduled",
   REJECTED: "Rejected",
   HIRED: "Hired",
+  WITHDRAWN: "Withdrawn",
 };
 
 export type ApplicationSortOption =
@@ -70,9 +72,14 @@ export function computeHourlyRate(
   return Math.round(monthlySalary / monthlyHours);
 }
 
-export function formatHourlyRate(rate: number | null): string {
+import { formatMoney } from "@/lib/format/currency";
+
+export function formatHourlyRate(
+  rate: number | null,
+  currency: string = "PHP"
+): string {
   if (rate == null) return "Rate TBD";
-  return `₱${rate.toLocaleString("en-US")}/hr`;
+  return formatMoney(rate, currency, { perHour: true });
 }
 
 export type StatusBadgeVariant =
@@ -95,6 +102,8 @@ export function getStatusBadge(
       return { label: "Declined", variant: "declined" };
     case "HIRED":
       return { label: "Hired", variant: "hired" };
+    case "WITHDRAWN":
+      return { label: "Withdrawn", variant: "declined" };
     case "PENDING":
     default:
       return { label: "Under Review", variant: "review" };

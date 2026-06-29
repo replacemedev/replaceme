@@ -33,7 +33,7 @@ export function WorkerOnboardingWizard() {
         return;
       }
       toast.success("Profile ready — welcome to ReplaceMe!");
-      router.replace("/worker/job-search");
+      router.replace("/worker/jobs");
       router.refresh();
     });
   };

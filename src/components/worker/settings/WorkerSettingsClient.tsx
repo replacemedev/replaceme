@@ -1,16 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateWorkerSettings } from "@/actions/worker/profile";
 import { reportEmployer } from "@/actions/worker/phase2";
+import {
+  COMPENSATION_CURRENCIES,
+  type CompensationCurrency,
+} from "@/lib/format/currency";
 
 interface WorkerSettingsClientProps {
   initial: {
     availability: string;
     hourlyRate: number;
     isRemote: boolean;
+    salaryCurrency: string;
   };
 }
 
@@ -25,6 +30,9 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
   const [pending, startTransition] = useTransition();
   const [availability, setAvailability] = useState(initial.availability);
   const [hourlyRate, setHourlyRate] = useState(String(initial.hourlyRate));
+  const [salaryCurrency, setSalaryCurrency] = useState(
+    initial.salaryCurrency as CompensationCurrency
+  );
   const [isRemote, setIsRemote] = useState(initial.isRemote);
   const [reportTitle, setReportTitle] = useState("");
   const [reportDescription, setReportDescription] = useState("");
@@ -36,6 +44,7 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
         availability: availability as (typeof AVAILABILITY)[number],
         hourlyRate: Number(hourlyRate),
         isRemote,
+        salaryCurrency,
       });
       if (result.error) toast.error(result.error);
       else toast.success("Settings saved");
@@ -87,7 +96,23 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
           </select>
         </label>
         <label className="block text-sm font-medium text-slate-700">
-          Hourly rate (USD)
+          Compensation currency
+          <select
+            value={salaryCurrency}
+            onChange={(e) =>
+              setSalaryCurrency(e.target.value as CompensationCurrency)
+            }
+            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          >
+            {COMPENSATION_CURRENCIES.map((currency) => (
+              <option key={currency.code} value={currency.code}>
+                {currency.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-sm font-medium text-slate-700">
+          Hourly rate
           <input
             type="number"
             min={0}

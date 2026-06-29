@@ -68,7 +68,15 @@ export function getNotificationHref(notification: Notification): string | null {
         ? `/employer/jobs/${meta.job_id}/applicants`
         : "/employer/dashboard";
     case "application_status":
-      return "/worker/applications";
+      return typeof meta.application_id === "string"
+        ? `/worker/applications/${meta.application_id}`
+        : "/worker/applications";
+    case "new_message":
+      return "/worker/messages";
+    case "worker_acceptance":
+      return "/worker/contracts";
+    case "verification_update":
+      return "/worker/verification";
     case "identity_verification_request":
     case "moderation_queue":
       return notification.type === "identity_verification_request"

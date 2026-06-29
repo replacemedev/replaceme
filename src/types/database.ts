@@ -2500,6 +2500,7 @@ export type Database = {
         | "INTERVIEW_SCHEDULED"
         | "REJECTED"
         | "HIRED"
+        | "WITHDRAWN"
       billing_approval_mode: "queued_2d" | "instant"
       billing_identity_mode: "anonymous_preview" | "full"
       dispute_status: "open" | "under_review" | "resolved" | "closed"
@@ -2654,6 +2655,7 @@ export const Constants = {
         "INTERVIEW_SCHEDULED",
         "REJECTED",
         "HIRED",
+        "WITHDRAWN",
       ],
       billing_approval_mode: ["queued_2d", "instant"],
       billing_identity_mode: ["anonymous_preview", "full"],

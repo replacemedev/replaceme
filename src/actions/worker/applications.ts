@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import {
@@ -14,7 +15,16 @@ import {
   CacheKeys,
   CACHE_TTL_SECONDS,
   getOrSet,
+  invalidateEmployerApplicantsCache,
+  invalidateWorkerCache,
 } from "@/lib/server/redis-cache";
+import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
+
+const WITHDRAWABLE_STATUSES: ApplicationStatus[] = [
+  "PENDING",
+  "UNDER_REVIEW",
+  "INTERVIEW_SCHEDULED",
+];
 
 type JobPostJoin = {
   id: string | null;
@@ -196,5 +206,109 @@ export async function getWorkerApplicationStats(): Promise<WorkerApplicationStat
       underReview: 0,
       interviewsScheduled: 0,
     };
+  }
+}
+
+export interface ApplicationStageEvent {
+  status: ApplicationStatus;
+  createdAt: string;
+  actorRole: string | null;
+}
+
+export async function getApplicationStageHistory(
+  applicationId: string
+): Promise<ApplicationStageEvent[]> {
+  try {
+    const ctx = await getAuthenticatedWorker();
+    if (!ctx) return [];
+
+    const { data, error } = await ctx.supabase
+      .from("application_stage_history")
+      .select("status, created_at, actor_role")
+      .eq("application_id", applicationId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      safeError("getApplicationStageHistory:", error);
+      return [];
+    }
+
+    return (data ?? []).map((row) => ({
+      status: isApplicationStatus(row.status) ? row.status : "PENDING",
+      createdAt: row.created_at,
+      actorRole: row.actor_role,
+    }));
+  } catch (err) {
+    safeError("getApplicationStageHistory:", err);
+    return [];
+  }
+}
+
+export async function withdrawApplication(
+  applicationId: string
+): Promise<{ success: true } | { error: string }> {
+  try {
+    const ctx = await getAuthenticatedWorker();
+    if (!ctx) return { error: "Unauthorized" };
+
+    const { supabase, profile } = ctx;
+
+    const { data: application, error: fetchError } = await supabase
+      .from("applications")
+      .select("id, job_id, status")
+      .eq("id", applicationId)
+      .eq("candidate_id", profile.id)
+      .maybeSingle();
+
+    if (fetchError || !application) {
+      return { error: "Application not found." };
+    }
+
+    const status = isApplicationStatus(application.status)
+      ? application.status
+      : "PENDING";
+
+    if (!WITHDRAWABLE_STATUSES.includes(status)) {
+      return { error: "This application can no longer be withdrawn." };
+    }
+
+    const { error: updateError } = await supabase
+      .from("applications")
+      .update({ status: "WITHDRAWN" })
+      .eq("id", applicationId)
+      .eq("candidate_id", profile.id);
+
+    if (updateError) {
+      safeError("withdrawApplication:", updateError);
+      return { error: "Failed to withdraw application." };
+    }
+
+    const { data: job } = await supabase
+      .from("jobs")
+      .select("employer_id")
+      .eq("id", application.job_id)
+      .maybeSingle();
+
+    if (job?.employer_id) {
+      await invalidateEmployerApplicantsCache(job.employer_id, application.job_id);
+    }
+    await invalidateWorkerCache(profile.id);
+
+    await emitWorkerAuditLog(profile.id, "worker.application_withdrawn", {
+      application_id: applicationId,
+      job_id: application.job_id,
+    });
+
+    revalidatePath("/worker/applications");
+    revalidatePath(`/worker/applications/${applicationId}`);
+    revalidatePath("/worker/dashboard");
+    if (job?.employer_id) {
+      revalidatePath(`/employer/jobs/${application.job_id}/applicants`);
+    }
+
+    return { success: true };
+  } catch (err) {
+    safeError("withdrawApplication:", err);
+    return { error: "Unexpected error." };
   }
 }

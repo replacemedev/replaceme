@@ -2,7 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createWorkerJobAlert } from "@/actions/worker/phase2";
+import {
+  createWorkerJobAlert,
+  deleteWorkerJobAlert,
+  toggleWorkerJobAlert,
+} from "@/actions/worker/phase2";
 import type { WorkerJobAlertRow } from "@/lib/validations/worker/phase2";
 
 interface JobAlertsClientProps {
@@ -26,9 +30,39 @@ export function JobAlertsClient({ alerts: initialAlerts }: JobAlertsClientProps)
         toast.error(result.error);
         return;
       }
+      if ("alert" in result && result.alert) {
+        setAlerts((prev) => [result.alert, ...prev]);
+      }
       toast.success("Job alert created");
       setLabel("");
       setSearchQuery("");
+    });
+  }
+
+  function handleToggle(alert: WorkerJobAlertRow) {
+    startTransition(async () => {
+      const result = await toggleWorkerJobAlert(alert.id, !alert.isActive);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      setAlerts((prev) =>
+        prev.map((a) =>
+          a.id === alert.id ? { ...a, isActive: !a.isActive } : a
+        )
+      );
+    });
+  }
+
+  function handleDelete(alertId: string) {
+    startTransition(async () => {
+      const result = await deleteWorkerJobAlert(alertId);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      setAlerts((prev) => prev.filter((a) => a.id !== alertId));
+      toast.success("Alert deleted");
     });
   }
 
@@ -93,12 +127,33 @@ export function JobAlertsClient({ alerts: initialAlerts }: JobAlertsClientProps)
             {alerts.map((a) => (
               <li
                 key={a.id}
-                className="bg-white border border-slate-200 rounded-xl px-4 py-3"
+                className="bg-white border border-slate-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
               >
-                <p className="text-sm font-bold text-slate-900">{a.label}</p>
-                <p className="text-xs text-slate-500">
-                  {a.searchQuery} · {a.frequency}
-                </p>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">{a.label}</p>
+                  <p className="text-xs text-slate-500">
+                    {a.searchQuery} · {a.frequency}
+                    {!a.isActive ? " · paused" : ""}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => handleToggle(a)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-700 hover:border-[#006e2f]/30"
+                  >
+                    {a.isActive ? "Pause" : "Resume"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => handleDelete(a.id)}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

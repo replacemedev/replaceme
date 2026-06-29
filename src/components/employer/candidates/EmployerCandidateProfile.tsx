@@ -7,6 +7,7 @@ import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
+import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
 import { CandidateProfileActions } from "./CandidateProfileActions";
 import {
   EmployerPageShell,
@@ -29,6 +30,19 @@ export type EmployerCandidateProfileData = {
     title: string;
     bio: string | null;
     skills: string[];
+    workerSkills: Array<{
+      id?: string;
+      skill_name?: string;
+      proficiency_label?: string;
+    }>;
+    workerProjects: Array<{
+      id?: string;
+      title?: string;
+      role?: string;
+      year?: number;
+      description?: string;
+      skills_used?: string[];
+    }>;
     experienceYears: number;
     avatarUrl: string | null;
     email: string | null;
@@ -41,26 +55,10 @@ export type EmployerCandidateProfileData = {
     expectedSalaryMin: number | null;
     expectedSalaryMax: number | null;
     salaryCurrency: string;
+    hourlyRate: number | null;
+    availability: string | null;
   };
 };
-
-function formatSalaryRange(
-  min: number | null,
-  max: number | null,
-  currency: string
-): string | null {
-  if (min === null && max === null) return null;
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(n);
-  if (min !== null && max !== null) return `${fmt(min)} – ${fmt(max)}`;
-  if (min !== null) return `From ${fmt(min)}`;
-  if (max !== null) return `Up to ${fmt(max)}`;
-  return null;
-}
 
 export function EmployerCandidateProfile({
   profile,
@@ -84,6 +82,8 @@ export function EmployerCandidateProfile({
     candidate.expectedSalaryMax,
     candidate.salaryCurrency
   );
+  const detailedSkills =
+    candidate.workerSkills.length > 0 ? candidate.workerSkills : null;
 
   const initials = candidate.name
     .split(" ")
@@ -151,9 +151,41 @@ export function EmployerCandidateProfile({
             </section>
           ) : null}
 
+          {!isPreview && candidate.hourlyRate != null ? (
+            <section className={`${EMPLOYER_CARD} p-5`}>
+              <h2 className="text-sm font-bold text-slate-900 mb-1">
+                Hourly rate
+              </h2>
+              <p className="text-sm font-semibold text-[#006e2f]">
+                {formatMoney(candidate.hourlyRate, candidate.salaryCurrency, {
+                  perHour: true,
+                })}
+              </p>
+              {candidate.availability ? (
+                <p className="text-xs text-slate-500 mt-1">
+                  Availability: {candidate.availability}
+                </p>
+              ) : null}
+            </section>
+          ) : null}
+
           <section className={`${EMPLOYER_CARD} p-5`}>
             <h2 className="text-sm font-bold text-slate-900 mb-3">Skills</h2>
-            {candidate.skills.length > 0 ? (
+            {detailedSkills ? (
+              <div className="flex flex-wrap gap-2">
+                {detailedSkills.map((skill) => (
+                  <span
+                    key={skill.id ?? skill.skill_name}
+                    className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600"
+                  >
+                    {skill.skill_name}
+                    {skill.proficiency_label
+                      ? ` · ${skill.proficiency_label}`
+                      : ""}
+                  </span>
+                ))}
+              </div>
+            ) : candidate.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {candidate.skills.map((skill) => (
                   <span
@@ -171,6 +203,39 @@ export function EmployerCandidateProfile({
               {candidate.experienceYears} years experience
             </p>
           </section>
+
+          {!isPreview && candidate.workerProjects.length > 0 ? (
+            <section className={`${EMPLOYER_CARD} p-5`}>
+              <h2 className="text-sm font-bold text-slate-900 mb-3">
+                Project highlights
+              </h2>
+              <ul className="space-y-4">
+                {candidate.workerProjects.map((project) => (
+                  <li key={project.id ?? project.title} className="space-y-1">
+                    <p className="text-sm font-bold text-slate-900">
+                      {project.title}
+                      {project.year ? (
+                        <span className="font-medium text-slate-400">
+                          {" "}
+                          · {project.year}
+                        </span>
+                      ) : null}
+                    </p>
+                    {project.role ? (
+                      <p className="text-xs font-semibold text-slate-500">
+                        {project.role}
+                      </p>
+                    ) : null}
+                    {project.description ? (
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {project.description}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           {isPreview ? (
             <UnlockOverlay feature="identity" currentPlan={planSlug} />

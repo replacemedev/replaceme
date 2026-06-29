@@ -7,6 +7,7 @@ export interface WorkerProfile {
   bio: string | null;
   avatar_url: string | null;
   hourly_rate: number | null;
+  salary_currency: string | null;
   experience_years: number | null;
   location: string | null;
   availability: string | null;
