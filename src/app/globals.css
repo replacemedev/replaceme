@@ -188,8 +188,9 @@ body {
 .carousel-container {
   position: relative;
   width: 100%;
-  overflow: visible;
-  padding: 20px 0;
+  max-width: 100%;
+  overflow: hidden;
+  padding: clamp(12px, 2vw, 20px) clamp(8px, 2vw, 16px);
 }
 
 .carousel-track {
@@ -257,10 +258,115 @@ body {
 
 @media (min-width: 1024px) {
   .carousel-button.prev {
-    left: -20px;
+    left: 4px;
   }
   .carousel-button.next {
-    right: -20px;
+    right: 4px;
+  }
+}
+
+/* Landing: skill marquee */
+.landing-skills-marquee {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+.landing-skills-marquee-track {
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+  animation: landing-marquee 42s linear infinite;
+}
+
+.landing-skills-marquee-reverse {
+  animation-direction: reverse;
+  animation-duration: 48s;
+}
+
+.landing-skill-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgb(226 232 240);
+  background: white;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+@keyframes landing-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Landing: pricing bento */
+.landing-pricing-bento {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .landing-pricing-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .landing-pricing-bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, auto);
+  }
+
+  .landing-pricing-card:nth-child(1) {
+    grid-column: span 3;
+  }
+  .landing-pricing-card:nth-child(2) {
+    grid-column: span 3;
+  }
+  .landing-pricing-card:nth-child(3) {
+    grid-column: span 6;
+    grid-row: span 2;
+  }
+  .landing-pricing-card:nth-child(4) {
+    grid-column: span 6;
+  }
+}
+
+.landing-pricing-growth::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgb(34 197 94 / 0.65),
+    rgb(45 212 191 / 0.35),
+    rgb(34 197 94 / 0.2)
+  );
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-skills-marquee-track {
+    animation: none !important;
   }
 }
 

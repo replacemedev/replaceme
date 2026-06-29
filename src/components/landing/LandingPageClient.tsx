@@ -130,6 +130,14 @@ const talentList = [
 ];
 
 import type { FAQItem, PricingPlan } from "@/types/employer/billing";
+import { LandingSkillsShowcase } from "@/components/landing/LandingSkillsShowcase";
+import { LandingPricingBento } from "@/components/landing/LandingPricingBento";
+import {
+  LANDING_AMBIENT_GLOW,
+  LANDING_INNER,
+  LANDING_SECTION,
+  LANDING_SECTION_GRID,
+} from "@/lib/landing/ui-tokens";
 
 interface LandingPageClientProps {
   pricingPlans: PricingPlan[];
@@ -274,16 +282,16 @@ export function LandingPageClient({
         {/* Hero Section */}
         <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
           {/* Decorative Glowing Blobs */}
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
-          <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
-          <div className="absolute bottom-[-10%] left-[30%] w-[400px] h-[400px] rounded-full bg-teal-100/25 blur-3xl animate-float-slow-3 pointer-events-none z-0" />
+          <div className="absolute top-[-20%] left-[-10%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
+          <div className="absolute top-[40%] right-[-10%] w-[min(600px,85vw)] h-[min(600px,85vw)] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
+          <div className="absolute bottom-[-10%] left-[30%] w-[min(400px,75vw)] h-[min(400px,75vw)] rounded-full bg-teal-100/25 blur-3xl animate-float-slow-3 pointer-events-none z-0" />
 
           {/* Dot Pattern Overlay */}
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
 
-          <div className="px-margin-desktop max-w-container-max mx-auto relative z-10 w-full">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-16 w-full">
-              <div className="w-full lg:w-[58%] space-y-10 pr-0 lg:pr-8 reveal-item">
+          <div className="px-margin-desktop max-w-container-max mx-auto relative z-10 w-full min-w-0">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-16 w-full min-w-0">
+              <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-10 pr-0 lg:pr-8 reveal-item">
                 <h1 className="text-display-xl-mobile md:text-display-xl text-slate-900 leading-[1.15] font-extrabold tracking-tight">
                   Your Direct Bridge to <span className="text-[#22c55e]">Filipino</span>
                   <br />
@@ -345,12 +353,11 @@ export function LandingPageClient({
 
 
         {/* Why Employers Choose Replace Me */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
-          {/* Dot Pattern Overlay */}
-          <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)] opacity-50 pointer-events-none z-0" />
-          <div className="absolute top-1/2 left-[-20%] w-[400px] h-[400px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-white`}>
+          <div className={LANDING_SECTION_GRID} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[-15%] bg-emerald-50/60`} aria-hidden />
 
-          <div className="max-w-container-max mx-auto relative z-10">
+          <div className={`${LANDING_INNER} relative z-10`}>
             <div className="text-center mb-16 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Why Employers Choose Replace Me</h2>
               <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Scale your team without the traditional agency overhead.</p>
@@ -382,12 +389,11 @@ export function LandingPageClient({
         </section>
 
         {/* For Job Seekers */}
-        <section className="py-24 px-margin-desktop bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] relative overflow-hidden">
-          {/* Subtle Grid and Blob Decorators */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-emerald-100/30 blur-3xl pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9]`}>
+          <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] right-[-10%] bg-emerald-100/40`} aria-hidden />
 
-          <div className="max-w-container-max mx-auto relative z-10">
+          <div className={`${LANDING_INNER} relative z-10`}>
             <Element name="find-work" id="find-work" className="h-0 w-0" aria-hidden />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
               <div className="lg:col-span-5 space-y-6 reveal-item">
@@ -439,12 +445,11 @@ export function LandingPageClient({
         </section>
 
         {/* How it Works */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
-          {/* Grid dot pattern overlay */}
-          <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-50 pointer-events-none z-0" />
-          <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-white`}>
+          <div className={LANDING_SECTION_GRID} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} top-[-10%] right-[-10%] bg-emerald-50/50`} aria-hidden />
 
-          <div className="max-w-container-max mx-auto relative z-10">
+          <div className={`${LANDING_INNER} relative z-10`}>
             <Element name="how-it-works" id="how-it-works" className="h-0 w-0" aria-hidden />
             <div className="text-center mb-20 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Outsourcing Made Simple</h2>
@@ -521,14 +526,15 @@ export function LandingPageClient({
           </div>
         </section>
 
-        {/* Talent Preview Carousel */}
-        <section className="bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc] py-24 relative overflow-hidden" id="top-talent">
-          {/* Decorative Background details */}
-          <div className="absolute inset-0 bg-grid-dots opacity-50 pointer-events-none z-0" />
-          <div className="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-emerald-100/30 blur-3xl pointer-events-none z-0" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[450px] h-[450px] rounded-full bg-indigo-100/25 blur-3xl pointer-events-none z-0" />
+        <LandingSkillsShowcase />
 
-          <div className="px-margin-desktop max-w-container-max mx-auto relative z-10">
+        {/* Talent Preview Carousel */}
+        <section className={`${LANDING_SECTION} bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#f8fafc]`} id="top-talent">
+          <div className={LANDING_SECTION_GRID} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} top-[-10%] left-[-10%] bg-emerald-100/35`} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] right-[-10%] bg-indigo-100/30`} aria-hidden />
+
+          <div className={`${LANDING_INNER} relative z-10`}>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-8 reveal-item">
               <div className="max-w-2xl text-left">
                 <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Immediate Value, <span className="text-[#22c55e]">Top Talent</span></h2>
@@ -539,7 +545,7 @@ export function LandingPageClient({
               </a>
             </div>
 
-            <div className="carousel-container relative overflow-visible">
+            <div className="carousel-container relative">
               {/* Carousel Buttons */}
               <button
                 onClick={prevSlide}
@@ -618,12 +624,11 @@ export function LandingPageClient({
         </section>
 
         {/* Voices of Success */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
-          {/* Dot Pattern Overlay */}
-          <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-40 pointer-events-none z-0" />
-          <div className="absolute top-1/2 left-[10%] w-[400px] h-[400px] rounded-full bg-emerald-50/50 blur-3xl pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-white`}>
+          <div className={LANDING_SECTION_GRID} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[10%] bg-emerald-50/50`} aria-hidden />
 
-          <div className="max-w-container-max mx-auto relative z-10">
+          <div className={`${LANDING_INNER} relative z-10`}>
             <div className="text-center mb-20 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Voices of <span className="text-[#22c55e]">Success</span></h2>
               <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg leading-relaxed">Discover how forward-thinking companies are transforming their operations with elite Filipino talent.</p>
@@ -709,14 +714,12 @@ export function LandingPageClient({
         </section>
 
         {/* Pricing Section */}
-        <section className="py-24 px-margin-desktop bg-[#0a0f1d] text-white relative overflow-hidden">
-          {/* Starry Dot Grid and Glowing Orbs */}
-          <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" />
-          <div className="absolute -top-40 -right-40 bg-emerald-500/15 w-[600px] h-[600px] rounded-full blur-[130px] animate-float-slow-2 pointer-events-none z-0" />
-          <div className="absolute -bottom-40 -left-40 bg-indigo-500/15 w-[600px] h-[600px] rounded-full blur-[130px] animate-float-slow-1 pointer-events-none z-0" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500/5 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-[#0a0f1d] text-white`}>
+          <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} -top-40 -right-40 bg-emerald-500/20 animate-float-slow-2`} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} -bottom-40 -left-40 bg-indigo-500/20 animate-float-slow-1`} aria-hidden />
 
-          <div className="max-w-3xl mx-auto text-center relative z-10">
+          <div className={`${LANDING_INNER} max-w-6xl text-center relative z-10`}>
             <Element name="pricing" id="pricing" className="h-0 w-0" aria-hidden />
             <div className="reveal-item">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
@@ -730,44 +733,10 @@ export function LandingPageClient({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 max-w-6xl mx-auto text-left reveal-item" style={{ transitionDelay: "150ms" }}>
-              {pricingPlans.length > 0 ? (
-                pricingPlans.map((plan) => (
-                  <div
-                    key={plan.id}
-                    className={`rounded-2xl p-5 border relative ${
-                      plan.popular
-                        ? "bg-white text-slate-800 border-4 border-emerald-500/40 shadow-lg"
-                        : "bg-white/95 text-slate-800 border border-white/20"
-                    }`}
-                  >
-                    {plan.popular ? (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#22c55e] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase whitespace-nowrap">
-                        Most Popular
-                      </div>
-                    ) : null}
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      {plan.slug === "discovery" ? "Free" : plan.name}
-                    </p>
-                    <h3 className="text-lg font-bold mt-1 capitalize">{plan.name}</h3>
-                    <p className="text-3xl font-extrabold mt-2">
-                      ${plan.price}
-                      <span className="text-sm font-medium text-slate-400">/mo</span>
-                    </p>
-                    <p className="text-sm text-slate-500 mt-3 line-clamp-3">
-                      {plan.features.slice(0, 3).join(" · ")}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="col-span-full text-center text-slate-300 text-sm">
-                  Plans load from your account database — see full comparison below.
-                </p>
-              )}
-            </div>
+            <LandingPricingBento plans={pricingPlans} />
             <Link
               href="/pricing"
-              className="inline-flex mt-8 items-center gap-2 bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] transition-all text-lg reveal-item"
+              className="inline-flex mt-8 items-center gap-2 bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 text-lg reveal-item min-h-[44px]"
               style={{ transitionDelay: "200ms" }}
             >
               Compare all plans
@@ -777,12 +746,11 @@ export function LandingPageClient({
         </section>
 
         {/* FAQ Section */}
-        <section className="py-24 px-margin-desktop bg-white relative overflow-hidden">
-          {/* Subtle dot pattern and glow */}
-          <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_75%,transparent_100%)] opacity-40 pointer-events-none z-0" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-emerald-50/40 blur-3xl pointer-events-none z-0" />
+        <section className={`${LANDING_SECTION} bg-white`}>
+          <div className={LANDING_SECTION_GRID} aria-hidden />
+          <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] left-[-10%] bg-emerald-50/45`} aria-hidden />
 
-          <div className="max-w-3xl mx-auto relative z-10">
+          <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
             <Element name="faq" id="faq" className="h-0 w-0" aria-hidden />
             <div className="text-center mb-16 reveal-item">
               <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Frequently Asked Questions</h2>
