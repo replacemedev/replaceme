@@ -65,7 +65,7 @@ export function LandingSkillsShowcase() {
             Roles employers post <span className="text-[#22c55e]">every day</span>
           </h2>
           <p className="text-slate-500 font-body-base text-lg leading-relaxed text-pretty">
-            Engineering, design, growth, and operations — the same categories used
+            Engineering, design, growth, and operations the same categories used
             across job posts, applicant filters, and worker profiles.
           </p>
         </div>
