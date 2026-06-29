@@ -82,7 +82,6 @@ export function ProfilePageSkeleton() {
           <div className="relative -mt-20 lg:-mt-32 bg-white rounded-3xl border border-slate-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-6 text-center space-y-6 select-none z-10">
             <div className="relative mx-auto w-32 h-32 rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden flex items-center justify-center">
               <SkeletonBlock className="h-full w-full rounded-full bg-slate-200/70" />
-              <div className="absolute bottom-1 right-1 w-6 h-6 bg-emerald-200 border-2 border-white rounded-full" />
             </div>
 
             <div className="space-y-2">

@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, Edit, Share2, MapPin, Calendar, Clock, DollarSign, ExternalLink } from "lucide-react";
+import { Edit, Share2, Clock, DollarSign, ExternalLink } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { WorkerProfile } from "@/types/worker-profile";
 
@@ -49,10 +49,7 @@ export function ProfileSidebar({ profile, isOwner = false }: ProfileSidebarProps
           </div>
         )}
         
-        {/* Verified green checkmark dot */}
-        <div className="absolute bottom-1 right-1 w-6 h-6 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center text-white">
-          <Check size={12} className="stroke-[3]" />
-        </div>
+
       </div>
 
       {/* Name and Professional Title */}

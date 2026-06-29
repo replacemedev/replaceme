@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import {
-  Download,
   ChevronDown,
   Filter,
   FileText,
@@ -71,37 +70,6 @@ function sortApplications(
   }
 }
 
-function exportApplicationsCsv(applications: WorkerApplication[]) {
-  const headers = [
-    "Job Title",
-    "Company",
-    "Status",
-    "Date Sent",
-    "Hourly Rate",
-    "Match Score",
-  ];
-  const rows = applications.map((app) => [
-    app.jobTitle,
-    app.companyName,
-    app.status,
-    new Date(app.createdAt).toISOString(),
-    app.hourlyRate?.toString() ?? "",
-    app.matchScore.toString(),
-  ]);
-  const csv = [headers, ...rows]
-    .map((row) =>
-      row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
-    )
-    .join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "my-applications.csv";
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 export function ApplicationsClient({
   applications,
@@ -151,17 +119,6 @@ export function ApplicationsClient({
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
-      <div className="flex justify-end -mt-2">
-        <button
-          type="button"
-          onClick={() => exportApplicationsCsv(filtered)}
-          disabled={filtered.length === 0}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
-        >
-          <Download className="h-4 w-4" aria-hidden />
-          Export List
-        </button>
-      </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
