@@ -6,6 +6,10 @@ import {
   contractResponseSchema,
   type WorkerContractRow,
 } from "@/lib/validations/worker/phase2";
+import {
+  invalidateEmployerHiringCache,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 export async function getWorkerContracts(): Promise<WorkerContractRow[]> {
   const ctx = await requireWorker();
@@ -57,6 +61,13 @@ export async function respondToContractOffer(payload: unknown) {
 
   const nextStatus = parsed.data.action === "accept" ? "active" : "declined";
 
+  const { data: contract } = await ctx.supabase
+    .from("contracts")
+    .select("employer_id")
+    .eq("id", parsed.data.contractId)
+    .eq("worker_id", ctx.profile.id)
+    .maybeSingle();
+
   const { error } = await ctx.supabase
     .from("contracts")
     .update({ status: nextStatus, updated_at: new Date().toISOString() })
@@ -65,6 +76,11 @@ export async function respondToContractOffer(payload: unknown) {
     .eq("status", "offered");
 
   if (error) return { error: "Failed to update contract offer" };
+
+  if (contract?.employer_id) {
+    await invalidateEmployerHiringCache(contract.employer_id);
+  }
+  await invalidateWorkerCache(ctx.profile.id);
 
   revalidatePath("/worker/contracts");
   return { success: true };

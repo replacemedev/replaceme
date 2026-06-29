@@ -9,6 +9,13 @@ export const PAGE_CONTENT_DEFINITIONS: PageContentDefinition[] = [
     description: "Long-form privacy policy (HTML). Falls back to built-in copy when empty.",
   },
   {
+    slug: "cookie-policy",
+    label: "Cookie Policy",
+    publicPath: "/cookie-policy",
+    contentType: "html",
+    description: "Cookie policy (HTML). Linked from the consent banner and footer.",
+  },
+  {
     slug: "terms-of-service",
     label: "Terms of Service",
     publicPath: "/terms-of-service",
@@ -91,6 +98,7 @@ export const PAGE_CONTENT_TAG = "page-content";
 
 export const PAGE_CONTENT_SLUGS = [
   "privacy-policy",
+  "cookie-policy",
   "terms-of-service",
   "pricing",
   "help-index",

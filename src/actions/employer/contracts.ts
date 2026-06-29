@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireRole } from "@/lib/server/auth/session";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { uuidSchema } from "@/lib/validations/common";
+import { invalidateEmployerHiringCache } from "@/lib/server/redis-cache";
 
 const contractIdSchema = z.object({ contractId: uuidSchema }).strict();
 
@@ -102,6 +103,8 @@ export async function updateEmployerContract(payload: unknown) {
 
     if (error) return fail("Failed to update contract.");
 
+    await invalidateEmployerHiringCache(profile.id);
+
     revalidatePath(`/employer/contracts/${parsed.contractId}`);
     revalidatePath("/employer/hired");
     return ok();
@@ -125,6 +128,8 @@ export async function terminateEmployerContract(contractId: string) {
       .eq("employer_id", profile.id);
 
     if (error) return fail("Failed to terminate contract.");
+
+    await invalidateEmployerHiringCache(profile.id);
 
     revalidatePath(`/employer/contracts/${parsed.contractId}`);
     revalidatePath("/employer/hired");

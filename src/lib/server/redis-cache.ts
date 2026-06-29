@@ -69,7 +69,7 @@ export async function invalidateEmployerCache(employerId: string): Promise<void>
   await cacheDel(...employerCacheKeys(employerId));
 }
 
-/** Drop applicant list + dashboard slices after apply or status change. */
+/** Drop applicant list + dashboard + hiring slices after apply or status change. */
 export async function invalidateEmployerApplicantsCache(
   employerId: string,
   jobId: string
@@ -77,8 +77,27 @@ export async function invalidateEmployerApplicantsCache(
   await cacheDel(
     CacheKeys.employerApplicants(employerId, jobId),
     CacheKeys.employerRecentJobs(employerId),
-    CacheKeys.employerRecentApplicants(employerId)
+    CacheKeys.employerRecentApplicants(employerId),
+    CacheKeys.employerInterviews(employerId),
+    CacheKeys.employerHired(employerId)
   );
+}
+
+/** Drop interviews + hired lists (contract mutations, offers). */
+export async function invalidateEmployerHiringCache(
+  employerId: string
+): Promise<void> {
+  await cacheDel(
+    CacheKeys.employerInterviews(employerId),
+    CacheKeys.employerHired(employerId)
+  );
+}
+
+/** Drop pinned workers list after pin/unpin. */
+export async function invalidateEmployerPinnedCache(
+  employerId: string
+): Promise<void> {
+  await cacheDel(CacheKeys.employerPinned(employerId));
 }
 
 /** Drop all worker-scoped keys (applications, search, saved jobs, messaging, profile). */

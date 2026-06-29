@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/shared/cookie-consent";
 
 export function Footer() {
   return (
@@ -70,6 +71,10 @@ export function Footer() {
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/privacy-policy">
             Privacy Policy
           </Link>
+          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/cookie-policy">
+            Cookie Policy
+          </Link>
+          <CookieSettingsButton className="text-left text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" />
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/terms-of-service">
             Terms of Service
           </Link>

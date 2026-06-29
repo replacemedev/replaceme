@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { CookieConsentRoot } from "@/components/shared/cookie-consent";
+import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/cookie-consent/types";
+import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -44,6 +47,11 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var raw=localStorage.getItem(${JSON.stringify(COOKIE_CONSENT_STORAGE_KEY)});if(!raw)return;var p=JSON.parse(raw);if(p&&p.policyVersion===${JSON.stringify(COOKIE_POLICY_VERSION)}){document.documentElement.setAttribute("data-cookie-consent","granted");}}catch(e){}})();`,
+          }}
+        />
       </head>
       <body className="font-body-base bg-background text-on-background antialiased min-h-screen flex flex-col">
         <Toaster
@@ -54,6 +62,7 @@ export default function RootLayout({
           toastOptions={{ className: "max-w-[calc(100vw-24px)]" }}
         />
         {children}
+        <CookieConsentRoot />
       </body>
     </html>
   );

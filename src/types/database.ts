@@ -422,6 +422,116 @@ export type Database = {
           },
         ]
       }
+      cookie_consent_events: {
+        Row: {
+          action: string
+          anonymous_id: string | null
+          consent_analytics: boolean
+          consent_marketing: boolean
+          consent_necessary: boolean
+          created_at: string
+          id: string
+          policy_version: string
+          profile_id: string | null
+        }
+        Insert: {
+          action: string
+          anonymous_id?: string | null
+          consent_analytics: boolean
+          consent_marketing: boolean
+          consent_necessary: boolean
+          created_at?: string
+          id?: string
+          policy_version: string
+          profile_id?: string | null
+        }
+        Update: {
+          action?: string
+          anonymous_id?: string | null
+          consent_analytics?: boolean
+          consent_marketing?: boolean
+          consent_necessary?: boolean
+          created_at?: string
+          id?: string
+          policy_version?: string
+          profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cookie_consent_events_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cookie_consent_events_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "cookie_consent_events_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      cookie_consent_preferences: {
+        Row: {
+          consent_analytics: boolean
+          consent_marketing: boolean
+          consent_necessary: boolean
+          consented_at: string
+          policy_version: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          consent_analytics?: boolean
+          consent_marketing?: boolean
+          consent_necessary?: boolean
+          consented_at?: string
+          policy_version: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          consent_analytics?: boolean
+          consent_marketing?: boolean
+          consent_necessary?: boolean
+          consented_at?: string
+          policy_version?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cookie_consent_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cookie_consent_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "cookie_consent_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
       company_profiles: {
         Row: {
           company_bio: string | null

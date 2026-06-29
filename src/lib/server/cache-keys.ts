@@ -18,6 +18,12 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:employer:${employerId}:applicants:${jobId}`,
   employerMessagingThreads: (employerId: string) =>
     `rm:${CACHE_VERSION}:employer:${employerId}:messaging-threads`,
+  employerInterviews: (employerId: string) =>
+    `rm:${CACHE_VERSION}:employer:${employerId}:interviews`,
+  employerHired: (employerId: string) =>
+    `rm:${CACHE_VERSION}:employer:${employerId}:hired`,
+  employerPinned: (employerId: string) =>
+    `rm:${CACHE_VERSION}:employer:${employerId}:pinned`,
   notificationsBootstrap: (userId: string) =>
     `rm:${CACHE_VERSION}:user:${userId}:notifications`,
   workerProfile: (workerId: string) =>
@@ -46,6 +52,7 @@ export const CACHE_TTL_SECONDS = {
   workerApplications: 45,
   jobSearch: 60,
   savedJobs: 60,
+  employerHiring: 45,
 } as const;
 
 export function employerCacheKeys(employerId: string): string[] {
@@ -55,6 +62,9 @@ export function employerCacheKeys(employerId: string): string[] {
     CacheKeys.employerRecentJobs(employerId),
     CacheKeys.employerRecentApplicants(employerId),
     CacheKeys.employerMessagingThreads(employerId),
+    CacheKeys.employerInterviews(employerId),
+    CacheKeys.employerHired(employerId),
+    CacheKeys.employerPinned(employerId),
   ];
 }
 

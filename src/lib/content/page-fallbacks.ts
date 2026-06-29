@@ -13,6 +13,14 @@ export const PRIVACY_FALLBACK_META: PageContentMeta = {
   badgeVariant: "pill",
 };
 
+export const COOKIE_FALLBACK_META: PageContentMeta = {
+  lastUpdated: "June 29, 2026",
+  badge: "Legal",
+  badgeVariant: "pill",
+};
+
+export const COOKIE_POLICY_VERSION = "cookie-policy-v1";
+
 export const TERMS_FALLBACK_META: PageContentMeta = {
   lastUpdated: "January 24, 2026",
   badge: "Legal Document",

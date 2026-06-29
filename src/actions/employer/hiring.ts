@@ -14,6 +14,14 @@ import {
   type BillingIdentityMode,
 } from "@/lib/server/entitlements";
 import { previewDisplayName } from "@/lib/entitlements/ui-copy";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateEmployerApplicantsCache,
+  invalidateEmployerHiringCache,
+  invalidateWorkerCache,
+} from "@/lib/server/redis-cache";
 
 const scheduleInterviewSchema = z
   .object({ applicationId: uuidSchema })
@@ -101,6 +109,10 @@ export async function sendJobOffer(applicationId: string) {
       .update({ status: "HIRED" })
       .eq("id", parsed.applicationId);
 
+    await invalidateEmployerHiringCache(profile.id);
+    await invalidateEmployerApplicantsCache(profile.id, application.job_id);
+    await invalidateWorkerCache(application.candidate_id);
+
     revalidatePath(`/employer/jobs/${application.job_id}/applicants`);
     revalidatePath("/employer/hired");
     revalidatePath("/employer/interviews");
@@ -128,44 +140,55 @@ export interface EmployerInterviewRow {
 export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
   const { supabase, profile } = await requireRole("employer");
 
-  const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
-  const isPreview = entitlements?.identityMode === "anonymous_preview";
+  return getOrSet(
+    CacheKeys.employerInterviews(profile.id),
+    CACHE_TTL_SECONDS.employerHiring,
+    async () => {
+      const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
+      const isPreview = entitlements?.identityMode === "anonymous_preview";
 
-  const { data: jobs } = await supabase
-    .from("jobs")
-    .select("id, title")
-    .eq("employer_id", profile.id);
+      const { data: jobs } = await supabase
+        .from("jobs")
+        .select("id, title")
+        .eq("employer_id", profile.id);
 
-  const jobIds = jobs?.map((j) => j.id) ?? [];
-  if (jobIds.length === 0) return [];
+      const jobIds = jobs?.map((j) => j.id) ?? [];
+      if (jobIds.length === 0) return [];
 
-  const jobTitleById = new Map(jobs!.map((j) => [j.id, j.title]));
+      const jobTitleById = new Map(jobs!.map((j) => [j.id, j.title]));
 
-  const { data: applications } = await supabase
-    .from("applications")
-    .select("id, job_id, candidate_id, updated_at, profiles(first_name, last_name)")
-    .in("job_id", jobIds)
-    .eq("status", "INTERVIEW_SCHEDULED")
-    .order("updated_at", { ascending: false });
+      const { data: applications } = await supabase
+        .from("applications")
+        .select(
+          "id, job_id, candidate_id, updated_at, profiles(first_name, last_name)"
+        )
+        .in("job_id", jobIds)
+        .eq("status", "INTERVIEW_SCHEDULED")
+        .order("updated_at", { ascending: false });
 
-  return (applications ?? []).map((app) => {
-    const candidate = app.profiles as { first_name?: string; last_name?: string } | null;
-    const name = candidate
-      ? `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim()
-      : "Candidate";
+      return (applications ?? []).map((app) => {
+        const candidate = app.profiles as {
+          first_name?: string;
+          last_name?: string;
+        } | null;
+        const name = candidate
+          ? `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim()
+          : "Candidate";
 
-    return {
-      applicationId: app.id,
-      jobId: app.job_id,
-      candidateId: app.candidate_id,
-      jobTitle: jobTitleById.get(app.job_id) ?? "Job",
-      candidateName: isPreview
-        ? previewDisplayName(app.candidate_id)
-        : name || "Candidate",
-      scheduledAt: app.updated_at,
-      isPreview,
-    };
-  });
+        return {
+          applicationId: app.id,
+          jobId: app.job_id,
+          candidateId: app.candidate_id,
+          jobTitle: jobTitleById.get(app.job_id) ?? "Job",
+          candidateName: isPreview
+            ? previewDisplayName(app.candidate_id)
+            : name || "Candidate",
+          scheduledAt: app.updated_at,
+          isPreview,
+        };
+      });
+    }
+  );
 }
 
 const candidateViewSchema = z

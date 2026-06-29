@@ -9,17 +9,23 @@ import { togglePinSchema } from "@/lib/validations/pinned";
 import { safeError, safeLog } from "@/utils/logger";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { assertEmployerCanPinWorker } from "@/lib/server/entitlements";
+import {
+  CacheKeys,
+  CACHE_TTL_SECONDS,
+  getOrSet,
+  invalidateEmployerPinnedCache,
+} from "@/lib/server/redis-cache";
 
-export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
-  try {
-    const { supabase, profile } = await requireRole("employer");
+async function loadPinnedWorkersForEmployer(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  employerId: string
+): Promise<PinnedWorker[]> {
+  const entitlements = await fetchEmployerEntitlements(employerId, supabase);
+  const isPreview = entitlements?.identityMode === "anonymous_preview";
 
-    const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
-    const isPreview = entitlements?.identityMode === "anonymous_preview";
-
-    const { data, error } = await supabase
-      .from("pinned_workers")
-      .select(`
+  const { data, error } = await supabase
+    .from("pinned_workers")
+    .select(`
         worker_id,
         profiles!pinned_workers_worker_id_fkey (
           id,
@@ -33,74 +39,95 @@ export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
           is_verified
         )
       `)
-      .eq("employer_id", profile.id);
+    .eq("employer_id", employerId);
 
-    if (error) {
-      safeError("Error fetching pinned workers:", error);
-      return [];
-    }
+  if (error) {
+    safeError("Error fetching pinned workers:", error);
+    return [];
+  }
 
-    const pinnedList: PinnedWorker[] = [];
+  const pinnedList: PinnedWorker[] = [];
 
-    for (const row of data || []) {
-      const worker = row.profiles as any;
-      if (!worker) continue;
+  for (const row of data || []) {
+    const profileRow = row.profiles;
+    const worker = (Array.isArray(profileRow) ? profileRow[0] : profileRow) as {
+      id: string;
+      first_name?: string | null;
+      last_name?: string | null;
+      avatar_url?: string | null;
+      professional_title?: string | null;
+      skills?: string[] | null;
+      experience_years?: number | null;
+      hourly_rate?: number | null;
+      is_verified?: boolean | null;
+    } | null;
+    if (!worker) continue;
 
-      const name =
-        `${worker.first_name || ""} ${worker.last_name || ""}`.trim() ||
-        "Worker";
+    const name =
+      `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || "Worker";
 
-      pinnedList.push({
-        id: worker.id,
-        name: isPreview ? previewDisplayName(worker.id) : name,
-        avatarUrl: isPreview ? null : worker.avatar_url,
-        role: worker.professional_title || "Developer",
-        skills: worker.skills || [],
-        experienceYears: worker.experience_years || 0,
-        hourlyRate: worker.hourly_rate ? Number(worker.hourly_rate) : 0,
-        isPinned: true,
-        online: false,
-        isVerified: Boolean(worker.is_verified),
-        isPreview,
-      });
-    }
-
-    pinnedList.sort((a, b) => {
-      if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
-      return a.name.localeCompare(b.name);
+    pinnedList.push({
+      id: worker.id,
+      name: isPreview ? previewDisplayName(worker.id) : name,
+      avatarUrl: isPreview ? null : worker.avatar_url ?? null,
+      role: worker.professional_title || "Developer",
+      skills: worker.skills || [],
+      experienceYears: worker.experience_years || 0,
+      hourlyRate: worker.hourly_rate ? Number(worker.hourly_rate) : 0,
+      isPinned: true,
+      online: false,
+      isVerified: Boolean(worker.is_verified),
+      isPreview,
     });
+  }
 
-    if (pinnedList.length > 0) {
-      const { data: jobs } = await supabase
-        .from("jobs")
-        .select("id")
-        .eq("employer_id", profile.id);
+  pinnedList.sort((a, b) => {
+    if (a.isVerified !== b.isVerified) return a.isVerified ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
 
-      const jobIds = jobs?.map((j) => j.id) ?? [];
-      if (jobIds.length > 0) {
-        const workerIds = pinnedList.map((w) => w.id);
-        const { data: applications } = await supabase
-          .from("applications")
-          .select("candidate_id, job_id, created_at")
-          .in("candidate_id", workerIds)
-          .in("job_id", jobIds)
-          .order("created_at", { ascending: false });
+  if (pinnedList.length > 0) {
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("id")
+      .eq("employer_id", employerId);
 
-        const jobByCandidate = new Map<string, string>();
-        for (const app of applications ?? []) {
-          if (!jobByCandidate.has(app.candidate_id)) {
-            jobByCandidate.set(app.candidate_id, app.job_id);
-          }
-        }
+    const jobIds = jobs?.map((j) => j.id) ?? [];
+    if (jobIds.length > 0) {
+      const workerIds = pinnedList.map((w) => w.id);
+      const { data: applications } = await supabase
+        .from("applications")
+        .select("candidate_id, job_id, created_at")
+        .in("candidate_id", workerIds)
+        .in("job_id", jobIds)
+        .order("created_at", { ascending: false });
 
-        const fallbackJobId = jobIds[0];
-        for (const worker of pinnedList) {
-          worker.contextJobId = jobByCandidate.get(worker.id) ?? fallbackJobId;
+      const jobByCandidate = new Map<string, string>();
+      for (const app of applications ?? []) {
+        if (!jobByCandidate.has(app.candidate_id)) {
+          jobByCandidate.set(app.candidate_id, app.job_id);
         }
       }
-    }
 
-    return pinnedList;
+      const fallbackJobId = jobIds[0];
+      for (const worker of pinnedList) {
+        worker.contextJobId = jobByCandidate.get(worker.id) ?? fallbackJobId;
+      }
+    }
+  }
+
+  return pinnedList;
+}
+
+export async function getPinnedWorkers(): Promise<PinnedWorker[]> {
+  try {
+    const { supabase, profile } = await requireRole("employer");
+
+    return getOrSet(
+      CacheKeys.employerPinned(profile.id),
+      CACHE_TTL_SECONDS.employerHiring,
+      () => loadPinnedWorkersForEmployer(supabase, profile.id)
+    );
   } catch (err) {
     safeError("getPinnedWorkers exception:", err);
     return [];
@@ -115,6 +142,8 @@ export async function togglePin(
     safeLog(`[Pinned] Toggle pin for worker: ${parsed.workerId}`);
 
     const { supabase, profile } = await requireRole("employer");
+
+    let pinned = false;
 
     const { data: workerProfile, error: workerError } = await supabase
       .from("profiles")
@@ -145,21 +174,24 @@ export async function togglePin(
         .eq("id", existingPin.id);
 
       if (deleteError) return fail("Failed to remove worker bookmark.");
-      return ok({ pinned: false });
+      pinned = false;
+    } else {
+      const pinCheck = await assertEmployerCanPinWorker(profile.id);
+      if (!pinCheck.allowed) {
+        return fail(pinCheck.error);
+      }
+
+      const { error: insertError } = await supabase.from("pinned_workers").insert({
+        employer_id: profile.id,
+        worker_id: parsed.workerId,
+      });
+
+      if (insertError) return fail("Failed to bookmark worker.");
+      pinned = true;
     }
 
-    const pinCheck = await assertEmployerCanPinWorker(profile.id);
-    if (!pinCheck.allowed) {
-      return fail(pinCheck.error);
-    }
-
-    const { error: insertError } = await supabase.from("pinned_workers").insert({
-      employer_id: profile.id,
-      worker_id: parsed.workerId,
-    });
-
-    if (insertError) return fail("Failed to bookmark worker.");
-    return ok({ pinned: true });
+    await invalidateEmployerPinnedCache(profile.id);
+    return ok({ pinned });
   });
 
   if (!result.success) {
