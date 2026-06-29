@@ -32,12 +32,12 @@ export function JobSearchHero({
             e.preventDefault();
             onSearch();
           }}
-          className="mt-8 max-w-3xl mx-auto bg-white rounded-full shadow-lg border border-slate-200/80 p-2 flex flex-col sm:flex-row sm:items-center gap-2"
+          className="mt-8 max-w-3xl mx-auto bg-white rounded-2xl md:rounded-full shadow-md hover:shadow-lg border border-slate-200/80 p-3 md:p-2 flex flex-col md:flex-row md:items-center gap-0 md:gap-2 transition-all duration-300 focus-within:ring-2 focus-within:ring-[#006e2f]/10 focus-within:border-[#006e2f]"
         >
           <label className="sr-only" htmlFor="job-keyword-search">
             Search jobs
           </label>
-          <div className="flex flex-1 items-center gap-2 px-3 py-2 min-w-0">
+          <div className="flex flex-1 items-center gap-2 px-3 py-3 md:py-2 min-w-0 border-b border-slate-100 md:border-0">
             <Search className="h-4.5 w-4.5 text-slate-400 shrink-0" aria-hidden />
             <input
               id="job-keyword-search"
@@ -49,12 +49,12 @@ export function JobSearchHero({
             />
           </div>
 
-          <div className="hidden sm:block w-px h-8 bg-slate-200 shrink-0" aria-hidden />
+          <div className="hidden md:block w-px h-8 bg-slate-200 shrink-0" aria-hidden />
 
           <label className="sr-only" htmlFor="job-location-search">
             Location
           </label>
-          <div className="flex flex-1 items-center gap-2 px-3 py-2 min-w-0 sm:max-w-[14rem]">
+          <div className="flex flex-1 items-center gap-2 px-3 py-3 md:py-2 min-w-0 md:max-w-[14rem]">
             <MapPin className="h-4.5 w-4.5 text-slate-400 shrink-0" aria-hidden />
             <input
               id="job-location-search"
@@ -68,7 +68,7 @@ export function JobSearchHero({
 
           <button
             type="submit"
-            className="shrink-0 w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-full bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-bold transition-colors cursor-pointer"
+            className="shrink-0 w-full md:w-auto mt-3 md:mt-0 px-6 py-3 md:py-2.5 rounded-xl md:rounded-full bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-bold transition-all duration-200 cursor-pointer"
           >
             Search Jobs
           </button>
