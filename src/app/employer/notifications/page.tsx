@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { EmployerNotificationsClient } from "@/components/employer/notifications/EmployerNotificationsClient";
-import { EmployerPageShell, EmployerBreadcrumb, EmployerPageHeader } from "@/components/employer/layout";
+import { EmployerPageShell, EmployerBreadcrumb } from "@/components/employer/layout";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
   title: "Notifications | ReplaceMe",
@@ -17,7 +18,16 @@ export default async function EmployerNotificationsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/signin");
 
-  const bootstrap = await fetchNotificationBootstrap(user.id, 50);
+  let bootstrap: Awaited<ReturnType<typeof fetchNotificationBootstrap>> | null =
+    null;
+  let loadError: string | null = null;
+
+  try {
+    bootstrap = await fetchNotificationBootstrap(user.id, 50);
+  } catch {
+    loadError =
+      "We couldn't load notifications right now. Please refresh and try again.";
+  }
 
   return (
     <EmployerPageShell width="content">
@@ -27,15 +37,14 @@ export default async function EmployerNotificationsPage() {
           { label: "Notifications" },
         ]}
       />
-      <EmployerPageHeader
-        title="Notifications"
-        subhead="Application updates, messages, and platform alerts."
-        bordered={false}
-      />
-      <EmployerNotificationsClient
-        userId={user.id}
-        initialBootstrap={bootstrap}
-      />
+      {loadError || !bootstrap ? (
+        <ErrorState description={loadError ?? "Failed to load notifications."} retryHref="/employer/notifications" />
+      ) : (
+        <EmployerNotificationsClient
+          userId={user.id}
+          initialBootstrap={bootstrap}
+        />
+      )}
     </EmployerPageShell>
   );
 }

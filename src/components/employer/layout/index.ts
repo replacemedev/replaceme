@@ -12,6 +12,7 @@ export {
 } from "./EmployerInlineActions";
 export { EmployerBreadcrumb } from "./EmployerBreadcrumb";
 export type { EmployerBreadcrumbItem } from "./EmployerBreadcrumb";
+export { EmployerBackButton } from "./EmployerBackButton";
 export { EmployerBottomTabBar } from "./EmployerBottomTabBar";
 export { EmployerLayoutChrome } from "./EmployerLayoutChrome";
 export { EmployerFilterSheet } from "./EmployerFilterSheet";

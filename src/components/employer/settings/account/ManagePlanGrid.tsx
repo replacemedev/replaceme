@@ -56,11 +56,17 @@ export function ManagePlanGrid({
   nextBillingDate,
 }: ManagePlanGridProps) {
   return (
-    <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+    <section className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+      <div className="border-b border-slate-100 bg-gradient-to-br from-[#fafdfb] to-white p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
-          <h2 className="text-lg font-bold text-slate-800">Manage Plan</h2>
-          <p className="text-xs text-slate-500 font-medium mt-1">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700">
+            Billing
+          </p>
+          <h2 className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
+            Manage plan
+          </h2>
+          <p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed max-w-xl">
             Upgrades take effect immediately. Downgrades apply at the end of your
             billing period via the Stripe billing portal.
           </p>
@@ -78,7 +84,9 @@ export function ManagePlanGrid({
           </p>
         ) : null}
       </div>
+      </div>
 
+      <div className="p-6 sm:p-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         {UPGRADE_PLANS.map((plan) => {
           const isCurrent = isCurrentTier(plan.slug, currentPlan);
@@ -89,10 +97,10 @@ export function ManagePlanGrid({
           return (
             <div
               key={plan.slug}
-              className={`relative rounded-2xl p-5 border flex flex-col justify-between min-h-[168px] ${
+              className={`relative rounded-2xl p-5 border flex flex-col justify-between min-h-[176px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                 isCurrent
-                  ? "border-emerald-500 bg-[#fafdfb]"
-                  : "border-slate-100 bg-white"
+                  ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
+                  : "border-slate-100 bg-white hover:border-slate-200"
               }`}
             >
               {isCurrent ? (
@@ -132,7 +140,7 @@ export function ManagePlanGrid({
                 <button
                   type="button"
                   disabled
-                  className="w-full h-10 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white mt-4 disabled:opacity-70"
+                  className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-600 bg-white mt-4 disabled:opacity-70"
                 >
                   Current plan
                 </button>
@@ -141,10 +149,10 @@ export function ManagePlanGrid({
                   type="button"
                   disabled={isUpgrading}
                   onClick={() => onUpgrade(plan.slug)}
-                  className={`w-full h-10 rounded-xl text-xs font-bold transition-colors mt-4 disabled:opacity-50 ${
+                  className={`w-full min-h-[44px] rounded-xl text-xs font-extrabold transition-colors mt-4 disabled:opacity-50 ${
                     plan.highlight
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                      : "bg-[#006e2f] hover:bg-[#005321] text-white"
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                      : "bg-[#006e2f] hover:bg-[#005321] text-white shadow-sm"
                   }`}
                 >
                   {isUpgrading ? "Redirecting..." : "Upgrade"}
@@ -155,7 +163,7 @@ export function ManagePlanGrid({
                     type="button"
                     disabled={isOpeningPortal}
                     onClick={onManageBilling}
-                    className="w-full h-10 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
                   >
                     {isOpeningPortal ? "Opening..." : "Downgrade in Stripe"}
                   </button>
@@ -167,7 +175,7 @@ export function ManagePlanGrid({
                 <button
                   type="button"
                   disabled
-                  className="w-full h-10 border border-slate-200 rounded-xl text-xs font-bold text-slate-400 bg-slate-50 mt-4"
+                  className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-400 bg-slate-50 mt-4"
                 >
                   Free tier
                 </button>
@@ -176,6 +184,7 @@ export function ManagePlanGrid({
           );
         })}
       </div>
-    </div>
+      </div>
+    </section>
   );
 }

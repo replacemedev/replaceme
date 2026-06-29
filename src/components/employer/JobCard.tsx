@@ -28,7 +28,7 @@ export function JobCard({
   );
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)] gap-5 overflow-hidden">
+    <div className="group relative flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)] gap-5 overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#006e2f] via-emerald-500 to-[#006e2f] opacity-70 group-hover:opacity-100 transition-opacity" />
 
       {showPriorityBadge ? (

@@ -68,7 +68,7 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
                 isAtOrOverLimit ? "text-rose-600" : jobsPercent >= 80 ? "text-amber-700" : "text-slate-500"
               }`}
             >
-              {isAtOrOverLimit ? "At limit — upgrade to post more jobs" : jobsPercent >= 80 ? "Near limit" : "Within plan limits"}
+              {isAtOrOverLimit ? "Upgrade to post more jobs" : jobsPercent >= 80 ? "Near limit" : "Within plan limits"}
             </p>
           ) : (
             <p className="text-[11px] font-bold text-slate-500">Unlimited on your plan</p>

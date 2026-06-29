@@ -145,17 +145,17 @@ export default async function EmployerDashboard() {
 
       <EmployerKpiStrip items={kpiItems} />
 
-      {atJobLimit && planUsage ? (
-        <ContextualUpgradeBanner
-          feature="job_limit"
-          currentPlan={planUsage.planSlug}
-        />
-      ) : null}
-
       {!messagingEnabled && totalApplicants > 0 ? (
         <ContextualUpgradeBanner
           feature="messaging"
           currentPlan={planUsage?.planSlug ?? "discovery"}
+        />
+      ) : null}
+
+      {atJobLimit && planUsage ? (
+        <ContextualUpgradeBanner
+          feature="job_limit"
+          currentPlan={planUsage.planSlug}
         />
       ) : null}
 
@@ -181,7 +181,7 @@ export default async function EmployerDashboard() {
           </div>
 
           {jobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[min(70vh,720px)] overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch lg:min-h-[680px]">
               {jobs.map((job) => (
                 <JobCard
                   key={job.id}

@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import type { ReactNode } from "react";
+import { EmployerBackButton } from "./EmployerBackButton";
 
 export type EmployerBreadcrumbItem = {
   label: string;
@@ -11,34 +11,23 @@ interface EmployerBreadcrumbProps {
 }
 
 export function EmployerBreadcrumb({ items }: EmployerBreadcrumbProps) {
-  return (
-    <nav
-      aria-label="Breadcrumb"
-      className="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-400"
-    >
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1;
+  const label =
+    items.length > 1
+      ? `Back to ${items[items.length - 2]?.label ?? "Dashboard"}`
+      : "Back";
 
-        return (
-          <span key={`${item.label}-${index}`} className="inline-flex items-center gap-1.5">
-            {index > 0 ? (
-              <ChevronRight className="h-3.5 w-3.5 text-slate-300" aria-hidden />
-            ) : null}
-            {item.href && !isLast ? (
-              <Link
-                href={item.href}
-                className="hover:text-[#006e2f] transition-colors"
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <span className={isLast ? "text-slate-600" : undefined}>
-                {item.label}
-              </span>
-            )}
-          </span>
-        );
-      })}
-    </nav>
+  const fallbackHref =
+    items.length > 1 ? items[items.length - 2]?.href : undefined;
+
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <EmployerBackButton
+        fallbackHref={fallbackHref ?? "/employer/dashboard"}
+        label={label}
+      />
+      <span className="text-xs font-bold text-slate-400 truncate">
+        {items[items.length - 1]?.label as ReactNode}
+      </span>
+    </div>
   );
 }

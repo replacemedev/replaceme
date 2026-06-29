@@ -5,7 +5,6 @@ import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
-import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { EmployerHeaderNav } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
 
@@ -49,14 +48,6 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
           <RoleNavDropdown session={resolvedSession} />
         </GlobalHeaderActions>
       </div>
-
-      {planUsage ? (
-        <div className="hidden md:block border-t border-slate-100 bg-slate-50/60 px-margin-desktop py-2">
-          <div className="max-w-container-max mx-auto w-full">
-            <PlanUsageStrip usage={planUsage} compact />
-          </div>
-        </div>
-      ) : null}
     </header>
   );
 }

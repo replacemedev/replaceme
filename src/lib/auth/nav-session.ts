@@ -14,6 +14,17 @@ import {
 } from "@/types/nav";
 import { resolveRoleFromUser } from "@/lib/auth/role";
 
+function avatarFromUserMeta(user: User): string | null {
+  const meta = user.user_metadata ?? {};
+  const candidates = [
+    typeof meta.avatar_url === "string" ? meta.avatar_url : null,
+    typeof meta.avatarUrl === "string" ? meta.avatarUrl : null,
+    typeof meta.picture === "string" ? meta.picture : null,
+  ].filter((value): value is string => Boolean(value?.trim()));
+
+  return candidates[0] ?? null;
+}
+
 function buildInitials(profile: NavProfile, role: UserRole): string {
   if (profile.first_name) return profile.first_name[0].toUpperCase();
   if (role === "employer" && profile.company_name) {
@@ -66,7 +77,7 @@ function buildFallbackProfile(user: User): NavProfile {
       (typeof meta.last_name === "string" ? meta.last_name : null) ??
       (nameParts.length > 1 ? nameParts.slice(1).join(" ") : null),
     username: typeof meta.username === "string" ? meta.username : null,
-    avatar_url: null,
+    avatar_url: avatarFromUserMeta(user),
     is_verified: false,
     company_name:
       typeof meta.company_name === "string" ? meta.company_name : null,
@@ -116,7 +127,7 @@ type ProfileRow = {
     | null;
 };
 
-function mapProfileRow(row: ProfileRow): NavProfile {
+function mapProfileRow(row: ProfileRow, user: User): NavProfile {
   const companyProfiles = row.company_profiles;
   const companyName = Array.isArray(companyProfiles)
     ? companyProfiles[0]?.company_name ?? null
@@ -127,7 +138,7 @@ function mapProfileRow(row: ProfileRow): NavProfile {
     first_name: row.first_name,
     last_name: row.last_name,
     username: row.username,
-    avatar_url: row.avatar_url,
+    avatar_url: row.avatar_url ?? avatarFromUserMeta(user),
     is_verified: Boolean(row.is_verified),
     company_name: companyName,
   };
@@ -162,7 +173,9 @@ export const getNavSession = cache(async (): Promise<NavSession> => {
     .maybeSingle();
 
   const role = resolveRoleFromUser(user, row?.role);
-  const profile = row?.id ? mapProfileRow(row as ProfileRow) : buildFallbackProfile(user);
+  const profile = row?.id
+    ? mapProfileRow(row as ProfileRow, user)
+    : buildFallbackProfile(user);
   const unreadMessageCount = await loadUnreadCount(role);
 
   return buildAuthenticatedSession(user, role, profile, unreadMessageCount);
