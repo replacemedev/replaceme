@@ -31,19 +31,18 @@ export function JobCard({
     <div className="group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)]">
       <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#006e2f] via-emerald-500 to-[#006e2f] opacity-70 group-hover:opacity-100 transition-opacity" />
 
-      {showPriorityBadge ? (
-        <div className="absolute top-4 right-4 flex items-center gap-1 rounded-full bg-violet-50 border border-violet-200 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-violet-700 shadow-sm">
-          <Sparkles className="h-3 w-3" aria-hidden />
-          Priority
-        </div>
-      ) : null}
-
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2 pr-20">
+        <div className="flex flex-wrap items-center gap-2">
           <ApprovalStatusBadge status={job.status} />
-          <span className="inline-flex items-center rounded-full border border-slate-100 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500 shrink-0">
+          <span className="inline-flex items-center rounded-full border border-slate-100 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500">
             {formattedDate}
           </span>
+          {showPriorityBadge ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-violet-700 shadow-sm">
+              <Sparkles className="h-3 w-3" aria-hidden />
+              Priority
+            </span>
+          ) : null}
         </div>
 
         <Link

@@ -58,7 +58,7 @@ export function ApplicationStatusDropdown({
   };
 
   return (
-    <div className="relative inline-flex items-center">
+    <div className="relative z-20 inline-flex items-center">
       {isPending && (
         <Loader2
           className="absolute -left-5 h-3.5 w-3.5 animate-spin text-slate-400"
@@ -70,7 +70,7 @@ export function ApplicationStatusDropdown({
         disabled={disabled || isPending}
         onChange={(e) => handleChange(e.target.value as ApplicationStatus)}
         aria-label="Application status"
-        className={`h-8 min-w-[9.5rem] rounded-xl border px-2.5 pr-7 text-[11px] font-bold shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectStyles(status)}`}
+        className={`relative z-30 h-8 min-w-[9.5rem] rounded-xl border px-2.5 pr-7 text-[11px] font-bold shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectStyles(status)}`}
       >
         {APPLICATION_STATUSES.map((value) => (
           <option key={value} value={value}>

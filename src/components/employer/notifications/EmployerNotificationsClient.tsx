@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Bell, CheckCheck, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +10,7 @@ import {
 } from "@/actions/notifications";
 import { useNotifications } from "@/hooks/useNotifications";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import {
   getNotificationHref,
   NOTIFICATION_TYPE_LABELS,
@@ -62,7 +62,7 @@ export function EmployerNotificationsClient({
   initialBootstrap,
 }: EmployerNotificationsClientProps) {
   const [pending, startTransition] = useTransition();
-  const { notifications, unreadCount, markReadLocal, markAllReadLocal } =
+  const { notifications, unreadCount, error, markReadLocal, markAllReadLocal } =
     useNotifications(userId, initialBootstrap);
 
   const grouped = groupByDate(notifications);
@@ -108,13 +108,20 @@ export function EmployerNotificationsClient({
         }
       />
 
-      {notifications.length === 0 ? (
+      {error ? (
+        <ErrorState
+          description={error}
+          retryHref="/employer/notifications"
+        />
+      ) : null}
+
+      {!error && notifications.length === 0 ? (
         <EmptyState
           icon={<Bell size={22} />}
           title="No notifications"
           description="You're all caught up. New alerts will appear here."
         />
-      ) : (
+      ) : !error ? (
         <div className="space-y-8">
           {unreadCount > 0 ? (
             <p className="text-xs font-bold text-[#006e2f]">
@@ -144,7 +151,7 @@ export function EmployerNotificationsClient({
             );
           })}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

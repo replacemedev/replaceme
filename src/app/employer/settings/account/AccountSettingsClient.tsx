@@ -13,7 +13,9 @@ import { toast } from "sonner";
 import { CheckCircle2, RefreshCw } from "lucide-react";
 
 import Link from "next/link";
+import type { EmployerAccountDetails } from "@/actions/employer/account";
 import { AccountDetailsList } from "@/components/employer/settings/account/AccountDetailsList";
+import { EmployerPersonalProfileCard } from "@/components/employer/settings/account/EmployerPersonalProfileCard";
 import { ManagePlanGrid } from "@/components/employer/settings/account/ManagePlanGrid";
 import { ActivePlanSidebar } from "@/components/employer/settings/account/ActivePlanSidebar";
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
@@ -22,11 +24,13 @@ import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 interface AccountSettingsClientProps {
   initialSettings: AccountSettings;
   planUsage: EmployerPlanUsage | null;
+  accountDetails: EmployerAccountDetails | null;
 }
 
 export function AccountSettingsClient({
   initialSettings,
   planUsage,
+  accountDetails,
 }: AccountSettingsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -140,6 +144,9 @@ export function AccountSettingsClient({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 space-y-8">
+          {accountDetails ? (
+            <EmployerPersonalProfileCard account={accountDetails} />
+          ) : null}
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}

@@ -19,6 +19,7 @@ interface ApplicantCardProps {
   resumeDownloadEnabled?: boolean;
   onMessageClick?: () => void;
   onDeleteClick?: () => void;
+  variant?: "default" | "kanban";
 }
 
 export function ApplicantCard({
@@ -29,6 +30,7 @@ export function ApplicantCard({
   resumeDownloadEnabled = true,
   onMessageClick,
   onDeleteClick,
+  variant = "default",
 }: ApplicantCardProps) {
   const isPreview = !applicant.isUnlocked;
   const initials = applicant.name
@@ -47,7 +49,11 @@ export function ApplicantCard({
   const isRejected = applicant.status === "REJECTED";
 
   return (
-    <div className="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col justify-between shadow-sm min-h-[220px] transition-all hover:shadow-md hover:border-slate-200/50">
+    <div
+      className={`bg-white border border-slate-100 rounded-3xl p-5 flex flex-col justify-between shadow-sm min-h-[220px] transition-all hover:shadow-md hover:border-slate-200/50 ${
+        variant === "kanban" ? "overflow-visible" : ""
+      }`}
+    >
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">

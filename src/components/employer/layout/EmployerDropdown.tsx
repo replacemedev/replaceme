@@ -50,6 +50,9 @@ export function EmployerDropdown({
     });
   };
 
+  const imageUrl =
+    profile?.avatar_url ?? profile?.company_logo_url ?? null;
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -61,9 +64,9 @@ export function EmployerDropdown({
         aria-label="User menu"
       >
         <div className="relative w-8 h-8 rounded-full shrink-0 border border-slate-100 bg-slate-50 overflow-hidden flex items-center justify-center">
-          {profile?.avatar_url ? (
+          {imageUrl ? (
             <Image
-              src={profile.avatar_url}
+              src={imageUrl}
               alt={`${displayName}'s Avatar`}
               fill
               className="rounded-full object-cover"

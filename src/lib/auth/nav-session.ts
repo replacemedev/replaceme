@@ -97,7 +97,7 @@ function buildAuthenticatedSession(
     homeHref: getHomeHrefForRole(role),
     displayName: buildDisplayName(profile, role, user.email),
     initials: buildInitials(profile, role),
-    avatarUrl: profile.avatar_url,
+    avatarUrl: profile.avatar_url ?? profile.company_logo_url ?? null,
     isVerified: profile.is_verified,
     unreadMessageCount,
     profile,
@@ -122,16 +122,18 @@ type ProfileRow = {
   role: string | null;
   is_verified: boolean | null;
   company_profiles:
-    | { company_name: string | null }
-    | { company_name: string | null }[]
+    | { company_name: string | null; logo_url: string | null }
+    | { company_name: string | null; logo_url: string | null }[]
     | null;
 };
 
 function mapProfileRow(row: ProfileRow, user: User): NavProfile {
   const companyProfiles = row.company_profiles;
-  const companyName = Array.isArray(companyProfiles)
-    ? companyProfiles[0]?.company_name ?? null
-    : companyProfiles?.company_name ?? null;
+  const companyProfile = Array.isArray(companyProfiles)
+    ? companyProfiles[0] ?? null
+    : companyProfiles;
+  const companyName = companyProfile?.company_name ?? null;
+  const companyLogoUrl = companyProfile?.logo_url ?? null;
 
   return {
     id: row.id,
@@ -141,6 +143,7 @@ function mapProfileRow(row: ProfileRow, user: User): NavProfile {
     avatar_url: row.avatar_url ?? avatarFromUserMeta(user),
     is_verified: Boolean(row.is_verified),
     company_name: companyName,
+    company_logo_url: companyLogoUrl,
   };
 }
 
@@ -165,7 +168,8 @@ export const getNavSession = cache(async (): Promise<NavSession> => {
       role,
       is_verified,
       company_profiles (
-        company_name
+        company_name,
+        logo_url
       )
     `
     )

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { User, ShieldAlert, CreditCard, Building2 } from "lucide-react";
+import { PasswordResetButton } from "./PasswordResetButton";
 
 export function AccountDetailsList() {
   return (
@@ -22,15 +23,15 @@ export function AccountDetailsList() {
                 Profile Information
               </h3>
               <p className="mt-0.5 text-xs text-slate-400">
-                Your employer login and display name
+                Your name, email, and personal account details
               </p>
             </div>
           </div>
           <Link
-            href="/employer/settings/company"
+            href="#employer-profile"
             className="shrink-0 text-sm font-bold text-emerald-600 transition-colors hover:text-emerald-700"
           >
-            Manage company
+            View profile
           </Link>
         </div>
 
@@ -70,12 +71,7 @@ export function AccountDetailsList() {
               </p>
             </div>
           </div>
-          <Link
-            href="/signin?view=forgot_password"
-            className="shrink-0 text-sm font-bold text-emerald-600 transition-colors hover:text-emerald-700"
-          >
-            Reset password
-          </Link>
+          <PasswordResetButton />
         </div>
 
         <div className="flex flex-col gap-3 p-6 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:justify-between">

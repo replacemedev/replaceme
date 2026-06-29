@@ -43,7 +43,7 @@ export function ApplicantKanban({
         return (
           <section
             key={column.status}
-            className={`w-[min(100%,280px)] shrink-0 ${EMPLOYER_CARD} rounded-lg bg-slate-50/80 p-3`}
+            className={`w-[min(100%,280px)] shrink-0 overflow-visible ${EMPLOYER_CARD} rounded-lg bg-slate-50/80 p-3`}
             aria-label={column.label}
           >
             <header className="mb-3 flex items-center justify-between px-1">
@@ -55,7 +55,7 @@ export function ApplicantKanban({
               </span>
             </header>
 
-            <div className="space-y-3 min-h-[80px]">
+            <div className="space-y-3 min-h-[80px] overflow-visible">
               {columnApps.length === 0 ? (
                 <p className="px-1 text-[11px] font-medium text-slate-400">
                   No candidates
@@ -76,6 +76,7 @@ export function ApplicantKanban({
                     <ApplicantCard
                       applicant={app}
                       jobId={jobId}
+                      variant="kanban"
                       planSlug={planSlug}
                       messagingEnabled={messagingEnabled}
                       resumeDownloadEnabled={resumeDownloadEnabled}

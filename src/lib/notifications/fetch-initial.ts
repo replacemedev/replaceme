@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import {
-  notificationListSchema,
+  notificationSchema,
   type NotificationBootstrap,
 } from "@/types/notifications.types";
 
@@ -25,8 +25,10 @@ export async function fetchNotificationBootstrap(
     throw new Error(`Failed to load notifications: ${error.message}`);
   }
 
-  const parsed = notificationListSchema.safeParse(data ?? []);
-  const notifications = parsed.success ? parsed.data : [];
+  const notifications = (data ?? [])
+    .map((row) => notificationSchema.safeParse(row))
+    .filter((result) => result.success)
+    .map((result) => result.data);
 
   return {
     notifications,

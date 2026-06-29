@@ -8,6 +8,7 @@ export interface NavProfile {
   avatar_url: string | null;
   is_verified: boolean;
   company_name?: string | null;
+  company_logo_url?: string | null;
 }
 
 export interface NavSession {

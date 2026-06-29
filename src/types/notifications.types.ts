@@ -22,7 +22,13 @@ export const notificationSchema = z.object({
   title: z.string(),
   message: z.string(),
   action_url: z.string().nullable(),
-  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  metadata: z
+    .preprocess(
+      (value) =>
+        value && typeof value === "object" && !Array.isArray(value) ? value : null,
+      z.record(z.string(), z.unknown()).nullable()
+    )
+    .optional(),
   is_read: z.boolean(),
   created_at: z.string(),
 });

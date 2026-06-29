@@ -110,7 +110,8 @@ export async function updateCompanyProfile(payload: CompanyProfileInput) {
     }
 
     safeLog("[Auth] Company profile successfully updated");
-    revalidatePath("/settings/company");
+    revalidatePath("/employer/settings/company");
+    revalidatePath("/", "layout");
 
     return {
       success: true,
@@ -179,6 +180,9 @@ export async function uploadCompanyLogo(formData: FormData) {
       safeError("uploadCompanyLogo db update error occurred:", updateError);
       return { error: "Failed to save logo URL to company profile." };
     }
+
+    revalidatePath("/employer/settings/company");
+    revalidatePath("/", "layout");
 
     return {
       success: true,

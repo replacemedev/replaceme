@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountSettings, getEmployerPlanUsage } from "@/actions/employer/billing";
+import { getEmployerAccountDetails } from "@/actions/employer/account";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 import {
   EmployerPageHeader,
@@ -31,9 +32,10 @@ export default async function AccountSettingsPage() {
     redirect("/dashboard");
   }
 
-  const [initialSettings, planUsage] = await Promise.all([
+  const [initialSettings, planUsage, accountDetails] = await Promise.all([
     getAccountSettings(),
     getEmployerPlanUsage(),
+    getEmployerAccountDetails(),
   ]);
 
   const defaultSettings = initialSettings || {
@@ -58,6 +60,7 @@ export default async function AccountSettingsPage() {
         <AccountSettingsClient
           initialSettings={defaultSettings}
           planUsage={planUsage}
+          accountDetails={accountDetails}
         />
       </Suspense>
     </EmployerPageShell>
