@@ -719,18 +719,13 @@ export function LandingPageClient({
           <div className={`${LANDING_AMBIENT_GLOW} -top-40 -right-40 bg-emerald-500/20 animate-float-slow-2`} aria-hidden />
           <div className={`${LANDING_AMBIENT_GLOW} -bottom-40 -left-40 bg-indigo-500/20 animate-float-slow-1`} aria-hidden />
 
-          <div className={`${LANDING_INNER} max-w-6xl text-center relative z-10`}>
+          <div className={`${LANDING_INNER} max-w-7xl text-center relative z-10`}>
             <Element name="pricing" id="pricing" className="h-0 w-0" aria-hidden />
             <div className="reveal-item">
               <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
               <p className="text-slate-300 mb-6 font-body-base text-lg">
                 Discovery is free. Upgrade when you need full profiles, messaging, and instant approval.
               </p>
-              <div className="inline-block bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-6 py-2 mb-12">
-                <p className="text-[#22c55e] font-body-bold flex items-center gap-2 text-sm font-semibold uppercase tracking-wider">
-                  <Gift className="h-5 w-5 shrink-0" aria-hidden /> Always 100% FREE for Job Seekers
-                </p>
-              </div>
             </div>
 
             <LandingPricingBento plans={pricingPlans} />

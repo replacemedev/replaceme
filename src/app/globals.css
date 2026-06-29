@@ -311,37 +311,25 @@ body {
   }
 }
 
-/* Landing: pricing bento */
-.landing-pricing-bento {
+/* Landing: pricing grid (4-up, matches employer pricing template) */
+.landing-pricing-grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-@media (min-width: 768px) {
-  .landing-pricing-bento {
+@media (min-width: 640px) {
+  .landing-pricing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
   }
 }
 
 @media (min-width: 1280px) {
-  .landing-pricing-bento {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, auto);
-  }
-
-  .landing-pricing-card:nth-child(1) {
-    grid-column: span 3;
-  }
-  .landing-pricing-card:nth-child(2) {
-    grid-column: span 3;
-  }
-  .landing-pricing-card:nth-child(3) {
-    grid-column: span 6;
-    grid-row: span 2;
-  }
-  .landing-pricing-card:nth-child(4) {
-    grid-column: span 6;
+  .landing-pricing-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+    align-items: stretch;
   }
 }
 
