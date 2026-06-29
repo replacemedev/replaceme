@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MessageSquare } from "lucide-react";
+import { ExternalLink, MapPin, MessageSquare, Phone } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
@@ -34,6 +34,10 @@ export type EmployerCandidateProfileData = {
     email: string | null;
     isVerified: boolean;
     resumeUrl: string | null;
+    cvUrl: string | null;
+    location: string | null;
+    phoneNumber: string | null;
+    portfolioUrl: string | null;
     expectedSalaryMin: number | null;
     expectedSalaryMax: number | null;
     salaryCurrency: string;
@@ -170,14 +174,73 @@ export function EmployerCandidateProfile({
 
           {isPreview ? (
             <UnlockOverlay feature="identity" currentPlan={planSlug} />
-          ) : candidate.bio ? (
-            <section className={`${EMPLOYER_CARD} p-5`}>
-              <h2 className="text-sm font-bold text-slate-900 mb-2">About</h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                {candidate.bio}
-              </p>
-            </section>
-          ) : null}
+          ) : (
+            <>
+              {(candidate.location ||
+                candidate.phoneNumber ||
+                candidate.portfolioUrl) && (
+                <section className={`${EMPLOYER_CARD} p-5`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-3">
+                    Contact &amp; location
+                  </h2>
+                  <dl className="space-y-2 text-sm">
+                    {candidate.location ? (
+                      <div className="flex items-start gap-2 text-slate-600">
+                        <MapPin
+                          className="h-4 w-4 shrink-0 text-slate-400 mt-0.5"
+                          aria-hidden
+                        />
+                        <dd>{candidate.location}</dd>
+                      </div>
+                    ) : null}
+                    {candidate.phoneNumber ? (
+                      <div className="flex items-start gap-2 text-slate-600">
+                        <Phone
+                          className="h-4 w-4 shrink-0 text-slate-400 mt-0.5"
+                          aria-hidden
+                        />
+                        <dd>
+                          <a
+                            href={`tel:${candidate.phoneNumber}`}
+                            className="hover:text-[#006e2f] transition-colors"
+                          >
+                            {candidate.phoneNumber}
+                          </a>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {candidate.portfolioUrl ? (
+                      <div className="flex items-start gap-2">
+                        <ExternalLink
+                          className="h-4 w-4 shrink-0 text-slate-400 mt-0.5"
+                          aria-hidden
+                        />
+                        <dd>
+                          <a
+                            href={candidate.portfolioUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#006e2f] font-semibold hover:underline"
+                          >
+                            View portfolio
+                          </a>
+                        </dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                </section>
+              )}
+
+              {candidate.bio ? (
+                <section className={`${EMPLOYER_CARD} p-5`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-2">About</h2>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {candidate.bio}
+                  </p>
+                </section>
+              ) : null}
+            </>
+          )}
         </div>
 
         <aside>
@@ -189,6 +252,7 @@ export function EmployerCandidateProfile({
             messagingThreadId={messagingThreadId}
             resumeDownloadEnabled={resumeDownloadEnabled}
             resumeUrl={candidate.resumeUrl}
+            cvUrl={candidate.cvUrl}
             isPreview={isPreview}
             isPinned={isPinned}
           />

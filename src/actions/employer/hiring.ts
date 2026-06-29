@@ -288,6 +288,12 @@ export async function getEmployerCandidateProfile(
         resumeUrl: resumeCheck.allowed
           ? ((candidate.resume_url as string | null) ?? null)
           : null,
+        cvUrl: resumeCheck.allowed
+          ? ((candidate.cv_url as string | null) ?? null)
+          : null,
+        location: (candidate.location as string | null) ?? null,
+        phoneNumber: (candidate.phone_number as string | null) ?? null,
+        portfolioUrl: (candidate.portfolio_url as string | null) ?? null,
         expectedSalaryMin:
           candidate.expected_salary_min === null ||
           candidate.expected_salary_min === undefined
@@ -323,6 +329,10 @@ export async function getEmployerCandidateProfile(
       email: null,
       isVerified: false,
       resumeUrl: null,
+      cvUrl: null,
+      location: null,
+      phoneNumber: null,
+      portfolioUrl: null,
       expectedSalaryMin:
         candidate.expected_salary_min === null ||
         candidate.expected_salary_min === undefined

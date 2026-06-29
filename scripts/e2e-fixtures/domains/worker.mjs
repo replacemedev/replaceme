@@ -206,15 +206,4 @@ export async function seedWorkerExtras(supabase) {
       storage_path: "e2e/verification/sofia-rivera-id-front.pdf",
     },
   ]);
-
-  await upsertRows(supabase, "skill_assessments", [
-    {
-      id: "e5a00001-0001-4001-8001-000000000001",
-      title: "React Proficiency",
-      skill_name: "React",
-      description: "Core React patterns for remote SaaS teams.",
-      duration_minutes: 45,
-      is_active: true,
-    },
-  ]);
 }

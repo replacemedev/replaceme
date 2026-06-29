@@ -11,6 +11,8 @@ export interface WorkerProfile {
   location: string | null;
   availability: string | null;
   portfolio_url: string | null;
+  resume_url: string | null;
+  cv_url: string | null;
   birth_year: number | null;
   is_top_rated: boolean | null;
   is_remote: boolean | null;

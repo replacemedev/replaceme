@@ -26,7 +26,6 @@ const ACCOUNT_EXPECTATIONS: Record<
   "/worker/profile/edit": { level: 1, name: "Edit Profile" },
   "/worker/settings": { level: 1, name: "Account Settings" },
   "/worker/earnings": { level: 1, name: "Earnings" },
-  "/worker/tests": { level: 1, name: "Skill Assessments" },
   "/worker/job-alerts": { level: 1, name: "Job Alerts" },
   "/worker/notifications": { level: 1, name: "Notifications" },
   "/worker/verification": { level: 1, name: "Worker Verification" },

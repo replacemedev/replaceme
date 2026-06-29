@@ -13,7 +13,6 @@ import { getMessagingThreads } from "@/actions/messaging";
 import { getWorkerContracts } from "@/actions/worker/contracts";
 import { ProfileStrengthCard } from "@/components/worker/ProfileStrengthCard";
 import { RecommendedJobCard } from "@/components/worker/RecommendedJobCard";
-import { ProveExpertiseCard } from "@/components/worker/ProveExpertiseCard";
 import { EarningsOverviewCard } from "@/components/worker/EarningsOverviewCard";
 import { SkillPill } from "@/components/worker/SkillPill";
 import { RecentMessageRow } from "@/components/worker/RecentMessageRow";
@@ -227,7 +226,6 @@ export default async function WorkerDashboard() {
             percentage={profileStrength.percentage}
             tierLabel={profileStrength.label}
           />
-          <ProveExpertiseCard />
           <EarningsOverviewCard earnings={earnings || []} />
         </div>
       </div>

@@ -77,14 +77,6 @@ export interface WorkerInterviewRow {
   status: string;
 }
 
-export interface SkillAssessmentRow {
-  id: string;
-  title: string;
-  description: string | null;
-  skillName: string;
-  durationMinutes: number;
-}
-
 export interface WorkerJobAlertRow {
   id: string;
   label: string;

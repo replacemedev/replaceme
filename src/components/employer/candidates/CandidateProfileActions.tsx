@@ -20,6 +20,7 @@ interface CandidateProfileActionsProps {
   messagingThreadId?: string | null;
   resumeDownloadEnabled: boolean;
   resumeUrl: string | null;
+  cvUrl: string | null;
   isPreview: boolean;
   isPinned: boolean;
 }
@@ -32,6 +33,7 @@ export function CandidateProfileActions({
   messagingThreadId,
   resumeDownloadEnabled,
   resumeUrl,
+  cvUrl,
   isPreview,
   isPinned: initialPinned,
 }: CandidateProfileActionsProps) {
@@ -116,6 +118,26 @@ export function CandidateProfileActions({
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
           >
             Download resume
+          </a>
+        ) : null}
+      </FeatureGate>
+
+      <FeatureGate
+        allowed={resumeDownloadEnabled && Boolean(cvUrl)}
+        feature="resume"
+        currentPlan={planSlug}
+        preview={
+          <UnlockOverlay feature="resume" currentPlan={planSlug} compact />
+        }
+      >
+        {cvUrl ? (
+          <a
+            href={cvUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+          >
+            Download CV
           </a>
         ) : null}
       </FeatureGate>

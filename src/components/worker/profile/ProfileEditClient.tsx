@@ -123,7 +123,8 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
             id="portfolio-url"
             name="portfolioUrl"
             type="url"
-            defaultValue={form.portfolioUrl}
+            value={form.portfolioUrl}
+            onChange={(e) => setForm({ ...form, portfolioUrl: e.target.value })}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />
@@ -134,10 +135,14 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
             id="resume-url"
             name="resumeUrl"
             type="url"
-            defaultValue={form.resumeUrl}
+            value={form.resumeUrl}
+            onChange={(e) => setForm({ ...form, resumeUrl: e.target.value })}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />
+          <p className="mt-1 text-xs text-slate-500">
+            Employers on Starter plans and above can download your resume when reviewing applications.
+          </p>
         </label>
         <label htmlFor="cv-url" className="block text-sm font-medium text-slate-700">
           CV URL
@@ -145,7 +150,8 @@ export function ProfileEditClient({ initial, projects }: ProfileEditClientProps)
             id="cv-url"
             name="cvUrl"
             type="url"
-            defaultValue={form.cvUrl}
+            value={form.cvUrl}
+            onChange={(e) => setForm({ ...form, cvUrl: e.target.value })}
             placeholder="https://"
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />

@@ -137,9 +137,46 @@ export function ProfileSidebar({ profile, isOwner = false }: ProfileSidebarProps
                 <ExternalLink size={12} />
               </a>
             ) : (
-              <span className="text-slate-400">N/A</span>
+              <span className="text-slate-400">Not specified</span>
             )}
-            {isOwner && <Edit size={12} className="text-slate-300 hover:text-slate-500 cursor-pointer" />}
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Resume</span>
+          <div className="flex items-center gap-1.5">
+            {profile.resume_url ? (
+              <a
+                href={profile.resume_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[#006e2f] hover:underline"
+              >
+                <span>View</span>
+                <ExternalLink size={12} />
+              </a>
+            ) : (
+              <span className="text-slate-400">Not specified</span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">CV</span>
+          <div className="flex items-center gap-1.5">
+            {profile.cv_url ? (
+              <a
+                href={profile.cv_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[#006e2f] hover:underline"
+              >
+                <span>View</span>
+                <ExternalLink size={12} />
+              </a>
+            ) : (
+              <span className="text-slate-400">Not specified</span>
+            )}
           </div>
         </div>
       </div>
@@ -147,13 +184,22 @@ export function ProfileSidebar({ profile, isOwner = false }: ProfileSidebarProps
       {/* Action Buttons */}
       <div className="space-y-3 pt-4">
         {isOwner ? (
-          <Link
-            href="/worker/dashboard/profile"
-            className="flex items-center justify-center gap-2 w-full py-3 px-4 font-bold text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] rounded-xl transition-all duration-150 shadow-xs cursor-pointer"
-          >
-            <Edit size={14} />
-            Edit Profile
-          </Link>
+          <>
+            <Link
+              href="/worker/profile/edit"
+              className="flex items-center justify-center gap-2 w-full py-3 px-4 font-bold text-white bg-[#006e2f] hover:bg-[#005c26] active:bg-[#00421a] rounded-xl transition-all duration-150 shadow-xs cursor-pointer"
+            >
+              <Edit size={14} />
+              Edit Profile
+            </Link>
+            <Link
+              href="/worker/settings"
+              className="flex items-center justify-center gap-2 w-full py-2.5 px-4 font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-150 text-xs"
+            >
+              <Clock size={14} className="text-slate-400" />
+              Rate &amp; availability
+            </Link>
+          </>
         ) : (
           <button
             type="button"

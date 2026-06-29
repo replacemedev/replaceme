@@ -6,7 +6,6 @@ import {
   jobAlertSchema,
   reportEmployerSchema,
   type WorkerJobAlertRow,
-  type SkillAssessmentRow,
   type WorkerInterviewRow,
 } from "@/lib/validations/worker/phase2";
 
@@ -38,25 +37,6 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
       status: row.status,
     };
   });
-}
-
-export async function getSkillAssessments(): Promise<SkillAssessmentRow[]> {
-  const ctx = await requireWorker();
-  if (!ctx) return [];
-
-  const { data } = await ctx.supabase
-    .from("skill_assessments")
-    .select("id, title, description, skill_name, duration_minutes")
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
-
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    skillName: row.skill_name,
-    durationMinutes: row.duration_minutes,
-  }));
 }
 
 export async function getWorkerJobAlerts(): Promise<WorkerJobAlertRow[]> {

@@ -42,7 +42,6 @@ const THRESHOLDS = [
   ["worker_saved_jobs", 3],
   ["earnings_overview", 2],
   ["worker_job_alerts", 2],
-  ["skill_assessments", 1],
   ["disputes", 1],
   ["verification_documents", 2],
   ["pinned_workers", 2],

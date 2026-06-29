@@ -1760,36 +1760,6 @@ export type Database = {
         }
         Relationships: []
       }
-      skill_assessments: {
-        Row: {
-          created_at: string
-          description: string | null
-          duration_minutes: number
-          id: string
-          is_active: boolean
-          skill_name: string
-          title: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          duration_minutes?: number
-          id?: string
-          is_active?: boolean
-          skill_name: string
-          title: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          duration_minutes?: number
-          id?: string
-          is_active?: boolean
-          skill_name?: string
-          title?: string
-        }
-        Relationships: []
-      }
       stripe_webhook_events: {
         Row: {
           event_id: string
