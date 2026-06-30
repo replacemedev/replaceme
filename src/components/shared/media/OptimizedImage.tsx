@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, useEffect, type ReactNode } from "react";
 import Image, { type ImageProps } from "next/image";
 import {
   getOptimizedImageUrl,
@@ -39,6 +39,11 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+  }, [src]);
 
   const transformWidth = transform?.width ?? (width ? retinaTransformWidth(width) : 256);
   const resolvedSrc =

@@ -230,24 +230,42 @@ export async function uploadCompanyLogo(formData: FormData) {
       .getPublicUrl(storagePath);
 
     const logoUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+    const now = new Date().toISOString();
 
     const { data: updatedRow, error: updateError } = await supabase
       .from("company_profiles")
       .update({
         logo_url: logoUrl,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
       .eq("employer_id", user.id)
       .select("employer_id")
       .maybeSingle();
 
-    if (updateError || !updatedRow) {
-      safeError("uploadCompanyLogo db update:", updateError ?? "no row updated");
+    if (updateError) {
+      safeError("uploadCompanyLogo db update:", updateError);
       await admin.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
       return {
         error:
-          "Your logo uploaded but we couldn't link it to your company profile. Save your company details first, then try again.",
+          "Your logo uploaded but we couldn't save it to your company profile. Please try again.",
       };
+    }
+
+    if (!updatedRow) {
+      const { error: insertError } = await supabase.from("company_profiles").insert({
+        employer_id: user.id,
+        logo_url: logoUrl,
+        updated_at: now,
+      });
+
+      if (insertError) {
+        safeError("uploadCompanyLogo db insert:", insertError);
+        await admin.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
+        return {
+          error:
+            "Your logo uploaded but we couldn't save it to your company profile. Please try again.",
+        };
+      }
     }
 
     revalidatePath("/employer/settings/company");

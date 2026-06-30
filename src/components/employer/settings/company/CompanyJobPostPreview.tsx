@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useFormContext } from "react-hook-form";
-import { Building2, Briefcase } from "lucide-react";
+import { Briefcase } from "lucide-react";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import type { CompanyProfileInput } from "@/lib/validations/employer/company";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
@@ -44,20 +44,19 @@ export function CompanyJobPostPreview({
 
         <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
-              {logoUrl ? (
-                <Image
-                  src={logoUrl}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="48px"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-slate-400">
-                  <Building2 className="h-5 w-5" aria-hidden />
-                </div>
-              )}
+            <div
+              key={logoUrl || "no-logo"}
+              className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white"
+            >
+              <LogoImage
+                src={logoUrl || null}
+                alt=""
+                label={displayName}
+                sizePx={48}
+                sizes="48px"
+                rounded="xl"
+                colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
+              />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-extrabold text-slate-900 truncate">

@@ -10,6 +10,8 @@ import {
 } from "@/actions/onboarding";
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
 import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import { CompanyLogoUpload } from "@/components/shared/CompanyLogoUpload";
+import { companyLogoHelperText } from "@/lib/storage/profile-image";
 import {
   COMPANY_SIZE_OPTIONS,
   DEFAULT_SKILL_OPTIONS,
@@ -44,6 +46,7 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
   const [skills, setSkills] = useState<string[]>(draft.skills);
   const [websiteUrl, setWebsiteUrl] = useState(draft.websiteUrl);
   const [companyBio, setCompanyBio] = useState(draft.companyBio);
+  const [logoUrl, setLogoUrl] = useState<string | null>(draft.logoUrl);
 
   const stepIndex: Record<WizardPhase, number> = {
     welcome: 0,
@@ -121,6 +124,13 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
           });
         }}
       >
+        <CompanyLogoUpload
+          logoUrl={logoUrl}
+          companyName={companyName}
+          size="md"
+          onLogoChange={setLogoUrl}
+          helperText={`Optional. ${companyLogoHelperText()}`}
+        />
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Company name
           <input

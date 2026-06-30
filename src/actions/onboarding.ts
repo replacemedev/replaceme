@@ -52,6 +52,7 @@ export type EmployerOnboardingDraft = {
   skills: string[];
   websiteUrl: string;
   companyBio: string;
+  logoUrl: string | null;
 };
 
 async function syncOnboardingWorkerSkills(
@@ -178,7 +179,7 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       supabase.from("profiles").select("skills").eq("id", user.id).single(),
       supabase
         .from("company_profiles")
-        .select("company_name, industry, company_size, website_url, company_bio")
+        .select("company_name, industry, company_size, website_url, company_bio, logo_url")
         .eq("employer_id", user.id)
         .maybeSingle(),
     ]);
@@ -190,6 +191,7 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       skills: profile?.skills ?? [],
       websiteUrl: company?.website_url ?? "",
       companyBio: company?.company_bio ?? "",
+      logoUrl: company?.logo_url ?? null,
     };
   } catch {
     return null;
