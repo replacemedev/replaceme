@@ -54,7 +54,7 @@ export const SIGNUP_MARKETING = {
 export const SIGNIN_MARKETING = {
   headline: "Welcome back",
   description:
-    "Your applications, conversations, and profile—organized in one professional workspace.",
+    "Your applications, conversations, and profile organized in one professional workspace.",
   highlights: [
     {
       title: "Stay in the loop",

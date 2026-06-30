@@ -6,6 +6,10 @@ import { Building2, Upload, Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { uploadCompanyLogo } from "@/actions/employer/company";
 import { toast } from "sonner";
+import {
+  PROFILE_IMAGE_MAX_BYTES,
+  profileImageMaxMbLabel,
+} from "@/lib/storage/profile-image";
 
 export function LogoUpload() {
   const { setValue, watch } = useFormContext();
@@ -23,8 +27,8 @@ export function LogoUpload() {
     if (!file) return;
 
     // Client-side quick checks
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("File size exceeds 2MB limit.");
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      toast.error(`File must be ${profileImageMaxMbLabel()} or smaller.`);
       return;
     }
 
@@ -105,7 +109,7 @@ export function LogoUpload() {
         <div className="space-y-1">
           <h3 className="text-sm font-bold text-slate-800">Company Logo</h3>
           <p className="text-xs text-slate-400 leading-normal">
-            Recommended size: 400×400px. Max file size: 2MB (JPG, PNG).
+            Recommended size: 400×400px. Max file size: {profileImageMaxMbLabel()} (JPG, PNG).
           </p>
         </div>
 

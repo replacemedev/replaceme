@@ -4,6 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
 import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
 import { revalidatePath } from "next/cache";
+import {
+  normalizeProfileImageMime,
+  PROFILE_IMAGE_MAX_BYTES,
+  profileImageMaxMbLabel,
+} from "@/lib/storage/profile-image";
+
+const COMPANY_LOGO_BUCKET = "company-logos";
 
 /**
  * Fetch industries list.
@@ -123,25 +130,21 @@ export async function updateCompanyProfile(payload: CompanyProfileInput) {
   }
 }
 
-/**
- * Upload company logo placeholder action.
- * Prepares the backend pipeline to receive logo files and validates them.
- */
 export async function uploadCompanyLogo(formData: FormData) {
   try {
-    safeLog("[Auth] Upload company logo action initiated");
-
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return { error: "Authentication failed. Please log in again." };
     }
 
-    // Verify role is employer
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("role")
+      .select("id, role")
       .eq("id", user.id)
       .single();
 
@@ -149,47 +152,59 @@ export async function uploadCompanyLogo(formData: FormData) {
       return { error: "Access denied. Only employers can upload company logos." };
     }
 
-    const file = formData.get("file") as File;
-    if (!file) {
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) {
       return { error: "No file was uploaded." };
     }
 
-    // Validate file size: 2MB Max
-    const maxSize = 2 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return { error: "File size exceeds the 2MB limit." };
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      return { error: `File must be ${profileImageMaxMbLabel()} or smaller.` };
     }
 
-    // Validate file type: JPG, PNG
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      return { error: "Invalid file type. Only JPG, JPEG, and PNG are allowed." };
+    const mimeType = normalizeProfileImageMime(file.type);
+    if (!mimeType) {
+      return { error: "Only JPG and PNG files are allowed." };
     }
 
-    // Simulate upload delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const logoUrl = "/images/logo_favicon.png";
+    const extension = mimeType === "image/png" ? "png" : "jpg";
+    const storagePath = `${user.id}/logo.${extension}`;
+    const fileBuffer = await file.arrayBuffer();
 
-    // Update the logoUrl in the database
+    const { error: uploadError } = await supabase.storage
+      .from(COMPANY_LOGO_BUCKET)
+      .upload(storagePath, fileBuffer, {
+        contentType: mimeType,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      safeError("uploadCompanyLogo storage:", uploadError);
+      return { error: "Failed to upload company logo." };
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(COMPANY_LOGO_BUCKET)
+      .getPublicUrl(storagePath);
+
+    const logoUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+
     const { error: updateError } = await supabase
       .from("company_profiles")
       .update({ logo_url: logoUrl })
       .eq("employer_id", user.id);
 
     if (updateError) {
-      safeError("uploadCompanyLogo db update error occurred:", updateError);
-      return { error: "Failed to save logo URL to company profile." };
+      safeError("uploadCompanyLogo db update:", updateError);
+      await supabase.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
+      return { error: "Failed to save logo to company profile." };
     }
 
     revalidatePath("/employer/settings/company");
     revalidatePath("/", "layout");
 
-    return {
-      success: true,
-      logoUrl,
-    };
+    return { success: true, logoUrl };
   } catch (err) {
-    safeError("uploadCompanyLogo error occurred:", err);
+    safeError("uploadCompanyLogo:", err);
     return { error: "An unexpected error occurred during logo upload. Please try again." };
   }
 }

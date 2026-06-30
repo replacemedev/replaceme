@@ -9,8 +9,12 @@ import {
   uploadWorkerAvatar,
 } from "@/actions/worker/profile";
 
-const MAX_BYTES = 2 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"] as const;
+import {
+  normalizeProfileImageMime,
+  PROFILE_IMAGE_ALLOWED_TYPES,
+  PROFILE_IMAGE_MAX_BYTES,
+  profileImageMaxMbLabel,
+} from "@/lib/storage/profile-image";
 
 type AvatarSize = "md" | "lg";
 
@@ -62,12 +66,16 @@ export function ProfileAvatarUpload({
   const handleFile = async (file: File) => {
     if (!editable || busy) return;
 
-    if (file.size > MAX_BYTES) {
-      toast.error("File must be 2 MB or smaller.");
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      toast.error(`File must be ${profileImageMaxMbLabel()} or smaller.`);
       return;
     }
 
-    if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
+    if (
+      !PROFILE_IMAGE_ALLOWED_TYPES.includes(
+        file.type as (typeof PROFILE_IMAGE_ALLOWED_TYPES)[number]
+      )
+    ) {
       toast.error("Only JPG and PNG files are allowed.");
       return;
     }
@@ -80,12 +88,12 @@ export function ProfileAvatarUpload({
       formData.append("file", file);
 
       const result = await uploadWorkerAvatar(formData);
-      if (result.error) {
+      if ("error" in result && result.error) {
         toast.error(result.error, { id: toastId });
         return;
       }
 
-      if (result.success && result.avatarUrl) {
+      if ("success" in result && result.success && result.avatarUrl) {
         setPreviewUrl(result.avatarUrl);
         onAvatarChange?.(result.avatarUrl);
         toast.success("Profile photo updated.", { id: toastId });
@@ -226,7 +234,7 @@ export function ProfileAvatarUpload({
         </p>
       ) : (
         <p className="max-w-xs text-center text-xs font-medium leading-relaxed text-slate-500">
-          JPG or PNG, max 2 MB. A clear headshot helps employers recognize you.
+          JPG or PNG, max {profileImageMaxMbLabel()}. A clear headshot helps employers recognize you.
         </p>
       )}
     </div>

@@ -20,22 +20,13 @@ import {
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 import { safeError } from "@/utils/logger";
+import {
+  normalizeProfileImageMime,
+  PROFILE_IMAGE_MAX_BYTES,
+  profileImageMaxMbLabel,
+} from "@/lib/storage/profile-image";
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
-const PROFILE_AVATAR_MAX_BYTES = 2 * 1024 * 1024;
-const PROFILE_AVATAR_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"] as const;
-
-function normalizeAvatarMime(mimeType: string): string | null {
-  if (mimeType === "image/jpg") return "image/jpeg";
-  if (
-    PROFILE_AVATAR_ALLOWED_TYPES.includes(
-      mimeType as (typeof PROFILE_AVATAR_ALLOWED_TYPES)[number]
-    )
-  ) {
-    return mimeType === "image/jpg" ? "image/jpeg" : mimeType;
-  }
-  return null;
-}
 
 function emptyToNull(value: string | undefined) {
   if (value === undefined) return undefined;
@@ -302,11 +293,11 @@ export async function uploadWorkerAvatar(formData: FormData) {
     return { error: "No file was uploaded." };
   }
 
-  if (file.size > PROFILE_AVATAR_MAX_BYTES) {
-    return { error: "File must be 2 MB or smaller." };
+  if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+    return { error: `File must be ${profileImageMaxMbLabel()} or smaller.` };
   }
 
-  const mimeType = normalizeAvatarMime(file.type);
+  const mimeType = normalizeProfileImageMime(file.type);
   if (!mimeType) {
     return { error: "Only JPG and PNG files are allowed." };
   }
@@ -331,7 +322,7 @@ export async function uploadWorkerAvatar(formData: FormData) {
     .from(PROFILE_AVATAR_BUCKET)
     .getPublicUrl(storagePath);
 
-  const avatarUrl = publicUrlData.publicUrl;
+  const avatarUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
 
   const { error: updateError } = await ctx.supabase
     .from("profiles")
@@ -339,9 +330,11 @@ export async function uploadWorkerAvatar(formData: FormData) {
       avatar_url: avatarUrl,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", ctx.profile.id);
+    .eq("id", ctx.user.id);
 
   if (updateError) {
+    safeError("uploadWorkerAvatar profile update:", updateError);
+    await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
     return { error: "Failed to save profile photo." };
   }
 
@@ -380,7 +373,7 @@ export async function removeWorkerAvatar() {
       avatar_url: null,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", ctx.profile.id);
+    .eq("id", ctx.user.id);
 
   if (error) return { error: "Failed to remove profile photo." };
 

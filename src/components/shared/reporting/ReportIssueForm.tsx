@@ -81,8 +81,13 @@ export function ReportIssueForm({
 
         const result = await submitReport(formData);
 
+        if (!result || typeof result !== "object" || !("success" in result)) {
+          toast.error("Unexpected response from server. Please try again.");
+          return;
+        }
+
         if (!result.success) {
-          toast.error(result.error);
+          toast.error(result.error ?? "Failed to submit report.");
           return;
         }
 
@@ -94,14 +99,24 @@ export function ReportIssueForm({
         setEvidenceFile(null);
         setEvidenceResetKey((k) => k + 1);
         onSubmitted?.();
-      } catch {
-        toast.error("Could not submit report. Please try again.");
+      } catch (err) {
+        const message =
+          err instanceof Error && err.message
+            ? err.message
+            : "Could not submit report. Please try again.";
+        toast.error(message);
       }
     });
   };
 
   return (
-    <div className="space-y-5">
+    <form
+      className="space-y-5"
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+    >
       <label className="block space-y-2 text-sm font-semibold text-slate-700">
         Category
         <select
@@ -162,13 +177,12 @@ export function ReportIssueForm({
       />
 
       <button
-        type="button"
-        onClick={submit}
+        type="submit"
         disabled={isPending}
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
       >
         {isPending ? "Submitting…" : "Submit report"}
       </button>
-    </div>
+    </form>
   );
 }

@@ -82,13 +82,15 @@ export async function createReport(input: unknown) {
     const rate = await rateLimitReportSubmission(ctx.profile.id);
     if (!rate.success) return fail(rate.error);
 
+    const authUserId = ctx.user.id;
+
     const h = await headers();
     const userAgent = h.get("user-agent");
 
     const { data: inserted, error } = await ctx.supabase
       .from("reports")
       .insert({
-        reporter_id: ctx.profile.id,
+        reporter_id: authUserId,
         reporter_role: ctx.profile.role,
         category: parsed.data.category,
         status: "open",
@@ -156,13 +158,15 @@ export async function submitReport(formData: FormData) {
     const rate = await rateLimitReportSubmission(ctx.profile.id);
     if (!rate.success) return fail(rate.error);
 
+    const authUserId = ctx.user.id;
+
     const h = await headers();
     const userAgent = h.get("user-agent");
 
     const { data: inserted, error } = await ctx.supabase
       .from("reports")
       .insert({
-        reporter_id: ctx.profile.id,
+        reporter_id: authUserId,
         reporter_role: ctx.profile.role,
         category: parsed.data.category,
         status: "open",
@@ -197,7 +201,7 @@ export async function submitReport(formData: FormData) {
               evidenceFile.name.toLowerCase().endsWith(".jpeg")
             ? "jpg"
             : "jpeg";
-      const storagePath = `${ctx.profile.id}/${inserted.id}.${extension}`;
+      const storagePath = `${authUserId}/${inserted.id}.${extension}`;
       const fileBuffer = await evidenceFile.arrayBuffer();
 
       const { error: uploadError } = await ctx.supabase.storage
@@ -221,7 +225,7 @@ export async function submitReport(formData: FormData) {
           evidence_file_size_bytes: evidenceFile.size,
         })
         .eq("id", inserted.id)
-        .eq("reporter_id", ctx.profile.id);
+        .eq("reporter_id", authUserId);
 
       if (evidenceUpdateError) {
         safeError("submitReport evidence update:", evidenceUpdateError);

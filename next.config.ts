@@ -29,6 +29,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   compress: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb",
+    },
+  },
   async redirects() {
     return [
       {
