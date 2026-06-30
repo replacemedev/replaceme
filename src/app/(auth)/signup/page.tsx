@@ -5,15 +5,23 @@ import { AuthFooter } from "@/components/auth/AuthFooter";
 import { SignUpBrandPanel } from "@/components/auth/marketing/SignUpBrandPanel";
 import { AUTH_LINK, AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { SIGNUP_PAGE } from "@/lib/auth/static-copy";
+import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Sign Up | ReplaceMe",
   description: "Create your ReplaceMe account.",
 };
 
-export default function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const params = await searchParams;
+  const callbackUrl = parseGuestCallbackUrl(params.callbackUrl) ?? undefined;
+
   return (
     <AuthPageShell
       marketing={<SignUpBrandPanel />}
@@ -26,12 +34,19 @@ export default function SignUpPage() {
       </header>
 
       <AuthFormCard>
-        <SignUpForm />
+        <SignUpForm callbackUrl={callbackUrl} />
 
         <div className="mt-6 text-center">
           <p className="text-sm font-body-base text-slate-600 leading-relaxed">
             {SIGNUP_PAGE.signInPrompt}{" "}
-            <Link href="/signin" className={AUTH_LINK}>
+            <Link
+              href={
+                callbackUrl
+                  ? `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/signin"
+              }
+              className={AUTH_LINK}
+            >
               {SIGNUP_PAGE.signInLinkLabel}
             </Link>
           </p>

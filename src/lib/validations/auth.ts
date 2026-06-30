@@ -72,6 +72,7 @@ export const loginCredentialsSchema = z
     password: z.string().min(1, "Password is required"),
     rememberMe: z.boolean().optional(),
     turnstileToken: z.string().optional(),
+    callbackUrl: z.string().optional(),
   })
   .strict();
 

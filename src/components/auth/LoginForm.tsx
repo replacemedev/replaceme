@@ -23,9 +23,10 @@ import {
 
 interface LoginFormProps {
   forgotPasswordHref: string;
+  callbackUrl?: string;
 }
 
-export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
+export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -69,6 +70,7 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
       const result = await signIn({
         ...data,
         turnstileToken: turnstileToken ?? undefined,
+        callbackUrl,
       });
 
       if (result && !result.success) {

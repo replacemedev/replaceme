@@ -46,6 +46,18 @@ export async function updateSession(request: NextRequest) {
   const isEmployerRoute = pathname.startsWith("/employer");
   const isProtectedRoute = isWorkerRoute || isEmployerRoute || isAdminRoute;
 
+  const isGuestBlockedWorkerIdentityRoute =
+    pathname.startsWith("/workers/") ||
+    /^\/profile\/[^/]+$/.test(pathname) ||
+    pathname === "/candidates" ||
+    pathname.startsWith("/candidates/");
+
+  if (!user && isGuestBlockedWorkerIdentityRoute) {
+    const signInUrl = new URL("/signin", request.url);
+    signInUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
   if (isAdminRoute && !isMfaChallenge) {
     if (!user) {
       return NextResponse.redirect(new URL("/signin", request.url));

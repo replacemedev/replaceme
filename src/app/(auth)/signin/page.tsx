@@ -7,6 +7,7 @@ import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { SignInWelcomePanel } from "@/components/auth/marketing/SignInWelcomePanel";
 import { AUTH_LINK, AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { SIGNIN_PAGE } from "@/lib/auth/static-copy";
+import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
 
 export const metadata = {
   title: "Sign In | ReplaceMe",
@@ -22,10 +23,11 @@ function resolveView(raw?: string): SignInView {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; callbackUrl?: string }>;
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
+  const callbackUrl = parseGuestCallbackUrl(params.callbackUrl) ?? undefined;
   const copy =
     view === "login" ? SIGNIN_PAGE.login : SIGNIN_PAGE.forgotPassword;
 
@@ -44,7 +46,10 @@ export default async function SignInPage({
 
       <AuthFormCard>
         {view === "login" ? (
-          <LoginForm forgotPasswordHref="/signin?view=forgot_password" />
+          <LoginForm
+            forgotPasswordHref="/signin?view=forgot_password"
+            callbackUrl={callbackUrl}
+          />
         ) : (
           <ForgotPasswordForm />
         )}
@@ -53,7 +58,14 @@ export default async function SignInPage({
       {view === "login" ? (
         <p className="mt-4 text-center text-sm font-body-base text-slate-600 leading-relaxed">
           {SIGNIN_PAGE.login.signUpPrompt}{" "}
-          <Link href="/signup" className={AUTH_LINK}>
+          <Link
+            href={
+              callbackUrl
+                ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : "/signup"
+            }
+            className={AUTH_LINK}
+          >
             {SIGNIN_PAGE.login.signUpLinkLabel}
           </Link>
         </p>

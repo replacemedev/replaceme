@@ -55,7 +55,7 @@ const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
   role: "employer",
 };
 
-export function SignUpForm() {
+export function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<SignUpRole>("worker");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -107,7 +107,8 @@ export function SignUpForm() {
       const result = await signUp({
         ...data,
         turnstileToken: turnstileToken ?? undefined,
-      });
+        callbackUrl,
+      } as SignUpValues & { callbackUrl?: string });
 
       if (!result.success) {
         const errMsg = result.error;

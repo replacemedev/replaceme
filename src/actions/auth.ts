@@ -16,6 +16,7 @@ import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
 import { authCallbackUrl } from "@/lib/auth/site-url";
 import { isAppRole, profileIdFilter } from "@/lib/auth/role";
+import { resolvePostAuthRedirect } from "@/lib/auth/safe-callback-url";
 import {
   forgotPasswordSchema,
   updatePasswordSchema,
@@ -274,13 +275,18 @@ export async function signUp(formData: SignUpFormValues) {
       };
     }
 
-    const destination =
-      role === "employer"
-        ? `${ROLE_HOME_PATH.employer}?welcome=signup&name=${encodeURIComponent(firstName)}`
-        : `${ROLE_HOME_PATH.worker}?welcome=signup&name=${encodeURIComponent(firstName)}`;
+    const destination = resolvePostAuthRedirect(
+      role === "employer" ? "employer" : "worker",
+      (formData as SignUpFormValues & { callbackUrl?: string }).callbackUrl
+    );
+    const welcomeQuery = new URLSearchParams({
+      welcome: "signup",
+      name: firstName,
+    });
+    const separator = destination.includes("?") ? "&" : "?";
 
     revalidatePath("/", "layout");
-    redirect(destination);
+    redirect(`${destination}${separator}${welcomeQuery.toString()}`);
   } catch (error) {
     if (
       error &&
@@ -297,13 +303,6 @@ export async function signUp(formData: SignUpFormValues) {
 
 const GENERIC_LOGIN_ERROR =
   "Invalid email, username, or password. Please try again.";
-
-function resolvePostLoginPath(role: string): string {
-  if (role === "admin") return ROLE_HOME_PATH.admin;
-  if (role === "employer") return ROLE_HOME_PATH.employer;
-  if (role === "worker") return ROLE_HOME_PATH.worker;
-  return ROLE_HOME_PATH.worker;
-}
 
 export async function signIn(formData: LoginCredentials) {
   try {
@@ -381,15 +380,20 @@ export async function signIn(formData: LoginCredentials) {
     }
 
     const finalRole = isAppRole(role) ? role : "worker";
-    const redirectUrl = resolvePostLoginPath(finalRole);
+    const redirectUrl = resolvePostAuthRedirect(
+      finalRole,
+      parsed.data.callbackUrl
+    );
 
     const welcomeQuery = new URLSearchParams({ welcome: "login" });
     if (displayName) {
       welcomeQuery.set("name", displayName);
     }
 
+    const separator = redirectUrl.includes("?") ? "&" : "?";
+
     revalidatePath("/", "layout");
-    redirect(`${redirectUrl}?${welcomeQuery.toString()}`);
+    redirect(`${redirectUrl}${separator}${welcomeQuery.toString()}`);
   } catch (error) {
     if (
       error &&
