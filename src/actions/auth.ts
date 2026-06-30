@@ -27,7 +27,17 @@ import {
   extractErrorMessage,
   mapSignupDatabaseError,
 } from "@/lib/auth/error-message";
-import { verifyTurnstileToken } from "@/lib/turnstile/verify";
+import {
+  requireTurnstileToken,
+  isTurnstileEnabled,
+} from "@/lib/turnstile/verify";
+
+function captchaAuthOptions(
+  token: string
+): { captchaToken: string } | Record<string, never> {
+  if (!isTurnstileEnabled()) return {};
+  return { captchaToken: token };
+}
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -155,7 +165,7 @@ export async function signUp(formData: SignUpFormValues) {
 
     const data = parsed.data;
 
-    const turnstile = await verifyTurnstileToken(data.turnstileToken);
+    const turnstile = requireTurnstileToken(data.turnstileToken);
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -171,6 +181,7 @@ export async function signUp(formData: SignUpFormValues) {
       email: data.email,
       password: data.password,
       options: {
+        ...captchaAuthOptions(turnstile.token),
         emailRedirectTo: authCallbackUrl("signup", "/signin"),
         data: {
           role: data.role,
@@ -306,7 +317,7 @@ export async function signIn(formData: LoginCredentials) {
 
     const { email, password, turnstileToken } = parsed.data;
 
-    const turnstile = await verifyTurnstileToken(turnstileToken);
+    const turnstile = requireTurnstileToken(turnstileToken);
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -319,6 +330,7 @@ export async function signIn(formData: LoginCredentials) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: emailToAuth,
       password,
+      options: captchaAuthOptions(turnstile.token),
     });
 
     if (error) {
@@ -425,7 +437,7 @@ export async function sendPasswordResetLink(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const turnstile = await verifyTurnstileToken(parsed.data.turnstileToken);
+    const turnstile = requireTurnstileToken(parsed.data.turnstileToken);
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -437,6 +449,7 @@ export async function sendPasswordResetLink(
       const supabase = await createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: authCallbackUrl("recovery", "/update-password"),
+        ...captchaAuthOptions(turnstile.token),
       });
 
       if (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ import Link from "next/link";
 import {
   TurnstileWidget,
   isTurnstileClientEnabled,
+  type TurnstileWidgetHandle,
 } from "@/components/auth/TurnstileWidget";
 
 function formatSignUpError(error: unknown): string {
@@ -58,7 +59,13 @@ export function SignUpForm() {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<SignUpRole>("worker");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileRequired = isTurnstileClientEnabled();
+
+  const resetCaptcha = () => {
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
 
   const schema = useMemo(
     () =>
@@ -132,6 +139,8 @@ export function SignUpForm() {
         throw error;
       }
       toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      resetCaptcha();
     }
   };
 
@@ -293,6 +302,7 @@ export function SignUpForm() {
         </FormField>
 
         <TurnstileWidget
+          ref={turnstileRef}
           onToken={setTurnstileToken}
           onExpire={() => setTurnstileToken(null)}
           onError={() => setTurnstileToken(null)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import {
   TurnstileWidget,
   isTurnstileClientEnabled,
+  type TurnstileWidgetHandle,
 } from "@/components/auth/TurnstileWidget";
 
 interface LoginFormProps {
@@ -27,7 +28,13 @@ interface LoginFormProps {
 export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileRequired = isTurnstileClientEnabled();
+
+  const resetCaptcha = () => {
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
   const {
     register,
     handleSubmit,
@@ -82,6 +89,7 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
       }
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
+      resetCaptcha();
       setIsLoading(false);
     }
   };
@@ -140,6 +148,7 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
 
       <div className="pt-4 space-y-4">
         <TurnstileWidget
+          ref={turnstileRef}
           onToken={setTurnstileToken}
           onExpire={() => setTurnstileToken(null)}
           onError={() => setTurnstileToken(null)}

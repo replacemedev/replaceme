@@ -1,12 +1,19 @@
 "use client";
 
-import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
-import { useRef } from "react";
+import {
+  Turnstile,
+  type TurnstileInstance,
+} from "@marsidev/react-turnstile";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function isTurnstileClientEnabled(): boolean {
   return Boolean(SITE_KEY);
+}
+
+export interface TurnstileWidgetHandle {
+  reset: () => void;
 }
 
 export interface TurnstileWidgetProps {
@@ -16,13 +23,20 @@ export interface TurnstileWidgetProps {
   className?: string;
 }
 
-export function TurnstileWidget({
-  onToken,
-  onExpire,
-  onError,
-  className,
-}: TurnstileWidgetProps) {
+export const TurnstileWidget = forwardRef<
+  TurnstileWidgetHandle,
+  TurnstileWidgetProps
+>(function TurnstileWidget(
+  { onToken, onExpire, onError, className },
+  forwardedRef
+) {
   const ref = useRef<TurnstileInstance>(null);
+
+  useImperativeHandle(forwardedRef, () => ({
+    reset: () => {
+      ref.current?.reset();
+    },
+  }));
 
   if (!SITE_KEY) return null;
 
@@ -47,4 +61,4 @@ export function TurnstileWidget({
       />
     </div>
   );
-}
+});

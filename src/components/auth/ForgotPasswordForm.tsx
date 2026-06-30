@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -17,13 +17,20 @@ import {
 import {
   TurnstileWidget,
   isTurnstileClientEnabled,
+  type TurnstileWidgetHandle,
 } from "@/components/auth/TurnstileWidget";
 
 export function ForgotPasswordForm() {
   const [emailSent, setEmailSent] = useState(false);
   const [sentToEmail, setSentToEmail] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileRequired = isTurnstileClientEnabled();
+
+  const resetCaptcha = () => {
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
 
   const {
     register,
@@ -40,19 +47,23 @@ export function ForgotPasswordForm() {
       return;
     }
 
-    const result = await sendPasswordResetLink({
-      ...data,
-      turnstileToken: turnstileToken ?? undefined,
-    });
+    try {
+      const result = await sendPasswordResetLink({
+        ...data,
+        turnstileToken: turnstileToken ?? undefined,
+      });
 
-    if (!result.success) {
-      toast.error(result.error ?? "Failed to send reset link.");
-      return;
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to send reset link.");
+        return;
+      }
+
+      setSentToEmail(data.email.trim());
+      setEmailSent(true);
+      toast.success(result.message);
+    } finally {
+      resetCaptcha();
     }
-
-    setSentToEmail(data.email.trim());
-    setEmailSent(true);
-    toast.success(result.message);
   };
 
   const onError = () => {
@@ -117,6 +128,7 @@ export function ForgotPasswordForm() {
 
       <div className="space-y-3 pt-4">
         <TurnstileWidget
+          ref={turnstileRef}
           onToken={setTurnstileToken}
           onExpire={() => setTurnstileToken(null)}
           onError={() => setTurnstileToken(null)}
