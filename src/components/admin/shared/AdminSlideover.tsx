@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+
+const FOCUSABLE_SELECTOR =
+  'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 export function AdminSlideover({
   open,
@@ -16,14 +19,51 @@ export function AdminSlideover({
   description?: string;
   children: React.ReactNode;
 }) {
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+  const lastActiveRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!open) return;
+    lastActiveRef.current = document.activeElement as HTMLElement | null;
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+
+      if (e.key === "Tab") {
+        const panel = panelRef.current;
+        if (!panel) return;
+        const focusables = Array.from(
+          panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        ).filter((el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden"));
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (e.shiftKey) {
+          if (!active || active === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (active === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
     document.addEventListener("keydown", onKeyDown);
+    closeBtnRef.current?.focus();
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
+
+  useEffect(() => {
+    if (open) return;
+    lastActiveRef.current?.focus?.();
+  }, [open]);
 
   if (!open) return null;
 
@@ -36,6 +76,7 @@ export function AdminSlideover({
         onClick={onClose}
       />
       <aside
+        ref={panelRef as any}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -53,6 +94,7 @@ export function AdminSlideover({
             ) : null}
           </div>
           <button
+            ref={closeBtnRef}
             type="button"
             onClick={onClose}
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"

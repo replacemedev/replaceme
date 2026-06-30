@@ -192,7 +192,7 @@ export function JobsModerationClient({
                     {job.employment_type}
                   </td>
                   <td className="px-4 py-3 text-slate-600 font-mono text-xs">
-                    ${job.monthly_salary.toLocaleString()}/mo
+                    {formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={job.status} />

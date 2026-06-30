@@ -149,6 +149,7 @@ export interface AdminJobRow {
   status: string;
   employment_type: string;
   monthly_salary: number;
+  salary_currency: string | null;
   employer_id: string;
   company_name: string | null;
   created_at: string;
