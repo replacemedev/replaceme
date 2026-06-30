@@ -619,6 +619,9 @@ export type Database = {
           context: Json
           created_at: string
           description_markdown: string
+          evidence_file_size_bytes: number | null
+          evidence_mime_type: string | null
+          evidence_storage_path: string | null
           id: string
           reported_url: string | null
           reporter_id: string
@@ -637,6 +640,9 @@ export type Database = {
           context?: Json
           created_at?: string
           description_markdown: string
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
           id?: string
           reported_url?: string | null
           reporter_id: string
@@ -655,6 +661,9 @@ export type Database = {
           context?: Json
           created_at?: string
           description_markdown?: string
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
           id?: string
           reported_url?: string | null
           reporter_id?: string

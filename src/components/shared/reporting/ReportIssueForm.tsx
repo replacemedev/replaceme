@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createReport } from "@/actions/reports";
+import { submitReport } from "@/actions/reports";
 import { REPORT_CATEGORIES } from "@/lib/reporting/constants";
+import { validateReportEvidenceFile } from "@/lib/reporting/evidence";
+import { ReportEvidenceDropzone } from "./ReportEvidenceDropzone";
 
 const CATEGORY_LABELS: Record<(typeof REPORT_CATEGORIES)[number], string> = {
   bug: "Bug",
@@ -27,6 +29,7 @@ export function ReportIssueForm({
     useState<(typeof REPORT_CATEGORIES)[number]>("bug");
   const [title, setTitle] = useState("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
 
   const computedUrl = useMemo(() => {
     if (defaultReportedUrl) return defaultReportedUrl;
@@ -46,15 +49,23 @@ export function ReportIssueForm({
   }, []);
 
   const submit = () => {
+    const evidenceError = validateReportEvidenceFile(evidenceFile);
+    if (evidenceError) {
+      toast.error(evidenceError);
+      return;
+    }
+
     startTransition(async () => {
-      const result = await createReport({
-        category,
-        title,
-        descriptionMarkdown,
-        reportedUrl: computedUrl,
-        appArea: computedAppArea,
-        context: {},
-      });
+      const formData = new FormData();
+      formData.append("category", category);
+      formData.append("title", title);
+      formData.append("descriptionMarkdown", descriptionMarkdown);
+      formData.append("reportedUrl", computedUrl);
+      formData.append("appArea", computedAppArea);
+      formData.append("context", JSON.stringify({}));
+      if (evidenceFile) formData.append("file", evidenceFile);
+
+      const result = await submitReport(formData);
 
       if (!result.success) {
         toast.error(result.error);
@@ -64,6 +75,7 @@ export function ReportIssueForm({
       toast.success("Report submitted. Thanks for helping us improve ReplaceMe.");
       setTitle("");
       setDescriptionMarkdown("");
+      setEvidenceFile(null);
       onSubmitted?.();
     });
   };
@@ -116,6 +128,12 @@ export function ReportIssueForm({
           We automatically attach the page URL and your account role.
         </p>
       </label>
+
+      <ReportEvidenceDropzone
+        file={evidenceFile}
+        onFileChange={setEvidenceFile}
+        disabled={isPending}
+      />
 
       <button
         type="button"

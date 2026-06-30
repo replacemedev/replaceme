@@ -20,6 +20,22 @@ import {
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 
+const PROFILE_AVATAR_BUCKET = "profile-avatars";
+const PROFILE_AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+const PROFILE_AVATAR_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"] as const;
+
+function normalizeAvatarMime(mimeType: string): string | null {
+  if (mimeType === "image/jpg") return "image/jpeg";
+  if (
+    PROFILE_AVATAR_ALLOWED_TYPES.includes(
+      mimeType as (typeof PROFILE_AVATAR_ALLOWED_TYPES)[number]
+    )
+  ) {
+    return mimeType === "image/jpg" ? "image/jpeg" : mimeType;
+  }
+  return null;
+}
+
 function emptyToNull(value: string | undefined) {
   if (value === undefined) return undefined;
   return value.trim() === "" ? null : value;
@@ -274,4 +290,102 @@ export async function getWorkerProjects() {
     description: row.description,
     skillsUsed: row.skills_used ?? [],
   }));
+}
+
+export async function uploadWorkerAvatar(formData: FormData) {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "No file was uploaded." };
+  }
+
+  if (file.size > PROFILE_AVATAR_MAX_BYTES) {
+    return { error: "File must be 2 MB or smaller." };
+  }
+
+  const mimeType = normalizeAvatarMime(file.type);
+  if (!mimeType) {
+    return { error: "Only JPG and PNG files are allowed." };
+  }
+
+  const extension = mimeType === "image/png" ? "png" : "jpg";
+  const storagePath = `${ctx.profile.id}/avatar.${extension}`;
+  const fileBuffer = await file.arrayBuffer();
+
+  const { error: uploadError } = await ctx.supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .upload(storagePath, fileBuffer, {
+      contentType: mimeType,
+      upsert: true,
+    });
+
+  if (uploadError) {
+    return { error: "Failed to upload profile photo." };
+  }
+
+  const { data: publicUrlData } = ctx.supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .getPublicUrl(storagePath);
+
+  const avatarUrl = publicUrlData.publicUrl;
+
+  const { error: updateError } = await ctx.supabase
+    .from("profiles")
+    .update({
+      avatar_url: avatarUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", ctx.profile.id);
+
+  if (updateError) {
+    return { error: "Failed to save profile photo." };
+  }
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/dashboard");
+  revalidatePath("/", "layout");
+
+  return { success: true, avatarUrl };
+}
+
+export async function removeWorkerAvatar() {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const { data: profile } = await ctx.supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", ctx.profile.id)
+    .single();
+
+  if (profile?.avatar_url) {
+    const marker = `/object/public/${PROFILE_AVATAR_BUCKET}/`;
+    const pathStart = profile.avatar_url.indexOf(marker);
+    if (pathStart !== -1) {
+      const storagePath = profile.avatar_url.slice(pathStart + marker.length);
+      await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
+    }
+  }
+
+  const { error } = await ctx.supabase
+    .from("profiles")
+    .update({
+      avatar_url: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", ctx.profile.id);
+
+  if (error) return { error: "Failed to remove profile photo." };
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/dashboard");
+  revalidatePath("/", "layout");
+
+  return { success: true };
 }

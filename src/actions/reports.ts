@@ -16,6 +16,12 @@ import { rateLimitReportSubmission } from "@/lib/server/rate-limit";
 import { safeError } from "@/utils/logger";
 
 import { REPORT_CATEGORIES, REPORT_STATUSES } from "@/lib/reporting/constants";
+import {
+  normalizeReportEvidenceMime,
+  validateReportEvidenceFile,
+} from "@/lib/reporting/evidence";
+
+const REPORT_EVIDENCE_BUCKET = "report-evidence";
 
 const jsonSizeLimitedSchema = z
   .unknown()
@@ -79,20 +85,26 @@ export async function createReport(input: unknown) {
     const h = await headers();
     const userAgent = h.get("user-agent");
 
-    const { error } = await ctx.supabase.from("reports").insert({
-      reporter_id: ctx.profile.id,
-      reporter_role: ctx.profile.role,
-      category: parsed.data.category,
-      status: "open",
-      title: parsed.data.title?.trim() ? parsed.data.title.trim() : null,
-      description_markdown: parsed.data.descriptionMarkdown,
-      reported_url: parsed.data.reportedUrl?.trim() ? parsed.data.reportedUrl.trim() : null,
-      user_agent: userAgent,
-      app_area: parsed.data.appArea?.trim() ? parsed.data.appArea.trim() : null,
-      context: parsed.data.context ?? {},
-    });
+    const { data: inserted, error } = await ctx.supabase
+      .from("reports")
+      .insert({
+        reporter_id: ctx.profile.id,
+        reporter_role: ctx.profile.role,
+        category: parsed.data.category,
+        status: "open",
+        title: parsed.data.title?.trim() ? parsed.data.title.trim() : null,
+        description_markdown: parsed.data.descriptionMarkdown,
+        reported_url: parsed.data.reportedUrl?.trim()
+          ? parsed.data.reportedUrl.trim()
+          : null,
+        user_agent: userAgent,
+        app_area: parsed.data.appArea?.trim() ? parsed.data.appArea.trim() : null,
+        context: parsed.data.context ?? {},
+      })
+      .select("id")
+      .single();
 
-    if (error) {
+    if (error || !inserted) {
       safeError("createReport insert:", error);
       return fail("Failed to submit report.");
     }
@@ -100,7 +112,128 @@ export async function createReport(input: unknown) {
     // keep admin list fresh
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");
-    return ok();
+    return ok({ reportId: inserted.id });
+  });
+}
+
+export async function submitReport(formData: FormData) {
+  return runAction("submitReport", async () => {
+    const category = formData.get("category");
+    const title = formData.get("title");
+    const descriptionMarkdown = formData.get("descriptionMarkdown");
+    const reportedUrl = formData.get("reportedUrl");
+    const appArea = formData.get("appArea");
+    const contextRaw = formData.get("context");
+    const file = formData.get("file");
+
+    let context: unknown = {};
+    if (typeof contextRaw === "string" && contextRaw.trim()) {
+      try {
+        context = JSON.parse(contextRaw);
+      } catch {
+        return fail("Invalid report context.");
+      }
+    }
+
+    const parsed = createReportSchema.safeParse({
+      category,
+      title: typeof title === "string" ? title : undefined,
+      descriptionMarkdown,
+      reportedUrl: typeof reportedUrl === "string" ? reportedUrl : undefined,
+      appArea: typeof appArea === "string" ? appArea : undefined,
+      context,
+    });
+
+    if (!parsed.success) {
+      return fail(parsed.error.issues[0]?.message ?? "Invalid report.");
+    }
+
+    const evidenceFile = file instanceof File && file.size > 0 ? file : null;
+    const evidenceError = validateReportEvidenceFile(evidenceFile);
+    if (evidenceError) return fail(evidenceError);
+
+    const ctx = await requireRole(["worker", "employer"]);
+    const rate = await rateLimitReportSubmission(ctx.profile.id);
+    if (!rate.success) return fail(rate.error);
+
+    const h = await headers();
+    const userAgent = h.get("user-agent");
+
+    const { data: inserted, error } = await ctx.supabase
+      .from("reports")
+      .insert({
+        reporter_id: ctx.profile.id,
+        reporter_role: ctx.profile.role,
+        category: parsed.data.category,
+        status: "open",
+        title: parsed.data.title?.trim() ? parsed.data.title.trim() : null,
+        description_markdown: parsed.data.descriptionMarkdown,
+        reported_url: parsed.data.reportedUrl?.trim()
+          ? parsed.data.reportedUrl.trim()
+          : null,
+        user_agent: userAgent,
+        app_area: parsed.data.appArea?.trim() ? parsed.data.appArea.trim() : null,
+        context: parsed.data.context ?? {},
+      })
+      .select("id")
+      .single();
+
+    if (error || !inserted) {
+      safeError("submitReport insert:", error);
+      return fail("Failed to submit report.");
+    }
+
+    if (evidenceFile) {
+      const mimeType = normalizeReportEvidenceMime(evidenceFile.type);
+      if (!mimeType) {
+        await ctx.supabase.from("reports").delete().eq("id", inserted.id);
+        return fail("Only JPG and PNG files are allowed.");
+      }
+
+      const extension =
+        mimeType === "image/png"
+          ? "png"
+          : evidenceFile.name.toLowerCase().endsWith(".jpg") ||
+              evidenceFile.name.toLowerCase().endsWith(".jpeg")
+            ? "jpg"
+            : "jpeg";
+      const storagePath = `${ctx.profile.id}/${inserted.id}.${extension}`;
+      const fileBuffer = await evidenceFile.arrayBuffer();
+
+      const { error: uploadError } = await ctx.supabase.storage
+        .from(REPORT_EVIDENCE_BUCKET)
+        .upload(storagePath, fileBuffer, {
+          contentType: mimeType,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        safeError("submitReport evidence upload:", uploadError);
+        await ctx.supabase.from("reports").delete().eq("id", inserted.id);
+        return fail("Failed to upload screenshot evidence.");
+      }
+
+      const { error: evidenceUpdateError } = await ctx.supabase
+        .from("reports")
+        .update({
+          evidence_storage_path: storagePath,
+          evidence_mime_type: mimeType,
+          evidence_file_size_bytes: evidenceFile.size,
+        })
+        .eq("id", inserted.id)
+        .eq("reporter_id", ctx.profile.id);
+
+      if (evidenceUpdateError) {
+        safeError("submitReport evidence update:", evidenceUpdateError);
+        await ctx.supabase.storage.from(REPORT_EVIDENCE_BUCKET).remove([storagePath]);
+        await ctx.supabase.from("reports").delete().eq("id", inserted.id);
+        return fail("Failed to attach screenshot evidence.");
+      }
+    }
+
+    await cacheDel(CacheKeys.adminReportsList("all"));
+    revalidatePath("/admin/reports");
+    return ok({ reportId: inserted.id });
   });
 }
 
@@ -184,6 +317,9 @@ export type AdminReportDeepDive = {
   adminNotes: string | null;
   resolvedAt: string | null;
   resolvedBy: string | null;
+  evidenceSignedUrl: string | null;
+  evidenceMimeType: string | null;
+  evidenceFileSizeBytes: number | null;
 };
 
 export async function getAdminReportById(
@@ -195,12 +331,23 @@ export async function getAdminReportById(
     const { data, error } = await supabase
       .from("reports")
       .select(
-        "id, created_at, updated_at, status, category, reporter_id, reporter_role, title, description_markdown, reported_url, app_area, user_agent, admin_notes, resolved_at, resolved_by"
+        "id, created_at, updated_at, status, category, reporter_id, reporter_role, title, description_markdown, reported_url, app_area, user_agent, admin_notes, resolved_at, resolved_by, evidence_storage_path, evidence_mime_type, evidence_file_size_bytes"
       )
       .eq("id", id)
       .maybeSingle();
 
     if (error || !data) return null;
+
+    let evidenceSignedUrl: string | null = null;
+    if (data.evidence_storage_path) {
+      const { data: signed, error: signedError } = await supabase.storage
+        .from(REPORT_EVIDENCE_BUCKET)
+        .createSignedUrl(data.evidence_storage_path, 60 * 60);
+
+      if (!signedError && signed?.signedUrl) {
+        evidenceSignedUrl = signed.signedUrl;
+      }
+    }
 
     return {
       id: data.id,
@@ -218,6 +365,9 @@ export async function getAdminReportById(
       adminNotes: data.admin_notes,
       resolvedAt: data.resolved_at,
       resolvedBy: data.resolved_by,
+      evidenceSignedUrl,
+      evidenceMimeType: data.evidence_mime_type,
+      evidenceFileSizeBytes: data.evidence_file_size_bytes,
     };
   } catch (err) {
     safeError("getAdminReportById:", err);

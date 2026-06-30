@@ -4,9 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
-
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"] as const;
+import { validateReportEvidenceFile } from "@/lib/reporting/evidence";
 
 export interface ReportEvidenceDropzoneProps {
   file: File | null;
@@ -31,16 +29,11 @@ export function ReportEvidenceDropzone({
         return;
       }
 
-      if (next.size > MAX_BYTES) {
+      const validationError = validateReportEvidenceFile(next);
+      if (validationError) {
         onFileChange(null);
         setPreviewUrl(null);
-        return { error: "File must be 5 MB or smaller." as const };
-      }
-
-      if (!ALLOWED_TYPES.includes(next.type as (typeof ALLOWED_TYPES)[number])) {
-        onFileChange(null);
-        setPreviewUrl(null);
-        return { error: "Only JPG and PNG files are allowed." as const };
+        return { error: validationError };
       }
 
       onFileChange(next);
@@ -148,11 +141,3 @@ export function ReportEvidenceDropzone({
   );
 }
 
-export function validateReportEvidenceFile(file: File | null): string | null {
-  if (!file) return null;
-  if (file.size > MAX_BYTES) return "File must be 5 MB or smaller.";
-  if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
-    return "Only JPG and PNG files are allowed.";
-  }
-  return null;
-}
