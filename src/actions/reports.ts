@@ -79,25 +79,114 @@ export async function createReport(input: unknown) {
     const h = await headers();
     const userAgent = h.get("user-agent");
 
-    const { error } = await ctx.supabase.from("reports").insert({
-      reporter_id: ctx.profile.id,
-      reporter_role: ctx.profile.role,
-      category: parsed.data.category,
-      status: "open",
-      title: parsed.data.title?.trim() ? parsed.data.title.trim() : null,
-      description_markdown: parsed.data.descriptionMarkdown,
-      reported_url: parsed.data.reportedUrl?.trim() ? parsed.data.reportedUrl.trim() : null,
-      user_agent: userAgent,
-      app_area: parsed.data.appArea?.trim() ? parsed.data.appArea.trim() : null,
-      context: parsed.data.context ?? {},
-    });
+    const { data: inserted, error } = await ctx.supabase
+      .from("reports")
+      .insert({
+        reporter_id: ctx.profile.id,
+        reporter_role: ctx.profile.role,
+        category: parsed.data.category,
+        status: "open",
+        title: parsed.data.title?.trim() ? parsed.data.title.trim() : null,
+        description_markdown: parsed.data.descriptionMarkdown,
+        reported_url: parsed.data.reportedUrl?.trim() ? parsed.data.reportedUrl.trim() : null,
+        user_agent: userAgent,
+        app_area: parsed.data.appArea?.trim() ? parsed.data.appArea.trim() : null,
+        context: parsed.data.context ?? {},
+      })
+      .select("id")
+      .single();
 
-    if (error) {
+    if (error || !inserted) {
       safeError("createReport insert:", error);
       return fail("Failed to submit report.");
     }
 
     // keep admin list fresh
+    await cacheDel(CacheKeys.adminReportsList("all"));
+    revalidatePath("/admin/reports");
+    return ok({ reportId: inserted.id });
+  });
+}
+
+const MAX_REPORT_EVIDENCE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_REPORT_EVIDENCE_TYPES = ["image/jpeg", "image/png"] as const;
+
+export async function uploadReportEvidence(reportId: string, formData: FormData) {
+  return runAction("uploadReportEvidence", async () => {
+    const id = z.string().uuid().safeParse(reportId);
+    if (!id.success) return fail("Invalid report.");
+
+    const ctx = await requireRole(["worker", "employer"]);
+    const rate = await rateLimitReportSubmission(ctx.profile.id);
+    if (!rate.success) return fail(rate.error);
+
+    const file = formData.get("file");
+    if (!(file instanceof File)) return fail("No file provided.");
+
+    if (file.size > MAX_REPORT_EVIDENCE_BYTES) {
+      return fail("File must be 5 MB or smaller.");
+    }
+
+    if (
+      !ALLOWED_REPORT_EVIDENCE_TYPES.includes(
+        file.type as (typeof ALLOWED_REPORT_EVIDENCE_TYPES)[number]
+      )
+    ) {
+      return fail("Use JPEG or PNG files only.");
+    }
+
+    const { data: report } = await ctx.supabase
+      .from("reports")
+      .select("id, reporter_id, evidence_storage_path")
+      .eq("id", id.data)
+      .maybeSingle();
+
+    if (!report || report.reporter_id !== ctx.profile.id) {
+      return fail("Report not found.");
+    }
+
+    if (report.evidence_storage_path) {
+      await ctx.supabase.storage
+        .from("report-evidence")
+        .remove([report.evidence_storage_path]);
+    }
+
+    const extension =
+      file.name.includes(".")
+        ? file.name.split(".").pop()
+        : file.type === "image/png"
+          ? "png"
+          : "jpg";
+    const storagePath = `${ctx.profile.id}/${id.data}/${crypto.randomUUID()}.${extension}`;
+
+    const fileBuffer = await file.arrayBuffer();
+    const { error: uploadError } = await ctx.supabase.storage
+      .from("report-evidence")
+      .upload(storagePath, fileBuffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      safeError("uploadReportEvidence storage:", uploadError);
+      return fail("Failed to upload evidence.");
+    }
+
+    const { error: updateError } = await ctx.supabase
+      .from("reports")
+      .update({
+        evidence_storage_path: storagePath,
+        evidence_mime_type: file.type,
+        evidence_file_size_bytes: file.size,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id.data);
+
+    if (updateError) {
+      safeError("uploadReportEvidence db:", updateError);
+      return fail("Failed to save evidence.");
+    }
+
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");
     return ok();
@@ -184,6 +273,8 @@ export type AdminReportDeepDive = {
   adminNotes: string | null;
   resolvedAt: string | null;
   resolvedBy: string | null;
+  evidenceSignedUrl: string | null;
+  hasEvidence: boolean;
 };
 
 export async function getAdminReportById(
@@ -195,12 +286,20 @@ export async function getAdminReportById(
     const { data, error } = await supabase
       .from("reports")
       .select(
-        "id, created_at, updated_at, status, category, reporter_id, reporter_role, title, description_markdown, reported_url, app_area, user_agent, admin_notes, resolved_at, resolved_by"
+        "id, created_at, updated_at, status, category, reporter_id, reporter_role, title, description_markdown, reported_url, app_area, user_agent, admin_notes, resolved_at, resolved_by, evidence_storage_path, evidence_mime_type"
       )
       .eq("id", id)
       .maybeSingle();
 
     if (error || !data) return null;
+
+    let evidenceSignedUrl: string | null = null;
+    if (data.evidence_storage_path) {
+      const { data: signed } = await supabase.storage
+        .from("report-evidence")
+        .createSignedUrl(data.evidence_storage_path, 60 * 15);
+      evidenceSignedUrl = signed?.signedUrl ?? null;
+    }
 
     return {
       id: data.id,
@@ -218,6 +317,8 @@ export async function getAdminReportById(
       adminNotes: data.admin_notes,
       resolvedAt: data.resolved_at,
       resolvedBy: data.resolved_by,
+      evidenceSignedUrl,
+      hasEvidence: Boolean(data.evidence_storage_path),
     };
   } catch (err) {
     safeError("getAdminReportById:", err);

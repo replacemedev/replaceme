@@ -14,10 +14,16 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/lib/validations/auth";
+import {
+  TurnstileWidget,
+  isTurnstileClientEnabled,
+} from "@/components/auth/TurnstileWidget";
 
 export function ForgotPasswordForm() {
   const [emailSent, setEmailSent] = useState(false);
   const [sentToEmail, setSentToEmail] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRequired = isTurnstileClientEnabled();
 
   const {
     register,
@@ -29,7 +35,15 @@ export function ForgotPasswordForm() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
-    const result = await sendPasswordResetLink(data.email);
+    if (turnstileRequired && !turnstileToken) {
+      toast.error("Please complete the security check.");
+      return;
+    }
+
+    const result = await sendPasswordResetLink({
+      ...data,
+      turnstileToken: turnstileToken ?? undefined,
+    });
 
     if (!result.success) {
       toast.error(result.error ?? "Failed to send reset link.");
@@ -102,9 +116,14 @@ export function ForgotPasswordForm() {
       </p>
 
       <div className="space-y-3 pt-4">
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken(null)}
+          onError={() => setTurnstileToken(null)}
+        />
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || (turnstileRequired && !turnstileToken)}
           className="h-12 w-full text-base"
         >
           {isSubmitting ? (

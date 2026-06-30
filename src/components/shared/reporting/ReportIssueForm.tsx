@@ -2,8 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createReport } from "@/actions/reports";
+import { createReport, uploadReportEvidence } from "@/actions/reports";
 import { REPORT_CATEGORIES } from "@/lib/reporting/constants";
+import {
+  ReportEvidenceDropzone,
+  validateReportEvidenceFile,
+} from "@/components/shared/reporting/ReportEvidenceDropzone";
 
 const CATEGORY_LABELS: Record<(typeof REPORT_CATEGORIES)[number], string> = {
   bug: "Bug",
@@ -27,6 +31,7 @@ export function ReportIssueForm({
     useState<(typeof REPORT_CATEGORIES)[number]>("bug");
   const [title, setTitle] = useState("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
 
   const computedUrl = useMemo(() => {
     if (defaultReportedUrl) return defaultReportedUrl;
@@ -46,6 +51,12 @@ export function ReportIssueForm({
   }, []);
 
   const submit = () => {
+    const evidenceError = validateReportEvidenceFile(evidenceFile);
+    if (evidenceError) {
+      toast.error(evidenceError);
+      return;
+    }
+
     startTransition(async () => {
       const result = await createReport({
         category,
@@ -61,9 +72,22 @@ export function ReportIssueForm({
         return;
       }
 
+      const reportId = result.data?.reportId;
+      if (evidenceFile && reportId) {
+        const formData = new FormData();
+        formData.append("file", evidenceFile);
+        const uploadResult = await uploadReportEvidence(reportId, formData);
+        if (!uploadResult.success) {
+          toast.warning(
+            "Report submitted, but the screenshot could not be uploaded. You can reply with a link in a follow-up."
+          );
+        }
+      }
+
       toast.success("Report submitted. Thanks for helping us improve ReplaceMe.");
       setTitle("");
       setDescriptionMarkdown("");
+      setEvidenceFile(null);
       onSubmitted?.();
     });
   };
@@ -108,7 +132,7 @@ export function ReportIssueForm({
           rows={7}
           className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           placeholder={
-            "Include:\n- Steps to reproduce\n- Expected vs actual behavior\n- Screenshots/recordings (links)\n- Anything you think we should know"
+            "Include:\n- Steps to reproduce\n- Expected vs actual behavior\n- Anything you think we should know"
           }
           disabled={isPending}
         />
@@ -116,6 +140,12 @@ export function ReportIssueForm({
           We automatically attach the page URL and your account role.
         </p>
       </label>
+
+      <ReportEvidenceDropzone
+        file={evidenceFile}
+        onFileChange={setEvidenceFile}
+        disabled={isPending}
+      />
 
       <button
         type="button"
@@ -128,4 +158,3 @@ export function ReportIssueForm({
     </div>
   );
 }
-

@@ -16,6 +16,7 @@ import {
   WORKER_LOCATION_OPTIONS,
 } from "@/config/onboarding";
 import { COMPENSATION_CURRENCIES } from "@/lib/format/currency";
+import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 
 const CONTENT_STEPS = 6;
 const AVAILABILITY_OPTIONS = [
@@ -48,6 +49,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   );
   const [firstName, setFirstName] = useState(draft.firstName);
   const [lastName, setLastName] = useState(draft.lastName);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
   const [location, setLocation] = useState(
     draft.location || WORKER_LOCATION_OPTIONS[0]
   );
@@ -147,6 +149,15 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
+        <ProfileAvatarUpload
+          avatarUrl={avatarUrl}
+          displayName={
+            [firstName, lastName].filter(Boolean).join(" ") || "Your profile"
+          }
+          size="md"
+          onAvatarChange={setAvatarUrl}
+          helperText="Optional — add a photo now or skip and upload later from your profile."
+        />
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Professional title
           <input

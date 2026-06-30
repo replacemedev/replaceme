@@ -6,7 +6,7 @@ import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { RecoveryHashHandler } from "@/components/auth/RecoveryHashHandler";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
-import { getAuthScreenContent } from "@/lib/content/auth-screen";
+import { getAuthStaticContent } from "@/lib/content/auth-static";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -26,11 +26,7 @@ export default async function UpdatePasswordPage() {
     redirect("/signin?view=forgot_password");
   }
 
-  const content = await getAuthScreenContent("auth-update-password");
-  const headline = content.headline?.trim() || "Set a new password";
-  const description =
-    content.description?.trim() ||
-    "Choose a strong password for your account.";
+  const content = getAuthStaticContent("updatePassword");
 
   return (
     <AuthPageShell
@@ -41,8 +37,8 @@ export default async function UpdatePasswordPage() {
       <AuthFlashToast />
 
       <header className="mb-6 space-y-2">
-        <h1 className={AUTH_TITLE}>{headline}</h1>
-        <p className={AUTH_SUBTITLE}>{description}</p>
+        <h1 className={AUTH_TITLE}>{content.headline}</h1>
+        <p className={AUTH_SUBTITLE}>{content.description}</p>
       </header>
 
       <AuthFormCard>

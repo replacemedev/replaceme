@@ -19,11 +19,15 @@ import {
   invalidateEmployerCachesForWorker,
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
+import { rateLimitAvatarUpload } from "@/lib/server/rate-limit";
 
 function emptyToNull(value: string | undefined) {
   if (value === undefined) return undefined;
   return value.trim() === "" ? null : value;
 }
+
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const ALLOWED_AVATAR_MIME_TYPES = ["image/jpeg", "image/png"] as const;
 
 export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   const ctx = await requireWorker();
@@ -51,6 +55,7 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   }
   if (data.resumeUrl !== undefined) update.resume_url = emptyToNull(data.resumeUrl);
   if (data.cvUrl !== undefined) update.cv_url = emptyToNull(data.cvUrl);
+  if (data.avatarUrl !== undefined) update.avatar_url = emptyToNull(data.avatarUrl);
   if (data.birthYear !== undefined) update.birth_year = data.birthYear;
 
   const { error } = await ctx.supabase
@@ -70,6 +75,100 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
 /** @deprecated Use patchWorkerProfile from inline profile editor */
 export async function updateWorkerProfile(payload: PatchWorkerProfileInput) {
   return patchWorkerProfile(payload);
+}
+
+export async function uploadWorkerAvatar(formData: FormData) {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const rate = await rateLimitAvatarUpload(ctx.profile.id);
+  if (!rate.success) return { error: rate.error };
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) return { error: "No file provided." };
+
+  if (file.size > MAX_AVATAR_BYTES) {
+    return { error: "File must be 2 MB or smaller." };
+  }
+
+  if (!ALLOWED_AVATAR_MIME_TYPES.includes(file.type as (typeof ALLOWED_AVATAR_MIME_TYPES)[number])) {
+    return { error: "Use JPEG or PNG files only." };
+  }
+
+  const extension =
+    file.name.includes(".") ? file.name.split(".").pop() : file.type === "image/png" ? "png" : "jpg";
+  const storagePath = `${ctx.profile.id}/avatar.${extension}`;
+
+  const fileBuffer = await file.arrayBuffer();
+  const { error: uploadError } = await ctx.supabase.storage
+    .from("profile-avatars")
+    .upload(storagePath, fileBuffer, {
+      contentType: file.type,
+      upsert: true,
+    });
+
+  if (uploadError) return { error: "Failed to upload avatar." };
+
+  const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-avatars/${storagePath}`;
+
+  const { error: updateError } = await ctx.supabase
+    .from("profiles")
+    .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
+    .eq("id", ctx.profile.id);
+
+  if (updateError) return { error: "Failed to save avatar." };
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  await emitWorkerAuditLog(ctx.profile.id, "worker.profile_updated");
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/onboarding");
+  revalidatePath("/worker/dashboard");
+
+  return { success: true, avatarUrl: publicUrl };
+}
+
+export async function removeWorkerAvatar() {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const rate = await rateLimitAvatarUpload(ctx.profile.id);
+  if (!rate.success) return { error: rate.error };
+
+  const { data: row } = await ctx.supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", ctx.profile.id)
+    .single();
+
+  const url = row?.avatar_url ?? null;
+  if (!url) return { success: true };
+
+  const prefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-avatars/`;
+  if (!url.startsWith(prefix)) {
+    // Only allow removal for avatars we control in our bucket.
+    return { error: "Avatar cannot be removed." };
+  }
+
+  const storagePath = url.slice(prefix.length);
+
+  await ctx.supabase.storage.from("profile-avatars").remove([storagePath]);
+
+  const { error: updateError } = await ctx.supabase
+    .from("profiles")
+    .update({ avatar_url: null, updated_at: new Date().toISOString() })
+    .eq("id", ctx.profile.id);
+
+  if (updateError) return { error: "Failed to remove avatar." };
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  await emitWorkerAuditLog(ctx.profile.id, "worker.profile_updated");
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/onboarding");
+  revalidatePath("/worker/dashboard");
+
+  return { success: true };
 }
 
 export async function updateWorkerSettings(payload: unknown) {

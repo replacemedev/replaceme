@@ -20,6 +20,10 @@ import {
   type WorkerSignUpFormValues,
 } from "@/lib/validations/auth";
 import Link from "next/link";
+import {
+  TurnstileWidget,
+  isTurnstileClientEnabled,
+} from "@/components/auth/TurnstileWidget";
 
 function formatSignUpError(error: unknown): string {
   if (typeof error === "string" && error.trim()) return error;
@@ -42,6 +46,7 @@ const WORKER_DEFAULTS: WorkerSignUpFormValues = {
   password: "",
   confirmPassword: "",
   terms: false,
+  turnstileToken: undefined,
 };
 
 const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
@@ -52,6 +57,8 @@ const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
 export function SignUpForm() {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<SignUpRole>("worker");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRequired = isTurnstileClientEnabled();
 
   const schema = useMemo(
     () =>
@@ -84,8 +91,16 @@ export function SignUpForm() {
   };
 
   const onSubmit = async (data: SignUpValues) => {
+    if (turnstileRequired && !turnstileToken) {
+      toast.error("Please complete the security check.");
+      return;
+    }
+
     try {
-      const result = await signUp(data);
+      const result = await signUp({
+        ...data,
+        turnstileToken: turnstileToken ?? undefined,
+      });
 
       if (!result.success) {
         const errMsg = result.error;
@@ -277,11 +292,18 @@ export function SignUpForm() {
           />
         </FormField>
 
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken(null)}
+          onError={() => setTurnstileToken(null)}
+          className="pt-2"
+        />
+
         <div className="pt-3">
           <Button
             type="submit"
             variant="success"
-            disabled={isSubmitting}
+            disabled={isSubmitting || (turnstileRequired && !turnstileToken)}
             className="h-12 w-full text-base"
           >
             {isSubmitting ? (

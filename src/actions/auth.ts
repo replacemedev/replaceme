@@ -19,6 +19,7 @@ import { isAppRole, profileIdFilter } from "@/lib/auth/role";
 import {
   forgotPasswordSchema,
   updatePasswordSchema,
+  type ForgotPasswordFormValues,
 } from "@/lib/validations/auth";
 import Stripe from "stripe";
 import { assertRateLimit } from "@/lib/server/rate-limit";
@@ -26,6 +27,7 @@ import {
   extractErrorMessage,
   mapSignupDatabaseError,
 } from "@/lib/auth/error-message";
+import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -152,6 +154,11 @@ export async function signUp(formData: SignUpFormValues) {
     }
 
     const data = parsed.data;
+
+    const turnstile = await verifyTurnstileToken(data.turnstileToken);
+    if (!turnstile.success) {
+      return { success: false, error: turnstile.error };
+    }
 
     // Split fullName into first and last name
     const nameParts = data.fullName.trim().split(" ");
@@ -297,7 +304,12 @@ export async function signIn(formData: LoginCredentials) {
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const { email, password } = parsed.data;
+    const { email, password, turnstileToken } = parsed.data;
+
+    const turnstile = await verifyTurnstileToken(turnstileToken);
+    if (!turnstile.success) {
+      return { success: false, error: turnstile.error };
+    }
 
     const emailToAuth = await resolveEmailForLogin(email);
     if (!emailToAuth) {
@@ -392,7 +404,9 @@ export async function logOut() {
   redirect("/signin");
 }
 
-export async function sendPasswordResetLink(email: string) {
+export async function sendPasswordResetLink(
+  input: ForgotPasswordFormValues | string
+) {
   try {
     safeLog("[Auth] Password reset link requested");
 
@@ -404,9 +418,16 @@ export async function sendPasswordResetLink(email: string) {
       return { success: false, error: rateLimit.error };
     }
 
-    const parsed = forgotPasswordSchema.safeParse({ email });
+    const parsed = forgotPasswordSchema.safeParse(
+      typeof input === "string" ? { email: input } : input
+    );
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
+    }
+
+    const turnstile = await verifyTurnstileToken(parsed.data.turnstileToken);
+    if (!turnstile.success) {
+      return { success: false, error: turnstile.error };
     }
 
     const normalizedEmail = parsed.data.email.trim().toLowerCase();

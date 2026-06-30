@@ -30,7 +30,10 @@ const passwordMatchRefine = {
 };
 
 export const workerSignUpSchema = z
-  .object({ ...baseAuthSchema })
+  .object({
+    ...baseAuthSchema,
+    turnstileToken: z.string().optional(),
+  })
   .refine(passwordMatchRefine.refine, {
     message: passwordMatchRefine.message,
     path: [...passwordMatchRefine.path],
@@ -47,6 +50,7 @@ export const forgotPasswordSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Please enter a valid email address"),
+  turnstileToken: z.string().optional(),
 });
 
 export const updatePasswordSchema = z
@@ -67,6 +71,7 @@ export const loginCredentialsSchema = z
     email: z.string().min(3, "Please enter a valid email or username"),
     password: z.string().min(1, "Password is required"),
     rememberMe: z.boolean().optional(),
+    turnstileToken: z.string().optional(),
   })
   .strict();
 

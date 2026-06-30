@@ -104,6 +104,7 @@ export async function assertRateLimit(
 const applyLimiter = createLimiter("job-apply", 10, "1 h");
 const messageLimiter = createLimiter("messaging", 60, "1 h");
 const reportLimiter = createLimiter("reports", 6, "1 h");
+const avatarLimiter = createLimiter("avatar", 10, "15 m");
 
 export async function rateLimitJobApplication(
   workerId: string
@@ -164,6 +165,25 @@ export async function rateLimitReportSubmission(
   return {
     success: false,
     error: `Report limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before submitting another.`,
+    retryAfterSeconds,
+  };
+}
+
+export async function rateLimitAvatarUpload(
+  profileId: string
+): Promise<RateLimitResult> {
+  if (!isRedisConfigured() || !avatarLimiter) {
+    return { success: true };
+  }
+
+  const { success, reset } = await avatarLimiter.limit(`avatar:${profileId}`);
+  if (success) return { success: true };
+
+  const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
+
+  return {
+    success: false,
+    error: `Upload limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before trying again.`,
     retryAfterSeconds,
   };
 }

@@ -32,6 +32,7 @@ export type WorkerOnboardingDraft = {
   professionalTitle: string;
   firstName: string;
   lastName: string;
+  avatarUrl: string | null;
   location: string;
   availability: string;
   isRemote: boolean;
@@ -141,7 +142,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, last_name, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_year"
+        "professional_title, first_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_year"
       )
       .eq("id", user.id)
       .single();
@@ -152,6 +153,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       professionalTitle: profile.professional_title ?? "",
       firstName: profile.first_name ?? "",
       lastName: profile.last_name ?? "",
+      avatarUrl: profile.avatar_url ?? null,
       location: profile.location ?? "",
       availability: profile.availability ?? "Full-time",
       isRemote: profile.is_remote ?? false,

@@ -15,6 +15,10 @@ import {
 } from "@/lib/validations/auth";
 import Link from "next/link";
 import { toast } from "sonner";
+import {
+  TurnstileWidget,
+  isTurnstileClientEnabled,
+} from "@/components/auth/TurnstileWidget";
 
 interface LoginFormProps {
   forgotPasswordHref: string;
@@ -22,6 +26,8 @@ interface LoginFormProps {
 
 export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRequired = isTurnstileClientEnabled();
   const {
     register,
     handleSubmit,
@@ -45,10 +51,18 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
   }, [setValue]);
 
   const onSubmit = async (data: LoginCredentials) => {
+    if (turnstileRequired && !turnstileToken) {
+      toast.error("Please complete the security check.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const result = await signIn(data);
+      const result = await signIn({
+        ...data,
+        turnstileToken: turnstileToken ?? undefined,
+      });
 
       if (result && !result.success) {
         toast.error(result.error ?? "Invalid email, username, or password. Please try again.");
@@ -124,8 +138,17 @@ export function LoginForm({ forgotPasswordHref }: LoginFormProps) {
         </Link>
       </div>
 
-      <div className="pt-4">
-        <Button type="submit" disabled={isLoading} className="w-full text-base h-12">
+      <div className="pt-4 space-y-4">
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpire={() => setTurnstileToken(null)}
+          onError={() => setTurnstileToken(null)}
+        />
+        <Button
+          type="submit"
+          disabled={isLoading || (turnstileRequired && !turnstileToken)}
+          className="w-full text-base h-12"
+        >
           {isLoading ? "Signing in..." : "Sign In"}
         </Button>
       </div>

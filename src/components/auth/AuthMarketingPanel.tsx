@@ -1,5 +1,3 @@
-import { EmptyState } from "@/components/shared/EmptyState";
-import { FileText } from "lucide-react";
 import { LoginTestimonial } from "./LoginTestimonial";
 import type { AuthScreenConfig } from "@/types/page-content";
 
@@ -27,25 +25,15 @@ export function AuthMarketingPanel({
     );
   }
 
-  if (!content.headline?.trim() && !content.description?.trim()) {
-    return (
-      <EmptyState
-        icon={<FileText className="h-5 w-5" aria-hidden />}
-        title="Content not configured"
-        description="An administrator can publish marketing copy for this screen in the Admin portal."
-      />
-    );
-  }
-
   return (
-    <div className="max-w-md text-center lg:text-left space-y-3">
+    <div className="max-w-md text-center lg:text-left space-y-3 px-2">
       {content.headline ? (
-        <p className="text-lg font-bold text-slate-900 leading-snug">
+        <p className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
           {content.headline}
         </p>
       ) : null}
       {content.description ? (
-        <p className="text-sm text-slate-600 leading-relaxed">
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
           {content.description}
         </p>
       ) : null}

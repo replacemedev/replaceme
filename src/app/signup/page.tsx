@@ -4,30 +4,33 @@ import { SignUpForm } from "@/components/auth/SignUpForm";
 import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
 import { AuthFooter } from "@/components/auth/AuthFooter";
 import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
-import { getAuthScreenContent } from "@/lib/content/auth-screen";
+import { AUTH_STATIC_COPY } from "@/lib/content/auth-static";
 
 export const metadata = {
   title: "Sign Up | ReplaceMe",
   description: "Create your ReplaceMe account.",
 };
 
-export default async function SignUpPage() {
-  const content = await getAuthScreenContent("auth-signup");
-
-  const headline = content.headline?.trim() || "Create your account";
-  const description =
-    content.description?.trim() ||
-    "Join the premier professional marketplace.";
+export default function SignUpPage() {
+  const content = AUTH_STATIC_COPY.signup;
 
   return (
     <AuthPageShell
-      marketing={<AuthMarketingPanel content={content} variant="brand" />}
+      marketing={
+        <AuthMarketingPanel
+          content={{
+            headline: content.headlineMarketing,
+            description: content.descriptionMarketing,
+          }}
+          variant="brand"
+        />
+      }
       marketingPosition="left"
       footer={<AuthFooter />}
     >
       <header className="mb-6 space-y-2 text-center lg:text-left">
-        <h1 className={AUTH_TITLE}>{headline}</h1>
-        <p className={AUTH_SUBTITLE}>{description}</p>
+        <h1 className={AUTH_TITLE}>{content.headline}</h1>
+        <p className={AUTH_SUBTITLE}>{content.description}</p>
       </header>
 
       <AuthFormCard>
