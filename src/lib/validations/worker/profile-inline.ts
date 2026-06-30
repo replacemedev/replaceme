@@ -13,7 +13,6 @@ export const patchWorkerProfileSchema = z
     portfolioUrl: optionalUrl,
     resumeUrl: optionalUrl,
     cvUrl: optionalUrl,
-    avatarUrl: z.union([z.literal(""), z.string().url()]),
     birthYear: z.number().int().min(1940).max(currentYear).nullable(),
   })
   .partial()

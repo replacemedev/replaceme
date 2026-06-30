@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
-import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { formatMoney } from "@/lib/format/currency";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -403,23 +402,22 @@ export function WorkerProfileEditor({
         {/* Sidebar */}
         <div className="lg:col-span-1 order-1 lg:order-2">
           <div className="relative -mt-20 lg:-mt-32 bg-white rounded-3xl border border-slate-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-6 text-center space-y-6 z-10">
-            {isOwner ? (
-              <ProfileAvatarUpload
-                avatarUrl={profile.avatar_url}
-                displayName={fullName}
-                size="lg"
-                onAvatarChange={(url) =>
-                  setProfile((prev) => ({ ...prev, avatar_url: url }))
-                }
-              />
-            ) : (
-              <ProfileAvatarUpload
-                avatarUrl={profile.avatar_url}
-                displayName={fullName}
-                editable={false}
-                size="lg"
-              />
-            )}
+            <div className="relative mx-auto w-32 h-32 rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden flex items-center justify-center">
+              {profile.avatar_url ? (
+                <Image
+                  src={profile.avatar_url}
+                  alt={fullName}
+                  fill
+                  className="object-cover"
+                  sizes="128px"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-bold text-3xl">
+                  {initials}
+                </div>
+              )}
+            </div>
 
             <div className="space-y-2 flex flex-col items-center">
               <h3 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-1.5 flex-wrap">

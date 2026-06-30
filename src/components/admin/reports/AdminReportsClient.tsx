@@ -249,27 +249,6 @@ export function AdminReportsClient({
               </pre>
             </div>
 
-            {selected.hasEvidence && selected.evidenceSignedUrl ? (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Evidence screenshot
-                </p>
-                <a
-                  href={selected.evidenceSignedUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={selected.evidenceSignedUrl}
-                    alt="Report evidence"
-                    className="max-h-80 w-full object-contain p-2"
-                  />
-                </a>
-              </div>
-            ) : null}
-
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Admin notes

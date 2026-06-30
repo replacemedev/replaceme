@@ -6,7 +6,7 @@ import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
-import { getAuthStaticContent } from "@/lib/content/auth-static";
+import { getAuthScreenContent } from "@/lib/content/auth-screen";
 
 export const metadata = {
   title: "Sign In | ReplaceMe",
@@ -26,10 +26,18 @@ export default async function SignInPage({
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
-  const content =
-    view === "forgot_password"
-      ? getAuthStaticContent("forgotPassword")
-      : getAuthStaticContent("login");
+  const contentSlug =
+    view === "forgot_password" ? "auth-forgot-password" : "auth-login";
+  const content = await getAuthScreenContent(contentSlug);
+
+  const headline =
+    content.headline?.trim() ||
+    (view === "login" ? "Sign in" : "Reset password");
+  const description =
+    content.description?.trim() ||
+    (view === "login"
+      ? "Access your professional dashboard."
+      : "Enter your email and we'll send you a secure reset link.");
 
   return (
     <AuthPageShell
@@ -40,8 +48,8 @@ export default async function SignInPage({
       <AuthFlashToast />
 
       <header className="mb-6 space-y-2">
-        <h1 className={AUTH_TITLE}>{content.headline}</h1>
-        <p className={AUTH_SUBTITLE}>{content.description}</p>
+        <h1 className={AUTH_TITLE}>{headline}</h1>
+        <p className={AUTH_SUBTITLE}>{description}</p>
       </header>
 
       <AuthFormCard>
