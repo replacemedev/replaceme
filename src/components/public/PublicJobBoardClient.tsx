@@ -1,8 +1,8 @@
 "use client";
 
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
-import Image from "next/image";
 import Link from "next/link";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import type { PublicJobListing } from "@/types/public-growth";
 
 interface PublicJobBoardClientProps {
@@ -48,18 +48,14 @@ export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
                 className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-emerald-200 hover:shadow-md transition-all"
               >
                 <div className="flex items-start gap-3">
-                  <div className="relative w-10 h-10 rounded-lg bg-[#ebfdf2] text-[#006e2f] flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
-                    {job.companyLogoUrl ? (
-                      <Image
-                        src={job.companyLogoUrl}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="40px"
-                      />
-                    ) : (
-                      job.companyName.charAt(0)
-                    )}
+                  <div className="relative w-10 h-10 shrink-0 overflow-hidden rounded-lg">
+                    <LogoImage
+                      src={job.companyLogoUrl}
+                      alt={`${job.companyName} logo`}
+                      label={job.companyName}
+                      sizePx={40}
+                      rounded="lg"
+                    />
                   </div>
                   <div className="min-w-0">
                     <h2 className="text-base font-bold text-slate-900 truncate">

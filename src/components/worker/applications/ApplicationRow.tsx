@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import {
   WorkerApplication,
   formatHourlyRate,
@@ -19,10 +19,6 @@ const badgeStyles = {
   hired: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/20",
   default: "bg-slate-100 text-slate-600 border-slate-200",
 };
-
-function companyInitial(name: string) {
-  return name.trim().charAt(0).toUpperCase() || "?";
-}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -46,26 +42,20 @@ function avatarColor(name: string) {
 
 export function ApplicationRow({ application }: ApplicationRowProps) {
   const { label, variant } = getStatusBadge(application.status);
-  const initial = companyInitial(application.companyName);
   const colorClass = avatarColor(application.companyName);
 
   return (
     <article className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl shadow-xs transition-all duration-200 hover:border-emerald-200 hover:shadow-md">
       <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
-        <div
-          className={`relative shrink-0 w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm overflow-hidden ${colorClass}`}
-        >
-          {application.companyLogoUrl ? (
-            <Image
-              src={application.companyLogoUrl}
-              alt={`${application.companyName} logo`}
-              fill
-              className="object-cover"
-              sizes="44px"
-            />
-          ) : (
-            <span>{initial}</span>
-          )}
+        <div className="relative shrink-0 w-11 h-11 overflow-hidden rounded-xl">
+          <LogoImage
+            src={application.companyLogoUrl}
+            alt={`${application.companyName} logo`}
+            label={application.companyName}
+            sizePx={44}
+            rounded="xl"
+            colorClass={`flex items-center justify-center font-bold text-sm ${colorClass}`}
+          />
         </div>
 
         <div className="min-w-0 flex-1">

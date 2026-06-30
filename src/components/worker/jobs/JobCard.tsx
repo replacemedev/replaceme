@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
 import { Bookmark, Clock, Loader2, Sparkles } from "lucide-react";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import { toggleSavedJob } from "@/actions/worker/job-search";
 import {
   JobSearchResult,
@@ -25,17 +25,12 @@ const avatarColors = [
   "bg-amber-50 text-amber-700",
 ];
 
-function companyInitial(name: string) {
-  return name.trim().charAt(0).toUpperCase() || "?";
-}
-
 function avatarColor(name: string) {
   return avatarColors[name.charCodeAt(0) % avatarColors.length];
 }
 
 export function JobCard({ job, onSavedChange }: JobCardProps) {
   const [isPending, startTransition] = useTransition();
-  const initial = companyInitial(job.companyName);
   const colorClass = avatarColor(job.companyName);
   const locationLabel = job.location.toLowerCase().includes("remote")
     ? `REMOTE (${job.location.replace(/remote/i, "").trim() || "PH"})`.toUpperCase()
@@ -57,20 +52,15 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
     <article className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl p-5 shadow-xs transition-all duration-200 hover:border-emerald-200 hover:shadow-md">
       <header className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-start gap-3 min-w-0">
-          <div
-            className={`relative shrink-0 w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm overflow-hidden ${colorClass}`}
-          >
-            {job.companyLogoUrl ? (
-              <Image
-                src={job.companyLogoUrl}
-                alt={`${job.companyName} logo`}
-                fill
-                className="object-cover"
-                sizes="44px"
-              />
-            ) : (
-              <span>{initial}</span>
-            )}
+          <div className="relative shrink-0 w-11 h-11 rounded-xl overflow-hidden">
+            <LogoImage
+              src={job.companyLogoUrl}
+              alt={`${job.companyName} logo`}
+              label={job.companyName}
+              sizePx={44}
+              rounded="xl"
+              colorClass={`flex items-center justify-center font-bold text-sm ${colorClass}`}
+            />
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-tight line-clamp-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { ExternalLink, MapPin, MessageSquare, Phone } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
@@ -113,19 +113,13 @@ export function EmployerCandidateProfile({
           >
             <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2]">
-                {candidate.avatarUrl ? (
-                  <Image
-                    src={candidate.avatarUrl}
-                    alt={candidate.name}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-lg font-bold text-[#006e2f]">
-                    {initials}
-                  </div>
-                )}
+                <AvatarImage
+                  src={candidate.avatarUrl}
+                  alt={candidate.name}
+                  initials={initials}
+                  size="sm"
+                  rounded="2xl"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-extrabold text-slate-900 inline-flex items-center gap-2 flex-wrap">

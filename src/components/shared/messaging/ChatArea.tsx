@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useState, useMemo } from "react";
-import Image from "next/image";
 import { Pin, Tag, Archive, MoreVertical } from "lucide-react";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInputArea } from "./ChatInputArea";
@@ -143,18 +143,13 @@ export function ChatArea({
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
           <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-          <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
-            {oppositeParty.avatarUrl ? (
-              <Image
-                src={oppositeParty.avatarUrl}
-                alt={oppositeParty.name}
-                fill
-                className="rounded-full object-cover"
-                sizes="40px"
-              />
-            ) : (
-              <span>{initials}</span>
-            )}
+          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
+            <AvatarImage
+              src={oppositeParty.avatarUrl}
+              alt={oppositeParty.name}
+              initials={initials}
+              size="xs"
+            />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">

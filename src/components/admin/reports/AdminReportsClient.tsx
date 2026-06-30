@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { ImageIcon, Paperclip } from "lucide-react";
+import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
 import { toast } from "sonner";
 import {
   getAdminReportById,
@@ -288,13 +289,14 @@ export function AdminReportsClient({
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                   {selected.evidenceSignedUrl ? (
-                    <div className="relative aspect-video w-full max-h-80">
-                      <img
-                        src={selected.evidenceSignedUrl}
-                        alt="Report screenshot evidence"
-                        className="h-full w-full max-h-80 object-contain p-2"
-                      />
-                    </div>
+                    <OptimizedImage
+                      src={selected.evidenceSignedUrl}
+                      alt="Report screenshot evidence"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 640px"
+                      className="object-contain p-2"
+                      containerClassName="relative aspect-video w-full max-h-80"
+                    />
                   ) : (
                     <p className="px-4 py-6 text-center text-sm font-medium text-amber-700">
                       Attachment is on file but the preview could not be loaded.

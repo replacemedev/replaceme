@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { usePathname } from "next/navigation";
 import { ChevronDown, LogOut, Flag } from "lucide-react";
 import { logOut } from "@/actions/auth";
@@ -74,20 +74,13 @@ export function WorkerDropdown({
         aria-expanded={dropdownOpen}
         aria-label="User menu"
       >
-        <div className="relative w-8 h-8 rounded-full shrink-0 border border-slate-100 bg-slate-50 overflow-hidden flex items-center justify-center">
-          {profile?.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={`${displayName}'s Avatar`}
-              fill
-              className="rounded-full object-cover"
-              sizes="32px"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-bold text-xs rounded-full">
-              {initials}
-            </div>
-          )}
+        <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
+          <AvatarImage
+            src={profile?.avatar_url}
+            alt={`${displayName}'s Avatar`}
+            initials={initials}
+            size="xs"
+          />
         </div>
 
         <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-700 select-none">

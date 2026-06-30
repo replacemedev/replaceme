@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Image from "next/image";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { toast } from "sonner";
 import {
   removeWorkerAvatar,
@@ -18,12 +18,9 @@ import {
 
 type AvatarSize = "md" | "lg";
 
-const SIZE_CLASSES: Record<
-  AvatarSize,
-  { ring: string; text: string; icon: number }
-> = {
-  md: { ring: "w-24 h-24 sm:w-28 sm:h-28", text: "text-2xl", icon: 18 },
-  lg: { ring: "w-32 h-32 sm:w-36 sm:h-36", text: "text-3xl", icon: 20 },
+const SIZE_CLASSES: Record<AvatarSize, { ring: string; avatar: "md" | "lg" }> = {
+  md: { ring: "w-24 h-24 sm:w-28 sm:h-28", avatar: "md" },
+  lg: { ring: "w-32 h-32 sm:w-36 sm:h-36", avatar: "lg" },
 };
 
 function initialsFromName(displayName: string): string {
@@ -62,6 +59,7 @@ export function ProfileAvatarUpload({
   const busy = isUploading || isRemoving;
   const initials = initialsFromName(displayName);
   const sizeClass = SIZE_CLASSES[size];
+  const iconSize = size === "lg" ? 20 : 18;
 
   const handleFile = async (file: File) => {
     if (!editable || busy) return;
@@ -129,24 +127,15 @@ export function ProfileAvatarUpload({
   if (!editable) {
     return (
       <div
-        className={`relative mx-auto ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden flex items-center justify-center`}
+        className={`relative mx-auto ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden`}
       >
-        {previewUrl ? (
-          <Image
-            src={previewUrl}
-            alt={displayName}
-            fill
-            className="object-cover"
-            sizes="144px"
-            priority
-          />
-        ) : (
-          <div
-            className={`w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-bold ${sizeClass.text}`}
-          >
-            {initials}
-          </div>
-        )}
+        <AvatarImage
+          src={previewUrl}
+          alt={displayName}
+          initials={initials}
+          size={sizeClass.avatar}
+          priority
+        />
       </div>
     );
   }
@@ -159,27 +148,18 @@ export function ProfileAvatarUpload({
           onClick={() => !busy && inputRef.current?.click()}
           disabled={busy}
           aria-label={previewUrl ? "Change profile photo" : "Upload profile photo"}
-          className={`relative ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden flex items-center justify-center transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100`}
+          className={`relative ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100`}
         >
-          {previewUrl ? (
-            <Image
-              src={previewUrl}
-              alt={displayName}
-              fill
-              className="object-cover"
-              sizes="144px"
-              priority
-            />
-          ) : (
-            <div
-              className={`w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-bold ${sizeClass.text}`}
-            >
-              {initials}
-            </div>
-          )}
+          <AvatarImage
+            src={previewUrl}
+            alt={displayName}
+            initials={initials}
+            size={sizeClass.avatar}
+            priority
+          />
 
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-slate-900/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-            <Camera size={sizeClass.icon} strokeWidth={2.25} />
+            <Camera size={iconSize} strokeWidth={2.25} />
             <span className="text-[10px] font-bold uppercase tracking-wide">
               {previewUrl ? "Change" : "Upload"}
             </span>

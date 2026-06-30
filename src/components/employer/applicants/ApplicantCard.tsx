@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { MessageSquare, Trash2, Eye, Lock } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
@@ -51,14 +51,14 @@ export function ApplicantCard({
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-12 h-12 rounded-2xl bg-emerald-50 border border-slate-100 shrink-0 overflow-hidden">
+            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
               {applicant.avatarUrl && !isPreview ? (
-                <Image
+                <AvatarImage
                   src={applicant.avatarUrl}
                   alt={applicant.name}
-                  fill
-                  className="rounded-2xl object-cover"
-                  sizes="48px"
+                  initials={initials}
+                  size="sm"
+                  rounded="2xl"
                 />
               ) : (
                 <div

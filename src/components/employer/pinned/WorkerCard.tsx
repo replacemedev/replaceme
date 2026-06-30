@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { Eye, Award, DollarSign, Lock } from "lucide-react";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
@@ -36,14 +36,14 @@ export function WorkerCard({
       <div>
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 rounded-2xl bg-emerald-50 border border-slate-100 shrink-0 overflow-hidden">
+            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
               {worker.avatarUrl && !isPreview ? (
-                <Image
+                <AvatarImage
                   src={worker.avatarUrl}
                   alt={worker.name}
-                  fill
-                  className="rounded-2xl object-cover"
-                  sizes="48px"
+                  initials={initials}
+                  size="sm"
+                  rounded="2xl"
                 />
               ) : (
                 <div

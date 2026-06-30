@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import {
   Award,
   Briefcase,
@@ -415,21 +415,14 @@ export function WorkerProfileEditor({
                 helperText={profileImageHelperText()}
               />
             ) : (
-              <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md flex items-center justify-center">
-                {profile.avatar_url ? (
-                  <Image
-                    src={profile.avatar_url}
-                    alt={fullName}
-                    fill
-                    className="object-cover"
-                    sizes="128px"
-                    priority
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-[#ebfdf2] text-3xl font-bold text-[#006e2f]">
-                    {initials}
-                  </div>
-                )}
+              <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md">
+                <AvatarImage
+                  src={profile.avatar_url}
+                  alt={fullName}
+                  initials={initials}
+                  size="lg"
+                  priority
+                />
               </div>
             )}
 

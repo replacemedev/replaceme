@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
 import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
@@ -84,20 +84,14 @@ export function HiredWorkerCard({
     <div className="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-md hover:border-slate-200/50 transition-all duration-300 animate-fadeIn">
       {/* Left Area: Profile Details */}
       <div className="flex items-center gap-4 shrink-0 min-w-0 lg:max-w-md">
-        <div className="relative w-14 h-14 rounded-2xl bg-emerald-50 border border-slate-100 shrink-0">
-          {worker.avatarUrl ? (
-            <Image
-              src={worker.avatarUrl}
-              alt={worker.name}
-              fill
-              className="rounded-2xl object-cover"
-              sizes="56px"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-emerald-800 font-extrabold text-base rounded-2xl">
-              {initials}
-            </div>
-          )}
+        <div className="relative w-14 h-14 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
+          <AvatarImage
+            src={worker.avatarUrl}
+            alt={worker.name}
+            initials={initials}
+            size="sm"
+            rounded="2xl"
+          />
           {/* Online Dot */}
           <span
             className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full ${

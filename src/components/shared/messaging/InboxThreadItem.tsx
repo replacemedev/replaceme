@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { MessagingThread } from "@/types/messaging";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 
 interface InboxThreadItemProps {
   thread: MessagingThread;
@@ -55,18 +55,13 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
           : "pl-4 hover:bg-slate-50/80"
       }`}
     >
-      <div className="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-sm overflow-hidden">
-        {oppositeParty.avatarUrl ? (
-          <Image
-            src={oppositeParty.avatarUrl}
-            alt={oppositeParty.name}
-            fill
-            className="rounded-full object-cover"
-            sizes="40px"
-          />
-        ) : (
-          <span>{initials(oppositeParty.name)}</span>
-        )}
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
+        <AvatarImage
+          src={oppositeParty.avatarUrl}
+          alt={oppositeParty.name}
+          initials={initials(oppositeParty.name)}
+          size="xs"
+        />
       </div>
 
       <div className="flex-1 min-w-0">

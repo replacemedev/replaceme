@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
 import { Bookmark, Loader2, MapPin } from "lucide-react";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import { toast } from "sonner";
 import { unsaveJob } from "@/actions/saved-jobs";
 import {
@@ -23,17 +23,12 @@ const avatarColors = [
   "bg-amber-50 text-amber-700",
 ];
 
-function companyInitial(name: string) {
-  return name.trim().charAt(0).toUpperCase() || "?";
-}
-
 function avatarColor(name: string) {
   return avatarColors[name.charCodeAt(0) % avatarColors.length];
 }
 
 export function SavedJobCard({ job }: SavedJobCardProps) {
   const [isPending, startTransition] = useTransition();
-  const initial = companyInitial(job.companyName);
   const colorClass = avatarColor(job.companyName);
 
   const handleUnsave = () => {
@@ -50,20 +45,15 @@ export function SavedJobCard({ job }: SavedJobCardProps) {
   return (
     <article className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-emerald-200/80 hover:shadow-sm transition-all">
       <div className="flex items-start gap-4 min-w-0 flex-1">
-        <div
-          className={`relative shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden ${colorClass}`}
-        >
-          {job.companyLogoUrl ? (
-            <Image
-              src={job.companyLogoUrl}
-              alt={`${job.companyName} logo`}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
-          ) : (
-            <span>{initial}</span>
-          )}
+        <div className="relative shrink-0 w-12 h-12 overflow-hidden rounded-full">
+          <LogoImage
+            src={job.companyLogoUrl}
+            alt={`${job.companyName} logo`}
+            label={job.companyName}
+            sizePx={48}
+            rounded="full"
+            colorClass={`flex items-center justify-center font-bold text-sm ${colorClass}`}
+          />
         </div>
 
         <div className="min-w-0 flex-1">

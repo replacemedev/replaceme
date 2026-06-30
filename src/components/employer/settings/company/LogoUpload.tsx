@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Building2, Upload, Loader2, X } from "lucide-react";
-import Image from "next/image";
+import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
 import { uploadCompanyLogo } from "@/actions/employer/company";
 import { toast } from "sonner";
 import {
@@ -76,11 +76,14 @@ export function LogoUpload() {
       <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50 shrink-0 overflow-hidden group">
         {logoUrl ? (
           <>
-            <Image
+            <OptimizedImage
               src={logoUrl}
               alt="Company Logo Preview"
               fill
-              className="object-cover"
+              sizes="96px"
+              className="object-cover rounded-2xl"
+              containerClassName="h-full w-full"
+              transform={{ width: 192, resize: "cover", quality: 80 }}
             />
             {/* Remove overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
