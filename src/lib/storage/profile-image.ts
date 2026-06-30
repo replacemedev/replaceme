@@ -22,3 +22,16 @@ export function normalizeProfileImageMime(mimeType: string): string | null {
 export function profileImageMaxMbLabel(): string {
   return `${PROFILE_IMAGE_MAX_BYTES / (1024 * 1024)} MB`;
 }
+
+/** Format + size only — no pixel dimension requirements (common SaaS pattern). */
+export function profileImageHelperText(): string {
+  return `JPG or PNG, up to ${profileImageMaxMbLabel()}.`;
+}
+
+export function profileImageHelperTextOptional(): string {
+  return `Optional. ${profileImageHelperText()}`;
+}
+
+export function companyLogoHelperText(): string {
+  return profileImageHelperText();
+}

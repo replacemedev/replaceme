@@ -10,9 +10,9 @@ import {
 } from "@/actions/worker/profile";
 
 import {
-  normalizeProfileImageMime,
   PROFILE_IMAGE_ALLOWED_TYPES,
   PROFILE_IMAGE_MAX_BYTES,
+  profileImageHelperText,
   profileImageMaxMbLabel,
 } from "@/lib/storage/profile-image";
 
@@ -234,7 +234,7 @@ export function ProfileAvatarUpload({
         </p>
       ) : (
         <p className="max-w-xs text-center text-xs font-medium leading-relaxed text-slate-500">
-          JPG or PNG, max {profileImageMaxMbLabel()}. A clear headshot helps employers recognize you.
+          {profileImageHelperText()}
         </p>
       )}
     </div>

@@ -22,7 +22,7 @@ import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profil
 import { formatMoney } from "@/lib/format/currency";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
-import { profileImageMaxMbLabel } from "@/lib/storage/profile-image";
+import { profileImageHelperText } from "@/lib/storage/profile-image";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { SkillProgressBar } from "@/components/worker/profile/SkillProgressBar";
 import { ProjectHighlightItem } from "@/components/worker/profile/ProjectHighlightItem";
@@ -412,7 +412,7 @@ export function WorkerProfileEditor({
                 onAvatarChange={(url) =>
                   setProfile((current) => ({ ...current, avatar_url: url }))
                 }
-                helperText={`JPG or PNG, max ${profileImageMaxMbLabel()}.`}
+                helperText={profileImageHelperText()}
               />
             ) : (
               <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md flex items-center justify-center">

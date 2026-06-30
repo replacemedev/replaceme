@@ -10,6 +10,7 @@ import {
 } from "@/actions/onboarding";
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
+import { profileImageHelperTextOptional } from "@/lib/storage/profile-image";
 import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -156,7 +157,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           }
           size="md"
           onAvatarChange={setAvatarUrl}
-          helperText="Optional — a clear photo helps employers recognize you."
+          helperText={profileImageHelperTextOptional()}
         />
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Professional title

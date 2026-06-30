@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { createAdminClient } from "@/lib/supabase/server";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import {
   CacheKeys,
@@ -322,6 +323,7 @@ export type AdminReportDeepDive = {
   resolvedAt: string | null;
   resolvedBy: string | null;
   evidenceSignedUrl: string | null;
+  evidenceStoragePath: string | null;
   evidenceMimeType: string | null;
   evidenceFileSizeBytes: number | null;
 };
@@ -331,8 +333,10 @@ export async function getAdminReportById(
 ): Promise<AdminReportDeepDive | null> {
   try {
     const id = z.string().uuid().parse(reportId);
-    const { supabase } = await requireAdmin();
-    const { data, error } = await supabase
+    await requireAdmin();
+
+    const adminSupabase = await createAdminClient();
+    const { data, error } = await adminSupabase
       .from("reports")
       .select(
         "id, created_at, updated_at, status, category, reporter_id, reporter_role, title, description_markdown, reported_url, app_area, user_agent, admin_notes, resolved_at, resolved_by, evidence_storage_path, evidence_mime_type, evidence_file_size_bytes"
@@ -340,15 +344,20 @@ export async function getAdminReportById(
       .eq("id", id)
       .maybeSingle();
 
-    if (error || !data) return null;
+    if (error || !data) {
+      if (error) safeError("getAdminReportById:", error);
+      return null;
+    }
 
     let evidenceSignedUrl: string | null = null;
     if (data.evidence_storage_path) {
-      const { data: signed, error: signedError } = await supabase.storage
+      const { data: signed, error: signedError } = await adminSupabase.storage
         .from(REPORT_EVIDENCE_BUCKET)
         .createSignedUrl(data.evidence_storage_path, 60 * 60);
 
-      if (!signedError && signed?.signedUrl) {
+      if (signedError) {
+        safeError("getAdminReportById signed url:", signedError);
+      } else if (signed?.signedUrl) {
         evidenceSignedUrl = signed.signedUrl;
       }
     }
@@ -370,6 +379,7 @@ export async function getAdminReportById(
       resolvedAt: data.resolved_at,
       resolvedBy: data.resolved_by,
       evidenceSignedUrl,
+      evidenceStoragePath: data.evidence_storage_path,
       evidenceMimeType: data.evidence_mime_type,
       evidenceFileSizeBytes: data.evidence_file_size_bytes,
     };

@@ -8,6 +8,7 @@ import { uploadCompanyLogo } from "@/actions/employer/company";
 import { toast } from "sonner";
 import {
   PROFILE_IMAGE_MAX_BYTES,
+  companyLogoHelperText,
   profileImageMaxMbLabel,
 } from "@/lib/storage/profile-image";
 
@@ -109,7 +110,7 @@ export function LogoUpload() {
         <div className="space-y-1">
           <h3 className="text-sm font-bold text-slate-800">Company Logo</h3>
           <p className="text-xs text-slate-400 leading-normal">
-            Recommended size: 400×400px. Max file size: {profileImageMaxMbLabel()} (JPG, PNG).
+            {companyLogoHelperText()}
           </p>
         </div>
 

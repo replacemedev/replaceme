@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import Image from "next/image";
 import { toast } from "sonner";
 import {
   getAdminReportById,
@@ -250,30 +249,46 @@ export function AdminReportsClient({
               </pre>
             </div>
 
-            {selected.evidenceSignedUrl ? (
+            {selected.evidenceStoragePath ? (
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Screenshot evidence
                 </p>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                  <div className="relative aspect-video w-full max-h-80">
-                    <Image
-                      src={selected.evidenceSignedUrl}
-                      alt="Report screenshot evidence"
-                      fill
-                      className="object-contain p-2"
-                      sizes="(max-width: 640px) 100vw, 560px"
-                      unoptimized
-                    />
-                  </div>
-                  {selected.evidenceFileSizeBytes ? (
-                    <p className="border-t border-slate-200 bg-white px-4 py-2 text-xs font-medium text-slate-500">
-                      {(selected.evidenceFileSizeBytes / 1024).toFixed(0)} KB
+                  {selected.evidenceSignedUrl ? (
+                    <div className="relative aspect-video w-full max-h-80">
+                      <img
+                        src={selected.evidenceSignedUrl}
+                        alt="Report screenshot evidence"
+                        className="h-full w-full max-h-80 object-contain p-2"
+                      />
+                    </div>
+                  ) : (
+                    <p className="px-4 py-6 text-center text-sm font-medium text-amber-700">
+                      Attachment is on file but the preview could not be loaded.
+                      Try reopening this report.
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-white px-4 py-2">
+                    <p className="text-xs font-medium text-slate-500">
+                      {selected.evidenceFileSizeBytes
+                        ? `${(selected.evidenceFileSizeBytes / 1024).toFixed(0)} KB`
+                        : "Attached file"}
                       {selected.evidenceMimeType
                         ? ` • ${selected.evidenceMimeType}`
                         : ""}
                     </p>
-                  ) : null}
+                    {selected.evidenceSignedUrl ? (
+                      <a
+                        href={selected.evidenceSignedUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-bold text-[#006e2f] hover:underline"
+                      >
+                        Open full size
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ) : null}
