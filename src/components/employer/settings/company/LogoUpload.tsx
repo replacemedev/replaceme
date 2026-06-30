@@ -84,6 +84,8 @@ export function LogoUpload() {
               sizePx={96}
               sizes="96px"
               rounded="2xl"
+              fit="contain"
+              className="object-contain"
               colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
             />
             {/* Remove overlay */}

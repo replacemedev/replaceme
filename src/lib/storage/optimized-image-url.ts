@@ -50,7 +50,19 @@ export function getOptimizedImageUrl(
 ): string | null {
   if (!src?.trim()) return null;
 
-  const cleaned = stripImageCacheBuster(src.trim());
+  const trimmed = src.trim();
+  let cacheVersion: string | null = null;
+
+  try {
+    const sourceParsed = new URL(trimmed);
+    cacheVersion =
+      sourceParsed.searchParams.get("v") ??
+      sourceParsed.searchParams.get("t");
+  } catch {
+    // fall through
+  }
+
+  const cleaned = stripImageCacheBuster(trimmed);
 
   if (!isSupabaseStorageUrl(cleaned)) {
     return cleaned;
@@ -69,6 +81,10 @@ export function getOptimizedImageUrl(
     parsed.searchParams.set("resize", options.resize ?? "cover");
     parsed.searchParams.set("quality", String(options.quality ?? 75));
     parsed.searchParams.set("format", "webp");
+
+    if (cacheVersion) {
+      parsed.searchParams.set("v", cacheVersion);
+    }
 
     return parsed.toString();
   } catch {

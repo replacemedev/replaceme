@@ -120,6 +120,8 @@ export function CompanyLogoUpload({
             label={label}
             sizePx={sizeClass.px}
             rounded="2xl"
+            fit="contain"
+            className="object-contain"
             colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
           />
         ) : (

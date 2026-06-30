@@ -10,6 +10,7 @@ import {
   profileImageMaxMbLabel,
   resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
+import { replaceStorageImage } from "@/lib/storage/replace-storage-image";
 
 const COMPANY_LOGO_BUCKET = "company-logos";
 
@@ -185,51 +186,25 @@ export async function uploadCompanyLogo(formData: FormData) {
     }
 
     const extension = mimeType === "image/png" ? "png" : "jpg";
-    const altExtension = extension === "png" ? "jpg" : "png";
-    const storagePath = `${user.id}/logo.${extension}`;
-    const altStoragePath = `${user.id}/logo.${altExtension}`;
     const fileBuffer = await file.arrayBuffer();
 
-    const { data: existingFiles } = await supabase.storage
-      .from(COMPANY_LOGO_BUCKET)
-      .list(user.id, { limit: 20 });
-
-    const pathsToRemove = [
-      storagePath,
-      altStoragePath,
-      ...(existingFiles ?? [])
-        .filter((entry) => entry.name.startsWith("logo."))
-        .map((entry) => `${user.id}/${entry.name}`),
-    ];
-
     const admin = await createAdminClient();
-    const uniquePaths = [...new Set(pathsToRemove)];
+    const stored = await replaceStorageImage(
+      admin,
+      COMPANY_LOGO_BUCKET,
+      user.id,
+      "logo",
+      fileBuffer,
+      mimeType,
+      extension
+    );
 
-    const { error: removeError } = await admin.storage
-      .from(COMPANY_LOGO_BUCKET)
-      .remove(uniquePaths);
-
-    if (removeError) {
-      safeError("uploadCompanyLogo remove:", removeError);
+    if ("error" in stored) {
+      safeError("uploadCompanyLogo storage:", stored.error);
+      return { error: mapProfileImageUploadError(stored.error, "logo") };
     }
 
-    const { error: uploadError } = await admin.storage
-      .from(COMPANY_LOGO_BUCKET)
-      .upload(storagePath, new Uint8Array(fileBuffer), {
-        contentType: mimeType,
-        upsert: true,
-      });
-
-    if (uploadError) {
-      safeError("uploadCompanyLogo storage:", uploadError);
-      return { error: mapProfileImageUploadError(uploadError.message, "logo") };
-    }
-
-    const { data: publicUrlData } = admin.storage
-      .from(COMPANY_LOGO_BUCKET)
-      .getPublicUrl(storagePath);
-
-    const logoUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+    const { publicUrl: logoUrl, storagePath } = stored;
     const now = new Date().toISOString();
 
     const { data: updatedRow, error: updateError } = await supabase
@@ -269,6 +244,7 @@ export async function uploadCompanyLogo(formData: FormData) {
     }
 
     revalidatePath("/employer/settings/company");
+    revalidatePath("/employer/onboarding");
     revalidatePath("/", "layout");
 
     return { success: true, logoUrl };

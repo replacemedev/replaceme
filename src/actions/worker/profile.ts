@@ -27,6 +27,10 @@ import {
   profileImageMaxMbLabel,
   resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
+import {
+  replaceStorageImage,
+  storagePathFromPublicUrl,
+} from "@/lib/storage/replace-storage-image";
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
 
@@ -305,55 +309,29 @@ export async function uploadWorkerAvatar(formData: FormData) {
   }
 
   const extension = mimeType === "image/png" ? "png" : "jpg";
-  const altExtension = extension === "png" ? "jpg" : "png";
-  const storagePath = `${ctx.user.id}/avatar.${extension}`;
-  const altStoragePath = `${ctx.user.id}/avatar.${altExtension}`;
   const fileBuffer = await file.arrayBuffer();
 
   if (fileBuffer.byteLength === 0) {
     return { error: "Uploaded file is empty. Please choose a different image." };
   }
 
-  const { data: existingFiles } = await ctx.supabase.storage
-    .from(PROFILE_AVATAR_BUCKET)
-    .list(ctx.user.id, { limit: 20 });
-
-  const pathsToRemove = [
-    storagePath,
-    altStoragePath,
-    ...(existingFiles ?? [])
-      .filter((entry) => entry.name.startsWith("avatar."))
-      .map((entry) => `${ctx.user.id}/${entry.name}`),
-  ];
-
   const admin = await createAdminClient();
-  const uniquePaths = [...new Set(pathsToRemove)];
+  const stored = await replaceStorageImage(
+    admin,
+    PROFILE_AVATAR_BUCKET,
+    ctx.user.id,
+    "avatar",
+    fileBuffer,
+    mimeType,
+    extension
+  );
 
-  const { error: removeError } = await admin.storage
-    .from(PROFILE_AVATAR_BUCKET)
-    .remove(uniquePaths);
-
-  if (removeError) {
-    safeError("uploadWorkerAvatar remove:", removeError);
+  if ("error" in stored) {
+    safeError("uploadWorkerAvatar storage:", stored.error);
+    return { error: mapProfileImageUploadError(stored.error, "avatar") };
   }
 
-  const { error: uploadError } = await admin.storage
-    .from(PROFILE_AVATAR_BUCKET)
-    .upload(storagePath, new Uint8Array(fileBuffer), {
-      contentType: mimeType,
-      upsert: true,
-    });
-
-  if (uploadError) {
-    safeError("uploadWorkerAvatar storage:", uploadError);
-    return { error: mapProfileImageUploadError(uploadError.message, "avatar") };
-  }
-
-  const { data: publicUrlData } = ctx.supabase.storage
-    .from(PROFILE_AVATAR_BUCKET)
-    .getPublicUrl(storagePath);
-
-  const avatarUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+  const { publicUrl: avatarUrl, storagePath } = stored;
 
   const { data: updatedRow, error: updateError } = await ctx.supabase
     .from("profiles")
@@ -395,13 +373,30 @@ export async function removeWorkerAvatar() {
     .single();
 
   if (profile?.avatar_url) {
-    const marker = `/object/public/${PROFILE_AVATAR_BUCKET}/`;
-    const pathStart = profile.avatar_url.indexOf(marker);
-    if (pathStart !== -1) {
-      const rawPath = profile.avatar_url.slice(pathStart + marker.length);
-      const storagePath = rawPath.split("?")[0];
-      const admin = await createAdminClient();
-      await admin.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
+    const admin = await createAdminClient();
+    const knownPath = storagePathFromPublicUrl(
+      profile.avatar_url,
+      PROFILE_AVATAR_BUCKET
+    );
+
+    const { data: existingFiles } = await admin.storage
+      .from(PROFILE_AVATAR_BUCKET)
+      .list(ctx.user.id, { limit: 100 });
+
+    const pathsToRemove = [
+      ...(knownPath ? [knownPath] : []),
+      ...(existingFiles ?? [])
+        .filter(
+          (entry) =>
+            entry.name.startsWith("avatar.") || entry.name.startsWith("avatar-")
+        )
+        .map((entry) => `${ctx.user.id}/${entry.name}`),
+    ];
+
+    if (pathsToRemove.length > 0) {
+      await admin.storage
+        .from(PROFILE_AVATAR_BUCKET)
+        .remove([...new Set(pathsToRemove)]);
     }
   }
 

@@ -13,6 +13,7 @@ export interface LogoImageProps {
   rounded?: "lg" | "xl" | "2xl" | "full";
   colorClass?: string;
   className?: string;
+  fit?: "cover" | "contain";
 }
 
 export function LogoImage({
@@ -25,6 +26,7 @@ export function LogoImage({
   rounded = "xl",
   colorClass = "bg-[#ebfdf2] text-[#006e2f]",
   className = "object-cover",
+  fit = "cover",
 }: LogoImageProps) {
   const roundClass =
     rounded === "full"
@@ -61,7 +63,7 @@ export function LogoImage({
       priority={priority}
       className={`${className} ${roundClass}`}
       containerClassName={`h-full w-full ${roundClass}`}
-      transform={{ width: retinaTransformWidth(sizePx), resize: "cover", quality: 80 }}
+      transform={{ width: retinaTransformWidth(sizePx), resize: fit, quality: 80 }}
       fallback={fallback}
     />
   );

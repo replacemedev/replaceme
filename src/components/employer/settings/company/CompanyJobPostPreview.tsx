@@ -55,6 +55,8 @@ export function CompanyJobPostPreview({
                 sizePx={48}
                 sizes="48px"
                 rounded="xl"
+                fit="contain"
+                className="object-contain"
                 colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
               />
             </div>

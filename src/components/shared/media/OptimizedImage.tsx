@@ -94,9 +94,9 @@ export function OptimizedImage({
         />
       ) : null}
       {fill ? (
-        <Image fill {...imageProps} />
+        <Image key={resolvedSrc} fill {...imageProps} />
       ) : (
-        <Image width={width!} height={height!} {...imageProps} />
+        <Image key={resolvedSrc} width={width!} height={height!} {...imageProps} />
       )}
     </span>
   );
