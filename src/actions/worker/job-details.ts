@@ -63,6 +63,7 @@ export async function getWorkerJobDetails(
     }
 
     const monthlySalary = Number(job.monthly_salary ?? 0);
+    const salaryCurrency = (job as { salary_currency?: string | null }).salary_currency ?? "PHP";
     const hoursPerWeek = Number(job.hours_per_week ?? 0);
     const description = job.description ?? "";
 
@@ -75,6 +76,7 @@ export async function getWorkerJobDetails(
       description,
       parsedSections: parseJobDescription(description),
       monthlySalary,
+      salaryCurrency,
       hoursPerWeek,
       hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek),
       location: job.location ?? "Remote",

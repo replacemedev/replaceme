@@ -94,6 +94,7 @@ export async function getPublicJobById(
       .eq("status", "Active");
 
     const monthlySalary = Number(job.monthly_salary ?? 0);
+    const salaryCurrency = job.salary_currency ?? "PHP";
     const hoursPerWeek = Number(job.hours_per_week ?? 0);
     const description = job.description ?? "";
 
@@ -106,6 +107,7 @@ export async function getPublicJobById(
       description,
       parsedSections: parseJobDescription(description),
       monthlySalary,
+      salaryCurrency,
       hoursPerWeek,
       hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek) ?? 0,
       location: job.location ?? "Remote",

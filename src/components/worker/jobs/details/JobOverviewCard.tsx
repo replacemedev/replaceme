@@ -70,7 +70,7 @@ export function JobOverviewCard({ job }: JobOverviewCardProps) {
         <p className="text-sm font-semibold text-slate-800">
           Compensation:{" "}
           <span className="text-[#006e2f] font-extrabold">
-            {formatCompensation(job.monthlySalary)}
+            {formatCompensation(job.monthlySalary, job.salaryCurrency)}
           </span>
         </p>
         <p className="mt-1 text-xs text-slate-500">

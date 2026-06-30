@@ -19,6 +19,7 @@ export interface RecommendedJob {
   title: string;
   employment_type: string;
   monthly_salary: number;
+  salary_currency?: string | null;
   hours_per_week: number;
   skills: string[];
   company_name: string;

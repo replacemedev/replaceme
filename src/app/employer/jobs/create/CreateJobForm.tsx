@@ -21,6 +21,7 @@ interface EditJobValues {
   title: string;
   employmentType: string;
   description: string;
+  salaryCurrency: string;
   monthlySalary: number;
   hoursPerWeek: number;
   skills: string[];
@@ -48,6 +49,7 @@ export function CreateJobForm({
           title: editJob.title,
           employmentType: editJob.employmentType,
           description: editJob.description,
+          salaryCurrency: editJob.salaryCurrency as CreateJobInput["salaryCurrency"],
           monthlySalary: editJob.monthlySalary,
           hoursPerWeek: editJob.hoursPerWeek,
           skills: editJob.skills,
@@ -58,6 +60,7 @@ export function CreateJobForm({
           title: "",
           employmentType: "",
           description: "",
+          salaryCurrency: "PHP",
           monthlySalary: 5000,
           hoursPerWeek: 40,
           skills: [],

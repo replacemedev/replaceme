@@ -99,6 +99,7 @@ export async function createJobPost(payload: CreateJobInput) {
         employment_type: parsed.data.employmentType,
         description: parsed.data.description,
         monthly_salary: parsed.data.monthlySalary,
+        salary_currency: parsed.data.salaryCurrency,
         hours_per_week: parsed.data.hoursPerWeek,
         skills: parsed.data.skills,
         status: jobStatus,
@@ -186,6 +187,7 @@ export async function updateJobPost(payload: UpdateJobInput) {
         employment_type: parsed.data.employmentType,
         description: parsed.data.description,
         monthly_salary: parsed.data.monthlySalary,
+        salary_currency: parsed.data.salaryCurrency,
         hours_per_week: parsed.data.hoursPerWeek,
         skills: parsed.data.skills,
       })
@@ -235,7 +237,7 @@ export async function getJobForEdit(jobId: string) {
 
   const { data: job } = await supabase
     .from("jobs")
-    .select("id, title, employment_type, description, monthly_salary, hours_per_week, skills, status")
+    .select("id, title, employment_type, description, monthly_salary, salary_currency, hours_per_week, skills, status")
     .eq("id", parsed.data.jobId)
     .eq("employer_id", profile.id)
     .maybeSingle();
@@ -248,6 +250,7 @@ export async function getJobForEdit(jobId: string) {
     employmentType: job.employment_type,
     description: job.description,
     monthlySalary: Number(job.monthly_salary),
+    salaryCurrency: job.salary_currency ?? "PHP",
     hoursPerWeek: Number(job.hours_per_week),
     skills: (job.skills as string[]) ?? [],
   };

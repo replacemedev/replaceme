@@ -1,3 +1,5 @@
+import { formatMoney } from "@/lib/format/currency";
+
 export type JobSortOption =
   | "most_relevant"
   | "newest"
@@ -13,6 +15,7 @@ export interface JobSearchResult {
   employmentType: string;
   description: string;
   monthlySalary: number;
+  salaryCurrency: string;
   hoursPerWeek: number;
   hourlyRate: number | null;
   location: string;
@@ -51,13 +54,14 @@ export function computeJobHourlyRate(
 
 export function formatSalaryBadge(
   monthlySalary: number,
-  hoursPerWeek: number
+  hoursPerWeek: number,
+  currency: string = "PHP"
 ): string {
   const hourly = computeJobHourlyRate(monthlySalary, hoursPerWeek);
   if (hourly && hourly > 0) {
-    return `₱${hourly.toLocaleString("en-US")}/HR`;
+    return formatMoney(hourly, currency, { perHour: true }).toUpperCase();
   }
-  return `₱${Math.round(monthlySalary).toLocaleString("en-US")}/MO`;
+  return `${formatMoney(monthlySalary, currency)}/mo`.toUpperCase();
 }
 
 export function formatEmploymentBadge(type: string): string {

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { DollarSign, Clock, Building2 } from "lucide-react";
+import { formatMoney } from "@/lib/format/currency";
 import { RecommendedJob } from "@/types/worker";
 
 interface RecommendedJobCardProps {
@@ -28,8 +29,7 @@ export function RecommendedJobCard({ job, onApply }: RecommendedJobCardProps) {
 
           {/* Salary */}
           <span className="flex items-center gap-1">
-            <span className="text-slate-400">₱</span>
-            {Number(job.monthly_salary).toLocaleString("en-US")}/mo
+            {formatMoney(Number(job.monthly_salary), job.salary_currency ?? "PHP")}/mo
           </span>
 
           {/* Job Type */}

@@ -1,4 +1,5 @@
 import { computeJobHourlyRate } from "@/types/job-search";
+import { formatMoney } from "@/lib/format/currency";
 
 export const SAVED_JOB_SORT_OPTIONS = [
   "date_saved_newest",
@@ -25,6 +26,7 @@ export interface SavedJob {
   companyLogoUrl: string | null;
   employmentType: string;
   monthlySalary: number;
+  salaryCurrency: string;
   hoursPerWeek: number;
   hourlyRate: number | null;
   location: string;
@@ -94,12 +96,16 @@ export const SAVED_JOB_SORT_LABELS: Record<SavedJobSortOption, string> = {
   title_az: "Job Title (A–Z)",
 };
 
-export function formatSavedJobSalary(monthlySalary: number, hoursPerWeek: number): string {
+export function formatSavedJobSalary(
+  monthlySalary: number,
+  hoursPerWeek: number,
+  currency: string = "PHP"
+): string {
   const hourly = computeJobHourlyRate(monthlySalary, hoursPerWeek);
   if (hourly && hourly > 0) {
-    return `$${hourly.toLocaleString("en-US")}/hr`;
+    return formatMoney(hourly, currency, { perHour: true });
   }
-  return `$${Math.round(monthlySalary).toLocaleString("en-US")}/mo`;
+  return `${formatMoney(monthlySalary, currency)}/mo`;
 }
 
 export function formatEmploymentPill(type: string): string {

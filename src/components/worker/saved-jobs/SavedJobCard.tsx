@@ -80,7 +80,7 @@ export function SavedJobCard({ job }: SavedJobCardProps) {
 
           <div className="flex flex-wrap gap-2 mt-3 md:hidden">
             <span className="inline-flex rounded-full bg-[#ebfdf2] border border-[#006e2f]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#006e2f]">
-              {formatSavedJobSalary(job.monthlySalary, job.hoursPerWeek)}
+              {formatSavedJobSalary(job.monthlySalary, job.hoursPerWeek, job.salaryCurrency)}
             </span>
             <span className="inline-flex rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-600 uppercase">
               {formatEmploymentPill(job.employmentType)}
@@ -91,7 +91,7 @@ export function SavedJobCard({ job }: SavedJobCardProps) {
 
       <div className="hidden md:flex flex-wrap items-center gap-2 shrink-0">
         <span className="inline-flex rounded-full bg-[#ebfdf2] border border-[#006e2f]/15 px-2.5 py-0.5 text-[11px] font-bold text-[#006e2f]">
-          {formatSavedJobSalary(job.monthlySalary, job.hoursPerWeek)}
+          {formatSavedJobSalary(job.monthlySalary, job.hoursPerWeek, job.salaryCurrency)}
         </span>
         <span className="inline-flex rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-600 uppercase">
           {formatEmploymentPill(job.employmentType)}

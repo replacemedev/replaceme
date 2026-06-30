@@ -110,7 +110,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
           {formatEmploymentBadge(job.employmentType)}
         </span>
         <span className="inline-flex items-center rounded-md bg-[#ebfdf2] border border-[#006e2f]/15 px-2 py-0.5 text-[10px] font-bold text-[#006e2f] uppercase tracking-wide">
-          {formatSalaryBadge(job.monthlySalary, job.hoursPerWeek)}
+          {formatSalaryBadge(job.monthlySalary, job.hoursPerWeek, job.salaryCurrency)}
         </span>
         <span className="inline-flex items-center rounded-md bg-slate-50 border border-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600 uppercase tracking-wide">
           {locationLabel}

@@ -38,7 +38,7 @@ export async function getApplyJobPageData(
     const { data: job, error: jobError } = await supabase
       .from("job_posts")
       .select(
-        "id, title, employer_id, employment_type, monthly_salary, hours_per_week, skills, created_at, company_name, status"
+        "id, title, employer_id, employment_type, monthly_salary, salary_currency, hours_per_week, skills, created_at, company_name, status"
       )
       .eq("id", jobId)
       .eq("status", "Active")
@@ -82,6 +82,7 @@ export async function getApplyJobPageData(
         categoryBadge: deriveJobCategoryBadge(skills, job.employment_type ?? ""),
         employmentType: job.employment_type ?? "Any",
         monthlySalary: Number(job.monthly_salary ?? 0),
+        salaryCurrency: job.salary_currency ?? "PHP",
         hoursPerWeek: Number(job.hours_per_week ?? 0),
         skills,
         createdAt: job.created_at ?? new Date().toISOString(),

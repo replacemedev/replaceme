@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { DropdownOption } from "@/lib/validations/employer/jobs";
-import { DollarSign, Clock, Plus, X } from "lucide-react";
+import { COMPENSATION_CURRENCIES } from "@/lib/format/currency";
+import { ONBOARDING_SELECT_CLASS } from "@/config/onboarding";
+import { Clock, Plus, X } from "lucide-react";
 
 interface JobRequirementsSectionProps {
   skillsOptions: DropdownOption[];
@@ -62,33 +64,47 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
         <p className="text-sm text-slate-500">Define the compensation details and required skillset.</p>
       </div>
 
-      {/* Salary & Suggestion */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
+      {/* Salary & currency */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 items-end">
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
-            Monthly Salary (USD) <span className="text-red-500">*</span>
+            Salary currency <span className="text-red-500">*</span>
+          </label>
+          <select
+            className={ONBOARDING_SELECT_CLASS}
+            {...register("salaryCurrency")}
+          >
+            {COMPENSATION_CURRENCIES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Monthly salary <span className="text-red-500">*</span>
           </label>
           <div className="relative pb-5">
             <Input
               type="number"
               placeholder="5000"
-              icon={<DollarSign size={18} />}
               error={errors.monthlySalary?.message as string}
               {...register("monthlySalary", { valueAsNumber: true })}
             />
           </div>
         </div>
+      </div>
 
-        <div className="pb-5">
-          <button
-            type="button"
-            onClick={handleSuggestSalary}
-            className="h-12 w-full px-4 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#22c55e] hover:border-[#22c55e] hover:bg-emerald-50/10 font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <DollarSign size={16} />
-            Suggest Competitive Salary
-          </button>
-        </div>
+      <div className="pb-2">
+        <button
+          type="button"
+          onClick={handleSuggestSalary}
+          className="h-12 w-full px-4 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#22c55e] hover:border-[#22c55e] hover:bg-emerald-50/10 font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          Suggest competitive salary
+        </button>
       </div>
 
       {/* Hours Per Week */}

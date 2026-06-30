@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { uuidSchema } from "@/lib/validations/common";
+import { salaryCurrencySchema } from "@/lib/validations/onboarding";
 
 export const createJobSchema = z
   .object({
@@ -11,7 +12,8 @@ export const createJobSchema = z
     description: z
       .string()
       .min(10, "Job description must be at least 10 characters"),
-    monthlySalary: z.number().min(100, "Monthly salary must be at least $100"),
+    salaryCurrency: salaryCurrencySchema,
+    monthlySalary: z.number().min(100, "Monthly salary must be at least 100"),
     hoursPerWeek: z
       .number()
       .min(1, "Hours per week must be at least 1")

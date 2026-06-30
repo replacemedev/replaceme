@@ -1,3 +1,5 @@
+import { formatMoney } from "@/lib/format/currency";
+
 export interface JobDetailsCompany {
   id: string;
   employerId: string;
@@ -25,6 +27,7 @@ export interface WorkerJobDetails {
   description: string;
   parsedSections: ParsedJobSections;
   monthlySalary: number;
+  salaryCurrency: string;
   hoursPerWeek: number;
   hourlyRate: number | null;
   location: string;
@@ -202,6 +205,9 @@ export function formatMemberSince(iso: string): string {
   });
 }
 
-export function formatCompensation(monthlySalary: number): string {
-  return `Starts at $${Math.round(monthlySalary).toLocaleString("en-US")}/month`;
+export function formatCompensation(
+  monthlySalary: number,
+  currency: string = "PHP"
+): string {
+  return `Starts at ${formatMoney(monthlySalary, currency)}/month`;
 }

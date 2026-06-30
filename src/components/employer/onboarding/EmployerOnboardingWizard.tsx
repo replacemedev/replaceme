@@ -2,16 +2,21 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { completeEmployerOnboarding } from "@/actions/onboarding";
 import { toast } from "sonner";
+import {
+  finishEmployerOnboarding,
+  saveEmployerOnboardingStep,
+  type EmployerOnboardingDraft,
+} from "@/actions/onboarding";
+import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
 import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
-import { OnboardingStepDots } from "@/components/employer/onboarding/OnboardingStepDots";
 import {
   COMPANY_SIZE_OPTIONS,
   DEFAULT_SKILL_OPTIONS,
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
-import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
+
+const CONTENT_STEPS = 3;
 
 const INDUSTRIES = [
   "Technology",
@@ -20,122 +25,210 @@ const INDUSTRIES = [
   "Finance",
   "Education",
   "Other",
-];
+] as const;
 
-export function EmployerOnboardingWizard() {
+type WizardPhase = "welcome" | "company" | "hiring" | "details";
+
+interface EmployerOnboardingWizardProps {
+  draft: EmployerOnboardingDraft;
+}
+
+export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [companyName, setCompanyName] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [companySize, setCompanySize] = useState("");
-  const [skills, setSkills] = useState<string[]>([]);
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [companyBio, setCompanyBio] = useState("");
+  const [phase, setPhase] = useState<WizardPhase>("welcome");
 
-  const activeStep =
-    companyName && industry && companySize
-      ? skills.length > 0
-        ? 2
-        : 1
-      : 0;
+  const [companyName, setCompanyName] = useState(draft.companyName);
+  const [industry, setIndustry] = useState(draft.industry);
+  const [companySize, setCompanySize] = useState(draft.companySize);
+  const [skills, setSkills] = useState<string[]>(draft.skills);
+  const [websiteUrl, setWebsiteUrl] = useState(draft.websiteUrl);
+  const [companyBio, setCompanyBio] = useState(draft.companyBio);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    startTransition(async () => {
-      const result = await completeEmployerOnboarding({
-        companyName,
-        industry,
-        companySize,
-        skills,
-        websiteUrl: websiteUrl || undefined,
-        companyBio: companyBio || undefined,
-      });
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
-      toast.success("Company profile created!");
-      router.replace("/employer/dashboard?onboarded=1");
-      router.refresh();
-    });
+  const stepIndex: Record<WizardPhase, number> = {
+    welcome: 0,
+    company: 1,
+    hiring: 2,
+    details: 3,
   };
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className={`mx-auto max-w-lg space-y-6 ${EMPLOYER_CARD} p-8`}
-    >
-      <header className="space-y-4">
-        <div className="lg:hidden">
-          <OnboardingStepDots activeStep={activeStep} />
-        </div>
-        <div className="space-y-1">
+  const finish = async () => {
+    const result = await finishEmployerOnboarding();
+    if (!result.success) {
+      toast.error(result.error);
+      return false;
+    }
+    toast.success("Company profile created!");
+    router.replace("/employer/dashboard?onboarded=1");
+    router.refresh();
+    return true;
+  };
+
+  if (phase === "welcome") {
+    return (
+      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
+        <header className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
-            Company profile
+            Employer onboarding
           </p>
           <h2 className="text-2xl font-bold text-slate-900">
             Tell us about your company
           </h2>
-          <p className="text-sm text-slate-600 font-medium">
-            Workers see this when you post jobs and review applicants.
+          <p className="text-sm font-medium text-slate-600">
+            Workers see this when you post jobs and review applicants. Takes
+            about 2 minutes.
           </p>
-        </div>
-      </header>
+        </header>
+        <button
+          type="button"
+          onClick={() => setPhase("company")}
+          className="w-full rounded-xl bg-[#006e2f] py-3 text-sm font-bold text-white transition-colors hover:bg-[#005c26]"
+        >
+          Get started
+        </button>
+      </section>
+    );
+  }
 
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Company name
-        <input
-          required
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+  const shellProps = {
+    currentStep: stepIndex[phase],
+    totalSteps: CONTENT_STEPS,
+    isPending,
+    accentClass: "bg-[#006e2f] hover:bg-[#005c26]",
+  };
+
+  if (phase === "company") {
+    return (
+      <OnboardingWizardShell
+        {...shellProps}
+        stepLabel="Company"
+        title="Company basics"
+        description="Your company name and industry appear on every job post."
+        onBack={() => setPhase("welcome")}
+        isNextDisabled={!companyName.trim() || !industry || !companySize}
+        onNext={() => {
+          startTransition(async () => {
+            const result = await saveEmployerOnboardingStep("company", {
+              companyName: companyName.trim(),
+              industry,
+              companySize,
+            });
+            if (!result.success) {
+              toast.error(result.error);
+              return;
+            }
+            setPhase("hiring");
+          });
+        }}
+      >
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Company name
+          <input
+            required
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+          />
+        </label>
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Industry
+          <select
+            required
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            className={ONBOARDING_SELECT_CLASS}
+          >
+            <option value="">Select industry</option>
+            {INDUSTRIES.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Company size
+          <select
+            required
+            value={companySize}
+            onChange={(e) => setCompanySize(e.target.value)}
+            className={ONBOARDING_SELECT_CLASS}
+          >
+            <option value="">Select company size</option>
+            {COMPANY_SIZE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+      </OnboardingWizardShell>
+    );
+  }
+
+  if (phase === "hiring") {
+    return (
+      <OnboardingWizardShell
+        {...shellProps}
+        stepLabel="Hiring focus"
+        title="What do you hire for?"
+        description="Select skills you most often need — we use these for matching."
+        onBack={() => setPhase("company")}
+        isNextDisabled={skills.length === 0}
+        onNext={() => {
+          startTransition(async () => {
+            const result = await saveEmployerOnboardingStep("hiring", {
+              skills,
+            });
+            if (!result.success) {
+              toast.error(result.error);
+              return;
+            }
+            setPhase("details");
+          });
+        }}
+      >
+        <SkillPicker
+          label="Top skills you hire for"
+          hint="Select or add the skills you most often need on your team."
+          options={DEFAULT_SKILL_OPTIONS}
+          value={skills}
+          onChange={setSkills}
+          maxSkills={8}
+          disabled={isPending}
         />
-      </label>
+      </OnboardingWizardShell>
+    );
+  }
 
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Industry
-        <select
-          required
-          value={industry}
-          onChange={(e) => setIndustry(e.target.value)}
-          className={ONBOARDING_SELECT_CLASS}
-        >
-          <option value="">Select industry</option>
-          {INDUSTRIES.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Company size
-        <select
-          required
-          value={companySize}
-          onChange={(e) => setCompanySize(e.target.value)}
-          className={ONBOARDING_SELECT_CLASS}
-        >
-          <option value="">Select company size</option>
-          {COMPANY_SIZE_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <SkillPicker
-        label="Top skills you hire for"
-        hint="Select or add the skills you most often need on your team."
-        options={DEFAULT_SKILL_OPTIONS}
-        value={skills}
-        onChange={setSkills}
-        maxSkills={8}
-        disabled={isPending}
-      />
-
+  return (
+    <OnboardingWizardShell
+      {...shellProps}
+      stepLabel="Details"
+      title="Polish your company page"
+      description="Optional links and bio — you can update these anytime in settings."
+      onBack={() => setPhase("hiring")}
+      canSkip
+      nextLabel="Go to dashboard"
+      onSkip={() => {
+        startTransition(async () => {
+          await finish();
+        });
+      }}
+      onNext={() => {
+        startTransition(async () => {
+          const result = await saveEmployerOnboardingStep("details", {
+            websiteUrl: websiteUrl.trim(),
+            companyBio: companyBio.trim() || undefined,
+          });
+          if (!result.success) {
+            toast.error(result.error);
+            return;
+          }
+          await finish();
+        });
+      }}
+    >
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Website (optional)
         <input
@@ -146,7 +239,6 @@ export function EmployerOnboardingWizard() {
           placeholder="https://"
         />
       </label>
-
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Company bio (optional)
         <textarea
@@ -156,14 +248,6 @@ export function EmployerOnboardingWizard() {
           className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
         />
       </label>
-
-      <button
-        type="submit"
-        disabled={isPending || skills.length === 0}
-        className="w-full rounded-xl bg-[#006e2f] py-3 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50 transition-colors"
-      >
-        {isPending ? "Saving…" : "Go to dashboard"}
-      </button>
-    </form>
+    </OnboardingWizardShell>
   );
 }

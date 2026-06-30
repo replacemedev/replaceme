@@ -28,6 +28,7 @@ function mapJobRow(
     employment_type: string | null;
     description: string | null;
     monthly_salary: number | null;
+    salary_currency?: string | null;
     hours_per_week: number | null;
     location: string | null;
     skills: string[] | null;
@@ -46,6 +47,7 @@ function mapJobRow(
     ? companyByEmployer.get(row.employer_id)
     : undefined;
   const monthlySalary = Number(row.monthly_salary ?? 0);
+  const salaryCurrency = row.salary_currency ?? "PHP";
   const hoursPerWeek = Number(row.hours_per_week ?? 0);
 
   return {
@@ -57,6 +59,7 @@ function mapJobRow(
     employmentType: row.employment_type ?? "Full-time",
     description: row.description ?? "",
     monthlySalary,
+    salaryCurrency,
     hoursPerWeek,
     hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek),
     location: row.location ?? "Remote",
@@ -152,6 +155,7 @@ export async function getJobSearchData(): Promise<JobSearchPayload> {
         employment_type,
         description,
         monthly_salary,
+        salary_currency,
         hours_per_week,
         location,
         skills,

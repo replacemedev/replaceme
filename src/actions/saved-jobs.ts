@@ -27,6 +27,7 @@ type JobPostEmbed = {
   logo_url: string | null;
   employment_type: string | null;
   monthly_salary: number | null;
+  salary_currency: string | null;
   hours_per_week: number | null;
   location: string | null;
   status: string | null;
@@ -54,6 +55,7 @@ function mapSavedJobRow(
   if (!post?.id || !post.title || post.status !== "Active") return null;
 
   const monthlySalary = Number(post.monthly_salary ?? 0);
+  const salaryCurrency = post.salary_currency ?? "PHP";
   const hoursPerWeek = Number(post.hours_per_week ?? 0);
 
   return {
@@ -65,6 +67,7 @@ function mapSavedJobRow(
     companyLogoUrl: post.logo_url ?? null,
     employmentType: post.employment_type ?? "Any",
     monthlySalary,
+    salaryCurrency,
     hoursPerWeek,
     hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek),
     location: post.location ?? "Remote",
@@ -91,6 +94,7 @@ async function loadSavedJobsForWorker(
           logo_url,
           employment_type,
           monthly_salary,
+          salary_currency,
           hours_per_week,
           location,
           status

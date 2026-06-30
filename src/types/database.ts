@@ -1324,6 +1324,7 @@ export type Database = {
           is_premium_path: boolean
           location: string | null
           monthly_salary: number
+          salary_currency: string
           paused_reason: string | null
           priority_score: number
           skills: string[]
@@ -1351,6 +1352,7 @@ export type Database = {
           is_premium_path?: boolean
           location?: string | null
           monthly_salary: number
+          salary_currency?: string
           paused_reason?: string | null
           priority_score?: number
           skills?: string[]
@@ -1378,6 +1380,7 @@ export type Database = {
           is_premium_path?: boolean
           location?: string | null
           monthly_salary?: number
+          salary_currency?: string
           paused_reason?: string | null
           priority_score?: number
           skills?: string[]
@@ -2277,6 +2280,7 @@ export type Database = {
           location: string | null
           logo_url: string | null
           monthly_salary: number | null
+          salary_currency: string | null
           skills: string[] | null
           status: string | null
           title: string | null

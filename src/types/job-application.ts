@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatMoney } from "@/lib/format/currency";
 
 export const CONTACT_METHOD_TYPES = ["email", "phone"] as const;
 export type ContactMethodType = (typeof CONTACT_METHOD_TYPES)[number];
@@ -46,6 +47,7 @@ export interface ApplyJobSummary {
   categoryBadge: string;
   employmentType: string;
   monthlySalary: number;
+  salaryCurrency: string;
   hoursPerWeek: number;
   skills: string[];
   createdAt: string;
@@ -69,8 +71,11 @@ export function deriveJobCategoryBadge(
   return normalized ? normalized.toUpperCase() : "GENERAL";
 }
 
-export function formatMonthlySalary(monthlySalary: number): string {
-  return `$${Math.round(monthlySalary).toLocaleString("en-US")}/mo`;
+export function formatMonthlySalary(
+  monthlySalary: number,
+  currency: string = "PHP"
+): string {
+  return `${formatMoney(monthlySalary, currency)}/mo`;
 }
 
 export function formatHoursPerWeek(hours: number): string {
