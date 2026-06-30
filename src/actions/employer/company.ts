@@ -189,15 +189,31 @@ export async function uploadCompanyLogo(formData: FormData) {
     const altStoragePath = `${user.id}/logo.${altExtension}`;
     const fileBuffer = await file.arrayBuffer();
 
-    await supabase.storage
+    const { data: existingFiles } = await supabase.storage
       .from(COMPANY_LOGO_BUCKET)
-      .remove([storagePath, altStoragePath]);
+      .list(user.id, { limit: 20 });
+
+    const pathsToRemove = [
+      storagePath,
+      altStoragePath,
+      ...(existingFiles ?? [])
+        .filter((entry) => entry.name.startsWith("logo."))
+        .map((entry) => `${user.id}/${entry.name}`),
+    ];
+
+    const { error: removeError } = await supabase.storage
+      .from(COMPANY_LOGO_BUCKET)
+      .remove([...new Set(pathsToRemove)]);
+
+    if (removeError) {
+      safeError("uploadCompanyLogo remove:", removeError);
+    }
 
     const { error: uploadError } = await supabase.storage
       .from(COMPANY_LOGO_BUCKET)
       .upload(storagePath, new Uint8Array(fileBuffer), {
         contentType: mimeType,
-        upsert: false,
+        upsert: true,
       });
 
     if (uploadError) {

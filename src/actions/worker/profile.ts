@@ -312,15 +312,31 @@ export async function uploadWorkerAvatar(formData: FormData) {
     return { error: "Uploaded file is empty. Please choose a different image." };
   }
 
-  await ctx.supabase.storage
+  const { data: existingFiles } = await ctx.supabase.storage
     .from(PROFILE_AVATAR_BUCKET)
-    .remove([storagePath, altStoragePath]);
+    .list(ctx.user.id, { limit: 20 });
+
+  const pathsToRemove = [
+    storagePath,
+    altStoragePath,
+    ...(existingFiles ?? [])
+      .filter((entry) => entry.name.startsWith("avatar."))
+      .map((entry) => `${ctx.user.id}/${entry.name}`),
+  ];
+
+  const { error: removeError } = await ctx.supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .remove([...new Set(pathsToRemove)]);
+
+  if (removeError) {
+    safeError("uploadWorkerAvatar remove:", removeError);
+  }
 
   const { error: uploadError } = await ctx.supabase.storage
     .from(PROFILE_AVATAR_BUCKET)
     .upload(storagePath, new Uint8Array(fileBuffer), {
       contentType: mimeType,
-      upsert: false,
+      upsert: true,
     });
 
   if (uploadError) {
