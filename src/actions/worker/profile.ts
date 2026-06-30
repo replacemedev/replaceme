@@ -19,6 +19,7 @@ import {
   invalidateEmployerCachesForWorker,
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
+import { safeError } from "@/utils/logger";
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
 const PROFILE_AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -311,7 +312,7 @@ export async function uploadWorkerAvatar(formData: FormData) {
   }
 
   const extension = mimeType === "image/png" ? "png" : "jpg";
-  const storagePath = `${ctx.profile.id}/avatar.${extension}`;
+  const storagePath = `${ctx.user.id}/avatar.${extension}`;
   const fileBuffer = await file.arrayBuffer();
 
   const { error: uploadError } = await ctx.supabase.storage
@@ -322,6 +323,7 @@ export async function uploadWorkerAvatar(formData: FormData) {
     });
 
   if (uploadError) {
+    safeError("uploadWorkerAvatar storage:", uploadError);
     return { error: "Failed to upload profile photo." };
   }
 
@@ -347,6 +349,7 @@ export async function uploadWorkerAvatar(formData: FormData) {
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   revalidatePath("/worker/dashboard");
+  revalidatePath("/worker/onboarding");
   revalidatePath("/", "layout");
 
   return { success: true, avatarUrl };
@@ -385,6 +388,7 @@ export async function removeWorkerAvatar() {
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
   revalidatePath("/worker/dashboard");
+  revalidatePath("/worker/onboarding");
   revalidatePath("/", "layout");
 
   return { success: true };

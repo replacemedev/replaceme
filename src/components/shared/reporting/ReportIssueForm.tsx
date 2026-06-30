@@ -7,6 +7,8 @@ import { REPORT_CATEGORIES } from "@/lib/reporting/constants";
 import { validateReportEvidenceFile } from "@/lib/reporting/evidence";
 import { ReportEvidenceDropzone } from "./ReportEvidenceDropzone";
 
+const MIN_DESCRIPTION_LENGTH = 10;
+
 const CATEGORY_LABELS: Record<(typeof REPORT_CATEGORIES)[number], string> = {
   bug: "Bug",
   ui_error: "UI error",
@@ -30,6 +32,10 @@ export function ReportIssueForm({
   const [title, setTitle] = useState("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
   const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [evidenceResetKey, setEvidenceResetKey] = useState(0);
+
+  const descriptionLength = descriptionMarkdown.trim().length;
+  const canSubmit = descriptionLength >= MIN_DESCRIPTION_LENGTH;
 
   const computedUrl = useMemo(() => {
     if (defaultReportedUrl) return defaultReportedUrl;
@@ -49,6 +55,13 @@ export function ReportIssueForm({
   }, []);
 
   const submit = () => {
+    if (!canSubmit) {
+      toast.error(
+        `Description must be at least ${MIN_DESCRIPTION_LENGTH} characters.`
+      );
+      return;
+    }
+
     const evidenceError = validateReportEvidenceFile(evidenceFile);
     if (evidenceError) {
       toast.error(evidenceError);
@@ -56,27 +69,34 @@ export function ReportIssueForm({
     }
 
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append("category", category);
-      formData.append("title", title);
-      formData.append("descriptionMarkdown", descriptionMarkdown);
-      formData.append("reportedUrl", computedUrl);
-      formData.append("appArea", computedAppArea);
-      formData.append("context", JSON.stringify({}));
-      if (evidenceFile) formData.append("file", evidenceFile);
+      try {
+        const formData = new FormData();
+        formData.append("category", category);
+        formData.append("title", title);
+        formData.append("descriptionMarkdown", descriptionMarkdown);
+        formData.append("reportedUrl", computedUrl);
+        formData.append("appArea", computedAppArea);
+        formData.append("context", JSON.stringify({}));
+        if (evidenceFile) formData.append("file", evidenceFile);
 
-      const result = await submitReport(formData);
+        const result = await submitReport(formData);
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+        if (!result.success) {
+          toast.error(result.error);
+          return;
+        }
+
+        toast.success(
+          "Report submitted. Thanks for helping us improve ReplaceMe."
+        );
+        setTitle("");
+        setDescriptionMarkdown("");
+        setEvidenceFile(null);
+        setEvidenceResetKey((k) => k + 1);
+        onSubmitted?.();
+      } catch {
+        toast.error("Could not submit report. Please try again.");
       }
-
-      toast.success("Report submitted. Thanks for helping us improve ReplaceMe.");
-      setTitle("");
-      setDescriptionMarkdown("");
-      setEvidenceFile(null);
-      onSubmitted?.();
     });
   };
 
@@ -124,12 +144,18 @@ export function ReportIssueForm({
           }
           disabled={isPending}
         />
-        <p className="text-xs font-medium text-slate-500">
-          We automatically attach the page URL and your account role.
+        <p
+          className={`text-xs font-medium ${
+            canSubmit ? "text-slate-500" : "text-amber-600"
+          }`}
+        >
+          {descriptionLength} / {MIN_DESCRIPTION_LENGTH} characters minimum. We
+          automatically attach the page URL and your account role.
         </p>
       </label>
 
       <ReportEvidenceDropzone
+        key={evidenceResetKey}
         file={evidenceFile}
         onFileChange={setEvidenceFile}
         disabled={isPending}
@@ -138,7 +164,7 @@ export function ReportIssueForm({
       <button
         type="button"
         onClick={submit}
-        disabled={isPending || descriptionMarkdown.trim().length < 30}
+        disabled={isPending}
         className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
       >
         {isPending ? "Submitting…" : "Submit report"}
@@ -146,4 +172,3 @@ export function ReportIssueForm({
     </div>
   );
 }
-

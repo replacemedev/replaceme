@@ -39,7 +39,7 @@ const createReportSchema = z
   .object({
     category: z.enum(REPORT_CATEGORIES),
     title: z.string().trim().max(140).optional(),
-    descriptionMarkdown: z.string().trim().min(30).max(10_000),
+    descriptionMarkdown: z.string().trim().min(10).max(10_000),
     reportedUrl: z.union([z.string().url(), z.literal("")]).optional(),
     appArea: z.string().trim().max(80).optional(),
     context: jsonSizeLimitedSchema.optional(),

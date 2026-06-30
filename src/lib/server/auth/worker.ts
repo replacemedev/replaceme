@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { profileIdFilter } from "@/lib/auth/role";
+import { safeError } from "@/utils/logger";
 
 export async function requireWorker() {
   const supabase = await createClient();
@@ -9,11 +11,16 @@ export async function requireWorker() {
 
   if (authError || !user) return null;
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("id, role")
-    .eq("id", user.id)
-    .single();
+    .or(profileIdFilter(user.id))
+    .maybeSingle();
+
+  if (profileError) {
+    safeError("[requireWorker] profile lookup failed:", profileError);
+    return null;
+  }
 
   if (!profile || profile.role !== "worker") return null;
 

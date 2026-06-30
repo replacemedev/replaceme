@@ -9,6 +9,7 @@ import {
   type WorkerOnboardingDraft,
 } from "@/actions/onboarding";
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
+import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -48,6 +49,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   );
   const [firstName, setFirstName] = useState(draft.firstName);
   const [lastName, setLastName] = useState(draft.lastName);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
   const [location, setLocation] = useState(
     draft.location || WORKER_LOCATION_OPTIONS[0]
   );
@@ -147,6 +149,15 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
+        <ProfileAvatarUpload
+          avatarUrl={avatarUrl}
+          displayName={
+            `${firstName} ${lastName}`.trim() || professionalTitle.trim() || "Worker"
+          }
+          size="md"
+          onAvatarChange={setAvatarUrl}
+          helperText="Optional — a clear photo helps employers recognize you."
+        />
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Professional title
           <input
