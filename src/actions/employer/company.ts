@@ -98,22 +98,39 @@ export async function updateCompanyProfile(payload: CompanyProfileInput) {
       return { error: errorMsg };
     }
 
-    // Upsert into company_profiles table directly
-    const { error: upsertError } = await supabase
+    const profileFields = {
+      company_name: parsed.data.companyName,
+      website_url: parsed.data.websiteUrl || null,
+      industry: parsed.data.industry || null,
+      company_bio: parsed.data.companyBio || null,
+      logo_url: parsed.data.logoUrl || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    // Update existing row by employer_id. Plain upsert() conflicts on primary key (id),
+    // not employer_id, which caused 409 when a company_profiles row already existed.
+    const { data: updated, error: updateError } = await supabase
       .from("company_profiles")
-      .upsert({
+      .update(profileFields)
+      .eq("employer_id", user.id)
+      .select("employer_id")
+      .maybeSingle();
+
+    if (updateError) {
+      safeError("updateCompanyProfile update error:", updateError);
+      return { error: "Failed to update company profile in database." };
+    }
+
+    if (!updated) {
+      const { error: insertError } = await supabase.from("company_profiles").insert({
         employer_id: user.id,
-        company_name: parsed.data.companyName,
-        website_url: parsed.data.websiteUrl || null,
-        industry: parsed.data.industry || null,
-        company_bio: parsed.data.companyBio || null,
-        logo_url: parsed.data.logoUrl || null,
-        updated_at: new Date().toISOString(),
+        ...profileFields,
       });
 
-    if (upsertError) {
-      safeError("updateCompanyProfile upsert error occurred:", upsertError);
-      return { error: "Failed to update company profile in database." };
+      if (insertError) {
+        safeError("updateCompanyProfile insert error:", insertError);
+        return { error: "Failed to create company profile in database." };
+      }
     }
 
     safeLog("[Auth] Company profile successfully updated");
@@ -167,14 +184,20 @@ export async function uploadCompanyLogo(formData: FormData) {
     }
 
     const extension = mimeType === "image/png" ? "png" : "jpg";
+    const altExtension = extension === "png" ? "jpg" : "png";
     const storagePath = `${user.id}/logo.${extension}`;
+    const altStoragePath = `${user.id}/logo.${altExtension}`;
     const fileBuffer = await file.arrayBuffer();
+
+    await supabase.storage
+      .from(COMPANY_LOGO_BUCKET)
+      .remove([storagePath, altStoragePath]);
 
     const { error: uploadError } = await supabase.storage
       .from(COMPANY_LOGO_BUCKET)
       .upload(storagePath, fileBuffer, {
         contentType: mimeType,
-        upsert: true,
+        upsert: false,
       });
 
     if (uploadError) {
@@ -183,7 +206,8 @@ export async function uploadCompanyLogo(formData: FormData) {
         error:
           uploadError.message?.includes("maximum")
             ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
-            : "Failed to upload company logo. Use JPG or PNG up to 5 MB.",
+            : uploadError.message ||
+              "Failed to upload company logo. Use JPG or PNG up to 5 MB.",
       };
     }
 
@@ -193,15 +217,24 @@ export async function uploadCompanyLogo(formData: FormData) {
 
     const logoUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
 
-    const { error: updateError } = await supabase
+    const { data: updatedRow, error: updateError } = await supabase
       .from("company_profiles")
-      .update({ logo_url: logoUrl })
-      .eq("employer_id", user.id);
+      .update({
+        logo_url: logoUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("employer_id", user.id)
+      .select("employer_id")
+      .maybeSingle();
 
-    if (updateError) {
-      safeError("uploadCompanyLogo db update:", updateError);
+    if (updateError || !updatedRow) {
+      safeError("uploadCompanyLogo db update:", updateError ?? "no row updated");
       await supabase.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
-      return { error: "Failed to save logo to company profile." };
+      return {
+        error: updateError
+          ? "Failed to save logo to company profile."
+          : "Company profile not found. Save your company details first, then upload a logo.",
+      };
     }
 
     revalidatePath("/employer/settings/company");
