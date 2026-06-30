@@ -20,8 +20,10 @@ import {
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 import { safeError } from "@/utils/logger";
+import { createAdminClient } from "@/lib/supabase/server";
 import {
   PROFILE_IMAGE_MAX_BYTES,
+  mapProfileImageUploadError,
   profileImageMaxMbLabel,
   resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
@@ -324,15 +326,18 @@ export async function uploadWorkerAvatar(formData: FormData) {
       .map((entry) => `${ctx.user.id}/${entry.name}`),
   ];
 
-  const { error: removeError } = await ctx.supabase.storage
+  const admin = await createAdminClient();
+  const uniquePaths = [...new Set(pathsToRemove)];
+
+  const { error: removeError } = await admin.storage
     .from(PROFILE_AVATAR_BUCKET)
-    .remove([...new Set(pathsToRemove)]);
+    .remove(uniquePaths);
 
   if (removeError) {
     safeError("uploadWorkerAvatar remove:", removeError);
   }
 
-  const { error: uploadError } = await ctx.supabase.storage
+  const { error: uploadError } = await admin.storage
     .from(PROFILE_AVATAR_BUCKET)
     .upload(storagePath, new Uint8Array(fileBuffer), {
       contentType: mimeType,
@@ -341,13 +346,7 @@ export async function uploadWorkerAvatar(formData: FormData) {
 
   if (uploadError) {
     safeError("uploadWorkerAvatar storage:", uploadError);
-    return {
-      error:
-        uploadError.message?.includes("maximum")
-          ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
-          : uploadError.message ||
-            "Failed to upload profile photo. Use JPG or PNG up to 5 MB.",
-    };
+    return { error: mapProfileImageUploadError(uploadError.message, "avatar") };
   }
 
   const { data: publicUrlData } = ctx.supabase.storage
@@ -368,8 +367,11 @@ export async function uploadWorkerAvatar(formData: FormData) {
 
   if (updateError || !updatedRow) {
     safeError("uploadWorkerAvatar profile update:", updateError ?? "no row updated");
-    await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
-    return { error: "Failed to save profile photo to your account." };
+    await admin.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
+    return {
+      error:
+        "Your photo uploaded but we couldn't link it to your profile. Please try again.",
+    };
   }
 
   await invalidateWorkerCache(ctx.profile.id);
@@ -398,7 +400,8 @@ export async function removeWorkerAvatar() {
     if (pathStart !== -1) {
       const rawPath = profile.avatar_url.slice(pathStart + marker.length);
       const storagePath = rawPath.split("?")[0];
-      await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
+      const admin = await createAdminClient();
+      await admin.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
     }
   }
 

@@ -1,11 +1,12 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
 import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
 import { revalidatePath } from "next/cache";
 import {
   PROFILE_IMAGE_MAX_BYTES,
+  mapProfileImageUploadError,
   profileImageMaxMbLabel,
   resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
@@ -201,15 +202,18 @@ export async function uploadCompanyLogo(formData: FormData) {
         .map((entry) => `${user.id}/${entry.name}`),
     ];
 
-    const { error: removeError } = await supabase.storage
+    const admin = await createAdminClient();
+    const uniquePaths = [...new Set(pathsToRemove)];
+
+    const { error: removeError } = await admin.storage
       .from(COMPANY_LOGO_BUCKET)
-      .remove([...new Set(pathsToRemove)]);
+      .remove(uniquePaths);
 
     if (removeError) {
       safeError("uploadCompanyLogo remove:", removeError);
     }
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await admin.storage
       .from(COMPANY_LOGO_BUCKET)
       .upload(storagePath, new Uint8Array(fileBuffer), {
         contentType: mimeType,
@@ -218,16 +222,10 @@ export async function uploadCompanyLogo(formData: FormData) {
 
     if (uploadError) {
       safeError("uploadCompanyLogo storage:", uploadError);
-      return {
-        error:
-          uploadError.message?.includes("maximum")
-            ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
-            : uploadError.message ||
-              "Failed to upload company logo. Use JPG or PNG up to 5 MB.",
-      };
+      return { error: mapProfileImageUploadError(uploadError.message, "logo") };
     }
 
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = admin.storage
       .from(COMPANY_LOGO_BUCKET)
       .getPublicUrl(storagePath);
 
@@ -245,11 +243,10 @@ export async function uploadCompanyLogo(formData: FormData) {
 
     if (updateError || !updatedRow) {
       safeError("uploadCompanyLogo db update:", updateError ?? "no row updated");
-      await supabase.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
+      await admin.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
       return {
-        error: updateError
-          ? "Failed to save logo to company profile."
-          : "Company profile not found. Save your company details first, then upload a logo.",
+        error:
+          "Your logo uploaded but we couldn't link it to your company profile. Save your company details first, then try again.",
       };
     }
 
