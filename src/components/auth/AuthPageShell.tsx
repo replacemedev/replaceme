@@ -5,7 +5,8 @@ import {
   AUTH_CARD,
   AUTH_FORM_MAX,
   AUTH_MARKETING_DESKTOP,
-  AUTH_MARKETING_MOBILE,
+  AUTH_MARKETING_LEFT,
+  AUTH_MARKETING_RIGHT,
   AUTH_PANEL_PADDING,
 } from "@/lib/auth/ui-tokens";
 
@@ -25,18 +26,13 @@ export function AuthPageShell({
   brandHref = "/",
 }: AuthPageShellProps) {
   const marketingPanel = marketing ? (
-    <>
-      <div
-        className={`${AUTH_MARKETING_DESKTOP} ${
-          marketingPosition === "left"
-            ? "bg-[#005321] order-first"
-            : "bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100"
-        }`}
-      >
-        {marketing}
-      </div>
-      <div className={AUTH_MARKETING_MOBILE}>{marketing}</div>
-    </>
+    <div
+      className={`${AUTH_MARKETING_DESKTOP} ${
+        marketingPosition === "left" ? AUTH_MARKETING_LEFT : AUTH_MARKETING_RIGHT
+      }`}
+    >
+      {marketing}
+    </div>
   ) : null;
 
   return (
@@ -44,14 +40,14 @@ export function AuthPageShell({
       {marketingPosition === "left" ? marketingPanel : null}
 
       <div
-        className={`flex w-full flex-1 flex-col justify-between min-h-screen ${AUTH_PANEL_PADDING} lg:w-1/2`}
+        className={`flex w-full flex-1 flex-col justify-between min-h-screen lg:w-1/2 ${AUTH_PANEL_PADDING}`}
       >
         <div
           className={`flex flex-1 flex-col justify-center w-full ${AUTH_FORM_MAX} mx-auto py-6 sm:py-8`}
         >
           <Link
             href={brandHref}
-            className="mb-6 inline-flex items-center gap-2 transition-opacity hover:opacity-90 w-fit"
+            className="mb-6 inline-flex items-center gap-2 w-fit transition-opacity duration-200 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
           >
             <div className="relative h-8 w-8 shrink-0">
               <Image

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
 import { AuthFooter } from "@/components/auth/AuthFooter";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { AuthMarketingPanel } from "@/components/auth/AuthMarketingPanel";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
-import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
-import { getAuthScreenContent } from "@/lib/content/auth-screen";
+import { SignInWelcomePanel } from "@/components/auth/marketing/SignInWelcomePanel";
+import { AUTH_LINK, AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
+import { SIGNIN_PAGE } from "@/lib/auth/static-copy";
 
 export const metadata = {
   title: "Sign In | ReplaceMe",
@@ -26,30 +26,20 @@ export default async function SignInPage({
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
-  const contentSlug =
-    view === "forgot_password" ? "auth-forgot-password" : "auth-login";
-  const content = await getAuthScreenContent(contentSlug);
-
-  const headline =
-    content.headline?.trim() ||
-    (view === "login" ? "Sign in" : "Reset password");
-  const description =
-    content.description?.trim() ||
-    (view === "login"
-      ? "Access your professional dashboard."
-      : "Enter your email and we'll send you a secure reset link.");
+  const copy =
+    view === "login" ? SIGNIN_PAGE.login : SIGNIN_PAGE.forgotPassword;
 
   return (
     <AuthPageShell
-      marketing={<AuthMarketingPanel content={content} variant="testimonial" />}
+      marketing={view === "login" ? <SignInWelcomePanel /> : undefined}
       marketingPosition="right"
       footer={<AuthFooter />}
     >
       <AuthFlashToast />
 
       <header className="mb-6 space-y-2">
-        <h1 className={AUTH_TITLE}>{headline}</h1>
-        <p className={AUTH_SUBTITLE}>{description}</p>
+        <h1 className={AUTH_TITLE}>{copy.headline}</h1>
+        <p className={AUTH_SUBTITLE}>{copy.description}</p>
       </header>
 
       <AuthFormCard>
@@ -60,14 +50,11 @@ export default async function SignInPage({
         )}
       </AuthFormCard>
 
-      {view === "login" && content.signupPrompt && content.signupLinkLabel ? (
+      {view === "login" ? (
         <p className="mt-4 text-center text-sm font-body-base text-slate-600 leading-relaxed">
-          {content.signupPrompt}{" "}
-          <Link
-            href="/signup"
-            className="font-body-bold font-bold text-[#006e2f] transition-colors hover:text-[#005321]"
-          >
-            {content.signupLinkLabel}
+          {SIGNIN_PAGE.login.signUpPrompt}{" "}
+          <Link href="/signup" className={AUTH_LINK}>
+            {SIGNIN_PAGE.login.signUpLinkLabel}
           </Link>
         </p>
       ) : null}
