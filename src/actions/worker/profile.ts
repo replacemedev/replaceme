@@ -21,9 +21,9 @@ import {
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 import { safeError } from "@/utils/logger";
 import {
-  normalizeProfileImageMime,
   PROFILE_IMAGE_MAX_BYTES,
   profileImageMaxMbLabel,
+  resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
@@ -294,10 +294,10 @@ export async function uploadWorkerAvatar(formData: FormData) {
   }
 
   if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-    return { error: `File must be ${profileImageMaxMbLabel()} or smaller.` };
+    return { error: `File exceeds ${profileImageMaxMbLabel()} maximum.` };
   }
 
-  const mimeType = normalizeProfileImageMime(file.type);
+  const mimeType = resolveProfileImageMime(file);
   if (!mimeType) {
     return { error: "Only JPG and PNG files are allowed." };
   }
@@ -315,7 +315,12 @@ export async function uploadWorkerAvatar(formData: FormData) {
 
   if (uploadError) {
     safeError("uploadWorkerAvatar storage:", uploadError);
-    return { error: "Failed to upload profile photo." };
+    return {
+      error:
+        uploadError.message?.includes("maximum")
+          ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
+          : "Failed to upload profile photo. Use JPG or PNG up to 5 MB.",
+    };
   }
 
   const { data: publicUrlData } = ctx.supabase.storage
@@ -362,7 +367,8 @@ export async function removeWorkerAvatar() {
     const marker = `/object/public/${PROFILE_AVATAR_BUCKET}/`;
     const pathStart = profile.avatar_url.indexOf(marker);
     if (pathStart !== -1) {
-      const storagePath = profile.avatar_url.slice(pathStart + marker.length);
+      const rawPath = profile.avatar_url.slice(pathStart + marker.length);
+      const storagePath = rawPath.split("?")[0];
       await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
     }
   }

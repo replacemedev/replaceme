@@ -10,10 +10,10 @@ import {
 } from "@/actions/worker/profile";
 
 import {
-  PROFILE_IMAGE_ALLOWED_TYPES,
   PROFILE_IMAGE_MAX_BYTES,
   profileImageHelperText,
-  profileImageMaxMbLabel,
+  profileImageSizeError,
+  resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
 
 type AvatarSize = "md" | "lg";
@@ -67,15 +67,12 @@ export function ProfileAvatarUpload({
     if (!editable || busy) return;
 
     if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      toast.error(`File must be ${profileImageMaxMbLabel()} or smaller.`);
+      toast.error(profileImageSizeError());
       return;
     }
 
-    if (
-      !PROFILE_IMAGE_ALLOWED_TYPES.includes(
-        file.type as (typeof PROFILE_IMAGE_ALLOWED_TYPES)[number]
-      )
-    ) {
+    const mimeType = resolveProfileImageMime(file);
+    if (!mimeType) {
       toast.error("Only JPG and PNG files are allowed.");
       return;
     }

@@ -218,7 +218,7 @@ export async function submitReport(formData: FormData) {
         return fail("Failed to upload screenshot evidence.");
       }
 
-      const { error: evidenceUpdateError } = await ctx.supabase
+      const { data: evidenceRow, error: evidenceUpdateError } = await ctx.supabase
         .from("reports")
         .update({
           evidence_storage_path: storagePath,
@@ -226,9 +226,11 @@ export async function submitReport(formData: FormData) {
           evidence_file_size_bytes: evidenceFile.size,
         })
         .eq("id", inserted.id)
-        .eq("reporter_id", authUserId);
+        .eq("reporter_id", authUserId)
+        .select("id, evidence_storage_path")
+        .maybeSingle();
 
-      if (evidenceUpdateError) {
+      if (evidenceUpdateError || !evidenceRow?.evidence_storage_path) {
         safeError("submitReport evidence update:", evidenceUpdateError);
         await ctx.supabase.storage.from(REPORT_EVIDENCE_BUCKET).remove([storagePath]);
         await ctx.supabase.from("reports").delete().eq("id", inserted.id);
@@ -251,7 +253,49 @@ export type AdminReportRow = {
   reporterRole: "worker" | "employer" | "admin";
   title: string | null;
   reportedUrl: string | null;
+  hasEvidence: boolean;
 };
+
+async function resolveReportEvidencePath(
+  adminSupabase: Awaited<ReturnType<typeof createAdminClient>>,
+  reporterId: string,
+  reportId: string,
+  existingPath: string | null
+): Promise<string | null> {
+  if (existingPath) return existingPath;
+
+  const { data: objects, error } = await adminSupabase.storage
+    .from(REPORT_EVIDENCE_BUCKET)
+    .list(reporterId, { limit: 20 });
+
+  if (error || !objects?.length) return null;
+
+  const match = objects.find(
+    (obj) =>
+      obj.name === `${reportId}.png` ||
+      obj.name === `${reportId}.jpg` ||
+      obj.name === `${reportId}.jpeg` ||
+      obj.name.startsWith(`${reportId}.`)
+  );
+
+  return match ? `${reporterId}/${match.name}` : null;
+}
+
+async function signReportEvidenceUrl(
+  adminSupabase: Awaited<ReturnType<typeof createAdminClient>>,
+  storagePath: string
+): Promise<string | null> {
+  const { data: signed, error: signedError } = await adminSupabase.storage
+    .from(REPORT_EVIDENCE_BUCKET)
+    .createSignedUrl(storagePath, 60 * 60);
+
+  if (signedError) {
+    safeError("signReportEvidenceUrl:", signedError);
+    return null;
+  }
+
+  return signed?.signedUrl ?? null;
+}
 
 export async function getAdminReports(input: unknown): Promise<{
   items: AdminReportRow[];
@@ -266,7 +310,7 @@ export async function getAdminReports(input: unknown): Promise<{
       let query = supabase
         .from("reports")
         .select(
-          "id, created_at, status, category, reporter_id, reporter_role, title, reported_url",
+          "id, created_at, status, category, reporter_id, reporter_role, title, reported_url, evidence_storage_path",
           { count: "exact" }
         )
         .order("created_at", { ascending: false })
@@ -296,6 +340,7 @@ export async function getAdminReports(input: unknown): Promise<{
           reporterRole: r.reporter_role,
           title: r.title,
           reportedUrl: r.reported_url,
+          hasEvidence: Boolean(r.evidence_storage_path),
         })),
         total: count ?? 0,
       };
@@ -349,18 +394,31 @@ export async function getAdminReportById(
       return null;
     }
 
-    let evidenceSignedUrl: string | null = null;
-    if (data.evidence_storage_path) {
-      const { data: signed, error: signedError } = await adminSupabase.storage
-        .from(REPORT_EVIDENCE_BUCKET)
-        .createSignedUrl(data.evidence_storage_path, 60 * 60);
+    let evidenceStoragePath = data.evidence_storage_path;
+    if (!evidenceStoragePath) {
+      evidenceStoragePath = await resolveReportEvidencePath(
+        adminSupabase,
+        data.reporter_id,
+        data.id,
+        null
+      );
 
-      if (signedError) {
-        safeError("getAdminReportById signed url:", signedError);
-      } else if (signed?.signedUrl) {
-        evidenceSignedUrl = signed.signedUrl;
+      if (evidenceStoragePath) {
+        await adminSupabase
+          .from("reports")
+          .update({
+            evidence_storage_path: evidenceStoragePath,
+            evidence_mime_type: evidenceStoragePath.endsWith(".png")
+              ? "image/png"
+              : "image/jpeg",
+          })
+          .eq("id", data.id);
       }
     }
+
+    const evidenceSignedUrl = evidenceStoragePath
+      ? await signReportEvidenceUrl(adminSupabase, evidenceStoragePath)
+      : null;
 
     return {
       id: data.id,
@@ -379,7 +437,7 @@ export async function getAdminReportById(
       resolvedAt: data.resolved_at,
       resolvedBy: data.resolved_by,
       evidenceSignedUrl,
-      evidenceStoragePath: data.evidence_storage_path,
+      evidenceStoragePath,
       evidenceMimeType: data.evidence_mime_type,
       evidenceFileSizeBytes: data.evidence_file_size_bytes,
     };

@@ -19,6 +19,21 @@ export function normalizeProfileImageMime(mimeType: string): string | null {
   return null;
 }
 
+/** Browsers often omit file.type; infer from extension before rejecting. */
+export function resolveProfileImageMime(file: File): string | null {
+  const fromType = normalizeProfileImageMime(file.type);
+  if (fromType) return fromType;
+
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "png") return "image/png";
+  return null;
+}
+
+export function profileImageSizeError(): string {
+  return `File exceeds ${profileImageMaxMbLabel()} maximum.`;
+}
+
 export function profileImageMaxMbLabel(): string {
   return `${PROFILE_IMAGE_MAX_BYTES / (1024 * 1024)} MB`;
 }

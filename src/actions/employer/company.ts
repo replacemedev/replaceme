@@ -5,9 +5,9 @@ import { safeError, safeLog } from "@/utils/logger";
 import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
 import { revalidatePath } from "next/cache";
 import {
-  normalizeProfileImageMime,
   PROFILE_IMAGE_MAX_BYTES,
   profileImageMaxMbLabel,
+  resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
 
 const COMPANY_LOGO_BUCKET = "company-logos";
@@ -158,10 +158,10 @@ export async function uploadCompanyLogo(formData: FormData) {
     }
 
     if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      return { error: `File must be ${profileImageMaxMbLabel()} or smaller.` };
+      return { error: `File exceeds ${profileImageMaxMbLabel()} maximum.` };
     }
 
-    const mimeType = normalizeProfileImageMime(file.type);
+    const mimeType = resolveProfileImageMime(file);
     if (!mimeType) {
       return { error: "Only JPG and PNG files are allowed." };
     }
@@ -179,7 +179,12 @@ export async function uploadCompanyLogo(formData: FormData) {
 
     if (uploadError) {
       safeError("uploadCompanyLogo storage:", uploadError);
-      return { error: "Failed to upload company logo." };
+      return {
+        error:
+          uploadError.message?.includes("maximum")
+            ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
+            : "Failed to upload company logo. Use JPG or PNG up to 5 MB.",
+      };
     }
 
     const { data: publicUrlData } = supabase.storage

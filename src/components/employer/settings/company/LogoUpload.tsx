@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import {
   PROFILE_IMAGE_MAX_BYTES,
   companyLogoHelperText,
-  profileImageMaxMbLabel,
+  profileImageSizeError,
+  resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
 
 export function LogoUpload() {
@@ -29,13 +30,12 @@ export function LogoUpload() {
 
     // Client-side quick checks
     if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      toast.error(`File must be ${profileImageMaxMbLabel()} or smaller.`);
+      toast.error(profileImageSizeError());
       return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Only JPG, JPEG, and PNG files are allowed.");
+    if (!resolveProfileImageMime(file)) {
+      toast.error("Only JPG and PNG files are allowed.");
       return;
     }
 

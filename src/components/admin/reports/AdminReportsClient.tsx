@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { ImageIcon, Paperclip } from "lucide-react";
 import { toast } from "sonner";
 import {
   getAdminReportById,
@@ -165,6 +166,7 @@ export function AdminReportsClient({
               <th className="px-4 py-3">Report</th>
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Attachment</th>
               <th className="px-4 py-3">Created</th>
             </tr>
           </thead>
@@ -186,6 +188,23 @@ export function AdminReportsClient({
                 <td className="px-4 py-3 text-slate-600">{r.reporterRole}</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={prettyStatus(r.status)} />
+                </td>
+                <td className="px-4 py-3">
+                  {r.hasEvidence ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openPanel(r.id);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#006e2f]/20 bg-[#ebfdf2] px-2.5 py-1 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#d8f9e6]"
+                    >
+                      <Paperclip className="h-3.5 w-3.5" aria-hidden />
+                      View image
+                    </button>
+                  ) : (
+                    <span className="text-xs font-medium text-slate-400">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-slate-500">
                   {new Date(r.createdAt).toLocaleString()}
@@ -250,10 +269,23 @@ export function AdminReportsClient({
             </div>
 
             {selected.evidenceStoragePath ? (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Screenshot evidence
-                </p>
+              <div className="space-y-3 rounded-2xl border border-[#006e2f]/15 bg-[#fafdfb] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Screenshot evidence
+                  </p>
+                  {selected.evidenceSignedUrl ? (
+                    <a
+                      href={selected.evidenceSignedUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#006e2f] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
+                    >
+                      <ImageIcon className="h-4 w-4" aria-hidden />
+                      View attachment
+                    </a>
+                  ) : null}
+                </div>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                   {selected.evidenceSignedUrl ? (
                     <div className="relative aspect-video w-full max-h-80">
