@@ -195,7 +195,7 @@ export async function uploadCompanyLogo(formData: FormData) {
 
     const { error: uploadError } = await supabase.storage
       .from(COMPANY_LOGO_BUCKET)
-      .upload(storagePath, fileBuffer, {
+      .upload(storagePath, new Uint8Array(fileBuffer), {
         contentType: mimeType,
         upsert: false,
       });

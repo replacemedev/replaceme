@@ -303,14 +303,24 @@ export async function uploadWorkerAvatar(formData: FormData) {
   }
 
   const extension = mimeType === "image/png" ? "png" : "jpg";
+  const altExtension = extension === "png" ? "jpg" : "png";
   const storagePath = `${ctx.user.id}/avatar.${extension}`;
+  const altStoragePath = `${ctx.user.id}/avatar.${altExtension}`;
   const fileBuffer = await file.arrayBuffer();
+
+  if (fileBuffer.byteLength === 0) {
+    return { error: "Uploaded file is empty. Please choose a different image." };
+  }
+
+  await ctx.supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .remove([storagePath, altStoragePath]);
 
   const { error: uploadError } = await ctx.supabase.storage
     .from(PROFILE_AVATAR_BUCKET)
-    .upload(storagePath, fileBuffer, {
+    .upload(storagePath, new Uint8Array(fileBuffer), {
       contentType: mimeType,
-      upsert: true,
+      upsert: false,
     });
 
   if (uploadError) {
@@ -319,7 +329,8 @@ export async function uploadWorkerAvatar(formData: FormData) {
       error:
         uploadError.message?.includes("maximum")
           ? `File exceeds ${profileImageMaxMbLabel()} maximum.`
-          : "Failed to upload profile photo. Use JPG or PNG up to 5 MB.",
+          : uploadError.message ||
+            "Failed to upload profile photo. Use JPG or PNG up to 5 MB.",
     };
   }
 
@@ -329,18 +340,20 @@ export async function uploadWorkerAvatar(formData: FormData) {
 
   const avatarUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
 
-  const { error: updateError } = await ctx.supabase
+  const { data: updatedRow, error: updateError } = await ctx.supabase
     .from("profiles")
     .update({
       avatar_url: avatarUrl,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", ctx.user.id);
+    .eq("id", ctx.profile.id)
+    .select("id")
+    .maybeSingle();
 
-  if (updateError) {
-    safeError("uploadWorkerAvatar profile update:", updateError);
+  if (updateError || !updatedRow) {
+    safeError("uploadWorkerAvatar profile update:", updateError ?? "no row updated");
     await ctx.supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([storagePath]);
-    return { error: "Failed to save profile photo." };
+    return { error: "Failed to save profile photo to your account." };
   }
 
   await invalidateWorkerCache(ctx.profile.id);
@@ -373,15 +386,17 @@ export async function removeWorkerAvatar() {
     }
   }
 
-  const { error } = await ctx.supabase
+  const { data: updatedRow, error } = await ctx.supabase
     .from("profiles")
     .update({
       avatar_url: null,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", ctx.user.id);
+    .eq("id", ctx.profile.id)
+    .select("id")
+    .maybeSingle();
 
-  if (error) return { error: "Failed to remove profile photo." };
+  if (error || !updatedRow) return { error: "Failed to remove profile photo." };
 
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
