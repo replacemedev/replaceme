@@ -13,6 +13,7 @@ import {
   ClipboardList,
   MessageSquare,
   CreditCard,
+  Flag,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/applications", label: "Applications", icon: ClipboardList },
   { href: "/admin/jobs", label: "Job Posts", icon: Briefcase },
   { href: "/admin/identity", label: "Identity", icon: Fingerprint },
+  { href: "/admin/reports", label: "Reports", icon: Flag },
   { href: "/admin/moderation", label: "Moderation", icon: MessageSquare },
   { href: "/admin/revenue", label: "Revenue", icon: DollarSign },
   { href: "/admin/billing-ops", label: "Billing Ops", icon: CreditCard },
@@ -55,6 +57,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         "/admin/users",
         "/admin/applications",
         "/admin/jobs",
+        "/admin/reports",
       ].includes(item.href)
     ),
   },

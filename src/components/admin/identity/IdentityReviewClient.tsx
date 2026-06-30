@@ -2,17 +2,20 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Fingerprint, Check, X, FileImage, ChevronDown, ChevronUp, Clock, Files } from "lucide-react";
+import { Fingerprint, Check, X, FileImage, ChevronDown, ChevronUp, Clock, Files, Eye } from "lucide-react";
 import { toast } from "sonner";
 import {
   fetchWorkerVerificationDocuments,
   reviewWorkerVerification,
 } from "@/actions/admin-actions";
+import { getAdminWorkerProfileDeepDive, type AdminWorkerProfileDeepDive } from "@/actions/admin/deep-dive";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatCard } from "@/components/shared/StatCard";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
+import { formatMoney } from "@/lib/format/currency";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
@@ -34,6 +37,13 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
     name: string;
     type: "approved" | "rejected";
   } | null>(null);
+  const [viewTarget, setViewTarget] = useState<{
+    workerId: string;
+    name: string;
+  } | null>(null);
+  const [viewData, setViewData] = useState<AdminWorkerProfileDeepDive | null>(
+    null
+  );
   const [reason, setReason] = useState("");
   const router = useRouter();
 
@@ -153,6 +163,25 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewTarget({ workerId: worker.id, name });
+                    setViewData(null);
+                    startTransition(async () => {
+                      const full = await getAdminWorkerProfileDeepDive(worker.id);
+                      if (!full) {
+                        toast.error("Failed to load worker profile");
+                        return;
+                      }
+                      setViewData(full);
+                    });
+                  }}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  <Eye className="h-3.5 w-3.5" aria-hidden />
+                  Deep dive
+                </button>
                 <button
                   type="button"
                   onClick={() => toggleExpand(worker.id)}
@@ -279,6 +308,154 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           />
         </label>
       ) : null}
+
+      <AdminSlideover
+        open={viewTarget !== null}
+        onClose={() => {
+          setViewTarget(null);
+          setViewData(null);
+        }}
+        title={viewTarget?.name ?? "Worker profile"}
+        description={
+          viewData
+            ? `${viewData.professionalTitle ?? "Worker"} • ${
+                viewData.hourlyRate != null
+                  ? formatMoney(viewData.hourlyRate, viewData.salaryCurrency, { perHour: true })
+                  : "No hourly rate"
+              }`
+            : "Loading…"
+        }
+      >
+        {!viewData ? (
+          <p className="text-sm font-medium text-slate-500">Loading profile…</p>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Identity
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-900">
+                  {[viewData.firstName, viewData.lastName].filter(Boolean).join(" ") || "—"}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">{viewData.email ?? "—"}</p>
+                <p className="mt-2 text-xs font-mono text-slate-500">{viewData.id}</p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Location & availability
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {viewData.location ?? "—"}
+                </p>
+                <p className="mt-1 text-xs font-medium text-slate-600">
+                  {viewData.availability ?? "—"}
+                  {viewData.isRemote ? " • Remote" : ""}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Joined {new Date(viewData.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Bio
+              </p>
+              <p className="mt-2 whitespace-pre-wrap text-sm font-medium text-slate-800">
+                {viewData.bio?.trim() ? viewData.bio : "—"}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Compensation
+                </p>
+                <p className="mt-2 text-sm font-bold text-slate-900">
+                  {viewData.hourlyRate != null
+                    ? formatMoney(viewData.hourlyRate, viewData.salaryCurrency, { perHour: true })
+                    : "—"}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Age
+                </p>
+                <p className="mt-2 text-sm font-bold text-slate-900">
+                  {viewData.birthYear
+                    ? `${new Date().getFullYear() - viewData.birthYear}`
+                    : "—"}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Top skills
+              </p>
+              {viewData.skills.length === 0 ? (
+                <p className="mt-2 text-sm font-medium text-slate-500">—</p>
+              ) : (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {viewData.skills.map((s) => (
+                    <span
+                      key={s.skillName}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700"
+                    >
+                      {s.skillName}
+                      <span className="text-[11px] font-bold text-slate-400">
+                        {s.proficiency}%
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Projects
+              </p>
+              {viewData.projects.length === 0 ? (
+                <p className="mt-2 text-sm font-medium text-slate-500">—</p>
+              ) : (
+                <ul className="mt-3 space-y-3">
+                  {viewData.projects.map((p) => (
+                    <li key={p.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold text-slate-900">
+                            {p.title}
+                          </p>
+                          <p className="text-xs font-medium text-slate-600">
+                            {p.role} • {p.year}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
+                        {p.description}
+                      </p>
+                      {p.skillsUsed.length > 0 ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {p.skillsUsed.map((s) => (
+                            <span
+                              key={`${p.id}-${s}`}
+                              className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 border border-slate-200"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </AdminSlideover>
     </div>
   );
 }

@@ -103,6 +103,7 @@ export async function assertRateLimit(
 
 const applyLimiter = createLimiter("job-apply", 10, "1 h");
 const messageLimiter = createLimiter("messaging", 60, "1 h");
+const reportLimiter = createLimiter("reports", 6, "1 h");
 
 export async function rateLimitJobApplication(
   workerId: string
@@ -144,6 +145,25 @@ export async function rateLimitMessaging(
   return {
     success: false,
     error: `Message limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before sending more.`,
+    retryAfterSeconds,
+  };
+}
+
+export async function rateLimitReportSubmission(
+  profileId: string
+): Promise<RateLimitResult> {
+  if (!isRedisConfigured() || !reportLimiter) {
+    return { success: true };
+  }
+
+  const { success, reset } = await reportLimiter.limit(`report:${profileId}`);
+  if (success) return { success: true };
+
+  const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
+
+  return {
+    success: false,
+    error: `Report limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before submitting another.`,
     retryAfterSeconds,
   };
 }

@@ -611,6 +611,106 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          app_area: string | null
+          category: string
+          context: Json
+          created_at: string
+          description_markdown: string
+          id: string
+          reported_url: string | null
+          reporter_id: string
+          reporter_role: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          app_area?: string | null
+          category: string
+          context?: Json
+          created_at?: string
+          description_markdown: string
+          id?: string
+          reported_url?: string | null
+          reporter_id: string
+          reporter_role: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          app_area?: string | null
+          category?: string
+          context?: Json
+          created_at?: string
+          description_markdown?: string
+          id?: string
+          reported_url?: string | null
+          reporter_id?: string
+          reporter_role?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           created_at: string

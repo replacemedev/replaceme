@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Check, Trash2, X } from "lucide-react";
+import { Briefcase, Check, Trash2, X, Eye } from "lucide-react";
 import { toast } from "sonner";
 import {
   approveJobPost,
@@ -14,6 +14,9 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import type { AdminJobRow } from "@/types/admin.types";
+import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
+import { getAdminJobDeepDive, type AdminJobDeepDive } from "@/actions/admin/deep-dive";
+import { formatMoney } from "@/lib/format/currency";
 
 const STATUS_FILTERS = [
   "All",
@@ -68,6 +71,8 @@ export function JobsModerationClient({
   const [pending, startTransition] = useTransition();
   const [rejectTarget, setRejectTarget] = useState<AdminJobRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminJobRow | null>(null);
+  const [viewTarget, setViewTarget] = useState<AdminJobRow | null>(null);
+  const [viewData, setViewData] = useState<AdminJobDeepDive | null>(null);
   const [reason, setReason] = useState("");
   const router = useRouter();
 
@@ -194,6 +199,24 @@ export function JobsModerationClient({
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
+                      <ActionBtn
+                        label="View"
+                        icon={Eye}
+                        className="text-slate-700 hover:bg-slate-100"
+                        disabled={pending}
+                        onClick={() => {
+                          setViewTarget(job);
+                          setViewData(null);
+                          startTransition(async () => {
+                            const full = await getAdminJobDeepDive(job.id);
+                            if (!full) {
+                              toast.error("Failed to load job details");
+                              return;
+                            }
+                            setViewData(full);
+                          });
+                        }}
+                      />
                       {job.status === "Pending Review" ? (
                         <>
                           <ActionBtn
@@ -269,6 +292,91 @@ export function JobsModerationClient({
           />
         </label>
       )}
+
+      <AdminSlideover
+        open={viewTarget !== null}
+        onClose={() => {
+          setViewTarget(null);
+          setViewData(null);
+        }}
+        title={viewTarget?.title ?? "Job post"}
+        description={viewData ? `${viewData.employmentType} • ${formatMoney(viewData.monthlySalary, viewData.salaryCurrency)}/mo` : "Loading…"}
+      >
+        {!viewData ? (
+          <p className="text-sm font-medium text-slate-500">Loading details…</p>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Employer
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-900">
+                  {viewData.companyName ?? "—"}
+                </p>
+                <p className="mt-1 text-xs font-mono text-slate-500">
+                  {viewData.employerId}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Status
+                </p>
+                <div className="mt-1">
+                  <StatusBadge status={viewData.status} />
+                </div>
+                <p className="mt-2 text-xs text-slate-500">
+                  Posted {new Date(viewData.createdAt).toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Description
+              </p>
+              <pre className="mt-2 whitespace-pre-wrap text-sm text-slate-800">
+                {viewData.description}
+              </pre>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Responsibilities
+                </p>
+                <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                  {viewData.parsedSections.responsibilities.length > 0 ? (
+                    viewData.parsedSections.responsibilities.map((i) => (
+                      <li key={i} className="leading-relaxed">
+                        - {i}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-slate-500">—</li>
+                  )}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Requirements
+                </p>
+                <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                  {viewData.parsedSections.requirements.length > 0 ? (
+                    viewData.parsedSections.requirements.map((i) => (
+                      <li key={i} className="leading-relaxed">
+                        - {i}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-slate-500">—</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+      </AdminSlideover>
     </div>
   );
 }

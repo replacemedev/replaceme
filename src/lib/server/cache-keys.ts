@@ -46,6 +46,8 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:admin:platform-metrics`,
   adminRecentAuditLogs: (limit: number) =>
     `rm:${CACHE_VERSION}:admin:audit-logs:${limit}`,
+  adminReportsList: (filterKey: string) =>
+    `rm:${CACHE_VERSION}:admin:reports:${filterKey}`,
   messagingMessages: (userId: string, threadId: string) =>
     `rm:${CACHE_VERSION}:user:${userId}:messages:${threadId}`,
 } as const;
@@ -68,6 +70,7 @@ export const CACHE_TTL_SECONDS = {
   workerEarnings: 120,
   adminMetrics: 30,
   adminAuditLogs: 30,
+  adminReports: 20,
 } as const;
 
 export function employerCacheKeys(employerId: string): string[] {
@@ -103,5 +106,6 @@ export function adminCacheKeys(): string[] {
     CacheKeys.adminRecentAuditLogs(10),
     CacheKeys.adminRecentAuditLogs(25),
     CacheKeys.adminRecentAuditLogs(50),
+    CacheKeys.adminReportsList("all"),
   ];
 }

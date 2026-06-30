@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User, Flag } from "lucide-react";
 import { logOut } from "@/actions/auth";
 import type { NavProfile } from "@/types/nav";
+import { ReportIssueSlideover } from "@/components/shared/reporting/ReportIssueSlideover";
 
 interface EmployerDropdownProps {
   profile: NavProfile | null;
@@ -19,6 +20,7 @@ export function EmployerDropdown({
   initials,
 }: EmployerDropdownProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -126,6 +128,19 @@ export function EmployerDropdown({
 
           <button
             type="button"
+            onClick={() => {
+              setDropdownOpen(false);
+              setReportOpen(true);
+            }}
+            className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold cursor-pointer"
+            role="menuitem"
+          >
+            <Flag size={14} className="text-slate-400" />
+            Report an issue
+          </button>
+
+          <button
+            type="button"
             disabled={isPending}
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
@@ -136,6 +151,8 @@ export function EmployerDropdown({
           </button>
         </div>
       )}
+
+      <ReportIssueSlideover open={reportOpen} onClose={() => setReportOpen(false)} />
     </div>
   );
 }
