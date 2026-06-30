@@ -31,26 +31,43 @@ export function MobileMenu({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden flex" role="dialog" aria-modal="true">
+    <div
+      className={`fixed inset-0 z-50 md:hidden ${
+        isOpen ? "pointer-events-auto" : "pointer-events-none"
+      }`}
+      role="dialog"
+      aria-modal={isOpen}
+      aria-hidden={!isOpen}
+    >
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 animate-fadeIn"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
+        aria-hidden
       />
 
       <div
         ref={panelRef}
-        className="relative flex flex-col w-4/5 max-w-sm bg-white h-full p-6 shadow-2xl transition-transform duration-300 ease-out z-10 animate-slideRight"
+        className={`relative z-10 flex h-full w-[280px] max-w-[75vw] flex-col bg-white p-5 shadow-2xl transition-transform duration-300 ease-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <Link
-            className="flex items-center gap-2.5"
+            className="flex items-center gap-2 rounded-lg transition-transform duration-200 active:scale-[0.98]"
             href="/worker/dashboard"
             onClick={onClose}
           >
-            <div className="relative w-8 h-8">
+            <div className="relative h-7 w-7">
               <Image
                 src="/images/logo_favicon.png"
                 alt="Replace Me Logo"
@@ -58,21 +75,21 @@ export function MobileMenu({
                 className="object-contain"
               />
             </div>
-            <span className="font-display-md text-base font-bold text-[#0a4a29]">
+            <span className="font-display-md text-sm font-bold text-[#0a4a29]">
               Replace Me
             </span>
           </Link>
           <button
             onClick={onClose}
             type="button"
-            className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+            className="rounded-lg p-1.5 text-slate-400 transition-all duration-200 hover:bg-slate-50 hover:text-slate-900 active:scale-95 cursor-pointer"
             aria-label="Close navigation menu"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <nav className="flex flex-col gap-2 py-6">
+        <nav className="flex flex-col gap-1 py-4">
           {WORKER_NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -83,10 +100,10 @@ export function MobileMenu({
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all ${
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
                   isActive
-                    ? "text-[#006e2f] bg-[#ebfdf2]/70"
-                    : "text-slate-700 hover:text-[#006e2f] hover:bg-[#ebfdf2]/50"
+                    ? "bg-[#ebfdf2]/70 text-[#006e2f]"
+                    : "text-slate-700 hover:bg-[#ebfdf2]/50 hover:text-[#006e2f] active:bg-slate-50"
                 }`}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={
@@ -96,12 +113,12 @@ export function MobileMenu({
                 }
               >
                 <Icon
-                  size={18}
+                  size={17}
                   className={isActive ? "text-[#006e2f]" : "text-slate-400"}
                 />
                 {item.label}
                 {item.href === "/worker/messages" && unreadMessageCount > 0 ? (
-                  <span className="ml-auto px-1.5 py-0.5 bg-[#006e2f] text-white text-[9px] font-bold rounded-full min-w-[14px] text-center leading-none">
+                  <span className="ml-auto min-w-[14px] rounded-full bg-[#006e2f] px-1.5 py-0.5 text-center text-[9px] font-bold leading-none text-white">
                     {unreadMessageCount}
                   </span>
                 ) : null}

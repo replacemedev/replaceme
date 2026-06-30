@@ -68,7 +68,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
         handleSectionClick(item.id);
         closeMobileMenu();
       }}
-      className="py-2 font-medium text-slate-700"
+      className="py-2.5 px-3 text-sm font-medium text-slate-700 rounded-lg transition-all duration-200 active:scale-[0.98] active:bg-slate-50"
     />
   ));
 
@@ -95,14 +95,14 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
     <>
       <Link
         onClick={closeMobileMenu}
-        className="text-slate-700 font-body-bold py-2 text-center hover:text-[#22c55e]"
+        className="text-slate-700 font-body-bold py-2.5 text-center text-sm rounded-lg transition-all duration-200 hover:text-[#22c55e] active:scale-[0.98] active:bg-slate-50"
         href="/signin"
       >
         Sign In
       </Link>
       <Link
         onClick={closeMobileMenu}
-        className="bg-[#22c55e] text-white text-center py-3 rounded-xl font-body-bold"
+        className="bg-[#22c55e] text-white text-center py-2.5 rounded-xl font-body-bold text-sm transition-transform duration-200 active:scale-[0.98]"
         href="/signup"
       >
         Get Started
@@ -150,32 +150,58 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
 
         {showMobileMenuButton ? (
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex items-center p-2 text-on-surface hover:text-[#22c55e] focus:outline-none ml-auto"
-            aria-label="Toggle Menu"
+            className="md:hidden relative flex h-9 w-9 items-center justify-center rounded-lg text-on-surface transition-colors duration-200 hover:bg-slate-50 hover:text-[#22c55e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e]/30 ml-auto"
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {mobileMenuOpen ? (
-              <X className="h-7 w-7" aria-hidden />
-            ) : (
-              <Menu className="h-7 w-7" aria-hidden />
-            )}
+            <Menu
+              className={`absolute h-5 w-5 transition-all duration-300 ease-out ${
+                mobileMenuOpen
+                  ? "scale-75 rotate-90 opacity-0"
+                  : "scale-100 rotate-0 opacity-100"
+              }`}
+              aria-hidden
+            />
+            <X
+              className={`absolute h-5 w-5 transition-all duration-300 ease-out ${
+                mobileMenuOpen
+                  ? "scale-100 rotate-0 opacity-100"
+                  : "scale-75 -rotate-90 opacity-0"
+              }`}
+              aria-hidden
+            />
           </button>
         ) : null}
       </div>
 
-      {mobileMenuOpen && showMobileMenuButton ? (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 flex flex-col p-6 gap-4 shadow-xl animate-fadeIn">
-          {isLandingPage ? landingMobileNavLinks : null}
-          {isLandingPage ? <hr className="border-slate-100 my-2" /> : null}
-          {session.isAuthenticated ? (
-            <PublicAuthenticatedNavActions
-              session={session}
-              layout="mobile"
-              onNavigate={closeMobileMenu}
-            />
-          ) : (
-            guestMobileAuthActions
-          )}
+      {showMobileMenuButton ? (
+        <div
+          className={`md:hidden absolute top-full left-0 z-40 w-full ${
+            mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+          aria-hidden={!mobileMenuOpen}
+        >
+          <div
+            className={`flex flex-col gap-2 border-b border-slate-100 bg-white px-4 py-3 shadow-lg origin-top transition-all duration-300 ease-out ${
+              mobileMenuOpen
+                ? "translate-y-0 scale-100 opacity-100"
+                : "-translate-y-1 scale-[0.98] opacity-0"
+            }`}
+          >
+            {isLandingPage ? landingMobileNavLinks : null}
+            {isLandingPage ? <hr className="my-1 border-slate-100" /> : null}
+            {session.isAuthenticated ? (
+              <PublicAuthenticatedNavActions
+                session={session}
+                layout="mobile"
+                onNavigate={closeMobileMenu}
+              />
+            ) : (
+              guestMobileAuthActions
+            )}
+          </div>
         </div>
       ) : null}
     </header>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 
 interface MobileTriggerAndMenuProps {
@@ -16,12 +16,30 @@ export function MobileTriggerAndMenu({
   return (
     <>
       <button
-        onClick={() => setMobileMenuOpen(true)}
+        onClick={() => setMobileMenuOpen((open) => !open)}
         type="button"
-        className="md:hidden p-2 text-slate-500 hover:text-[#006e2f] hover:bg-slate-50 rounded-xl transition-all duration-200 cursor-pointer"
-        aria-label="Open navigation menu"
+        className="relative md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-200 hover:bg-slate-50 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 cursor-pointer"
+        aria-expanded={mobileMenuOpen}
+        aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
       >
-        <Menu size={22} />
+        <Menu
+          size={20}
+          className={`absolute transition-all duration-300 ease-out ${
+            mobileMenuOpen
+              ? "scale-75 rotate-90 opacity-0"
+              : "scale-100 rotate-0 opacity-100"
+          }`}
+          aria-hidden
+        />
+        <X
+          size={20}
+          className={`absolute transition-all duration-300 ease-out ${
+            mobileMenuOpen
+              ? "scale-100 rotate-0 opacity-100"
+              : "scale-75 -rotate-90 opacity-0"
+          }`}
+          aria-hidden
+        />
       </button>
 
       <MobileMenu

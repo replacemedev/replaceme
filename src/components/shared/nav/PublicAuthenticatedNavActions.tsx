@@ -25,7 +25,7 @@ export function PublicAuthenticatedNavActions({
       onClick={onNavigate}
       className={
         layout === "mobile"
-          ? "bg-[#22c55e] text-white text-center py-3 rounded-xl font-body-bold hover:bg-[#16a34a] transition-colors"
+          ? "bg-[#22c55e] text-white text-center py-2.5 rounded-xl font-body-bold text-sm transition-transform duration-200 hover:bg-[#16a34a] active:scale-[0.98]"
           : "bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
       }
     >
@@ -35,7 +35,7 @@ export function PublicAuthenticatedNavActions({
 
   if (layout === "mobile") {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2.5">
         {dashboardLink}
         <div className="flex justify-center">
           <RoleNavDropdown session={session} />
