@@ -37,14 +37,14 @@ export default async function AdminShellLayout({
 
   const sidebarProfile = {
     displayName: session.displayName,
-    roleLabel: "Platform Admin",
+    roleLabel: isSuperAdmin ? "Super Admin" : "Platform Admin",
     initials: session.initials,
     avatarUrl: session.profile?.avatar_url ?? null,
     homeHref: session.homeHref,
   };
 
   return (
-    <AdminLayoutChrome profile={sidebarProfile}>
+    <AdminLayoutChrome profile={sidebarProfile} isSuperAdmin={isSuperAdmin}>
       <div className="min-h-screen bg-slate-50">
         <AuthFlashToast />
         <div className="flex min-h-screen">

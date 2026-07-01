@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { Database } from "@/types/database";
+import { createAdminClient } from "@/lib/supabase/server";
 import { AdminAuthError, requireAdmin } from "@/lib/server/auth/require-admin";
 
 export class SuperAdminAuthError extends AdminAuthError {
@@ -13,9 +14,10 @@ type AdminProfileRow = Database["public"]["Tables"]["admin_profiles"]["Row"];
 
 export const getCurrentAdminProfile = cache(
   async (): Promise<AdminProfileRow | null> => {
-    const { supabase, user } = await requireAdmin();
+    const { user } = await requireAdmin();
+    const adminClient = await createAdminClient();
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from("admin_profiles")
       .select(
         "user_id, admin_role, display_name, avatar_url, department, created_at, updated_at"
@@ -32,12 +34,8 @@ export const getCurrentAdminProfile = cache(
 );
 
 export const isCurrentUserSuperAdmin = cache(async (): Promise<boolean> => {
-  try {
-    const profile = await getCurrentAdminProfile();
-    return profile?.admin_role === "superadmin";
-  } catch {
-    return false;
-  }
+  const profile = await getCurrentAdminProfile();
+  return profile?.admin_role === "superadmin";
 });
 
 export const requireSuperAdmin = cache(async () => {

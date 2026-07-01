@@ -26,6 +26,7 @@ export function useAdminNav() {
 
 interface AdminLayoutChromeProps {
   profile?: AdminNavProfile;
+  isSuperAdmin?: boolean;
 }
 
 const defaultProfile: AdminNavProfile = {
@@ -36,6 +37,7 @@ const defaultProfile: AdminNavProfile = {
 
 export function AdminLayoutChrome({
   profile = defaultProfile,
+  isSuperAdmin = false,
   children,
 }: AdminLayoutChromeProps & { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -51,6 +53,7 @@ export function AdminLayoutChrome({
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         profile={profile}
+        isSuperAdmin={isSuperAdmin}
       />
     </AdminNavContext>
   );

@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { ADMIN_NAV_GROUPS } from "@/config/adminNav";
+import { filterAdminNavGroups } from "@/lib/admin/filter-nav";
 
 interface AdminMobileDrawerProps {
   open: boolean;
   onClose: () => void;
+  isSuperAdmin?: boolean;
   profile: {
     displayName: string;
     roleLabel: string;
@@ -19,9 +22,14 @@ interface AdminMobileDrawerProps {
 export function AdminMobileDrawer({
   open,
   onClose,
+  isSuperAdmin = false,
   profile,
 }: AdminMobileDrawerProps) {
   const pathname = usePathname();
+  const navGroups = useMemo(
+    () => filterAdminNavGroups(ADMIN_NAV_GROUPS, isSuperAdmin),
+    [isSuperAdmin]
+  );
 
   if (!open) return null;
 
@@ -76,7 +84,7 @@ export function AdminMobileDrawer({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          {ADMIN_NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.label}>
               <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 {group.label}

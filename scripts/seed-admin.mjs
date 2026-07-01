@@ -105,7 +105,7 @@ async function updateAdminUser(userId, userPayload) {
   return data.user.id;
 }
 
-async function ensureAdminProfile(userId) {
+async function ensureProfile(userId) {
   const { error } = await supabase.from("profiles").upsert(
     {
       id: userId,
@@ -114,9 +114,24 @@ async function ensureAdminProfile(userId) {
       last_name: "User",
       email: ADMIN_EMAIL,
       username: ADMIN_USERNAME,
+      account_status: "active",
       updated_at: new Date().toISOString(),
     },
     { onConflict: "id" }
+  );
+
+  if (error) throw error;
+}
+
+async function ensureAdminProfileRow(userId) {
+  const { error } = await supabase.from("admin_profiles").upsert(
+    {
+      user_id: userId,
+      admin_role: "superadmin",
+      display_name: "Admin User",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" }
   );
 
   if (error) throw error;
@@ -170,13 +185,15 @@ async function main() {
     userId = await createAdminUser(userPayload);
   }
 
-  await ensureAdminProfile(userId);
+  await ensureProfile(userId);
+  await ensureAdminProfileRow(userId);
 
   console.log("[seed:admin] Done.");
   console.log(`  Email:    ${ADMIN_EMAIL}`);
   console.log(`  Password: ${ADMIN_PASSWORD}`);
   console.log(`  User ID:  ${userId}`);
   console.log("  Claims:   app_metadata.role = admin");
+  console.log("  Tier:     admin_profiles.admin_role = superadmin");
 }
 
 main().catch((error) => {
