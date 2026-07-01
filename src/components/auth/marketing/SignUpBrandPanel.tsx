@@ -1,12 +1,11 @@
 import { BadgeCheck, ShieldCheck, Users } from "lucide-react";
 import { SIGNUP_MARKETING } from "@/lib/auth/static-copy";
-import { AuthInitialsAvatar } from "./AuthInitialsAvatar";
 import { AuthPanelBackdrop } from "./AuthPanelBackdrop";
 
 const VALUE_ICONS = [ShieldCheck, Users, BadgeCheck] as const;
 
 export function SignUpBrandPanel() {
-  const { headline, description, valueProps, testimonial, trustBadges } =
+  const { headline, description, valueProps, trustBadges } =
     SIGNUP_MARKETING;
 
   return (
@@ -50,21 +49,6 @@ export function SignUpBrandPanel() {
           })}
         </ul>
 
-        <figure className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.08)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_8px_32px_rgb(0_0_0/0.2)]">
-          <blockquote className="text-base leading-relaxed text-emerald-50/90">
-            &ldquo;{testimonial.quote}&rdquo;
-          </blockquote>
-          <figcaption className="mt-5 flex items-center gap-3 border-t border-white/10 pt-5">
-            <AuthInitialsAvatar
-              initials={testimonial.initials}
-              variant="dark"
-            />
-            <div>
-              <p className="text-sm font-bold text-white">{testimonial.name}</p>
-              <p className="text-xs text-emerald-100/70">{testimonial.role}</p>
-            </div>
-          </figcaption>
-        </figure>
 
         <ul className="flex flex-wrap gap-2">
           {trustBadges.map((badge) => (

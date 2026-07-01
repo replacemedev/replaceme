@@ -34,7 +34,7 @@ export const SIGNUP_MARKETING = {
     },
     {
       title: "Role-based workspaces",
-      description: "Separate dashboards for workers, employers, and admins.",
+      description: "Separate dashboards for workers and employers.",
     },
     {
       title: "Direct hire, no middlemen",

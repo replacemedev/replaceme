@@ -1,12 +1,11 @@
 import { MessageSquare, LayoutDashboard, UserCircle } from "lucide-react";
 import { SIGNIN_MARKETING } from "@/lib/auth/static-copy";
-import { AuthInitialsAvatar } from "./AuthInitialsAvatar";
 import { AuthPanelBackdrop } from "./AuthPanelBackdrop";
 
 const HIGHLIGHT_ICONS = [LayoutDashboard, MessageSquare, UserCircle] as const;
 
 export function SignInWelcomePanel() {
-  const { headline, description, highlights, testimonial } = SIGNIN_MARKETING;
+  const { headline, description, highlights } = SIGNIN_MARKETING;
 
   return (
     <section
@@ -51,20 +50,6 @@ export function SignInWelcomePanel() {
           </ul>
         </article>
 
-        <figure className="rounded-2xl border border-emerald-900/8 bg-white/40 px-6 py-5 backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_6px_24px_rgb(16_185_129/0.06)]">
-          <blockquote className="text-sm leading-relaxed text-slate-700">
-            &ldquo;{testimonial.quote}&rdquo;
-          </blockquote>
-          <figcaption className="mt-4 flex items-center gap-3">
-            <AuthInitialsAvatar initials={testimonial.initials} />
-            <div>
-              <p className="text-sm font-bold text-slate-900">
-                {testimonial.name}
-              </p>
-              <p className="text-xs text-slate-600">{testimonial.role}</p>
-            </div>
-          </figcaption>
-        </figure>
       </div>
     </section>
   );
