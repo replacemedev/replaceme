@@ -8,7 +8,9 @@ import { markAllNotificationsRead, markNotificationRead } from "@/actions/notifi
 import { useNotifications } from "@/hooks/useNotifications";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
+import { AdminNotificationsPageSkeleton } from "@/components/admin/shared/AdminSkeletons";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
 import {
   getNotificationHref,
@@ -27,25 +29,58 @@ export function AdminNotificationsClient({
   initialBootstrap,
 }: AdminNotificationsClientProps) {
   const [pending, startTransition] = useTransition();
-  const { notifications, unreadCount, markReadLocal, markAllReadLocal } =
-    useNotifications(userId, initialBootstrap);
+  const {
+    notifications,
+    unreadCount,
+    error,
+    isLoading,
+    refresh,
+    markReadLocal,
+    markAllReadLocal,
+  } = useNotifications(userId, initialBootstrap);
 
   const handleMarkAllRead = () => {
+    markAllReadLocal();
     startTransition(async () => {
       const result = await markAllNotificationsRead();
       if (result.success) {
-        markAllReadLocal();
         toast.success("All notifications marked as read");
       } else {
         toast.error(result.error);
+        void refresh();
       }
     });
   };
 
   const handleMarkRead = (notificationId: string) => {
     markReadLocal(notificationId);
-    void markNotificationRead(notificationId);
+    void markNotificationRead(notificationId).then((result) => {
+      if (!result.success) {
+        toast.error(result.error);
+        void refresh();
+      }
+    });
   };
+
+  if (isLoading && notifications.length === 0) {
+    return <AdminNotificationsPageSkeleton />;
+  }
+
+  if (error && notifications.length === 0) {
+    return (
+      <div className="space-y-6">
+        <AdminPageHeader
+          title="Notifications"
+          description="Platform alerts for moderation, identity review, billing, and system events."
+        />
+        <ErrorState
+          title="Unable to load notifications"
+          description={error}
+          retryHref="/admin/notifications"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -97,6 +132,12 @@ export function AdminNotificationsClient({
               />
             ))}
           </ul>
+          {isLoading ? (
+            <p className="flex items-center justify-center gap-2 text-xs text-slate-400">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+              Refreshing…
+            </p>
+          ) : null}
         </section>
       )}
     </div>

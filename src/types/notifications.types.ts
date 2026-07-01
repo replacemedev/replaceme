@@ -53,36 +53,52 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   moderation_queue: "Moderation",
   flagged_report: "Report",
   system_alert: "System",
+  system: "System",
   billing_update: "Billing",
   subscription_update: "Subscription",
   worker_acceptance: "Hiring",
 };
 
-export function getNotificationHref(notification: Notification): string | null {
-  if (notification.action_url) return notification.action_url;
+function metaId(
+  metadata: Record<string, unknown> | null | undefined,
+  key: string
+): string | null {
+  const value = metadata?.[key];
+  return typeof value === "string" ? value : null;
+}
 
+export function getNotificationHref(notification: Notification): string | null {
   const meta = notification.metadata ?? {};
+
   switch (notification.type) {
-    case "new_applicant":
-      return typeof meta.job_id === "string"
-        ? `/employer/jobs/${meta.job_id}/applicants`
-        : "/employer/dashboard";
-    case "application_status":
-      return typeof meta.application_id === "string"
-        ? `/worker/applications/${meta.application_id}`
-        : "/worker/applications";
+    case "new_applicant": {
+      const jobId = metaId(meta, "job_id");
+      if (jobId) return `/employer/jobs/${jobId}/applicants`;
+      return notification.action_url ?? "/employer/dashboard";
+    }
+    case "application_status": {
+      const applicationId = metaId(meta, "application_id");
+      if (applicationId) return `/worker/applications/${applicationId}`;
+      return notification.action_url ?? "/worker/applications";
+    }
     case "new_message":
-      return "/worker/messages";
+      return notification.action_url ?? "/worker/messages";
     case "worker_acceptance":
-      return "/worker/contracts";
+      return notification.action_url ?? "/worker/contracts";
     case "verification_update":
-      return "/worker/verification";
-    case "identity_verification_request":
-      return "/admin/identity";
-    case "moderation_queue":
-      return "/admin/moderation";
+      return notification.action_url ?? "/worker/verification";
+    case "identity_verification_request": {
+      const workerId = metaId(meta, "worker_id");
+      if (workerId) return `/admin/users/workers/${workerId}`;
+      return notification.action_url ?? "/admin/identity";
+    }
+    case "moderation_queue": {
+      const jobId = metaId(meta, "job_id");
+      if (jobId) return `/admin/jobs/${jobId}`;
+      return notification.action_url ?? "/admin/jobs";
+    }
     case "flagged_report":
-      return "/admin/reports";
+      return notification.action_url ?? "/admin/reports";
     case "billing_update":
     case "subscription_update":
       if (
@@ -94,8 +110,11 @@ export function getNotificationHref(notification: Notification): string | null {
           ? notification.action_url
           : "/admin/billing";
       }
-      return "/employer/pricing";
+      return notification.action_url ?? "/employer/pricing";
+    case "system_alert":
+    case "system":
+      return notification.action_url ?? "/admin/notifications";
     default:
-      return null;
+      return notification.action_url ?? null;
   }
 }

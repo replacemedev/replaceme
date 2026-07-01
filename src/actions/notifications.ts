@@ -40,6 +40,7 @@ export async function markNotificationRead(
     await invalidateUserCache(userId);
     revalidatePath("/employer/notifications");
     revalidatePath("/worker/notifications");
+    revalidatePath("/admin/notifications");
     return { success: true };
   } catch (err) {
     return {
@@ -63,6 +64,7 @@ export async function markAllNotificationsRead(): Promise<ActionResult> {
     await invalidateUserCache(userId);
     revalidatePath("/employer/notifications");
     revalidatePath("/worker/notifications");
+    revalidatePath("/admin/notifications");
     return { success: true };
   } catch (err) {
     return {
@@ -89,6 +91,7 @@ export async function deleteNotification(
     await invalidateUserCache(userId);
     revalidatePath("/employer/notifications");
     revalidatePath("/worker/notifications");
+    revalidatePath("/admin/notifications");
     return { success: true };
   } catch (err) {
     return {
