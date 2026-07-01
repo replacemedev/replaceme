@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RoleSelector } from "@/components/auth/RoleSelector";
 import { FormField } from "@/components/shared/FormField";
 import { Lock, Mail, User, Loader2 } from "lucide-react";
 import { signUp } from "@/actions/auth";
@@ -37,7 +36,6 @@ function formatFieldError(message: unknown): string {
 }
 
 type SignUpRole = "employer" | "worker";
-type SignUpValues = EmployerSignUpFormValues | WorkerSignUpFormValues;
 
 const WORKER_DEFAULTS: WorkerSignUpFormValues = {
   role: "worker",
@@ -55,49 +53,40 @@ const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
   role: "employer",
 };
 
-export function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
+interface SignUpFormProps {
+  role: SignUpRole;
+  callbackUrl?: string;
+  submitLabel: string;
+}
+
+export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) {
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<SignUpRole>("worker");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileRequired = isTurnstileClientEnabled();
+
+  const schema = role === "employer" ? employerSignUpSchema : workerSignUpSchema;
+  const defaultValues = role === "employer" ? EMPLOYER_DEFAULTS : WORKER_DEFAULTS;
 
   const resetCaptcha = () => {
     setTurnstileToken(null);
     turnstileRef.current?.reset();
   };
 
-  const schema = useMemo(
-    () =>
-      selectedRole === "employer" ? employerSignUpSchema : workerSignUpSchema,
-    [selectedRole]
-  );
-
   const {
     register,
     handleSubmit,
     control,
-    reset,
-    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpValues>({
+  } = useForm<WorkerSignUpFormValues | EmployerSignUpFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: WORKER_DEFAULTS,
+    defaultValues,
     mode: "onSubmit",
   });
 
-  useEffect(() => {
-    reset(selectedRole === "employer" ? EMPLOYER_DEFAULTS : WORKER_DEFAULTS, {
-      keepDefaultValues: false,
-    });
-  }, [selectedRole, reset]);
-
-  const handleRoleChange = (role: string) => {
-    setSelectedRole(role as SignUpRole);
-    setValue("role", role as SignUpRole);
-  };
-
-  const onSubmit = async (data: SignUpValues) => {
+  const onSubmit = async (
+    data: WorkerSignUpFormValues | EmployerSignUpFormValues
+  ) => {
     if (turnstileRequired && !turnstileToken) {
       toast.error("Please complete the security check.");
       return;
@@ -108,7 +97,9 @@ export function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
         ...data,
         turnstileToken: turnstileToken ?? undefined,
         callbackUrl,
-      } as SignUpValues & { callbackUrl?: string });
+      } as (WorkerSignUpFormValues | EmployerSignUpFormValues) & {
+        callbackUrl?: string;
+      });
 
       if (!result.success) {
         const errMsg = result.error;
@@ -154,19 +145,10 @@ export function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
 
   return (
     <div className="w-full">
-      <RoleSelector
-        options={[
-          { label: "I want to Work", value: "worker" },
-          { label: "I want to Hire", value: "employer" },
-        ]}
-        value={selectedRole}
-        onChange={handleRoleChange}
-      />
-
       <form
         method="POST"
         onSubmit={handleSubmit(onSubmit, onError)}
-        className="mt-4 space-y-1"
+        className="space-y-1"
         noValidate
       >
         <input type="hidden" {...register("role")} />
@@ -323,7 +305,7 @@ export function SignUpForm({ callbackUrl }: { callbackUrl?: string }) {
                 Creating Account...
               </span>
             ) : (
-              "Create Account"
+              submitLabel
             )}
           </Button>
         </div>

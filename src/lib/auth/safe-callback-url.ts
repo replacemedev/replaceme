@@ -66,9 +66,10 @@ export function resolvePostAuthRedirect(
 }
 
 export function buildAuthHref(
-  base: "/signin" | "/signup",
+  base: "/signin" | "/signup" | "/signup/worker" | "/signup/employer",
   callbackPath: string
 ): string {
+  if (!callbackPath) return base;
   const params = new URLSearchParams({ callbackUrl: callbackPath });
   return `${base}?${params.toString()}`;
 }

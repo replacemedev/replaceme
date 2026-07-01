@@ -17,7 +17,7 @@ function planRank(slug: string): number {
 }
 
 function ctaHref(slug: string): string {
-  return slug === "discovery" ? "/signup" : "/employer/pricing";
+  return slug === "discovery" ? "/signup/employer" : "/employer/pricing";
 }
 
 function ctaClassName(slug: string): string {

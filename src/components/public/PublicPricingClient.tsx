@@ -22,7 +22,7 @@ export function PublicPricingClient({
 
   return (
     <>
-      <PricingCards plans={plans} onSelectPlan={() => router.push("/signup")} />
+      <PricingCards plans={plans} onSelectPlan={() => router.push("/signup/employer")} />
       <CompareTable plans={plans} />
       <Testimonials items={testimonials} />
       <FAQ items={faqs} />

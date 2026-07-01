@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -153,6 +154,22 @@ export async function signUp(formData: SignUpFormValues) {
   try {
     const role = formData.role;
     safeLog(`[Auth] Sign-up initiated for role: ${role}`);
+
+    const headerStore = await headers();
+    const ip =
+      headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      headerStore.get("x-real-ip") ??
+      "anonymous";
+    const emailKey = formData.email?.trim().toLowerCase() ?? "unknown";
+
+    const rateLimit = await assertRateLimit("signup", {
+      maxAttempts: 5,
+      windowMs: 15 * 60 * 1000,
+      identifier: `${ip}:${emailKey}`,
+    });
+    if (!rateLimit.ok) {
+      return { success: false, error: rateLimit.error };
+    }
 
     const supabase = await createClient();
 

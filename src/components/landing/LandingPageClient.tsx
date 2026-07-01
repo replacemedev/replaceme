@@ -150,11 +150,11 @@ export function LandingPageClient({
                 Connect directly with top-tier Filipino talent or find your dream remote role. Skip the agency fees and middlemen. Scale your business faster or launch your global career with world-class opportunities.
               </p>
               <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
+                <Link href="/signup/employer" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
                   <span>Hire Talent Now</span>
                   <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
-                <Link href="/signup" className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
+                <Link href="/signup/worker" className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
                   <span>Find a Job</span>
                   <Search className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
@@ -251,7 +251,7 @@ export function LandingPageClient({
               <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Elevate Your Career with <span className="text-[#22c55e]">Global Opportunities</span></h2>
               <p className="text-slate-500 font-body-base text-lg leading-relaxed">Build a real remote career with global employers not one-off gigs and endless bidding.</p>
               <div className="pt-2">
-                <Link href="/signup" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
+                <Link href="/signup/worker" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                   <span>Create Your Free Profile</span>
                   <UserPlus className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>

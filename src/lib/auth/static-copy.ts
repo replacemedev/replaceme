@@ -10,6 +10,22 @@ export const SIGNUP_PAGE = {
   signInLinkLabel: "Sign in",
 } as const;
 
+export const SIGNUP_WORKER_PAGE = {
+  headline: "Create your worker account",
+  description: "Build your profile and apply to remote roles from verified employers.",
+  crossRolePrompt: "Looking to hire?",
+  crossRoleLinkLabel: "Create an Employer account",
+  submitLabel: "Create Worker Account",
+} as const;
+
+export const SIGNUP_EMPLOYER_PAGE = {
+  headline: "Create your employer account",
+  description: "Post jobs, review applicants, and hire Filipino talent directly.",
+  crossRolePrompt: "Looking for work?",
+  crossRoleLinkLabel: "Sign up as a Worker",
+  submitLabel: "Create Employer Account",
+} as const;
+
 export const SIGNIN_PAGE = {
   login: {
     headline: "Sign in",

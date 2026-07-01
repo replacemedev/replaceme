@@ -6,8 +6,7 @@ const termsSchema = z
     message: "You must accept the terms and privacy policy",
   });
 
-export const baseAuthSchema = {
-  role: z.enum(["employer", "worker"]),
+const signUpSharedFields = {
   username: z
     .string()
     .min(3, "Username must be at least 3 characters")
@@ -29,9 +28,15 @@ const passwordMatchRefine = {
   path: ["confirmPassword"] as const,
 };
 
+export const baseAuthSchema = {
+  role: z.enum(["employer", "worker"]),
+  ...signUpSharedFields,
+};
+
 export const workerSignUpSchema = z
   .object({
-    ...baseAuthSchema,
+    role: z.literal("worker"),
+    ...signUpSharedFields,
     turnstileToken: z.string().optional(),
   })
   .refine(passwordMatchRefine.refine, {
@@ -39,11 +44,20 @@ export const workerSignUpSchema = z
     path: [...passwordMatchRefine.path],
   });
 
-export const employerSignUpSchema = workerSignUpSchema;
+export const employerSignUpSchema = z
+  .object({
+    role: z.literal("employer"),
+    ...signUpSharedFields,
+    turnstileToken: z.string().optional(),
+  })
+  .refine(passwordMatchRefine.refine, {
+    message: passwordMatchRefine.message,
+    path: [...passwordMatchRefine.path],
+  });
 
 export type WorkerSignUpFormValues = z.infer<typeof workerSignUpSchema>;
-export type EmployerSignUpFormValues = WorkerSignUpFormValues;
-export type SignUpFormValues = WorkerSignUpFormValues;
+export type EmployerSignUpFormValues = z.infer<typeof employerSignUpSchema>;
+export type SignUpFormValues = WorkerSignUpFormValues | EmployerSignUpFormValues;
 
 export const forgotPasswordSchema = z.object({
   email: z

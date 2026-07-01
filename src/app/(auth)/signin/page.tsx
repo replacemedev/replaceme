@@ -61,8 +61,8 @@ export default async function SignInPage({
           <Link
             href={
               callbackUrl
-                ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`
-                : "/signup"
+                ? `/signup/worker?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : "/signup/worker"
             }
             className={AUTH_LINK}
           >
