@@ -73,6 +73,7 @@ export function LandingPageClient({
 
   // State for FAQ Accordion
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   // Scroll Reveal Observer
   useEffect(() => {
@@ -168,9 +169,10 @@ export function LandingPageClient({
                     src="/images/hero-worker.png"
                     alt="Professional Filipino Remote Worker"
                     fill
-                    className="object-cover"
+                    className={`object-cover transition-opacity duration-500 ease-in ${imageLoaded ? "opacity-100" : "opacity-0"}`}
                     priority
                     sizes="500px"
+                    onLoad={() => setImageLoaded(true)}
                   />
                 </div>
                 {/* Floating Card 1 */}
