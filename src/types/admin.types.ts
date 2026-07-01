@@ -183,14 +183,53 @@ export interface AdminSubscriptionRow {
   company_name: string | null;
   employer_email: string | null;
   plan_name: string | null;
+  plan_slug: string | null;
   plan_price: number | null;
+  unit_amount_cents: number | null;
+  billing_interval: "month" | "year" | null;
   status: string;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   current_period_end: string | null;
+  last_payment_status: string | null;
+  last_payment_at: string | null;
+  failed_payment_count: number;
   job_posts_used: number;
   unlocks_used: number;
   created_at: string;
+}
+
+export interface AdminBillingLedgerRow {
+  id: string;
+  employer_id: string;
+  company_name: string | null;
+  event_type: string;
+  amount_cents: number;
+  currency: string;
+  plan_slug: string | null;
+  subscription_status: string | null;
+  occurred_at: string;
+}
+
+export interface AdminBillingTierBreakdown {
+  plan_slug: string;
+  label: string;
+  count: number;
+  mrr_cents: number;
+}
+
+export interface AdminBillingMetrics {
+  active_subscriptions: number;
+  estimated_mrr_cents: number;
+  total_accounts: number;
+  failed_payments_30d: number;
+  tier_breakdown: AdminBillingTierBreakdown[];
+}
+
+export interface AdminBillingPageData {
+  metrics: AdminBillingMetrics;
+  subscriptions: AdminSubscriptionRow[];
+  ledger: AdminBillingLedgerRow[];
 }
 
 export interface AdminAuditLogRow {

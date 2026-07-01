@@ -85,6 +85,151 @@ export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDi
   }
 }
 
+export type AdminEmployerDeepDive = {
+  employerId: string;
+  companyName: string;
+  email: string | null;
+  industry: string | null;
+  websiteUrl: string | null;
+  companyBio: string | null;
+  accountStatus: string;
+  createdAt: string;
+  subscription: {
+    status: string;
+    planSlug: string | null;
+    planName: string | null;
+    unitAmountCents: number | null;
+    billingInterval: string | null;
+    stripeCustomerId: string | null;
+    stripeSubscriptionId: string | null;
+    currentPeriodEnd: string | null;
+    lastPaymentStatus: string | null;
+    lastPaymentAt: string | null;
+    failedPaymentCount: number;
+    jobPostsUsed: number;
+    unlocksUsed: number;
+  } | null;
+  jobs: Array<{
+    id: string;
+    title: string;
+    status: string;
+    createdAt: string;
+  }>;
+  recentLedger: Array<{
+    id: string;
+    eventType: string;
+    amountCents: number;
+    currency: string;
+    occurredAt: string;
+  }>;
+};
+
+export async function getAdminEmployerDeepDive(
+  employerId: string
+): Promise<AdminEmployerDeepDive | null> {
+  try {
+    const id = z.string().uuid().parse(employerId);
+    const { supabase } = await requireAdmin();
+
+    const [{ data: profile }, { data: company }, { data: subscription }, { data: jobs }, { data: ledger }] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, email, account_status, created_at, role")
+          .eq("id", id)
+          .maybeSingle(),
+        supabase
+          .from("company_profiles")
+          .select("company_name, industry, website_url, company_bio, created_at")
+          .eq("employer_id", id)
+          .maybeSingle(),
+        supabase
+          .from("employer_subscriptions")
+          .select(
+            `
+            status,
+            plan_slug,
+            unit_amount_cents,
+            billing_interval,
+            stripe_customer_id,
+            stripe_subscription_id,
+            current_period_end,
+            last_payment_status,
+            last_payment_at,
+            failed_payment_count,
+            job_posts_used,
+            unlocks_used,
+            billing_plans!employer_subscriptions_plan_id_fkey (name)
+          `
+          )
+          .eq("employer_id", id)
+          .maybeSingle(),
+        supabase
+          .from("jobs")
+          .select("id, title, status, created_at")
+          .eq("employer_id", id)
+          .order("created_at", { ascending: false })
+          .limit(12),
+        supabase
+          .from("billing_ledger_events")
+          .select("id, event_type, amount_cents, currency, occurred_at")
+          .eq("employer_id", id)
+          .order("occurred_at", { ascending: false })
+          .limit(8),
+      ]);
+
+    if (!profile?.id || profile.role !== "employer") return null;
+
+    const plan = Array.isArray(subscription?.billing_plans)
+      ? subscription.billing_plans[0]
+      : subscription?.billing_plans;
+
+    return {
+      employerId: profile.id,
+      companyName: company?.company_name ?? "Unnamed company",
+      email: profile.email,
+      industry: company?.industry ?? null,
+      websiteUrl: company?.website_url ?? null,
+      companyBio: company?.company_bio ?? null,
+      accountStatus: profile.account_status,
+      createdAt: company?.created_at ?? profile.created_at,
+      subscription: subscription
+        ? {
+            status: subscription.status,
+            planSlug: subscription.plan_slug,
+            planName: plan?.name ?? null,
+            unitAmountCents: subscription.unit_amount_cents,
+            billingInterval: subscription.billing_interval,
+            stripeCustomerId: subscription.stripe_customer_id,
+            stripeSubscriptionId: subscription.stripe_subscription_id,
+            currentPeriodEnd: subscription.current_period_end,
+            lastPaymentStatus: subscription.last_payment_status,
+            lastPaymentAt: subscription.last_payment_at,
+            failedPaymentCount: subscription.failed_payment_count ?? 0,
+            jobPostsUsed: subscription.job_posts_used,
+            unlocksUsed: subscription.unlocks_used,
+          }
+        : null,
+      jobs: (jobs ?? []).map((job) => ({
+        id: job.id,
+        title: job.title,
+        status: job.status,
+        createdAt: job.created_at,
+      })),
+      recentLedger: (ledger ?? []).map((row) => ({
+        id: row.id,
+        eventType: row.event_type,
+        amountCents: row.amount_cents,
+        currency: row.currency,
+        occurredAt: row.occurred_at,
+      })),
+    };
+  } catch (err) {
+    safeError("getAdminEmployerDeepDive:", err);
+    return null;
+  }
+}
+
 export type AdminWorkerProfileDeepDive = {
   id: string;
   firstName: string | null;
@@ -98,6 +243,8 @@ export type AdminWorkerProfileDeepDive = {
   isRemote: boolean | null;
   hourlyRate: number | null;
   salaryCurrency: string;
+  accountStatus: string;
+  verificationStatus: string | null;
   skills: Array<{
     skillName: string;
     proficiency: number;
@@ -126,7 +273,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, last_name, email, professional_title, bio, birth_year, location, availability, is_remote, hourly_rate, salary_currency, created_at, role"
+            "id, first_name, last_name, email, professional_title, bio, birth_year, location, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -159,6 +306,8 @@ export async function getAdminWorkerProfileDeepDive(
       isRemote: profile.is_remote,
       hourlyRate: profile.hourly_rate,
       salaryCurrency: profile.salary_currency ?? "PHP",
+      accountStatus: profile.account_status,
+      verificationStatus: profile.verification_status ?? null,
       skills: (skills ?? []).map((s) => ({
         skillName: s.skill_name,
         proficiency: s.proficiency,

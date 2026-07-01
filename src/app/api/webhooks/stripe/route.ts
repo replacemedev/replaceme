@@ -11,6 +11,11 @@ import {
   syncEmployerSubscription,
   syncEmployerSubscriptionFromStripe,
 } from "@/lib/server/stripe/sync-subscription";
+import {
+  handleInvoicePaid,
+  handleInvoicePaymentFailed,
+} from "@/lib/server/stripe/invoice-handlers";
+import { getInvoiceSubscriptionRef } from "@/lib/server/stripe/invoice-utils";
 import { safeError, safeLog } from "@/utils/logger";
 
 async function retrieveSubscription(
@@ -74,23 +79,31 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       break;
     }
 
-    case "invoice.payment_failed": {
-      const invoice = event.data.object as Stripe.Invoice & {
-        subscription?: string | Stripe.Subscription | null;
-      };
-      const subscription = await retrieveSubscription(
-        stripe,
-        invoice.subscription
-      );
+    case "invoice.paid": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subscriptionRef = getInvoiceSubscriptionRef(invoice);
+      if (!subscriptionRef) break;
+      await handleInvoicePaid(invoice, event.id);
+      const subscription = await retrieveSubscription(stripe, subscriptionRef);
       if (subscription) {
         const result = await syncEmployerSubscriptionFromStripe(
           subscription,
           event.id
         );
         if (!result.success) {
-          throw new Error(result.error ?? "Past-due sync failed");
+          throw new Error(result.error ?? "Invoice paid sync failed");
         }
       }
+      break;
+    }
+
+    case "invoice.payment_failed": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subscription = await retrieveSubscription(
+        stripe,
+        getInvoiceSubscriptionRef(invoice)
+      );
+      await handleInvoicePaymentFailed(invoice, event.id, subscription);
       break;
     }
 

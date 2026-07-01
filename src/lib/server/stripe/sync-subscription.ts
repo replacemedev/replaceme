@@ -7,6 +7,7 @@ import {
 } from "@/lib/server/stripe/plan";
 import { safeError, safeLog } from "@/utils/logger";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
+import { extractSubscriptionPrice } from "@/lib/server/stripe/subscription-price";
 
 function stripeTimestampToIso(value: number | null | undefined): string | null {
   if (!value) return null;
@@ -31,6 +32,32 @@ function mapStripeSubscriptionStatus(
     default:
       return "inactive";
   }
+}
+
+async function resetEmployerUsageForNewPeriod(employerId: string): Promise<void> {
+  const supabase = await createAdminClient();
+  const now = new Date().toISOString();
+
+  await Promise.all([
+    supabase
+      .from("employer_subscriptions")
+      .update({
+        job_posts_used: 0,
+        unlocks_used: 0,
+        updated_at: now,
+      })
+      .eq("employer_id", employerId),
+    supabase.from("employer_plan_usage").upsert(
+      {
+        employer_id: employerId,
+        active_jobs_count: 0,
+        period_applicants_received: 0,
+        period_messages_sent: 0,
+        computed_at: now,
+      },
+      { onConflict: "employer_id" }
+    ),
+  ]);
 }
 
 async function resolvePlanForSubscription(
@@ -182,6 +209,18 @@ export async function syncEmployerSubscriptionFromStripe(
       : subscription.customer?.id ?? null;
 
   const status = mapStripeSubscriptionStatus(subscription.status);
+  const { unitAmountCents, billingInterval } = extractSubscriptionPrice(subscription);
+
+  const { data: existing } = await supabase
+    .from("employer_subscriptions")
+    .select("billing_period_start")
+    .eq("employer_id", employerId)
+    .maybeSingle();
+
+  const periodRolled =
+    periodStart &&
+    existing?.billing_period_start &&
+    existing.billing_period_start !== periodStart;
 
   const { error: subError } = await supabase.from("employer_subscriptions").upsert(
     {
@@ -197,6 +236,8 @@ export async function syncEmployerSubscriptionFromStripe(
       cancel_at_period_end: subscription.cancel_at_period_end,
       trial_end: stripeTimestampToIso(subscription.trial_end),
       last_stripe_event_id: stripeEventId ?? null,
+      unit_amount_cents: unitAmountCents,
+      billing_interval: billingInterval,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "employer_id" }
@@ -208,6 +249,10 @@ export async function syncEmployerSubscriptionFromStripe(
       subError
     );
     return { success: false, error: "Failed to update subscription." };
+  }
+
+  if (periodRolled) {
+    await resetEmployerUsageForNewPeriod(employerId);
   }
 
   safeLog(

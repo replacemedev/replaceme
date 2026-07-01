@@ -214,3 +214,13 @@ export function AdminNotificationsPageSkeleton() {
     </div>
   );
 }
+
+export function AdminDetailSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading details">
+      <AdminPageHeaderSkeleton />
+      <AdminCardGridSkeleton count={2} />
+      <AdminPanelSkeleton height="min-h-[200px]" rows={4} />
+    </div>
+  );
+}

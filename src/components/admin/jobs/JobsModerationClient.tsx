@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Briefcase, Check, Trash2, X, Eye } from "lucide-react";
 import { toast } from "sonner";
@@ -168,7 +169,12 @@ export function JobsModerationClient({
               {filtered.map((job) => (
                 <tr key={job.id} className="hover:bg-slate-50/50">
                   <td className="px-4 py-3">
-                    <p className="font-medium text-slate-900">{job.title}</p>
+                    <Link
+                      href={`/admin/jobs/${job.id}`}
+                      className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                    >
+                      {job.title}
+                    </Link>
                     <p className="text-xs text-slate-400">
                       {new Date(job.created_at).toLocaleDateString()}
                     </p>

@@ -224,6 +224,59 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_ledger_events: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          employer_id: string
+          event_type: string
+          id: string
+          occurred_at: string
+          plan_slug: string | null
+          stripe_event_id: string
+          stripe_invoice_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          employer_id: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          plan_slug?: string | null
+          stripe_event_id: string
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          employer_id?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          plan_slug?: string | null
+          stripe_event_id?: string
+          stripe_invoice_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_ledger_events_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_plans: {
         Row: {
           applicants_per_job_limit: number | null
@@ -1064,14 +1117,18 @@ export type Database = {
       }
       employer_subscriptions: {
         Row: {
+          billing_interval: string | null
           billing_period_end: string | null
           billing_period_start: string | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
           employer_id: string
+          failed_payment_count: number
           id: string
           job_posts_used: number
+          last_payment_at: string | null
+          last_payment_status: string | null
           last_stripe_event_id: string | null
           override_by: string | null
           override_expires_at: string | null
@@ -1083,18 +1140,23 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           trial_end: string | null
+          unit_amount_cents: number | null
           unlocks_used: number
           updated_at: string
         }
         Insert: {
+          billing_interval?: string | null
           billing_period_end?: string | null
           billing_period_start?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           employer_id: string
+          failed_payment_count?: number
           id?: string
           job_posts_used?: number
+          last_payment_at?: string | null
+          last_payment_status?: string | null
           last_stripe_event_id?: string | null
           override_by?: string | null
           override_expires_at?: string | null
@@ -1106,18 +1168,23 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
+          unit_amount_cents?: number | null
           unlocks_used?: number
           updated_at?: string
         }
         Update: {
+          billing_interval?: string | null
           billing_period_end?: string | null
           billing_period_start?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
           employer_id?: string
+          failed_payment_count?: number
           id?: string
           job_posts_used?: number
+          last_payment_at?: string | null
+          last_payment_status?: string | null
           last_stripe_event_id?: string | null
           override_by?: string | null
           override_expires_at?: string | null
@@ -1129,6 +1196,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
+          unit_amount_cents?: number | null
           unlocks_used?: number
           updated_at?: string
         }

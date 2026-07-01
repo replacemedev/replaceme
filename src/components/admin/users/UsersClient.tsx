@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UserX, UserCheck, ShieldCheck, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -195,7 +196,14 @@ export function UsersClient({
                   />
                 }
               >
-                <p className="font-semibold text-slate-900">{name}</p>
+                <p className="font-semibold text-slate-900">
+                  <Link
+                    href={`/admin/users/workers/${worker.id}`}
+                    className="hover:text-emerald-700 hover:underline"
+                  >
+                    {name}
+                  </Link>
+                </p>
                 <p className="text-xs text-slate-500">{worker.email}</p>
                 <p className="text-sm text-slate-600">
                   {worker.professional_title ?? "—"}
@@ -236,7 +244,12 @@ export function UsersClient({
                 }
               >
                 <p className="font-semibold text-slate-900">
-                  {employer.company_name}
+                  <Link
+                    href={`/admin/users/employers/${employer.employer_id}`}
+                    className="hover:text-emerald-700 hover:underline"
+                  >
+                    {employer.company_name}
+                  </Link>
                 </p>
                 <p className="text-xs text-slate-500">{employer.email}</p>
                 <p className="text-sm text-slate-600">
@@ -316,13 +329,16 @@ export function UsersClient({
               ? (filtered as AdminWorkerRow[]).map((worker) => (
                   <tr key={worker.id} className={ADMIN_TABLE_ROW}>
                     <td className={ADMIN_TABLE_TD}>
-                      <p className="font-medium text-slate-900">
+                      <Link
+                        href={`/admin/users/workers/${worker.id}`}
+                        className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                      >
                         {displayName(
                           worker.first_name,
                           worker.last_name,
                           "Unnamed"
                         )}
-                      </p>
+                      </Link>
                       <p className="text-xs text-slate-400">{worker.email}</p>
                     </td>
                     <td className="px-4 py-3 text-slate-600">
@@ -371,9 +387,12 @@ export function UsersClient({
               ? (filtered as AdminEmployerRow[]).map((employer) => (
                   <tr key={employer.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-900">
+                      <Link
+                        href={`/admin/users/employers/${employer.employer_id}`}
+                        className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                      >
                         {employer.company_name}
-                      </p>
+                      </Link>
                       <p className="text-xs text-slate-400">{employer.email}</p>
                     </td>
                     <td className="px-4 py-3 text-slate-600">

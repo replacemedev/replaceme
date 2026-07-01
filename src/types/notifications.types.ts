@@ -78,12 +78,22 @@ export function getNotificationHref(notification: Notification): string | null {
     case "verification_update":
       return "/worker/verification";
     case "identity_verification_request":
+      return "/admin/identity";
     case "moderation_queue":
-      return notification.type === "identity_verification_request"
-        ? "/admin/identity"
-        : "/admin/jobs";
+      return "/admin/moderation";
+    case "flagged_report":
+      return "/admin/reports";
     case "billing_update":
     case "subscription_update":
+      if (
+        notification.action_url?.startsWith("/admin") ||
+        meta.audience === "admin" ||
+        meta.recipient_role === "admin"
+      ) {
+        return notification.action_url?.startsWith("/admin")
+          ? notification.action_url
+          : "/admin/billing";
+      }
       return "/employer/pricing";
     default:
       return null;

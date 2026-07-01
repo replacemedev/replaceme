@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminPageShell } from "@/components/admin/layout";
+import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { AdminNotificationsClient } from "@/components/admin/notifications/AdminNotificationsClient";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
   title: "Notifications | Admin",
@@ -18,11 +20,29 @@ export default async function AdminNotificationsPage() {
 
   if (!user) redirect("/signin");
 
-  const bootstrap = await fetchNotificationBootstrap(user.id, 50);
+  try {
+    const bootstrap = await fetchNotificationBootstrap(user.id, 50);
 
-  return (
-    <AdminPageShell>
-      <AdminNotificationsClient userId={user.id} initialBootstrap={bootstrap} />
-    </AdminPageShell>
-  );
+    return (
+      <AdminPageShell>
+        <AdminNotificationsClient userId={user.id} initialBootstrap={bootstrap} />
+      </AdminPageShell>
+    );
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Unable to load notifications.";
+    return (
+      <AdminPageShell>
+        <AdminPageHeader
+          title="Notifications"
+          description="Platform alerts for moderation, billing, and system events."
+        />
+        <ErrorState
+          title="Unable to load notifications"
+          description={message}
+          retryHref="/admin/notifications"
+        />
+      </AdminPageShell>
+    );
+  }
 }

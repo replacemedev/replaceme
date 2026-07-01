@@ -227,43 +227,8 @@ export async function signUp(formData: SignUpFormValues) {
       return { success: false, error: "Failed to create user account." };
     }
 
-    // 3. Conditional Stripe Customer Creation for Employers
-    if (role === "employer" && stripe) {
-      try {
-        const customer = await stripe.customers.create({
-          email: data.email,
-          name: data.fullName,
-          metadata: {
-            supabase_user_id: authData.user.id,
-            username: data.username,
-          },
-        });
-
-        // Update the user's profile with the new Stripe Customer ID using elevated privileges if available
-        let dbClient = supabase;
-        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-          try {
-            const { createAdminClient } = await import("@/lib/supabase/server");
-            dbClient = await createAdminClient();
-          } catch (adminErr) {
-            safeError("Failed to initialize admin client, falling back to standard user client:", adminErr);
-          }
-        }
-
-        const { error: updateError } = await dbClient
-          .from("profiles")
-          .update({ stripe_customer_id: customer.id })
-          .eq("auth_user_id", authData.user.id);
-
-        if (updateError) {
-          safeError("Failed to update profile with Stripe ID:", updateError);
-        }
-      } catch (stripeError) {
-        safeError("Stripe customer creation failed:", stripeError);
-      }
-    }
-
-    // 4. Return success response to the client
+    // Stripe customer is created on first checkout via ensureStripeCustomer()
+    // (employer_subscriptions.stripe_customer_id — single billing source of truth).
     revalidatePath("/", "layout");
     
     if (!authData.session) {

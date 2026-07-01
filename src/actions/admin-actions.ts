@@ -646,15 +646,22 @@ export async function fetchAdminSubscriptions(): Promise<
       id,
       employer_id,
       status,
+      plan_slug,
+      unit_amount_cents,
+      billing_interval,
       stripe_customer_id,
       stripe_subscription_id,
       current_period_end,
+      last_payment_status,
+      last_payment_at,
+      failed_payment_count,
       job_posts_used,
       unlocks_used,
       created_at,
       billing_plans!employer_subscriptions_plan_id_fkey (
         name,
-        price
+        price,
+        slug
       ),
       profiles!employer_subscriptions_employer_id_fkey (
         email,
@@ -684,11 +691,20 @@ export async function fetchAdminSubscriptions(): Promise<
       company_name: company?.company_name ?? null,
       employer_email: profile?.email ?? null,
       plan_name: plan?.name ?? null,
+      plan_slug: row.plan_slug ?? plan?.slug ?? null,
       plan_price: plan?.price ?? null,
+      unit_amount_cents: row.unit_amount_cents ?? null,
+      billing_interval:
+        row.billing_interval === "year" || row.billing_interval === "month"
+          ? row.billing_interval
+          : null,
       status: row.status,
       stripe_customer_id: row.stripe_customer_id,
       stripe_subscription_id: row.stripe_subscription_id,
       current_period_end: row.current_period_end,
+      last_payment_status: row.last_payment_status ?? null,
+      last_payment_at: row.last_payment_at ?? null,
+      failed_payment_count: row.failed_payment_count ?? 0,
       job_posts_used: row.job_posts_used,
       unlocks_used: row.unlocks_used,
       created_at: row.created_at,
