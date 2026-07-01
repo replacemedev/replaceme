@@ -1,17 +1,18 @@
 "use client";
 
 import { AppSidebar } from "@/components/shared/layout/AppSidebar";
-import { ADMIN_NAV_ITEMS } from "@/config/adminNav";
+import type { AdminNavItem } from "@/config/adminNav";
 import type { AppSidebarProfile } from "@/components/shared/layout/AppSidebar";
 
 interface AdminSidebarProps {
   profile: AppSidebarProfile;
+  items: AdminNavItem[];
 }
 
-export function AdminSidebar({ profile }: AdminSidebarProps) {
+export function AdminSidebar({ profile, items }: AdminSidebarProps) {
   return (
     <AppSidebar
-      items={ADMIN_NAV_ITEMS}
+      items={items}
       profile={profile}
       showBrand={false}
       footer={

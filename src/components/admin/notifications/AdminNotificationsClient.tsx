@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useTransition } from "react";
+import { useTransition } from "react";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { markAllNotificationsRead, markNotificationRead } from "@/actions/notifications";
@@ -28,35 +28,6 @@ export function AdminNotificationsClient({
   userId,
   initialBootstrap,
 }: AdminNotificationsClientProps) {
-  // #region agent log
-  useEffect(() => {
-    fetch("http://127.0.0.1:7616/ingest/92da0cf0-b581-4b9a-8f33-a2958a515450", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "6b02a8",
-      },
-      body: JSON.stringify({
-        sessionId: "6b02a8",
-        runId: "pre-fix",
-        hypothesisId: "A-C",
-        location: "AdminNotificationsClient.tsx:mount",
-        message: "client initialBootstrap",
-        data: {
-          userId,
-          hasNotifications: Array.isArray(initialBootstrap?.notifications),
-          notificationsLength: Array.isArray(initialBootstrap?.notifications)
-            ? initialBootstrap.notifications.length
-            : null,
-          unreadCount: initialBootstrap?.unreadCount,
-          bootstrapKeys: initialBootstrap ? Object.keys(initialBootstrap) : null,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [userId, initialBootstrap]);
-  // #endregion
-
   const [pending, startTransition] = useTransition();
   const {
     notifications,

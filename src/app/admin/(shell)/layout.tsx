@@ -6,6 +6,8 @@ import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
 import { AdminLayoutChrome } from "@/components/admin/layout/AdminLayoutChrome";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { ADMIN_MAIN_BG } from "@/lib/admin/ui-tokens";
+import { ADMIN_NAV_ITEMS } from "@/config/adminNav";
+import { isCurrentUserSuperAdmin } from "@/lib/server/auth/require-super-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,10 @@ export default async function AdminShellLayout({
   }
 
   const session = await getNavSession();
+  const isSuperAdmin = await isCurrentUserSuperAdmin();
+  const navItems = isSuperAdmin
+    ? ADMIN_NAV_ITEMS
+    : ADMIN_NAV_ITEMS.filter((item) => !item.superAdminOnly);
 
   const sidebarProfile = {
     displayName: session.displayName,
@@ -46,7 +52,7 @@ export default async function AdminShellLayout({
       <div className="min-h-screen bg-slate-50">
         <AuthFlashToast />
         <div className="flex min-h-screen">
-          <AdminSidebar profile={sidebarProfile} />
+          <AdminSidebar profile={sidebarProfile} items={navItems} />
           <div className="flex flex-1 flex-col min-w-0 min-h-screen">
             <AdminHeader session={session} />
             <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>

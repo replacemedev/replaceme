@@ -93,6 +93,16 @@ export const adminAdminRowSchema = z.object({
   created_at: z.string(),
 });
 
+export const adminRoleSchema = z.enum(["moderator", "superadmin"]);
+
+export const adminTeamRowSchema = adminAdminRowSchema.extend({
+  admin_role: adminRoleSchema.catch("moderator"),
+  display_name: z.string().nullable().optional(),
+  last_sign_in_at: z.string().nullable().optional(),
+});
+
+export const adminTeamListSchema = z.array(adminTeamRowSchema);
+
 export const adminWorkerListSchema = z.array(adminWorkerRowSchema);
 export const adminEmployerListSchema = z.array(adminEmployerRowSchema);
 export const adminAdminListSchema = z.array(adminAdminRowSchema);
@@ -141,6 +151,14 @@ export interface AdminAdminRow {
   email: string | null;
   account_status: AccountStatus;
   created_at: string;
+}
+
+export type AdminRole = "moderator" | "superadmin";
+
+export interface AdminTeamRow extends AdminAdminRow {
+  admin_role: AdminRole;
+  display_name?: string | null;
+  last_sign_in_at?: string | null;
 }
 
 export interface AdminJobRow {

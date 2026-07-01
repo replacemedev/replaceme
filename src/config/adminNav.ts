@@ -13,6 +13,7 @@ import {
   ClipboardList,
   MessageSquare,
   Flag,
+  UserCog,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export interface AdminNavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  superAdminOnly?: boolean;
 }
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
@@ -36,6 +38,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Security", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  {
+    href: "/admin/settings/team",
+    label: "Admin Team",
+    icon: UserCog,
+    superAdminOnly: true,
+  },
   { href: "/admin/settings/pages", label: "Public Pages", icon: FileText },
 ];
 
@@ -83,6 +91,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         "/admin/audit-log",
         "/admin/security",
         "/admin/settings",
+        "/admin/settings/team",
         "/admin/settings/pages",
       ].includes(item.href)
     ),

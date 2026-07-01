@@ -46,33 +46,6 @@ export function useNotifications(
     `notifications:${userId}:${crypto.randomUUID()}`
   );
 
-  // #region agent log
-  useEffect(() => {
-    fetch("http://127.0.0.1:7616/ingest/92da0cf0-b581-4b9a-8f33-a2958a515450", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "6b02a8",
-      },
-      body: JSON.stringify({
-        sessionId: "6b02a8",
-        runId: "post-fix",
-        hypothesisId: "D",
-        location: "useNotifications.ts:mount",
-        message: "hook initialized",
-        data: {
-          userId,
-          channelName: realtimeChannelIdRef.current,
-          initialCount: Array.isArray(initialBootstrap?.notifications)
-            ? initialBootstrap.notifications.length
-            : "not-array",
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [userId, initialBootstrap]);
-  // #endregion
-
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.is_read).length,
     [notifications]
