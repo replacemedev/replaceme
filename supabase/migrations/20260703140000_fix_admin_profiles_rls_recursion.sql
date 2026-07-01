@@ -1,4 +1,5 @@
--- Admin team management: superadmin helper + tighten admin_profiles mutations
+-- Fix recursive RLS on admin_profiles:
+-- is_superadmin() queried admin_profiles while RLS evaluated is_superadmin() again.
 
 CREATE OR REPLACE FUNCTION public.is_superadmin()
 RETURNS boolean
@@ -19,7 +20,7 @@ REVOKE ALL ON FUNCTION public.is_superadmin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_superadmin() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_superadmin() TO service_role;
 
-DROP POLICY IF EXISTS "Admins manage admin profiles" ON public.admin_profiles;
+DROP POLICY IF EXISTS "Superadmins manage admin profiles" ON public.admin_profiles;
 
 CREATE POLICY "Superadmins insert admin profiles" ON public.admin_profiles
   FOR INSERT

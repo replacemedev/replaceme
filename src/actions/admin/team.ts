@@ -32,6 +32,11 @@ const TEAM_AUDIT_ACTIONS = [
 
 type ActionResult = { success: true } | { success: false; error: string };
 
+async function getTeamDbClient() {
+  await requireSuperAdmin();
+  return createAdminClient();
+}
+
 function revalidateTeamSurfaces() {
   revalidatePath(TEAM_PATH);
   revalidatePath("/admin/users");
@@ -41,7 +46,7 @@ function revalidateTeamSurfaces() {
 async function assertTargetAdmin(
   userId: string
 ): Promise<{ id: string; email: string | null; account_status: string }> {
-  const { supabase } = await requireSuperAdmin();
+  const supabase = await getTeamDbClient();
 
   const { data, error } = await supabase
     .from("profiles")
@@ -62,7 +67,7 @@ async function assertTargetAdmin(
 }
 
 async function countActiveSuperadmins(): Promise<number> {
-  const { supabase } = await requireSuperAdmin();
+  const supabase = await getTeamDbClient();
 
   const { data: superadminRows, error: roleError } = await supabase
     .from("admin_profiles")
@@ -85,7 +90,7 @@ async function countActiveSuperadmins(): Promise<number> {
 }
 
 async function assertNotLastSuperadmin(userId: string): Promise<void> {
-  const { supabase } = await requireSuperAdmin();
+  const supabase = await getTeamDbClient();
 
   const { data: profile, error } = await supabase
     .from("admin_profiles")
@@ -129,7 +134,8 @@ export async function fetchAdminTeam(): Promise<
   AdminFetchResult<AdminTeamRow[]>
 > {
   try {
-    const { supabase } = await requireSuperAdmin();
+    await requireSuperAdmin();
+    const supabase = await createAdminClient();
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
@@ -197,7 +203,8 @@ export async function fetchAdminTeamActivity(
   limit = 50
 ): Promise<AdminFetchResult<AdminAuditLogRow[]>> {
   try {
-    const { supabase } = await requireSuperAdmin();
+    await requireSuperAdmin();
+    const supabase = await createAdminClient();
 
     const { data, error } = await supabase
       .from("audit_logs")
@@ -292,9 +299,8 @@ export async function createAdminUser(
     }
 
     const newUserId = created.user.id;
-    const { supabase } = await requireSuperAdmin();
 
-    const { error: profileError } = await supabase.from("admin_profiles").upsert(
+    const { error: profileError } = await adminClient.from("admin_profiles").upsert(
       {
         user_id: newUserId,
         admin_role: parsed.admin_role,
@@ -341,16 +347,15 @@ export async function updateAdminStatus(
       await assertNotLastSuperadmin(parsed.userId);
     }
 
-    const { supabase } = await requireSuperAdmin();
-    const { error } = await supabase
+    const db = await getTeamDbClient();
+    const { error } = await db
       .from("profiles")
       .update({ account_status: parsed.status })
       .eq("id", parsed.userId);
 
     if (error) throw new Error(error.message);
 
-    const adminClient = await createAdminClient();
-    await adminClient.auth.admin.updateUserById(parsed.userId, {
+    await db.auth.admin.updateUserById(parsed.userId, {
       ban_duration: parsed.status === "suspended" ? "876000h" : "none",
     });
 
@@ -384,8 +389,8 @@ export async function updateAdminRole(
 
     await assertTargetAdmin(parsed.userId);
 
-    const { supabase } = await requireSuperAdmin();
-    const { data: current, error: currentError } = await supabase
+    const db = await getTeamDbClient();
+    const { data: current, error: currentError } = await db
       .from("admin_profiles")
       .select("admin_role")
       .eq("user_id", parsed.userId)
@@ -400,7 +405,7 @@ export async function updateAdminRole(
       await assertNotLastSuperadmin(parsed.userId);
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from("admin_profiles")
       .upsert(
         {
