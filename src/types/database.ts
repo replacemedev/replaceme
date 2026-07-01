@@ -1994,38 +1994,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_ux_preferences: {
-        Row: {
-          locale: string | null
-          profile_id: string
-          sidebar_collapsed: boolean
-          theme: string
-          updated_at: string
-        }
-        Insert: {
-          locale?: string | null
-          profile_id: string
-          sidebar_collapsed?: boolean
-          theme?: string
-          updated_at?: string
-        }
-        Update: {
-          locale?: string | null
-          profile_id?: string
-          sidebar_collapsed?: boolean
-          theme?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_ux_preferences_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       unlocked_profiles: {
         Row: {
           application_id: string | null

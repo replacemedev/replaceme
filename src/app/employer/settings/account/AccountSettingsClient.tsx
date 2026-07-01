@@ -20,7 +20,6 @@ import { ManagePlanGrid } from "@/components/employer/settings/account/ManagePla
 import { ActivePlanSidebar } from "@/components/employer/settings/account/ActivePlanSidebar";
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
-import { ThemePreferenceRow } from "@/components/shared/ThemePreferenceRow";
 
 interface AccountSettingsClientProps {
   initialSettings: AccountSettings;
@@ -137,8 +136,6 @@ export function AccountSettingsClient({
       ) : null}
 
       {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
-
-      <ThemePreferenceRow />
 
       <PlanFeatureChecklist
         currentPlan={initialSettings.plan}

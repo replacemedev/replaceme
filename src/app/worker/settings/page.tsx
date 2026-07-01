@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSettingsClient";
-import { ThemePreferenceRow } from "@/components/shared/ThemePreferenceRow";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
@@ -31,17 +30,14 @@ export default async function WorkerSettingsPage() {
         title="Account settings"
         subhead="Manage availability, hourly rate, and trust & safety reports."
       />
-      <div className="space-y-6">
-        <WorkerSettingsClient
-          initial={{
-            availability: profile.availability ?? "Full-time",
-            hourlyRate: Number(profile.hourly_rate ?? 0),
-            isRemote: Boolean(profile.is_remote),
-            salaryCurrency: profile.salary_currency ?? "PHP",
-          }}
-        />
-        <ThemePreferenceRow />
-      </div>
+      <WorkerSettingsClient
+        initial={{
+          availability: profile.availability ?? "Full-time",
+          hourlyRate: Number(profile.hourly_rate ?? 0),
+          isRemote: Boolean(profile.is_remote),
+          salaryCurrency: profile.salary_currency ?? "PHP",
+        }}
+      />
     </WorkerPageShell>
   );
 }
