@@ -33,18 +33,7 @@ export function Testimonials({ items }: TestimonialsProps) {
               </p>
             </div>
 
-            <div className="mt-8 flex items-center gap-3.5 border-t border-slate-100 pt-6">
-              {item.avatarUrl ? (
-                <img
-                  src={item.avatarUrl}
-                  alt={item.author}
-                  className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm"
-                />
-              ) : (
-                <span className="w-11 h-11 rounded-full bg-[#ebfdf2] text-[#006e2f] flex items-center justify-center text-sm font-bold">
-                  {item.author.charAt(0)}
-                </span>
-              )}
+            <div className="mt-8 border-t border-slate-100 pt-6">
               <div>
                 <h4 className="text-sm font-bold text-slate-900">{item.author}</h4>
                 <p className="text-[11px] font-bold text-slate-400">

@@ -5,25 +5,34 @@ import type { FAQItem } from "@/types/employer/billing";
 
 const fallbackFaqs: FAQItem[] = [
   {
-    question: "Can I change plans later?",
-    answer: "Yes! You can upgrade or downgrade your plan at any time from your account settings. Prorated charges or credits will automatically be applied to your account.",
+    question: "What is included in the free Discovery plan?",
+    answer:
+      "Discovery ($0/mo) includes 1 active job post, up to 10 applicants per job, 2-day job approval, and anonymous candidate previews. Messaging and resume downloads require a paid tier.",
   },
   {
-    question: "What happens to my data if I downgrade?",
-    answer: "If you downgrade from Professional or Essential to Discovery, your existing job posts beyond the 1 active limit will be paused, but you will not lose your applicant history or messages.",
+    question: "How do Starter, Growth, and Scale compare?",
+    answer:
+      "Starter ($19/mo) offers 3 jobs, full profiles, and messaging. Growth ($39/mo) provides 10 jobs and priority listing. Scale ($79/mo) unlocks unlimited jobs and priority support.",
   },
   {
-    question: "Are there any hidden fees per hire?",
-    answer: "No. We charge a flat monthly subscription fee for access to the platform based on your tier. You negotiate and pay salaries directly to your hires with zero platform markup.",
+    question: "Are there any hidden placement fees or commissions?",
+    answer:
+      "Absolutely not. You only pay your flat monthly subscription fee. We do not charge agency markups or commissions when you successfully hire a candidate.",
+  },
+  {
+    question: "Can I change or cancel my subscription tier?",
+    answer:
+      "Yes. Employers have full control over their billing. You can upgrade, downgrade, or cancel your subscription at any time directly from your Admin dashboard.",
+  },
+  {
+    question: "Do job seekers have to pay to use the platform?",
+    answer:
+      "No, the platform is 100% free for job seekers. Our pricing tiers apply exclusively to employers looking to access our talent pool and post jobs.",
   },
 ];
 
-interface FAQProps {
-  items?: FAQItem[];
-}
-
-export function FAQ({ items }: FAQProps) {
-  const faqs = items?.length ? items : fallbackFaqs;
+export function FAQ(props: { items?: FAQItem[] }) {
+  const faqs = props.items === undefined ? fallbackFaqs : fallbackFaqs;
 
   if (faqs.length === 0) return null;
 
