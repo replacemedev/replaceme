@@ -10,7 +10,7 @@ export function SignUpBrandPanel() {
 
   return (
     <section
-      className="relative flex h-full min-h-[28rem] w-full flex-col justify-center overflow-hidden px-8 py-12 xl:px-14 xl:py-16"
+      className="relative flex h-full min-h-[28rem] w-full flex-col justify-center lg:justify-start overflow-hidden px-8 py-12 lg:pt-24 lg:pb-12 xl:px-14 xl:pt-32 xl:pb-16"
       aria-label="Why Replace Me"
     >
       <AuthPanelBackdrop variant="dark" />
