@@ -36,11 +36,42 @@ export function useNotifications(
   initialBootstrap: NotificationBootstrap
 ) {
   const [notifications, setNotifications] = useState<Notification[]>(
-    initialBootstrap.notifications
+    initialBootstrap.notifications ?? []
   );
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const supabaseRef = useRef(createClient());
+  // Unique per hook instance — header bell + notifications page both use this hook.
+  const realtimeChannelIdRef = useRef(
+    `notifications:${userId}:${crypto.randomUUID()}`
+  );
+
+  // #region agent log
+  useEffect(() => {
+    fetch("http://127.0.0.1:7616/ingest/92da0cf0-b581-4b9a-8f33-a2958a515450", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "6b02a8",
+      },
+      body: JSON.stringify({
+        sessionId: "6b02a8",
+        runId: "post-fix",
+        hypothesisId: "D",
+        location: "useNotifications.ts:mount",
+        message: "hook initialized",
+        data: {
+          userId,
+          channelName: realtimeChannelIdRef.current,
+          initialCount: Array.isArray(initialBootstrap?.notifications)
+            ? initialBootstrap.notifications.length
+            : "not-array",
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }, [userId, initialBootstrap]);
+  // #endregion
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.is_read).length,
@@ -104,15 +135,17 @@ export function useNotifications(
   }, []);
 
   useEffect(() => {
-    if (initialBootstrap.notifications.length === 0) {
+    const initialCount = initialBootstrap.notifications?.length ?? 0;
+    if (initialCount === 0) {
       void refresh();
     }
-  }, [initialBootstrap.notifications.length, refresh]);
+  }, [initialBootstrap.notifications?.length, refresh]);
 
   useEffect(() => {
     const supabase = supabaseRef.current;
+    const channelName = realtimeChannelIdRef.current;
     const channel = supabase
-      .channel(`notifications:${userId}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         {

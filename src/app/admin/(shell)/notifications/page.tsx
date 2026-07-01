@@ -23,6 +23,33 @@ export default async function AdminNotificationsPage() {
   try {
     const bootstrap = await fetchNotificationBootstrap(user.id, 50);
 
+    // #region agent log
+    fetch("http://127.0.0.1:7616/ingest/92da0cf0-b581-4b9a-8f33-a2958a515450", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "6b02a8",
+      },
+      body: JSON.stringify({
+        sessionId: "6b02a8",
+        runId: "pre-fix",
+        hypothesisId: "A-B",
+        location: "admin/notifications/page.tsx:fetch",
+        message: "server bootstrap loaded",
+        data: {
+          userId: user.id,
+          hasNotifications: Array.isArray(bootstrap?.notifications),
+          notificationsLength: Array.isArray(bootstrap?.notifications)
+            ? bootstrap.notifications.length
+            : null,
+          unreadCount: bootstrap?.unreadCount,
+          bootstrapKeys: bootstrap ? Object.keys(bootstrap) : null,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
     return (
       <AdminPageShell>
         <AdminNotificationsClient userId={user.id} initialBootstrap={bootstrap} />
@@ -31,6 +58,28 @@ export default async function AdminNotificationsPage() {
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Unable to load notifications.";
+
+    // #region agent log
+    fetch("http://127.0.0.1:7616/ingest/92da0cf0-b581-4b9a-8f33-a2958a515450", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "6b02a8",
+      },
+      body: JSON.stringify({
+        sessionId: "6b02a8",
+        runId: "pre-fix",
+        hypothesisId: "B",
+        location: "admin/notifications/page.tsx:catch",
+        message: "server fetch threw",
+        data: {
+          errorMessage: message,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
     return (
       <AdminPageShell>
         <AdminPageHeader
