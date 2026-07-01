@@ -19,3 +19,4 @@ export { LandingPageSkeleton } from "./LandingPageSkeleton";
 export { ProfilePageSkeleton } from "./ProfilePageSkeleton";
 export { JobDetailPageSkeleton, FormPageSkeleton } from "./JobDetailPageSkeleton";
 export { SettingsPageSkeleton, GridListingPageSkeleton } from "./SettingsPageSkeleton";
+export { PricingPageSkeleton } from "./PricingPageSkeleton";

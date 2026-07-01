@@ -1,5 +1,5 @@
 import { PricingPageSkeleton } from "@/components/shared/skeletons";
 
-export default function EmployerPricingLoading() {
+export default function PublicPricingLoading() {
   return <PricingPageSkeleton />;
 }
