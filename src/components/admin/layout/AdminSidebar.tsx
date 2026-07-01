@@ -1,15 +1,27 @@
 "use client";
 
+import { useMemo } from "react";
 import { AppSidebar } from "@/components/shared/layout/AppSidebar";
-import type { AdminNavItem } from "@/config/adminNav";
+import { ADMIN_NAV_ITEMS } from "@/config/adminNav";
 import type { AppSidebarProfile } from "@/components/shared/layout/AppSidebar";
 
 interface AdminSidebarProps {
   profile: AppSidebarProfile;
-  items: AdminNavItem[];
+  isSuperAdmin?: boolean;
 }
 
-export function AdminSidebar({ profile, items }: AdminSidebarProps) {
+export function AdminSidebar({
+  profile,
+  isSuperAdmin = false,
+}: AdminSidebarProps) {
+  const items = useMemo(
+    () =>
+      isSuperAdmin
+        ? ADMIN_NAV_ITEMS
+        : ADMIN_NAV_ITEMS.filter((item) => !item.superAdminOnly),
+    [isSuperAdmin]
+  );
+
   return (
     <AppSidebar
       items={items}

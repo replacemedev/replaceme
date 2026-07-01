@@ -24,9 +24,7 @@ export const getCurrentAdminProfile = cache(
       .maybeSingle();
 
     if (error) {
-      throw new SuperAdminAuthError(
-        `Failed to load admin profile: ${error.message}`
-      );
+      return null;
     }
 
     return data;
