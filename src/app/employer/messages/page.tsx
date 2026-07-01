@@ -8,7 +8,7 @@ import {
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { EmployerPageShell } from "@/components/employer/layout";
+import { EmployerPageShell, EmployerPageHeader } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
@@ -50,7 +50,7 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
     }
   }
 
-  const resolvedThreadId = threadId;
+  let resolvedThreadId = threadId;
 
   let threads: MessagingThread[] = [];
   let availableJobRoles: MessagingJobRole[] = [];
@@ -80,7 +80,12 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   }
 
   return (
-    <EmployerPageShell width="wide" className="py-4 md:py-6 gap-0">
+    <EmployerPageShell width="wide" className="py-8 gap-4">
+      <EmployerPageHeader
+        title="Messaging"
+        subhead="Chat with candidates across your active job posts."
+        bordered={false}
+      />
       <MessagingClient
         role="employer"
         basePath="/employer/messages"

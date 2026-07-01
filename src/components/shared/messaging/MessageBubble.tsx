@@ -10,13 +10,23 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
   const isMe = message.sender_id === currentUserId;
-  
+
   // Format message time
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   };
 
+  // Safe split name to get initials
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  };
 
   // Helper to parse content and detect email links, template blocks, etc.
   const renderParsedContent = (content: string) => {
@@ -117,6 +127,8 @@ export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
     });
   };
 
+  const senderName = message.sender?.full_name || "User";
+  const initials = getInitials(senderName);
 
   if (isMe) {
     return (
@@ -131,6 +143,9 @@ export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
           <span className="text-[11px] font-semibold text-slate-400">
             {formatTime(message.created_at)}
           </span>
+          <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-semibold text-[9px]">
+            {initials}
+          </div>
         </div>
       </div>
     );
@@ -143,6 +158,9 @@ export function MessageBubble({ message, currentUserId }: MessageBubbleProps) {
       </div>
 
       <div className="flex items-center gap-1.5 mt-2 ml-1">
+        <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#e8f5e9] text-[#006e2f] font-bold text-[9px]">
+          {initials}
+        </div>
         <span className="text-[11px] font-semibold text-slate-400">
           {formatTime(message.created_at)}
         </span>

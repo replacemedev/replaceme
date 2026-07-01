@@ -108,9 +108,8 @@ export function ChatArea({
   if (!thread) {
     return (
       <section
-        className={`flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8 ${
-          mobileHidden ? "hidden lg:flex" : ""
-        }`}
+        className={`flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8 ${mobileHidden ? "hidden lg:flex" : ""
+          }`}
       >
         <MessagingEmptyState
           role={role}
@@ -135,32 +134,35 @@ export function ChatArea({
 
   return (
     <section
-      className={`flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0 ${
-        mobileHidden ? "hidden lg:flex" : ""
-      }`}
+      className={`flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0 ${mobileHidden ? "hidden lg:flex" : ""
+        }`}
     >
       <header className="relative shrink-0 h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
           <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
-            <AvatarImage
-              src={oppositeParty.avatarUrl}
-              alt={oppositeParty.name}
-              initials={initials}
-              size="xs"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
-              {contextTitle}
-            </h3>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
-              <span className="text-xs text-slate-500 font-semibold truncate">
-                {oppositeParty.name}
-              </span>
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
+              <AvatarImage
+                src={oppositeParty.avatarUrl}
+                alt={oppositeParty.name}
+                initials={initials}
+                size="xs"
+              />
             </div>
-          </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
+                {contextTitle}
+              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
+                <span className="text-xs text-slate-500 font-semibold truncate">
+                  {oppositeParty.name}
+                </span>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold uppercase tracking-wide w-fit">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#006e2f]" />
+                  Online
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -173,11 +175,10 @@ export function ChatArea({
               setIsPinning(false);
             }}
             disabled={isPinning}
-            className={`hidden sm:inline-flex p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
-              thread.is_pinned
+            className={`hidden sm:inline-flex p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${thread.is_pinned
                 ? "text-[#006e2f]"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-            }`}
+              }`}
             aria-label="Pin conversation"
           >
             <Pin className={`h-4.5 w-4.5 ${thread.is_pinned ? "fill-current" : ""}`} />

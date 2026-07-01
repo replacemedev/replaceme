@@ -7,7 +7,7 @@ import {
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
-import { WorkerPageShell } from "@/components/worker/layout";
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
@@ -58,14 +58,21 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
 
   if (loadError) {
     return (
-      <WorkerPageShell width="wide" className="py-4 md:py-6 gap-0">
+      <WorkerPageShell width="wide" className="py-8 gap-4">
         <ErrorState description={loadError} retryHref="/worker/messages" />
       </WorkerPageShell>
     );
   }
 
   return (
-    <WorkerPageShell width="wide" className="py-4 md:py-6 gap-0">
+    <WorkerPageShell width="wide" className="py-8 gap-4">
+      <div>
+        <WorkerPageHeader
+          title="Messages"
+          subhead="Conversations with employers about your applications."
+          bordered={false}
+        />
+      </div>
       <MessagingClient
         role="worker"
         basePath="/worker/messages"
