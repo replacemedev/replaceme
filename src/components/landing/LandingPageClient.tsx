@@ -16,7 +16,6 @@ import {
   CircleDollarSign,
   Clock,
   CreditCard,
-  Gift,
   Handshake,
   Plus,
   Quote,
@@ -146,26 +145,36 @@ interface LandingPageClientProps {
 
 const LANDING_FAQ_FALLBACK: FAQItem[] = [
   {
-    question: "What is included in the free Discovery plan?",
+    question: "How does the pricing work for employers?",
     answer:
-      "Discovery ($0/mo) includes 1 active job, up to 10 applicants per job, 2-day approval, and anonymous candidate previews. Upgrade to Starter or above for messaging and full profiles.",
+      "We offer 4 transparent subscription tiers (Discovery, Starter, Growth, and Scale). You pay a predictable flat rate to access talent and post jobs, with absolutely no placement fees, commissions, or agency markups.",
   },
   {
-    question: "How do Starter, Growth, and Scale compare?",
+    question: "Is the platform free for workers?",
     answer:
-      "Starter is $19/mo (3 jobs, 20 applicants). Growth is $39/mo (10 jobs, 50 applicants, priority listing). Scale is $79/mo (unlimited jobs and applicants).",
+      "Yes, the platform is 100% free for job seekers. You can build your profile, apply to public job posts, and negotiate directly with employers without ever paying a fee.",
   },
   {
-    question: "Is Replace Me free for job seekers?",
-    answer: "Yes — workers browse, apply, and message employers at no cost.",
+    question: "Can anyone on the internet see worker profiles?",
+    answer:
+      "No. To protect our talent pool, worker profiles are strictly private. They are exclusively visible to authenticated employers who have an active, verified subscription tier.",
+  },
+  {
+    question: "How is this different from a traditional recruitment agency?",
+    answer:
+      "We provide a curated direct-hire marketplace, not an agency service. We give you the platform to connect and hire directly, eliminating the middlemen so you can build relationships on your own terms.",
+  },
+  {
+    question: "Can employers change or cancel their subscription?",
+    answer:
+      "Yes. Employers have full control over their billing and can upgrade, downgrade, or cancel their subscription tier at any time directly from their Admin dashboard.",
   },
 ];
 
 export function LandingPageClient({
   pricingPlans,
-  faqs: faqsProp,
 }: LandingPageClientProps) {
-  const faqs = faqsProp.length > 0 ? faqsProp : LANDING_FAQ_FALLBACK;
+  const faqs = LANDING_FAQ_FALLBACK;
 
   // States for Carousel
   const [carouselIndex, setCarouselIndex] = useState(0);
