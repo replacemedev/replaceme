@@ -18,6 +18,7 @@ import {
   updateAdminStatus,
 } from "@/actions/admin/team";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { AdminSelfPasswordActions } from "@/components/admin/settings/AdminSelfPasswordActions";
 import type { AdminRole, AdminTeamRow } from "@/types/admin.types";
 
 interface AdminTeamActionsMenuProps {
@@ -99,9 +100,7 @@ export function AdminTeamActionsMenu({
   };
 
   if (isSelf) {
-    return (
-      <span className="text-xs font-medium text-slate-400">Current user</span>
-    );
+    return <AdminSelfPasswordActions />;
   }
 
   const nextRole: AdminRole =

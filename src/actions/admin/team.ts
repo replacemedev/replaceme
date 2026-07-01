@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { logAdminAction } from "@/actions/admin-actions";
 import { authCallbackUrl } from "@/lib/auth/site-url";
+import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { requireSuperAdmin } from "@/lib/server/auth/require-super-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
@@ -427,6 +428,38 @@ export async function updateAdminRole(
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to update admin role",
+    };
+  }
+}
+
+export async function triggerOwnPasswordReset(): Promise<ActionResult> {
+  try {
+    const { user } = await requireAdmin();
+
+    if (!user.email) {
+      return { success: false, error: "Admin account has no email on file." };
+    }
+
+    const adminClient = await createAdminClient();
+    const { error } = await adminClient.auth.resetPasswordForEmail(user.email, {
+      redirectTo: authCallbackUrl("recovery", "/update-password"),
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    await logAdminAction("admin_password_reset", "admin_profile", user.id, {
+      email: user.email,
+      initiated_by: "self",
+    });
+
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to send password reset",
     };
   }
 }

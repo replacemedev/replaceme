@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ChevronRight, FileText, Settings, UserCog } from "lucide-react";
+import { ChevronRight, FileText, Settings, Shield, UserCog } from "lucide-react";
 import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
+import { AdminSelfPasswordActions } from "@/components/admin/settings/AdminSelfPasswordActions";
 import { isCurrentUserSuperAdmin } from "@/lib/server/auth/require-super-admin";
 
 export const metadata = {
@@ -73,6 +74,23 @@ export default async function AdminSettingsPage() {
             </Link>
           );
         })}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#ebfdf2] text-[#006e2f]">
+            <Shield className="h-5 w-5" aria-hidden />
+          </span>
+          <div className="min-w-0 flex-1 space-y-3">
+            <div>
+              <p className="text-sm font-bold text-slate-900">Account security</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Update your password now or receive a reset link by email.
+              </p>
+            </div>
+            <AdminSelfPasswordActions variant="card" />
+          </div>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)] divide-y divide-slate-100">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { ADMIN_NAV_GROUPS } from "@/config/adminNav";
+import { ADMIN_NAV_GROUPS, getActiveAdminNavHref } from "@/config/adminNav";
 import { filterAdminNavGroups } from "@/lib/admin/filter-nav";
 
 interface AdminMobileDrawerProps {
@@ -30,6 +30,11 @@ export function AdminMobileDrawer({
     () => filterAdminNavGroups(ADMIN_NAV_GROUPS, isSuperAdmin),
     [isSuperAdmin]
   );
+  const navItems = useMemo(
+    () => navGroups.flatMap((group) => group.items),
+    [navGroups]
+  );
+  const activeHref = getActiveAdminNavHref(pathname, navItems);
 
   if (!open) return null;
 
@@ -92,9 +97,7 @@ export function AdminMobileDrawer({
               <ul className="space-y-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const active =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
+                  const active = item.href === activeHref;
                   return (
                     <li key={item.href}>
                       <Link

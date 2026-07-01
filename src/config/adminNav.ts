@@ -98,6 +98,26 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
 ];
 
-export function isAdminNavActive(pathname: string, href: string): boolean {
+/** Longest matching nav href wins so parent routes (e.g. /admin/settings) do not stay active on child pages. */
+export function getActiveAdminNavHref(
+  pathname: string,
+  items: ReadonlyArray<{ href: string }>
+): string | null {
+  const matches = items.filter(
+    (item) =>
+      pathname === item.href || pathname.startsWith(`${item.href}/`)
+  );
+  if (matches.length === 0) return null;
+  return matches.sort((a, b) => b.href.length - a.href.length)[0].href;
+}
+
+export function isAdminNavActive(
+  pathname: string,
+  href: string,
+  items?: ReadonlyArray<{ href: string }>
+): boolean {
+  if (items && items.length > 0) {
+    return getActiveAdminNavHref(pathname, items) === href;
+  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

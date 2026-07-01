@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
+import { getActiveAdminNavHref } from "@/config/adminNav";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 
 export interface AppSidebarNavItem {
@@ -33,6 +34,7 @@ export function AppSidebar({
   showBrand = true,
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const activeHref = getActiveAdminNavHref(pathname, items);
 
   return (
     <aside className="hidden lg:flex flex-col bg-white border-r border-slate-200/80 w-[260px] shrink-0">
@@ -70,8 +72,7 @@ export function AppSidebar({
 
       <nav className="flex flex-col gap-1 flex-1 px-3 py-4 overflow-y-auto">
         {items.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            pathname === href || pathname.startsWith(`${href}/`);
+          const isActive = href === activeHref;
           return (
             <Link
               key={href}
