@@ -49,6 +49,15 @@ export function CookiePolicyContent() {
             Required for authentication, security, and core marketplace features. Always active.
           </BulletItem>
           <BulletItem>
+            <strong className="font-semibold text-slate-800">Functional (UX)</strong> —
+            After you make a cookie choice, we may store preferences such as{" "}
+            <code className="text-xs bg-slate-100 px-1 rounded">cookie_consent</code>,{" "}
+            <code className="text-xs bg-slate-100 px-1 rounded">rm_theme</code>, and{" "}
+            <code className="text-xs bg-slate-100 px-1 rounded">rm_sidebar</code> to remember
+            theme and layout settings. These are only set once you have accepted or saved
+            cookie preferences.
+          </BulletItem>
+          <BulletItem>
             <strong className="font-semibold text-slate-800">Analytics</strong> — Help us
             understand traffic and product usage (e.g. page views, funnels). Only loaded after
             you opt in.

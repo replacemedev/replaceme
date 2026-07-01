@@ -2,6 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getSiteUrl } from "@/lib/auth/site-url";
+import {
+  COOKIE_CONSENT_NAME,
+  COOKIE_CONSENT_VALUE,
+  hasConsentCookieValue,
+} from "@/lib/cookies/constants";
+import { applyUxPreferenceCookiesOnResponse } from "@/lib/cookies/server";
+import { createAdminClient } from "@/lib/supabase/server";
+import type { ThemePreference } from "@/lib/cookies/constants";
 
 function resolveRedirectOrigin(request: NextRequest): string {
   const forwardedHost = request.headers.get("x-forwarded-host");
@@ -51,6 +59,32 @@ function createSupabaseWithResponse(cookieStore: Awaited<ReturnType<typeof cooki
   };
 }
 
+async function attachUxPreferencesToResponse(
+  response: NextResponse,
+  profileId: string,
+  hasConsent: boolean
+): Promise<void> {
+  if (!hasConsent) return;
+
+  const admin = await createAdminClient();
+  const { data } = await admin
+    .from("user_ux_preferences")
+    .select("theme, sidebar_collapsed")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+
+  if (!data) return;
+
+  applyUxPreferenceCookiesOnResponse(
+    response,
+    {
+      theme: data.theme as ThemePreference,
+      sidebarCollapsed: data.sidebar_collapsed,
+    },
+    true
+  );
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const code = searchParams.get("code");
@@ -83,8 +117,19 @@ export async function GET(request: NextRequest) {
     return attachRedirect(`${origin}/update-password`);
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const hasConsent = hasConsentCookieValue(
+    cookieStore.get(COOKIE_CONSENT_NAME)?.value
+  );
+
   if (next?.startsWith("/")) {
-    return attachRedirect(`${origin}${next}`);
+    const redirect = attachRedirect(`${origin}${next}`);
+    if (user) {
+      await attachUxPreferencesToResponse(redirect, user.id, hasConsent);
+    }
+    return redirect;
   }
 
   await supabase.auth.signOut();

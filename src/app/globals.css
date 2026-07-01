@@ -85,6 +85,22 @@
   --text-caption: 14px;
 }
 
+/* Shell-only dark mode tokens (nav, headers, sidebars — not full app recolor) */
+html.dark {
+  --color-background: #0c1017;
+  --color-surface: #151b26;
+  --color-on-background: #e8edf5;
+  --color-on-surface: #e8edf5;
+  --color-surface-subdued: #1a2230;
+  --color-border-subtle: #2a3548;
+  --color-canvas: #151b26;
+  color-scheme: dark;
+}
+
+@utility bg-shell {
+  background-color: var(--color-background);
+}
+
 @utility text-display-xl {
   font-size: 64px;
   line-height: 1.1;

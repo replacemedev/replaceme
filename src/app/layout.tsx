@@ -3,8 +3,13 @@ import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { CookieConsentRoot } from "@/components/shared/cookie-consent";
-import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/cookie-consent/types";
-import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { UxProvidersWithSync } from "@/components/shared/UxProvidersWithSync";
+import { UxPreferenceBootstrap } from "@/components/shared/UxPreferenceBootstrap";
+import {
+  buildUxBlockingScript,
+} from "@/lib/cookies/blocking-script";
+import { getUxCookies } from "@/lib/cookies/server";
+import { resolveThemeClass } from "@/lib/cookies/theme";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -32,15 +37,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const ux = await getUxCookies();
+  const themeClass = ux.hasConsent ? resolveThemeClass(ux.theme, false) : "";
+  const fontClasses = `${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`;
+
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${fontClasses}${themeClass ? ` ${themeClass}` : ""}`}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -49,20 +59,23 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var raw=localStorage.getItem(${JSON.stringify(COOKIE_CONSENT_STORAGE_KEY)});if(!raw)return;var p=JSON.parse(raw);if(p&&p.policyVersion===${JSON.stringify(COOKIE_POLICY_VERSION)}){document.documentElement.setAttribute("data-cookie-consent","granted");}}catch(e){}})();`,
+            __html: buildUxBlockingScript(),
           }}
         />
       </head>
       <body className="font-body-base bg-background text-on-background antialiased min-h-screen flex flex-col">
-        <Toaster
-          position="top-right"
-          richColors
-          offset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12 }}
-          mobileOffset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12, left: 12 }}
-          toastOptions={{ className: "max-w-[calc(100vw-24px)]" }}
-        />
-        {children}
-        <CookieConsentRoot />
+        <UxProvidersWithSync initialTheme={ux.theme}>
+          <Toaster
+            position="top-right"
+            richColors
+            offset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12 }}
+            mobileOffset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12, left: 12 }}
+            toastOptions={{ className: "max-w-[calc(100vw-24px)]" }}
+          />
+          {children}
+          <UxPreferenceBootstrap />
+          <CookieConsentRoot />
+        </UxProvidersWithSync>
       </body>
     </html>
   );

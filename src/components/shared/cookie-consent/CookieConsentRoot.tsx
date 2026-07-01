@@ -11,6 +11,7 @@ import {
   consentNeedsBanner,
   getOrCreateAnonymousId,
   readStoredConsent,
+  syncHttpConsentFromStorage,
   writeStoredConsent,
 } from "@/lib/cookie-consent/storage";
 import {
@@ -85,6 +86,7 @@ export function CookieConsentRoot() {
       setDraftAnalytics(resolved?.analytics ?? false);
       setDraftMarketing(resolved?.marketing ?? false);
       setShowBanner(consentNeedsBanner(resolved));
+      syncHttpConsentFromStorage();
       setHydrated(true);
     };
 

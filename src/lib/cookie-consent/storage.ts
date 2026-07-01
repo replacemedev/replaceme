@@ -3,6 +3,12 @@ import {
   COOKIE_CONSENT_STORAGE_KEY,
   type CookieConsentPreferences,
 } from "@/lib/cookie-consent/types";
+import {
+  clearCookieConsent,
+  clearUxCookies,
+  hasCookieConsent,
+  setCookieConsentGranted,
+} from "@/lib/cookies/client";
 
 const ANONYMOUS_ID_KEY = "replace_me_cookie_anonymous_id";
 
@@ -64,6 +70,7 @@ export function writeStoredConsent(preferences: CookieConsentPreferences): void 
   try {
     localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(preferences));
     document.documentElement.setAttribute("data-cookie-consent", "granted");
+    setCookieConsentGranted();
   } catch {
     // Private browsing or quota exceeded — banner may reappear on reload.
   }
@@ -75,6 +82,8 @@ export function clearStoredConsent(): void {
   try {
     localStorage.removeItem(COOKIE_CONSENT_STORAGE_KEY);
     document.documentElement.removeAttribute("data-cookie-consent");
+    clearCookieConsent();
+    clearUxCookies();
   } catch {
     // ignore
   }
@@ -83,6 +92,15 @@ export function clearStoredConsent(): void {
 export function consentNeedsBanner(preferences: CookieConsentPreferences | null): boolean {
   if (!preferences) return true;
   return preferences.policyVersion !== COOKIE_POLICY_VERSION;
+}
+
+export function syncHttpConsentFromStorage(): void {
+  if (typeof window === "undefined") return;
+  const stored = readStoredConsent();
+  if (!stored || consentNeedsBanner(stored)) return;
+  if (!hasCookieConsent()) {
+    setCookieConsentGranted();
+  }
 }
 
 export function buildConsent(

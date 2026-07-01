@@ -18,7 +18,7 @@ export default async function WorkerLayout({
     <>
       <AuthFlashToast />
       <WorkerHeader session={session} />
-      <main className="pt-0 min-h-screen bg-[#f8fafe] pb-[calc(56px+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="pt-0 min-h-screen bg-shell pb-[calc(56px+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
       <WorkerLayoutChrome unreadMessageCount={session.unreadMessageCount} />
