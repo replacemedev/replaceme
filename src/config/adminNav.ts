@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Flag,
   UserCog,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/admin/jobs", label: "Job Posts", icon: Briefcase },
   { href: "/admin/identity", label: "Identity", icon: Fingerprint },
   { href: "/admin/reports", label: "Reports", icon: Flag },
+  { href: "/admin/reports/email", label: "Email", icon: Mail, superAdminOnly: true },
   { href: "/admin/moderation", label: "Moderation", icon: MessageSquare },
   { href: "/admin/billing", label: "Billing", icon: DollarSign },
   { href: "/admin/disputes", label: "Disputes", icon: Scale },
@@ -64,6 +66,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         "/admin/applications",
         "/admin/jobs",
         "/admin/reports",
+        "/admin/reports/email",
       ].includes(item.href)
     ),
   },

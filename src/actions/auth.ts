@@ -16,6 +16,7 @@ import {
 import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
 import { authCallbackUrl } from "@/lib/auth/site-url";
+import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { isAppRole, profileIdFilter } from "@/lib/auth/role";
 import { resolvePostAuthRedirect } from "@/lib/auth/safe-callback-url";
 import {
@@ -242,6 +243,25 @@ export async function signUp(formData: SignUpFormValues) {
 
     if (!authData.user) {
       return { success: false, error: "Failed to create user account." };
+    }
+
+    // Resend contact sync (for future broadcasts). Safe to run even if email confirmation is pending.
+    try {
+      const isEmployer = role === "employer";
+      await syncResendContactForUser({
+        userId: authData.user.id,
+        email: authData.user.email ?? data.email,
+        firstName,
+        lastName: lastName || null,
+        role: isEmployer ? "employer" : "worker",
+        tierSlug: isEmployer ? "discovery" : null,
+        companyName:
+          isEmployer && "companyName" in (data as any)
+            ? ((data as any).companyName as string)
+            : null,
+      });
+    } catch (err) {
+      safeError("[Auth] Resend contact sync failed:", err);
     }
 
     // Stripe customer is created on first checkout via ensureStripeCustomer()

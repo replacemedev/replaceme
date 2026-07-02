@@ -6,6 +6,7 @@ import {
   resolveBillingPlanByStripePriceId,
 } from "@/lib/server/stripe/plan";
 import { safeError, safeLog } from "@/utils/logger";
+import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
 import { extractSubscriptionPrice } from "@/lib/server/stripe/subscription-price";
 
@@ -260,6 +261,29 @@ export async function syncEmployerSubscriptionFromStripe(
   );
 
   await invalidateEmployerCache(employerId);
+
+  // Resend contact sync (tier/segments) for broadcasts.
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, email, first_name, last_name, role")
+      .eq("id", employerId)
+      .maybeSingle();
+
+    if (profile?.email) {
+      await syncResendContactForUser({
+        userId: employerId,
+        email: profile.email,
+        firstName: profile.first_name,
+        lastName: profile.last_name,
+        role: "employer",
+        tierSlug: (planSlug ?? "discovery") as any,
+        companyName: null,
+      });
+    }
+  } catch (err) {
+    safeError("syncEmployerSubscriptionFromStripe: resend sync failed", err);
+  }
 
   return { success: true };
 }
