@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { EmployerAccountDetails } from "@/actions/employer/account";
 
 interface EmployerPersonalProfileCardProps {
@@ -8,12 +7,6 @@ interface EmployerPersonalProfileCardProps {
 function displayName(account: EmployerAccountDetails): string {
   const full = [account.firstName, account.lastName].filter(Boolean).join(" ").trim();
   return full || account.username || "Employer";
-}
-
-function initials(account: EmployerAccountDetails): string {
-  if (account.firstName) return account.firstName[0].toUpperCase();
-  if (account.username) return account.username[0].toUpperCase();
-  return "E";
 }
 
 export function EmployerPersonalProfileCard({
@@ -33,23 +26,7 @@ export function EmployerPersonalProfileCard({
         </p>
       </div>
 
-      <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
-          {account.avatarUrl ? (
-            <Image
-              src={account.avatarUrl}
-              alt={`${name} avatar`}
-              fill
-              className="object-cover"
-              sizes="64px"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#ebfdf2] text-lg font-bold text-[#006e2f]">
-              {initials(account)}
-            </div>
-          )}
-        </div>
-
+      <div className="p-6">
         <dl className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
