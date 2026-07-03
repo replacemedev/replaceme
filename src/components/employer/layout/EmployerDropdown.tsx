@@ -84,15 +84,14 @@ export function EmployerDropdown({
 
         <ChevronDown
           size={14}
-          className={`text-slate-400 transition-transform duration-200 ${
-            dropdownOpen ? "rotate-180" : ""
-          }`}
+          className={`text-slate-400 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
       {dropdownOpen && (
         <div
-          className="absolute right-0 mt-2 w-56 bg-white border border-slate-150 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn"
+          className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn"
           role="menu"
           aria-label="User actions dropdown"
         >

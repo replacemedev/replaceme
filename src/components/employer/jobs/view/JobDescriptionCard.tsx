@@ -56,7 +56,7 @@ export function JobDescriptionCard({
               {requiredSkills.map((skill) => (
                 <span
                   key={skill}
-                  className="px-3 py-1 bg-slate-50 border border-slate-150 text-slate-600 rounded-xl text-xs font-semibold shadow-sm"
+                  className="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold shadow-sm"
                 >
                   {skill}
                 </span>

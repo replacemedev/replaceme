@@ -25,11 +25,7 @@ export function ApplyJobHero({ job }: ApplyJobHeroProps) {
           ← Back to job details
         </Link>
 
-        <span className="inline-flex items-center rounded-full bg-[#4ade80] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-[#0a4a29]">
-          {job.categoryBadge}
-        </span>
-
-        <h1 className="mt-4 text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight">
           {job.title}
         </h1>
         <p className="mt-2 text-sm sm:text-base font-medium text-white/85">
