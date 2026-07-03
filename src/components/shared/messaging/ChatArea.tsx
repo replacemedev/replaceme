@@ -157,10 +157,6 @@ export function ChatArea({
                 <span className="text-xs text-slate-500 font-semibold truncate">
                   {oppositeParty.name}
                 </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#e8f5e9] text-[#006e2f] text-[9px] font-bold uppercase tracking-wide w-fit">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#006e2f]" />
-                  Online
-                </span>
               </div>
             </div>
           </div>

@@ -65,14 +65,7 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   }
 
   return (
-    <WorkerPageShell width="wide" className="py-8 gap-4">
-      <div>
-        <WorkerPageHeader
-          title="Messages"
-          subhead="Conversations with employers about your applications."
-          bordered={false}
-        />
-      </div>
+    <WorkerPageShell width="wide" className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4">
       <MessagingClient
         role="worker"
         basePath="/worker/messages"

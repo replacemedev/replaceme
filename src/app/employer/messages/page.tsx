@@ -80,12 +80,7 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   }
 
   return (
-    <EmployerPageShell width="wide" className="py-8 gap-4">
-      <EmployerPageHeader
-        title="Messaging"
-        subhead="Chat with candidates across your active job posts."
-        bordered={false}
-      />
+    <EmployerPageShell width="wide" className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4">
       <MessagingClient
         role="employer"
         basePath="/employer/messages"
