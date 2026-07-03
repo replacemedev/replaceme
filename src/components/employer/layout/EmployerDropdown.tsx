@@ -7,17 +7,21 @@ import { ChevronDown, LogOut, Settings, User, Flag } from "lucide-react";
 import { logOut } from "@/actions/auth";
 import type { NavProfile } from "@/types/nav";
 import { ReportIssueSlideover } from "@/components/shared/reporting/ReportIssueSlideover";
+import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
+import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 
 interface EmployerDropdownProps {
   profile: NavProfile | null;
   displayName: string;
   initials: string;
+  planUsage?: EmployerPlanUsage | null;
 }
 
 export function EmployerDropdown({
   profile,
   displayName,
   initials,
+  planUsage = null,
 }: EmployerDropdownProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -96,6 +100,24 @@ export function EmployerDropdown({
             <p className="text-[10px] text-slate-400 font-medium">Logged in as</p>
             <p className="text-xs font-bold text-slate-800 truncate">{displayName}</p>
           </div>
+
+          {planUsage && (
+            <div className="px-4 py-2.5 border-b border-slate-50 mb-1 md:hidden">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Plan</span>
+                <PlanTierBadge tier={planUsage.planSlug} />
+              </div>
+              {planUsage.planSlug !== "scale" && (
+                <Link
+                  href="/employer/pricing"
+                  onClick={() => setDropdownOpen(false)}
+                  className="mt-2.5 flex w-full justify-center items-center rounded-xl bg-[#006e2f] px-3 py-2 text-xs font-bold text-white hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
+                >
+                  Upgrade Plan
+                </Link>
+              )}
+            </div>
+          )}
 
           <Link
             href="/employer/settings/account"

@@ -26,7 +26,7 @@ export function NavBrand({ homeHref, compact = false }: NavBrandProps) {
       </div>
       <span
         className={`font-display-md font-bold text-[#0a4a29] leading-none ${
-          compact ? "text-lg hidden sm:inline" : "text-xl sm:text-2xl"
+          compact ? "text-lg inline-block" : "text-xl sm:text-2xl"
         }`}
       >
         Replace Me

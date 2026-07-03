@@ -25,7 +25,7 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         <div className="flex items-center gap-2 shrink-0">
           <NavBrand homeHref={resolvedSession.homeHref} compact />
           {planUsage ? (
-            <span className="md:hidden flex items-center gap-2">
+            <span className="hidden md:flex items-center gap-2">
               <PlanTierBadge tier={planUsage.planSlug} />
               {planUsage.planSlug !== "scale" ? (
                 <Link
@@ -45,7 +45,7 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         />
 
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>
-          <RoleNavDropdown session={resolvedSession} />
+          <RoleNavDropdown session={resolvedSession} planUsage={planUsage} />
         </GlobalHeaderActions>
       </div>
     </header>
