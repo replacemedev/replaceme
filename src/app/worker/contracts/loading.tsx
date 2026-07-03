@@ -20,9 +20,9 @@ export default function WorkerContractsLoading() {
               <SkeletonBlock className="h-4 w-1/4 max-w-[10rem] rounded" />
               <SkeletonBlock className="h-3 w-1/2 max-w-[18rem] rounded mt-1" />
             </div>
-            <div className="flex gap-2 shrink-0">
-              <SkeletonBlock className="h-8 w-16 rounded-lg" />
-              <SkeletonBlock className="h-8 w-16 rounded-lg" />
+            <div className="flex gap-2 w-full sm:w-auto shrink-0">
+              <SkeletonBlock className="flex-1 sm:flex-none h-8 w-16 rounded-lg" />
+              <SkeletonBlock className="flex-1 sm:flex-none h-8 w-16 rounded-lg" />
             </div>
           </li>
         ))}

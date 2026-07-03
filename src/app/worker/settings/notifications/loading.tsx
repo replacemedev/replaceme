@@ -22,7 +22,7 @@ export default function WorkerNotificationPreferencesLoading() {
           ))}
         </ul>
 
-        <SkeletonBlock className="h-9 w-36 rounded-xl" />
+        <SkeletonBlock className="h-9 w-full sm:w-36 rounded-xl" />
       </div>
     </WorkerPageShell>
   );

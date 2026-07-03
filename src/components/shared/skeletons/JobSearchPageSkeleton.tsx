@@ -1,3 +1,4 @@
+import { WorkerPageShell } from "@/components/worker/layout";
 import { CardSkeleton, SkeletonBlock } from "./primitives";
 
 export function JobSearchPageSkeleton() {
@@ -20,7 +21,7 @@ export function JobSearchPageSkeleton() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <WorkerPageShell width="wide" className="py-8 gap-0">
         <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
           {/* Filters sidebar */}
           <div className="hidden lg:block min-h-[560px] rounded-2xl border border-slate-100 bg-white p-5">
@@ -75,7 +76,7 @@ export function JobSearchPageSkeleton() {
             </div>
           </div>
         </div>
-      </div>
+      </WorkerPageShell>
     </div>
   );
 }

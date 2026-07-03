@@ -42,22 +42,24 @@ function InterviewCard({ item }: { item: WorkerInterviewRow }) {
           <p className="text-xs text-slate-400 mt-2">
             Scheduled: {new Date(item.scheduledAt).toLocaleString()}
           </p>
-          {item.meetingUrl ? (
-            <a
-              href={item.meetingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex mt-2 text-xs font-bold text-[#006e2f] hover:underline"
+          <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
+            {item.meetingUrl ? (
+              <a
+                href={item.meetingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-[#006e2f] hover:underline"
+              >
+                Join meeting
+              </a>
+            ) : null}
+            <Link
+              href={`/worker/applications/${item.applicationId}`}
+              className="text-xs font-bold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
             >
-              Join meeting
-            </a>
-          ) : null}
-          <Link
-            href={`/worker/applications/${item.applicationId}`}
-            className="inline-flex mt-3 text-xs font-bold text-[#006e2f] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
-          >
-            View application
-          </Link>
+              View application
+            </Link>
+          </div>
         </div>
       </div>
     </article>

@@ -27,7 +27,7 @@ export default function WorkerSettingsLoading() {
             <SkeletonBlock className="h-4 w-4 rounded" />
             <SkeletonBlock className="h-4 w-32 rounded" />
           </div>
-          <SkeletonBlock className="h-10 w-32 rounded-xl mt-2" />
+          <SkeletonBlock className="h-10 w-full sm:w-32 rounded-xl mt-2" />
         </div>
 
         {/* Report Employer Form Skeleton */}
@@ -42,7 +42,7 @@ export default function WorkerSettingsLoading() {
             <SkeletonBlock className="h-4 w-16 rounded" />
             <SkeletonBlock className="h-28 w-full rounded-lg" />
           </div>
-          <SkeletonBlock className="h-10 w-32 rounded-xl mt-2" />
+          <SkeletonBlock className="h-10 w-full sm:w-32 rounded-xl mt-2" />
         </div>
       </div>
     </WorkerPageShell>
