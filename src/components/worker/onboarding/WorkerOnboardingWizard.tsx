@@ -94,15 +94,15 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
 
   if (phase === "welcome") {
     return (
-      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
         <header className="space-y-2 text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-wider text-primary">
             Worker onboarding
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl whitespace-normal break-words">
             Build a profile employers trust
           </h1>
-          <p className="text-sm font-medium text-slate-600">
+          <p className="text-xs font-medium text-slate-600 sm:text-sm whitespace-normal break-words">
             A short guided setup — about 3 minutes. You can skip optional steps
             and finish later from your profile.
           </p>

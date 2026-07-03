@@ -12,7 +12,7 @@ const DISCOVERY_INCLUDES = [
 export function OnboardingPlanWelcome() {
   return (
     <aside className="mx-auto max-w-lg space-y-6">
-      <div className="rounded-3xl border border-[#006e2f]/15 bg-[#fafdfb] p-6 shadow-sm">
+      <div className="rounded-3xl border border-[#006e2f]/15 bg-[#fafdfb] p-4 shadow-sm sm:p-6 md:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#ebfdf2] text-[#006e2f]">
             <Sparkles className="h-5 w-5" aria-hidden />

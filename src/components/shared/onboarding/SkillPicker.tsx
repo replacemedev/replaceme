@@ -70,13 +70,13 @@ export function SkillPicker({
           {value.map((skill) => (
             <span
               key={skill}
-              className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary max-w-full"
             >
-              {skill}
+              <span className="truncate">{skill}</span>
               <button
                 type="button"
                 onClick={() => removeSkill(skill)}
-                className="rounded-full p-0.5 hover:bg-primary/15"
+                className="rounded-full p-0.5 hover:bg-primary/15 shrink-0"
                 aria-label={`Remove ${skill}`}
               >
                 <X size={12} />
@@ -100,10 +100,10 @@ export function SkillPicker({
           type="button"
           onClick={() => addSkill(customSkill)}
           disabled={atMax || !customSkill.trim()}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 sm:px-4"
         >
-          <Plus size={14} />
-          Add
+          <Plus size={14} className="shrink-0" />
+          <span className="hidden min-[400px]:inline">Add</span>
         </button>
       </div>
 
@@ -117,7 +117,7 @@ export function SkillPicker({
               type="button"
               onClick={() => togglePreset(skill)}
               disabled={presetDisabled}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors truncate max-w-full ${
                 selected
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-slate-200 text-slate-600 hover:border-primary/30 hover:text-primary"

@@ -34,7 +34,7 @@ export function OnboardingWizardShell({
   accentClass = "bg-primary hover:bg-primary/90",
 }: OnboardingWizardShellProps) {
   return (
-    <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
       <OnboardingProgress
         currentStep={currentStep}
         totalSteps={totalSteps}
@@ -42,9 +42,9 @@ export function OnboardingWizardShell({
       />
 
       <header className="space-y-1">
-        <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">{title}</h1>
+        <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl md:text-2xl whitespace-normal break-words">{title}</h1>
         {description ? (
-          <p className="text-sm font-medium text-slate-600">{description}</p>
+          <p className="text-xs font-medium leading-relaxed text-slate-600 sm:text-sm whitespace-normal break-words">{description}</p>
         ) : null}
       </header>
 

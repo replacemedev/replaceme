@@ -69,15 +69,15 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
 
   if (phase === "welcome") {
     return (
-      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
+      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6 md:p-8">
         <header className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
             Employer onboarding
           </p>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl whitespace-normal break-words">
             Tell us about your company
           </h2>
-          <p className="text-sm font-medium text-slate-600">
+          <p className="text-xs font-medium text-slate-600 sm:text-sm whitespace-normal break-words">
             Workers see this when you post jobs and review applicants. Takes
             about 2 minutes.
           </p>
