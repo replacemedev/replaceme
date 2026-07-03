@@ -102,7 +102,7 @@ export function EmployerDropdown({
           </div>
 
           {planUsage && (
-            <div className="px-4 py-2.5 border-b border-slate-50 mb-1 md:hidden">
+            <div className="px-4 py-2.5 border-b border-slate-50 mb-1">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Plan</span>
                 <PlanTierBadge tier={planUsage.planSlug} />

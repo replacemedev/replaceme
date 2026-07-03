@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { getNavSession } from "@/lib/auth/nav-session";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
-import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { EmployerHeaderNav } from "./EmployerHeaderNav";
 import type { NavSession } from "@/types/nav";
 
@@ -24,19 +22,6 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
       <div className="relative flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16 gap-3">
         <div className="flex items-center gap-2 shrink-0">
           <NavBrand homeHref={resolvedSession.homeHref} compact />
-          {planUsage ? (
-            <span className="hidden md:flex items-center gap-2">
-              <PlanTierBadge tier={planUsage.planSlug} />
-              {planUsage.planSlug !== "scale" ? (
-                <Link
-                  href="/employer/pricing"
-                  className="text-[10px] font-extrabold uppercase tracking-wide text-[#006e2f] hover:text-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2 rounded-sm"
-                >
-                  Upgrade
-                </Link>
-              ) : null}
-            </span>
-          ) : null}
         </div>
 
         <EmployerHeaderNav
