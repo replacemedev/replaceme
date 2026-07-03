@@ -587,14 +587,6 @@ export function WorkerProfileEditor({
                     }
                     onSave={(v) => saveProfileField({ resumeUrl: v })}
                   />
-                  <InlineEditableRow
-                    label="CV"
-                    value={profile.cv_url ?? ""}
-                    inputType="url"
-                    editable
-                    displayValue={profile.cv_url ? "Link set" : undefined}
-                    onSave={(v) => saveProfileField({ cvUrl: v })}
-                  />
                 </>
               ) : (
                 <>
@@ -603,21 +595,6 @@ export function WorkerProfileEditor({
                     {profile.resume_url ? (
                       <a
                         href={profile.resume_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#006e2f] hover:underline flex items-center gap-1"
-                      >
-                        View <ExternalLink size={12} />
-                      </a>
-                    ) : (
-                      <span className="text-slate-400">Not specified</span>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">CV</span>
-                    {profile.cv_url ? (
-                      <a
-                        href={profile.cv_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[#006e2f] hover:underline flex items-center gap-1"
