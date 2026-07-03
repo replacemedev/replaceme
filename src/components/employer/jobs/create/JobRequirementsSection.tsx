@@ -65,21 +65,23 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
       </div>
 
       {/* Salary & currency */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 items-end">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
             Salary currency <span className="text-red-500">*</span>
           </label>
-          <select
-            className={ONBOARDING_SELECT_CLASS}
-            {...register("salaryCurrency")}
-          >
-            {COMPENSATION_CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative pb-5">
+            <select
+              className={ONBOARDING_SELECT_CLASS}
+              {...register("salaryCurrency")}
+            >
+              {COMPENSATION_CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="space-y-2">
