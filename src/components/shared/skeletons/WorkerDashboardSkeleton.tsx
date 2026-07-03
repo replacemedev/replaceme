@@ -1,51 +1,93 @@
+import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import {
   CardSkeleton,
-  GridCardSkeleton,
-  PageHeaderSkeleton,
   SkeletonBlock,
-  StatCardSkeleton,
-  TitleSkeleton,
 } from "./primitives";
+import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
 export function WorkerDashboardSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-10 animate-pulse">
-      <div className="space-y-2">
-        <TitleSkeleton size="lg" />
-        <SkeletonBlock className="h-4 w-full max-w-2xl" />
-      </div>
+    <WorkerPageShell width="wide" className="gap-8 animate-pulse">
+      {/* Header placeholder matching WorkerPageHeader */}
+      <WorkerPageHeader
+        title={<SkeletonBlock className="h-9 w-48 rounded-xl" />}
+        subhead={<SkeletonBlock className="h-4 w-96 max-w-full rounded mt-2" />}
+        bordered={false}
+      />
 
-      <div className="space-y-4">
-        <SkeletonBlock className="h-6 w-44" />
-        <GridCardSkeleton columns={3} />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* WorkerKpiStrip skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <StatCardSkeleton key={i} />
+          <div key={i} className={`${WORKER_CARD} flex flex-col gap-1 p-4`}>
+            <div className="flex items-center justify-between gap-2">
+              <SkeletonBlock className="h-3 w-16 rounded" />
+              <div className="h-4 w-4 bg-slate-100 rounded" />
+            </div>
+            <SkeletonBlock className="h-7 w-10 rounded mt-1" />
+            <SkeletonBlock className="h-3.5 w-20 rounded" />
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          <SkeletonBlock className="h-6 w-48" />
-          <CardSkeleton minHeight="min-h-[100px]" />
-          <CardSkeleton minHeight="min-h-[100px]" />
-        </div>
-        <div className="space-y-4">
-          <CardSkeleton minHeight="min-h-[160px]" />
-          <CardSkeleton minHeight="min-h-[200px]" />
-        </div>
+      {/* WorkerDashboardQuickLinks skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <CardSkeleton key={i} minHeight="h-24" />
+        ))}
       </div>
 
-      <div className="space-y-4">
-        <SkeletonBlock className="h-6 w-32" />
-        <div className="flex flex-wrap gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <SkeletonBlock key={i} className="h-8 w-24 rounded-full" />
+      {/* Recent messages skeleton */}
+      <div className={`${WORKER_CARD} p-6 space-y-4`}>
+        <SkeletonBlock className="h-5 w-32 rounded" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 p-3 border border-slate-100 rounded-2xl bg-slate-50/30">
+              <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0" />
+              <div className="flex-1 space-y-2 min-w-0">
+                <SkeletonBlock className="h-3.5 w-2/3 rounded" />
+                <SkeletonBlock className="h-3 w-1/2 rounded" />
+              </div>
+            </div>
           ))}
         </div>
       </div>
-    </div>
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Recommended jobs column */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <SkeletonBlock className="h-6 w-44 rounded" />
+            <SkeletonBlock className="h-4 w-20 rounded" />
+          </div>
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CardSkeleton key={i} minHeight="min-h-[120px]" />
+            ))}
+          </div>
+        </div>
+
+        {/* Sidebar column */}
+        <div className="flex flex-col gap-6">
+          {/* Profile Strength skeleton */}
+          <CardSkeleton minHeight="min-h-[160px]" />
+          {/* Earnings Overview skeleton */}
+          <CardSkeleton minHeight="min-h-[220px]" />
+        </div>
+      </div>
+
+      {/* My Skills skeleton */}
+      <div className={`${WORKER_CARD} p-6 space-y-4`}>
+        <div className="flex items-center justify-between">
+          <SkeletonBlock className="h-5 w-24 rounded" />
+          <SkeletonBlock className="h-4.5 w-16 rounded" />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonBlock key={i} className="h-7 w-20 rounded-full" />
+          ))}
+        </div>
+      </div>
+    </WorkerPageShell>
   );
 }
