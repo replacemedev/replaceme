@@ -10,9 +10,9 @@ export function DashboardSkeleton() {
     <div className="space-y-8" aria-busy="true" aria-label="Loading dashboard">
       <AdminPageHeaderSkeleton />
 
-      <AdminStatGridSkeleton count={4} columns="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4" />
+      <AdminStatGridSkeleton count={4} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6" />
 
-      <AdminStatGridSkeleton count={3} columns="grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" />
+      <AdminStatGridSkeleton count={3} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" />
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">

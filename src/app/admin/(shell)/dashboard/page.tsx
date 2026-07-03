@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
         <h2 className={ADMIN_SECTION_LABEL}>
           Key metrics
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         <StatCard
           variant="dashboard"
           title="Total Users"
@@ -97,7 +97,7 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <StatCard
           variant="dashboard"
           title="Applications"

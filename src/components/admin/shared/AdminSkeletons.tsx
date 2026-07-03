@@ -26,25 +26,25 @@ export function AdminPageHeaderSkeleton({ withAction = false }: { withAction?: b
 /** Matches admin / dashboard `StatCard` (white card, icon top-right). */
 export function AdminStatCardSkeleton() {
   return (
-    <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)] animate-pulse">
-      <div className="flex items-start justify-between">
-        <SkeletonBlock className="h-4 w-24 rounded bg-slate-100" />
-        <SkeletonBlock className="h-8 w-8 rounded-full bg-slate-100" />
+    <div className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] animate-pulse">
+      <div className="flex items-start justify-between gap-2">
+        <SkeletonBlock className="h-3.5 w-20 rounded bg-slate-100" />
+        <SkeletonBlock className="h-7 w-7 rounded-full bg-slate-100 shrink-0" />
       </div>
-      <SkeletonBlock className="h-10 w-16 rounded-lg bg-slate-200/70" />
+      <SkeletonBlock className="h-8 w-16 rounded-lg bg-slate-200/70" />
     </div>
   );
 }
 
 export function AdminStatGridSkeleton({
   count,
-  columns = "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4",
+  columns = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6",
 }: {
   count: number;
   columns?: string;
 }) {
   return (
-    <section className={`grid gap-4 ${columns}`}>
+    <section className={`grid ${columns}`}>
       {Array.from({ length: count }).map((_, index) => (
         <AdminStatCardSkeleton key={index} />
       ))}
@@ -169,8 +169,18 @@ export function AdminRevenuePageSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Loading revenue">
       <AdminPageHeaderSkeleton />
-      <AdminStatGridSkeleton count={3} columns="grid-cols-1 sm:grid-cols-3" />
+      <AdminStatGridSkeleton count={3} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" />
       <AdminChartSkeleton titleWidth="w-40" />
+    </div>
+  );
+}
+
+export function AdminBillingPageSkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading billing">
+      <AdminPageHeaderSkeleton />
+      <AdminStatGridSkeleton count={4} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6" />
+      <AdminTableSkeleton />
     </div>
   );
 }

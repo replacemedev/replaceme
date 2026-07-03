@@ -68,13 +68,13 @@ function AdminStatCard({
   accentColor = "bg-emerald-50 text-emerald-600",
 }: AdminStatCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+    <article className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             {label}
           </p>
-          <p className="text-3xl font-extrabold text-slate-900 mt-1.5 tabular-nums">
+          <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tabular-nums">
             {value.toLocaleString()}
           </p>
           {trend && (
@@ -92,9 +92,9 @@ function AdminStatCard({
           )}
         </div>
         <span
-          className={`flex items-center justify-center w-10 h-10 rounded-xl ${accentColor}`}
+          className={`flex shrink-0 items-center justify-center w-8 h-8 rounded-lg ${accentColor}`}
         >
-          <Icon className="h-5 w-5" aria-hidden />
+          <Icon className="h-4 w-4" aria-hidden />
         </span>
       </div>
     </article>
@@ -109,18 +109,18 @@ function DashboardStatCard({
   iconColorClass,
 }: DashboardStatCardProps) {
   return (
-    <div className="flex flex-col justify-between p-6 bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-xs gap-4 relative overflow-hidden select-none">
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-semibold text-slate-500 tracking-tight">
+    <div className="flex flex-col justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-xs gap-3 relative overflow-hidden select-none">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-xs font-semibold text-slate-500 tracking-tight leading-snug">
           {title}
         </span>
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center ${iconBgClass} ${iconColorClass}`}
+          className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${iconBgClass} ${iconColorClass}`}
         >
           {icon}
         </div>
       </div>
-      <span className="text-4xl font-extrabold text-slate-900 leading-none">
+      <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-none tabular-nums">
         {value}
       </span>
     </div>
@@ -139,10 +139,10 @@ function ApplicationStatCard({
 
   return (
     <article
-      className={`relative overflow-hidden rounded-2xl border p-5 sm:p-6 shadow-xs ${styles.card}`}
+      className={`relative overflow-hidden rounded-2xl border p-4 sm:p-5 shadow-xs ${styles.card}`}
     >
       <WatermarkIcon
-        className={`absolute top-4 right-4 h-10 w-10 sm:h-12 sm:w-12 ${styles.watermark}`}
+        className={`absolute top-3 right-3 h-8 w-8 sm:h-10 sm:w-10 ${styles.watermark}`}
         strokeWidth={1.5}
         aria-hidden
       />
@@ -152,13 +152,13 @@ function ApplicationStatCard({
       >
         {label}
       </p>
-      <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900 leading-none">
+      <p className="mt-1.5 text-2xl sm:text-3xl font-extrabold text-slate-900 leading-none">
         {value}
       </p>
 
       {badge && (
         <span
-          className={`mt-3 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${styles.badge}`}
+          className={`mt-2.5 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${styles.badge}`}
         >
           {BadgeIcon && <BadgeIcon className="h-3 w-3" aria-hidden />}
           {badge}

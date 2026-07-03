@@ -11,11 +11,15 @@ export default function EmployerDashboardLoading() {
       />
 
       {/* KPI Strip Skeleton */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-sm space-y-2">
-            <SkeletonBlock className="h-4 w-20 bg-slate-200 rounded" />
-            <SkeletonBlock className="h-8 w-16 bg-slate-200 rounded-lg" />
+          <div key={i} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-1">
+            <div className="flex items-center justify-between gap-2">
+              <SkeletonBlock className="h-3 w-16 bg-slate-100 rounded" />
+              <div className="h-4 w-4 bg-slate-100 rounded" />
+            </div>
+            <SkeletonBlock className="h-7 w-12 bg-slate-200 rounded-lg mt-1" />
+            <SkeletonBlock className="h-3 w-20 bg-slate-100 rounded mt-0.5" />
           </div>
         ))}
       </div>

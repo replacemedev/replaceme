@@ -19,7 +19,7 @@ export function WorkerKpiStrip({ items, className = "" }: WorkerKpiStripProps) {
   if (items.length === 0) return null;
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-4 gap-3 ${className}`}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 ${className}`}>
       {items.map((item) => {
         const Icon = item.icon;
         const card = (

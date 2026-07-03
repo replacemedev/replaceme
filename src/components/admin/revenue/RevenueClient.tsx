@@ -30,7 +30,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
     <div className="space-y-6">
       <section className="space-y-4">
         <AdminSectionLabel>Billing overview</AdminSectionLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <StatCard
             variant="dashboard"
             title="Active Subscriptions"
