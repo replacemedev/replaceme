@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, ShieldAlert, CreditCard, Building2 } from "lucide-react";
+import { ShieldAlert, CreditCard, Building2 } from "lucide-react";
 import { PasswordResetButton } from "./PasswordResetButton";
 
 export function AccountDetailsList() {
@@ -13,27 +13,6 @@ export function AccountDetailsList() {
       </div>
 
       <div className="divide-y divide-slate-50">
-        <div className="flex flex-col gap-3 p-6 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4 min-w-0">
-            <div className="shrink-0 rounded-xl bg-slate-50 p-2.5 text-slate-500">
-              <User size={20} />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-sm font-bold text-slate-800">
-                Profile Information
-              </h3>
-              <p className="mt-0.5 text-xs text-slate-400">
-                Your name, email, and personal account details
-              </p>
-            </div>
-          </div>
-          <Link
-            href="#employer-profile"
-            className="shrink-0 text-sm font-bold text-emerald-600 transition-colors hover:text-emerald-700"
-          >
-            View profile
-          </Link>
-        </div>
 
         <div className="flex flex-col gap-3 p-6 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4 min-w-0">
