@@ -218,7 +218,7 @@ export function ApplicationForm({
           <legend className="text-[11px] font-extrabold uppercase tracking-wider text-[#006e2f]">
             Profile Assets
           </legend>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <ProfileAssetButton
               label="View Resume"
               href={profileAssets.resumeUrl}
@@ -231,12 +231,6 @@ export function ApplicationForm({
               icon={Globe}
               trailing={ExternalLink}
               external
-            />
-            <ProfileAssetButton
-              label="View CV"
-              href={profileAssets.cvUrl}
-              icon={FileText}
-              trailing={Eye}
             />
           </div>
         </fieldset>
