@@ -1,5 +1,5 @@
 import { EmployerPageShell, EmployerPageHeader } from "@/components/employer/layout";
-import { CardSkeleton, SkeletonBlock } from "@/components/shared/skeletons/primitives";
+import { CardSkeleton } from "@/components/shared/skeletons/primitives";
 
 export default function EmployerCompanySettingsLoading() {
   return (
@@ -8,7 +8,10 @@ export default function EmployerCompanySettingsLoading() {
         title="Company profile"
         subhead="Build your brand presence to attract top talent. This information is visible on your job postings."
       />
-      <CardSkeleton minHeight="min-h-[500px]" />
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 items-start">
+        <CardSkeleton minHeight="min-h-[500px]" />
+        <CardSkeleton minHeight="min-h-[400px]" />
+      </div>
     </EmployerPageShell>
   );
 }
