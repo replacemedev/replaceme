@@ -127,7 +127,7 @@ export function NotificationBell({
           id={panelId}
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-[calc(100%+8px)] z-[60] w-[min(100vw-2rem,380px)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.12)]"
+          className="fixed top-16 left-4 right-4 mx-auto w-auto max-w-[380px] md:absolute md:top-[calc(100%+8px)] md:right-0 md:left-auto md:w-[380px] md:max-w-none md:mx-0 z-[60] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.12)]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
             <div>
@@ -236,7 +236,7 @@ function NotificationItem({
     <>
       <div className="flex items-start justify-between gap-2">
         <p
-          className={`text-sm font-semibold ${
+          className={`text-sm font-semibold break-words whitespace-normal ${
             notification.is_read ? "text-slate-600" : "text-slate-900"
           }`}
         >
@@ -246,7 +246,7 @@ function NotificationItem({
           <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
         ) : null}
       </div>
-      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+      <p className="mt-0.5 text-xs leading-relaxed text-slate-500 break-words whitespace-normal">
         {notification.message}
       </p>
       <div className="mt-2 flex items-center justify-between gap-2">
