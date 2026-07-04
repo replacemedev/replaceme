@@ -26,7 +26,7 @@ export function PublicAuthenticatedNavActions({
       className={
         layout === "mobile"
           ? "bg-[#22c55e] text-white text-center py-2.5 rounded-xl font-body-bold text-sm transition-transform duration-200 hover:bg-[#16a34a] active:scale-[0.98]"
-          : "bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
+          : "bg-[#22c55e] text-white px-3 py-1.5 sm:px-5 sm:py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-xs sm:text-sm"
       }
     >
       Dashboard

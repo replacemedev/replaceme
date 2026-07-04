@@ -116,7 +116,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
       <div
-        className={`px-margin-desktop max-w-container-max mx-auto w-full h-16 items-center ${
+        className={`px-4 md:px-margin-desktop max-w-container-max mx-auto w-full h-16 items-center ${
           isLandingPage
             ? "flex justify-between md:grid md:grid-cols-[1fr_auto_1fr]"
             : "flex justify-between"
