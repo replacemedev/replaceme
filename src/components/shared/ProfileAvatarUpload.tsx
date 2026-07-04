@@ -71,7 +71,7 @@ export function ProfileAvatarUpload({
 
     const mimeType = resolveProfileImageMime(file);
     if (!mimeType) {
-      toast.error("Only JPG and PNG files are allowed.");
+      toast.error("Only JPG and PNG allowed.");
       return;
     }
 

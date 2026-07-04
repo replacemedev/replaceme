@@ -57,9 +57,12 @@ export default function RootLayout({
         <Toaster
           position="top-right"
           richColors
-          offset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12 }}
-          mobileOffset={{ top: "calc(12px + env(safe-area-inset-top))", right: 12, left: 12 }}
-          toastOptions={{ className: "max-w-[calc(100vw-24px)]" }}
+          closeButton
+          offset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16 }}
+          mobileOffset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16, left: 16, bottom: 16 }}
+          toastOptions={{
+            className: "mx-auto w-[calc(100vw-2rem)] max-w-sm sm:max-w-md",
+          }}
         />
         {children}
         <CookieConsentRoot />

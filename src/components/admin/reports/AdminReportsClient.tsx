@@ -15,6 +15,7 @@ import { REPORT_STATUSES } from "@/lib/reporting/constants";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { TablePagination } from "@/components/shared/TablePagination";
 
 const STATUS_FILTERS = ["open", "in_progress", "resolved"] as const;
 const ROLE_FILTERS = ["all", "worker", "employer"] as const;
@@ -33,6 +34,7 @@ export function AdminReportsClient({
   const [role, setRole] = useState<(typeof ROLE_FILTERS)[number]>("all");
   const [q, setQ] = useState("");
   const [data, setData] = useState(initial);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selected, setSelected] = useState<AdminReportDeepDive | null>(null);
@@ -47,24 +49,30 @@ export function AdminReportsClient({
     return counts;
   }, [data.items]);
 
-  const refresh = () => {
+  const itemsPerPage = 20;
+
+  const fetchPage = (page: number) => {
     startTransition(async () => {
       const next = await getAdminReports({
         status,
         reporterRole: role === "all" ? undefined : role,
         q: q.trim() || undefined,
-        limit: 25,
-        offset: 0,
+        limit: itemsPerPage,
+        offset: (page - 1) * itemsPerPage,
       });
       if (!next) {
         toast.error("Failed to load reports");
         return;
       }
       setData(next);
+      setCurrentPage(page);
     });
   };
 
+  const refresh = () => fetchPage(1);
+
   useEffect(() => {
+    setCurrentPage(1);
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, role]);
@@ -160,60 +168,68 @@ export function AdminReportsClient({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              <th className="px-4 py-3">Report</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Attachment</th>
-              <th className="px-4 py-3">Created</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {data.items.map((r) => (
-              <tr
-                key={r.id}
-                className="cursor-pointer hover:bg-slate-50/60"
-                onClick={() => openPanel(r.id)}
-              >
-                <td className="px-4 py-3">
-                  <p className="font-semibold text-slate-900">
-                    {r.title || r.category.replace(/_/g, " ")}
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
-                    {r.reportedUrl ?? "—"}
-                  </p>
-                </td>
-                <td className="px-4 py-3 text-slate-600">{r.reporterRole}</td>
-                <td className="px-4 py-3">
-                  <StatusBadge status={prettyStatus(r.status)} />
-                </td>
-                <td className="px-4 py-3">
-                  {r.hasEvidence ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openPanel(r.id);
-                      }}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#006e2f]/20 bg-[#ebfdf2] px-2.5 py-1 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#d8f9e6]"
-                    >
-                      <Paperclip className="h-3.5 w-3.5" aria-hidden />
-                      View image
-                    </button>
-                  ) : (
-                    <span className="text-xs font-medium text-slate-400">—</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-slate-500">
-                  {new Date(r.createdAt).toLocaleString()}
-                </td>
+      <div className="space-y-4">
+        <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                <th className="px-4 py-3">Report</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Attachment</th>
+                <th className="px-4 py-3">Created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {data.items.map((r) => (
+                <tr
+                  key={r.id}
+                  className="cursor-pointer hover:bg-slate-50/60"
+                  onClick={() => openPanel(r.id)}
+                >
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-slate-900">
+                      {r.title || r.category.replace(/_/g, " ")}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
+                      {r.reportedUrl ?? "—"}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">{r.reporterRole}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={prettyStatus(r.status)} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {r.hasEvidence ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openPanel(r.id);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#006e2f]/20 bg-[#ebfdf2] px-2.5 py-1 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#d8f9e6]"
+                      >
+                        <Paperclip className="h-3.5 w-3.5" aria-hidden />
+                        View image
+                      </button>
+                    ) : (
+                      <span className="text-xs font-medium text-slate-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {new Date(r.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePagination
+          currentPage={currentPage}
+          totalItems={data.total}
+          pageSize={itemsPerPage}
+          onPageChange={fetchPage}
+        />
       </div>
 
       <AdminSlideover

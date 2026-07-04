@@ -18,7 +18,7 @@ export function AdminDataTable({
     <>
       <div className={`lg:hidden space-y-3 ${className}`}>{mobileCards}</div>
       <div
-        className={`hidden lg:block overflow-x-auto ${ADMIN_CARD} shadow-[0_2px_8px_rgba(0,0,0,0.02)] ${className}`}
+        className={`hidden lg:block overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
       >
         {children}
       </div>

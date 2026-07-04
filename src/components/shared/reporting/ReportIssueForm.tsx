@@ -82,18 +82,16 @@ export function ReportIssueForm({
         const result = await submitReport(formData);
 
         if (!result || typeof result !== "object" || !("success" in result)) {
-          toast.error("Unexpected response from server. Please try again.");
+          toast.error("Server error. Please retry.");
           return;
         }
 
         if (!result.success) {
-          toast.error(result.error ?? "Failed to submit report.");
+          toast.error(result.error ?? "Submission failed.");
           return;
         }
 
-        toast.success(
-          "Report submitted. Thanks for helping us improve ReplaceMe."
-        );
+        toast.success("Report submitted.");
         setTitle("");
         setDescriptionMarkdown("");
         setEvidenceFile(null);

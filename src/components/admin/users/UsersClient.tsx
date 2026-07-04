@@ -17,6 +17,7 @@ import { AdminFilterBar } from "@/components/admin/shared/AdminFilterBar";
 import { suspendUser, unsuspendUser } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import type {
   AdminAdminRow,
@@ -63,6 +64,16 @@ export function UsersClient({
   const [reason, setReason] = useState("");
   const router = useRouter();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevTab, setPrevTab] = useState(tab);
+  const [prevSearch, setPrevSearch] = useState(search);
+
+  if (tab !== prevTab || search !== prevSearch) {
+    setPrevTab(tab);
+    setPrevSearch(search);
+    setCurrentPage(1);
+  }
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (tab === "workers") {
@@ -95,6 +106,15 @@ export function UsersClient({
       );
     });
   }, [tab, search, workers, employers, admins]);
+
+  const itemsPerPage = 20;
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedFiltered = useMemo(() => {
+    return filtered.slice(startIndex, startIndex + itemsPerPage);
+  }, [filtered, startIndex, itemsPerPage]);
 
   const handleConfirm = () => {
     if (!confirm) return;
@@ -165,7 +185,7 @@ export function UsersClient({
       />
 
       <AdminDataTable
-        mobileCards={filtered.map((row) => {
+        mobileCards={paginatedFiltered.map((row) => {
           if (tab === "workers") {
             const worker = row as AdminWorkerRow;
             const name = displayName(
@@ -326,7 +346,7 @@ export function UsersClient({
           </thead>
           <tbody className="divide-y divide-slate-50">
             {tab === "workers"
-              ? (filtered as AdminWorkerRow[]).map((worker) => (
+              ? (paginatedFiltered as AdminWorkerRow[]).map((worker) => (
                   <tr key={worker.id} className={ADMIN_TABLE_ROW}>
                     <td className={ADMIN_TABLE_TD}>
                       <Link
@@ -384,7 +404,7 @@ export function UsersClient({
                 ))
               : null}
             {tab === "employers"
-              ? (filtered as AdminEmployerRow[]).map((employer) => (
+              ? (paginatedFiltered as AdminEmployerRow[]).map((employer) => (
                   <tr key={employer.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <Link
@@ -432,7 +452,7 @@ export function UsersClient({
                 ))
               : null}
             {tab === "admins"
-              ? (filtered as AdminAdminRow[]).map((admin) => (
+              ? (paginatedFiltered as AdminAdminRow[]).map((admin) => (
                   <tr key={admin.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-900">
@@ -489,6 +509,12 @@ export function UsersClient({
           </tbody>
         </table>
       </AdminDataTable>
+      <TablePagination
+        currentPage={activePage}
+        totalItems={totalItems}
+        pageSize={itemsPerPage}
+        onPageChange={setCurrentPage}
+      />
 
       <ConfirmDialog
         open={confirm !== null}

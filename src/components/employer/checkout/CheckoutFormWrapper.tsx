@@ -38,7 +38,7 @@ export function CheckoutFormWrapper({
   const router = useRouter();
 
   const handleSuccess = () => {
-    toast.success("Subscription upgraded successfully!");
+    toast.success("Subscription upgraded!");
     router.push("/employer/settings/account?checkout=success");
     router.refresh();
   };

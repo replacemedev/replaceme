@@ -441,7 +441,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             toast.error(result.error);
             return;
           }
-          toast.success("Profile ready — welcome to ReplaceMe!");
+          toast.success("Profile ready!");
           router.replace("/worker/dashboard");
           router.refresh();
         });
@@ -474,7 +474,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             toast.error(result.error);
             return;
           }
-          toast.success("Profile ready — welcome to ReplaceMe!");
+          toast.success("Profile ready!");
           router.replace("/worker/dashboard");
           router.refresh();
         });

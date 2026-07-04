@@ -39,12 +39,12 @@ export function DocumentDropzone({
       if (disabled) return;
 
       if (!ALLOWED_VERIFICATION_MIME_TYPES.includes(file.type as (typeof ALLOWED_VERIFICATION_MIME_TYPES)[number])) {
-        toast.error("Use JPEG, PNG, WebP, or PDF files only.");
+        toast.error("Invalid file format.");
         return;
       }
 
       if (file.size > MAX_VERIFICATION_FILE_BYTES) {
-        toast.error("File must be 5 MB or smaller.");
+        toast.error("File too large (max 5MB).");
         return;
       }
 

@@ -43,7 +43,7 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     if (turnstileRequired && !turnstileToken) {
-      toast.error("Please complete the security check.");
+      toast.error("Complete security check.");
       return;
     }
 
@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
       });
 
       if (!result.success) {
-        toast.error(result.error ?? "Failed to send reset link.");
+        toast.error(result.error ?? "Failed to send link.");
         return;
       }
 

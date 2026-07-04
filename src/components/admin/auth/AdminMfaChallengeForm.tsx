@@ -25,7 +25,7 @@ export function AdminMfaChallengeForm() {
 
       const totpFactor = factorsData.totp.find((f) => f.status === "verified");
       if (!totpFactor) {
-        toast.error("No verified authenticator found. Contact a super-admin.");
+        toast.error("No authenticator found. Contact admin.");
         return;
       }
 

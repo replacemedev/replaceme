@@ -138,11 +138,11 @@ export function ApplicationForm({
     try {
       const result = await submitJobApplication(data);
       if (!result.success) {
-        toast.error(result.error ?? "Could not submit application.");
+        toast.error(result.error ?? "Submission failed.");
         return;
       }
       setIsSuccess(true);
-      toast.success("Application submitted successfully.");
+      toast.success("Application submitted.");
       router.push("/worker/applications");
       router.refresh();
     } finally {

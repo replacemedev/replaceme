@@ -44,7 +44,7 @@ export function UpdatePasswordForm() {
       ) {
         throw error;
       }
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("Error occurred. Please retry.");
     }
   };
 

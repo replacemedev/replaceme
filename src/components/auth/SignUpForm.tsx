@@ -88,7 +88,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
     data: WorkerSignUpFormValues | EmployerSignUpFormValues
   ) => {
     if (turnstileRequired && !turnstileToken) {
-      toast.error("Please complete the security check.");
+      toast.error("Complete security check.");
       return;
     }
 
@@ -104,11 +104,11 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
       if (!result.success) {
         const errMsg = result.error;
         if (errMsg === "auth/username-already-exists") {
-          toast.error("This username is already taken. Please choose another.");
+          toast.error("Username taken.");
           return;
         }
         if (errMsg === "auth/email-already-exists") {
-          toast.error("This email is already registered. Please log in.");
+          toast.error("Email already registered.");
           return;
         }
         toast.error(formatSignUpError(errMsg));
@@ -130,7 +130,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
       ) {
         throw error;
       }
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("Error occurred. Please retry.");
     } finally {
       resetCaptcha();
     }

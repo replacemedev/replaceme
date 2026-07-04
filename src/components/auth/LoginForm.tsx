@@ -60,7 +60,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
 
   const onSubmit = async (data: LoginCredentials) => {
     if (turnstileRequired && !turnstileToken) {
-      toast.error("Please complete the security check.");
+      toast.error("Complete security check.");
       return;
     }
 
@@ -74,7 +74,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
       });
 
       if (result && !result.success) {
-        toast.error(result.error ?? "Invalid email, username, or password. Please try again.");
+        toast.error(result.error ?? "Invalid credentials.");
       } else if (data.rememberMe) {
         localStorage.setItem("remember_email", data.email);
       } else {
@@ -89,7 +89,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
       ) {
         throw error;
       }
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("Error occurred. Please retry.");
     } finally {
       resetCaptcha();
       setIsLoading(false);

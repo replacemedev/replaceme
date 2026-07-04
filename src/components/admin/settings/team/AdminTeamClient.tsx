@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { AdminTeamActionsMenu } from "@/components/admin/settings/team/AdminTeamActionsMenu";
 import { AdminTeamActivityTab } from "@/components/admin/settings/team/AdminTeamActivityTab";
 import { CreateAdminDialog } from "@/components/admin/settings/team/CreateAdminDialog";
+import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminAuditLogRow, AdminTeamRow } from "@/types/admin.types";
 
 type TeamTab = "team" | "activity";
@@ -51,6 +52,16 @@ export function AdminTeamClient({
   const [tab, setTab] = useState<TeamTab>("team");
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevSearch, setPrevSearch] = useState(search);
+  const [prevTab, setPrevTab] = useState(tab);
+
+  if (search !== prevSearch || tab !== prevTab) {
+    setPrevSearch(search);
+    setPrevTab(tab);
+    setCurrentPage(1);
+  }
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -64,6 +75,15 @@ export function AdminTeamClient({
       );
     });
   }, [members, search]);
+
+  const itemsPerPage = 20;
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedMembers = useMemo(() => {
+    return filtered.slice(startIndex, startIndex + itemsPerPage);
+  }, [filtered, startIndex, itemsPerPage]);
 
   return (
     <>
@@ -126,8 +146,9 @@ export function AdminTeamClient({
               }
             />
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-              <table className="w-full text-sm">
+            <div className="space-y-4">
+              <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+                <table className="w-full text-sm">
                 <thead className={ADMIN_TABLE_HEAD}>
                   <tr>
                     <th className={ADMIN_TABLE_TH}>Email</th>
@@ -138,7 +159,7 @@ export function AdminTeamClient({
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((member) => (
+                  {paginatedMembers.map((member) => (
                     <tr key={member.id} className={ADMIN_TABLE_ROW}>
                       <td className={ADMIN_TABLE_TD}>
                         <p className="font-semibold text-slate-900">
@@ -168,6 +189,13 @@ export function AdminTeamClient({
                 </tbody>
               </table>
             </div>
+            <TablePagination
+              currentPage={activePage}
+              totalItems={totalItems}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
           )}
         </>
       )}

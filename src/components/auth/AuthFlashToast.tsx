@@ -30,9 +30,7 @@ function AuthFlashToastInner() {
   useEffect(() => {
     const confirmed = searchParams.get("confirmed");
     if (confirmed === "email") {
-      toast.success(
-        "Email confirmed! You can now sign in with your password."
-      );
+      toast.success("Email confirmed.");
       const nextParams = new URLSearchParams(searchParams.toString());
       nextParams.delete("confirmed");
       const query = nextParams.toString();
@@ -44,7 +42,7 @@ function AuthFlashToastInner() {
 
     const reset = searchParams.get("reset");
     if (reset === "success") {
-      toast.success("Password updated successfully. Please sign in.");
+      toast.success("Password updated.");
       const nextParams = new URLSearchParams(searchParams.toString());
       nextParams.delete("reset");
       const query = nextParams.toString();
@@ -56,7 +54,7 @@ function AuthFlashToastInner() {
 
     const error = searchParams.get("error");
     if (error === "auth_callback_failed") {
-      toast.error("Authentication link expired or is invalid. Please try again.");
+      toast.error("Link expired or invalid.");
       const nextParams = new URLSearchParams(searchParams.toString());
       nextParams.delete("error");
       const query = nextParams.toString();

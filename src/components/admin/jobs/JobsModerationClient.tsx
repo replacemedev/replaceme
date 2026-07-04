@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminJobRow } from "@/types/admin.types";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { getAdminJobDeepDive, type AdminJobDeepDive } from "@/actions/admin/deep-dive";
@@ -136,6 +137,23 @@ export function JobsModerationClient({
     return counts;
   }, [jobs]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevFilter, setPrevFilter] = useState(filter);
+
+  if (filter !== prevFilter) {
+    setPrevFilter(filter);
+    setCurrentPage(1);
+  }
+
+  const itemsPerPage = 20;
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedJobs = useMemo(() => {
+    return filtered.slice(startIndex, startIndex + itemsPerPage);
+  }, [filtered, startIndex, itemsPerPage]);
+
   return (
     <div className="space-y-4">
       <AdminFilterPills
@@ -152,7 +170,8 @@ export function JobsModerationClient({
           description="Job posts matching this filter will appear here."
         />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        <div className="space-y-4">
+          <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
@@ -166,7 +185,7 @@ export function JobsModerationClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.map((job) => (
+              {paginatedJobs.map((job) => (
                 <tr key={job.id} className="hover:bg-slate-50/50">
                   <td className="px-4 py-3">
                     <Link
@@ -255,6 +274,13 @@ export function JobsModerationClient({
             </tbody>
           </table>
         </div>
+        <TablePagination
+          currentPage={activePage}
+          totalItems={totalItems}
+          pageSize={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
+      </div>
       )}
 
       <ConfirmDialog

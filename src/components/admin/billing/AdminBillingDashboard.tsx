@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   AlertTriangle,
   CreditCard,
@@ -16,6 +17,7 @@ import { BillingOpsClient } from "@/components/admin/billing/BillingOpsClient";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatCard } from "@/components/shared/StatCard";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
+import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminBillingPageData } from "@/types/admin.types";
 
 interface AdminBillingDashboardProps {
@@ -37,6 +39,28 @@ function formatEventType(type: string): string {
 export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboardProps) {
   const { metrics, subscriptions, ledger } = data;
   const tab = activeTab === "ledger" || activeTab === "ops" ? activeTab : "overview";
+
+  const [subPage, setSubPage] = useState(1);
+  const [ledgerPage, setLedgerPage] = useState(1);
+  const itemsPerPage = 20;
+
+  // Subscription pagination
+  const totalSubItems = subscriptions.length;
+  const totalSubPages = Math.ceil(totalSubItems / itemsPerPage);
+  const activeSubPage = Math.min(subPage, totalSubPages || 1);
+  const paginatedSubscriptions = subscriptions.slice(
+    (activeSubPage - 1) * itemsPerPage,
+    activeSubPage * itemsPerPage
+  );
+
+  // Ledger pagination
+  const totalLedgerItems = ledger.length;
+  const totalLedgerPages = Math.ceil(totalLedgerItems / itemsPerPage);
+  const activeLedgerPage = Math.min(ledgerPage, totalLedgerPages || 1);
+  const paginatedLedger = ledger.slice(
+    (activeLedgerPage - 1) * itemsPerPage,
+    activeLedgerPage * itemsPerPage
+  );
 
   return (
     <div className="space-y-6">
@@ -124,80 +148,88 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                 description="Employer billing records from Stripe will appear here."
               />
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-                <table className="w-full min-w-[720px] text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      <th className="px-4 py-3">Employer</th>
-                      <th className="px-4 py-3">Plan</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="hidden md:table-cell px-4 py-3">Payment</th>
-                      <th className="hidden lg:table-cell px-4 py-3">Period end</th>
-                      <th className="px-4 py-3">Stripe</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {subscriptions.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-4 py-3">
-                          <Link
-                            href={`/admin/users/employers/${sub.employer_id}`}
-                            className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
-                          >
-                            {sub.company_name ?? "—"}
-                          </Link>
-                          <p className="text-xs text-slate-400">{sub.employer_email}</p>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-medium text-slate-700">
-                              {sub.plan_name ?? "—"}
-                            </span>
-                            {sub.plan_slug ? (
-                              <PlanTierBadge tier={sub.plan_slug} size="sm" />
-                            ) : null}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={sub.status} />
-                        </td>
-                        <td className="hidden md:table-cell px-4 py-3">
-                          {sub.last_payment_status ? (
-                            <div className="space-y-0.5">
-                              <StatusBadge status={sub.last_payment_status} />
-                              {sub.failed_payment_count > 0 ? (
-                                <p className="text-[10px] text-amber-700">
-                                  {sub.failed_payment_count} failed
-                                </p>
+              <div className="space-y-4">
+                <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+                  <table className="w-full min-w-[720px] text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <th className="px-4 py-3">Employer</th>
+                        <th className="px-4 py-3">Plan</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="hidden md:table-cell px-4 py-3">Payment</th>
+                        <th className="hidden lg:table-cell px-4 py-3">Period end</th>
+                        <th className="px-4 py-3">Stripe</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {paginatedSubscriptions.map((sub) => (
+                        <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-4 py-3">
+                            <Link
+                              href={`/admin/users/employers/${sub.employer_id}`}
+                              className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                            >
+                              {sub.company_name ?? "—"}
+                            </Link>
+                            <p className="text-xs text-slate-400">{sub.employer_email}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-medium text-slate-700">
+                                {sub.plan_name ?? "—"}
+                              </span>
+                              {sub.plan_slug ? (
+                                <PlanTierBadge tier={sub.plan_slug} size="sm" />
                               ) : null}
                             </div>
-                          ) : (
-                            <span className="text-xs text-slate-400">—</span>
-                          )}
-                        </td>
-                        <td className="hidden lg:table-cell px-4 py-3 text-xs text-slate-500">
-                          {sub.current_period_end
-                            ? new Date(sub.current_period_end).toLocaleDateString()
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3">
-                          {sub.stripe_customer_id ? (
-                            <a
-                              href={`https://dashboard.stripe.com/customers/${sub.stripe_customer_id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs font-semibold text-[#006e2f] hover:underline"
-                            >
-                              Stripe
-                            </a>
-                          ) : (
-                            <span className="text-xs text-slate-400">—</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          </td>
+                          <td className="px-4 py-3">
+                            <StatusBadge status={sub.status} />
+                          </td>
+                          <td className="hidden md:table-cell px-4 py-3">
+                            {sub.last_payment_status ? (
+                              <div className="space-y-0.5">
+                                <StatusBadge status={sub.last_payment_status} />
+                                {sub.failed_payment_count > 0 ? (
+                                  <p className="text-[10px] text-amber-700">
+                                    {sub.failed_payment_count} failed
+                                  </p>
+                                ) : null}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-slate-400">—</span>
+                            )}
+                          </td>
+                          <td className="hidden lg:table-cell px-4 py-3 text-xs text-slate-500">
+                            {sub.current_period_end
+                              ? new Date(sub.current_period_end).toLocaleDateString()
+                              : "—"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {sub.stripe_customer_id ? (
+                              <a
+                                href={`https://dashboard.stripe.com/customers/${sub.stripe_customer_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-semibold text-[#006e2f] hover:underline"
+                              >
+                                Stripe
+                              </a>
+                            ) : (
+                              <span className="text-xs text-slate-400">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <TablePagination
+                  currentPage={activeSubPage}
+                  totalItems={totalSubItems}
+                  pageSize={itemsPerPage}
+                  onPageChange={setSubPage}
+                />
               </div>
             )}
           </section>
@@ -214,55 +246,63 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
               description="Invoice payments and failures from Stripe webhooks will appear here."
             />
           ) : (
-            <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-              <table className="w-full min-w-[640px] text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <th className="px-4 py-3">When</th>
-                    <th className="px-4 py-3">Employer</th>
-                    <th className="px-4 py-3">Event</th>
-                    <th className="px-4 py-3">Amount</th>
-                    <th className="hidden sm:table-cell px-4 py-3">Plan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {ledger.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
-                        {new Date(row.occurred_at).toLocaleString()}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/users/employers/${row.employer_id}`}
-                          className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
-                        >
-                          {row.company_name ?? "—"}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="capitalize text-slate-700">
-                          {formatEventType(row.event_type)}
-                        </span>
-                        {row.subscription_status ? (
-                          <p className="text-[10px] text-slate-400 mt-0.5">
-                            {row.subscription_status}
-                          </p>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-slate-700">
-                        {formatUsd(row.amount_cents)} {row.currency.toUpperCase()}
-                      </td>
-                      <td className="hidden sm:table-cell px-4 py-3">
-                        {row.plan_slug ? (
-                          <PlanTierBadge tier={row.plan_slug} size="sm" />
-                        ) : (
-                          <span className="text-xs text-slate-400">—</span>
-                        )}
-                      </td>
+            <div className="space-y-4">
+              <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+                <table className="w-full min-w-[640px] text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="px-4 py-3">When</th>
+                      <th className="px-4 py-3">Employer</th>
+                      <th className="px-4 py-3">Event</th>
+                      <th className="px-4 py-3">Amount</th>
+                      <th className="hidden sm:table-cell px-4 py-3">Plan</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {paginatedLedger.map((row) => (
+                      <tr key={row.id} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
+                          {new Date(row.occurred_at).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/admin/users/employers/${row.employer_id}`}
+                            className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                          >
+                            {row.company_name ?? "—"}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="capitalize text-slate-700">
+                            {formatEventType(row.event_type)}
+                          </span>
+                          {row.subscription_status ? (
+                            <p className="text-[10px] text-slate-400 mt-0.5">
+                              {row.subscription_status}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-700">
+                          {formatUsd(row.amount_cents)} {row.currency.toUpperCase()}
+                        </td>
+                        <td className="hidden sm:table-cell px-4 py-3">
+                          {row.plan_slug ? (
+                            <PlanTierBadge tier={row.plan_slug} size="sm" />
+                          ) : (
+                            <span className="text-xs text-slate-400">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <TablePagination
+                currentPage={activeLedgerPage}
+                totalItems={totalLedgerItems}
+                pageSize={itemsPerPage}
+                onPageChange={setLedgerPage}
+              />
             </div>
           )}
         </section>

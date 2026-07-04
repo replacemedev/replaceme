@@ -35,7 +35,7 @@ export function LogoUpload() {
     }
 
     if (!resolveProfileImageMime(file)) {
-      toast.error("Only JPG and PNG files are allowed.");
+      toast.error("Only JPG and PNG allowed.");
       return;
     }
 

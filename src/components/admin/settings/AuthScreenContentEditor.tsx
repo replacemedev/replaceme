@@ -63,7 +63,7 @@ export function AuthScreenContentEditor({
       });
 
       if (result.success) {
-        toast.success("Auth screen saved. Public pages will refresh on next visit.");
+        toast.success("Auth screen saved.");
       } else {
         toast.error(result.error ?? "Save failed.");
       }

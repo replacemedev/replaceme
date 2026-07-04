@@ -20,6 +20,7 @@ import {
 } from "@/actions/admin/email-management";
 import { createAndSendBroadcast } from "@/actions/admin/email-broadcasts";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
+import { TablePagination } from "@/components/shared/TablePagination";
 
 const STATUS_FILTERS = [
   "all",
@@ -72,6 +73,14 @@ export function AdminEmailManagementClient({
   const [subject, setSubject] = useState("");
   const [html, setHtml] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [prevStatus, setPrevStatus] = useState(status);
+
+  if (status !== prevStatus) {
+    setPrevStatus(status);
+    setCurrentPage(1);
+  }
+
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const f of STATUS_FILTERS) map.set(f, 0);
@@ -118,6 +127,15 @@ export function AdminEmailManagementClient({
       refresh();
     });
   };
+
+  const itemsPerPage = 20;
+  const totalItems = rows.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedRows = useMemo(() => {
+    return rows.slice(startIndex, startIndex + itemsPerPage);
+  }, [rows, startIndex, itemsPerPage]);
 
   return (
     <div className="space-y-6">
@@ -220,80 +238,13 @@ export function AdminEmailManagementClient({
           </button>
         </div>
 
-        <AdminDataTable
-          mobileCards={
-            rows.map((row) => (
-              <AdminMobileCard
-                key={row.id}
-                actions={
-                  <button
-                    type="button"
-                    onClick={() => openRow(row.id)}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                  >
-                    View events
-                  </button>
-                }
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-slate-900 line-clamp-2">
-                      {row.subject ?? "—"}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {row.kind} · {row.to_email ?? "Broadcast"}
-                    </p>
-                  </div>
-                  <StatusBadge status={row.status} />
-                </div>
-                <p className="text-xs text-slate-400">
-                  {formatWhen(row.last_event_at ?? row.created_at)}
-                </p>
-              </AdminMobileCard>
-            ))
-          }
-        >
-          <table className="w-full text-sm">
-            <thead className={ADMIN_TABLE_HEAD}>
-              <tr>
-                <th className={ADMIN_TABLE_TH}>Subject</th>
-                <th className={ADMIN_TABLE_TH}>Kind</th>
-                <th className={ADMIN_TABLE_TH}>Recipient</th>
-                <th className={ADMIN_TABLE_TH}>Status</th>
-                <th className={ADMIN_TABLE_TH}>Last event</th>
-                <th className={`${ADMIN_TABLE_TH} text-right`}>Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {rows.map((row) => (
-                <tr key={row.id} className={ADMIN_TABLE_ROW}>
-                  <td className={ADMIN_TABLE_TD}>
-                    <p className="font-semibold text-slate-900 line-clamp-2">
-                      {row.subject ?? "—"}
-                    </p>
-                    <p className="mt-0.5 text-xs text-slate-400">
-                      {row.provider_message_id ?? row.provider_broadcast_id ?? "—"}
-                    </p>
-                  </td>
-                  <td className={ADMIN_TABLE_TD}>
-                    <span className="text-xs font-semibold text-slate-700">
-                      {row.kind}
-                    </span>
-                  </td>
-                  <td className={ADMIN_TABLE_TD}>
-                    <span className="text-xs text-slate-600">
-                      {row.to_email ?? "Broadcast"}
-                    </span>
-                  </td>
-                  <td className={ADMIN_TABLE_TD}>
-                    <StatusBadge status={row.status} />
-                  </td>
-                  <td className={ADMIN_TABLE_TD}>
-                    <span className="text-xs text-slate-500 whitespace-nowrap">
-                      {formatWhen(row.last_event_at ?? row.created_at)}
-                    </span>
-                  </td>
-                  <td className={`${ADMIN_TABLE_TD} text-right`}>
+        <div className="space-y-4">
+          <AdminDataTable
+            mobileCards={
+              paginatedRows.map((row) => (
+                <AdminMobileCard
+                  key={row.id}
+                  actions={
                     <button
                       type="button"
                       onClick={() => openRow(row.id)}
@@ -301,12 +252,87 @@ export function AdminEmailManagementClient({
                     >
                       View events
                     </button>
-                  </td>
+                  }
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-900 line-clamp-2">
+                        {row.subject ?? "—"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {row.kind} · {row.to_email ?? "Broadcast"}
+                      </p>
+                    </div>
+                    <StatusBadge status={row.status} />
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {formatWhen(row.last_event_at ?? row.created_at)}
+                  </p>
+                </AdminMobileCard>
+              ))
+            }
+          >
+            <table className="w-full text-sm">
+              <thead className={ADMIN_TABLE_HEAD}>
+                <tr>
+                  <th className={ADMIN_TABLE_TH}>Subject</th>
+                  <th className={ADMIN_TABLE_TH}>Kind</th>
+                  <th className={ADMIN_TABLE_TH}>Recipient</th>
+                  <th className={ADMIN_TABLE_TH}>Status</th>
+                  <th className={ADMIN_TABLE_TH}>Last event</th>
+                  <th className={`${ADMIN_TABLE_TH} text-right`}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </AdminDataTable>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {paginatedRows.map((row) => (
+                  <tr key={row.id} className={ADMIN_TABLE_ROW}>
+                    <td className={ADMIN_TABLE_TD}>
+                      <p className="font-semibold text-slate-900 line-clamp-2">
+                        {row.subject ?? "—"}
+                      </p>
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        {row.provider_message_id ?? row.provider_broadcast_id ?? "—"}
+                      </p>
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
+                      <span className="text-xs font-semibold text-slate-700">
+                        {row.kind}
+                      </span>
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
+                      <span className="text-xs text-slate-600">
+                        {row.to_email ?? "Broadcast"}
+                      </span>
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
+                      <StatusBadge status={row.status} />
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
+                      <span className="text-xs text-slate-500 whitespace-nowrap">
+                        {formatWhen(row.last_event_at ?? row.created_at)}
+                      </span>
+                    </td>
+                    <td className={`${ADMIN_TABLE_TD} text-right`}>
+                      <button
+                        type="button"
+                        onClick={() => openRow(row.id)}
+                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        View events
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </AdminDataTable>
+          <TablePagination
+            currentPage={activePage}
+            totalItems={totalItems}
+            pageSize={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       </section>
 
       <AdminSlideover
@@ -340,4 +366,3 @@ export function AdminEmailManagementClient({
     </div>
   );
 }
-

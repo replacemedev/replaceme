@@ -9,6 +9,7 @@ import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
+import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminSubscriptionRow } from "@/types/admin.types";
 
 interface BillingOpsClientProps {
@@ -22,6 +23,9 @@ export function BillingOpsClient({ subscriptions }: BillingOpsClientProps) {
   const [unlocks, setUnlocks] = useState(0);
   const [note, setNote] = useState("");
   const router = useRouter();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   if (subscriptions.length === 0) {
     return (
@@ -58,6 +62,12 @@ export function BillingOpsClient({ subscriptions }: BillingOpsClientProps) {
     });
   };
 
+  const totalItems = subscriptions.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedSubscriptions = subscriptions.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <section className="space-y-4">
       <AdminSectionLabel>Billing operations</AdminSectionLabel>
@@ -65,107 +75,115 @@ export function BillingOpsClient({ subscriptions }: BillingOpsClientProps) {
         Adjust job-post and unlock counters for support cases. Stripe refunds and
         dispute handling remain in the Stripe dashboard.
       </p>
-      <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              <th className="px-4 py-3">Employer</th>
-              <th className="px-4 py-3">Plan</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Usage</th>
-              <th className="px-4 py-3 text-right">Ops</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {subscriptions.map((sub) => (
-              <tr key={sub.id} className="align-top hover:bg-slate-50/50">
-                <td className="px-4 py-3">
-                  <p className="font-medium text-slate-900">
-                    {sub.company_name ?? "—"}
-                  </p>
-                  <p className="text-xs text-slate-400">{sub.employer_email}</p>
-                </td>
-                <td className="px-4 py-3 text-slate-600">{sub.plan_name ?? "—"}</td>
-                <td className="px-4 py-3">
-                  <StatusBadge status={sub.status} />
-                </td>
-                <td className="px-4 py-3 text-xs text-slate-600">
-                  {editingId === sub.id ? (
-                    <div className="flex flex-col gap-2">
-                      <label className="flex items-center gap-2">
-                        <span className="w-20">Job posts</span>
+      <div className="space-y-4">
+        <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                <th className="px-4 py-3">Employer</th>
+                <th className="px-4 py-3">Plan</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Usage</th>
+                <th className="px-4 py-3 text-right">Ops</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {paginatedSubscriptions.map((sub) => (
+                <tr key={sub.id} className="align-top hover:bg-slate-50/50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-slate-900">
+                      {sub.company_name ?? "—"}
+                    </p>
+                    <p className="text-xs text-slate-400">{sub.employer_email}</p>
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">{sub.plan_name ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={sub.status} />
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-600">
+                    {editingId === sub.id ? (
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center gap-2">
+                          <span className="w-20">Job posts</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={jobPosts}
+                            onChange={(e) => setJobPosts(Number(e.target.value))}
+                            className="w-20 rounded border border-slate-200 px-2 py-1"
+                          />
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <span className="w-20">Unlocks</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={unlocks}
+                            onChange={(e) => setUnlocks(Number(e.target.value))}
+                            className="w-20 rounded border border-slate-200 px-2 py-1"
+                          />
+                        </label>
                         <input
-                          type="number"
-                          min={0}
-                          value={jobPosts}
-                          onChange={(e) => setJobPosts(Number(e.target.value))}
-                          className="w-20 rounded border border-slate-200 px-2 py-1"
+                          type="text"
+                          placeholder="Override note"
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                          className="rounded border border-slate-200 px-2 py-1"
                         />
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <span className="w-20">Unlocks</span>
-                        <input
-                          type="number"
-                          min={0}
-                          value={unlocks}
-                          onChange={(e) => setUnlocks(Number(e.target.value))}
-                          className="w-20 rounded border border-slate-200 px-2 py-1"
-                        />
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Override note"
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        className="rounded border border-slate-200 px-2 py-1"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      Job posts: {sub.job_posts_used}
-                      <br />
-                      Unlocks: {sub.unlocks_used}
-                    </>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {editingId === sub.id ? (
-                    <div className="flex flex-col gap-2 items-end">
-                      <Button
-                        type="button"
-                        size="sm"
-                        disabled={pending}
-                        onClick={() => submitOverride(sub.id)}
-                        className="w-auto"
-                      >
-                        {pending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                        ) : (
-                          "Save"
-                        )}
-                      </Button>
+                      </div>
+                    ) : (
+                      <>
+                        Job posts: {sub.job_posts_used}
+                        <br />
+                        Unlocks: {sub.unlocks_used}
+                      </>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {editingId === sub.id ? (
+                      <div className="flex flex-col gap-2 items-end">
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={pending}
+                          onClick={() => submitOverride(sub.id)}
+                          className="w-auto"
+                        >
+                          {pending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                          ) : (
+                            "Save"
+                          )}
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingId(null)}
+                          className="text-xs text-slate-500 hover:text-slate-700"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => setEditingId(null)}
-                        className="text-xs text-slate-500 hover:text-slate-700"
+                        onClick={() => startEdit(sub)}
+                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                       >
-                        Cancel
+                        Override usage
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => startEdit(sub)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      Override usage
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePagination
+          currentPage={activePage}
+          totalItems={totalItems}
+          pageSize={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </section>
   );
