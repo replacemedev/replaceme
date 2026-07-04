@@ -370,9 +370,9 @@ export function WorkerProfileEditor({
 
           {/* Testimonials */}
           <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+            <div className="flex flex-col gap-3 items-start md:flex-row md:items-center md:justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-[#ebfdf2] text-[#006e2f] rounded-lg">
+                <div className="p-1.5 bg-[#ebfdf2] text-[#006e2f] rounded-lg shrink-0">
                   <Star size={18} className="stroke-[2.5]" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 tracking-tight uppercase">
@@ -380,7 +380,7 @@ export function WorkerProfileEditor({
                 </h3>
               </div>
               {reviewCount > 0 ? (
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 shrink-0 whitespace-nowrap">
                   <Star size={14} className="text-[#006e2f] fill-[#006e2f]" />
                   <span>{averageRating.toFixed(1)}</span>
                   <span className="text-slate-400">({reviewCount} reviews)</span>
