@@ -8,12 +8,16 @@ import {
   isEmployerNavActive,
 } from "@/config/employerNav";
 
+import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import type { NavSession } from "@/types/nav";
+
 interface EmployerMoreSheetProps {
   open: boolean;
   onClose: () => void;
+  session?: NavSession;
 }
 
-export function EmployerMoreSheet({ open, onClose }: EmployerMoreSheetProps) {
+export function EmployerMoreSheet({ open, onClose, session }: EmployerMoreSheetProps) {
   const pathname = usePathname();
 
   if (!open) return null;
@@ -65,6 +69,12 @@ export function EmployerMoreSheet({ open, onClose }: EmployerMoreSheetProps) {
             );
           })}
         </ul>
+
+        {session?.isAuthenticated && (
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <RoleNavDropdown session={session} layout="mobile" />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
         <EmployerHeaderNav
           unreadMessageCount={resolvedSession.unreadMessageCount}
           planUsage={planUsage}
+          session={resolvedSession}
         />
 
         <GlobalHeaderActions session={resolvedSession} bellSize={22}>

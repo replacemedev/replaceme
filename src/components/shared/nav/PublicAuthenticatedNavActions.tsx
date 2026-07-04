@@ -35,10 +35,10 @@ export function PublicAuthenticatedNavActions({
 
   if (layout === "mobile") {
     return (
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5 w-full">
         {dashboardLink}
-        <div className="flex justify-center">
-          <RoleNavDropdown session={session} />
+        <div className="w-full">
+          <RoleNavDropdown session={session} layout="mobile" />
         </div>
       </div>
     );

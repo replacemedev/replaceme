@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
+import { AdminDropdown } from "./AdminDropdown";
 import { ADMIN_NAV_GROUPS, getActiveAdminNavHref } from "@/config/adminNav";
 import { filterAdminNavGroups } from "@/lib/admin/filter-nav";
 
@@ -65,27 +66,17 @@ export function AdminMobileDrawer({
         </div>
 
         <div className="border-b border-slate-100 px-4 py-4">
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-100 p-3">
-            {profile.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt=""
-                className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-xs"
-              />
-            ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ebfdf2] text-sm font-bold text-[#006e2f] border border-emerald-100">
-                {profile.initials}
-              </span>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-slate-900">
-                {profile.displayName}
-              </p>
-              <p className="truncate text-xs font-semibold text-[#22c55e]">
-                {profile.roleLabel}
-              </p>
-            </div>
-          </div>
+          <AdminDropdown
+            profile={{
+              avatar_url: profile.avatarUrl || null,
+              first_name: null,
+              last_name: null,
+              username: null,
+            }}
+            displayName={profile.displayName}
+            initials={profile.initials}
+            layout="mobile"
+          />
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">

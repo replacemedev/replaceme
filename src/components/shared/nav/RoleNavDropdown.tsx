@@ -14,10 +14,15 @@ const ROLE_LABELS: Record<UserRole, { displayName: string; initials: string }> =
 interface RoleNavDropdownProps {
   session: NavSession;
   planUsage?: EmployerPlanUsage | null;
+  layout?: "desktop" | "mobile";
 }
 
 /** Role-specific avatar dropdown — always renders when session is authenticated. */
-export function RoleNavDropdown({ session, planUsage = null }: RoleNavDropdownProps) {
+export function RoleNavDropdown({
+  session,
+  planUsage = null,
+  layout = "desktop",
+}: RoleNavDropdownProps) {
   if (!session.isAuthenticated || !session.role) return null;
 
   const fallback = ROLE_LABELS[session.role];
@@ -31,6 +36,7 @@ export function RoleNavDropdown({ session, planUsage = null }: RoleNavDropdownPr
         displayName={displayName}
         initials={initials}
         isVerified={session.isVerified}
+        layout={layout}
       />
     );
   }
@@ -42,6 +48,7 @@ export function RoleNavDropdown({ session, planUsage = null }: RoleNavDropdownPr
         displayName={displayName}
         initials={initials}
         planUsage={planUsage}
+        layout={layout}
       />
     );
   }
@@ -51,6 +58,7 @@ export function RoleNavDropdown({ session, planUsage = null }: RoleNavDropdownPr
       profile={session.profile}
       displayName={displayName}
       initials={initials}
+      layout={layout}
     />
   );
 }

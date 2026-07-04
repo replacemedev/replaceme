@@ -23,6 +23,7 @@ export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
         <div className="flex items-center gap-4">
           <MobileTriggerAndMenu
             unreadMessageCount={resolvedSession.unreadMessageCount}
+            session={resolvedSession}
           />
           <NavBrand homeHref={resolvedSession.homeHref} compact />
         </div>

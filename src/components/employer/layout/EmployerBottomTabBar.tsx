@@ -11,12 +11,16 @@ import {
 } from "@/config/employerNav";
 import { EmployerMoreSheet } from "./EmployerMoreSheet";
 
+import type { NavSession } from "@/types/nav";
+
 interface EmployerBottomTabBarProps {
   unreadMessageCount?: number;
+  session?: NavSession;
 }
 
 export function EmployerBottomTabBar({
   unreadMessageCount = 0,
+  session,
 }: EmployerBottomTabBarProps) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -79,7 +83,7 @@ export function EmployerBottomTabBar({
           </li>
         </ul>
       </nav>
-      <EmployerMoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
+      <EmployerMoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} session={session} />
     </>
   );
 }

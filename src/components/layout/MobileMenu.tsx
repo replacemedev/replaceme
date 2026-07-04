@@ -7,16 +7,21 @@ import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { WORKER_NAV_ITEMS } from "@/config/workerNav";
 
+import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import type { NavSession } from "@/types/nav";
+
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
   unreadMessageCount?: number;
+  session?: NavSession;
 }
 
 export function MobileMenu({
   isOpen,
   onClose,
   unreadMessageCount = 0,
+  session,
 }: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -126,6 +131,12 @@ export function MobileMenu({
             );
           })}
         </nav>
+
+        {session?.isAuthenticated && (
+          <div className="mt-auto border-t border-slate-100 pt-4">
+            <RoleNavDropdown session={session} layout="mobile" />
+          </div>
+        )}
       </div>
     </div>
   );

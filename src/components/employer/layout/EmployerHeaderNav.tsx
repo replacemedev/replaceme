@@ -7,6 +7,8 @@ import { ChevronDown, Menu, X, Briefcase } from "lucide-react";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 import { PostJobNavLink } from "@/components/employer/jobs/PostJobNavLink";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
+import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import type { NavSession } from "@/types/nav";
 import {
   EMPLOYER_HEADER_MORE_LINKS,
   EMPLOYER_MORE_NAV_ITEMS,
@@ -17,11 +19,13 @@ import {
 interface EmployerHeaderNavProps {
   unreadMessageCount?: number;
   planUsage?: EmployerPlanUsage | null;
+  session?: NavSession;
 }
 
 export function EmployerHeaderNav({
   unreadMessageCount = 0,
   planUsage = null,
+  session,
 }: EmployerHeaderNavProps) {
   const pathname = usePathname();
   const [jobsDropdownOpen, setJobsDropdownOpen] = useState(false);
@@ -197,11 +201,13 @@ export function EmployerHeaderNav({
 interface EmployerMobileMenuProps {
   unreadMessageCount?: number;
   planUsage?: EmployerPlanUsage | null;
+  session?: NavSession;
 }
 
 export function EmployerMobileMenu({
   unreadMessageCount = 0,
   planUsage = null,
+  session,
 }: EmployerMobileMenuProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -289,6 +295,12 @@ export function EmployerMobileMenu({
               Upgrade plan
             </Link>
           ) : null}
+
+          {session?.isAuthenticated && (
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <RoleNavDropdown session={session} planUsage={planUsage} layout="mobile" />
+            </div>
+          )}
         </div>
       ) : null}
     </>

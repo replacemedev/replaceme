@@ -3,13 +3,16 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
+import type { NavSession } from "@/types/nav";
 
 interface MobileTriggerAndMenuProps {
   unreadMessageCount?: number;
+  session?: NavSession;
 }
 
 export function MobileTriggerAndMenu({
   unreadMessageCount = 0,
+  session,
 }: MobileTriggerAndMenuProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -46,6 +49,7 @@ export function MobileTriggerAndMenu({
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         unreadMessageCount={unreadMessageCount}
+        session={session}
       />
     </>
   );
