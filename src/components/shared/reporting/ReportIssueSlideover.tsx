@@ -36,7 +36,7 @@ export function ReportIssueSlideover({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end lg:justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
@@ -47,7 +47,7 @@ export function ReportIssueSlideover({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative w-full overflow-y-auto rounded-t-3xl border border-slate-100 bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl lg:mx-auto lg:max-h-[min(85vh,820px)] lg:max-w-2xl lg:rounded-3xl lg:p-8"
+        className="relative w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-100 bg-white p-5 pb-6 shadow-2xl md:p-8 max-w-xl md:max-w-2xl"
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div className="space-y-1">
