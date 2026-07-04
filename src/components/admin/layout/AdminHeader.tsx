@@ -14,7 +14,7 @@ export async function AdminHeader({ session }: AdminHeaderProps = {}) {
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
-      <div className="flex justify-between items-center px-4 sm:px-8 max-w-7xl mx-auto h-16 gap-3">
+      <div className="flex justify-between items-center px-4 md:px-margin-desktop max-w-7xl mx-auto h-16 gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <AdminMobileMenuButton />
           <NavBrand homeHref={resolvedSession.homeHref} compact />

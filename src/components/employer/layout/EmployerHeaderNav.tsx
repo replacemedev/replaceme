@@ -66,7 +66,7 @@ export function EmployerHeaderNav({
   }, []);
 
   return (
-    <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+    <nav className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
       <NavUnderlineLink
         href="/employer/dashboard"
         label="Dashboard"
@@ -224,7 +224,7 @@ export function EmployerMobileMenu({
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         type="button"
-        className="md:hidden flex items-center justify-center p-2 text-slate-500 hover:text-[#006e2f] rounded-xl hover:bg-slate-50 min-h-[44px] min-w-[44px] cursor-pointer"
+        className="lg:hidden flex items-center justify-center p-2 text-slate-500 hover:text-[#006e2f] rounded-xl hover:bg-slate-50 min-h-[44px] min-w-[44px] cursor-pointer"
         aria-label="Toggle menu"
         aria-expanded={mobileMenuOpen}
       >
@@ -232,7 +232,7 @@ export function EmployerMobileMenu({
       </button>
 
       {mobileMenuOpen ? (
-        <div className="md:hidden absolute top-full left-0 w-full border-t border-slate-100 bg-white px-margin-desktop py-4 flex flex-col gap-3 shadow-inner z-40">
+        <div className="lg:hidden absolute top-full left-0 w-full border-t border-slate-100 bg-white px-4 md:px-margin-desktop py-4 flex flex-col gap-3 shadow-inner z-40">
           <Link
             href="/employer/dashboard"
             onClick={() => setMobileMenuOpen(false)}

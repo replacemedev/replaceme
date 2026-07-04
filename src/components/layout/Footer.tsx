@@ -9,7 +9,7 @@ export function Footer() {
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)] opacity-30 pointer-events-none z-0" />
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-12 px-margin-desktop max-w-container-max mx-auto relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-12 px-4 md:px-margin-desktop max-w-container-max mx-auto relative z-10">
         {/* Brand Column */}
         <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
           <Link className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity" href="/">
@@ -88,7 +88,7 @@ export function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="mt-16 pt-8 border-t border-slate-100 px-margin-desktop max-w-container-max mx-auto flex items-center justify-between relative z-10">
+      <div className="mt-16 pt-8 border-t border-slate-100 px-4 md:px-margin-desktop max-w-container-max mx-auto flex items-center justify-between relative z-10">
         <p className="text-slate-400 font-body-base text-sm">
           © {new Date().getFullYear()} Replace Me. All rights reserved.
         </p>

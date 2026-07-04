@@ -16,7 +16,7 @@ export function InterviewsCalendarHeader({
 
   return (
     <div
-      className="grid grid-cols-7 gap-2 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+      className="grid grid-cols-7 gap-1 min-[375px]:gap-2 rounded-2xl border border-slate-100 bg-white p-1.5 min-[375px]:p-3 shadow-sm"
       aria-label="Interviews this week"
     >
       {WEEKDAY_LABELS.map((label, index) => {

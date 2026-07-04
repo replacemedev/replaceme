@@ -21,7 +21,7 @@ export function MobileTriggerAndMenu({
       <button
         onClick={() => setMobileMenuOpen((open) => !open)}
         type="button"
-        className="relative md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-200 hover:bg-slate-50 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 cursor-pointer"
+        className="relative lg:hidden flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors duration-200 hover:bg-slate-50 hover:text-[#006e2f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 cursor-pointer"
         aria-expanded={mobileMenuOpen}
         aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
       >

@@ -19,7 +19,7 @@ export async function EmployerHeader({ session }: EmployerHeaderProps = {}) {
       className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm"
       style={{ viewTransitionName: "employer-header" }}
     >
-      <div className="relative flex justify-between items-center px-margin-desktop max-w-container-max mx-auto w-full h-16 gap-3">
+      <div className="relative flex justify-between items-center px-4 md:px-margin-desktop max-w-container-max mx-auto w-full h-16 gap-3">
         <div className="flex items-center gap-2 shrink-0">
           <NavBrand homeHref={resolvedSession.homeHref} compact />
         </div>

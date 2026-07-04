@@ -118,20 +118,20 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
       <div
         className={`px-4 md:px-margin-desktop max-w-container-max mx-auto w-full h-16 items-center ${
           isLandingPage
-            ? "flex justify-between md:grid md:grid-cols-[1fr_auto_1fr]"
+            ? "flex justify-between lg:grid lg:grid-cols-[1fr_auto_1fr]"
             : "flex justify-between"
         }`}
       >
         <NavBrand homeHref="/" compact />
 
         {isLandingPage ? (
-          <nav className="hidden md:flex items-center justify-self-center gap-6 lg:gap-8">
+          <nav className="hidden lg:flex items-center justify-self-center gap-6 lg:gap-8">
             {landingNavLinks}
           </nav>
         ) : null}
 
         <div
-          className={`hidden md:flex items-center gap-6 ${
+          className={`hidden lg:flex items-center gap-6 ${
             isLandingPage ? "justify-self-end" : "ml-auto"
           }`}
         >
@@ -143,7 +143,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
         </div>
 
         {!showMobileMenuButton && session.isAuthenticated ? (
-          <div className="md:hidden flex items-center gap-3 ml-auto">
+          <div className="lg:hidden flex items-center gap-3 ml-auto">
             <PublicAuthenticatedNavActions session={session} />
           </div>
         ) : null}
@@ -152,7 +152,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden relative flex h-9 w-9 items-center justify-center rounded-lg text-on-surface transition-colors duration-200 hover:bg-slate-50 hover:text-[#22c55e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e]/30 ml-auto"
+            className="lg:hidden relative flex h-9 w-9 items-center justify-center rounded-lg text-on-surface transition-colors duration-200 hover:bg-slate-50 hover:text-[#22c55e] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e]/30 ml-auto"
             aria-expanded={mobileMenuOpen}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -178,7 +178,7 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
 
       {showMobileMenuButton ? (
         <div
-          className={`md:hidden absolute top-full left-0 z-40 w-full ${
+          className={`lg:hidden absolute top-full left-0 z-40 w-full ${
             mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none"
           }`}
           aria-hidden={!mobileMenuOpen}

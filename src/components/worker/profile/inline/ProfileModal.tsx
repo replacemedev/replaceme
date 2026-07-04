@@ -32,7 +32,7 @@ export function ProfileModal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 m-auto w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-xl backdrop:bg-slate-900/40 open:flex open:flex-col max-h-[90vh]"
+      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-xl backdrop:bg-slate-900/40 open:flex open:flex-col max-h-[90vh]"
       onClose={onClose}
     >
       <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 shrink-0">
