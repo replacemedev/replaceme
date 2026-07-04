@@ -68,6 +68,8 @@ export function AdminMobileDrawer({
         <div className="border-b border-slate-100 px-4 py-4">
           <AdminDropdown
             profile={{
+              id: "admin-mobile-drawer",
+              is_verified: false,
               avatar_url: profile.avatarUrl || null,
               first_name: null,
               last_name: null,
