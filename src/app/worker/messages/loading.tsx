@@ -10,7 +10,7 @@ export default function WorkerMessagesLoading() {
       <div className="w-full h-full flex items-center justify-center animate-pulse">
         <div className="flex h-full max-h-[calc(100dvh-8rem)] min-h-[480px] w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:max-h-[calc(100dvh-7.5rem)] lg:max-h-[calc(100dvh-6rem)] lg:min-h-[640px]">
           {/* Mock Sidebar */}
-          <div className="w-80 border-r border-slate-200 hidden md:flex flex-col bg-white p-4 space-y-4">
+          <div className="w-full lg:w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full p-4 space-y-4">
             <SkeletonBlock className="h-9 w-1/2 rounded-lg" />
             <SkeletonBlock className="h-10 w-full rounded-xl" />
             <div className="flex gap-2">
@@ -32,7 +32,7 @@ export default function WorkerMessagesLoading() {
           </div>
 
           {/* Mock Active Chat */}
-          <div className="flex-1 bg-[#f8fafd]/40 flex flex-col h-full">
+          <div className="flex-1 bg-[#f8fafd]/40 hidden lg:flex flex-col h-full">
             {/* Active Chat Header */}
             <div className="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
