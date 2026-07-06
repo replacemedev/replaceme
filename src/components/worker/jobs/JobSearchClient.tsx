@@ -54,7 +54,6 @@ export function JobSearchClient({
 }: JobSearchClientProps) {
   const [jobs, setJobs] = useState(initialJobs);
   const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
   const [skillQuery, setSkillQuery] = useState("");
 
   const [appliedSkills, setAppliedSkills] = useState<string[]>([]);
@@ -93,7 +92,6 @@ export function JobSearchClient({
     startTransition(async () => {
       const result = await getJobSearchData({
         keyword,
-        location,
         skills: filters.skills,
         employmentTypes: filters.employmentTypes,
       });
@@ -101,13 +99,31 @@ export function JobSearchClient({
     });
   };
 
-  const handleSearch = () => {
+  const handleSearch = (newKeyword: string) => {
+    setKeyword(newKeyword);
     setCurrentPage(1);
     startTransition(async () => {
       const result = await getJobSearchData({
-        keyword,
-        location,
+        keyword: newKeyword,
         skills: appliedSkills,
+        employmentTypes: appliedEmploymentTypes,
+      });
+      setJobs(result.jobs);
+    });
+  };
+
+  const handleSkillChipToggle = (skill: string) => {
+    const nextSkills = appliedSkills.includes(skill)
+      ? appliedSkills.filter((s) => s !== skill)
+      : [...appliedSkills, skill];
+
+    setAppliedSkills(nextSkills);
+    setCurrentPage(1);
+
+    startTransition(async () => {
+      const result = await getJobSearchData({
+        keyword,
+        skills: nextSkills,
         employmentTypes: appliedEmploymentTypes,
       });
       setJobs(result.jobs);
@@ -116,7 +132,6 @@ export function JobSearchClient({
 
   const handleClearAll = () => {
     setKeyword("");
-    setLocation("");
     setSkillQuery("");
     setAppliedSkills([]);
     setAppliedEmploymentTypes([]);
@@ -148,11 +163,11 @@ export function JobSearchClient({
   return (
     <>
       <JobSearchHero
-        keyword={keyword}
-        location={location}
-        onKeywordChange={setKeyword}
-        onLocationChange={setLocation}
+        initialKeyword={keyword}
         onSearch={handleSearch}
+        activeSkills={appliedSkills}
+        onSkillChipToggle={handleSkillChipToggle}
+        skillSuggestions={facets.skillSuggestions}
       />
 
       <WorkerPageShell width="wide" className="py-8 gap-6">
@@ -177,7 +192,7 @@ export function JobSearchClient({
                 <button
                   type="button"
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg cursor-pointer shrink-0"
+                  className="lg:hidden inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200/80 rounded-lg cursor-pointer shrink-0"
                 >
                   <Filter className="h-4 w-4" aria-hidden />
                   Filters

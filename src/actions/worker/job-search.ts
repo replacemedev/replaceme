@@ -25,7 +25,6 @@ export interface JobSearchFilters {
   skills?: string[];
   employmentTypes?: string[];
   keyword?: string;
-  location?: string;
 }
 
 function mapJobRow(
@@ -201,15 +200,9 @@ export async function getJobSearchData(
         query = query.or(parts.join(","));
       }
 
-      // Apply location filter
-      if (filters?.location) {
-        query = query.ilike("location", `%${filters.location.trim()}%`);
-      }
-
-      // Apply keyword filter
+      // Apply keyword filter (strictly query title column only)
       if (filters?.keyword) {
-        const kw = `%${filters.keyword.trim()}%`;
-        query = query.or(`title.ilike.${kw},description.ilike.${kw}`);
+        query = query.ilike("title", `%${filters.keyword.trim()}%`);
       }
 
       const { data, error } = await query;

@@ -43,25 +43,28 @@ export function JobSearchPageSkeleton() {
   return (
     <div className="animate-pulse">
       {/* Hero (matches JobSearchHero gradient + centered copy + pill search) */}
-      <div className="bg-gradient-to-b from-[#e8f7f4] via-[#f4faf8] to-[#f8fafe] px-4 sm:px-6 lg:px-8 pt-10 pb-12 sm:pt-14 sm:pb-16">
-        <div className="max-w-4xl mx-auto text-center">
+      <div className="bg-gradient-to-b from-[#e8f7f4] via-[#f4faf8] to-[#f8fafe] pt-10 pb-12 sm:pt-14 sm:pb-16">
+        <div className="px-4 mx-auto max-w-5xl text-center">
           <SkeletonBlock className="h-10 sm:h-12 w-80 max-w-full mx-auto bg-slate-200/70 rounded-xl" />
           <SkeletonBlock className="h-4 w-full max-w-md mx-auto bg-slate-200/60 rounded mt-4" />
           <SkeletonBlock className="h-4 w-64 mx-auto bg-slate-200/50 rounded mt-2" />
 
           {/* 1:1 Responsive Search Bar Skeleton */}
-          <div className="mt-8 max-w-3xl mx-auto bg-white rounded-2xl md:rounded-full shadow-md border border-slate-200/80 p-3 md:p-2 flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
-            <div className="flex flex-1 items-center gap-2 px-3 py-3 md:py-2 min-w-0 border-b border-slate-100 md:border-0">
-              <SkeletonBlock className="h-5 flex-1 rounded bg-slate-100" />
+          <div className="mt-8 max-w-3xl mx-auto w-full">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-0 bg-white rounded-2xl sm:rounded-full p-2.5 sm:p-2 border border-slate-200/80 shadow-sm w-full">
+              <div className="flex flex-1 items-center gap-2 px-3 py-1 min-w-0 w-full">
+                <SkeletonBlock className="h-5 flex-1 rounded bg-slate-100" />
+              </div>
+
+              <SkeletonBlock className="shrink-0 w-full sm:w-auto h-11 sm:h-10 w-full sm:w-32 rounded-xl sm:rounded-full bg-slate-200" />
             </div>
+          </div>
 
-            <div className="hidden md:block w-px h-8 bg-slate-200 shrink-0" />
-
-            <div className="flex flex-1 items-center gap-2 px-3 py-3 md:py-2 min-w-0 md:max-w-[14rem]">
-              <SkeletonBlock className="h-5 flex-1 rounded bg-slate-100" />
-            </div>
-
-            <SkeletonBlock className="shrink-0 w-full md:w-auto mt-3 md:mt-0 h-11 md:h-10 w-full md:w-32 rounded-xl md:rounded-full bg-slate-200" />
+          {/* Quick Skills Filter row Skeleton */}
+          <div className="flex flex-wrap gap-2 justify-center mt-5 max-w-3xl mx-auto w-full">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonBlock key={i} className="h-7 w-20 rounded-full bg-slate-200/70" />
+            ))}
           </div>
         </div>
       </div>
