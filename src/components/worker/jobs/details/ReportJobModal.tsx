@@ -13,7 +13,6 @@ interface ReportJobModalProps {
 }
 
 const REPORT_REASONS = [
-  "Inaccurate Agent Skills Required (e.g., Ponytail)",
   "Spam or misleading information",
   "Inappropriate or offensive content",
   "Scam, fraud, or phishing",
@@ -119,11 +118,10 @@ export function ReportJobModal({
               {REPORT_REASONS.map((r) => (
                 <label
                   key={r}
-                  className={`flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all hover:bg-slate-50/50 ${
-                    reason === r
-                      ? "border-emerald-600 bg-emerald-50/30 ring-1 ring-emerald-600"
-                      : "border-slate-200 bg-white"
-                  }`}
+                  className={`flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all hover:bg-slate-50/50 ${reason === r
+                    ? "border-emerald-600 bg-emerald-50/30 ring-1 ring-emerald-600"
+                    : "border-slate-200 bg-white"
+                    }`}
                 >
                   <input
                     type="radio"
