@@ -8,3 +8,7 @@ export const updateApplicationStatusSchema = z.object({
     message: "Invalid application status.",
   }),
 });
+
+export const deleteApplicationSchema = z.object({
+  applicationId: uuidSchema,
+});

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { AlertCircle, LayoutGrid, Table2, KanbanSquare } from "lucide-react";
+import { AlertCircle, LayoutGrid, Table2, KanbanSquare, AlertTriangle } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { useOpenEmployerMessagingThread } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
@@ -22,7 +22,7 @@ import { ContextualUpgradeBanner } from "@/components/shared/entitlements/Contex
 import { HiddenApplicantsBanner } from "@/components/shared/entitlements/HiddenApplicantsBanner";
 import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
 import { ScheduleInterviewModal } from "./ScheduleInterviewModal";
-import { updateApplicationStatus } from "@/actions/applications";
+import { updateApplicationStatus, deleteApplication } from "@/actions/applications";
 import { ApplicationStatus } from "@/types/applications";
 import { toast } from "sonner";
 
@@ -57,6 +57,22 @@ export function ApplicantsClient({
   const [viewMode, setViewMode] = useState<"pipeline" | "cards" | "table">("pipeline");
   const [schedulingApp, setSchedulingApp] = useState<{ id: string; name: string } | null>(null);
   const [expandedMobileStage, setExpandedMobileStage] = useState<ApplicationStatus | null>("PENDING");
+  const [deletingApp, setDeletingApp] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteApplication = async () => {
+    if (!deletingApp) return;
+    setIsDeleting(true);
+    const result = await deleteApplication(deletingApp.id);
+    setIsDeleting(false);
+    if (!result.success) {
+      toast.error(result.error ?? "Failed to delete application.");
+      return;
+    }
+    toast.success("Applicant removed.");
+    setApplicants((prev) => prev.filter((a) => a.id !== deletingApp.id));
+    setDeletingApp(null);
+  };
 
   const isDiscoveryPreview = identityMode === "anonymous_preview";
   const planSlug = planUsage?.planSlug ?? "discovery";
@@ -313,6 +329,7 @@ export function ApplicantsClient({
                                   ? () => handleChatWithCandidate(app.candidateId)
                                   : undefined
                               }
+                              onDeleteClick={() => setDeletingApp({ id: app.id, name: app.name })}
                             />
                           </div>
                         ))
@@ -373,6 +390,7 @@ export function ApplicantsClient({
                                   ? () => handleChatWithCandidate(app.candidateId)
                                   : undefined
                               }
+                              onDeleteClick={() => setDeletingApp({ id: app.id, name: app.name })}
                             />
                           ))
                         )}
@@ -400,6 +418,7 @@ export function ApplicantsClient({
                       ? () => handleChatWithCandidate(app.candidateId)
                       : undefined
                   }
+                  onDeleteClick={() => setDeletingApp({ id: app.id, name: app.name })}
                 />
               ))}
             </div>
@@ -432,6 +451,7 @@ export function ApplicantsClient({
                       ? () => handleChatWithCandidate(app.candidateId)
                       : undefined
                   }
+                  onDeleteClick={() => setDeletingApp({ id: app.id, name: app.name })}
                 />
               ))}
             </div>
@@ -452,6 +472,40 @@ export function ApplicantsClient({
             setSchedulingApp(null);
           }}
         />
+      )}
+
+      {deletingApp && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 shadow-xl max-w-md w-full w-[calc(100vw-2rem)] mx-auto animate-scaleIn border border-slate-100">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <span className="p-2 rounded-xl bg-red-50 text-red-600">
+                <AlertTriangle className="h-6 w-6" />
+              </span>
+              <h4 className="text-base font-bold text-slate-900">Delete Application?</h4>
+            </div>
+            <p className="text-xs font-semibold leading-relaxed text-slate-500">
+              Are you sure you want to permanently remove <strong className="text-slate-800">{deletingApp.name}</strong> from your pipeline? This action cannot be undone.
+            </p>
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-6">
+              <button
+                type="button"
+                onClick={() => setDeletingApp(null)}
+                disabled={isDeleting}
+                className="h-10 rounded-xl px-4 text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 cursor-pointer w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteApplication}
+                disabled={isDeleting}
+                className="h-10 rounded-xl px-4 text-xs font-bold bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2"
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
