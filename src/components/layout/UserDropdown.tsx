@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { ChevronDown, LogOut, FileText, User } from "lucide-react";
-import { logOut } from "@/actions/auth";
+import { useSession } from "@/providers/SessionProvider";
 
 interface UserProfile {
   first_name: string | null;
@@ -51,10 +51,12 @@ export function UserDropdown({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const { logout } = useSession();
+
   const handleLogout = () => {
     startTransition(async () => {
       try {
-        await logOut();
+        await logout();
       } catch (err) {
         console.error("Sign out failed", err);
       }

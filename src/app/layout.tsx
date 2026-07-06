@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import { CookieConsentRoot } from "@/components/shared/cookie-consent";
 import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/cookie-consent/types";
 import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { getNavSession } from "@/lib/auth/nav-session";
+import { SessionProvider } from "@/providers/SessionProvider";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -32,11 +34,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getNavSession();
+
   return (
     <html
       lang="en"
@@ -64,7 +68,9 @@ export default function RootLayout({
             className: "w-[calc(100vw-2rem)] mx-auto max-w-sm sm:max-w-md md:max-w-md md:w-full md:mx-0",
           }}
         />
-        {children}
+        <SessionProvider initialSession={session}>
+          {children}
+        </SessionProvider>
         <CookieConsentRoot />
       </body>
     </html>
