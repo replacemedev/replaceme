@@ -84,8 +84,8 @@ export function ApplicantCard({
               ) : (
                 <div
                   className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-xl ${isPreview
-                      ? "bg-slate-100 text-slate-400 blur-[1px]"
-                      : "bg-emerald-100 text-emerald-800"
+                    ? "bg-slate-100 text-slate-400 blur-[1px]"
+                    : "bg-emerald-100 text-emerald-800"
                     }`}
                 >
                   {isPreview ? "?" : initials}
@@ -117,7 +117,7 @@ export function ApplicantCard({
             </div>
           </div>
 
-          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
             <span
               className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
             >
@@ -158,8 +158,8 @@ export function ApplicantCard({
               <span
                 key={idx}
                 className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-colors ${isAgent
-                    ? "bg-blue-50 border-blue-200/50 text-blue-700 hover:bg-blue-100/50"
-                    : "bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100/50"
+                  ? "bg-blue-50 border-blue-200/50 text-blue-700 hover:bg-blue-100/50"
+                  : "bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100/50"
                   }`}
               >
                 {skill}
@@ -243,30 +243,30 @@ export function ApplicantCard({
           interview={
             applicant.interview
               ? {
-                  id: applicant.interview.id,
-                  applicationId: applicant.id,
-                  jobId: applicant.jobId,
-                  candidateId: applicant.candidateId,
-                  jobTitle: applicant.role,
-                  candidateName: applicant.name,
-                  scheduledAt: applicant.interview.scheduled_at,
-                  meetingUrl: applicant.interview.meeting_link,
-                  status: applicant.interview.status,
-                  notes: applicant.interview.notes,
-                  isPreview,
-                }
+                id: applicant.interview.id,
+                applicationId: applicant.id,
+                jobId: applicant.jobId,
+                candidateId: applicant.candidateId,
+                jobTitle: applicant.role,
+                candidateName: applicant.name,
+                scheduledAt: applicant.interview.scheduled_at,
+                meetingUrl: applicant.interview.meeting_link,
+                status: applicant.interview.status,
+                notes: applicant.interview.notes,
+                isPreview,
+              }
               : {
-                  applicationId: applicant.id,
-                  jobId: applicant.jobId,
-                  candidateId: applicant.candidateId,
-                  jobTitle: applicant.role,
-                  candidateName: applicant.name,
-                  scheduledAt: applicant.createdAt,
-                  meetingUrl: null,
-                  status: "scheduled",
-                  notes: null,
-                  isPreview,
-                }
+                applicationId: applicant.id,
+                jobId: applicant.jobId,
+                candidateId: applicant.candidateId,
+                jobTitle: applicant.role,
+                candidateName: applicant.name,
+                scheduledAt: applicant.createdAt,
+                meetingUrl: null,
+                status: "scheduled",
+                notes: null,
+                isPreview,
+              }
           }
         />
       )}
