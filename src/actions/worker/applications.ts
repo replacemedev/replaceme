@@ -113,6 +113,13 @@ export async function getWorkerApplicationById(applicationId: string) {
           logo_url,
           monthly_salary,
           hours_per_week
+        ),
+        interviews (
+          id,
+          scheduled_at,
+          meeting_link,
+          notes,
+          status
         )
       `
       )
@@ -121,7 +128,24 @@ export async function getWorkerApplicationById(applicationId: string) {
       .maybeSingle();
 
     if (error || !data) return null;
-    return mapApplicationRow(data);
+    
+    const mapped = mapApplicationRow(data);
+    if (!mapped) return null;
+
+    const interview = Array.isArray(data.interviews) ? data.interviews[0] : data.interviews;
+
+    return {
+      ...mapped,
+      interview: interview
+        ? {
+            id: interview.id,
+            scheduledAt: interview.scheduled_at,
+            meetingUrl: interview.meeting_link,
+            notes: interview.notes,
+            status: interview.status,
+          }
+        : null,
+    };
   } catch (err) {
     safeError("getWorkerApplicationById:", err);
     return null;

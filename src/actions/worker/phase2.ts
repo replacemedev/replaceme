@@ -30,7 +30,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
           `
           id,
           scheduled_at,
-          meeting_url,
+          meeting_link,
           status,
           application_id,
           applications!inner (
@@ -41,7 +41,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
         `
         )
         .eq("worker_id", ctx.profile.id)
-        .in("status", ["scheduled"])
+        .in("status", ["SCHEDULED", "scheduled"])
         .order("scheduled_at", { ascending: true });
 
       return (data ?? []).map((row) => {
@@ -58,7 +58,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
           jobTitle: job?.title ?? "Interview",
           companyName: job?.company_name ?? "Employer",
           scheduledAt: row.scheduled_at,
-          meetingUrl: row.meeting_url,
+          meetingUrl: row.meeting_link,
           status: row.status,
         };
       });

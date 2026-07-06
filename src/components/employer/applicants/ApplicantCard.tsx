@@ -11,6 +11,24 @@ import { ApplicantActions } from "./ApplicantActions";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
 
+const AGENT_SKILLS = new Set([
+  "ponytail",
+  "underdeclared-agent",
+  "friendly-greeter",
+  "google-antigravity-sdk",
+  "a11y-debugging",
+  "chrome-devtools",
+  "general-assistant",
+  "safe-greeting",
+  "memory-leak-debugging",
+  "troubleshooting",
+  "web-design-guidelines"
+]);
+
+function isAgentSkill(skillName: string) {
+  return AGENT_SKILLS.has(skillName.toLowerCase().trim());
+}
+
 interface ApplicantCardProps {
   applicant: Applicant;
   jobId?: string;
@@ -62,11 +80,10 @@ export function ApplicantCard({
                 />
               ) : (
                 <div
-                  className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-2xl ${
-                    isPreview
+                  className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-2xl ${isPreview
                       ? "bg-slate-100 text-slate-400 blur-[1px]"
                       : "bg-emerald-100 text-emerald-800"
-                  }`}
+                    }`}
                 >
                   {isPreview ? "?" : initials}
                 </div>
@@ -111,14 +128,20 @@ export function ApplicantCard({
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {applicant.skills.map((skill, idx) => (
-            <span
-              key={idx}
-              className="px-2.5 py-1 bg-slate-50 border border-slate-100 text-[10px] text-slate-500 font-bold rounded-lg"
-            >
-              {skill}
-            </span>
-          ))}
+          {applicant.skills.map((skill, idx) => {
+            const isAgent = isAgentSkill(skill);
+            return (
+              <span
+                key={idx}
+                className={`px-2.5 py-1 text-[10px] font-bold rounded-lg border transition-colors ${isAgent
+                    ? "bg-blue-50 border-blue-200/50 text-blue-700 hover:bg-blue-100/50"
+                    : "bg-slate-50 border-slate-100 text-slate-500 hover:bg-slate-100/50"
+                  }`}
+              >
+                {skill}
+              </span>
+            );
+          })}
         </div>
 
         {isPreview ? (
@@ -153,13 +176,13 @@ export function ApplicantCard({
         ) : (
           <>
             {jobId ? (
-            <Link
-              href={`/employer/candidates/${applicant.candidateId}?jobId=${jobId}`}
-              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
-            >
-              <Eye size={14} />
-              {isPreview ? "Preview profile" : "View profile"}
-            </Link>
+              <Link
+                href={`/employer/candidates/${applicant.candidateId}?jobId=${jobId}`}
+                className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
+              >
+                <Eye size={14} />
+                {isPreview ? "Preview profile" : "View profile"}
+              </Link>
             ) : null}
             {messagingEnabled ? (
               <button

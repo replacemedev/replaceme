@@ -77,6 +77,23 @@ export async function updateApplicationStatus(
       return fail("Failed to update status in the database.");
     }
 
+    // Sync associated interview status if the application status moves away from INTERVIEW_SCHEDULED
+    if (parsed.status !== "INTERVIEW_SCHEDULED") {
+      const { data: interview } = await supabase
+        .from("interviews")
+        .select("id")
+        .eq("application_id", parsed.applicationId)
+        .maybeSingle();
+
+      if (interview) {
+        const nextInterviewStatus = parsed.status === "HIRED" ? "completed" : "cancelled";
+        await supabase
+          .from("interviews")
+          .update({ status: nextInterviewStatus })
+          .eq("id", interview.id);
+      }
+    }
+
     await invalidateEmployerApplicantsCache(profile.id, application.job_id);
     await invalidateWorkerCache(application.candidate_id);
 

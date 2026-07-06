@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Calendar, Lock } from "lucide-react";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
 import { EmployerInlineActions } from "@/components/employer/layout/EmployerInlineActions";
+import { InterviewDetailModal } from "./InterviewDetailModal";
 
 interface InterviewCardProps {
   interview: EmployerInterviewRow;
@@ -16,12 +17,17 @@ export function InterviewCard({
   planSlug,
   messagingEnabled,
 }: InterviewCardProps) {
+  const [openDetails, setOpenDetails] = useState(false);
   const scheduledDate = new Date(interview.scheduledAt);
 
   return (
     <li className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-slate-200/60 hover:shadow-md">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="flex items-start gap-3 min-w-0">
+        <button
+          type="button"
+          onClick={() => setOpenDetails(true)}
+          className="flex items-start gap-3 min-w-0 text-left flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 rounded-xl cursor-pointer"
+        >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ebfdf2] text-[#006e2f]">
             {interview.isPreview ? (
               <Lock className="h-5 w-5" aria-hidden />
@@ -52,7 +58,7 @@ export function InterviewCard({
               </p>
             ) : null}
           </div>
-        </div>
+        </button>
 
         <EmployerInlineActions
           planSlug={planSlug}
@@ -64,6 +70,14 @@ export function InterviewCard({
           candidateId={interview.candidateId}
         />
       </div>
+
+      {openDetails && (
+        <InterviewDetailModal
+          open={openDetails}
+          onClose={() => setOpenDetails(false)}
+          interview={interview}
+        />
+      )}
     </li>
   );
 }

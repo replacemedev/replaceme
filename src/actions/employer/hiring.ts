@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { safeError } from "@/utils/logger";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { uuidSchema } from "@/lib/validations/common";
@@ -128,12 +129,16 @@ export async function sendJobOffer(applicationId: string) {
 }
 
 export interface EmployerInterviewRow {
+  id?: string;
   applicationId: string;
   jobId: string;
   candidateId: string;
   jobTitle: string;
   candidateName: string;
   scheduledAt: string;
+  meetingUrl?: string | null;
+  status?: string;
+  notes?: string | null;
   isPreview: boolean;
 }
 
@@ -147,43 +152,52 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
       const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
       const isPreview = entitlements?.identityMode === "anonymous_preview";
 
-      const { data: jobs } = await supabase
-        .from("jobs")
-        .select("id, title")
-        .eq("employer_id", profile.id);
+      const { data: interviews, error } = await supabase
+        .from("interviews")
+        .select(`
+          id,
+          application_id,
+          employer_id,
+          worker_id,
+          job_id,
+          scheduled_at,
+          meeting_link,
+          status,
+          notes,
+          jobs ( title ),
+          profiles!interviews_worker_id_fkey ( first_name, last_name )
+        `)
+        .eq("employer_id", profile.id)
+        .order("scheduled_at", { ascending: true });
 
-      const jobIds = jobs?.map((j) => j.id) ?? [];
-      if (jobIds.length === 0) return [];
+      if (error) {
+        safeError("Failed to fetch employer interviews:", error);
+        return [];
+      }
 
-      const jobTitleById = new Map(jobs!.map((j) => [j.id, j.title]));
-
-      const { data: applications } = await supabase
-        .from("applications")
-        .select(
-          "id, job_id, candidate_id, updated_at, profiles(first_name, last_name)"
-        )
-        .in("job_id", jobIds)
-        .eq("status", "INTERVIEW_SCHEDULED")
-        .order("updated_at", { ascending: false });
-
-      return (applications ?? []).map((app) => {
-        const candidate = app.profiles as {
+      return (interviews ?? []).map((row: any) => {
+        const candidate = row.profiles as {
           first_name?: string;
           last_name?: string;
         } | null;
         const name = candidate
           ? `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim()
           : "Candidate";
+        const job = row.jobs as { title: string } | null;
 
         return {
-          applicationId: app.id,
-          jobId: app.job_id,
-          candidateId: app.candidate_id,
-          jobTitle: jobTitleById.get(app.job_id) ?? "Job",
+          id: row.id,
+          applicationId: row.application_id,
+          jobId: row.job_id,
+          candidateId: row.worker_id,
+          jobTitle: job?.title ?? "Job",
           candidateName: isPreview
-            ? previewDisplayName(app.candidate_id)
+            ? previewDisplayName(row.worker_id)
             : name || "Candidate",
-          scheduledAt: app.updated_at,
+          scheduledAt: row.scheduled_at,
+          meetingUrl: row.meeting_link,
+          status: row.status,
+          notes: row.notes,
           isPreview,
         };
       });
@@ -343,46 +357,139 @@ export async function getEmployerCandidateProfile(
       },
     };
   }
+}
 
-  return {
-    jobTitle: job.title,
-    jobId: job.id,
-    identityMode: "anonymous_preview" as const,
-    planSlug,
-    resumeDownloadEnabled,
-    messagingEnabled,
-    isPinned,
-    messagingThreadId,
-    candidate: {
-      id: String(candidate.id ?? parsed.data.candidateId),
-      name: previewDisplayName(parsed.data.candidateId),
-      title: String(candidate.professional_title ?? "Professional"),
-      bio: null,
-      skills,
-      workerSkills: [],
-      workerProjects: [],
-      experienceYears: Number(candidate.experience_years ?? 0),
-      avatarUrl: null,
-      email: null,
-      isVerified: false,
-      resumeUrl: null,
-      cvUrl: null,
-      location: null,
-      phoneNumber: null,
-      portfolioUrl: null,
-      expectedSalaryMin:
-        candidate.expected_salary_min === null ||
-        candidate.expected_salary_min === undefined
-          ? null
-          : Number(candidate.expected_salary_min),
-      expectedSalaryMax:
-        candidate.expected_salary_max === null ||
-        candidate.expected_salary_max === undefined
-          ? null
-          : Number(candidate.expected_salary_max),
-      salaryCurrency: (candidate.salary_currency as string | null) ?? "PHP",
-      hourlyRate: null,
-      availability: null,
-    },
-  };
+export async function createOrUpdateInterview(input: {
+  applicationId: string;
+  scheduledAt: string;
+  meetingUrl?: string;
+  notes?: string;
+}) {
+  try {
+    const { supabase, profile } = await requireRole("employer");
+
+    const identityCheck = await assertEmployerFullIdentity(profile.id);
+    if (!identityCheck.allowed) {
+      return { success: false, error: identityCheck.error };
+    }
+
+    const { data: application, error: appError } = await supabase
+      .from("applications")
+      .select("id, job_id, candidate_id")
+      .eq("id", input.applicationId)
+      .single();
+
+    if (appError || !application) {
+      return { success: false, error: "Application not found." };
+    }
+
+    const { data: existing } = await supabase
+      .from("interviews")
+      .select("id")
+      .eq("application_id", input.applicationId)
+      .maybeSingle();
+
+    let dbError;
+    if (existing) {
+      const { error } = await supabase
+        .from("interviews")
+        .update({
+          scheduled_at: input.scheduledAt,
+          meeting_link: input.meetingUrl || null,
+          notes: input.notes || null,
+          status: "scheduled",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id);
+      dbError = error;
+    } else {
+      const { error } = await supabase
+        .from("interviews")
+        .insert({
+          application_id: input.applicationId,
+          employer_id: profile.id,
+          worker_id: application.candidate_id,
+          job_id: application.job_id,
+          scheduled_at: input.scheduledAt,
+          meeting_link: input.meetingUrl || null,
+          notes: input.notes || null,
+          status: "scheduled",
+        });
+      dbError = error;
+    }
+
+    if (dbError) {
+      safeError("Failed to save interview in database:", dbError);
+      return { success: false, error: "Failed to schedule interview." };
+    }
+
+    const statusResult = await updateApplicationStatus(input.applicationId, "INTERVIEW_SCHEDULED");
+    if (!statusResult.success) {
+      return { success: false, error: statusResult.error };
+    }
+
+    await invalidateEmployerHiringCache(profile.id);
+    await invalidateWorkerCache(application.candidate_id);
+
+    revalidatePath(`/employer/jobs/${application.job_id}/applicants`);
+    revalidatePath("/employer/interviews");
+    revalidatePath(`/worker/applications/${input.applicationId}`);
+    revalidatePath("/worker/applications");
+    revalidatePath("/worker/interviews");
+
+    return { success: true };
+  } catch (err) {
+    safeError("createOrUpdateInterview error:", err);
+    return { success: false, error: "An unexpected error occurred." };
+  }
+}
+
+export async function cancelInterview(applicationId: string) {
+  try {
+    const { supabase, profile } = await requireRole("employer");
+
+    const identityCheck = await assertEmployerFullIdentity(profile.id);
+    if (!identityCheck.allowed) {
+      return { success: false, error: identityCheck.error };
+    }
+
+    const { data: application } = await supabase
+      .from("applications")
+      .select("id, job_id, candidate_id")
+      .eq("id", applicationId)
+      .single();
+
+    if (!application) {
+      return { success: false, error: "Application not found." };
+    }
+
+    const { error: dbError } = await supabase
+      .from("interviews")
+      .update({ status: "cancelled" })
+      .eq("application_id", applicationId);
+
+    if (dbError) {
+      safeError("Failed to cancel interview in database:", dbError);
+      return { success: false, error: "Failed to cancel interview." };
+    }
+
+    const statusResult = await updateApplicationStatus(applicationId, "UNDER_REVIEW");
+    if (!statusResult.success) {
+      return { success: false, error: statusResult.error };
+    }
+
+    await invalidateEmployerHiringCache(profile.id);
+    await invalidateWorkerCache(application.candidate_id);
+
+    revalidatePath(`/employer/jobs/${application.job_id}/applicants`);
+    revalidatePath("/employer/interviews");
+    revalidatePath(`/worker/applications/${applicationId}`);
+    revalidatePath("/worker/applications");
+    revalidatePath("/worker/interviews");
+
+    return { success: true };
+  } catch (err) {
+    safeError("cancelInterview error:", err);
+    return { success: false, error: "An unexpected error occurred." };
+  }
 }

@@ -93,6 +93,63 @@ export default async function WorkerApplicationDetailPage({
         }
       />
 
+      {application.interview && (application.interview.status === "SCHEDULED" || application.interview.status === "scheduled") && (
+        <div className="bg-[#006e2f] text-white rounded-3xl p-6 shadow-md border border-[#006e2f]/10 space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-700 text-emerald-50 text-xs font-bold uppercase tracking-wider mb-2">
+                <Calendar size={12} />
+                Interview Scheduled
+              </span>
+              <h2 className="text-xl font-extrabold tracking-tight">Upcoming Interview Details</h2>
+            </div>
+            <span className="text-xs font-semibold text-emerald-100 bg-emerald-850 px-3.5 py-1.5 rounded-xl border border-emerald-700/50">
+              Scheduled via ReplaceMe
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-emerald-750">
+            <div>
+              <p className="text-xs text-emerald-200/90 font-bold uppercase tracking-wide">Date & Time</p>
+              <p className="text-base font-black mt-0.5">
+                {new Date(application.interview.scheduledAt).toLocaleString(undefined, {
+                  dateStyle: "full",
+                  timeStyle: "short",
+                })}
+              </p>
+            </div>
+            {application.interview.meetingUrl && (
+              <div>
+                <p className="text-xs text-emerald-200/90 font-bold uppercase tracking-wide">Meeting Link</p>
+                <p className="text-sm font-semibold mt-0.5 truncate select-all">
+                  {application.interview.meetingUrl}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {application.interview.notes && (
+            <div className="bg-emerald-950/20 border border-emerald-750/30 rounded-2xl p-4 text-sm mt-2 text-emerald-50">
+              <p className="font-bold text-xs text-emerald-200/80 uppercase tracking-wide mb-1">Employer Notes</p>
+              {application.interview.notes}
+            </div>
+          )}
+
+          {application.interview.meetingUrl && (
+            <div className="pt-2">
+              <a
+                href={application.interview.meetingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-50 text-[#006e2f] font-bold text-sm w-full md:w-auto px-6 transition-all duration-200 shadow-sm hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              >
+                Join Meeting
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+
       <article className={`${WORKER_CARD} p-6 space-y-6`}>
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm font-semibold text-[#006e2f]">

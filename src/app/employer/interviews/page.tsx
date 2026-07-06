@@ -5,17 +5,11 @@ import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
-import { InterviewCard } from "@/components/employer/interviews/InterviewCard";
-import { InterviewsCalendarHeader } from "@/components/employer/interviews/InterviewsCalendarHeader";
+import { EmployerInterviewsClient } from "@/components/employer/interviews/EmployerInterviewsClient";
 import {
   interviewsPageSubhead,
   normalizePlanSlug,
 } from "@/lib/entitlements/ui-copy";
-import {
-  groupInterviewsByWeek,
-  INTERVIEW_BUCKET_LABELS,
-  type InterviewWeekBucket,
-} from "@/lib/employer/interviews";
 import {
   EmployerPageHeader,
   EmployerPageShell,
@@ -29,12 +23,6 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const BUCKET_ORDER: InterviewWeekBucket[] = [
-  "this_week",
-  "upcoming",
-  "past",
-];
-
 export default async function EmployerInterviewsPage() {
   const [interviews, planUsage] = await Promise.all([
     getEmployerInterviews(),
@@ -44,7 +32,6 @@ export default async function EmployerInterviewsPage() {
   const planSlug = normalizePlanSlug(planUsage?.planSlug ?? "discovery");
   const messagingEnabled = planUsage?.messagingEnabled ?? false;
   const isPreview = planUsage?.identityMode === "anonymous_preview";
-  const grouped = groupInterviewsByWeek(interviews);
 
   return (
     <EmployerPageShell>
@@ -76,41 +63,15 @@ export default async function EmployerInterviewsPage() {
           actionHref="/employer/jobs"
         />
       ) : (
-        <div className="space-y-8">
-          <InterviewsCalendarHeader interviews={interviews} />
-
-          {BUCKET_ORDER.map((bucket) => {
-            const items = grouped[bucket];
-            if (items.length === 0) return null;
-
-            return (
-              <section key={bucket} className="space-y-4">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-500">
-                    {INTERVIEW_BUCKET_LABELS[bucket]}
-                  </h2>
-                  <span className="text-xs font-bold text-slate-400 tabular-nums">
-                    {items.length}
-                  </span>
-                </div>
-                <ul className="space-y-4">
-                  {items.map((item) => (
-                    <InterviewCard
-                      key={item.applicationId}
-                      interview={item}
-                      planSlug={planSlug}
-                      messagingEnabled={messagingEnabled}
-                    />
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
-        </div>
+        <EmployerInterviewsClient
+          interviews={interviews}
+          planSlug={planSlug}
+          messagingEnabled={messagingEnabled}
+        />
       )}
 
       {interviews.length > 0 ? (
-        <p className="text-center text-xs font-medium text-slate-400 pt-2">
+        <p className="text-center text-xs font-medium text-slate-400 pt-6">
           Need to schedule more? Open a{" "}
           <Link
             href="/employer/jobs"
