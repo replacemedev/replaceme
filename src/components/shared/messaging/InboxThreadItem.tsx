@@ -39,7 +39,7 @@ function initials(name: string) {
 
 export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemProps) {
   const { oppositeParty } = thread;
-  const isUnread = thread.unread_count > 0;
+  const isUnread = thread.unread_count > 0 || thread.marked_unread;
   const snippet = thread.last_message?.content || "No messages yet";
   const time = formatTime(
     thread.last_message?.created_at || thread.updated_at

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useMemo } from "react";
-import { Pin, Tag, Archive, MoreVertical } from "lucide-react";
+import { Pin, MoreVertical, AlertTriangle, Trash2, MailOpen } from "lucide-react";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
 import { MessageBubble } from "./MessageBubble";
@@ -20,8 +20,9 @@ interface ChatAreaProps {
   planSlug?: string;
   onSendMessage: (content: string) => Promise<void>;
   onTogglePin: () => Promise<void>;
+  onMarkUnread: () => Promise<void>;
+  onDeleteConversation: () => Promise<void>;
   onBack?: () => void;
-  /** Hide chat pane on mobile until a thread is selected. */
   mobileHidden?: boolean;
 }
 
@@ -92,11 +93,15 @@ export function ChatArea({
   planSlug = "discovery",
   onSendMessage,
   onTogglePin,
+  onMarkUnread,
+  onDeleteConversation,
   onBack,
   mobileHidden = false,
 }: ChatAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPinning, setIsPinning] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const messageGroups = useMemo(() => groupMessagesByDay(messages), [messages]);
 
@@ -181,20 +186,6 @@ export function ChatArea({
           </button>
           <button
             type="button"
-            className="hidden sm:inline-flex p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
-            aria-label="Tag conversation"
-          >
-            <Tag className="h-4.5 w-4.5" />
-          </button>
-          <button
-            type="button"
-            className="hidden sm:inline-flex p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
-            aria-label="Archive conversation"
-          >
-            <Archive className="h-4.5 w-4.5" />
-          </button>
-          <button
-            type="button"
             onClick={() => setShowMenu(!showMenu)}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg cursor-pointer"
             aria-label="More options"
@@ -222,34 +213,26 @@ export function ChatArea({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowMenu(false)}
-                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer"
-                >
-                  <Tag className="h-3.5 w-3.5" />
-                  Tag conversation
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowMenu(false)}
-                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer"
-                >
-                  <Archive className="h-3.5 w-3.5" />
-                  Archive conversation
-                </button>
-                <div className="h-px bg-slate-100 my-1 sm:hidden" />
-                <button
-                  type="button"
-                  onClick={() => setShowMenu(false)}
+                  onClick={async () => {
+                    setShowMenu(false);
+                    await onMarkUnread();
+                  }}
                   className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
                 >
+                  <MailOpen className="h-3.5 w-3.5" />
                   Mark as unread
                 </button>
+                <div className="h-px bg-slate-100 my-1" />
                 <button
                   type="button"
-                  onClick={() => setShowMenu(false)}
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowDeleteConfirm(true);
+                  }}
                   className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer font-semibold"
                 >
-                  Block user
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Delete conversation
                 </button>
               </div>
             </>
@@ -320,6 +303,44 @@ export function ChatArea({
           <p className="text-center text-xs font-medium text-slate-500">
             Reply unlocks after the employer sends the first message.
           </p>
+        </div>
+      )}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 shadow-xl max-w-sm w-full w-[calc(100vw-2rem)] mx-auto animate-scaleIn border border-slate-100">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <span className="p-2 rounded-xl bg-red-50 text-red-600">
+                <AlertTriangle className="h-6 w-6" />
+              </span>
+              <h4 className="text-base font-bold text-slate-900">Delete Conversation?</h4>
+            </div>
+            <p className="text-xs font-semibold leading-relaxed text-slate-500">
+              Are you sure? This will remove the chat from your inbox.
+            </p>
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="h-10 rounded-xl px-4 text-xs font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 cursor-pointer w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsDeleting(true);
+                  await onDeleteConversation();
+                  setIsDeleting(false);
+                  setShowDeleteConfirm(false);
+                }}
+                disabled={isDeleting}
+                className="h-10 rounded-xl px-4 text-xs font-bold bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2"
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </section>

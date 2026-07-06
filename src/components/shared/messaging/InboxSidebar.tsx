@@ -53,7 +53,7 @@ export function InboxSidebar({
       (t.jobTitle?.toLowerCase().includes(q) ?? false) ||
       (t.last_message?.content.toLowerCase().includes(q) ?? false);
     if (!matches) return false;
-    if (activeTab === "unread") return t.unread_count > 0;
+    if (activeTab === "unread") return t.unread_count > 0 || t.marked_unread;
     if (activeTab === "pinned") return t.is_pinned;
     return true;
   });

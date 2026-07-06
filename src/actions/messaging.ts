@@ -110,6 +110,11 @@ async function enrichThreads(
       };
     }
 
+    const markedUnread =
+      role === "worker"
+        ? (t.worker_marked_unread as boolean)
+        : (t.employer_marked_unread as boolean);
+
     result.push({
       id: t.id as string,
       worker_id: t.worker_id as string,
@@ -124,6 +129,7 @@ async function enrichThreads(
       blocked_reason: (t.blocked_reason as string | null) ?? null,
       last_message: lastMessages?.[0] ?? null,
       unread_count: unreadCount ?? 0,
+      marked_unread: markedUnread,
     });
   }
 
@@ -142,6 +148,7 @@ async function loadMessagingThreads(
         `*, company_profiles (id, company_name, logo_url, employer_id), jobs (id, title)`
       )
       .eq("worker_id", profile.id)
+      .is("worker_deleted_at", null)
       .order("updated_at", { ascending: false });
 
     if (error) {
@@ -186,6 +193,7 @@ async function loadMessagingThreads(
       `*, worker:profiles!chat_threads_worker_id_fkey (id, full_name, avatar_url), jobs (id, title)`
     )
     .eq("company_profile_id", company.id)
+    .is("employer_deleted_at", null)
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -384,6 +392,27 @@ export async function markMessagingThreadRead(
 
     if (error) {
       return fail("Failed to mark messages as read");
+    }
+
+    // Reset marked unread for the current user based on role
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile) {
+      if (profile.role === "worker") {
+        await supabase
+          .from("chat_threads")
+          .update({ worker_marked_unread: false })
+          .eq("id", parsed.threadId);
+      } else if (profile.role === "employer") {
+        await supabase
+          .from("chat_threads")
+          .update({ employer_marked_unread: false })
+          .eq("id", parsed.threadId);
+      }
     }
 
     const { data: thread } = await supabase
@@ -595,4 +624,110 @@ export async function getUnreadMessagingCount(
   } catch {
     return 0;
   }
+}
+
+export async function deleteConversation(
+  threadId: string,
+  basePath: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await runAction("deleteConversation", async () => {
+    const parsed = threadActionSchema.parse({ threadId, basePath });
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
+
+    const { supabase, user } = ctx;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile) return fail("Profile not found");
+
+    let updateData = {};
+    if (profile.role === "worker") {
+      updateData = { worker_deleted_at: new Date().toISOString() };
+    } else if (profile.role === "employer") {
+      updateData = { employer_deleted_at: new Date().toISOString() };
+    } else {
+      return fail("Unsupported role");
+    }
+
+    const { error } = await supabase
+      .from("chat_threads")
+      .update(updateData)
+      .eq("id", parsed.threadId);
+
+    if (error) {
+      return fail("Failed to delete conversation");
+    }
+
+    await invalidateMessagingThreadMessages(user.id, parsed.threadId);
+    if (profile.role === "employer") {
+      await invalidateEmployerMessagingCache(profile.id);
+    } else {
+      await invalidateWorkerMessagingCache(profile.id);
+    }
+
+    revalidatePath(parsed.basePath);
+    return ok();
+  });
+
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
+}
+
+export async function toggleUnreadStatus(
+  threadId: string,
+  basePath: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await runAction("toggleUnreadStatus", async () => {
+    const parsed = threadActionSchema.parse({ threadId, basePath });
+    const ctx = await getSession();
+    if (!ctx) return fail("Unauthorized");
+
+    const { supabase, user } = ctx;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile) return fail("Profile not found");
+
+    let updateData = {};
+    if (profile.role === "worker") {
+      updateData = { worker_marked_unread: true };
+    } else if (profile.role === "employer") {
+      updateData = { employer_marked_unread: true };
+    } else {
+      return fail("Unsupported role");
+    }
+
+    const { error } = await supabase
+      .from("chat_threads")
+      .update(updateData)
+      .eq("id", parsed.threadId);
+
+    if (error) {
+      return fail("Failed to update unread status");
+    }
+
+    await invalidateMessagingThreadMessages(user.id, parsed.threadId);
+    if (profile.role === "employer") {
+      await invalidateEmployerMessagingCache(profile.id);
+    } else {
+      await invalidateWorkerMessagingCache(profile.id);
+    }
+
+    revalidatePath(parsed.basePath);
+    return ok();
+  });
+
+  return result.success
+    ? { success: true }
+    : { success: false, error: result.error };
 }

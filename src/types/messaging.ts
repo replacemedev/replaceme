@@ -44,6 +44,7 @@ export interface MessagingThread {
     read_at: string | null;
   } | null;
   unread_count: number;
+  marked_unread: boolean;
 }
 
 export interface MessagingMessage extends DbChatMessage {

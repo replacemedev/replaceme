@@ -18,6 +18,8 @@ import {
   sendMessagingMessage,
   markMessagingThreadRead,
   toggleMessagingThreadPin,
+  deleteConversation,
+  toggleUnreadStatus,
 } from "@/actions/messaging";
 
 interface MessagingClientProps {
@@ -139,6 +141,26 @@ export function MessagingClient({
     }
   };
 
+  const handleMarkUnread = async () => {
+    if (!selectedThreadId) return;
+    const result = await toggleUnreadStatus(selectedThreadId, basePath);
+    if (result.success) {
+      handleBackToInbox();
+    } else {
+      alert(result.error || "Failed to mark as unread");
+    }
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!selectedThreadId) return;
+    const result = await deleteConversation(selectedThreadId, basePath);
+    if (result.success) {
+      handleBackToInbox();
+    } else {
+      alert(result.error || "Failed to delete conversation");
+    }
+  };
+
   const activeThread =
     threads.find((t) => t.id === selectedThreadId) ?? null;
 
@@ -175,6 +197,8 @@ export function MessagingClient({
           planSlug={planSlug}
           onSendMessage={handleSendMessage}
           onTogglePin={handleTogglePin}
+          onMarkUnread={handleMarkUnread}
+          onDeleteConversation={handleDeleteConversation}
           onBack={mobileChatOpen ? handleBackToInbox : undefined}
           mobileHidden={!mobileChatOpen}
         />
