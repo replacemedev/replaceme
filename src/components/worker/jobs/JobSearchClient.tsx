@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Filter } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Briefcase } from "lucide-react";
@@ -10,6 +10,7 @@ import { JobCard } from "./JobCard";
 import { JobCardGrid } from "./JobCardGrid";
 import { WorkerPageShell, WorkerFilterSheet } from "@/components/worker/layout";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { getJobSearchData } from "@/actions/worker/job-search";
 import {
   JobSearchFacets,
   JobSearchResult,
@@ -56,104 +57,26 @@ export function JobSearchClient({
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const [skillQuery, setSkillQuery] = useState("");
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState<
-    string[]
-  >([]);
-  const [salaryMin, setSalaryMin] = useState(0);
-  const [salaryMax, setSalaryMax] = useState(
-    facets.salaryMax || SALARY_SLIDER_MAX
-  );
+
+  const [appliedSkills, setAppliedSkills] = useState<string[]>([]);
+  const [appliedEmploymentTypes, setAppliedEmploymentTypes] = useState<string[]>([]);
+  const [appliedSalaryMin, setAppliedSalaryMin] = useState(0);
+  const [appliedSalaryMax, setAppliedSalaryMax] = useState(facets.salaryMax || SALARY_SLIDER_MAX);
+  const [appliedCurrency, setAppliedCurrency] = useState("PHP");
+
   const [sortBy, setSortBy] = useState<JobSortOption>("most_relevant");
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJobs(initialJobs);
   }, [initialJobs]);
 
-  const [prevFilterState, setPrevFilterState] = useState({
-    keyword,
-    location,
-    selectedSkills,
-    selectedEmploymentTypes,
-    salaryMin,
-    salaryMax,
-    sortBy,
-  });
-
-  if (
-    keyword !== prevFilterState.keyword ||
-    location !== prevFilterState.location ||
-    selectedSkills !== prevFilterState.selectedSkills ||
-    selectedEmploymentTypes !== prevFilterState.selectedEmploymentTypes ||
-    salaryMin !== prevFilterState.salaryMin ||
-    salaryMax !== prevFilterState.salaryMax ||
-    sortBy !== prevFilterState.sortBy
-  ) {
-    setPrevFilterState({
-      keyword,
-      location,
-      selectedSkills,
-      selectedEmploymentTypes,
-      salaryMin,
-      salaryMax,
-      sortBy,
-    });
-    setCurrentPage(1);
-  }
-
   const filtered = useMemo(() => {
-    const q = keyword.trim().toLowerCase();
-    const loc = location.trim().toLowerCase();
-
-    const result = jobs.filter((job) => {
-      const matchesKeyword =
-        !q ||
-        job.title.toLowerCase().includes(q) ||
-        job.companyName.toLowerCase().includes(q) ||
-        job.description.toLowerCase().includes(q) ||
-        job.skills.some((s) => s.toLowerCase().includes(q));
-
-      const matchesLocation =
-        !loc ||
-        job.location.toLowerCase().includes(loc) ||
-        (loc.includes("remote") && job.location.toLowerCase().includes("remote"));
-
-      const matchesEmployment =
-        selectedEmploymentTypes.length === 0 ||
-        selectedEmploymentTypes.includes(job.employmentType);
-
-      const matchesSkills =
-        selectedSkills.length === 0 ||
-        selectedSkills.every((skill) =>
-          job.skills.some((s) => s.toLowerCase() === skill.toLowerCase())
-        );
-
-      const matchesSalary =
-        job.monthlySalary >= salaryMin && job.monthlySalary <= salaryMax;
-
-      return (
-        matchesKeyword &&
-        matchesLocation &&
-        matchesEmployment &&
-        matchesSkills &&
-        matchesSalary
-      );
-    });
-
-    return sortJobs(result, sortBy);
-  }, [
-    jobs,
-    keyword,
-    location,
-    selectedEmploymentTypes,
-    selectedSkills,
-    salaryMin,
-    salaryMax,
-    sortBy,
-  ]);
+    return sortJobs(jobs, sortBy);
+  }, [jobs, sortBy]);
 
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / PAGE_SIZE);
@@ -163,25 +86,65 @@ export function JobSearchClient({
     return filtered.slice(startIndex, startIndex + PAGE_SIZE);
   }, [filtered, startIndex]);
 
-  const handleSkillToggle = (skill: string) => {
-    setSelectedSkills((prev) => {
-      if (prev.includes(skill)) return prev.filter((s) => s !== skill);
-      if (prev.length >= 3) return prev;
-      return [...prev, skill];
-    });
+  const handleApplyFilters = (filters: {
+    skills: string[];
+    employmentTypes: string[];
+    salaryMin: number;
+    salaryMax: number;
+    currency: string;
+  }) => {
+    setAppliedSkills(filters.skills);
+    setAppliedEmploymentTypes(filters.employmentTypes);
+    setAppliedSalaryMin(filters.salaryMin);
+    setAppliedSalaryMax(filters.salaryMax);
+    setAppliedCurrency(filters.currency);
     setCurrentPage(1);
+
+    startTransition(async () => {
+      const result = await getJobSearchData({
+        keyword,
+        location,
+        skills: filters.skills,
+        employmentTypes: filters.employmentTypes,
+        minSalary: filters.salaryMin,
+        maxSalary: filters.salaryMax,
+        currency: filters.currency,
+      });
+      setJobs(result.jobs);
+    });
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    startTransition(async () => {
+      const result = await getJobSearchData({
+        keyword,
+        location,
+        skills: appliedSkills,
+        employmentTypes: appliedEmploymentTypes,
+        minSalary: appliedSalaryMin,
+        maxSalary: appliedSalaryMax,
+        currency: appliedCurrency,
+      });
+      setJobs(result.jobs);
+    });
   };
 
   const handleClearAll = () => {
     setKeyword("");
     setLocation("");
     setSkillQuery("");
-    setSelectedSkills([]);
-    setSelectedEmploymentTypes([]);
-    setSalaryMin(0);
-    setSalaryMax(facets.salaryMax || SALARY_SLIDER_MAX);
-    setSortBy("most_relevant");
+    setAppliedSkills([]);
+    setAppliedEmploymentTypes([]);
+    setAppliedSalaryMin(0);
+    setAppliedSalaryMax(facets.salaryMax || SALARY_SLIDER_MAX);
+    setAppliedCurrency("PHP");
     setCurrentPage(1);
+
+    startTransition(async () => {
+      const result = await getJobSearchData({});
+      setJobs(result.jobs);
+    });
   };
 
   const handleSavedChange = (jobId: string, saved: boolean) => {
@@ -193,21 +156,14 @@ export function JobSearchClient({
   const filterPanelProps = {
     skillQuery,
     onSkillQueryChange: setSkillQuery,
-    selectedSkills,
-    onSkillToggle: handleSkillToggle,
+    selectedSkills: appliedSkills,
     skillSuggestions: facets.skillSuggestions,
     employmentTypes: facets.employmentTypes,
-    selectedEmploymentTypes,
-    onEmploymentTypeToggle: (type: string) => {
-      setSelectedEmploymentTypes((prev) =>
-        prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-      );
-      setCurrentPage(1);
-    },
-    salaryMin,
-    salaryMax,
-    onSalaryMinChange: setSalaryMin,
-    onSalaryMaxChange: setSalaryMax,
+    selectedEmploymentTypes: appliedEmploymentTypes,
+    salaryMin: appliedSalaryMin,
+    salaryMax: appliedSalaryMax,
+    currency: appliedCurrency,
+    onApplyFilters: handleApplyFilters,
     onClearAll: handleClearAll,
   };
 
@@ -218,7 +174,7 @@ export function JobSearchClient({
         location={location}
         onKeywordChange={setKeyword}
         onLocationChange={setLocation}
-        onSearch={() => setCurrentPage(1)}
+        onSearch={handleSearch}
       />
 
       <WorkerPageShell width="wide" className="py-8 gap-6">
@@ -279,7 +235,12 @@ export function JobSearchClient({
               </label>
             </div>
 
-            {filtered.length === 0 ? (
+            {isPending ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-4 bg-white/50 backdrop-blur-xs rounded-2xl border border-slate-100 shadow-xs">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#006e2f]" />
+                <p className="text-sm font-semibold text-slate-500">Searching active opportunities...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <EmptyState
                 icon={<Briefcase className="h-6 w-6" />}
                 title="No jobs found matching your criteria"

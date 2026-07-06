@@ -78,7 +78,11 @@ export function daysSincePosted(createdAt: string): string {
 }
 
 export function normalizeEmploymentType(type: string): string {
-  return type.trim();
+  const t = type.trim().toLowerCase();
+  if (t === "full-time" || t === "fulltime") return "Full-time";
+  if (t === "part-time" || t === "parttime") return "Part-time";
+  if (t === "contract") return "Contract";
+  return type.trim().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export const SALARY_SLIDER_MAX = 200_000;
