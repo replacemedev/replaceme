@@ -61,7 +61,7 @@ export default function RootLayout({
           offset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16 }}
           mobileOffset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16, left: 16, bottom: 16 }}
           toastOptions={{
-            className: "mx-auto w-[calc(100vw-2rem)] max-w-sm sm:max-w-md",
+            className: "w-[calc(100vw-2rem)] mx-auto max-w-sm sm:max-w-md md:max-w-md md:w-full md:mx-0",
           }}
         />
         {children}
