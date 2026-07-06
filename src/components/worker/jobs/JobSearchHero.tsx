@@ -26,8 +26,7 @@ export function JobSearchHero({
   }, [initialKeyword]);
 
   const quickSkills = useMemo(() => {
-    const defaults = [""];
-    const merged = [...defaults, ...skillSuggestions];
+    const merged = [...skillSuggestions];
     return Array.from(new Set(merged)).slice(0, 8);
   }, [skillSuggestions]);
 
