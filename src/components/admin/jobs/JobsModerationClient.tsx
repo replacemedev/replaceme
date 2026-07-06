@@ -43,16 +43,16 @@ function PlanTierBadge({ planSlug, requiresManualApproval }: {
   const label = PLAN_LABELS[slug] ?? slug;
 
   return (
-    <div className="flex flex-col gap-1">
-      <span className="inline-flex w-fit items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+    <div className="flex flex-col items-start gap-1">
+      <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide text-slate-600 whitespace-nowrap">
         {label}
       </span>
       {requiresManualApproval ? (
-        <span className="text-[10px] font-semibold text-amber-700">
+        <span className="text-xs font-medium text-amber-700 whitespace-nowrap">
           2-day approval queue
         </span>
       ) : (
-        <span className="text-[10px] font-medium text-emerald-700">
+        <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
           Instant publish
         </span>
       )}
@@ -171,16 +171,16 @@ export function JobsModerationClient({
         />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+          <div className="w-full overflow-x-auto border border-gray-200 rounded-lg shadow-sm bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 <th className="px-4 py-3">Job</th>
                 <th className="px-4 py-3">Employer</th>
-                <th className="px-4 py-3">Plan</th>
+                <th className="px-4 py-3 text-left">Plan</th>
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Salary</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -202,16 +202,18 @@ export function JobsModerationClient({
                     {job.company_name ?? "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <PlanTierBadge
-                      planSlug={job.plan_slug}
-                      requiresManualApproval={job.requires_manual_approval}
-                    />
-                    {job.submitted_for_review_at ? (
-                      <p className="mt-1 text-[10px] text-slate-400">
-                        Submitted{" "}
-                        {new Date(job.submitted_for_review_at).toLocaleDateString()}
-                      </p>
-                    ) : null}
+                    <div className="flex flex-col items-start gap-1">
+                      <PlanTierBadge
+                        planSlug={job.plan_slug}
+                        requiresManualApproval={job.requires_manual_approval}
+                      />
+                      {job.submitted_for_review_at ? (
+                        <p className="mt-1 text-[10px] text-slate-400 whitespace-nowrap">
+                          Submitted{" "}
+                          {new Date(job.submitted_for_review_at).toLocaleDateString()}
+                        </p>
+                      ) : null}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {job.employment_type}
@@ -220,7 +222,9 @@ export function JobsModerationClient({
                     {formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={job.status} />
+                    <div className="flex justify-start">
+                      <StatusBadge status={job.status} />
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
