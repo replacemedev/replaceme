@@ -269,7 +269,7 @@ export function ApplicantsClient({
         <>
           {/* 1. Kanban Pipeline View - Desktop */}
           {viewMode === "pipeline" && (
-            <div className="hidden md:grid md:grid-cols-5 gap-4 items-start pb-10">
+            <div className="hidden md:flex md:flex-row md:overflow-x-auto gap-6 pb-10 w-full snap-x scrollbar-thin">
               {stages.map((stage) => {
                 const stageApps = filteredApplicants.filter((a) => a.status === stage.key);
                 return (
@@ -277,7 +277,7 @@ export function ApplicantsClient({
                     key={stage.key}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleDrop(e, stage.key)}
-                    className={`flex flex-col rounded-3xl border p-3 min-h-[550px] transition-all bg-slate-50/20 ${stage.bg}`}
+                    className={`flex flex-col rounded-3xl border border-slate-200/60 p-4 min-h-[580px] transition-all bg-slate-50/10 min-w-[320px] max-w-[350px] w-full flex-shrink-0 snap-center shadow-xs hover:shadow-sm ${stage.bg}`}
                   >
                     <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
                       <h3 className={`text-[11px] font-black uppercase tracking-wider ${stage.text}`}>
