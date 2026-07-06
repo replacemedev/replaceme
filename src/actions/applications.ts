@@ -77,7 +77,7 @@ export async function updateApplicationStatus(
       return fail("Failed to update status in the database.");
     }
 
-    // Sync associated interview status if the application status moves away from INTERVIEW_SCHEDULED
+    // Sync associated interview status
     if (parsed.status !== "INTERVIEW_SCHEDULED") {
       const { data: interview } = await supabase
         .from("interviews")
@@ -91,6 +91,28 @@ export async function updateApplicationStatus(
           .from("interviews")
           .update({ status: nextInterviewStatus })
           .eq("id", interview.id);
+      }
+    } else {
+      // If status is INTERVIEW_SCHEDULED, check if an interview record exists.
+      // If not, auto-create a default one so the page is not empty.
+      const { data: interview } = await supabase
+        .from("interviews")
+        .select("id")
+        .eq("application_id", parsed.applicationId)
+        .maybeSingle();
+
+      if (!interview) {
+        const tomorrow = new Date();
+        tomorrow.setHours(tomorrow.getHours() + 24);
+
+        await supabase.from("interviews").insert({
+          application_id: parsed.applicationId,
+          employer_id: profile.id,
+          worker_id: application.candidate_id,
+          job_id: application.job_id,
+          scheduled_at: tomorrow.toISOString(),
+          status: "scheduled",
+        });
       }
     }
 

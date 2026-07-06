@@ -17,6 +17,7 @@ import {
   WorkerSectionCard,
 } from "@/components/worker/layout";
 import { ApplicationTimeline } from "@/components/worker/applications/ApplicationTimeline";
+import { ApplicationStepper } from "@/components/worker/applications/ApplicationStepper";
 import { WithdrawApplicationButton } from "@/components/worker/applications/WithdrawApplicationButton";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
 
@@ -150,17 +151,27 @@ export default async function WorkerApplicationDetailPage({
         </div>
       )}
 
-      <article className={`${WORKER_CARD} p-6 space-y-6`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-sm font-semibold text-[#006e2f]">
-            {formatHourlyRate(application.hourlyRate)}
+      <article className={`${WORKER_CARD} p-6 space-y-8`}>
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100/60">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm font-semibold text-[#006e2f]">
+              {formatHourlyRate(application.hourlyRate)}
+            </p>
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">
+              {label}
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 font-semibold">
+            Applied on {new Date(application.createdAt).toLocaleDateString()}
           </p>
-          <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">
-            {label}
-          </span>
         </div>
 
-        <WorkerSectionCard title="Timeline" className="border-0 shadow-none p-0">
+        {/* Responsive Progress Stepper */}
+        <div className="py-2">
+          <ApplicationStepper status={application.status} />
+        </div>
+
+        <WorkerSectionCard title="Application History" className="border-0 shadow-none p-0 pt-4 border-t border-slate-150/40">
           <ApplicationTimeline events={timeline} />
         </WorkerSectionCard>
       </article>
