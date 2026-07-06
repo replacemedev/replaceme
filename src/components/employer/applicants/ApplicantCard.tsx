@@ -70,8 +70,8 @@ export function ApplicantCard({
   return (
     <div className="relative overflow-hidden bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow p-5 flex flex-col justify-between min-h-[220px]">
       <div className="space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
             <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-emerald-50">
               {applicant.avatarUrl && !isPreview ? (
                 <AvatarImage
@@ -100,7 +100,7 @@ export function ApplicantCard({
               )}
             </div>
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h3 className="text-xs font-extrabold text-slate-800 leading-snug mb-1 inline-flex items-center gap-1 flex-wrap">
                 {applicant.name}
                 {isPreview ? (
@@ -117,7 +117,7 @@ export function ApplicantCard({
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1 shrink-0 max-w-[8.5rem]">
+          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
             <span
               className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
             >
