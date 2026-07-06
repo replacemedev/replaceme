@@ -1,7 +1,8 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
+import { invalidateEmployerApplicantsCache } from "@/lib/server/redis-cache";
 import { computeJobHourlyRate } from "@/types/job-search";
 import {
   WorkerJobDetails,
@@ -27,6 +28,24 @@ export async function getWorkerJobDetails(
     if (error || !job?.id || !job.title || !job.employer_id) {
       if (error) safeError("getWorkerJobDetails job:", error);
       return null;
+    }
+
+    try {
+      const admin = await createAdminClient();
+      const { data: jobViews } = await admin
+        .from("jobs")
+        .select("views_count")
+        .eq("id", jobId)
+        .maybeSingle();
+      if (jobViews) {
+        await admin
+          .from("jobs")
+          .update({ views_count: (jobViews.views_count ?? 0) + 1 })
+          .eq("id", jobId);
+      }
+      await invalidateEmployerApplicantsCache(job.employer_id, jobId);
+    } catch (incrementErr) {
+      safeError("getWorkerJobDetails increment views failed", incrementErr);
     }
 
     const { data: company } = await supabase

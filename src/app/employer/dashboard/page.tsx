@@ -16,6 +16,7 @@ import { JobCard } from "@/components/employer/JobCard";
 import { RecentApplicantRow } from "@/components/employer/RecentApplicantRow";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { DashboardOnboardedBanner } from "@/components/employer/dashboard/DashboardOnboardedBanner";
+import { DashboardPoller } from "@/components/employer/dashboard/DashboardPoller";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
@@ -127,6 +128,7 @@ export default async function EmployerDashboard() {
 
   return (
     <EmployerPageShell width="wide" className="gap-6">
+      <DashboardPoller />
       <EmployerPageHeader
         title={`Welcome back, ${employerName}!`}
         subhead={

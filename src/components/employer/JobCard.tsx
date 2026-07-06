@@ -10,6 +10,16 @@ interface JobCardProps {
   applicantsPerJobLimit?: number | null;
 }
 
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  }
+  return num.toString();
+}
+
 export function JobCard({
   job,
   applicantsPerJobLimit = null,
@@ -62,7 +72,7 @@ export function JobCard({
               Applicants
             </p>
             <p className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
-              {visibleCount}
+              {formatNumber(visibleCount)}
               {applicantsPerJobLimit !== null ? (
                 <span className="text-xs font-bold text-slate-500 ml-1">
                   / {applicantsPerJobLimit}
@@ -86,7 +96,7 @@ export function JobCard({
               Views
             </p>
             <p className="mt-1 text-lg font-extrabold text-slate-900 tracking-tight">
-              {job.hits_count}
+              {formatNumber(job.hits_count)}
             </p>
           </div>
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 border border-slate-100">

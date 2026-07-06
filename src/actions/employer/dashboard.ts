@@ -72,9 +72,9 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
         status,
         views_count,
         priority_score,
-        visible_applicant_count,
         applications (
-          id
+          id,
+          is_within_plan_cap
         )
       `)
           .eq("employer_id", employerProfileId)
@@ -90,16 +90,23 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
           return [];
         }
 
-        return jobs.map((job: any) => ({
-          id: job.id,
-          title: job.title,
-          created_at: job.created_at,
-          applicants_count: job.applications ? job.applications.length : 0,
-          visible_applicants_count: Number(job.visible_applicant_count ?? 0),
-          hits_count: job.views_count || 0,
-          status: job.status,
-          priority_score: Number(job.priority_score ?? 0),
-        }));
+        return jobs.map((job: any) => {
+          const totalApps = job.applications ? job.applications.length : 0;
+          const visibleApps = job.applications
+            ? job.applications.filter((app: any) => app.is_within_plan_cap).length
+            : 0;
+
+          return {
+            id: job.id,
+            title: job.title,
+            created_at: job.created_at,
+            applicants_count: totalApps,
+            visible_applicants_count: visibleApps,
+            hits_count: job.views_count || 0,
+            status: job.status,
+            priority_score: Number(job.priority_score ?? 0),
+          };
+        });
       }
     );
   } catch (err) {
