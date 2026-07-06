@@ -315,63 +315,62 @@ export async function getEmployerCandidateProfile(
     ? (candidate.skills as string[])
     : [];
 
-  if (identityMode === "full" && preview.identity_mode === "full") {
-    const resumeCheck = await assertEmployerResumeDownload(profile.id);
-    const workerSkills = asWorkerSkills(candidate.worker_skills);
-    const workerProjects = asWorkerProjects(candidate.worker_projects);
-    const showHourly = planSlug !== "discovery";
+  const finalIdentityMode = (identityMode === "full" && preview.identity_mode === "full") ? "full" : "anonymous_preview";
+  const resumeCheck = await assertEmployerResumeDownload(profile.id);
+  const workerSkills = asWorkerSkills(candidate.worker_skills);
+  const workerProjects = asWorkerProjects(candidate.worker_projects);
+  const showHourly = planSlug !== "discovery";
 
-    return {
-      jobTitle: job.title,
-      jobId: job.id,
-      identityMode: "full" as const,
-      planSlug,
-      resumeDownloadEnabled,
-      messagingEnabled,
-      isPinned,
-      messagingThreadId,
-      candidate: {
-        id: String(candidate.id ?? parsed.data.candidateId),
-        name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
-        title: String(candidate.professional_title ?? "Professional"),
-        bio: (candidate.bio as string | null) ?? null,
-        skills,
-        workerSkills,
-        workerProjects,
-        experienceYears: Number(candidate.experience_years ?? 0),
-        avatarUrl: (candidate.avatar_url as string | null) ?? null,
-        email: (candidate.email as string | null) ?? null,
-        isVerified: Boolean(candidate.is_verified),
-        resumeUrl: resumeCheck.allowed
-          ? ((candidate.resume_url as string | null) ?? null)
+  return {
+    jobTitle: job.title,
+    jobId: job.id,
+    identityMode: finalIdentityMode as "full" | "anonymous_preview",
+    planSlug,
+    resumeDownloadEnabled,
+    messagingEnabled,
+    isPinned,
+    messagingThreadId,
+    candidate: {
+      id: String(candidate.id ?? parsed.data.candidateId),
+      name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
+      title: String(candidate.professional_title ?? "Professional"),
+      bio: (candidate.bio as string | null) ?? null,
+      skills,
+      workerSkills,
+      workerProjects,
+      experienceYears: Number(candidate.experience_years ?? 0),
+      avatarUrl: (candidate.avatar_url as string | null) ?? null,
+      email: (candidate.email as string | null) ?? null,
+      isVerified: Boolean(candidate.is_verified),
+      resumeUrl: resumeCheck.allowed
+        ? ((candidate.resume_url as string | null) ?? null)
+        : null,
+      cvUrl: resumeCheck.allowed
+        ? ((candidate.cv_url as string | null) ?? null)
+        : null,
+      location: (candidate.location as string | null) ?? null,
+      phoneNumber: (candidate.phone_number as string | null) ?? null,
+      portfolioUrl: (candidate.portfolio_url as string | null) ?? null,
+      expectedSalaryMin:
+        candidate.expected_salary_min === null ||
+        candidate.expected_salary_min === undefined
+          ? null
+          : Number(candidate.expected_salary_min),
+      expectedSalaryMax:
+        candidate.expected_salary_max === null ||
+        candidate.expected_salary_max === undefined
+          ? null
+          : Number(candidate.expected_salary_max),
+      salaryCurrency: (candidate.salary_currency as string | null) ?? "PHP",
+      hourlyRate:
+        showHourly && candidate.hourly_rate != null
+          ? Number(candidate.hourly_rate)
           : null,
-        cvUrl: resumeCheck.allowed
-          ? ((candidate.cv_url as string | null) ?? null)
-          : null,
-        location: (candidate.location as string | null) ?? null,
-        phoneNumber: (candidate.phone_number as string | null) ?? null,
-        portfolioUrl: (candidate.portfolio_url as string | null) ?? null,
-        expectedSalaryMin:
-          candidate.expected_salary_min === null ||
-          candidate.expected_salary_min === undefined
-            ? null
-            : Number(candidate.expected_salary_min),
-        expectedSalaryMax:
-          candidate.expected_salary_max === null ||
-          candidate.expected_salary_max === undefined
-            ? null
-            : Number(candidate.expected_salary_max),
-        salaryCurrency: (candidate.salary_currency as string | null) ?? "PHP",
-        hourlyRate:
-          showHourly && candidate.hourly_rate != null
-            ? Number(candidate.hourly_rate)
-            : null,
-        availability: showHourly
-          ? ((candidate.availability as string | null) ?? null)
-          : null,
-      },
-    };
-  }
+      availability: showHourly
+        ? ((candidate.availability as string | null) ?? null)
+        : null,
+    },
+  };
 }
 
 export async function createOrUpdateInterview(input: {
