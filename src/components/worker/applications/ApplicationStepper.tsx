@@ -30,14 +30,17 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
   return (
     <div className="w-full">
       {/* Desktop version: Horizontal stepper */}
-      <div className="hidden md:flex items-center justify-between w-full relative py-6">
-        {/* Background connector line */}
-        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-100 -translate-y-1/2 z-0" />
-        {/* Active progress connector line */}
-        <div
-          className="absolute top-1/2 left-0 h-0.5 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-350"
-          style={{ width: `${activeIndex >= 0 ? (activeIndex / (steps.length - 1)) * 100 : 0}%` }}
-        />
+      <div className="hidden md:flex items-center justify-between w-full relative py-6 select-none">
+        {/* Background connector line (starts at 12.5% and ends at 87.5%) */}
+        <div className="absolute top-5 left-[12.5%] right-[12.5%] h-0.5 bg-slate-100 -translate-y-1/2 z-0" />
+        
+        {/* Active progress connector line (spans 75% total from first node center to last node center) */}
+        {activeIndex > 0 && (
+          <div
+            className="absolute top-5 left-[12.5%] h-0.5 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-500 ease-out"
+            style={{ width: `${(activeIndex / (steps.length - 1)) * 75}%` }}
+          />
+        )}
 
         {steps.map((step, idx) => {
           const isCompleted = idx < activeIndex;
@@ -46,22 +49,22 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
           return (
             <div key={idx} className="flex flex-col items-center relative z-10 w-1/4">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-350 ${
+                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300 bg-white ${
                   isCompleted
-                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/10"
                     : isActive
-                    ? "bg-white border-emerald-600 text-emerald-600 ring-4 ring-emerald-50"
-                    : "bg-white border-slate-200 text-slate-400"
+                    ? "border-emerald-600 text-emerald-600 ring-4 ring-emerald-100/70 shadow-sm"
+                    : "border-slate-200 text-slate-400"
                 }`}
               >
                 {isCompleted ? (
                   <Check size={16} strokeWidth={3} />
                 ) : (
-                  <span className="text-xs font-bold">{idx + 1}</span>
+                  <span className="text-xs font-black">{idx + 1}</span>
                 )}
               </div>
               <div className="text-center mt-3">
-                <p className={`text-xs font-bold ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-450"}`}>
+                <p className={`text-xs font-black transition-colors duration-300 ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
                   {step.label}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 mt-0.5 max-w-[120px] mx-auto leading-normal">
@@ -73,14 +76,17 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
         })}
       </div>
 
-      {/* Mobile version: Vertical stepper (timeline style) to avoid horizontal overflow */}
-      <div className="flex md:hidden flex-col space-y-6 relative pl-6 before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-0.5 before:bg-slate-100">
-        {/* Active connection line over mobile background */}
+      {/* Mobile version: Vertical timeline */}
+      <div className="flex md:hidden flex-col space-y-6 relative pl-4 select-none">
+        {/* Background connector line */}
+        <div className="absolute top-4 bottom-4 left-6 w-0.5 bg-slate-100" />
+        
+        {/* Active connection line */}
         {activeIndex > 0 && (
           <div
-            className="absolute left-[11px] top-2 bg-emerald-500 w-0.5 transition-all duration-350"
+            className="absolute left-6 top-4 bg-emerald-500 w-0.5 transition-all duration-500 ease-out"
             style={{
-              height: activeIndex === 3 ? "calc(100% - 1.5rem)" : `${(activeIndex / (steps.length - 1)) * 82}%`,
+              height: activeIndex === 3 ? "calc(100% - 2rem)" : `${(activeIndex / (steps.length - 1)) * 78}%`,
             }}
           />
         )}
@@ -90,24 +96,24 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
           const isActive = idx === activeIndex;
 
           return (
-            <div key={idx} className="flex items-start gap-4 relative">
+            <div key={idx} className="flex items-start relative pl-10 min-h-[40px]">
               <div
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 z-10 transition-all duration-350 ${
+                className={`absolute left-2 top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 z-10 transition-all duration-300 bg-white ${
                   isCompleted
-                    ? "bg-emerald-500 border-emerald-500 text-white"
+                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/10"
                     : isActive
-                    ? "bg-white border-emerald-600 text-emerald-600 ring-4 ring-emerald-50"
-                    : "bg-white border-slate-200 text-slate-400"
+                    ? "border-emerald-600 text-emerald-600 ring-4 ring-emerald-100/70 shadow-sm"
+                    : "border-slate-200 text-slate-400"
                 }`}
               >
                 {isCompleted ? (
-                  <Check size={10} strokeWidth={3} />
+                  <Check size={12} strokeWidth={3} />
                 ) : (
-                  <span className="text-[9px] font-bold">{idx + 1}</span>
+                  <span className="text-xs font-black">{idx + 1}</span>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-xs font-bold ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-450"}`}>
+              <div className="flex-1 min-w-0 pt-0.5">
+                <p className={`text-xs font-black transition-colors duration-300 ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
                   {step.label}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 leading-normal mt-0.5">

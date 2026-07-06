@@ -95,24 +95,24 @@ export default async function WorkerApplicationDetailPage({
       />
 
       {application.interview && (application.interview.status === "SCHEDULED" || application.interview.status === "scheduled") && (
-        <div className="bg-[#006e2f] text-white rounded-3xl p-6 shadow-md border border-[#006e2f]/10 space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-green-800 text-white rounded-3xl p-6 shadow-xl border border-white/10 ring-1 ring-white/10 relative overflow-hidden space-y-5">
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none" />
+
+          <div className="flex items-start justify-between gap-3 relative z-10">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-700 text-emerald-50 text-xs font-bold uppercase tracking-wider mb-2">
-                <Calendar size={12} />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-700/80 text-emerald-50 text-[10px] font-black uppercase tracking-wider mb-2 border border-emerald-600/30">
+                <Calendar size={11} />
                 Interview Scheduled
               </span>
-              <h2 className="text-xl font-extrabold tracking-tight">Upcoming Interview Details</h2>
+              <h2 className="text-xl font-extrabold tracking-tight text-white">Upcoming Interview Details</h2>
             </div>
-            <span className="text-xs font-semibold text-emerald-100 bg-emerald-850 px-3.5 py-1.5 rounded-xl border border-emerald-700/50">
-              Scheduled via ReplaceMe
-            </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-emerald-750">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-3 border-t border-emerald-800/60 relative z-10">
             <div>
-              <p className="text-xs text-emerald-200/90 font-bold uppercase tracking-wide">Date & Time</p>
-              <p className="text-base font-black mt-0.5">
+              <p className="text-xs text-emerald-200/80 font-bold uppercase tracking-wide">Date & Time</p>
+              <p className="text-sm font-black mt-1 text-emerald-50">
                 {new Date(application.interview.scheduledAt).toLocaleString(undefined, {
                   dateStyle: "full",
                   timeStyle: "short",
@@ -120,9 +120,9 @@ export default async function WorkerApplicationDetailPage({
               </p>
             </div>
             {application.interview.meetingUrl && (
-              <div>
-                <p className="text-xs text-emerald-200/90 font-bold uppercase tracking-wide">Meeting Link</p>
-                <p className="text-sm font-semibold mt-0.5 truncate select-all">
+              <div className="min-w-0">
+                <p className="text-xs text-emerald-200/80 font-bold uppercase tracking-wide">Meeting Link</p>
+                <p className="text-xs font-semibold mt-1 break-all select-all text-emerald-100 hover:text-white transition-colors">
                   {application.interview.meetingUrl}
                 </p>
               </div>
@@ -130,19 +130,34 @@ export default async function WorkerApplicationDetailPage({
           </div>
 
           {application.interview.notes && (
-            <div className="bg-emerald-950/20 border border-emerald-750/30 rounded-2xl p-4 text-sm mt-2 text-emerald-50">
-              <p className="font-bold text-xs text-emerald-200/80 uppercase tracking-wide mb-1">Employer Notes</p>
+            <div className="bg-emerald-950/40 border border-white/5 rounded-2xl p-4 text-xs relative z-10 text-emerald-50 leading-relaxed">
+              <p className="font-bold text-xs text-emerald-200/80 uppercase tracking-wide mb-1.5">Employer Notes</p>
               {application.interview.notes}
             </div>
           )}
 
+          {/* Translucent Glassmorphism Agent Skills badges */}
+          <div className="pt-4 border-t border-emerald-800/60 relative z-10">
+            <p className="text-xs text-emerald-200/80 font-bold uppercase tracking-wide mb-2.5">Matched Agent Skills</p>
+            <div className="flex flex-wrap gap-2">
+              {["Ponytail", "Fast-Typer", "Bilingual"].map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/15 text-[11px] font-semibold tracking-wide shadow-sm select-none hover:bg-white/15 transition-all cursor-default"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
           {application.interview.meetingUrl && (
-            <div className="pt-2">
+            <div className="pt-2 relative z-10">
               <a
                 href={application.interview.meetingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-50 text-[#006e2f] font-bold text-sm w-full md:w-auto px-6 transition-all duration-200 shadow-sm hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-50 text-emerald-900 font-bold text-xs w-full sm:w-auto px-6 transition-all duration-200 shadow-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
               >
                 Join Meeting
               </a>
