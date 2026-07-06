@@ -22,6 +22,7 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
   } = useFormContext();
 
   const selectedSkills: string[] = watch("skills") || [];
+  const [customSkillInput, setCustomSkillInput] = useState("");
 
   // Fallback default skills if none provided by server actions
   const defaultSkills = skillsOptions.length > 0 ? skillsOptions : [
@@ -36,9 +37,7 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
     { label: "Product Management", value: "Product Management" },
   ];
 
-  // Suggest a market-rate salary
   const handleSuggestSalary = () => {
-    // Generate a random suggestion between 4000 and 12000 in increments of 500
     const values = [4000, 5000, 6000, 7500, 8000, 9500, 10000, 12000];
     const randomVal = values[Math.floor(Math.random() * values.length)];
     setValue("monthlySalary", randomVal, { shouldValidate: true });
@@ -46,21 +45,34 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
 
   const handleToggleSkill = (skillValue: string) => {
     if (selectedSkills.includes(skillValue)) {
-      // Remove
-      const filtered = selectedSkills.filter((s) => s !== skillValue);
-      setValue("skills", filtered, { shouldValidate: true });
+      setValue("skills", selectedSkills.filter((s) => s !== skillValue), { shouldValidate: true });
     } else {
-      // Add if under max limit of 3
       if (selectedSkills.length < 3) {
         setValue("skills", [...selectedSkills, skillValue], { shouldValidate: true });
       }
     }
   };
 
+  const handleCustomSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+
+    const trimmed = customSkillInput.trim();
+    if (!trimmed) return;
+    if (selectedSkills.length >= 3) return;
+    // Case-insensitive duplicate check
+    if (selectedSkills.some((s) => s.toLowerCase() === trimmed.toLowerCase())) return;
+
+    setValue("skills", [...selectedSkills, trimmed], { shouldValidate: true });
+    setCustomSkillInput("");
+  };
+
+  const isAtLimit = selectedSkills.length >= 3;
+
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-slate-900 mb-1">2. Requirements & Compensation</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-1">2. Requirements &amp; Compensation</h2>
         <p className="text-sm text-slate-500">Define the compensation details and required skillset.</p>
       </div>
 
@@ -71,14 +83,9 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
             Salary currency <span className="text-red-500">*</span>
           </label>
           <div className="relative pb-5">
-            <select
-              className={ONBOARDING_SELECT_CLASS}
-              {...register("salaryCurrency")}
-            >
+            <select className={ONBOARDING_SELECT_CLASS} {...register("salaryCurrency")}>
               {COMPENSATION_CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.label}
-                </option>
+                <option key={c.code} value={c.code}>{c.label}</option>
               ))}
             </select>
           </div>
@@ -125,31 +132,70 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
         </div>
       </div>
 
-      {/* Skills Selector */}
+      {/* ── Skills Selector ── */}
       <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <label className="block text-sm font-semibold text-slate-700">
-            Key Required Skills <span className="text-red-500">*</span>
-            <span className="text-xs font-normal text-slate-400 ml-1.5">(Select up to 3)</span>
-          </label>
-          <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+
+        {/* Header: responsive flex-wrap keeps badge on the right */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <label className="block text-sm font-semibold text-slate-700">
+              Key Required Skills <span className="text-red-500">*</span>
+            </label>
+            <span className="text-xs font-normal text-slate-400 whitespace-nowrap">
+              (Select up to 3)
+            </span>
+          </div>
+          <span
+            className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 transition-colors ${
+              isAtLimit
+                ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                : "bg-slate-100 text-slate-500"
+            }`}
+          >
             {selectedSkills.length}/3 selected
           </span>
         </div>
 
-        {/* Selected Tags list */}
+        {/* Custom skill input */}
+        <div className="relative">
+          <input
+            type="text"
+            value={customSkillInput}
+            onChange={(e) => setCustomSkillInput(e.target.value)}
+            onKeyDown={handleCustomSkillKeyDown}
+            disabled={isAtLimit}
+            placeholder={
+              isAtLimit
+                ? "3 skills selected — remove one to add more"
+                : "Type a custom skill and press Enter…"
+            }
+            className={`w-full h-10 rounded-xl border px-3 pr-16 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 ${
+              isAtLimit
+                ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed placeholder:text-slate-400"
+                : "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400"
+            }`}
+          />
+          {customSkillInput.trim() && !isAtLimit && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none select-none">
+              ↵ Enter
+            </span>
+          )}
+        </div>
+
+        {/* Selected tags */}
         {selectedSkills.length > 0 && (
           <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-100 min-h-[50px] items-center">
             {selectedSkills.map((skill) => (
               <span
                 key={skill}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold shadow-sm animate-scaleIn"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold shadow-sm"
               >
                 {skill}
                 <button
                   type="button"
                   onClick={() => handleToggleSkill(skill)}
-                  className="hover:bg-emerald-100 p-0.5 rounded-full text-emerald-600 transition-colors"
+                  className="hover:bg-emerald-100 p-0.5 rounded-full text-emerald-600 transition-colors cursor-pointer"
+                  aria-label={`Remove ${skill}`}
                 >
                   <X size={12} />
                 </button>
@@ -158,12 +204,12 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
           </div>
         )}
 
-        {/* List of skills selector buttons */}
+        {/* Predefined pills grid */}
         <div className="relative pb-5">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {defaultSkills.map((skill) => {
               const isSelected = selectedSkills.includes(skill.value);
-              const isDisabled = !isSelected && selectedSkills.length >= 3;
+              const isDisabled = !isSelected && isAtLimit;
               return (
                 <button
                   key={skill.value}
