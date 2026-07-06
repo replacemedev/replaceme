@@ -10,27 +10,14 @@ interface JobFilterSidebarProps {
   skillSuggestions: string[];
   employmentTypes: EmploymentTypeFacet[];
   selectedEmploymentTypes: string[];
-  salaryMin: number;
-  salaryMax: number;
-  currency: string;
   onApplyFilters: (filters: {
     skills: string[];
     employmentTypes: string[];
-    salaryMin: number;
-    salaryMax: number;
-    currency: string;
   }) => void;
   onClearAll: () => void;
   mobileOpen: boolean;
   onMobileClose: () => void;
 }
-
-const CURRENCY_CONFIGS: Record<string, { max: number; step: number; symbol: string }> = {
-  PHP: { max: 200000, step: 1000, symbol: "₱" },
-  USD: { max: 15000, step: 100, symbol: "$" },
-  EUR: { max: 15000, step: 100, symbol: "€" },
-  GBP: { max: 15000, step: 100, symbol: "£" },
-};
 
 export function JobFilterPanel({
   skillQuery,
@@ -39,18 +26,12 @@ export function JobFilterPanel({
   skillSuggestions,
   employmentTypes,
   selectedEmploymentTypes: initialSelectedEmploymentTypes,
-  salaryMin: initialSalaryMin,
-  salaryMax: initialSalaryMax,
-  currency: initialCurrency,
   onApplyFilters,
   onClearAll,
 }: Omit<JobFilterSidebarProps, "mobileOpen" | "onMobileClose">) {
   // Local states
   const [localSkills, setLocalSkills] = useState(initialSelectedSkills);
   const [localEmploymentTypes, setLocalEmploymentTypes] = useState(initialSelectedEmploymentTypes);
-  const [localCurrency, setLocalCurrency] = useState(initialCurrency);
-  const [localSalaryMin, setLocalSalaryMin] = useState(initialSalaryMin);
-  const [localSalaryMax, setLocalSalaryMax] = useState(initialSalaryMax);
 
   // Sync state if initial props change
   useEffect(() => {
@@ -62,21 +43,6 @@ export function JobFilterPanel({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalEmploymentTypes(initialSelectedEmploymentTypes);
   }, [initialSelectedEmploymentTypes]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalCurrency(initialCurrency);
-  }, [initialCurrency]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalSalaryMin(initialSalaryMin);
-  }, [initialSalaryMin]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalSalaryMax(initialSalaryMax);
-  }, [initialSalaryMax]);
 
   const handleLocalSkillToggle = (skill: string) => {
     setLocalSkills((prev) => {
@@ -92,24 +58,19 @@ export function JobFilterPanel({
     );
   };
 
-  const handleLocalCurrencyChange = (newCurr: string) => {
-    setLocalCurrency(newCurr);
-    const config = CURRENCY_CONFIGS[newCurr] || CURRENCY_CONFIGS.PHP;
-    setLocalSalaryMin(0);
-    setLocalSalaryMax(config.max);
-  };
-
   const handleApplyClick = () => {
     onApplyFilters({
       skills: localSkills,
       employmentTypes: localEmploymentTypes,
-      salaryMin: localSalaryMin,
-      salaryMax: localSalaryMax,
-      currency: localCurrency,
     });
   };
 
-  const currentConfig = CURRENCY_CONFIGS[localCurrency] || CURRENCY_CONFIGS.PHP;
+  const getFacetCount = (type: string) => {
+    const match = employmentTypes.find(
+      (et) => et.type.toLowerCase() === type.toLowerCase()
+    );
+    return match ? match.count : 0;
+  };
 
   const filteredSuggestions = skillSuggestions
     .filter((s) => s.toLowerCase().includes(skillQuery.toLowerCase()))
@@ -174,84 +135,31 @@ export function JobFilterPanel({
             Employment Type
           </p>
           <ul className="space-y-2">
-            {employmentTypes.length === 0 ? (
-              <li className="text-xs text-slate-400">No employment types yet</li>
-            ) : (
-              employmentTypes.map(({ type, count }) => {
-                const checked = localEmploymentTypes.includes(type);
-                return (
-                  <li key={type}>
-                    <label className="flex items-center justify-between gap-3 cursor-pointer group">
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => handleLocalEmploymentToggle(type)}
-                          className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer"
-                        />
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 truncate">
-                          {type}
-                        </span>
+            {["Full-time", "Part-time", "Contract"].map((type) => {
+              const checked = localEmploymentTypes.includes(type);
+              const count = getFacetCount(type);
+              return (
+                <li key={type}>
+                  <label className="flex items-center justify-between gap-3 cursor-pointer group">
+                    <span className="flex items-center gap-2.5 min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => handleLocalEmploymentToggle(type)}
+                        className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer"
+                      />
+                      <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 truncate">
+                        {type}
                       </span>
-                      <span className="text-xs font-semibold text-slate-400 shrink-0">
-                        {count}
-                      </span>
-                    </label>
-                  </li>
-                );
-              })
-            )}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400 shrink-0">
+                      {count}
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
           </ul>
-        </div>
-
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-            Salary Currency
-          </p>
-          <select
-            value={localCurrency}
-            onChange={(e) => handleLocalCurrencyChange(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] cursor-pointer mb-4"
-          >
-            <option value="PHP">PHP (₱)</option>
-            <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option>
-          </select>
-
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
-            Salary Range
-          </p>
-          <div className="space-y-3">
-            <input
-              type="range"
-              min={0}
-              max={currentConfig.max}
-              step={currentConfig.step}
-              value={localSalaryMin}
-              onChange={(e) =>
-                setLocalSalaryMin(Math.min(Number(e.target.value), localSalaryMax))
-              }
-              className="w-full accent-[#006e2f]"
-              aria-label="Minimum salary"
-            />
-            <input
-              type="range"
-              min={0}
-              max={currentConfig.max}
-              step={currentConfig.step}
-              value={localSalaryMax}
-              onChange={(e) =>
-                setLocalSalaryMax(Math.max(Number(e.target.value), localSalaryMin))
-              }
-              className="w-full accent-[#006e2f]"
-              aria-label="Maximum salary"
-            />
-            <div className="flex justify-between text-xs font-semibold text-slate-500">
-              <span>{currentConfig.symbol}{localSalaryMin.toLocaleString()}</span>
-              <span>{currentConfig.symbol}{localSalaryMax.toLocaleString()}{localSalaryMax >= currentConfig.max ? "+" : ""}</span>
-            </div>
-          </div>
         </div>
       </div>
 

@@ -18,7 +18,7 @@ export function TablePagination({
   className = "border-t border-slate-100 bg-white px-4 py-4 mt-4",
 }: TablePaginationProps) {
   const totalPages = Math.ceil(totalItems / pageSize);
-  if (totalPages <= 1) return null;
+  if (totalItems === 0) return null;
 
   const startIdx = (currentPage - 1) * pageSize + 1;
   const endIdx = Math.min(currentPage * pageSize, totalItems);

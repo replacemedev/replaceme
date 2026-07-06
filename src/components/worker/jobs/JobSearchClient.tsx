@@ -15,7 +15,6 @@ import {
   JobSearchFacets,
   JobSearchResult,
   JobSortOption,
-  SALARY_SLIDER_MAX,
 } from "@/types/job-search";
 
 const PAGE_SIZE = 20;
@@ -60,9 +59,6 @@ export function JobSearchClient({
 
   const [appliedSkills, setAppliedSkills] = useState<string[]>([]);
   const [appliedEmploymentTypes, setAppliedEmploymentTypes] = useState<string[]>([]);
-  const [appliedSalaryMin, setAppliedSalaryMin] = useState(0);
-  const [appliedSalaryMax, setAppliedSalaryMax] = useState(facets.salaryMax || SALARY_SLIDER_MAX);
-  const [appliedCurrency, setAppliedCurrency] = useState("PHP");
 
   const [sortBy, setSortBy] = useState<JobSortOption>("most_relevant");
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,15 +85,9 @@ export function JobSearchClient({
   const handleApplyFilters = (filters: {
     skills: string[];
     employmentTypes: string[];
-    salaryMin: number;
-    salaryMax: number;
-    currency: string;
   }) => {
     setAppliedSkills(filters.skills);
     setAppliedEmploymentTypes(filters.employmentTypes);
-    setAppliedSalaryMin(filters.salaryMin);
-    setAppliedSalaryMax(filters.salaryMax);
-    setAppliedCurrency(filters.currency);
     setCurrentPage(1);
 
     startTransition(async () => {
@@ -106,9 +96,6 @@ export function JobSearchClient({
         location,
         skills: filters.skills,
         employmentTypes: filters.employmentTypes,
-        minSalary: filters.salaryMin,
-        maxSalary: filters.salaryMax,
-        currency: filters.currency,
       });
       setJobs(result.jobs);
     });
@@ -122,9 +109,6 @@ export function JobSearchClient({
         location,
         skills: appliedSkills,
         employmentTypes: appliedEmploymentTypes,
-        minSalary: appliedSalaryMin,
-        maxSalary: appliedSalaryMax,
-        currency: appliedCurrency,
       });
       setJobs(result.jobs);
     });
@@ -136,9 +120,6 @@ export function JobSearchClient({
     setSkillQuery("");
     setAppliedSkills([]);
     setAppliedEmploymentTypes([]);
-    setAppliedSalaryMin(0);
-    setAppliedSalaryMax(facets.salaryMax || SALARY_SLIDER_MAX);
-    setAppliedCurrency("PHP");
     setCurrentPage(1);
 
     startTransition(async () => {
@@ -160,9 +141,6 @@ export function JobSearchClient({
     skillSuggestions: facets.skillSuggestions,
     employmentTypes: facets.employmentTypes,
     selectedEmploymentTypes: appliedEmploymentTypes,
-    salaryMin: appliedSalaryMin,
-    salaryMax: appliedSalaryMax,
-    currency: appliedCurrency,
     onApplyFilters: handleApplyFilters,
     onClearAll: handleClearAll,
   };

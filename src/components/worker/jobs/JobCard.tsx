@@ -49,10 +49,10 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
   };
 
   const cardStyles =
-    "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-emerald-200 hover:shadow-md";
+    "bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md";
 
   return (
-    <article className={`flex flex-col h-full rounded-2xl p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
+    <article className={`flex flex-col h-full p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 min-w-0">
           <div className="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden">
@@ -66,10 +66,10 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
             />
           </div>
           <div className="min-w-0">
-            <h3 className="text-base md:text-lg font-bold text-slate-900 break-words leading-snug">
+            <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white break-words leading-snug">
               {job.title}
             </h3>
-            <p className="text-xs font-semibold text-slate-500 truncate mt-1">
+            <p className="text-xs font-semibold text-gray-900 dark:text-white truncate mt-1">
               {job.companyName}
             </p>
           </div>
@@ -79,7 +79,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="shrink-0 p-2 rounded-lg text-slate-400 hover:text-[#006e2f] hover:bg-[#ebfdf2] transition-colors disabled:opacity-50 cursor-pointer"
+          className="shrink-0 p-2 rounded-lg text-gray-400 hover:text-[#006e2f] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 cursor-pointer"
           aria-label={job.isSaved ? "Remove bookmark" : "Save job"}
         >
           {isPending ? (
@@ -105,25 +105,25 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
         <span className="inline-flex items-center rounded-full bg-[#ebfdf2] border border-[#006e2f]/15 px-2.5 py-0.5 text-xs font-semibold text-[#006e2f] uppercase tracking-wide whitespace-nowrap">
           {formatSalaryBadge(job.monthlySalary, job.hoursPerWeek, job.salaryCurrency)}
         </span>
-        <span className="inline-flex items-center rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-650 uppercase tracking-wide whitespace-nowrap">
+        <span className="inline-flex items-center rounded-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-750 px-2.5 py-0.5 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide whitespace-nowrap">
           {locationLabel}
         </span>
       </div>
 
-      <p className="text-sm text-slate-600 dark:text-slate-350 leading-relaxed line-clamp-3 flex-1">
+      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 flex-1">
         {job.description}
       </p>
 
-      <footer className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto w-full">
+      <footer className="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 mt-auto w-full">
         <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-400">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">
             <Clock className="h-3.5 w-3.5" aria-hidden />
             {daysSincePosted(job.createdAt)}
           </span>
           {job.skills.slice(0, 3).map((skill) => (
             <span
               key={skill}
-              className="inline-flex rounded-full bg-slate-50 border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-500 whitespace-nowrap"
+              className="inline-flex rounded-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-750 px-2 py-0.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 whitespace-nowrap"
             >
               {skill}
             </span>

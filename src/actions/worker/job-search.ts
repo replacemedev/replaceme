@@ -24,9 +24,6 @@ import {
 export interface JobSearchFilters {
   skills?: string[];
   employmentTypes?: string[];
-  minSalary?: number;
-  maxSalary?: number;
-  currency?: string;
   keyword?: string;
   location?: string;
 }
@@ -162,15 +159,10 @@ export async function getJobSearchData(
 
     const hasFilters =
       filters &&
-      Object.entries(filters).some(([key, val]) => {
+      Object.values(filters).some((val) => {
         if (val === undefined) return false;
         if (Array.isArray(val)) return val.length > 0;
         if (typeof val === "string") return val.trim() !== "";
-        if (typeof val === "number") {
-          if (key === "minSalary") return val > 0;
-          if (key === "maxSalary") return val < 200_000;
-          return true;
-        }
         return true;
       });
 
@@ -207,19 +199,6 @@ export async function getJobSearchData(
       if (filters?.employmentTypes && filters.employmentTypes.length > 0) {
         const parts = filters.employmentTypes.map((t) => `employment_type.ilike.${t}`);
         query = query.or(parts.join(","));
-      }
-
-      // Apply currency filter
-      if (filters?.currency) {
-        query = query.eq("salary_currency", filters.currency);
-      }
-
-      // Apply salary range
-      if (filters?.minSalary !== undefined) {
-        query = query.gte("monthly_salary", filters.minSalary);
-      }
-      if (filters?.maxSalary !== undefined) {
-        query = query.lte("monthly_salary", filters.maxSalary);
       }
 
       // Apply location filter
