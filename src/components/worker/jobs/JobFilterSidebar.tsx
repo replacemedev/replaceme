@@ -15,8 +15,9 @@ interface JobFilterSidebarProps {
     employmentTypes: string[];
   }) => void;
   onClearAll: () => void;
-  mobileOpen: boolean;
-  onMobileClose: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+  hideTitle?: boolean;
 }
 
 export function JobFilterPanel({
@@ -28,7 +29,11 @@ export function JobFilterPanel({
   selectedEmploymentTypes: initialSelectedEmploymentTypes,
   onApplyFilters,
   onClearAll,
-}: Omit<JobFilterSidebarProps, "mobileOpen" | "onMobileClose">) {
+  hideTitle = false,
+  onClose,
+}: Omit<JobFilterSidebarProps, "mobileOpen" | "onMobileClose"> & {
+  onClose?: () => void;
+}) {
   // Local states
   const [localSkills, setLocalSkills] = useState(initialSelectedSkills);
   const [localEmploymentTypes, setLocalEmploymentTypes] = useState(initialSelectedEmploymentTypes);
@@ -63,6 +68,9 @@ export function JobFilterPanel({
       skills: localSkills,
       employmentTypes: localEmploymentTypes,
     });
+    if (onClose) {
+      onClose();
+    }
   };
 
   const getFacetCount = (type: string) => {
@@ -79,11 +87,15 @@ export function JobFilterPanel({
   return (
     <aside className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-sm font-bold text-slate-900">Filters</h2>
+        {!hideTitle && (
+          <h2 className="text-sm font-bold text-slate-900">Filters</h2>
+        )}
         <button
           type="button"
           onClick={onClearAll}
-          className="text-[11px] font-bold uppercase tracking-wide text-[#006e2f] hover:underline cursor-pointer"
+          className={`text-[11px] font-bold uppercase tracking-wide text-[#006e2f] hover:underline cursor-pointer ${
+            hideTitle ? "ml-auto" : ""
+          }`}
         >
           Clear all
         </button>

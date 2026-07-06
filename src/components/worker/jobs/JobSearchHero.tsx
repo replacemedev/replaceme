@@ -26,7 +26,7 @@ export function JobSearchHero({
   }, [initialKeyword]);
 
   const quickSkills = useMemo(() => {
-    const defaults = ["ponytail", "safe-greeting", "reаd_data"];
+    const defaults = [""];
     const merged = [...defaults, ...skillSuggestions];
     return Array.from(new Set(merged)).slice(0, 8);
   }, [skillSuggestions]);
@@ -82,11 +82,10 @@ export function JobSearchHero({
                 key={skill}
                 type="button"
                 onClick={() => onSkillChipToggle(skill)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors ${
-                  isActive
-                    ? "bg-[#006e2f] text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
+                className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors ${isActive
+                  ? "bg-[#006e2f] text-white"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
               >
                 {skill}
               </button>

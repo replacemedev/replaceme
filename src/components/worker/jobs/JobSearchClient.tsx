@@ -183,7 +183,11 @@ export function JobSearchClient({
             open={mobileFiltersOpen}
             onClose={() => setMobileFiltersOpen(false)}
           >
-            <JobFilterPanel {...filterPanelProps} />
+            <JobFilterPanel
+              {...filterPanelProps}
+              hideTitle={true}
+              onClose={() => setMobileFiltersOpen(false)}
+            />
           </WorkerFilterSheet>
 
           <section className="min-w-0 mt-6 lg:mt-0">
