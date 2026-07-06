@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
+import { createAdminClient } from "@/lib/supabase/server";
 import { updateApplicationStatusSchema, deleteApplicationSchema } from "@/lib/validations/applications";
 import type { ApplicationStatus } from "@/types/applications";
 import { assertEmployerCanAdvanceApplication } from "@/lib/server/entitlements";
@@ -164,7 +165,8 @@ export async function deleteApplication(
       );
     }
 
-    const { error: deleteError } = await supabase
+    const admin = await createAdminClient();
+    const { error: deleteError } = await admin
       .from("applications")
       .delete()
       .eq("id", parsed.applicationId);
