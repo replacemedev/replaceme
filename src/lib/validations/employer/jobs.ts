@@ -13,6 +13,7 @@ export const createJobSchema = z
       .string()
       .min(10, "Job description must be at least 10 characters"),
     salaryCurrency: salaryCurrencySchema,
+    hourlyRate: z.number().min(1, "Hourly rate must be at least 1"),
     monthlySalary: z.number().min(100, "Monthly salary must be at least 100"),
     hoursPerWeek: z
       .number()

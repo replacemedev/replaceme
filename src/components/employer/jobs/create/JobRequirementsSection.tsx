@@ -37,10 +37,20 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
     { label: "Product Management", value: "Product Management" },
   ];
 
+  const hourlyRateValue = watch("hourlyRate");
+  const hoursPerWeekValue = watch("hoursPerWeek");
+
+  React.useEffect(() => {
+    const hr = Number(hourlyRateValue) || 0;
+    const hpw = Number(hoursPerWeekValue) || 0;
+    const calculated = Math.round(hr * hpw * 4);
+    setValue("monthlySalary", calculated, { shouldValidate: true });
+  }, [hourlyRateValue, hoursPerWeekValue, setValue]);
+
   const handleSuggestSalary = () => {
-    const values = [4000, 5000, 6000, 7500, 8000, 9500, 10000, 12000];
+    const values = [25, 30, 35, 40, 45, 50, 60, 75];
     const randomVal = values[Math.floor(Math.random() * values.length)];
-    setValue("monthlySalary", randomVal, { shouldValidate: true });
+    setValue("hourlyRate", randomVal, { shouldValidate: true });
   };
 
   const handleToggleSkill = (skillValue: string) => {
@@ -76,8 +86,8 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
         <p className="text-sm text-slate-500">Define the compensation details and required skillset.</p>
       </div>
 
-      {/* Salary & currency */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {/* Currency, Hourly Salary, and Hours */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
             Salary currency <span className="text-red-500">*</span>
@@ -93,42 +103,60 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
 
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
-            Monthly salary <span className="text-red-500">*</span>
+            Hourly salary ($/hr) <span className="text-red-500">*</span>
           </label>
           <div className="relative pb-5">
             <Input
               type="number"
-              placeholder="5000"
-              error={errors.monthlySalary?.message as string}
-              {...register("monthlySalary", { valueAsNumber: true })}
+              placeholder="30"
+              error={errors.hourlyRate?.message as string}
+              {...register("hourlyRate", { valueAsNumber: true })}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Hours per Week <span className="text-red-500">*</span>
+          </label>
+          <div className="relative pb-5">
+            <Input
+              type="number"
+              placeholder="40"
+              icon={<Clock size={18} />}
+              error={errors.hoursPerWeek?.message as string}
+              {...register("hoursPerWeek", { valueAsNumber: true })}
             />
           </div>
         </div>
       </div>
 
-      <div className="pb-2">
-        <button
-          type="button"
-          onClick={handleSuggestSalary}
-          className="h-12 w-full px-4 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#22c55e] hover:border-[#22c55e] hover:bg-emerald-50/10 font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          Suggest competitive salary
-        </button>
-      </div>
+      {/* Monthly salary (read-only/disabled) */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Monthly salary (Calculated)
+          </label>
+          <div className="relative pb-5">
+            <Input
+              type="number"
+              placeholder="4800"
+              readOnly
+              className="bg-slate-50 text-slate-500 cursor-not-allowed border-slate-200"
+              error={errors.monthlySalary?.message as string}
+              {...register("monthlySalary", { valueAsNumber: true })}
+            />
+          </div>
+        </div>
 
-      {/* Hours Per Week */}
-      <div className="space-y-2">
-        <label className="block text-sm font-semibold text-slate-700">
-          Hours per Week <span className="text-red-500">*</span>
-        </label>
-        <div className="relative pb-5">
-          <Input
-            type="number"
-            placeholder="40"
-            icon={<Clock size={18} />}
-            error={errors.hoursPerWeek?.message as string}
-            {...register("hoursPerWeek", { valueAsNumber: true })}
-          />
+        <div className="flex items-end pb-7">
+          <button
+            type="button"
+            onClick={handleSuggestSalary}
+            className="h-12 w-full px-4 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#22c55e] hover:border-[#22c55e] hover:bg-emerald-50/10 font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            Suggest competitive hourly rate
+          </button>
         </div>
       </div>
 

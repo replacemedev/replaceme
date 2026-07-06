@@ -4,11 +4,18 @@ import React from "react";
 import { CreditCard } from "lucide-react";
 
 interface CompensationCardProps {
+  hourlyRate: number;
   monthlySalary: number;
   hoursPerWeek: number;
+  salaryCurrency?: string;
 }
 
-export function CompensationCard({ monthlySalary, hoursPerWeek }: CompensationCardProps) {
+export function CompensationCard({
+  hourlyRate,
+  monthlySalary,
+  hoursPerWeek,
+  salaryCurrency = "PHP",
+}: CompensationCardProps) {
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-4">
       <div className="flex items-center gap-2">
@@ -18,13 +25,31 @@ export function CompensationCard({ monthlySalary, hoursPerWeek }: CompensationCa
         <h2 className="text-sm font-bold text-slate-800">Compensation</h2>
       </div>
 
-      <div className="space-y-1">
-        <p className="text-2xl font-extrabold text-[#22c55e]">
-          ${monthlySalary.toLocaleString()} <span className="text-sm font-normal text-slate-500">/ month</span>
-        </p>
-        <p className="text-xs text-slate-400 leading-normal font-medium">
-          Fixed monthly retainer based on {hoursPerWeek} hours/week.
-        </p>
+      <div className="space-y-3">
+        {/* Primary: Hourly Rate */}
+        <div>
+          <p className="text-2xl font-extrabold text-[#22c55e]">
+            {salaryCurrency} {hourlyRate.toLocaleString()}
+            <span className="text-sm font-normal text-slate-500"> / hr</span>
+          </p>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">
+            Hourly rate · {hoursPerWeek} hrs/week
+          </p>
+        </div>
+
+        {/* Secondary: Estimated monthly */}
+        <div className="pt-3 border-t border-slate-100">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+            Est. Monthly
+          </p>
+          <p className="text-base font-extrabold text-slate-700 mt-0.5">
+            {salaryCurrency} {monthlySalary.toLocaleString()}
+            <span className="text-xs font-normal text-slate-400"> / month</span>
+          </p>
+          <p className="text-[10px] text-slate-400 mt-0.5">
+            Based on {hoursPerWeek} hrs/week × 4 weeks
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -207,7 +207,12 @@ export function formatMemberSince(iso: string): string {
 
 export function formatCompensation(
   monthlySalary: number,
-  currency: string = "PHP"
+  currency: string = "PHP",
+  hoursPerWeek?: number
 ): string {
-  return `Starts at ${formatMoney(monthlySalary, currency)}/month`;
+  if (hoursPerWeek && hoursPerWeek > 0) {
+    const hourly = Math.round(monthlySalary / (hoursPerWeek * 4));
+    return `${formatMoney(hourly, currency, { perHour: true })} (${formatMoney(monthlySalary, currency)}/mo)`;
+  }
+  return `${formatMoney(monthlySalary, currency)}/mo`;
 }

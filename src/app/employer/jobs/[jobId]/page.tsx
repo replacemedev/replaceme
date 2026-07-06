@@ -62,6 +62,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
         status={job.status}
         location={job.location}
         employmentType={job.employmentType}
+        hourlyRate={job.hourlyRate}
         monthlySalary={job.monthlySalary}
         isPriorityListing={(job.priorityScore ?? 0) > 0}
       />
@@ -98,9 +99,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
         <div className="lg:col-span-2">
           <JobDescriptionCard
             description={job.description}
-            keyResponsibilities={job.keyResponsibilities}
             requiredSkills={job.requiredSkills}
-            experienceAndEducation={job.experienceAndEducation}
           />
         </div>
 
@@ -113,6 +112,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
             priorityScore={job.priorityScore}
           />
           <CompensationCard
+            hourlyRate={job.hourlyRate}
             monthlySalary={job.monthlySalary}
             hoursPerWeek={job.hoursPerWeek}
           />

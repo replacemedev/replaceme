@@ -57,7 +57,7 @@ export function JobSidebarCards({ job }: JobSidebarCardsProps) {
         <DetailRow
           icon={DollarSign}
           label="Wage / Salary"
-          value={formatCompensation(job.monthlySalary, job.salaryCurrency)}
+          value={formatCompensation(job.monthlySalary, job.salaryCurrency, job.hoursPerWeek)}
         />
         <DetailRow
           icon={Clock}

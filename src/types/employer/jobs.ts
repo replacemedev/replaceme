@@ -21,12 +21,11 @@ export interface JobDetails {
   status: "Active" | "Closed" | "Pending Review";
   location: string;
   employmentType: string;
+  hourlyRate: number;
   monthlySalary: number;
   hoursPerWeek: number;
   description: string;
-  keyResponsibilities: string[];
   requiredSkills: string[];
-  experienceAndEducation: string[];
   performance: JobPerformance;
   hiringTeam: HiringTeamMember;
   priorityScore: number;

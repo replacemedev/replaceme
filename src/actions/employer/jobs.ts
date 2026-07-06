@@ -91,6 +91,9 @@ export async function createJobPost(payload: CreateJobInput) {
     );
 
     // Write the job to the database table
+    // Compute monthly salary from hourly rate as source of truth
+    const computedMonthly = Math.round(parsed.data.hourlyRate * (parsed.data.hoursPerWeek * 4));
+
     const { data: newJob, error: insertError } = await supabase
       .from("jobs")
       .insert({
@@ -98,7 +101,7 @@ export async function createJobPost(payload: CreateJobInput) {
         title: parsed.data.title,
         employment_type: parsed.data.employmentType,
         description: parsed.data.description,
-        monthly_salary: parsed.data.monthlySalary,
+        monthly_salary: computedMonthly,
         salary_currency: parsed.data.salaryCurrency,
         hours_per_week: parsed.data.hoursPerWeek,
         skills: parsed.data.skills,
@@ -180,13 +183,15 @@ export async function updateJobPost(payload: UpdateJobInput) {
       return { error: "Closed jobs cannot be edited." };
     }
 
+    const updatedMonthly = Math.round(parsed.data.hourlyRate * (parsed.data.hoursPerWeek * 4));
+
     const { error: updateError } = await supabase
       .from("jobs")
       .update({
         title: parsed.data.title,
         employment_type: parsed.data.employmentType,
         description: parsed.data.description,
-        monthly_salary: parsed.data.monthlySalary,
+        monthly_salary: updatedMonthly,
         salary_currency: parsed.data.salaryCurrency,
         hours_per_week: parsed.data.hoursPerWeek,
         skills: parsed.data.skills,
@@ -244,14 +249,21 @@ export async function getJobForEdit(jobId: string) {
 
   if (!job || job.status === "Closed") return null;
 
+  const fetchedHoursPerWeek = Number(job.hours_per_week);
+  const fetchedMonthly = Number(job.monthly_salary);
+  const derivedHourlyRate = fetchedHoursPerWeek > 0
+    ? Math.round(fetchedMonthly / (fetchedHoursPerWeek * 4))
+    : 0;
+
   return {
     id: job.id,
     title: job.title,
     employmentType: job.employment_type,
     description: job.description,
-    monthlySalary: Number(job.monthly_salary),
+    hourlyRate: derivedHourlyRate,
+    monthlySalary: fetchedMonthly,
     salaryCurrency: job.salary_currency ?? "PHP",
-    hoursPerWeek: Number(job.hours_per_week),
+    hoursPerWeek: fetchedHoursPerWeek,
     skills: (job.skills as string[]) ?? [],
   };
 }
@@ -313,6 +325,12 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
       .eq("job_id", jobId)
       .eq("status", "UNDER_REVIEW");
 
+    const hoursPerWeek = Number(job.hours_per_week);
+    const monthlySalary = Number(job.monthly_salary);
+    const hourlyRate = hoursPerWeek > 0
+      ? Math.round(monthlySalary / (hoursPerWeek * 4))
+      : 0;
+
     // Map database model to high-fidelity frontend structures
     return {
       id: job.id,
@@ -320,21 +338,11 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
       status: job.status as "Active" | "Closed" | "Pending Review",
       location: "Remote",
       employmentType: job.employment_type,
-      monthlySalary: Number(job.monthly_salary),
-      hoursPerWeek: Number(job.hours_per_week),
+      hourlyRate,
+      monthlySalary,
+      hoursPerWeek,
       description: job.description,
-      keyResponsibilities: [
-        "Take ownership of critical features and deliverables matching key job requirements.",
-        "Collaborate closely with distributed team members and cross-functional departments.",
-        "Optimize codebase and design systems to deliver premium visual experiences.",
-        "Stay up-to-date with design trends, platform guidelines, and modern workflows."
-      ],
       requiredSkills: job.skills || [],
-      experienceAndEducation: [
-        "Minimum 2 years of professional experience in similar roles.",
-        "A strong portfolio or track record of past successful projects.",
-        "Proficiency with modern tools, frameworks, and visual platforms."
-      ],
       performance: {
         totalViews: job.views_count || 0,
         viewsTrend: "+12%",

@@ -13,6 +13,7 @@ interface JobHeaderProps {
   status: "Active" | "Closed" | "Pending Review";
   location: string;
   employmentType: string;
+  hourlyRate: number;
   monthlySalary: number;
   isPriorityListing?: boolean;
 }
@@ -23,6 +24,7 @@ export function JobHeader({
   status,
   location,
   employmentType,
+  hourlyRate,
   monthlySalary,
   isPriorityListing = false,
 }: JobHeaderProps) {
@@ -104,7 +106,9 @@ export function JobHeader({
             </div>
             <div className="flex items-center gap-1.5">
               <DollarSign size={16} className="text-slate-400" aria-hidden />
-              <span>${monthlySalary.toLocaleString()}/mo</span>
+              <span className="text-emerald-600 font-bold">${hourlyRate.toLocaleString()}/hr</span>
+              <span className="text-slate-300">·</span>
+              <span className="text-slate-400 text-xs">${monthlySalary.toLocaleString()}/mo</span>
             </div>
           </div>
         </div>
