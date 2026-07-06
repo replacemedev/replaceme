@@ -30,7 +30,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
           `
           id,
           status,
-          updated_at,
+          created_at,
           job_posts ( title, company_name ),
           interviews (
             id,
@@ -42,7 +42,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
         )
         .eq("candidate_id", ctx.profile.id)
         .eq("status", "INTERVIEW_SCHEDULED")
-        .order("updated_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) {
         return [];
@@ -62,7 +62,7 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
           applicationId: app.id,
           jobTitle: job?.title ?? "Interview",
           companyName: job?.company_name ?? "Employer",
-          scheduledAt: interview?.scheduled_at || app.updated_at,
+          scheduledAt: interview?.scheduled_at || app.created_at,
           meetingUrl: interview?.meeting_link || null,
           status: interview?.status || "scheduled",
         };

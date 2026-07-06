@@ -168,7 +168,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           id,
           job_id,
           candidate_id,
-          updated_at,
+          created_at,
           profiles ( first_name, last_name ),
           interviews (
             id,
@@ -180,7 +180,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
         `)
         .in("job_id", jobIds)
         .eq("status", "INTERVIEW_SCHEDULED")
-        .order("updated_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) {
         safeError("Failed to fetch employer interviews:", error);
@@ -209,7 +209,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           candidateName: isPreview
             ? previewDisplayName(app.candidate_id)
             : name || "Candidate",
-          scheduledAt: interview?.scheduled_at || app.updated_at,
+          scheduledAt: interview?.scheduled_at || app.created_at,
           meetingUrl: interview?.meeting_link || null,
           status: interview?.status || "scheduled",
           notes: interview?.notes || null,
