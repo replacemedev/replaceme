@@ -1,13 +1,19 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Flag } from "lucide-react";
 import { WorkerJobDetails, formatPostedDate } from "@/types/job-details";
 import { ApplyActionButtons } from "./ApplyActionButtons";
+import { ReportJobModal } from "./ReportJobModal";
 
 interface JobDetailsHeroProps {
   job: WorkerJobDetails;
 }
 
 export function JobDetailsHero({ job }: JobDetailsHeroProps) {
+  const [isReportOpen, setIsReportOpen] = useState(false);
+
   return (
     <header className="relative bg-[#0a4a29] text-white overflow-hidden">
       <div
@@ -29,6 +35,7 @@ export function JobDetailsHero({ job }: JobDetailsHeroProps) {
           </Link>
           <button
             type="button"
+            onClick={() => setIsReportOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white/90 hover:bg-white/10 transition-colors cursor-pointer"
           >
             <Flag className="h-3.5 w-3.5" aria-hidden />
@@ -55,6 +62,14 @@ export function JobDetailsHero({ job }: JobDetailsHeroProps) {
           </div>
         </div>
       </div>
+
+      <ReportJobModal
+        open={isReportOpen}
+        jobId={job.id}
+        jobTitle={job.title}
+        onClose={() => setIsReportOpen(false)}
+      />
     </header>
   );
 }
+

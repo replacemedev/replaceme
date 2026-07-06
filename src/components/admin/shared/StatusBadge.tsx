@@ -15,6 +15,9 @@ const STYLES: Record<string, string> = {
   documents_submitted: "bg-blue-50 text-blue-700 ring-blue-600/20",
   under_review: "bg-amber-50 text-amber-700 ring-amber-600/20",
   unverified: "bg-slate-100 text-slate-600 ring-slate-500/20",
+  pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
+  reviewed: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  dismissed: "bg-slate-150 text-slate-700 ring-slate-500/20",
 };
 
 function formatLabel(value: string): string {

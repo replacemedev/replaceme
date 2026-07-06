@@ -490,3 +490,228 @@ export async function updateReportStatus(input: unknown) {
   });
 }
 
+const createJobReportSchema = z
+  .object({
+    jobId: z.string().uuid(),
+    reason: z.string().min(1, "Reason is required"),
+    description: z.string().min(10, "Please provide at least 10 characters of description").max(1000),
+  })
+  .strict();
+
+export async function createJobReport(input: unknown) {
+  return runAction("createJobReport", async () => {
+    const parsed = createJobReportSchema.safeParse(input);
+    if (!parsed.success) {
+      return fail(parsed.error.issues[0]?.message ?? "Invalid report.");
+    }
+
+    const ctx = await requireRole(["worker"]);
+    const rate = await rateLimitReportSubmission(ctx.profile.id);
+    if (!rate.success) return fail(rate.error);
+
+    const authUserId = ctx.profile.id;
+
+    // Check for duplicate reports by the same worker for the same job
+    const { data: existingReport, error: checkError } = await ctx.supabase
+      .from("reported_jobs")
+      .select("id")
+      .eq("job_id", parsed.data.jobId)
+      .eq("reporter_id", authUserId)
+      .maybeSingle();
+
+    if (checkError) {
+      safeError("createJobReport check existing:", checkError);
+      return fail("Failed to verify report status.");
+    }
+
+    if (existingReport) {
+      return fail("You have already reported this job post.");
+    }
+
+    const { data: inserted, error: insertError } = await ctx.supabase
+      .from("reported_jobs")
+      .insert({
+        job_id: parsed.data.jobId,
+        reporter_id: authUserId,
+        reason: parsed.data.reason,
+        description: parsed.data.description,
+        status: "PENDING",
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !inserted) {
+      safeError("createJobReport insert:", insertError);
+      return fail("Failed to submit job report.");
+    }
+
+    await cacheDel(CacheKeys.adminReportsList("all"));
+    revalidatePath("/admin/reports");
+    return ok({ reportId: inserted.id });
+  });
+}
+
+const adminJobReportsQuerySchema = z
+  .object({
+    status: z.enum(["PENDING", "REVIEWED", "DISMISSED"]).optional(),
+    q: z.string().trim().max(120).optional(),
+    limit: z.number().int().min(10).max(100).default(25),
+    offset: z.number().int().min(0).default(0),
+  })
+  .strict();
+
+export type AdminJobReportsQuery = z.infer<typeof adminJobReportsQuerySchema>;
+
+export type AdminJobReportRow = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "PENDING" | "REVIEWED" | "DISMISSED";
+  reason: string;
+  description: string;
+  adminNotes: string | null;
+  jobId: string;
+  jobTitle: string;
+  employerId: string;
+  reporterId: string;
+  reporterEmail?: string;
+  reporterName?: string;
+};
+
+export async function getAdminJobReports(input: unknown): Promise<{
+  items: AdminJobReportRow[];
+  total: number;
+} | null> {
+  try {
+    const parsed = adminJobReportsQuerySchema.parse(input);
+    const { supabase } = await requireAdmin();
+
+    let query = supabase
+      .from("reported_jobs")
+      .select(
+        `
+        id,
+        created_at,
+        updated_at,
+        status,
+        reason,
+        description,
+        admin_notes,
+        job_id,
+        reporter_id,
+        jobs:job_id (
+          title,
+          employer_id
+        ),
+        profiles:reporter_id (
+          email,
+          first_name,
+          last_name
+        )
+        `,
+        { count: "exact" }
+      )
+      .order("created_at", { ascending: false })
+      .range(parsed.offset, parsed.offset + parsed.limit - 1);
+
+    if (parsed.status) {
+      query = query.eq("status", parsed.status);
+    }
+    if (parsed.q) {
+      const like = `%${parsed.q}%`;
+      query = query.or(`reason.ilike.${like},description.ilike.${like}`);
+    }
+
+    const { data, count, error } = await query;
+    if (error) {
+      safeError("getAdminJobReports:", error);
+      return { items: [], total: 0 };
+    }
+
+    interface DbJobReport {
+      id: string;
+      created_at: string;
+      updated_at: string;
+      status: string;
+      reason: string;
+      description: string;
+      admin_notes: string | null;
+      job_id: string;
+      reporter_id: string;
+      jobs: { title: string; employer_id: string } | { title: string; employer_id: string }[] | null;
+      profiles: { email: string; first_name: string | null; last_name: string | null } | { email: string; first_name: string | null; last_name: string | null }[] | null;
+    }
+
+    const items: AdminJobReportRow[] = (data as unknown as DbJobReport[] ?? []).map((r) => {
+      const job = Array.isArray(r.jobs) ? r.jobs[0] : r.jobs;
+      const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+      const reporterName = profile
+        ? `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim()
+        : "";
+
+      return {
+        id: r.id,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+        status: r.status as "PENDING" | "REVIEWED" | "DISMISSED",
+        reason: r.reason,
+        description: r.description,
+        adminNotes: r.admin_notes,
+        jobId: r.job_id,
+        jobTitle: job?.title ?? "Unknown Job",
+        employerId: job?.employer_id ?? "",
+        reporterId: r.reporter_id,
+        reporterEmail: profile?.email ?? "",
+        reporterName: reporterName || "Unknown Worker",
+      };
+    });
+
+    return {
+      items,
+      total: count ?? 0,
+    };
+  } catch (err) {
+    safeError("getAdminJobReports:", err);
+    return null;
+  }
+}
+
+const updateJobReportStatusSchema = z
+  .object({
+    reportId: z.string().uuid(),
+    status: z.enum(["PENDING", "REVIEWED", "DISMISSED"]),
+    adminNotes: z.string().trim().max(5000).optional(),
+  })
+  .strict();
+
+export async function updateJobReportStatus(input: unknown) {
+  return runAction("updateJobReportStatus", async () => {
+    const parsed = updateJobReportStatusSchema.safeParse(input);
+    if (!parsed.success) return fail("Invalid update.");
+
+    const { supabase } = await requireAdmin();
+    const now = new Date().toISOString();
+
+    const update: Record<string, unknown> = {
+      status: parsed.data.status,
+      admin_notes: parsed.data.adminNotes?.trim() ? parsed.data.adminNotes.trim() : null,
+      updated_at: now,
+    };
+
+    const { error } = await supabase
+      .from("reported_jobs")
+      .update(update)
+      .eq("id", parsed.data.reportId);
+
+    if (error) {
+      safeError("updateJobReportStatus:", error);
+      return fail("Failed to update job report.");
+    }
+
+    await cacheDel(CacheKeys.adminReportsList("all"));
+    revalidatePath("/admin/reports");
+    return ok();
+  });
+}
+
+
