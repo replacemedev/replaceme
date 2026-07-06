@@ -32,9 +32,6 @@ function avatarColor(name: string) {
 export function JobCard({ job, onSavedChange }: JobCardProps) {
   const [isPending, startTransition] = useTransition();
   const colorClass = avatarColor(job.companyName);
-  const locationLabel = job.location.toLowerCase().includes("remote")
-    ? `REMOTE (${job.location.replace(/remote/i, "").trim() || "PH"})`.toUpperCase()
-    : job.location.toUpperCase();
   const isPriorityListing = (job.priorityScore ?? 0) > 0;
 
   const handleSave = () => {
@@ -104,9 +101,6 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
         </span>
         <span className="inline-flex items-center rounded-full bg-[#ebfdf2] border border-[#006e2f]/15 px-2.5 py-0.5 text-xs font-semibold text-[#006e2f] uppercase tracking-wide whitespace-nowrap">
           {formatSalaryBadge(job.monthlySalary, job.hoursPerWeek, job.salaryCurrency)}
-        </span>
-        <span className="inline-flex items-center rounded-full bg-gray-50 border border-gray-200 px-2.5 py-0.5 text-xs font-semibold text-gray-600 uppercase tracking-wide whitespace-nowrap">
-          {locationLabel}
         </span>
       </div>
 
