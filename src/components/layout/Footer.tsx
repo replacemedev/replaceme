@@ -15,7 +15,7 @@ export function Footer() {
           <Link className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity" href="/">
             <div className="relative w-12 h-12 shrink-0">
               <Image
-                src="/images/logo_favicon.png"
+                src="/images/logo.png"
                 alt="Replace Me Logo"
                 fill
                 className="object-contain"

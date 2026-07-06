@@ -27,9 +27,8 @@ export function AuthPageShell({
 }: AuthPageShellProps) {
   const marketingPanel = marketing ? (
     <div
-      className={`${AUTH_MARKETING_DESKTOP} ${
-        marketingPosition === "left" ? AUTH_MARKETING_LEFT : AUTH_MARKETING_RIGHT
-      }`}
+      className={`${AUTH_MARKETING_DESKTOP} ${marketingPosition === "left" ? AUTH_MARKETING_LEFT : AUTH_MARKETING_RIGHT
+        }`}
     >
       {marketing}
     </div>
@@ -51,8 +50,8 @@ export function AuthPageShell({
           >
             <div className="relative h-8 w-8 shrink-0">
               <Image
-                src="/images/logo_favicon.png"
-                alt="Replace Me"
+                src="/images/logo.png"
+                alt="Replace Me Logo"
                 fill
                 className="object-contain"
                 sizes="32px"

@@ -38,7 +38,7 @@ export function OrderSummary({
         <div className="flex items-center gap-2 mb-12">
           <div className="relative w-8 h-8 shrink-0">
             <Image
-              src="/images/logo_favicon.png"
+              src="/images/logo.png"
               alt="Replace Me Logo"
               fill
               className="object-contain"

@@ -45,26 +45,23 @@ export function MobileMenu({
 
   return (
     <div
-      className={`fixed inset-0 z-50 md:hidden ${
-        isOpen ? "pointer-events-auto" : "pointer-events-none"
-      }`}
+      className={`fixed inset-0 z-50 md:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
       role="dialog"
       aria-modal={isOpen}
       aria-hidden={!isOpen}
     >
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0"
+          }`}
         onClick={onClose}
         aria-hidden
       />
 
       <div
         ref={panelRef}
-        className={`relative z-10 flex h-full w-[280px] max-w-[75vw] flex-col bg-white p-5 shadow-2xl transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`relative z-10 flex h-full w-[280px] max-w-[75vw] flex-col bg-white p-5 shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <Link
@@ -74,7 +71,7 @@ export function MobileMenu({
           >
             <div className="relative h-7 w-7">
               <Image
-                src="/images/logo_favicon.png"
+                src="/images/logo.png"
                 alt="Replace Me Logo"
                 fill
                 className="object-contain"
@@ -105,11 +102,10 @@ export function MobileMenu({
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
-                  isActive
-                    ? "bg-[#ebfdf2]/70 text-[#006e2f]"
-                    : "text-slate-700 hover:bg-[#ebfdf2]/50 hover:text-[#006e2f] active:bg-slate-50"
-                }`}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${isActive
+                  ? "bg-[#ebfdf2]/70 text-[#006e2f]"
+                  : "text-slate-700 hover:bg-[#ebfdf2]/50 hover:text-[#006e2f] active:bg-slate-50"
+                  }`}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={
                   item.href === "/worker/messages" && unreadMessageCount > 0

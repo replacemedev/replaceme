@@ -16,8 +16,8 @@ export function NavBrand({ homeHref, compact = false }: NavBrandProps) {
         className={`relative shrink-0 ${compact ? "w-8 h-8 sm:w-9 sm:h-9" : "w-10 h-10 sm:w-12 sm:h-12"}`}
       >
         <Image
-          src="/images/logo_favicon.png"
-          alt="Replace Me home"
+          src="/images/logo.png"
+          alt="Replace Me Logo"
           fill
           className="object-contain"
           sizes={compact ? "36px" : "48px"}
@@ -25,9 +25,8 @@ export function NavBrand({ homeHref, compact = false }: NavBrandProps) {
         />
       </div>
       <span
-        className={`font-display-md font-bold text-[#0a4a29] leading-none ${
-          compact ? "text-sm sm:text-lg hidden min-[360px]:inline-block" : "text-xl sm:text-2xl"
-        }`}
+        className={`font-display-md font-bold text-[#0a4a29] leading-none ${compact ? "text-sm sm:text-lg hidden min-[360px]:inline-block" : "text-xl sm:text-2xl"
+          }`}
       >
         Replace Me
       </span>
