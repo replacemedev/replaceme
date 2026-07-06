@@ -133,16 +133,26 @@ export async function getWorkerApplicationById(applicationId: string) {
     if (!mapped) return null;
 
     const interview = Array.isArray(data.interviews) ? data.interviews[0] : data.interviews;
+    const hasInterview = !!interview;
+    const isInterviewScheduled = mapped.status === "INTERVIEW_SCHEDULED";
 
     return {
       ...mapped,
-      interview: interview
+      interview: hasInterview
         ? {
             id: interview.id,
             scheduledAt: interview.scheduled_at,
             meetingUrl: interview.meeting_link,
             notes: interview.notes,
             status: interview.status,
+          }
+        : isInterviewScheduled
+        ? {
+            id: data.id,
+            scheduledAt: data.created_at,
+            meetingUrl: null,
+            notes: null,
+            status: "scheduled",
           }
         : null,
     };

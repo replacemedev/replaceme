@@ -24,42 +24,47 @@ export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
     CacheKeys.workerInterviews(ctx.profile.id),
     CACHE_TTL_SECONDS.workerInterviews,
     async () => {
-      const { data } = await ctx.supabase
-        .from("interviews")
+      const { data, error } = await ctx.supabase
+        .from("applications")
         .select(
           `
           id,
-          scheduled_at,
-          meeting_link,
           status,
-          application_id,
-          applications!inner (
+          updated_at,
+          job_posts ( title, company_name ),
+          interviews (
             id,
-            status,
-            job_posts ( title, company_name )
+            scheduled_at,
+            meeting_link,
+            status
           )
         `
         )
-        .eq("worker_id", ctx.profile.id)
-        .in("status", ["SCHEDULED", "scheduled"])
-        .order("scheduled_at", { ascending: true });
+        .eq("candidate_id", ctx.profile.id)
+        .eq("status", "INTERVIEW_SCHEDULED")
+        .order("updated_at", { ascending: false });
 
-      return (data ?? []).map((row) => {
-        const app = Array.isArray(row.applications)
-          ? row.applications[0]
-          : row.applications;
-        const job = Array.isArray(app?.job_posts)
+      if (error) {
+        return [];
+      }
+
+      return (data ?? []).map((app: any) => {
+        const job = Array.isArray(app.job_posts)
           ? app.job_posts[0]
-          : app?.job_posts;
+          : app.job_posts;
+
+        const interview = Array.isArray(app.interviews)
+          ? app.interviews[0]
+          : app.interviews;
 
         return {
-          interviewId: row.id,
-          applicationId: row.application_id,
+          interviewId: interview?.id || app.id,
+          applicationId: app.id,
           jobTitle: job?.title ?? "Interview",
           companyName: job?.company_name ?? "Employer",
-          scheduledAt: row.scheduled_at,
-          meetingUrl: row.meeting_link,
-          status: row.status,
+          scheduledAt: interview?.scheduled_at || app.updated_at,
+          meetingUrl: interview?.meeting_link || null,
+          status: interview?.status || "scheduled",
         };
       });
     }

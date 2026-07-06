@@ -152,52 +152,67 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
       const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
       const isPreview = entitlements?.identityMode === "anonymous_preview";
 
-      const { data: interviews, error } = await supabase
-        .from("interviews")
+      const { data: jobs } = await supabase
+        .from("jobs")
+        .select("id, title")
+        .eq("employer_id", profile.id);
+
+      const jobIds = jobs?.map((j) => j.id) ?? [];
+      if (jobIds.length === 0) return [];
+
+      const jobTitleById = new Map(jobs!.map((j) => [j.id, j.title]));
+
+      const { data: applications, error } = await supabase
+        .from("applications")
         .select(`
           id,
-          application_id,
-          employer_id,
-          worker_id,
           job_id,
-          scheduled_at,
-          meeting_link,
-          status,
-          notes,
-          jobs ( title ),
-          profiles!interviews_worker_id_fkey ( first_name, last_name )
+          candidate_id,
+          updated_at,
+          profiles ( first_name, last_name ),
+          interviews (
+            id,
+            scheduled_at,
+            meeting_link,
+            status,
+            notes
+          )
         `)
-        .eq("employer_id", profile.id)
-        .order("scheduled_at", { ascending: true });
+        .in("job_id", jobIds)
+        .eq("status", "INTERVIEW_SCHEDULED")
+        .order("updated_at", { ascending: false });
 
       if (error) {
         safeError("Failed to fetch employer interviews:", error);
         return [];
       }
 
-      return (interviews ?? []).map((row: any) => {
-        const candidate = row.profiles as {
+      return (applications ?? []).map((app: any) => {
+        const candidate = app.profiles as {
           first_name?: string;
           last_name?: string;
         } | null;
         const name = candidate
           ? `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim()
           : "Candidate";
-        const job = row.jobs as { title: string } | null;
+
+        const interview = Array.isArray(app.interviews)
+          ? app.interviews[0]
+          : app.interviews;
 
         return {
-          id: row.id,
-          applicationId: row.application_id,
-          jobId: row.job_id,
-          candidateId: row.worker_id,
-          jobTitle: job?.title ?? "Job",
+          id: interview?.id || undefined,
+          applicationId: app.id,
+          jobId: app.job_id,
+          candidateId: app.candidate_id,
+          jobTitle: jobTitleById.get(app.job_id) ?? "Job",
           candidateName: isPreview
-            ? previewDisplayName(row.worker_id)
+            ? previewDisplayName(app.candidate_id)
             : name || "Candidate",
-          scheduledAt: row.scheduled_at,
-          meetingUrl: row.meeting_link,
-          status: row.status,
-          notes: row.notes,
+          scheduledAt: interview?.scheduled_at || app.updated_at,
+          meetingUrl: interview?.meeting_link || null,
+          status: interview?.status || "scheduled",
+          notes: interview?.notes || null,
           isPreview,
         };
       });
