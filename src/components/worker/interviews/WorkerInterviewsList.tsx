@@ -3,6 +3,7 @@ import { Calendar } from "lucide-react";
 import type { WorkerInterviewRow } from "@/lib/validations/worker/phase2";
 import type { WorkerInterviewGroup } from "@/lib/worker/interviews";
 import { WORKER_CARD } from "@/lib/worker/ui-tokens";
+import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 
 interface WorkerInterviewsListProps {
   groups: WorkerInterviewGroup[];
@@ -40,7 +41,7 @@ function InterviewCard({ item }: { item: WorkerInterviewRow }) {
           <p className="text-sm font-bold text-slate-900">{item.jobTitle}</p>
           <p className="text-sm text-slate-500">{item.companyName}</p>
           <p className="text-xs text-slate-400 mt-2">
-            Scheduled: {new Date(item.scheduledAt).toLocaleString()}
+            Scheduled: <ClientFormattedDate date={item.scheduledAt} />
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
             {item.meetingUrl ? (

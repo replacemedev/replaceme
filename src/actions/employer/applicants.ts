@@ -144,7 +144,21 @@ async function loadApplicantsForJob(
 
   const { data: applications, error: appsError } = await supabase
     .from("applications")
-    .select("id, job_id, candidate_id, status, match_score, created_at")
+    .select(`
+      id,
+      job_id,
+      candidate_id,
+      status,
+      match_score,
+      created_at,
+      interviews (
+        id,
+        scheduled_at,
+        meeting_link,
+        status,
+        notes
+      )
+    `)
     .eq("job_id", jobId)
     .eq("is_within_plan_cap", true)
     .order("created_at", { ascending: false });
@@ -168,9 +182,22 @@ async function loadApplicantsForJob(
     const preview = await fetchApplicantPreview(supabase, app.id, employerId);
     const mapped = mapPreviewToApplicant(app, preview, identityMode);
     if (mapped) {
+      const interview = Array.isArray(app.interviews)
+        ? app.interviews[0]
+        : app.interviews;
+
       dbApplicants.push({
         ...mapped,
         messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
+        interview: interview
+          ? {
+              id: interview.id,
+              scheduled_at: interview.scheduled_at,
+              meeting_link: interview.meeting_link,
+              status: interview.status,
+              notes: interview.notes,
+            }
+          : null,
       });
     }
   }

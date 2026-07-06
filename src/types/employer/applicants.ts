@@ -28,6 +28,13 @@ export interface Applicant {
   createdAt: string;
   isVerified: boolean;
   messagingThreadId?: string | null;
+  interview?: {
+    id: string;
+    scheduled_at: string;
+    meeting_link: string | null;
+    status: string;
+    notes: string | null;
+  } | null;
 }
 
 export interface EmployerCreditInfo {

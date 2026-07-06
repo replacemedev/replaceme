@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Calendar, Lock } from "lucide-react";
+import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
 import { EmployerInlineActions } from "@/components/employer/layout/EmployerInlineActions";
 import { InterviewDetailModal } from "./InterviewDetailModal";
@@ -43,14 +44,7 @@ export function InterviewCard({
               {interview.jobTitle}
             </p>
             <p className="text-xs text-slate-500 font-medium mt-2">
-              Scheduled{" "}
-              {scheduledDate.toLocaleString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
+              Scheduled <ClientFormattedDate date={interview.scheduledAt} />
             </p>
             {interview.isPreview ? (
               <p className="text-[11px] text-slate-400 font-medium mt-1">

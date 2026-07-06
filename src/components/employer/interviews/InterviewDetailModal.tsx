@@ -2,8 +2,10 @@
 
 import React, { useState, useTransition } from "react";
 import { X, Loader2, Calendar, Video, Clock, AlignLeft, Edit, Trash } from "lucide-react";
+import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import { createOrUpdateInterview, cancelInterview, updateInterviewSchedule, type EmployerInterviewRow } from "@/actions/employer/hiring";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface InterviewDetailModalProps {
   open: boolean;
@@ -16,6 +18,7 @@ export function InterviewDetailModal({
   onClose,
   interview,
 }: InterviewDetailModalProps) {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [dateVal, setDateVal] = useState(() => {
     const d = new Date(interview.scheduledAt);
@@ -70,6 +73,7 @@ export function InterviewDetailModal({
 
       toast.success("Interview rescheduled successfully.");
       setIsEditing(false);
+      router.refresh();
       onClose();
     });
   };
@@ -87,6 +91,7 @@ export function InterviewDetailModal({
       }
 
       toast.success("Interview cancelled successfully.");
+      router.refresh();
       onClose();
     });
   };
@@ -218,10 +223,7 @@ export function InterviewDetailModal({
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Date & Time</p>
                 <p className="text-sm font-black text-slate-850 mt-0.5">
-                  {new Date(interview.scheduledAt).toLocaleString(undefined, {
-                    dateStyle: "full",
-                    timeStyle: "short",
-                  })}
+                  <ClientFormattedDate date={interview.scheduledAt} />
                 </p>
               </div>
             </div>

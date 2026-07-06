@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Calendar, MessageSquare } from "lucide-react";
+import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import {
   getWorkerApplicationById,
   getApplicationStageHistory,
@@ -113,10 +114,7 @@ export default async function WorkerApplicationDetailPage({
             <div>
               <p className="text-xs text-emerald-200/80 font-bold uppercase tracking-wide">Date & Time</p>
               <p className="text-sm font-black mt-1 text-emerald-50">
-                {new Date(application.interview.scheduledAt).toLocaleString(undefined, {
-                  dateStyle: "full",
-                  timeStyle: "short",
-                })}
+                <ClientFormattedDate date={application.interview.scheduledAt} />
               </p>
             </div>
             {application.interview.meetingUrl && (
