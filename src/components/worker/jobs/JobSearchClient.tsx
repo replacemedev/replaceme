@@ -9,6 +9,7 @@ import { JobFilterSidebar, JobFilterPanel } from "./JobFilterSidebar";
 import { JobCard } from "./JobCard";
 import { JobCardGrid } from "./JobCardGrid";
 import { WorkerPageShell, WorkerFilterSheet } from "@/components/worker/layout";
+import { TablePagination } from "@/components/shared/TablePagination";
 import {
   JobSearchFacets,
   JobSearchResult,
@@ -16,7 +17,7 @@ import {
   SALARY_SLIDER_MAX,
 } from "@/types/job-search";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 20;
 
 interface JobSearchClientProps {
   initialJobs: JobSearchResult[];
@@ -64,19 +65,50 @@ export function JobSearchClient({
     facets.salaryMax || SALARY_SLIDER_MAX
   );
   const [sortBy, setSortBy] = useState<JobSortOption>("most_relevant");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setJobs(initialJobs);
   }, [initialJobs]);
+
+  const [prevFilterState, setPrevFilterState] = useState({
+    keyword,
+    location,
+    selectedSkills,
+    selectedEmploymentTypes,
+    salaryMin,
+    salaryMax,
+    sortBy,
+  });
+
+  if (
+    keyword !== prevFilterState.keyword ||
+    location !== prevFilterState.location ||
+    selectedSkills !== prevFilterState.selectedSkills ||
+    selectedEmploymentTypes !== prevFilterState.selectedEmploymentTypes ||
+    salaryMin !== prevFilterState.salaryMin ||
+    salaryMax !== prevFilterState.salaryMax ||
+    sortBy !== prevFilterState.sortBy
+  ) {
+    setPrevFilterState({
+      keyword,
+      location,
+      selectedSkills,
+      selectedEmploymentTypes,
+      salaryMin,
+      salaryMax,
+      sortBy,
+    });
+    setCurrentPage(1);
+  }
 
   const filtered = useMemo(() => {
     const q = keyword.trim().toLowerCase();
     const loc = location.trim().toLowerCase();
 
-    let result = jobs.filter((job) => {
+    const result = jobs.filter((job) => {
       const matchesKeyword =
         !q ||
         job.title.toLowerCase().includes(q) ||
@@ -123,8 +155,13 @@ export function JobSearchClient({
     sortBy,
   ]);
 
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * PAGE_SIZE;
+  const paginatedJobs = useMemo(() => {
+    return filtered.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filtered, startIndex]);
 
   const handleSkillToggle = (skill: string) => {
     setSelectedSkills((prev) => {
@@ -132,7 +169,7 @@ export function JobSearchClient({
       if (prev.length >= 3) return prev;
       return [...prev, skill];
     });
-    setVisibleCount(PAGE_SIZE);
+    setCurrentPage(1);
   };
 
   const handleClearAll = () => {
@@ -144,13 +181,7 @@ export function JobSearchClient({
     setSalaryMin(0);
     setSalaryMax(facets.salaryMax || SALARY_SLIDER_MAX);
     setSortBy("most_relevant");
-    setVisibleCount(PAGE_SIZE);
-  };
-
-  const handleLoadMore = () => {
-    setIsLoadingMore(true);
-    setVisibleCount((c) => c + PAGE_SIZE);
-    setTimeout(() => setIsLoadingMore(false), 300);
+    setCurrentPage(1);
   };
 
   const handleSavedChange = (jobId: string, saved: boolean) => {
@@ -171,7 +202,7 @@ export function JobSearchClient({
       setSelectedEmploymentTypes((prev) =>
         prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
       );
-      setVisibleCount(PAGE_SIZE);
+      setCurrentPage(1);
     },
     salaryMin,
     salaryMax,
@@ -187,7 +218,7 @@ export function JobSearchClient({
         location={location}
         onKeywordChange={setKeyword}
         onLocationChange={setLocation}
-        onSearch={() => setVisibleCount(PAGE_SIZE)}
+        onSearch={() => setCurrentPage(1)}
       />
 
       <WorkerPageShell width="wide" className="py-8 gap-6">
@@ -236,7 +267,7 @@ export function JobSearchClient({
                   value={sortBy}
                   onChange={(e) => {
                     setSortBy(e.target.value as JobSortOption);
-                    setVisibleCount(PAGE_SIZE);
+                    setCurrentPage(1);
                   }}
                   className="w-full sm:w-auto rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] cursor-pointer"
                 >
@@ -255,17 +286,24 @@ export function JobSearchClient({
                 description="Try adjusting your filters or search terms. New employer postings will appear here automatically."
               />
             ) : (
-              <JobCardGrid
-                hasMore={hasMore}
-                isLoadingMore={isLoadingMore}
-                onLoadMore={handleLoadMore}
-              >
-                {visible.map((job) => (
-                  <li key={job.id}>
-                    <JobCard job={job} onSavedChange={handleSavedChange} />
-                  </li>
-                ))}
-              </JobCardGrid>
+              <div className="space-y-6">
+                <JobCardGrid>
+                  {paginatedJobs.map((job) => (
+                    <li key={job.id}>
+                      <JobCard job={job} onSavedChange={handleSavedChange} />
+                    </li>
+                  ))}
+                </JobCardGrid>
+
+                <TablePagination
+                  totalItems={totalItems}
+                  pageSize={PAGE_SIZE}
+                  currentPage={activePage}
+                  onPageChange={setCurrentPage}
+                  label="jobs"
+                  className="mt-8 px-0 py-0 border-t-0 bg-transparent"
+                />
+              </div>
             )}
           </section>
         </div>

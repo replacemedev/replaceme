@@ -1,5 +1,5 @@
 import { WorkerPageShell } from "@/components/worker/layout";
-import { CardSkeleton, SkeletonBlock } from "./primitives";
+import { SkeletonBlock } from "./primitives";
 
 function JobCardSkeleton() {
   return (
@@ -114,7 +114,7 @@ export function JobSearchPageSkeleton() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+            <div className="flex flex-col gap-6">
               {Array.from({ length: 4 }).map((_, i) => (
                 <JobCardSkeleton key={i} />
               ))}

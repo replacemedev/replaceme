@@ -5,6 +5,8 @@ interface TablePaginationProps {
   pageSize?: number;
   currentPage: number;
   onPageChange: (page: number) => void;
+  label?: string;
+  className?: string;
 }
 
 export function TablePagination({
@@ -12,6 +14,8 @@ export function TablePagination({
   pageSize = 20,
   currentPage,
   onPageChange,
+  label = "entries",
+  className = "border-t border-slate-100 bg-white px-4 py-4 mt-4",
 }: TablePaginationProps) {
   const totalPages = Math.ceil(totalItems / pageSize);
   if (totalPages <= 1) return null;
@@ -52,11 +56,11 @@ export function TablePagination({
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-100 bg-white px-4 py-4 mt-4 w-full">
-      <div className="hidden md:block text-sm text-slate-500">
+    <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 w-full ${className}`}>
+      <div className="hidden sm:block text-sm text-slate-500">
         Showing <span className="font-semibold text-slate-750">{startIdx}</span> to{" "}
         <span className="font-semibold text-slate-750">{endIdx}</span> of{" "}
-        <span className="font-semibold text-slate-750">{totalItems}</span> entries
+        <span className="font-semibold text-slate-750">{totalItems}</span> {label}
       </div>
       <div className="flex items-center justify-between w-full sm:w-auto sm:justify-end gap-2">
         <button
