@@ -45,13 +45,13 @@ export default async function WorkerApplicationDetailPage({
   const timeline =
     stageHistory.length > 0
       ? stageHistory.map((event) => ({
-          label: `Status: ${APPLICATION_STATUS_LABELS[event.status]}`,
-          at: event.createdAt,
-        }))
+        label: `Status: ${APPLICATION_STATUS_LABELS[event.status]}`,
+        at: event.createdAt,
+      }))
       : [
-          { label: "Application submitted", at: application.createdAt },
-          { label: `Status: ${label}`, at: application.createdAt },
-        ];
+        { label: "Application submitted", at: application.createdAt },
+        { label: `Status: ${label}`, at: application.createdAt },
+      ];
 
   return (
     <WorkerPageShell width="content">
@@ -135,22 +135,6 @@ export default async function WorkerApplicationDetailPage({
               {application.interview.notes}
             </div>
           )}
-
-          {/* Translucent Glassmorphism Agent Skills badges */}
-          <div className="pt-4 border-t border-emerald-800/60 relative z-10">
-            <p className="text-xs text-emerald-200/80 font-bold uppercase tracking-wide mb-2.5">Matched Agent Skills</p>
-            <div className="flex flex-wrap gap-2">
-              {["Ponytail", "Fast-Typer", "Bilingual"].map((skill, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/15 text-[11px] font-semibold tracking-wide shadow-sm select-none hover:bg-white/15 transition-all cursor-default"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-
           {application.interview.meetingUrl && (
             <div className="pt-2 relative z-10">
               <a
