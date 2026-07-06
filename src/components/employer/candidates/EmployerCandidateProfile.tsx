@@ -96,45 +96,29 @@ export function EmployerCandidateProfile({
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
-          <FeatureGate
-            allowed={!isPreview}
-            feature="identity"
-            currentPlan={planSlug}
-            preview={
-              <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
-                <div className="h-16 w-16 rounded-2xl bg-slate-200" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-6 w-40 rounded bg-slate-200" />
-                  <div className="h-4 w-28 rounded bg-slate-100" />
-                  <div className="h-3 w-36 rounded bg-slate-100" />
-                </div>
-              </header>
-            }
-          >
-            <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2]">
-                <AvatarImage
-                  src={candidate.avatarUrl}
-                  alt={candidate.name}
-                  initials={initials}
-                  size="sm"
-                  rounded="2xl"
-                />
-              </div>
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 inline-flex items-center gap-2 flex-wrap">
-                  {candidate.name}
-                  <VerifiedBadge show={candidate.isVerified} />
-                </h1>
-                <p className="text-sm text-slate-500 mt-1 font-medium">
-                  {candidate.title}
-                </p>
-                {candidate.email ? (
-                  <p className="text-xs text-slate-400 mt-1">{candidate.email}</p>
-                ) : null}
-              </div>
-            </header>
-          </FeatureGate>
+          <header className={`${EMPLOYER_CARD} flex items-start gap-4 p-5`}>
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2]">
+              <AvatarImage
+                src={candidate.avatarUrl}
+                alt={candidate.name}
+                initials={initials}
+                size="sm"
+                rounded="2xl"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold text-slate-900 inline-flex items-center gap-2 flex-wrap">
+                {candidate.name}
+                <VerifiedBadge show={candidate.isVerified} />
+              </h1>
+              <p className="text-sm text-slate-500 mt-1 font-medium">
+                {candidate.title}
+              </p>
+              {candidate.email ? (
+                <p className="text-xs text-slate-400 mt-1">{candidate.email}</p>
+              ) : null}
+            </div>
+          </header>
 
           {salary ? (
             <section className={`${EMPLOYER_CARD} p-5`}>
@@ -198,43 +182,133 @@ export function EmployerCandidateProfile({
             </p>
           </section>
 
-          {!isPreview && candidate.workerProjects.length > 0 ? (
-            <section className={`${EMPLOYER_CARD} p-5`}>
-              <h2 className="text-sm font-bold text-slate-900 mb-3">
-                Project highlights
-              </h2>
-              <ul className="space-y-4">
-                {candidate.workerProjects.map((project) => (
-                  <li key={project.id ?? project.title} className="space-y-1">
-                    <p className="text-sm font-bold text-slate-900">
-                      {project.title}
-                      {project.year ? (
-                        <span className="font-medium text-slate-400">
-                          {" "}
-                          · {project.year}
-                        </span>
-                      ) : null}
-                    </p>
-                    {project.role ? (
-                      <p className="text-xs font-semibold text-slate-500">
-                        {project.role}
-                      </p>
-                    ) : null}
-                    {project.description ? (
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {project.description}
-                      </p>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
           {isPreview ? (
-            <UnlockOverlay feature="identity" currentPlan={planSlug} />
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50">
+              {/* Restricted Content Wrapper (blurred & disabled) */}
+              <div className="opacity-40 blur-[2px] select-none pointer-events-none space-y-6 p-6">
+                {/* Restricted Section: Contact & Location */}
+                <section className={`${EMPLOYER_CARD} p-5 bg-white`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-3">
+                    Contact &amp; location
+                  </h2>
+                  <dl className="space-y-2 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-slate-400" />
+                      <dd>{candidate.location || "Manila, Philippines"}</dd>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-slate-400" />
+                      <dd>{candidate.phoneNumber || "+63 917 123 4567"}</dd>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="h-4 w-4 text-slate-400" />
+                      <dd>candidate-portfolio-link.com</dd>
+                    </div>
+                  </dl>
+                </section>
+
+                {/* Restricted Section: About / Bio */}
+                <section className={`${EMPLOYER_CARD} p-5 bg-white`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-2">About</h2>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {candidate.bio || "Highly skilled professional with years of experience building modern web applications, implementing scalable database architectures, and leading agile dev teams to deliver high-quality code."}
+                  </p>
+                </section>
+
+                {/* Restricted Section: Project highlights / Work history */}
+                <section className={`${EMPLOYER_CARD} p-5 bg-white`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-3">
+                    Project highlights
+                  </h2>
+                  <ul className="space-y-4">
+                    {candidate.workerProjects.length > 0 ? (
+                      candidate.workerProjects.map((project) => (
+                        <li key={project.id ?? project.title} className="space-y-1">
+                          <p className="text-sm font-bold text-slate-900">
+                            {project.title}
+                            {project.year ? (
+                              <span className="font-medium text-slate-400">
+                                {" "}
+                                · {project.year}
+                              </span>
+                            ) : null}
+                          </p>
+                          {project.role ? (
+                            <p className="text-xs font-semibold text-slate-500">
+                              {project.role}
+                            </p>
+                          ) : null}
+                          {project.description ? (
+                            <p className="text-sm text-slate-600 leading-relaxed">
+                              {project.description}
+                            </p>
+                          ) : null}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="space-y-1">
+                        <p className="text-sm font-bold text-slate-900">
+                          Senior Full-Stack Developer
+                          <span className="font-medium text-slate-400"> · 2024</span>
+                        </p>
+                        <p className="text-xs font-semibold text-slate-500">
+                          E-Commerce Platform Redesign
+                        </p>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          Led development of a high-performance web storefront, optimizing image loading and page speed.
+                        </p>
+                      </li>
+                    )}
+                  </ul>
+                </section>
+              </div>
+
+              {/* Centered Paywall Upgrade Card Overlay */}
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm p-4">
+                <div className="w-full max-w-md mx-auto">
+                  <UnlockOverlay 
+                    feature="identity" 
+                    currentPlan={planSlug}
+                    className="shadow-xl rounded-xl border border-gray-200 bg-white"
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <>
+              {candidate.workerProjects.length > 0 && (
+                <section className={`${EMPLOYER_CARD} p-5`}>
+                  <h2 className="text-sm font-bold text-slate-900 mb-3">
+                    Project highlights
+                  </h2>
+                  <ul className="space-y-4">
+                    {candidate.workerProjects.map((project) => (
+                      <li key={project.id ?? project.title} className="space-y-1">
+                        <p className="text-sm font-bold text-slate-900">
+                          {project.title}
+                          {project.year ? (
+                            <span className="font-medium text-slate-400">
+                              {" "}
+                              · {project.year}
+                            </span>
+                          ) : null}
+                        </p>
+                        {project.role ? (
+                          <p className="text-xs font-semibold text-slate-500">
+                            {project.role}
+                          </p>
+                        ) : null}
+                        {project.description ? (
+                          <p className="text-sm text-slate-600 leading-relaxed">
+                            {project.description}
+                          </p>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
               {(candidate.location ||
                 candidate.phoneNumber ||
                 candidate.portfolioUrl) && (
@@ -317,16 +391,6 @@ export function EmployerCandidateProfile({
           />
         </aside>
       </div>
-
-      {isPreview ? (
-        <EmployerStickyActionBar>
-          <UpgradeCTA
-            feature="identity"
-            currentPlan={planSlug}
-            className="w-full justify-center"
-          />
-        </EmployerStickyActionBar>
-      ) : null}
     </EmployerPageShell>
   );
 }
