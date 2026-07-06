@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { X, Loader2, Calendar, Video, Clock, AlignLeft, Edit, Trash } from "lucide-react";
+import React, { useState, useTransition, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X, Loader2, Video, Clock, AlignLeft, Edit, Trash } from "lucide-react";
 import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import { createOrUpdateInterview, cancelInterview, updateInterviewSchedule, type EmployerInterviewRow } from "@/actions/employer/hiring";
 import { toast } from "sonner";
@@ -19,7 +20,12 @@ export function InterviewDetailModal({
   interview,
 }: InterviewDetailModalProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [dateVal, setDateVal] = useState(() => {
     const d = new Date(interview.scheduledAt);
     const year = d.getFullYear();
@@ -37,7 +43,7 @@ export function InterviewDetailModal({
   const [notes, setNotes] = useState(interview.notes ?? "");
   const [isPending, startTransition] = useTransition();
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   const handleReschedule = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,8 +102,8 @@ export function InterviewDetailModal({
     });
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <button
         type="button"
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
@@ -293,4 +299,6 @@ export function InterviewDetailModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

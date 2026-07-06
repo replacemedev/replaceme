@@ -117,9 +117,9 @@ export function ApplicantCard({
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1.5 shrink-0">
+          <div className="flex flex-col items-end gap-1 shrink-0 max-w-[8.5rem]">
             <span
-              className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase ${matchPillStyle}`}
+              className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
             >
               {matchText}
             </span>
