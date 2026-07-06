@@ -69,65 +69,64 @@ export function ApplicantCard({
 
   return (
     <div className="relative overflow-hidden bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow p-5 flex flex-col justify-between min-h-[220px]">
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
-            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-emerald-50">
-              {applicant.avatarUrl && !isPreview ? (
-                <AvatarImage
-                  src={applicant.avatarUrl}
-                  alt={applicant.name}
-                  initials={initials}
-                  size="sm"
-                  rounded="xl"
-                />
-              ) : (
-                <div
-                  className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-xl ${isPreview
-                    ? "bg-slate-100 text-slate-400 blur-[1px]"
-                    : "bg-emerald-100 text-emerald-800"
-                    }`}
-                >
-                  {isPreview ? "?" : initials}
-                </div>
-              )}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 min-w-0 w-full">
+          <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-emerald-50">
+            {applicant.avatarUrl && !isPreview ? (
+              <AvatarImage
+                src={applicant.avatarUrl}
+                alt={applicant.name}
+                initials={initials}
+                size="sm"
+                rounded="xl"
+              />
+            ) : (
+              <div
+                className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-xl ${isPreview
+                  ? "bg-slate-100 text-slate-400 blur-[1px]"
+                  : "bg-emerald-100 text-emerald-800"
+                  }`}
+              >
+                {isPreview ? "?" : initials}
+              </div>
+            )}
+            {isPreview ? (
+              <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
+                <Lock className="h-4 w-4 text-slate-500" aria-hidden />
+              </span>
+            ) : (
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h3 className="text-xs font-extrabold text-slate-800 leading-snug mb-1 inline-flex items-center gap-1 flex-wrap">
+              {applicant.name}
               {isPreview ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
-                  <Lock className="h-4 w-4 text-slate-500" aria-hidden />
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 uppercase tracking-wider">
+                  Preview
                 </span>
               ) : (
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
+                <VerifiedBadge show={applicant.isVerified} size="sm" />
               )}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <h3 className="text-xs font-extrabold text-slate-800 leading-snug mb-1 inline-flex items-center gap-1 flex-wrap">
-                {applicant.name}
-                {isPreview ? (
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 uppercase tracking-wider">
-                    Preview
-                  </span>
-                ) : (
-                  <VerifiedBadge show={applicant.isVerified} size="sm" />
-                )}
-              </h3>
-              <p className="text-[10px] text-slate-450 font-bold leading-none truncate">
-                {applicant.role}
-              </p>
-            </div>
+            </h3>
+            <p className="text-[10px] text-slate-450 font-bold leading-none truncate">
+              {applicant.role}
+            </p>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-            <span
-              className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
-            >
-              {matchText}
-            </span>
-            <ApplicationStatusDropdown
-              applicationId={applicant.id}
-              status={applicant.status}
-            />
-          </div>
+        {/* Status Row */}
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <span
+            className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
+          >
+            {matchText}
+          </span>
+          <ApplicationStatusDropdown
+            applicationId={applicant.id}
+            status={applicant.status}
+          />
         </div>
 
         {applicant.status === "INTERVIEW_SCHEDULED" && (
@@ -152,7 +151,7 @@ export function ApplicantCard({
         )}
 
         <div className="flex flex-wrap gap-2 mt-3">
-          {applicant.skills.map((skill, idx) => {
+          {skillsList.map((skill, idx) => {
             const isAgent = isAgentSkill(skill);
             return (
               <span
