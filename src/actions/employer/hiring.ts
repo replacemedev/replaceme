@@ -508,3 +508,73 @@ export async function cancelInterview(applicationId: string) {
     return { success: false, error: "An unexpected error occurred." };
   }
 }
+
+export async function updateInterviewSchedule(input: {
+  interviewId: string;
+  scheduledAt: string;
+  meetingLink?: string;
+  notes?: string;
+}) {
+  try {
+    const schema = z.object({
+      interviewId: z.string().uuid(),
+      scheduledAt: z.string().refine((val) => new Date(val) > new Date(), {
+        message: "Interview date must be in the future",
+      }),
+      meetingLink: z.string().url().optional().or(z.literal("")),
+      notes: z.string().optional(),
+    });
+
+    const parsed = schema.parse(input);
+    const { supabase, profile } = await requireRole("employer");
+
+    // Verify the user making the request is the Employer who owns this interview
+    const { data: interview, error: intError } = await supabase
+      .from("interviews")
+      .select("id, employer_id, application_id, worker_id, job_id")
+      .eq("id", parsed.interviewId)
+      .single();
+
+    if (intError || !interview) {
+      return { success: false, error: "Interview record not found." };
+    }
+
+    if (interview.employer_id !== profile.id) {
+      return { success: false, error: "Unauthorized access to this interview." };
+    }
+
+    const { error: updateError } = await supabase
+      .from("interviews")
+      .update({
+        scheduled_at: parsed.scheduledAt,
+        meeting_link: parsed.meetingLink ? parsed.meetingLink.trim() : null,
+        notes: parsed.notes ? parsed.notes.trim() : null,
+        status: "scheduled",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", parsed.interviewId);
+
+    if (updateError) {
+      safeError("Failed to update interview:", updateError);
+      return { success: false, error: "Failed to update interview schedule." };
+    }
+
+    // Invalidate caches
+    await invalidateEmployerHiringCache(profile.id);
+    await invalidateWorkerCache(interview.worker_id);
+
+    revalidatePath(`/employer/jobs/${interview.job_id}/applicants`);
+    revalidatePath("/employer/interviews");
+    revalidatePath(`/worker/applications/${interview.application_id}`);
+    revalidatePath("/worker/applications");
+    revalidatePath("/worker/interviews");
+
+    return { success: true };
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return { success: false, error: err.issues[0]?.message ?? "Invalid input data." };
+    }
+    safeError("updateInterviewSchedule:", err);
+    return { success: false, error: "An unexpected error occurred." };
+  }
+}

@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { X, Loader2, Calendar, Video, Clock, AlignLeft, Edit, Trash } from "lucide-react";
-import { createOrUpdateInterview, cancelInterview, type EmployerInterviewRow } from "@/actions/employer/hiring";
+import { createOrUpdateInterview, cancelInterview, updateInterviewSchedule, type EmployerInterviewRow } from "@/actions/employer/hiring";
 import { toast } from "sonner";
 
 interface InterviewDetailModalProps {
@@ -17,12 +17,18 @@ export function InterviewDetailModal({
   interview,
 }: InterviewDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [scheduledAt, setScheduledAt] = useState(() => {
-    // Format date string for datetime-local value (YYYY-MM-DDThh:mm)
-    const date = new Date(interview.scheduledAt);
-    const tzOffset = date.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
-    return localISOTime;
+  const [dateVal, setDateVal] = useState(() => {
+    const d = new Date(interview.scheduledAt);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  });
+  const [timeVal, setTimeVal] = useState(() => {
+    const d = new Date(interview.scheduledAt);
+    const hrs = String(d.getHours()).padStart(2, "0");
+    const mins = String(d.getMinutes()).padStart(2, "0");
+    return `${hrs}:${mins}`;
   });
   const [meetingUrl, setMeetingUrl] = useState(interview.meetingUrl ?? "");
   const [notes, setNotes] = useState(interview.notes ?? "");
@@ -32,18 +38,30 @@ export function InterviewDetailModal({
 
   const handleReschedule = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!scheduledAt) {
+    if (!dateVal || !timeVal) {
       toast.error("Please pick a valid date and time.");
       return;
     }
 
+    const scheduledAt = new Date(`${dateVal}T${timeVal}`).toISOString();
+
     startTransition(async () => {
-      const result = await createOrUpdateInterview({
-        applicationId: interview.applicationId,
-        scheduledAt: new Date(scheduledAt).toISOString(),
-        meetingUrl: meetingUrl.trim() || undefined,
-        notes: notes.trim() || undefined,
-      });
+      let result;
+      if (interview.id) {
+        result = await updateInterviewSchedule({
+          interviewId: interview.id,
+          scheduledAt,
+          meetingLink: meetingUrl.trim() || undefined,
+          notes: notes.trim() || undefined,
+        });
+      } else {
+        result = await createOrUpdateInterview({
+          applicationId: interview.applicationId,
+          scheduledAt,
+          meetingUrl: meetingUrl.trim() || undefined,
+          notes: notes.trim() || undefined,
+        });
+      }
 
       if (!result.success) {
         toast.error(result.error ?? "Failed to reschedule interview.");
@@ -98,21 +116,39 @@ export function InterviewDetailModal({
 
         {isEditing ? (
           <form onSubmit={handleReschedule} className="space-y-4 pt-4">
-            <div>
-              <label
-                htmlFor="editScheduledAt"
-                className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5"
-              >
-                Date & Time *
-              </label>
-              <input
-                type="datetime-local"
-                id="editScheduledAt"
-                value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                required
-                className="w-full h-11 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-800 focus:border-[#006e2f] focus:outline-hidden focus:ring-4 focus:ring-[#006e2f]/10"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="editDateVal"
+                  className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5"
+                >
+                  Date *
+                </label>
+                <input
+                  type="date"
+                  id="editDateVal"
+                  value={dateVal}
+                  onChange={(e) => setDateVal(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-800 focus:border-[#006e2f] focus:outline-hidden focus:ring-4 focus:ring-[#006e2f]/10"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="editTimeVal"
+                  className="block text-[11px] font-black uppercase tracking-wider text-slate-500 mb-1.5"
+                >
+                  Time *
+                </label>
+                <input
+                  type="time"
+                  id="editTimeVal"
+                  value={timeVal}
+                  onChange={(e) => setTimeVal(e.target.value)}
+                  required
+                  className="w-full h-11 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-800 focus:border-[#006e2f] focus:outline-hidden focus:ring-4 focus:ring-[#006e2f]/10"
+                />
+              </div>
             </div>
 
             <div>

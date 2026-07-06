@@ -29,32 +29,25 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
 
   return (
     <div className="w-full">
-      {/* Desktop version: Horizontal stepper */}
-      <div className="hidden md:flex items-center justify-between w-full relative py-6 select-none">
-        {/* Background connector line (starts at 12.5% and ends at 87.5%) */}
-        <div className="absolute top-5 left-[12.5%] right-[12.5%] h-0.5 bg-slate-100 -translate-y-1/2 z-0" />
-        
-        {/* Active progress connector line (spans 75% total from first node center to last node center) */}
-        {activeIndex > 0 && (
-          <div
-            className="absolute top-5 left-[12.5%] h-0.5 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-500 ease-out"
-            style={{ width: `${(activeIndex / (steps.length - 1)) * 75}%` }}
-          />
-        )}
-
+      {/* Responsive layout: Horizontally scrollable on mobile to prevent squishing, full width row on desktop */}
+      <div className="flex flex-row overflow-x-auto md:overflow-x-visible snap-x snap-mandatory gap-4 md:gap-0 justify-start md:justify-between w-full py-4 select-none scrollbar-none">
         {steps.map((step, idx) => {
           const isCompleted = idx < activeIndex;
           const isActive = idx === activeIndex;
+          const isPending = idx > activeIndex;
 
           return (
-            <div key={idx} className="flex flex-col items-center relative z-10 w-1/4">
+            <div
+              key={idx}
+              className="flex flex-col items-center shrink-0 md:shrink md:w-1/4 w-[160px] snap-center px-2"
+            >
               <div
                 className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300 bg-white ${
                   isCompleted
                     ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/10"
                     : isActive
-                    ? "border-emerald-600 text-emerald-600 ring-4 ring-emerald-100/70 shadow-sm"
-                    : "border-slate-200 text-slate-400"
+                    ? "bg-white border-emerald-500 border-4 text-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                    : "bg-white border-slate-200 text-slate-350"
                 }`}
               >
                 {isCompleted ? (
@@ -64,59 +57,22 @@ export function ApplicationStepper({ status }: ApplicationStepperProps) {
                 )}
               </div>
               <div className="text-center mt-3">
-                <p className={`text-xs font-black transition-colors duration-300 ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
+                <p
+                  className={`text-xs transition-colors duration-300 ${
+                    isActive
+                      ? "text-gray-900 font-bold"
+                      : isCompleted
+                      ? "text-slate-800 font-bold"
+                      : "text-slate-400 font-semibold"
+                  }`}
+                >
                   {step.label}
                 </p>
-                <p className="text-[10px] font-semibold text-slate-400 mt-0.5 max-w-[120px] mx-auto leading-normal">
-                  {step.desc}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Mobile version: Vertical timeline */}
-      <div className="flex md:hidden flex-col space-y-6 relative pl-4 select-none">
-        {/* Background connector line */}
-        <div className="absolute top-4 bottom-4 left-6 w-0.5 bg-slate-100" />
-        
-        {/* Active connection line */}
-        {activeIndex > 0 && (
-          <div
-            className="absolute left-6 top-4 bg-emerald-500 w-0.5 transition-all duration-500 ease-out"
-            style={{
-              height: activeIndex === 3 ? "calc(100% - 2rem)" : `${(activeIndex / (steps.length - 1)) * 78}%`,
-            }}
-          />
-        )}
-
-        {steps.map((step, idx) => {
-          const isCompleted = idx < activeIndex;
-          const isActive = idx === activeIndex;
-
-          return (
-            <div key={idx} className="flex items-start relative pl-10 min-h-[40px]">
-              <div
-                className={`absolute left-2 top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 z-10 transition-all duration-300 bg-white ${
-                  isCompleted
-                    ? "bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/10"
-                    : isActive
-                    ? "border-emerald-600 text-emerald-600 ring-4 ring-emerald-100/70 shadow-sm"
-                    : "border-slate-200 text-slate-400"
-                }`}
-              >
-                {isCompleted ? (
-                  <Check size={12} strokeWidth={3} />
-                ) : (
-                  <span className="text-xs font-black">{idx + 1}</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0 pt-0.5">
-                <p className={`text-xs font-black transition-colors duration-300 ${isActive ? "text-emerald-700" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
-                  {step.label}
-                </p>
-                <p className="text-[10px] font-semibold text-slate-400 leading-normal mt-0.5">
+                <p
+                  className={`text-[10px] font-semibold mt-0.5 max-w-[120px] mx-auto leading-normal transition-colors duration-300 ${
+                    isActive || isCompleted ? "text-gray-500" : "text-slate-400"
+                  }`}
+                >
                   {step.desc}
                 </p>
               </div>
