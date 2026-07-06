@@ -48,9 +48,8 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
     });
   };
 
-  const cardStyles = isPriorityListing
-    ? "border border-purple-300 border-l-4 border-l-purple-600 bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-900/10 dark:to-slate-900 shadow-[0_0_15px_rgba(168,85,247,0.15)] dark:border-purple-800 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] hover:border-purple-400"
-    : "border border-slate-200 bg-white shadow-xs hover:border-emerald-200 hover:shadow-md";
+  const cardStyles =
+    "border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:border-emerald-200 hover:shadow-md";
 
   return (
     <article className={`flex flex-col h-full rounded-2xl p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
