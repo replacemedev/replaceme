@@ -129,7 +129,7 @@ export function MobileMenu({
         </nav>
 
         {session?.isAuthenticated && (
-          <div className="mt-auto border-t border-slate-100 pt-4">
+          <div className="hidden lg:block mt-auto border-t border-slate-100 pt-4">
             <RoleNavDropdown session={session} layout="mobile" />
           </div>
         )}

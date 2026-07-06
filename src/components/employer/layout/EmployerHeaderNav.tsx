@@ -25,7 +25,6 @@ interface EmployerHeaderNavProps {
 export function EmployerHeaderNav({
   unreadMessageCount = 0,
   planUsage = null,
-  session,
 }: EmployerHeaderNavProps) {
   const pathname = usePathname();
   const [jobsDropdownOpen, setJobsDropdownOpen] = useState(false);
@@ -297,7 +296,7 @@ export function EmployerMobileMenu({
           ) : null}
 
           {session?.isAuthenticated && (
-            <div className="mt-4 border-t border-slate-100 pt-4">
+            <div className="hidden lg:block mt-4 border-t border-slate-100 pt-4">
               <RoleNavDropdown session={session} planUsage={planUsage} layout="mobile" />
             </div>
           )}
