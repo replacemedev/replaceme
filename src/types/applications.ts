@@ -21,7 +21,7 @@ export function isApplicationStatus(value: string): value is ApplicationStatus {
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   PENDING: "Pending",
   UNDER_REVIEW: "Under Review",
-  INTERVIEW_SCHEDULED: "Interview Scheduled",
+  INTERVIEW_SCHEDULED: "Interviewing",
   REJECTED: "Rejected",
   HIRED: "Hired",
   WITHDRAWN: "Withdrawn",
