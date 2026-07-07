@@ -70,9 +70,9 @@ export function ApplicationStatusDropdown({
         disabled={disabled || isPending}
         onChange={(e) => handleChange(e.target.value as ApplicationStatus)}
         aria-label="Application status"
-        className={`relative z-30 h-8 w-auto w-fit max-w-[140px] rounded-md border pl-2 pr-7 text-xs font-bold shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectStyles(status)}`}
+        className={`relative z-30 w-fit max-w-[140px] text-xs py-1 px-2 rounded-md border font-bold shadow-xs transition-colors focus:outline-hidden focus:ring-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${selectStyles(status)}`}
       >
-        {APPLICATION_STATUSES.map((value) => (
+        {APPLICATION_STATUSES.filter((value) => value !== "WITHDRAWN").map((value) => (
           <option key={value} value={value}>
             {APPLICATION_STATUS_LABELS[value]}
           </option>

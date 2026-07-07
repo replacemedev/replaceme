@@ -69,7 +69,7 @@ export function ApplicantCard({
 
   return (
     <div className="relative overflow-hidden bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow p-5 flex flex-col justify-between min-h-[220px]">
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 min-w-0 w-full">
           <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-emerald-50">
             {applicant.avatarUrl && !isPreview ? (
@@ -117,7 +117,7 @@ export function ApplicantCard({
         </div>
 
         {/* Status Row */}
-        <div className="flex flex-wrap items-center gap-2 mt-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span
             className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
           >
@@ -130,7 +130,7 @@ export function ApplicantCard({
         </div>
 
         {applicant.status === "INTERVIEW_SCHEDULED" && (
-          <div className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2 mt-2">
+          <div className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <Calendar className="h-3.5 w-3.5 text-slate-405 shrink-0" />
               <p className="text-[10px] font-extrabold text-slate-650 truncate">
@@ -150,8 +150,8 @@ export function ApplicantCard({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 mt-3">
-          {skillsList.map((skill, idx) => {
+        <div className="flex flex-wrap gap-2">
+          {applicant.skills.map((skill, idx) => {
             const isAgent = isAgentSkill(skill);
             return (
               <span
