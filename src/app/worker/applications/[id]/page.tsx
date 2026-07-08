@@ -152,7 +152,7 @@ export default async function WorkerApplicationDetailPage({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100/60">
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm font-semibold text-[#006e2f]">
-              {formatHourlyRate(application.hourlyRate)}
+              {formatHourlyRate(application.hourlyRate, application.salaryCurrency)}
             </p>
             <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">
               {label}

@@ -82,7 +82,7 @@ export function ApplicationRow({ application }: ApplicationRowProps) {
             {formatDate(application.createdAt)}
           </p>
           <p className="mt-1 text-sm font-bold text-slate-900">
-            {formatHourlyRate(application.hourlyRate)}
+            {formatHourlyRate(application.hourlyRate, application.salaryCurrency)}
           </p>
         </div>
 

@@ -33,6 +33,7 @@ type JobPostJoin = {
   logo_url: string | null;
   monthly_salary: number | null;
   hours_per_week: number | null;
+  salary_currency: string | null;
 };
 
 function mapApplicationRow(row: {
@@ -68,6 +69,7 @@ function mapApplicationRow(row: {
     monthlySalary,
     hoursPerWeek,
     hourlyRate: computeHourlyRate(monthlySalary, hoursPerWeek),
+    salaryCurrency: job.salary_currency ?? "PHP",
   };
 }
 
@@ -112,7 +114,8 @@ export async function getWorkerApplicationById(applicationId: string) {
           company_name,
           logo_url,
           monthly_salary,
-          hours_per_week
+          hours_per_week,
+          salary_currency
         ),
         interviews (
           id,
@@ -189,7 +192,8 @@ export async function getWorkerApplications(): Promise<WorkerApplication[]> {
           company_name,
           logo_url,
           monthly_salary,
-          hours_per_week
+          hours_per_week,
+          salary_currency
         )
       `
           )

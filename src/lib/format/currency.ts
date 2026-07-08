@@ -20,6 +20,7 @@ export function formatMoney(
     const formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
+      currencyDisplay: "narrowSymbol",
       maximumFractionDigits: digits,
       minimumFractionDigits: digits,
     }).format(amount);
@@ -53,6 +54,7 @@ export function formatCurrency(
     const formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currencyCode,
+      currencyDisplay: "narrowSymbol",
       maximumFractionDigits: digits,
       minimumFractionDigits: digits,
     }).format(amount);

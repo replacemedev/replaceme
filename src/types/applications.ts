@@ -61,6 +61,7 @@ export interface WorkerApplication {
   monthlySalary: number;
   hoursPerWeek: number;
   hourlyRate: number | null;
+  salaryCurrency?: string;
 }
 
 export function computeHourlyRate(
