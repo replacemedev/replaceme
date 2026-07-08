@@ -1,5 +1,5 @@
 import { AdminListPageSkeleton } from "@/components/admin/shared/AdminSkeletons";
 
 export default function AdminJobsLoading() {
-  return <AdminListPageSkeleton />;
+  return <AdminListPageSkeleton withTabs tabCount={5} />;
 }

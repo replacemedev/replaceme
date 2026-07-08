@@ -37,7 +37,7 @@ export function AppSidebar({
   const activeHref = getActiveAdminNavHref(pathname, items);
 
   return (
-    <aside className="hidden lg:flex flex-col bg-white border-r border-slate-200/80 w-[260px] shrink-0">
+    <aside className="hidden md:flex flex-col bg-white border-r border-slate-200/80 w-[260px] shrink-0">
       {showBrand ? (
         <div className="px-5 pt-6 pb-5 border-b border-slate-100">
           <NavBrand homeHref={profile.homeHref} compact />

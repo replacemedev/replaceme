@@ -18,10 +18,10 @@ export const ADMIN_CARD_HOVER =
   "transition-all duration-300 hover:shadow-md hover:border-slate-200/60";
 
 export const ADMIN_PAGE_TITLE =
-  "text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight";
+  "text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight break-words whitespace-normal";
 
 export const ADMIN_PAGE_SUBHEAD =
-  "text-xs sm:text-sm text-slate-500 font-medium mt-2 leading-relaxed max-w-2xl";
+  "text-xs sm:text-sm text-slate-500 font-medium mt-2 leading-relaxed max-w-2xl break-words whitespace-normal";
 
 export const ADMIN_SECTION_TITLE =
   "text-lg sm:text-xl font-bold text-slate-900 tracking-tight";

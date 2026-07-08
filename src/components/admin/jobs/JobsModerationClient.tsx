@@ -19,6 +19,10 @@ import type { AdminJobRow } from "@/types/admin.types";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { getAdminJobDeepDive, type AdminJobDeepDive } from "@/actions/admin/deep-dive";
 import { formatMoney } from "@/lib/format/currency";
+import {
+  AdminDataTable,
+  AdminMobileCard,
+} from "@/components/admin/shared/AdminDataTable";
 
 const STATUS_FILTERS = [
   "All",
@@ -171,119 +175,194 @@ export function JobsModerationClient({
         />
       ) : (
         <div className="space-y-4">
-          <div className="w-full overflow-x-auto border border-gray-200 rounded-lg shadow-sm bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                <th className="px-4 py-3">Job</th>
-                <th className="px-4 py-3">Employer</th>
-                <th className="px-4 py-3 text-left">Plan</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Salary</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {paginatedJobs.map((job) => (
-                <tr key={job.id} className="hover:bg-slate-50/50">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/jobs/${job.id}`}
-                      className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
-                    >
-                      {job.title}
-                    </Link>
-                    <p className="text-xs text-slate-400">
-                      {new Date(job.created_at).toLocaleDateString()}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">
-                    {job.company_name ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col items-start gap-1">
-                      <PlanTierBadge
-                        planSlug={job.plan_slug}
-                        requiresManualApproval={job.requires_manual_approval}
-                      />
-                      {job.submitted_for_review_at ? (
-                        <p className="mt-1 text-[10px] text-slate-400 whitespace-nowrap">
-                          Submitted{" "}
-                          {new Date(job.submitted_for_review_at).toLocaleDateString()}
-                        </p>
-                      ) : null}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">
-                    {job.employment_type}
-                  </td>
-                  <td className="px-4 py-3 text-slate-600 font-mono text-xs">
-                    {formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-start">
-                      <StatusBadge status={job.status} />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1">
-                      <ActionBtn
-                        label="View"
-                        icon={Eye}
-                        className="text-slate-700 hover:bg-slate-100"
-                        disabled={pending}
-                        onClick={() => {
-                          setViewTarget(job);
-                          setViewData(null);
-                          startTransition(async () => {
-                            const full = await getAdminJobDeepDive(job.id);
-                            if (!full) {
-                              toast.error("Failed to load job details");
-                              return;
-                            }
-                            setViewData(full);
-                          });
-                        }}
-                      />
-                      {job.status === "Pending Review" ? (
-                        <>
-                          <ActionBtn
-                            label="Approve"
-                            icon={Check}
-                            className="text-[#006e2f] hover:bg-[#ebfdf2]"
-                            disabled={pending}
-                            onClick={() => handleApprove(job.id)}
-                          />
-                          <ActionBtn
-                            label="Reject"
-                            icon={X}
-                            className="text-amber-700 hover:bg-amber-50"
-                            disabled={pending}
-                            onClick={() => setRejectTarget(job)}
-                          />
-                        </>
-                      ) : null}
-                      <ActionBtn
-                        label="Delete"
-                        icon={Trash2}
-                        className="text-red-600 hover:bg-red-50"
-                        disabled={pending}
-                        onClick={() => setDeleteTarget(job)}
-                      />
-                    </div>
-                  </td>
+          <AdminDataTable
+            mobileCards={paginatedJobs.map((job) => (
+              <AdminMobileCard
+                key={job.id}
+                actions={
+                  <>
+                    <ActionBtn
+                      label="View"
+                      icon={Eye}
+                      className="text-slate-700 hover:bg-slate-100"
+                      disabled={pending}
+                      onClick={() => {
+                        setViewTarget(job);
+                        setViewData(null);
+                        startTransition(async () => {
+                          const full = await getAdminJobDeepDive(job.id);
+                          if (!full) {
+                            toast.error("Failed to load job details");
+                            return;
+                          }
+                          setViewData(full);
+                        });
+                      }}
+                    />
+                    {job.status === "Pending Review" ? (
+                      <>
+                        <ActionBtn
+                          label="Approve"
+                          icon={Check}
+                          className="text-[#006e2f] hover:bg-[#ebfdf2]"
+                          disabled={pending}
+                          onClick={() => handleApprove(job.id)}
+                        />
+                        <ActionBtn
+                          label="Reject"
+                          icon={X}
+                          className="text-amber-700 hover:bg-amber-50"
+                          disabled={pending}
+                          onClick={() => setRejectTarget(job)}
+                        />
+                      </>
+                    ) : null}
+                    <ActionBtn
+                      label="Delete"
+                      icon={Trash2}
+                      className="text-red-600 hover:bg-red-50"
+                      disabled={pending}
+                      onClick={() => setDeleteTarget(job)}
+                    />
+                  </>
+                }
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <Link
+                    href={`/admin/jobs/${job.id}`}
+                    className="font-bold text-slate-900 hover:text-[#006e2f] hover:underline block"
+                  >
+                    {job.title}
+                  </Link>
+                  <StatusBadge status={job.status} />
+                </div>
+                <p className="text-xs text-slate-500">{job.company_name ?? "—"}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+                  <span>{job.employment_type}</span>
+                  <span>{formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo</span>
+                </div>
+                <div className="flex items-center justify-between border-t border-slate-50 pt-2 text-[10px] text-slate-400">
+                  <PlanTierBadge
+                    planSlug={job.plan_slug}
+                    requiresManualApproval={job.requires_manual_approval}
+                  />
+                  <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                </div>
+              </AdminMobileCard>
+            ))}
+          >
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 py-3">Job</th>
+                  <th className="px-4 py-3">Employer</th>
+                  <th className="px-4 py-3 text-left">Plan</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Salary</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <TablePagination
-          currentPage={activePage}
-          totalItems={totalItems}
-          pageSize={itemsPerPage}
-          onPageChange={setCurrentPage}
-        />
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {paginatedJobs.map((job) => (
+                  <tr key={job.id} className="hover:bg-slate-50/50">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/admin/jobs/${job.id}`}
+                        className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                      >
+                        {job.title}
+                      </Link>
+                      <p className="text-xs text-slate-400">
+                        {new Date(job.created_at).toLocaleDateString()}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {job.company_name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col items-start gap-1">
+                        <PlanTierBadge
+                          planSlug={job.plan_slug}
+                          requiresManualApproval={job.requires_manual_approval}
+                        />
+                        {job.submitted_for_review_at ? (
+                          <p className="mt-1 text-[10px] text-slate-400 whitespace-nowrap">
+                            Submitted{" "}
+                            {new Date(job.submitted_for_review_at).toLocaleDateString()}
+                          </p>
+                        ) : null}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {job.employment_type}
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 font-mono text-xs">
+                      {formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-start">
+                        <StatusBadge status={job.status} />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <ActionBtn
+                          label="View"
+                          icon={Eye}
+                          className="text-slate-700 hover:bg-slate-100"
+                          disabled={pending}
+                          onClick={() => {
+                            setViewTarget(job);
+                            setViewData(null);
+                            startTransition(async () => {
+                              const full = await getAdminJobDeepDive(job.id);
+                              if (!full) {
+                                toast.error("Failed to load job details");
+                                return;
+                              }
+                              setViewData(full);
+                            });
+                          }}
+                        />
+                        {job.status === "Pending Review" ? (
+                          <>
+                            <ActionBtn
+                              label="Approve"
+                              icon={Check}
+                              className="text-[#006e2f] hover:bg-[#ebfdf2]"
+                              disabled={pending}
+                              onClick={() => handleApprove(job.id)}
+                            />
+                            <ActionBtn
+                              label="Reject"
+                              icon={X}
+                              className="text-amber-700 hover:bg-amber-50"
+                              disabled={pending}
+                              onClick={() => setRejectTarget(job)}
+                            />
+                          </>
+                        ) : null}
+                        <ActionBtn
+                          label="Delete"
+                          icon={Trash2}
+                          className="text-red-600 hover:bg-red-50"
+                          disabled={pending}
+                          onClick={() => setDeleteTarget(job)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </AdminDataTable>
+          <TablePagination
+            currentPage={activePage}
+            totalItems={totalItems}
+            pageSize={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
       </div>
       )}
 

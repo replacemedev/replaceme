@@ -45,11 +45,11 @@ export default async function AdminShellLayout({
 
   return (
     <AdminLayoutChrome profile={sidebarProfile} isSuperAdmin={isSuperAdmin}>
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 w-full max-w-[100vw] overflow-x-hidden">
         <AuthFlashToast />
         <div className="flex min-h-screen">
           <AdminSidebar profile={sidebarProfile} isSuperAdmin={isSuperAdmin} />
-          <div className="flex flex-1 flex-col min-w-0 min-h-screen">
+          <div className="flex flex-1 flex-col min-w-0 min-h-screen w-full max-w-[100vw] overflow-x-hidden">
             <AdminHeader session={session} />
             <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>
           </div>

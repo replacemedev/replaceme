@@ -3,6 +3,7 @@ import {
   SkeletonBlock,
   TextLineSkeleton,
 } from "@/components/shared/skeletons/primitives";
+import { AdminPageShell } from "@/components/admin/layout/AdminPageShell";
 
 /** Matches `AdminPageHeader` — title + muted description (+ optional action slot). */
 export function AdminPageHeaderSkeleton({ withAction = false }: { withAction?: boolean }) {
@@ -147,67 +148,67 @@ export function AdminCardGridSkeleton({
 
 export function AdminListPageSkeleton({ withTabs = false, tabCount = 2 }: { withTabs?: boolean; tabCount?: number }) {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading admin page">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading admin page">
       <AdminPageHeaderSkeleton />
       {withTabs ? <AdminTabsSkeleton count={tabCount} /> : null}
       <AdminTableSkeleton />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminSettingsPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading settings">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading settings">
       <AdminPageHeaderSkeleton />
       <AdminSettingsListSkeleton />
       <CardSkeleton minHeight="min-h-[120px]" />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminRevenuePageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading revenue">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading revenue">
       <AdminPageHeaderSkeleton />
       <AdminStatGridSkeleton count={3} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" />
       <AdminChartSkeleton titleWidth="w-40" />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminBillingPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading billing">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading billing">
       <AdminPageHeaderSkeleton />
       <AdminStatGridSkeleton count={4} columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6" />
       <AdminTableSkeleton />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminIdentityPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading identity review">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading identity review">
       <AdminPageHeaderSkeleton withAction />
       <AdminCardGridSkeleton count={2} />
       <AdminTableSkeleton rows={5} />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminSecurityPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading security">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading security">
       <AdminPageHeaderSkeleton />
       <AdminPanelSkeleton height="min-h-[160px]" rows={2} />
       <AdminPanelSkeleton height="min-h-[240px]" rows={4} />
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminNotificationsPageSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading notifications">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading notifications">
       <AdminPageHeaderSkeleton withAction />
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, index) => (
@@ -221,16 +222,16 @@ export function AdminNotificationsPageSkeleton() {
           </div>
         ))}
       </div>
-    </div>
+    </AdminPageShell>
   );
 }
 
 export function AdminDetailSkeleton() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-label="Loading details">
+    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading details">
       <AdminPageHeaderSkeleton />
       <AdminCardGridSkeleton count={2} />
       <AdminPanelSkeleton height="min-h-[200px]" rows={4} />
-    </div>
+    </AdminPageShell>
   );
 }

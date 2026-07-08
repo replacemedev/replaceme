@@ -23,6 +23,7 @@ export function AdminMobileDrawer({
   open,
   onClose,
   isSuperAdmin = false,
+  profile,
 }: AdminMobileDrawerProps) {
   const pathname = usePathname();
   const navGroups = useMemo(
@@ -35,21 +36,28 @@ export function AdminMobileDrawer({
   );
   const activeHref = getActiveAdminNavHref(pathname, navItems);
 
-  if (!open) return null;
-
   return (
-    <div className="lg:hidden fixed inset-0 z-[60] flex">
+    <div
+      className={`md:hidden fixed inset-0 z-[60] flex transition-all duration-300 ${
+        open ? "pointer-events-auto" : "pointer-events-none"
+      }`}
+    >
       <button
         type="button"
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
+        className={`absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 ease-in-out ${
+          open ? "opacity-100" : "opacity-0"
+        }`}
         aria-label="Close navigation"
         onClick={onClose}
+        disabled={!open}
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-label="Admin navigation"
-        className="relative flex h-full w-[min(300px,88vw)] flex-col border-r border-slate-100 bg-white shadow-2xl"
+        className={`relative flex h-full w-[min(300px,88vw)] flex-col border-r border-slate-100 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         <div className="flex justify-end px-3 pt-3 shrink-0">
           <button
