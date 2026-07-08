@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminSubscriptionRow } from "@/types/admin.types";
+import { formatCurrency } from "@/lib/format/currency";
 
 interface RevenueClientProps {
   subscriptions: AdminSubscriptionRow[];
@@ -55,7 +56,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
           <StatCard
             variant="dashboard"
             title="Estimated MRR"
-            value={`$${mrr.toLocaleString()}`}
+            value={formatCurrency(mrr, "USD", { maximumFractionDigits: 0 })}
             icon={<TrendingUp className="h-4 w-4" aria-hidden />}
             iconBgClass="bg-violet-50"
             iconColorClass="text-violet-600"
@@ -104,7 +105,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
                       </div>
                       {sub.plan_price != null ? (
                         <p className="text-xs text-slate-400 font-mono mt-1">
-                          ${sub.plan_price}/mo
+                          {formatCurrency(sub.plan_price, "USD")}/mo (USD)
                         </p>
                       ) : null}
                     </td>

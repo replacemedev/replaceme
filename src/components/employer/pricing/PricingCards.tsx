@@ -52,115 +52,120 @@ export function PricingCards({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto px-4 py-8">
-      {plans.map((plan) => {
-        const isPopular = plan.popular;
-        const isGrowth = plan.slug === "growth";
-        const isScale = plan.slug === "scale";
-        const isCurrent = currentPlanSlug
-          ? isCurrentTier(plan.slug, currentPlanSlug)
-          : false;
-        const isUpgrade = currentPlanSlug
-          ? isHigherTier(plan.slug, currentPlanSlug)
-          : true;
-        const isDowngrade = currentPlanSlug
-          ? isLowerTier(plan.slug, currentPlanSlug)
-          : false;
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        {plans.map((plan) => {
+          const isPopular = plan.popular;
+          const isGrowth = plan.slug === "growth";
+          const isScale = plan.slug === "scale";
+          const isCurrent = currentPlanSlug
+            ? isCurrentTier(plan.slug, currentPlanSlug)
+            : false;
+          const isUpgrade = currentPlanSlug
+            ? isHigherTier(plan.slug, currentPlanSlug)
+            : true;
+          const isDowngrade = currentPlanSlug
+            ? isLowerTier(plan.slug, currentPlanSlug)
+            : false;
 
-        return (
-          <div
-            key={plan.id}
-            className={`relative flex flex-col justify-between p-6 rounded-2xl bg-white transition-all duration-300 ${
-              isCurrent
-                ? "border-2 border-[#006e2f] shadow-md ring-2 ring-[#006e2f]/10"
-                : isPopular
-                  ? "border-2 border-[#10b981] shadow-lg xl:-translate-y-2"
-                  : "border border-gray-200 shadow-sm hover:shadow-md"
-            }`}
-          >
-            {isCurrent ? (
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full whitespace-nowrap">
-                Your plan
-              </div>
-            ) : isPopular ? (
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#e6fbf2] border border-[#10b981] text-[#10b981] text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
-                ★ Most Popular
-              </div>
-            ) : null}
-
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 capitalize">
-                {plan.name}
-                {plan.slug === "discovery" ? (
-                  <span className="text-sm font-normal text-gray-500 ml-1.5">
-                    (Free)
-                  </span>
-                ) : null}
-              </h3>
-              <div className="mt-3 flex items-baseline">
-                <span className="text-3xl font-extrabold text-gray-900">
-                  {formatMoney(plan.price, "USD")}
-                </span>
-                <span className="text-gray-500 font-medium ml-1 text-sm">
-                  /mo
-                </span>
-              </div>
-
-              <ul className="mt-6 space-y-3">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5">
-                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center mt-0.5">
-                      <Check className="w-3.5 h-3.5 text-[#10b981] stroke-[3]" />
-                    </div>
-                    <span className="text-gray-600 text-xs font-medium leading-snug">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mt-6 space-y-2">
+          return (
+            <div
+              key={plan.id}
+              className={`relative flex flex-col justify-between p-6 rounded-2xl bg-white transition-all duration-300 ${
+                isCurrent
+                  ? "border-2 border-[#006e2f] shadow-md ring-2 ring-[#006e2f]/10"
+                  : isPopular
+                    ? "border-2 border-[#10b981] shadow-lg xl:-translate-y-2"
+                    : "border border-gray-200 shadow-sm hover:shadow-md"
+              }`}
+            >
               {isCurrent ? (
-                <Link
-                  href="/employer/settings/account"
-                  className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-semibold text-sm border-2 border-[#006e2f] text-[#006e2f] bg-[#fafdfb] hover:bg-[#ebfdf2] transition-colors"
-                >
-                  Manage subscription
-                </Link>
-              ) : isDowngrade ? (
-                <Link
-                  href="/employer/settings/account"
-                  className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-semibold text-sm border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors"
-                >
-                  {ctaLabel(plan, currentPlanSlug)}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onSelectPlan(plan.slug)}
-                  className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${
-                    isGrowth && isUpgrade
-                      ? "bg-[#10b981] text-white hover:bg-[#0d9668] shadow-sm hover:shadow"
-                      : isScale && isUpgrade
-                        ? "bg-white border border-[#10b981] text-[#10b981] hover:bg-[#e6fbf2]"
-                        : plan.slug === "discovery"
-                          ? "bg-[#e8edfb] text-[#5569ff] hover:bg-[#d8e0fa]"
-                          : "bg-slate-900 text-white hover:bg-slate-800"
-                  }`}
-                >
-                  {ctaLabel(plan, currentPlanSlug)}
-                </button>
-              )}
-              {isDowngrade ? (
-                <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
-                  Downgrades apply at period end via Stripe billing portal.
-                </p>
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full whitespace-nowrap">
+                  Your plan
+                </div>
+              ) : isPopular ? (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#e6fbf2] border border-[#10b981] text-[#10b981] text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
+                  ★ Most Popular
+                </div>
               ) : null}
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 capitalize">
+                  {plan.name}
+                  {plan.slug === "discovery" ? (
+                    <span className="text-sm font-normal text-gray-500 ml-1.5">
+                      (Free)
+                    </span>
+                  ) : null}
+                </h3>
+                <div className="mt-3 flex items-baseline">
+                  <span className="text-3xl font-extrabold text-gray-900">
+                    {formatMoney(plan.price, "USD")}
+                  </span>
+                  <span className="text-gray-500 font-medium ml-1 text-sm">
+                    /mo (USD)
+                  </span>
+                </div>
+
+                <ul className="mt-6 space-y-3">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center mt-0.5">
+                        <Check className="w-3.5 h-3.5 text-[#10b981] stroke-[3]" />
+                      </div>
+                      <span className="text-gray-600 text-xs font-medium leading-snug">
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-8 space-y-2">
+                {isCurrent ? (
+                  <Link
+                    href="/employer/settings/account"
+                    className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-semibold text-sm border-2 border-[#006e2f] text-[#006e2f] bg-[#fafdfb] hover:bg-[#ebfdf2] transition-colors"
+                  >
+                    Manage subscription
+                  </Link>
+                ) : isDowngrade ? (
+                  <Link
+                    href="/employer/settings/account"
+                    className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-semibold text-sm border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors"
+                  >
+                    {ctaLabel(plan, currentPlanSlug)}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onSelectPlan(plan.slug)}
+                    className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${
+                      isGrowth && isUpgrade
+                        ? "bg-[#10b981] text-white hover:bg-[#0d9668] shadow-sm hover:shadow"
+                        : isScale && isUpgrade
+                          ? "bg-white border border-[#10b981] text-[#10b981] hover:bg-[#e6fbf2]"
+                          : plan.slug === "discovery"
+                            ? "bg-[#e8edfb] text-[#5569ff] hover:bg-[#d8e0fa]"
+                            : "bg-slate-900 text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    {ctaLabel(plan, currentPlanSlug)}
+                  </button>
+                )}
+                {isDowngrade ? (
+                  <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
+                    Downgrades apply at period end via Stripe billing portal.
+                  </p>
+                ) : null}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      <p className="text-center text-xs text-slate-400 font-semibold max-w-xl mx-auto leading-relaxed">
+        All prices are billed exclusively in USD (United States Dollars) through Stripe. Cancel anytime.
+      </p>
     </div>
   );
 }

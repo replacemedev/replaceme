@@ -93,7 +93,7 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
                 >
                   ${plan.price}
                 </span>
-                <span className="text-slate-500 font-medium text-sm">/mo USD</span>
+                <span className="text-slate-500 font-medium text-sm">/mo (USD)</span>
               </div>
 
               <ul className="mt-6 space-y-3">
@@ -127,6 +127,11 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
           </article>
         );
       })}
+      <div className="col-span-full text-center mt-6">
+        <p className="text-xs text-slate-400 font-semibold leading-relaxed">
+          All prices are billed exclusively in USD (United States Dollars) through Stripe. Cancel anytime.
+        </p>
+      </div>
     </div>
   );
 }

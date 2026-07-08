@@ -36,6 +36,9 @@ export function PricingPageSkeleton() {
           </div>
         ))}
       </div>
+      <div className="max-w-7xl mx-auto px-4 mb-8">
+        <SkeletonBlock className="h-4 w-full max-w-md mx-auto rounded-md" />
+      </div>
 
       {/* Compare Table */}
       <div className="max-w-7xl mx-auto px-4 py-12 hidden md:block">

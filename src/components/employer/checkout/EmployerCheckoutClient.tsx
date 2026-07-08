@@ -52,7 +52,7 @@ export function EmployerCheckoutClient({
             href={checkoutUrl}
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-5 py-4 text-sm font-bold text-white transition-colors hover:bg-[#005c26]"
           >
-            Continue to Stripe
+            Continue to Stripe Checkout (USD)
             <ArrowRight className="h-4 w-4" aria-hidden />
           </a>
 

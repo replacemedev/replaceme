@@ -26,8 +26,8 @@ interface AdminBillingDashboardProps {
   activeTab: string;
 }
 
-function formatCents(cents: number, currency: string = "USD"): string {
-  return formatCurrency(cents / 100, currency, { maximumFractionDigits: 0 });
+function formatCents(cents: number): string {
+  return formatCurrency(cents / 100, "USD", { maximumFractionDigits: 0 });
 }
 
 function formatEventType(type: string): string {
@@ -281,7 +281,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                           ) : null}
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-slate-700">
-                          {formatCents(row.amount_cents, row.currency)}
+                          {formatCents(row.amount_cents)}
                         </td>
                         <td className="hidden sm:table-cell px-4 py-3">
                           {row.plan_slug ? (

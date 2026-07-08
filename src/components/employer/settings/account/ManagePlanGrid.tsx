@@ -131,7 +131,7 @@ export function ManagePlanGrid({
                   {plan.price}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                  per month
+                  per month (USD)
                 </p>
                 {plan.detail ? (
                   <p className="text-xs text-slate-500 font-medium mt-2">
@@ -188,6 +188,11 @@ export function ManagePlanGrid({
           );
         })}
       </div>
+      </div>
+      <div className="border-t border-slate-100 bg-slate-50/50 p-4 text-center">
+        <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
+          All prices are billed exclusively in USD (United States Dollars) through Stripe. Cancel anytime.
+        </p>
       </div>
     </section>
   );
