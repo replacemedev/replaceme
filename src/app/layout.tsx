@@ -7,6 +7,7 @@ import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/cookie-consent/types";
 import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
 import { getNavSession } from "@/lib/auth/nav-session";
 import { SessionProvider } from "@/providers/SessionProvider";
+import { OrganizationSchema } from "@/components/seo";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -26,11 +27,72 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["600"],
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
 export const metadata: Metadata = {
-  title: "Replace Me - Hire Top Filipino Remote Talent",
-  description: "Connect directly with top-tier Filipino talent or find your dream remote role. Skip the agency fees and middlemen. Scale your business faster.",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Replace Me — Hire Top Filipino Remote Talent",
+    template: "%s | Replace Me",
+  },
+  description:
+    "Connect directly with top-tier Filipino remote talent or find your dream remote job. No agency fees, no salary commissions. Replace Me is the direct-hire marketplace for global employers and Filipino professionals.",
+  keywords: [
+    "hire Filipino remote workers",
+    "Filipino remote talent",
+    "remote jobs Philippines",
+    "direct hire marketplace",
+    "no agency fees remote hiring",
+    "Filipino virtual assistant",
+    "remote jobs for Filipinos",
+    "SaaS hiring platform Philippines",
+  ],
+  authors: [{ name: "Replace Me", url: BASE_URL }],
+  creator: "Replace Me",
+  publisher: "Replace Me",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_PH",
+    url: BASE_URL,
+    siteName: "Replace Me",
+    title: "Replace Me — Hire Top Filipino Remote Talent",
+    description:
+      "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
+    images: [
+      {
+        url: "/images/og-default.png",
+        width: 1200,
+        height: 630,
+        alt: "Replace Me — Direct Filipino Remote Talent Marketplace",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Replace Me — Hire Top Filipino Remote Talent",
+    description:
+      "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
+    images: ["/images/og-default.png"],
+    creator: "@replacemeph",
+  },
   icons: {
     icon: "/images/logo_favicon.png",
+    shortcut: "/images/logo_favicon.png",
+    apple: "/images/logo_favicon.png",
+  },
+  alternates: {
+    canonical: BASE_URL,
   },
 };
 
@@ -68,6 +130,7 @@ export default async function RootLayout({
             className: "w-[calc(100vw-2rem)] mx-auto max-w-sm sm:max-w-md md:max-w-md md:w-full md:mx-0",
           }}
         />
+        <OrganizationSchema />
         <SessionProvider initialSession={session}>
           {children}
         </SessionProvider>

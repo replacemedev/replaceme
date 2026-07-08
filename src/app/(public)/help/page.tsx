@@ -3,9 +3,27 @@ import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import { getPublishedPageContent } from "@/actions/public/page-content";
 import { HELP_INDEX_FALLBACK } from "@/lib/content/page-fallbacks";
 import type { HelpIndexConfig } from "@/types/page-content";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Help Center | ReplaceMe",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Help Center — Guides for Employers & Job Seekers",
+  description:
+    "Find answers and guides for using Replace Me. Learn how to post jobs, manage your employer subscription, build a worker profile, apply to remote roles, and navigate the hiring pipeline.",
+  keywords: [
+    "Replace Me help",
+    "how to use Replace Me",
+    "employer hiring guide Philippines",
+    "remote job application guide",
+  ],
+  alternates: { canonical: `${BASE_URL}/help` },
+  openGraph: {
+    title: "Help Center — Replace Me",
+    description: "Guides and documentation for employers and Filipino job seekers using Replace Me.",
+    url: `${BASE_URL}/help`,
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";

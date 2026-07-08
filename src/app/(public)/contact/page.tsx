@@ -4,10 +4,30 @@ import { Mail, MessageCircle } from "lucide-react";
 import { getPublishedPageContent } from "@/actions/public/page-content";
 import { CONTACT_FALLBACK } from "@/lib/content/page-fallbacks";
 import type { ContactPageConfig } from "@/types/page-content";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Contact Us | ReplaceMe",
-  description: "Get in touch with the ReplaceMe support team.",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Contact Replace Me — Get Help & Support",
+  description:
+    "Have a question about hiring Filipino remote talent or using the Replace Me platform? Contact our support team by email. We're here to help employers and job seekers alike.",
+  keywords: [
+    "Replace Me contact",
+    "Replace Me support",
+    "hire Filipino workers help",
+    "remote hiring platform support",
+  ],
+  alternates: {
+    canonical: `${BASE_URL}/contact`,
+  },
+  openGraph: {
+    title: "Contact Replace Me",
+    description:
+      "Reach out to the Replace Me team for platform support, billing questions, or general enquiries about hiring Filipino remote talent.",
+    url: `${BASE_URL}/contact`,
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";

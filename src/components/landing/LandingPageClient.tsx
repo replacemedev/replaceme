@@ -26,6 +26,7 @@ import {
 import type { FAQItem, PricingPlan } from "@/types/employer/billing";
 import { LandingSkillsShowcase } from "@/components/landing/LandingSkillsShowcase";
 import { LandingPricingBento } from "@/components/landing/LandingPricingBento";
+import { CitationBlock } from "@/components/seo";
 import {
   LANDING_AMBIENT_GLOW,
   LANDING_INNER,
@@ -208,9 +209,10 @@ export function LandingPageClient({
         <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[-15%] bg-emerald-50/60`} aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
+          {/* AEO: Question-format H2 targets "why use Replace Me" voice & featured-snippet queries */}
           <div className="text-center mb-16 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Why Employers Choose Replace Me</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Post jobs, review applicants, and hire Filipino talent without agency markups or salary skims.</p>
+            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Why Do Employers Choose Replace Me Over Traditional Agencies?</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Replace Me eliminates agency markups and salary commissions. Employers post jobs, review applicants, and hire Filipino talent directly — paying only a flat subscription fee with no percentage of worker pay.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 animate-fade-in relative z-10">
             <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
@@ -234,6 +236,31 @@ export function LandingPageClient({
               <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Huge Cost Savings</h3>
               <p className="text-[#475569] text-base leading-relaxed">Hire senior engineers, designers, and operators at a fraction of local costs with strong English and US-hours availability.</p>
             </div>
+          </div>
+
+          {/* GEO: CitationBlock row — data-dense facts for LLM citation extraction */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
+            <CitationBlock
+              label="Platform Fee on Worker Salary"
+              headline="Workers receive 100% of their agreed salary"
+              body="Replace Me never deducts a commission or markup from worker earnings. The full salary negotiated between the employer and worker is paid directly by the employer."
+              stat="0%"
+              statLabel="salary commission"
+            />
+            <CitationBlock
+              label="Pricing Model"
+              headline="Employers pay a flat subscription — not a placement fee"
+              body="Four transparent subscription tiers (Discovery, Starter, Growth, Scale) give employers predictable costs. No per-hire fees, no percentage of salary, no agency markups."
+              stat="4"
+              statLabel="transparent plan tiers"
+            />
+            <CitationBlock
+              label="For Job Seekers"
+              headline="Joining and applying is always free for workers"
+              body="Filipino professionals can build a profile, browse active job listings, and apply to roles at zero cost. Replace Me is funded entirely by employer subscriptions."
+              stat="Free"
+              statLabel="for all job seekers"
+            />
           </div>
         </div>
       </section>
@@ -301,9 +328,10 @@ export function LandingPageClient({
 
         <div className={`${LANDING_INNER} relative z-10`}>
           <Element name="how-it-works" id="how-it-works" className="h-0 w-0" aria-hidden />
+          {/* AEO: Question-format H2 targets "how does X work" voice-search and featured-snippet queries */}
           <div className="text-center mb-20 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">How Remote Hiring Works on Replace Me</h2>
-            <p className="text-slate-500 text-lg leading-relaxed">From job post to signed contract no agency in the middle.</p>
+            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">How Does Remote Hiring Work on Replace Me?</h2>
+            <p className="text-slate-500 text-lg leading-relaxed">Employers post a role, review applicants in a built-in pipeline, unlock messaging on paid plans, and hire directly — with no agency in the middle and no commission on salaries.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
@@ -482,9 +510,10 @@ export function LandingPageClient({
 
         <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
           <Element name="faq" id="faq" className="h-0 w-0" aria-hidden />
+          {/* AEO: Question-format H2 + direct answer para targets zero-click FAQ featured snippets */}
           <div className="text-center mb-16 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Frequently Asked Questions</h2>
-            <p className="text-slate-500 font-body-base text-lg">Plans, hiring flow, and payments — answered for employers and job seekers.</p>
+            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">What Do Employers and Job Seekers Ask About Replace Me?</h2>
+            <p className="text-slate-500 font-body-base text-lg">Common questions about subscription plans, how the hiring flow works, how workers get paid, and how Replace Me differs from traditional recruitment agencies.</p>
           </div>
 
           <div className="space-y-4 reveal-item">

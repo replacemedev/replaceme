@@ -3,10 +3,21 @@ import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
 import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import { CookiePolicyContent } from "@/components/shared/legal/CookiePolicyContent";
 import { COOKIE_FALLBACK_META } from "@/lib/content/page-fallbacks";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Cookie Policy | ReplaceMe",
-  description: "How ReplaceMe uses cookies and how you can manage your preferences.",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Cookie Policy — How Replace Me Uses Cookies",
+  description:
+    "Learn how Replace Me uses cookies and similar tracking technologies to keep the platform secure, remember your preferences, and improve your experience as an employer or job seeker.",
+  alternates: { canonical: `${BASE_URL}/cookie-policy` },
+  openGraph: {
+    title: "Cookie Policy — Replace Me",
+    description: "Read Replace Me's cookie policy and learn how to manage your cookie preferences.",
+    url: `${BASE_URL}/cookie-policy`,
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";

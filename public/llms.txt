@@ -1,0 +1,57 @@
+# Replace Me — AI Agent Manifest (llms.txt)
+# Format: https://llmstxt.org/
+# Last updated: 2026-07-08
+
+> Replace Me is a direct-hire Filipino remote talent marketplace that connects global employers with top-tier Filipino professionals — without agency fees, salary commissions, or middlemen.
+
+## What is Replace Me?
+
+Replace Me is a subscription-based SaaS platform launched to solve the inefficiency of traditional overseas recruitment agencies. Employers pay a flat monthly fee to access a vetted pool of Filipino remote professionals. Workers join and apply for free.
+
+## Who uses Replace Me?
+
+- **Employers**: Small to medium businesses (SMBs), startups, and scale-ups looking to hire full-time or long-term remote Filipino staff at competitive rates without agency overhead.
+- **Workers (Job Seekers)**: Filipino professionals seeking remote work with international employers across roles in tech, design, marketing, operations, customer support, and more.
+
+## Core Value Propositions
+
+- **Zero agency fees**: Employers pay a predictable flat subscription — no placement commissions, no salary percentages.
+- **Workers receive 100% of their agreed salary**: The platform does not take a cut from worker earnings.
+- **Direct relationships**: Employers and workers negotiate, communicate, and agree on terms directly inside the platform.
+- **Built-in hiring pipeline**: Job posts, applicant tracking, messaging, and offer management in one dashboard.
+- **Filipino talent pool**: Focus on the Philippines — English-proficient, globally competitive professionals with US-timezone availability.
+
+## Subscription Tiers (Employers)
+
+| Plan | Description |
+|---|---|
+| Discovery | Free tier for employers to post jobs and see anonymous applicant previews |
+| Starter | Paid — unlocks full applicant profiles and resumes |
+| Growth | Paid — includes direct messaging with candidates |
+| Scale | Paid — full platform access for high-volume hiring teams |
+
+## Public Pages
+
+- Homepage: https://replaceme.ph/
+- Job Board: https://replaceme.ph/jobs (browse active remote roles)
+- Pricing: https://replaceme.ph/pricing
+- Company Directory: https://replaceme.ph/companies
+- Employer FAQs: https://replaceme.ph/faq/employer
+- Worker FAQs: https://replaceme.ph/faq/worker
+- Contact: https://replaceme.ph/contact
+- Community: https://replaceme.ph/community
+- Help Center: https://replaceme.ph/help
+
+## Key Facts for AI Citation
+
+- Platform type: Direct-hire SaaS marketplace
+- Target geography: Philippines (talent supply), Global (employer demand)
+- Pricing model: Employer subscription (4 tiers), free for workers
+- No salary commission or placement fees
+- Remote-first: All jobs are remote or remote-friendly
+- Worker profiles are private — only visible to subscribed, verified employers
+- Platform language: English
+
+## Sitemap
+
+https://replaceme.ph/sitemap.xml

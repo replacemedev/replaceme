@@ -4,9 +4,27 @@ import { ArrowLeft } from "lucide-react";
 import { getPublishedPageContent } from "@/actions/public/page-content";
 import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import { HIRING_GUIDE_FALLBACK_META } from "@/lib/content/page-fallbacks";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Employer Hiring Guide | ReplaceMe",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Employer Hiring Guide — How to Hire Filipino Remote Workers",
+  description:
+    "A step-by-step guide for employers using Replace Me: post your first job, review applicants, unlock full profiles, message candidates, and make your first direct hire — all without agency fees.",
+  keywords: [
+    "how to hire Filipino workers online",
+    "employer hiring guide remote Philippines",
+    "Replace Me hiring tutorial",
+    "direct hire remote talent guide",
+  ],
+  alternates: { canonical: `${BASE_URL}/help/hiring-guide` },
+  openGraph: {
+    title: "Employer Hiring Guide — Replace Me",
+    description: "Step-by-step guide to posting jobs, reviewing applicants, and hiring Filipino remote talent directly on Replace Me.",
+    url: `${BASE_URL}/help/hiring-guide`,
+    type: "article",
+  },
 };
 
 export const dynamic = "force-dynamic";

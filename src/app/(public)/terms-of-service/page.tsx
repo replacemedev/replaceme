@@ -3,10 +3,21 @@ import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
 import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import { TermsOfServiceContent } from "@/components/shared/legal/TermsOfServiceContent";
 import { TERMS_FALLBACK_META } from "@/lib/content/page-fallbacks";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Terms of Service | ReplaceMe",
-  description: "Terms of Service for the ReplaceMe marketplace platform.",
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Terms of Service — Replace Me Platform Agreement",
+  description:
+    "The Replace Me Terms of Service govern your use of the platform as an employer or job seeker. Review your rights, obligations, and our service agreement before registering.",
+  alternates: { canonical: `${BASE_URL}/terms-of-service` },
+  openGraph: {
+    title: "Terms of Service — Replace Me",
+    description: "Read the Replace Me platform terms of service for employers and Filipino job seekers.",
+    url: `${BASE_URL}/terms-of-service`,
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";
