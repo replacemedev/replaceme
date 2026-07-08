@@ -18,12 +18,12 @@ import {
   type EmployerSignUpFormValues,
   type WorkerSignUpFormValues,
 } from "@/lib/validations/auth";
-import Link from "next/link";
 import {
   TurnstileWidget,
   isTurnstileClientEnabled,
   type TurnstileWidgetHandle,
 } from "@/components/auth/TurnstileWidget";
+import { LegalDocumentModal } from "@/components/shared/LegalDocumentModal";
 
 function formatSignUpError(error: unknown): string {
   if (typeof error === "string" && error.trim()) return error;
@@ -62,6 +62,7 @@ interface SignUpFormProps {
 export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) {
   const router = useRouter();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [activeDocumentModal, setActiveDocumentModal] = useState<"terms" | "privacy" | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const turnstileRequired = isTurnstileClientEnabled();
 
@@ -265,19 +266,21 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
                 />
                 <span className="text-sm font-body-base leading-relaxed text-slate-600">
                   I agree to the{" "}
-                  <Link
-                    href="/terms-of-service"
-                    className="text-[#22c55e] hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setActiveDocumentModal("terms")}
+                    className="text-[#22c55e] hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
                   >
                     Terms of Service
-                  </Link>{" "}
+                  </button>{" "}
                   and{" "}
-                  <Link
-                    href="/privacy-policy"
-                    className="text-[#22c55e] hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setActiveDocumentModal("privacy")}
+                    className="text-[#22c55e] hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
                   >
                     Privacy Policy
-                  </Link>
+                  </button>
                 </span>
               </label>
             )}
@@ -310,6 +313,12 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           </Button>
         </div>
       </form>
+
+      <LegalDocumentModal
+        open={activeDocumentModal !== null}
+        documentType={activeDocumentModal}
+        onClose={() => setActiveDocumentModal(null)}
+      />
     </div>
   );
 }
