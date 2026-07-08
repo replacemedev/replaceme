@@ -49,9 +49,9 @@ export function OrderSummary({
           </h1>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-extrabold text-gray-900">
-              {formatCurrency(planPrice, "USD")}
+              {formatCurrency(planPrice, "USD", { asReact: true, codeClassName: "text-gray-500 text-lg font-semibold ml-1" })}
             </span>
-            <span className="text-gray-400 text-sm font-bold">per month (USD)</span>
+            <span className="text-gray-400 text-sm font-bold">/month</span>
           </div>
           <p className="text-xs font-semibold text-slate-500 mt-2">
             Billed monthly in USD · Cancel anytime

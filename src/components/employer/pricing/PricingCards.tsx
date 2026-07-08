@@ -100,10 +100,10 @@ export function PricingCards({
                 </h3>
                 <div className="mt-3 flex items-baseline">
                   <span className="text-3xl font-extrabold text-gray-900">
-                    {formatMoney(plan.price, "USD")}
+                    {formatMoney(plan.price, "USD", { asReact: true, codeClassName: "text-gray-500 text-sm font-semibold ml-1" })}
                   </span>
-                  <span className="text-gray-500 font-medium ml-1 text-sm">
-                    /mo (USD)
+                  <span className="text-gray-500 font-medium ml-0.5 text-sm">
+                    /mo
                   </span>
                 </div>
 

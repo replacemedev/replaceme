@@ -58,11 +58,11 @@ function getFeatures(plan: SubscriptionTier): string[] {
 function planPrice(plan: SubscriptionTier): string {
   switch (plan) {
     case "starter":
-      return `${formatMoney(19, "USD")}/mo (USD)`;
+      return `${formatMoney(19, "USD")}/mo`;
     case "growth":
-      return `${formatMoney(39, "USD")}/mo (USD)`;
+      return `${formatMoney(39, "USD")}/mo`;
     case "scale":
-      return `${formatMoney(79, "USD")}/mo (USD)`;
+      return `${formatMoney(79, "USD")}/mo`;
     default:
       return `${formatMoney(0, "USD")} — free forever`;
   }

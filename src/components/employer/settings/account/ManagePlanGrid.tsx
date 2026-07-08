@@ -131,7 +131,7 @@ export function ManagePlanGrid({
                   {plan.price}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                  per month (USD)
+                  per month
                 </p>
                 {plan.detail ? (
                   <p className="text-xs text-slate-500 font-medium mt-2">

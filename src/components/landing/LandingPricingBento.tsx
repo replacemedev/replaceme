@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, Star } from "lucide-react";
 import type { PricingPlan } from "@/types/employer/billing";
+import { formatMoney } from "@/lib/format/currency";
 
 interface LandingPricingBentoProps {
   plans: PricingPlan[];
@@ -87,13 +88,13 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
 
               <div className="mt-3 flex items-baseline gap-1">
                 <span
-                  className={`font-extrabold text-slate-900 tracking-tight ${
+                  className={`font-extrabold text-slate-900 tracking-tight flex items-baseline ${
                     isGrowth ? "text-4xl" : "text-3xl"
                   }`}
                 >
-                  ${plan.price}
+                  {formatMoney(plan.price, "USD", { asReact: true, codeClassName: "text-slate-500 text-sm font-semibold ml-1" })}
                 </span>
-                <span className="text-slate-500 font-medium text-sm">/mo (USD)</span>
+                <span className="text-slate-500 font-medium text-sm">/mo</span>
               </div>
 
               <ul className="mt-6 space-y-3">

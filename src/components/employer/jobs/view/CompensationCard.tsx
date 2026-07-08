@@ -30,8 +30,12 @@ export function CompensationCard({
         {/* Primary: Hourly Rate */}
         <div>
           <p className="text-2xl font-extrabold text-[#22c55e]">
-            {formatCurrency(hourlyRate, salaryCurrency, { maximumFractionDigits: 0 })}
-            <span className="text-sm font-normal text-slate-500">/hr</span>
+            {formatCurrency(hourlyRate, salaryCurrency, {
+              maximumFractionDigits: 0,
+              asReact: true,
+              perHour: true,
+              codeClassName: "text-slate-500 text-sm ml-1 font-semibold",
+            })}
           </p>
           <p className="text-xs text-slate-400 font-medium mt-0.5">
             Hourly rate · {hoursPerWeek} hrs/week
@@ -44,7 +48,11 @@ export function CompensationCard({
             Est. Monthly
           </p>
           <p className="text-base font-extrabold text-slate-700 mt-0.5">
-            {formatCurrency(monthlySalary, salaryCurrency, { maximumFractionDigits: 0 })}
+            {formatCurrency(monthlySalary, salaryCurrency, {
+              maximumFractionDigits: 0,
+              asReact: true,
+              codeClassName: "text-slate-400 text-xs ml-1 font-semibold",
+            })}
             <span className="text-xs font-normal text-slate-400">/month</span>
           </p>
           <p className="text-[10px] text-slate-400 mt-0.5">

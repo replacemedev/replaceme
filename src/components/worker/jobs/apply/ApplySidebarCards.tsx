@@ -27,7 +27,7 @@ function SummaryRow({
 }: {
   icon: typeof Briefcase;
   label: string;
-  value: string;
+  value: React.ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 py-3 border-b border-slate-100 last:border-0">
@@ -65,12 +65,22 @@ export function ApplySidebarCards({ job }: ApplySidebarCardsProps) {
         <SummaryRow
           icon={DollarSign}
           label="Monthly Salary"
-          value={formatMonthlySalary(job.monthlySalary, job.salaryCurrency)}
+          value={
+            <span>
+              {formatMoney(job.monthlySalary, job.salaryCurrency, { asReact: true, codeClassName: "text-slate-500 text-xs font-semibold ml-0.5" })}
+              <span className="text-slate-500 text-xs font-normal">/mo</span>
+            </span>
+          }
         />
         <SummaryRow
           icon={DollarSign}
           label="Hourly Rate"
-          value={formatMoney(hourlyRate, job.salaryCurrency, { perHour: true, maximumFractionDigits: 2 })}
+          value={formatMoney(hourlyRate, job.salaryCurrency, {
+            perHour: true,
+            maximumFractionDigits: 2,
+            asReact: true,
+            codeClassName: "text-slate-500 text-xs font-semibold ml-0.5",
+          })}
         />
         <SummaryRow
           icon={Clock}

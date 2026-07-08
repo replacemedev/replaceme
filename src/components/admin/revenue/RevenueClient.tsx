@@ -105,7 +105,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
                       </div>
                       {sub.plan_price != null ? (
                         <p className="text-xs text-slate-400 font-mono mt-1">
-                          {formatCurrency(sub.plan_price, "USD")}/mo (USD)
+                          {formatCurrency(sub.plan_price, "USD")}/mo
                         </p>
                       ) : null}
                     </td>
