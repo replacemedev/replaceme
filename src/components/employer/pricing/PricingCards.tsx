@@ -9,6 +9,7 @@ import {
   isHigherTier,
   isLowerTier,
 } from "@/lib/entitlements/ui-copy";
+import { formatMoney } from "@/lib/format/currency";
 
 interface PricingCardsProps {
   plans: PricingPlan[];
@@ -98,10 +99,10 @@ export function PricingCards({
               </h3>
               <div className="mt-3 flex items-baseline">
                 <span className="text-3xl font-extrabold text-gray-900">
-                  ${plan.price}
+                  {formatMoney(plan.price, "USD")}
                 </span>
                 <span className="text-gray-500 font-medium ml-1 text-sm">
-                  /mo USD
+                  /mo
                 </span>
               </div>
 

@@ -7,6 +7,7 @@ import { Eye, Award, DollarSign, Lock } from "lucide-react";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { PinToggle } from "./PinToggle";
+import { formatMoney } from "@/lib/format/currency";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
 
@@ -100,7 +101,7 @@ export function WorkerCard({
                 Rate
               </p>
               <p className="text-[10px] font-black text-slate-700 leading-none">
-                ${worker.hourlyRate.toFixed(2)}/hr
+                {formatMoney(worker.hourlyRate, worker.salaryCurrency, { perHour: true, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>

@@ -42,3 +42,23 @@ export function formatSalaryRange(
   if (max !== null) return `Up to ${formatMoney(max, currency)}`;
   return null;
 }
+
+export function formatCurrency(
+  amount: number,
+  currencyCode: string,
+  options?: { perHour?: boolean; maximumFractionDigits?: number }
+): string {
+  const digits = options?.maximumFractionDigits ?? 2;
+  try {
+    const formatted = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currencyCode,
+      maximumFractionDigits: digits,
+      minimumFractionDigits: digits,
+    }).format(amount);
+    return options?.perHour ? `${formatted}/hr` : formatted;
+  } catch {
+    const code = currencyCode ? currencyCode.toUpperCase() : "USD";
+    return options?.perHour ? `${code} ${amount}/hr` : `${code} ${amount}`;
+  }
+}

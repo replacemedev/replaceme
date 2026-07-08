@@ -57,15 +57,16 @@ export default async function JobListingViewPage({ params }: PageProps) {
     <>
       <EmployerPageShell width="content" className="gap-8 pb-24 lg:pb-12">
         <JobHeader
-        jobId={job.id}
-        title={job.title}
-        status={job.status}
-        location={job.location}
-        employmentType={job.employmentType}
-        hourlyRate={job.hourlyRate}
-        monthlySalary={job.monthlySalary}
-        isPriorityListing={(job.priorityScore ?? 0) > 0}
-      />
+          jobId={job.id}
+          title={job.title}
+          status={job.status}
+          location={job.location}
+          employmentType={job.employmentType}
+          hourlyRate={job.hourlyRate}
+          monthlySalary={job.monthlySalary}
+          salaryCurrency={job.salaryCurrency}
+          isPriorityListing={(job.priorityScore ?? 0) > 0}
+        />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
 

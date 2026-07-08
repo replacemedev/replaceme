@@ -340,6 +340,7 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
       employmentType: job.employment_type,
       hourlyRate,
       monthlySalary,
+      salaryCurrency: job.salary_currency ?? "PHP",
       hoursPerWeek,
       description: job.description,
       requiredSkills: job.skills || [],

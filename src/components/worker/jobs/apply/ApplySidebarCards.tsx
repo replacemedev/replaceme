@@ -64,12 +64,12 @@ export function ApplySidebarCards({ job }: ApplySidebarCardsProps) {
         />
         <SummaryRow
           icon={DollarSign}
-          label="Monthly Salary (USD)"
+          label="Monthly Salary"
           value={formatMonthlySalary(job.monthlySalary, job.salaryCurrency)}
         />
         <SummaryRow
           icon={DollarSign}
-          label={`Hourly Rate (${job.salaryCurrency})`}
+          label="Hourly Rate"
           value={formatMoney(hourlyRate, job.salaryCurrency, { perHour: true, maximumFractionDigits: 2 })}
         />
         <SummaryRow

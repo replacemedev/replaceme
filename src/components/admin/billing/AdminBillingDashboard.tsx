@@ -19,17 +19,15 @@ import { StatCard } from "@/components/shared/StatCard";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminBillingPageData } from "@/types/admin.types";
+import { formatCurrency } from "@/lib/format/currency";
 
 interface AdminBillingDashboardProps {
   data: AdminBillingPageData;
   activeTab: string;
 }
 
-function formatUsd(cents: number): string {
-  return `$${(cents / 100).toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`;
+function formatCents(cents: number, currency: string = "USD"): string {
+  return formatCurrency(cents / 100, currency, { maximumFractionDigits: 0 });
 }
 
 function formatEventType(type: string): string {
@@ -90,7 +88,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
               <StatCard
                 variant="dashboard"
                 title="Estimated MRR"
-                value={formatUsd(metrics.estimated_mrr_cents)}
+                value={formatCents(metrics.estimated_mrr_cents)}
                 icon={<TrendingUp className="h-4 w-4" aria-hidden />}
                 iconBgClass="bg-violet-50"
                 iconColorClass="text-violet-600"
@@ -130,7 +128,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                       </span>
                     </div>
                     <p className="mt-3 text-2xl font-bold text-slate-900">
-                      {formatUsd(tier.mrr_cents)}
+                      {formatCents(tier.mrr_cents)}
                     </p>
                     <p className="text-xs text-slate-400">est. monthly</p>
                   </div>
@@ -283,7 +281,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                           ) : null}
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-slate-700">
-                          {formatUsd(row.amount_cents)} {row.currency.toUpperCase()}
+                          {formatCents(row.amount_cents, row.currency)}
                         </td>
                         <td className="hidden sm:table-cell px-4 py-3">
                           {row.plan_slug ? (

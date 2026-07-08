@@ -1122,6 +1122,7 @@ export type Database = {
           billing_period_start: string | null
           cancel_at_period_end: boolean
           created_at: string
+          currency: string
           current_period_end: string | null
           employer_id: string
           failed_payment_count: number
@@ -1150,6 +1151,7 @@ export type Database = {
           billing_period_start?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
+          currency?: string
           current_period_end?: string | null
           employer_id: string
           failed_payment_count?: number
@@ -1178,6 +1180,7 @@ export type Database = {
           billing_period_start?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
+          currency?: string
           current_period_end?: string | null
           employer_id?: string
           failed_payment_count?: number

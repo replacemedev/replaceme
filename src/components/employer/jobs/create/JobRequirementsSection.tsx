@@ -22,6 +22,7 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
   } = useFormContext();
 
   const selectedSkills: string[] = watch("skills") || [];
+  const salaryCurrency = watch("salaryCurrency") || "PHP";
   const [customSkillInput, setCustomSkillInput] = useState("");
 
   // Fallback default skills if none provided by server actions
@@ -103,7 +104,7 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
 
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
-            Hourly salary ($/hr) <span className="text-red-500">*</span>
+            Hourly salary ({salaryCurrency}/hr) <span className="text-red-500">*</span>
           </label>
           <div className="relative pb-5">
             <Input
@@ -135,7 +136,7 @@ export function JobRequirementsSection({ skillsOptions }: JobRequirementsSection
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-700">
-            Monthly salary (Calculated)
+            Monthly salary (Calculated, {salaryCurrency})
           </label>
           <div className="relative pb-5">
             <Input

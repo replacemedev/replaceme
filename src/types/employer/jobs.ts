@@ -23,6 +23,7 @@ export interface JobDetails {
   employmentType: string;
   hourlyRate: number;
   monthlySalary: number;
+  salaryCurrency: string;
   hoursPerWeek: number;
   description: string;
   requiredSkills: string[];

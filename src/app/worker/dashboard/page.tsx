@@ -41,7 +41,7 @@ export default async function WorkerDashboard() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url"
+      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url, salary_currency"
     )
     .eq("id", user.id)
     .single();
@@ -229,7 +229,7 @@ export default async function WorkerDashboard() {
             percentage={profileStrength.percentage}
             tierLabel={profileStrength.label}
           />
-          <EarningsOverviewCard earnings={earnings || []} />
+          <EarningsOverviewCard earnings={earnings || []} currency={profile.salary_currency ?? "PHP"} />
         </div>
       </div>
 

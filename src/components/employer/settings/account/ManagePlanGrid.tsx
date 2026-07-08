@@ -8,6 +8,7 @@ import {
   isHigherTier,
   isLowerTier,
 } from "@/lib/entitlements/ui-copy";
+import { formatMoney } from "@/lib/format/currency";
 
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
@@ -25,24 +26,24 @@ const UPGRADE_PLANS: {
   detail?: string;
   highlight?: boolean;
 }[] = [
-  { slug: "discovery", label: "Discovery", price: "$0 USD" },
+  { slug: "discovery", label: "Discovery", price: formatMoney(0, "USD") },
   {
     slug: "starter",
     label: "Starter",
-    price: "$19 USD",
+    price: formatMoney(19, "USD"),
     detail: "3 jobs · 20 applicants/job",
   },
   {
     slug: "growth",
     label: "Growth",
-    price: "$39 USD",
+    price: formatMoney(39, "USD"),
     detail: "10 jobs · 50 applicants/job",
     highlight: true,
   },
   {
     slug: "scale",
     label: "Scale",
-    price: "$79 USD",
+    price: formatMoney(79, "USD"),
     detail: "Unlimited jobs & applicants",
   },
 ];

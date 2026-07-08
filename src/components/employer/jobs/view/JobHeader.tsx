@@ -6,6 +6,7 @@ import { MapPin, Clock, DollarSign, Share2, Edit3, X, Loader2, Users, Sparkles }
 import { toast } from "sonner";
 import { deactivateJob } from "@/actions/employer/jobs";
 import { useRouter } from "next/navigation";
+import { formatMoney } from "@/lib/format/currency";
 
 interface JobHeaderProps {
   jobId: string;
@@ -15,6 +16,7 @@ interface JobHeaderProps {
   employmentType: string;
   hourlyRate: number;
   monthlySalary: number;
+  salaryCurrency: string;
   isPriorityListing?: boolean;
 }
 
@@ -26,6 +28,7 @@ export function JobHeader({
   employmentType,
   hourlyRate,
   monthlySalary,
+  salaryCurrency,
   isPriorityListing = false,
 }: JobHeaderProps) {
   const router = useRouter();
@@ -106,9 +109,9 @@ export function JobHeader({
             </div>
             <div className="flex items-center gap-1.5">
               <DollarSign size={16} className="text-slate-400" aria-hidden />
-              <span className="text-emerald-600 font-bold">${hourlyRate.toLocaleString()}/hr</span>
+              <span className="text-emerald-600 font-bold">{formatMoney(hourlyRate, salaryCurrency, { perHour: true })}</span>
               <span className="text-slate-300">·</span>
-              <span className="text-slate-400 text-xs">${monthlySalary.toLocaleString()}/mo</span>
+              <span className="text-slate-400 text-xs">{formatMoney(monthlySalary, salaryCurrency)}/mo</span>
             </div>
           </div>
         </div>

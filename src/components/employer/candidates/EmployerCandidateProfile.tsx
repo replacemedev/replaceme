@@ -136,13 +136,11 @@ export function EmployerCandidateProfile({
                       Target Hourly Rate
                     </span>
                     <p className="text-lg font-extrabold text-[#006e2f]">
-                      {isPreview ? (
-                        <span className="blur-xs select-none">PHP 400 - 600/hr</span>
-                      ) : (
-                        formatMoney(candidate.hourlyRate, candidate.salaryCurrency, {
+                      <span className={isPreview ? "blur-xs select-none" : ""}>
+                        {formatMoney(candidate.hourlyRate, candidate.salaryCurrency, {
                           perHour: true,
-                        })
-                      )}
+                        })}
+                      </span>
                     </p>
                   </div>
                 )}

@@ -6,6 +6,7 @@ export interface PinnedWorker {
   skills: string[];
   experienceYears: number;
   hourlyRate: number;
+  salaryCurrency: string;
   isPinned: boolean;
   online: boolean;
   isVerified: boolean;

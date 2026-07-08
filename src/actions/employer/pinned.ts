@@ -36,7 +36,8 @@ async function loadPinnedWorkersForEmployer(
           skills,
           experience_years,
           hourly_rate,
-          is_verified
+          is_verified,
+          salary_currency
         )
       `)
     .eq("employer_id", employerId);
@@ -60,6 +61,7 @@ async function loadPinnedWorkersForEmployer(
       experience_years?: number | null;
       hourly_rate?: number | null;
       is_verified?: boolean | null;
+      salary_currency?: string | null;
     } | null;
     if (!worker) continue;
 
@@ -74,6 +76,7 @@ async function loadPinnedWorkersForEmployer(
       skills: worker.skills || [],
       experienceYears: worker.experience_years || 0,
       hourlyRate: worker.hourly_rate ? Number(worker.hourly_rate) : 0,
+      salaryCurrency: worker.salary_currency ?? "PHP",
       isPinned: true,
       online: false,
       isVerified: Boolean(worker.is_verified),

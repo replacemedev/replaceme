@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Check, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
+import { formatCurrency } from "@/lib/format/currency";
 
 interface OrderSummaryProps {
   planName: string;
@@ -48,7 +49,7 @@ export function OrderSummary({
           </h1>
           <div className="flex items-baseline gap-1">
             <span className="text-4xl font-extrabold text-gray-900">
-              ${planPrice.toFixed(2)}
+              {formatCurrency(planPrice, "USD")}
             </span>
             <span className="text-gray-400 text-sm font-bold">per month</span>
           </div>

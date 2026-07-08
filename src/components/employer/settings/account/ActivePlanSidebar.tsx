@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SubscriptionTier } from "@/types/employer/billing";
 import { Check, AlertTriangle, CalendarDays } from "lucide-react";
 import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
+import { formatMoney } from "@/lib/format/currency";
 
 interface ActivePlanSidebarProps {
   currentPlan: SubscriptionTier;
@@ -21,22 +22,25 @@ function getFeatures(plan: SubscriptionTier): string[] {
   switch (plan) {
     case "scale":
       return [
-        "Unlimited job posts",
+        "Unlimited active job posts",
         "Unlimited applicants per job",
-        "Full identity & messaging",
-        "Priority listing & support",
+        "Instant job approvals",
+        "Full profiles & resume downloads",
+        "Direct messaging & priority support",
       ];
     case "growth":
       return [
-        "Up to 10 job posts",
-        "50 applicants per job",
-        "Full identity & messaging",
-        "Priority listing",
+        "10 active job posts",
+        "Unlimited applicants per job",
+        "Instant job approvals",
+        "Full profiles & resume downloads",
+        "Direct messaging & email support",
       ];
     case "starter":
       return [
-        "Up to 3 job posts",
+        "3 active job posts",
         "20 applicants per job",
+        "Instant job approvals",
         "Full profiles & resume downloads",
         "Direct messaging & email support",
       ];
@@ -54,13 +58,13 @@ function getFeatures(plan: SubscriptionTier): string[] {
 function planPrice(plan: SubscriptionTier): string {
   switch (plan) {
     case "starter":
-      return "$19 USD/mo";
+      return `${formatMoney(19, "USD")}/mo`;
     case "growth":
-      return "$39 USD/mo";
+      return `${formatMoney(39, "USD")}/mo`;
     case "scale":
-      return "$79 USD/mo";
+      return `${formatMoney(79, "USD")}/mo`;
     default:
-      return "$0 — free forever";
+      return `${formatMoney(0, "USD")} — free forever`;
   }
 }
 

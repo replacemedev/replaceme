@@ -1,11 +1,13 @@
 import React from "react";
 import { EarningsMonth } from "@/types/worker";
+import { formatMoney } from "@/lib/format/currency";
 
 interface EarningsOverviewCardProps {
   earnings: EarningsMonth[];
+  currency: string;
 }
 
-export function EarningsOverviewCard({ earnings }: EarningsOverviewCardProps) {
+export function EarningsOverviewCard({ earnings, currency }: EarningsOverviewCardProps) {
   // Find maximum amount to calculate heights proportionally
   const maxAmount = earnings.length > 0 
     ? Math.max(...earnings.map((e) => e.amount)) 
@@ -33,7 +35,7 @@ export function EarningsOverviewCard({ earnings }: EarningsOverviewCardProps) {
               {/* Tooltip on hover */}
               <div className="group relative flex flex-col items-center w-full h-full justify-end">
                 <span className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-slate-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-xs whitespace-nowrap pointer-events-none z-20">
-                  ₱{item.amount.toLocaleString()}
+                  {formatMoney(item.amount, currency)}
                 </span>
                 
                 {/* Faint background container track to provide scale */}
