@@ -249,7 +249,7 @@ export function LandingPageClient({
             />
             <CitationBlock
               label="Pricing Model"
-              headline="Employers pay a flat subscription — not a placement fee"
+              headline="Employers pay a flat subscription, not a placement fee"
               body="Four transparent subscription tiers (Discovery, Starter, Growth, Scale) give employers predictable costs. No per-hire fees, no percentage of salary, no agency markups."
               stat="4"
               statLabel="transparent plan tiers"

@@ -33,7 +33,7 @@ export function AuthPageShell({
   );
 
   return (
-    <main className={`flex min-h-screen bg-white ${AUTH_CARD}`}>
+    <main className="flex min-h-screen w-full flex-col bg-[#f8fafe] lg:flex-row">
       {marketingPosition === "left" ? marketingPanel : null}
 
       <div

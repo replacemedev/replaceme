@@ -28,9 +28,8 @@ export function NavBrand({ homeHref, compact = false, onClick, className = "" }:
         />
       </div>
       <span
-        className={`-translate-y-[1px] font-display-md font-bold text-[#0a4a29] truncate ${
-          compact ? "text-[15px] sm:text-lg" : "text-xl sm:text-2xl"
-        }`}
+        className={`-translate-y-[2px] font-display-md font-bold text-[#0a4a29] truncate ${compact ? "text-[15px] sm:text-lg" : "text-xl sm:text-2xl"
+          }`}
       >
         Replace Me
       </span>
