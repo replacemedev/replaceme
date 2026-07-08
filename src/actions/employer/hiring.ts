@@ -270,7 +270,7 @@ export async function getEmployerCandidateProfile(
 
   const { data: application } = await supabase
     .from("applications")
-    .select("id")
+    .select("id, cover_letter")
     .eq("job_id", parsed.data.jobId)
     .eq("candidate_id", parsed.data.candidateId)
     .eq("is_within_plan_cap", true)
@@ -330,6 +330,7 @@ export async function getEmployerCandidateProfile(
     messagingEnabled,
     isPinned,
     messagingThreadId,
+    coverLetter: (application?.cover_letter as string | null) ?? null,
     candidate: {
       id: String(candidate.id ?? parsed.data.candidateId),
       name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),

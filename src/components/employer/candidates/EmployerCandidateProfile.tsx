@@ -1,16 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { ExternalLink, MapPin, Phone, Briefcase, Clock, Wallet } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
-import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
 import { CandidateProfileActions } from "./CandidateProfileActions";
-import {
-  EmployerPageShell,
-} from "@/components/employer/layout";
+import { EmployerPageShell } from "@/components/employer/layout";
 
 export type EmployerCandidateProfileData = {
   jobTitle: string;
@@ -21,6 +17,7 @@ export type EmployerCandidateProfileData = {
   messagingEnabled: boolean;
   isPinned: boolean;
   messagingThreadId?: string | null;
+  coverLetter?: string | null;
   candidate: {
     id: string;
     name: string;
@@ -45,7 +42,6 @@ export type EmployerCandidateProfileData = {
     email: string | null;
     isVerified: boolean;
     resumeUrl: string | null;
-    cvUrl: string | null;
     location: string | null;
     phoneNumber: string | null;
     portfolioUrl: string | null;
@@ -71,6 +67,7 @@ export function EmployerCandidateProfile({
     messagingEnabled,
     isPinned,
     messagingThreadId,
+    coverLetter,
   } = profile;
   const isPreview = identityMode === "anonymous_preview";
   const salary = formatSalaryRange(
@@ -90,8 +87,8 @@ export function EmployerCandidateProfile({
 
   return (
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-8 space-y-6">
           {/* Header Card Upgrade */}
           <header className="relative bg-gradient-to-br from-emerald-50/20 via-white to-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
             <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2] shadow-sm">
@@ -216,6 +213,16 @@ export function EmployerCandidateProfile({
             <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-50/50 shadow-inner">
               {/* Restricted Content Wrapper (blurred & disabled) */}
               <div className="opacity-35 blur-[3px] select-none pointer-events-none space-y-6 p-6">
+                {/* Restricted Section: Application Message */}
+                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 space-y-4">
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                    Application Message
+                  </h2>
+                  <div className="prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                    I am very interested in this remote position. I have years of experience with React, Next.js, and Node.js. I have built multiple responsive and high-performance applications, and I would love to bring my skills to your team. Please review my profile and projects below.
+                  </div>
+                </section>
+
                 {/* Restricted Section: Contact & Location */}
                 <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 space-y-4">
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
@@ -280,6 +287,17 @@ export function EmployerCandidateProfile({
             </div>
           ) : (
             <>
+              {coverLetter && (
+                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Application Message
+                  </h2>
+                  <div className="pt-4 border-t border-slate-100/60 prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                    {coverLetter}
+                  </div>
+                </section>
+              )}
+
               {candidate.workerProjects.length > 0 && (
                 <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -399,7 +417,7 @@ export function EmployerCandidateProfile({
           )}
         </div>
 
-        <aside>
+        <aside className="lg:col-span-4">
           <CandidateProfileActions
             candidateId={candidate.id}
             jobId={jobId}
@@ -408,7 +426,6 @@ export function EmployerCandidateProfile({
             messagingThreadId={messagingThreadId}
             resumeDownloadEnabled={resumeDownloadEnabled}
             resumeUrl={candidate.resumeUrl}
-            cvUrl={candidate.cvUrl}
             isPreview={isPreview}
             isPinned={isPinned}
           />

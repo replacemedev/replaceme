@@ -4,8 +4,8 @@ import { SkeletonBlock } from "@/components/shared/skeletons/primitives";
 export default function EmployerCandidateLoading() {
   return (
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12 animate-pulse">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-8 space-y-6">
           {/* Header Skeleton */}
           <div className="relative bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <div className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-2xl bg-slate-200" />
@@ -51,7 +51,17 @@ export default function EmployerCandidateLoading() {
             </div>
           </div>
 
-          {/* Locked/Project highlights Skeleton */}
+          {/* Application Message Skeleton */}
+          <div className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
+            <SkeletonBlock className="h-4 w-40 bg-slate-200 rounded-lg" />
+            <div className="space-y-3 pt-4 border-t border-slate-100/60">
+              <SkeletonBlock className="h-4 w-full bg-slate-100 rounded-md" />
+              <SkeletonBlock className="h-4 w-[90%] bg-slate-100 rounded-md" />
+              <SkeletonBlock className="h-4 w-[95%] bg-slate-100 rounded-md" />
+            </div>
+          </div>
+
+          {/* Project Highlights Skeleton */}
           <div className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
             <SkeletonBlock className="h-4 w-36 bg-slate-200 rounded-lg" />
             <div className="space-y-6 pt-2 border-t border-slate-100/60">
@@ -68,16 +78,14 @@ export default function EmployerCandidateLoading() {
         </div>
 
         {/* Sidebar Actions Skeleton */}
-        <aside className="bg-white border border-slate-200 shadow-sm rounded-xl p-5 sm:p-6 space-y-4">
+        <aside className="lg:col-span-4 bg-white border border-slate-200 shadow-sm rounded-xl p-5 sm:p-6 space-y-4">
           <SkeletonBlock className="h-4 w-16 bg-slate-200 rounded-lg" />
           <div className="flex flex-col gap-3">
             <SkeletonBlock className="h-[42px] w-full bg-slate-200 rounded-xl" />
             <SkeletonBlock className="h-[42px] w-full bg-slate-100 rounded-xl" />
-            <SkeletonBlock className="h-[42px] w-full bg-slate-100 rounded-xl" />
           </div>
           <div className="pt-4 border-t border-slate-100 space-y-3">
             <SkeletonBlock className="h-3.5 w-20 bg-slate-200 rounded-lg" />
-            <SkeletonBlock className="h-11 w-full bg-slate-50 rounded-xl" />
             <SkeletonBlock className="h-11 w-full bg-slate-50 rounded-xl" />
           </div>
         </aside>
