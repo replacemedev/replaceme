@@ -14,6 +14,8 @@ import {
   formatPostedShort,
 } from "@/types/job-application";
 
+import { formatMoney } from "@/lib/format/currency";
+
 interface ApplySidebarCardsProps {
   job: ApplyJobSummary;
 }
@@ -43,6 +45,11 @@ function SummaryRow({
 }
 
 export function ApplySidebarCards({ job }: ApplySidebarCardsProps) {
+  const hourlyRate =
+    job.monthlySalary && job.hoursPerWeek
+      ? job.monthlySalary / (4.33 * job.hoursPerWeek)
+      : 0;
+
   return (
     <aside className="space-y-5">
       <article className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
@@ -59,6 +66,11 @@ export function ApplySidebarCards({ job }: ApplySidebarCardsProps) {
           icon={DollarSign}
           label="Monthly Salary (USD)"
           value={formatMonthlySalary(job.monthlySalary, job.salaryCurrency)}
+        />
+        <SummaryRow
+          icon={DollarSign}
+          label={`Hourly Rate (${job.salaryCurrency})`}
+          value={formatMoney(hourlyRate, job.salaryCurrency, { perHour: true, maximumFractionDigits: 2 })}
         />
         <SummaryRow
           icon={Clock}
