@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,6 +27,11 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -44,7 +50,9 @@ export function MobileMenu({
     };
   }, [isOpen]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className={`fixed inset-0 z-[100] md:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
@@ -123,6 +131,7 @@ export function MobileMenu({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
