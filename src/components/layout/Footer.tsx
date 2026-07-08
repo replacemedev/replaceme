@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/shared/cookie-consent";
+import { NavBrand } from "@/components/shared/nav/NavBrand";
 
 export function Footer() {
   return (
@@ -12,20 +13,7 @@ export function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-12 px-4 md:px-margin-desktop max-w-container-max mx-auto relative z-10">
         {/* Brand Column */}
         <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
-          <Link className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity" href="/">
-            <div className="relative w-12 h-12 shrink-0">
-              <Image
-                src="/images/logo.png"
-                alt="Replace Me Logo"
-                fill
-                className="object-contain"
-                sizes="48px"
-              />
-            </div>
-            <span className="font-display-md text-2xl font-extrabold text-slate-800 leading-none relative top-[-4px]">
-              Replace Me
-            </span>
-          </Link>
+          <NavBrand homeHref="/" />
           <p className="text-slate-400 font-body-base text-sm mt-2 max-w-sm">
             Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
           </p>

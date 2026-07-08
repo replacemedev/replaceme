@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Check, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { NavBrand } from "@/components/shared/nav/NavBrand";
 
 interface OrderSummaryProps {
   planName: string;
@@ -35,21 +36,7 @@ export function OrderSummary({
         </Link>
 
         {/* Brand Name */}
-        <div className="flex items-center gap-2 mb-12">
-          <div className="relative w-8 h-8 shrink-0">
-            <Image
-              src="/images/logo.png"
-              alt="Replace Me Logo"
-              fill
-              className="object-contain"
-              sizes="32px"
-              priority
-            />
-          </div>
-          <span className="text-2xl font-black text-[#0a4a29] leading-none">
-            Replace Me
-          </span>
-        </div>
+        <NavBrand homeHref="/employer/dashboard" compact className="mb-12" />
 
         {/* Plan Header */}
         <div className="space-y-3">

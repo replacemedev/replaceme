@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { WORKER_NAV_ITEMS } from "@/config/workerNav";
 
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import { NavBrand } from "@/components/shared/nav/NavBrand";
 import type { NavSession } from "@/types/nav";
 
 interface MobileMenuProps {
@@ -45,14 +46,14 @@ export function MobileMenu({
 
   return (
     <div
-      className={`fixed inset-0 z-50 md:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"
+      className={`fixed inset-0 z-[100] md:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
       role="dialog"
       aria-modal={isOpen}
       aria-hidden={!isOpen}
     >
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0"
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0"
           }`}
         onClick={onClose}
         aria-hidden
@@ -60,27 +61,15 @@ export function MobileMenu({
 
       <div
         ref={panelRef}
-        className={`relative z-10 flex h-full w-[280px] max-w-[75vw] flex-col bg-white p-5 shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`relative z-[101] flex h-full w-[280px] max-w-[75vw] flex-col bg-white p-5 shadow-2xl transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <Link
-            className="flex items-center gap-2 rounded-lg transition-transform duration-200 active:scale-[0.98]"
-            href="/worker/dashboard"
+          <NavBrand
+            homeHref="/worker/dashboard"
             onClick={onClose}
-          >
-            <div className="relative h-7 w-7">
-              <Image
-                src="/images/logo.png"
-                alt="Replace Me Logo"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <span className="font-display-md text-sm font-bold text-[#0a4a29]">
-              Replace Me
-            </span>
-          </Link>
+            compact
+          />
           <button
             onClick={onClose}
             type="button"
