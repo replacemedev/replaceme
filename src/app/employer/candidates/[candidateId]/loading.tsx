@@ -1,5 +1,5 @@
 import { EmployerPageShell } from "@/components/employer/layout";
-import { CardSkeleton, SkeletonBlock } from "@/components/shared/skeletons/primitives";
+import { SkeletonBlock } from "@/components/shared/skeletons/primitives";
 
 export default function EmployerCandidateLoading() {
   return (
@@ -7,48 +7,76 @@ export default function EmployerCandidateLoading() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
           {/* Header Skeleton */}
-          <div className="rounded-3xl border border-slate-100 bg-white shadow-sm flex items-start gap-4 p-5">
-            <div className="h-16 w-16 rounded-2xl bg-slate-200" />
-            <div className="space-y-2 flex-1">
-              <SkeletonBlock className="h-6 w-40 bg-slate-200 rounded" />
-              <SkeletonBlock className="h-4 w-28 bg-slate-200 rounded" />
+          <div className="relative bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-2xl bg-slate-200" />
+            <div className="space-y-3 flex-1 w-full flex flex-col items-center sm:items-start">
+              <SkeletonBlock className="h-7 w-48 bg-slate-200 rounded-lg" />
+              <SkeletonBlock className="h-4.5 w-36 bg-slate-200 rounded-lg" />
+              <SkeletonBlock className="h-3.5 w-24 bg-slate-100 rounded-lg" />
             </div>
           </div>
 
-          {/* Compensation Skeleton */}
-          <CardSkeleton minHeight="min-h-[80px]" />
-          
-          {/* Skills Skeleton */}
-          <CardSkeleton minHeight="min-h-[120px]" />
+          {/* Compensation & Availability Grid Skeleton */}
+          <div className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-6">
+            <SkeletonBlock className="h-4 w-44 bg-slate-200 rounded-lg" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100/60">
+              <div className="space-y-2">
+                <SkeletonBlock className="h-3 w-28 bg-slate-100 rounded" />
+                <SkeletonBlock className="h-5 w-40 bg-slate-200 rounded-lg" />
+              </div>
+              <div className="space-y-2">
+                <SkeletonBlock className="h-3 w-28 bg-slate-100 rounded" />
+                <SkeletonBlock className="h-5 w-32 bg-slate-200 rounded-lg" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <SkeletonBlock className="h-3 w-20 bg-slate-100 rounded" />
+                <SkeletonBlock className="h-4.5 w-48 bg-slate-200 rounded-lg" />
+              </div>
+            </div>
+          </div>
 
-          {/* Grouped Masked Sections Skeleton */}
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 space-y-6">
-            <div className="rounded-3xl border border-slate-100 bg-white shadow-sm p-5 space-y-4">
-              <SkeletonBlock className="h-4 w-32 bg-slate-200 rounded" />
-              <div className="space-y-2">
-                <SkeletonBlock className="h-3 w-40 bg-slate-100 rounded" />
-                <SkeletonBlock className="h-3 w-48 bg-slate-100 rounded" />
-              </div>
+          {/* Skills & Experience Skeleton */}
+          <div className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
+            <SkeletonBlock className="h-4 w-32 bg-slate-200 rounded-lg" />
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100/60">
+              <SkeletonBlock className="h-7 w-20 bg-slate-100 rounded-full" />
+              <SkeletonBlock className="h-7 w-24 bg-slate-100 rounded-full" />
+              <SkeletonBlock className="h-7 w-16 bg-slate-100 rounded-full" />
+              <SkeletonBlock className="h-7 w-28 bg-slate-100 rounded-full" />
+              <SkeletonBlock className="h-7 w-22 bg-slate-100 rounded-full" />
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white shadow-sm p-5 space-y-4">
-              <SkeletonBlock className="h-4 w-24 bg-slate-200 rounded" />
-              <div className="space-y-2">
-                <SkeletonBlock className="h-3 w-full bg-slate-100 rounded" />
-                <SkeletonBlock className="h-3 w-5/6 bg-slate-100 rounded" />
-              </div>
+            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
+              <div className="h-4 w-4 bg-slate-200 rounded-full shrink-0" />
+              <SkeletonBlock className="h-4.5 w-60 bg-slate-200 rounded-lg" />
             </div>
-            <div className="rounded-3xl border border-slate-100 bg-white shadow-sm p-5 space-y-4">
-              <SkeletonBlock className="h-4 w-36 bg-slate-200 rounded" />
+          </div>
+
+          {/* Locked/Project highlights Skeleton */}
+          <div className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
+            <SkeletonBlock className="h-4 w-36 bg-slate-200 rounded-lg" />
+            <div className="space-y-6 pt-2 border-t border-slate-100/60">
               <div className="space-y-2">
-                <SkeletonBlock className="h-3 w-full bg-slate-100 rounded" />
-                <SkeletonBlock className="h-3 w-2/3 bg-slate-100 rounded" />
+                <div className="flex justify-between">
+                  <SkeletonBlock className="h-4.5 w-48 bg-slate-200 rounded-lg" />
+                  <SkeletonBlock className="h-4 w-12 bg-slate-100 rounded" />
+                </div>
+                <SkeletonBlock className="h-3.5 w-24 bg-slate-100 rounded" />
+                <SkeletonBlock className="h-4 w-full bg-slate-150 rounded-lg" />
               </div>
             </div>
           </div>
         </div>
 
-        <aside>
-          <CardSkeleton minHeight="min-h-[220px]" />
+        {/* Sidebar Actions Skeleton */}
+        <aside className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 space-y-4">
+          <SkeletonBlock className="h-4 w-16 bg-slate-200 rounded-lg" />
+          <div className="h-10 bg-slate-50 border border-slate-100 rounded-xl" />
+          <SkeletonBlock className="h-10 w-full bg-slate-200 rounded-xl" />
+          <SkeletonBlock className="h-10 w-full bg-slate-100 rounded-xl" />
+          <div className="pt-4 border-t border-slate-100 space-y-2 flex flex-col items-center">
+            <SkeletonBlock className="h-3 w-16 bg-slate-100 rounded" />
+            <SkeletonBlock className="h-8 w-28 bg-slate-50 rounded-lg" />
+          </div>
         </aside>
       </div>
     </EmployerPageShell>
