@@ -17,7 +17,7 @@ import {
 } from "@/actions/reports";
 import { REPORT_STATUSES } from "@/lib/reporting/constants";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
-import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
+import { AdminDrawer } from "@/components/admin/shared/AdminDrawer";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 
@@ -446,8 +446,8 @@ export function AdminReportsClient({
         </div>
       )}
 
-      {/* Slideover for Platform Issue */}
-      <AdminSlideover
+      {/* Drawer for Platform Issue */}
+      <AdminDrawer
         open={Boolean(selectedId)}
         onClose={() => {
           setSelectedId(null);
@@ -455,6 +455,36 @@ export function AdminReportsClient({
         }}
         title={selected?.title || "Report details"}
         description={selected ? `${selected.category.replace(/_/g, " ")} • ${prettyStatus(selected.status)}` : "Loading…"}
+        footer={
+          selected ? (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveStatus("open")}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
+              >
+                Mark open
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveStatus("in_progress")}
+                className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-50 cursor-pointer"
+              >
+                Mark in progress
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveStatus("resolved")}
+                className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50 cursor-pointer"
+              >
+                Resolve
+              </button>
+            </div>
+          ) : null
+        }
       >
         {!selected ? (
           <p className="text-sm font-medium text-slate-500">Loading report…</p>
@@ -562,52 +592,54 @@ export function AdminReportsClient({
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Admin notes
               </p>
-              <textarea
+              <AdminNotesTextarea
                 value={notesDraft}
-                onChange={(e) => setNotesDraft(e.target.value)}
-                rows={5}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
+                onChange={setNotesDraft}
+                placeholder="Enter admin notes..."
               />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveStatus("open")}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-              >
-                Mark open
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveStatus("in_progress")}
-                className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-50"
-              >
-                Mark in progress
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveStatus("resolved")}
-                className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50"
-              >
-                Resolve
-              </button>
             </div>
           </div>
         )}
-      </AdminSlideover>
+      </AdminDrawer>
 
-      {/* Slideover for Job Report */}
-      <AdminSlideover
+      {/* Drawer for Job Report */}
+      <AdminDrawer
         open={Boolean(selectedJobReport)}
         onClose={() => {
           setSelectedJobReport(null);
         }}
         title="Job Report Details"
         description={selectedJobReport ? `${selectedJobReport.reason}` : "Loading…"}
+        footer={
+          selectedJobReport ? (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveJobReportStatus("PENDING")}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
+              >
+                Mark Pending
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveJobReportStatus("REVIEWED")}
+                className="rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] disabled:opacity-50 cursor-pointer"
+              >
+                Mark Reviewed
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => saveJobReportStatus("DISMISSED")}
+                className="rounded-xl bg-slate-500 px-4 py-2 text-xs font-bold text-white hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
+              >
+                Dismiss Report
+              </button>
+            </div>
+          ) : null
+        }
       >
         {!selectedJobReport ? (
           <p className="text-sm font-medium text-slate-500">Loading report…</p>
@@ -667,45 +699,37 @@ export function AdminReportsClient({
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Admin Notes
               </p>
-              <textarea
+              <AdminNotesTextarea
                 value={notesDraft}
-                onChange={(e) => setNotesDraft(e.target.value)}
-                rows={5}
+                onChange={setNotesDraft}
                 placeholder="Enter moderation audit notes..."
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
               />
-            </div>
-
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveJobReportStatus("PENDING")}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
-              >
-                Mark Pending
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveJobReportStatus("REVIEWED")}
-                className="rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] disabled:opacity-50 cursor-pointer"
-              >
-                Mark Reviewed
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => saveJobReportStatus("DISMISSED")}
-                className="rounded-xl bg-slate-500 px-4 py-2 text-xs font-bold text-white hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
-              >
-                Dismiss Report
-              </button>
             </div>
           </div>
         )}
-      </AdminSlideover>
+      </AdminDrawer>
     </div>
+  );
+}
+
+// Stable top-level component defined outside the render body to prevent React unmounting/focus loss
+function AdminNotesTextarea({
+  value,
+  onChange,
+  placeholder = "Enter moderation audit notes...",
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      rows={5}
+      placeholder={placeholder}
+      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
+    />
   );
 }
 
