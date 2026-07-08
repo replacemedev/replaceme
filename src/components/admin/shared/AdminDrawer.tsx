@@ -62,7 +62,7 @@ export function AdminDrawer({
         aria-modal="true"
         aria-label={title}
         className={`relative flex h-full w-full max-w-full md:max-w-xl flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
