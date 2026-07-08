@@ -108,8 +108,8 @@ export function EmployerCandidateProfile({
                 {candidate.name}
                 <VerifiedBadge show={candidate.isVerified} />
               </h1>
-              <p className="text-sm sm:text-base text-slate-600 font-semibold">
-                {candidate.title}
+              <p className={`text-sm sm:text-base ${isPreview ? "text-slate-500 font-medium" : "text-slate-600 font-semibold"}`}>
+                {isPreview ? "Candidate Profile" : candidate.title}
               </p>
               {candidate.email ? (
                 <p className="text-xs text-slate-400 mt-1 font-medium">{candidate.email}</p>

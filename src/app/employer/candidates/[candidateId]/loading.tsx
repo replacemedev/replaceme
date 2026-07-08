@@ -68,14 +68,17 @@ export default function EmployerCandidateLoading() {
         </div>
 
         {/* Sidebar Actions Skeleton */}
-        <aside className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 space-y-4">
+        <aside className="bg-white border border-slate-200 shadow-sm rounded-xl p-5 sm:p-6 space-y-4">
           <SkeletonBlock className="h-4 w-16 bg-slate-200 rounded-lg" />
-          <div className="h-10 bg-slate-50 border border-slate-100 rounded-xl" />
-          <SkeletonBlock className="h-10 w-full bg-slate-200 rounded-xl" />
-          <SkeletonBlock className="h-10 w-full bg-slate-100 rounded-xl" />
-          <div className="pt-4 border-t border-slate-100 space-y-2 flex flex-col items-center">
-            <SkeletonBlock className="h-3 w-16 bg-slate-100 rounded" />
-            <SkeletonBlock className="h-8 w-28 bg-slate-50 rounded-lg" />
+          <div className="flex flex-col gap-3">
+            <SkeletonBlock className="h-[42px] w-full bg-slate-200 rounded-xl" />
+            <SkeletonBlock className="h-[42px] w-full bg-slate-100 rounded-xl" />
+            <SkeletonBlock className="h-[42px] w-full bg-slate-100 rounded-xl" />
+          </div>
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <SkeletonBlock className="h-3.5 w-20 bg-slate-200 rounded-lg" />
+            <SkeletonBlock className="h-11 w-full bg-slate-50 rounded-xl" />
+            <SkeletonBlock className="h-11 w-full bg-slate-50 rounded-xl" />
           </div>
         </aside>
       </div>
