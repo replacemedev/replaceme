@@ -408,19 +408,19 @@ export function WorkerProfileEditor({
               <ProfileAvatarUpload
                 avatarUrl={profile.avatar_url}
                 displayName={fullName}
-                size="md"
+                size="xl"
                 onAvatarChange={(url) =>
                   setProfile((current) => ({ ...current, avatar_url: url }))
                 }
                 helperText={profileImageHelperText()}
               />
             ) : (
-              <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md">
+              <div className="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md">
                 <AvatarImage
                   src={profile.avatar_url}
                   alt={fullName}
                   initials={initials}
-                  size="lg"
+                  size="xl"
                   priority
                 />
               </div>

@@ -16,11 +16,12 @@ import {
   resolveProfileImageMime,
 } from "@/lib/storage/profile-image";
 
-type AvatarSize = "md" | "lg";
+type AvatarSize = "md" | "lg" | "xl";
 
-const SIZE_CLASSES: Record<AvatarSize, { ring: string; avatar: "md" | "lg" }> = {
+const SIZE_CLASSES: Record<AvatarSize, { ring: string; avatar: "md" | "lg" | "xl" }> = {
   md: { ring: "w-24 h-24 sm:w-28 sm:h-28", avatar: "md" },
   lg: { ring: "w-32 h-32 sm:w-36 sm:h-36", avatar: "lg" },
+  xl: { ring: "w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48", avatar: "xl" },
 };
 
 function initialsFromName(displayName: string): string {
@@ -59,7 +60,7 @@ export function ProfileAvatarUpload({
   const busy = isUploading || isRemoving;
   const initials = initialsFromName(displayName);
   const sizeClass = SIZE_CLASSES[size];
-  const iconSize = size === "lg" ? 20 : 18;
+  const iconSize = size === "xl" ? 22 : size === "lg" ? 20 : 18;
 
   const handleFile = async (file: File) => {
     if (!editable || busy) return;
@@ -177,9 +178,9 @@ export function ProfileAvatarUpload({
             type="button"
             onClick={handleRemove}
             aria-label="Remove profile photo"
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-red-600 text-white shadow-md transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 sm:opacity-0 sm:group-hover:opacity-100"
+            className="absolute bottom-2 right-2 md:bottom-3 md:right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-red-600 text-white shadow-md transition-all hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 sm:opacity-0 sm:group-hover:opacity-100"
           >
-            <Trash2 size={14} />
+            <Trash2 size={15} />
           </button>
         ) : null}
       </div>
