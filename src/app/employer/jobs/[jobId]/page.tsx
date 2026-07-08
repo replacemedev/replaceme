@@ -116,6 +116,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
             hourlyRate={job.hourlyRate}
             monthlySalary={job.monthlySalary}
             hoursPerWeek={job.hoursPerWeek}
+            salaryCurrency={job.salaryCurrency}
           />
           <HiringTeamCard hiringTeam={job.hiringTeam} />
         </div>
