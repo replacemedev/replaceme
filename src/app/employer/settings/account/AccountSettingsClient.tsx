@@ -137,6 +137,19 @@ export function AccountSettingsClient({
 
       {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
 
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+        <p className="text-sm font-bold text-slate-900">Account security</p>
+        <p className="mt-1 text-sm text-slate-500">
+          Sign out other devices or end every session if you suspect unauthorized access.
+        </p>
+        <Link
+          href="/employer/settings/security"
+          className="mt-3 inline-flex text-sm font-bold text-[#006e2f] hover:underline"
+        >
+          Open security settings →
+        </Link>
+      </div>
+
       <PlanFeatureChecklist
         currentPlan={initialSettings.plan}
         planUsage={planUsage}

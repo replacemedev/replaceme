@@ -21,7 +21,10 @@
     "test:e2e:tier": "playwright test e2e/employer/tier-entitlements.spec.ts e2e/cross-role/billing-entitlements.spec.ts e2e/employer/pricing-tiers.spec.ts",
     "probe:employer": "node scripts/e2e-employer-probe.mjs",
     "probe:employer-lifecycle": "node scripts/e2e-employer-lifecycle.mjs",
-    "prompt:sync": "node scripts/sync-prompt-file-map.mjs"
+    "prompt:sync": "node scripts/sync-prompt-file-map.mjs",
+    "audit": "npm audit --audit-level=high",
+    "audit:fix": "npm audit fix",
+    "check:rls": "node scripts/check-rls.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -32,7 +35,6 @@
     "@supabase/supabase-js": "^2.108.2",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
-    "autoskills": "^0.3.6",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",
     "react": "19.2.4",

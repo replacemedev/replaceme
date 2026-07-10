@@ -14,6 +14,16 @@ type AssertRateLimitOptions = {
 
 const limiterCache = new Map<string, Ratelimit>();
 
+const REDIS_REQUIRED_ERROR =
+  "Security controls unavailable. Please try again later.";
+
+function mustEnforceRateLimit(): boolean {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.RATE_LIMIT_FAIL_CLOSED === "1"
+  );
+}
+
 function msToWindow(windowMs: number): `${number} s` | `${number} m` | `${number} h` {
   if (windowMs % (60 * 60 * 1000) === 0) {
     return `${windowMs / (60 * 60 * 1000)} h`;
@@ -63,28 +73,36 @@ function createLimiter(
   });
 }
 
+async function resolveIdentifier(explicit?: string): Promise<string> {
+  if (explicit) return explicit;
+  const headerStore = await headers();
+  return (
+    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    headerStore.get("x-real-ip") ??
+    "anonymous"
+  );
+}
+
 export async function assertRateLimit(
   prefix: string,
   options: AssertRateLimitOptions
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!isRedisConfigured()) {
+    if (mustEnforceRateLimit()) {
+      return { ok: false, error: REDIS_REQUIRED_ERROR };
+    }
     return { ok: true };
   }
 
   const limiter = getLimiter(prefix, options.maxAttempts, options.windowMs);
   if (!limiter) {
+    if (mustEnforceRateLimit()) {
+      return { ok: false, error: REDIS_REQUIRED_ERROR };
+    }
     return { ok: true };
   }
 
-  let identifier = options.identifier;
-  if (!identifier) {
-    const headerStore = await headers();
-    identifier =
-      headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      headerStore.get("x-real-ip") ??
-      "anonymous";
-  }
-
+  const identifier = await resolveIdentifier(options.identifier);
   const { success, reset } = await limiter.limit(identifier);
   if (success) {
     return { ok: true };
@@ -105,65 +123,58 @@ const applyLimiter = createLimiter("job-apply", 10, "1 h");
 const messageLimiter = createLimiter("messaging", 60, "1 h");
 const reportLimiter = createLimiter("reports", 6, "1 h");
 
-export async function rateLimitJobApplication(
-  workerId: string
+async function limitedOrFailOpen(
+  limiter: Ratelimit | null,
+  key: string,
+  blockedMessage: (retryAfterSeconds: number) => string
 ): Promise<RateLimitResult> {
-  if (!isRedisConfigured() || !applyLimiter) {
+  if (!isRedisConfigured() || !limiter) {
+    if (mustEnforceRateLimit()) {
+      return { success: false, error: REDIS_REQUIRED_ERROR };
+    }
     return { success: true };
   }
 
-  const { success, reset } = await applyLimiter.limit(`apply:${workerId}`);
+  const { success, reset } = await limiter.limit(key);
   if (success) return { success: true };
 
-  const retryAfterSeconds = Math.max(
-    1,
-    Math.ceil((reset - Date.now()) / 1000)
-  );
-
+  const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
   return {
     success: false,
-    error: `Too many applications. Please try again in ${Math.ceil(retryAfterSeconds / 60)} minutes.`,
+    error: blockedMessage(retryAfterSeconds),
     retryAfterSeconds,
   };
+}
+
+export async function rateLimitJobApplication(
+  workerId: string
+): Promise<RateLimitResult> {
+  return limitedOrFailOpen(
+    applyLimiter,
+    `apply:${workerId}`,
+    (s) =>
+      `Too many applications. Please try again in ${Math.ceil(s / 60)} minutes.`
+  );
 }
 
 export async function rateLimitMessaging(
   profileId: string
 ): Promise<RateLimitResult> {
-  if (!isRedisConfigured() || !messageLimiter) {
-    return { success: true };
-  }
-
-  const { success, reset } = await messageLimiter.limit(`msg:${profileId}`);
-  if (success) return { success: true };
-
-  const retryAfterSeconds = Math.max(
-    1,
-    Math.ceil((reset - Date.now()) / 1000)
+  return limitedOrFailOpen(
+    messageLimiter,
+    `msg:${profileId}`,
+    (s) =>
+      `Message limit reached. Please wait ${Math.ceil(s / 60)} minutes before sending more.`
   );
-
-  return {
-    success: false,
-    error: `Message limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before sending more.`,
-    retryAfterSeconds,
-  };
 }
 
 export async function rateLimitReportSubmission(
   profileId: string
 ): Promise<RateLimitResult> {
-  if (!isRedisConfigured() || !reportLimiter) {
-    return { success: true };
-  }
-
-  const { success, reset } = await reportLimiter.limit(`report:${profileId}`);
-  if (success) return { success: true };
-
-  const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
-
-  return {
-    success: false,
-    error: `Report limit reached. Please wait ${Math.ceil(retryAfterSeconds / 60)} minutes before submitting another.`,
-    retryAfterSeconds,
-  };
+  return limitedOrFailOpen(
+    reportLimiter,
+    `report:${profileId}`,
+    (s) =>
+      `Report limit reached. Please wait ${Math.ceil(s / 60)} minutes before submitting another.`
+  );
 }

@@ -2,11 +2,30 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { ROLE_HOME_PATH } from "@/config/navigation";
 import { profileIdFilter, resolveRoleFromUser } from "@/lib/auth/role";
+import {
+  IDLE_COOKIE,
+  isSessionIdle,
+} from "@/lib/security/session-idle";
 
 const MFA_CHALLENGE_PATH = "/admin/mfa-challenge";
 
+const IDLE_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 30,
+};
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  // Survives setAll recreating the response
+  let idleStamp: string | null = null;
+
+  const applyIdleCookie = (response: NextResponse) => {
+    if (!idleStamp) return;
+    response.cookies.set(IDLE_COOKIE, idleStamp, IDLE_COOKIE_OPTIONS);
+  };
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +43,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
+          applyIdleCookie(supabaseResponse);
         },
       },
     }
@@ -32,6 +52,24 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user) {
+    const isAdmin = user.app_metadata?.role === "admin";
+    const lastRaw = request.cookies.get(IDLE_COOKIE)?.value;
+    const lastActive = lastRaw ? Number(lastRaw) : null;
+
+    if (isSessionIdle(lastActive, isAdmin)) {
+      await supabase.auth.signOut();
+      const signInUrl = new URL("/signin", request.url);
+      signInUrl.searchParams.set("reason", "session_expired");
+      const redirect = NextResponse.redirect(signInUrl);
+      redirect.cookies.delete(IDLE_COOKIE);
+      return redirect;
+    }
+
+    idleStamp = String(Date.now());
+    applyIdleCookie(supabaseResponse);
+  }
 
   const pathname = request.nextUrl.pathname;
   const isAuthRoute =
@@ -161,5 +199,6 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  applyIdleCookie(supabaseResponse);
   return supabaseResponse;
 }

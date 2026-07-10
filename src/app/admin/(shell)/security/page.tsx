@@ -6,6 +6,7 @@ import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatCard } from "@/components/shared/StatCard";
 import { fetchAuditLogs } from "@/actions/admin-actions";
+import { SessionSecurityPanel } from "@/components/shared/security/SessionSecurityPanel";
 
 export const metadata = {
   title: "Security | Admin",
@@ -76,6 +77,11 @@ export default async function AdminSecurityPage() {
             ? ` · ${totpFactors.filter((f) => f.status === "verified").length} verified TOTP factor(s).`
             : " · Enroll TOTP for production admin accounts."}
         </p>
+      </section>
+
+      <section className="space-y-4">
+        <AdminSectionLabel>Device sessions</AdminSectionLabel>
+        <SessionSecurityPanel variant="card" />
       </section>
 
       {!mfaEnrolled ? (

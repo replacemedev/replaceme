@@ -34,6 +34,11 @@ import {
   requireTurnstileToken,
   isTurnstileEnabled,
 } from "@/lib/turnstile/verify";
+import {
+  clearLoginFailures,
+  isLoginLocked,
+  recordLoginFailure,
+} from "@/lib/server/login-lockout";
 
 function captchaAuthOptions(
   token: string
@@ -184,7 +189,7 @@ export async function signUp(formData: SignUpFormValues) {
 
     const data = parsed.data;
 
-    const turnstile = requireTurnstileToken(data.turnstileToken);
+    const turnstile = await requireTurnstileToken(data.turnstileToken, ip);
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -318,13 +323,35 @@ export async function signIn(formData: LoginCredentials) {
 
     const { email, password, turnstileToken } = parsed.data;
 
-    const turnstile = requireTurnstileToken(turnstileToken);
+    const headerStore = await headers();
+    const ip =
+      headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      headerStore.get("x-real-ip") ??
+      "anonymous";
+    const emailKey = email.trim().toLowerCase();
+
+    const rateLimit = await assertRateLimit("signin", {
+      maxAttempts: 10,
+      windowMs: 15 * 60 * 1000,
+      identifier: `${ip}:${emailKey}`,
+    });
+    if (!rateLimit.ok) {
+      return { success: false, error: rateLimit.error };
+    }
+
+    const turnstile = await requireTurnstileToken(turnstileToken, ip);
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
 
+    // Silent progressive lockout (OWASP) — same message as bad password
+    if (await isLoginLocked(emailKey)) {
+      return { success: false, error: GENERIC_LOGIN_ERROR };
+    }
+
     const emailToAuth = await resolveEmailForLogin(email);
     if (!emailToAuth) {
+      await recordLoginFailure(emailKey);
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
@@ -342,17 +369,20 @@ export async function signIn(formData: LoginCredentials) {
             "Please confirm your email address before logging in. A confirmation link was sent to your email.",
         };
       }
+      await recordLoginFailure(emailKey);
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
     if (data.user && !data.user.email_confirmed_at) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: "local" });
       return {
         success: false,
         error:
           "Please confirm your email address before logging in. A confirmation link was sent to your email.",
       };
     }
+
+    await clearLoginFailures(emailKey);
 
     // Blueprint: app_metadata → profiles.role → signup user_metadata
     let role = data.user.app_metadata?.role as string | undefined;
@@ -417,7 +447,8 @@ export async function logIn(formData: LoginCredentials) {
 
 export async function logOut() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // Local only — use revokeAllSessionsAndSignOut for every device
+  await supabase.auth.signOut({ scope: "local" });
   revalidatePath("/", "layout");
   redirect("/signin");
 }
@@ -443,7 +474,16 @@ export async function sendPasswordResetLink(
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const turnstile = requireTurnstileToken(parsed.data.turnstileToken);
+    const headerStore = await headers();
+    const ip =
+      headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      headerStore.get("x-real-ip") ??
+      "anonymous";
+
+    const turnstile = await requireTurnstileToken(
+      parsed.data.turnstileToken,
+      ip
+    );
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -518,7 +558,7 @@ export async function updatePassword(formData: {
       };
     }
 
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "global" });
     revalidatePath("/", "layout");
     redirect("/signin?reset=success");
   } catch (error) {

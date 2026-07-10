@@ -69,9 +69,12 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <p className="lg:col-span-2 text-sm">
+      <p className="lg:col-span-2 flex flex-col gap-2 sm:flex-row sm:gap-6 text-sm">
         <Link href="/worker/settings/notifications" className="font-bold text-[#006e2f] hover:underline">
           Notification preferences →
+        </Link>
+        <Link href="/worker/settings/security" className="font-bold text-[#006e2f] hover:underline">
+          Security & sessions →
         </Link>
       </p>
       <form
