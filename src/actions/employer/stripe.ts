@@ -1,29 +1,36 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
+import { upgradeExistingSubscription } from "@/lib/server/stripe/upgrade-subscription";
 import { getStripe } from "@/lib/server/stripe/client";
 import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
 import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
 import { safeError, safeLog } from "@/utils/logger";
 
 export type StripeCheckoutResult = {
+  /** True when an existing Stripe subscription was updated in place (no Checkout). */
+  upgraded?: boolean;
   checkoutUrl?: string;
   planName?: string;
   planPrice?: number;
+  planSlug?: string;
+  message?: string;
   error?: string;
 };
 
 /**
- * Creates a Stripe Checkout Session (subscription mode).
- * Returns a hosted checkout URL — activation happens via webhook after payment.
+ * Start a paid plan: update an existing Stripe subscription in place when
+ * possible; otherwise open Checkout (subscription mode) for first-time paid.
+ * @see https://docs.stripe.com/billing/subscriptions/change-price
  */
 export async function createStripeCheckoutSession(
   planId: string
 ): Promise<StripeCheckoutResult> {
   try {
     const parsed = planIdSchema.parse({ planId });
-    safeLog(`[Stripe] Initiating checkout session for plan: ${parsed.planId}`);
+    safeLog(`[Stripe] Initiating plan change for: ${parsed.planId}`);
 
     const { user, profile } = await requireRole("employer");
 
@@ -50,6 +57,29 @@ export async function createStripeCheckoutSession(
       };
     }
 
+    const inPlace = await upgradeExistingSubscription({
+      employerId: profile.id,
+      planRef: parsed.planId,
+    });
+
+    if ("error" in inPlace) {
+      return { error: inPlace.error };
+    }
+
+    if (inPlace.mode === "updated") {
+      revalidatePath("/employer/settings/account");
+      revalidatePath("/employer/pricing");
+      revalidatePath("/employer/dashboard");
+      revalidatePath(`/employer/checkout/${parsed.planId}`);
+      return {
+        upgraded: true,
+        planName: plan.name,
+        planPrice: Number(plan.price),
+        planSlug: inPlace.planSlug,
+        message: `Your plan is now ${inPlace.planSlug}. Proration will appear on your next Stripe invoice.`,
+      };
+    }
+
     const name =
       `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
       "Employer";
@@ -66,6 +96,7 @@ export async function createStripeCheckoutSession(
     }
 
     return {
+      upgraded: false,
       checkoutUrl: session.checkoutUrl,
       planName: plan.name,
       planPrice: Number(plan.price),

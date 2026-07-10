@@ -35,6 +35,7 @@ export function AccountSettingsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const checkoutSuccess = searchParams.get("checkout") === "success";
+  const upgradedInPlace = searchParams.get("upgraded") === "1";
   const [isUpgrading, startUpgradeTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
   const [isOpeningPortal, startPortalTransition] = useTransition();
@@ -43,17 +44,26 @@ export function AccountSettingsClient({
     if (planId === "discovery") return;
 
     startUpgradeTransition(async () => {
-      const toastId = toast.loading(`Preparing checkout for ${planId}...`);
+      const toastId = toast.loading(`Updating plan to ${planId}...`);
       try {
         const result = await createUpgradeCheckout(planId);
         if (result.error) {
           toast.error(result.error, { id: toastId });
+        } else if (result.success && result.upgraded) {
+          toast.success(result.message ?? `You're now on ${planId}.`, {
+            id: toastId,
+          });
+          router.refresh();
         } else if (result.success && result.checkoutUrl) {
           toast.success("Redirecting to Stripe checkout...", { id: toastId });
           window.location.href = result.checkoutUrl;
+        } else {
+          toast.error("Unexpected billing response. Please try again.", {
+            id: toastId,
+          });
         }
       } catch {
-        toast.error("Failed to initiate checkout. Please try again.", {
+        toast.error("Failed to change plan. Please try again.", {
           id: toastId,
         });
       }
@@ -108,11 +118,14 @@ export function AccountSettingsClient({
             <CheckCircle2 className="h-5 w-5 text-[#006e2f] shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-[#006e2f]">
-                Payment successful — welcome to your new plan
+                {upgradedInPlace
+                  ? "Plan updated — you're on your new tier"
+                  : "Payment successful — welcome to your new plan"}
               </p>
               <p className="text-xs text-emerald-900/80 font-medium mt-1">
-                Your entitlements update within a minute after Stripe confirms
-                payment. Post a job or review applicants to use your new limits.
+                {upgradedInPlace
+                  ? "Your existing subscription was upgraded in place (with proration). Entitlements are available now."
+                  : "Your entitlements update within a minute after Stripe confirms payment. Post a job or review applicants to use your new limits."}
               </p>
             </div>
           </div>

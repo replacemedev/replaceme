@@ -6,6 +6,7 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { upgradeCheckoutSchema } from "@/lib/validations/billing";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
+import { upgradeExistingSubscription } from "@/lib/server/stripe/upgrade-subscription";
 import { createBillingPortalSession } from "@/lib/server/stripe/portal-session";
 import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
@@ -113,14 +114,22 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
   }
 }
 
+type UpgradeCheckoutData = {
+  upgraded: boolean;
+  checkoutUrl?: string;
+  planSlug?: string;
+  message?: string;
+};
+
 /**
- * Creates a Stripe Checkout Session — does NOT mutate subscription state.
- * Activation happens via webhook after payment succeeds.
+ * Change plan: update existing Stripe subscription in place (with proration),
+ * or open Checkout only when the employer has no active paid subscription.
+ * @see https://docs.stripe.com/billing/subscriptions/change-price
  */
 export async function createUpgradeCheckout(planId: string) {
   const result = await runAction("createUpgradeCheckout", async () => {
     const parsed = upgradeCheckoutSchema.parse({ planId });
-    safeLog(`[Billing] Checkout session for plan: ${parsed.planId}`);
+    safeLog(`[Billing] Plan change requested: ${parsed.planId}`);
 
     const { user, profile } = await requireRole("employer");
 
@@ -128,6 +137,26 @@ export async function createUpgradeCheckout(planId: string) {
       return fail(
         "Stripe is not configured. Set STRIPE_SECRET_KEY in your environment."
       );
+    }
+
+    const inPlace = await upgradeExistingSubscription({
+      employerId: profile.id,
+      planRef: parsed.planId,
+    });
+
+    if ("error" in inPlace) {
+      return fail(inPlace.error);
+    }
+
+    if (inPlace.mode === "updated") {
+      revalidatePath("/employer/settings/account");
+      revalidatePath("/employer/pricing");
+      revalidatePath("/employer/dashboard");
+      return ok<UpgradeCheckoutData>({
+        upgraded: true,
+        planSlug: inPlace.planSlug,
+        message: `Your plan is now ${inPlace.planSlug}. Proration will appear on your next Stripe invoice.`,
+      });
     }
 
     const { data: employerProfile } = await (
@@ -153,11 +182,20 @@ export async function createUpgradeCheckout(planId: string) {
       return fail(session.error);
     }
 
-    return ok({ checkoutUrl: session.checkoutUrl });
+    return ok<UpgradeCheckoutData>({
+      upgraded: false,
+      checkoutUrl: session.checkoutUrl,
+    });
   });
 
   if (!result.success) return { error: result.error };
-  return { success: true as const, checkoutUrl: result.data?.checkoutUrl };
+  return {
+    success: true as const,
+    upgraded: result.data?.upgraded ?? false,
+    checkoutUrl: result.data?.checkoutUrl,
+    planSlug: result.data?.planSlug,
+    message: result.data?.message,
+  };
 }
 
 export async function createCustomerPortalSession() {

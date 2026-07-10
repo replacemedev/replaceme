@@ -75,10 +75,28 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     redirect("/employer/pricing");
   }
 
+  if (checkout.error) {
+    redirect(
+      `/employer/pricing?checkout=error&message=${encodeURIComponent(
+        checkout.error
+      )}`
+    );
+  }
+
+  // Existing subscriber: plan was swapped on the Stripe subscription item
+  // (no second Checkout subscription).
+  if (checkout.upgraded) {
+    redirect(
+      `/employer/settings/account?checkout=success&upgraded=1&plan=${encodeURIComponent(
+        checkout.planSlug ?? targetPlan
+      )}`
+    );
+  }
+
   if (!checkout.checkoutUrl) {
     redirect(
       `/employer/pricing?checkout=error&message=${encodeURIComponent(
-        checkout.error ?? "Checkout unavailable"
+        "Checkout unavailable"
       )}`
     );
   }
