@@ -13,10 +13,14 @@ import { formatMoney } from "@/lib/format/currency";
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
   isUpgrading: boolean;
+  isCancelling?: boolean;
   onUpgrade: (planId: SubscriptionTier) => void;
+  onCancelToDiscovery?: () => void;
   onManageBilling: () => void;
   isOpeningPortal: boolean;
   nextBillingDate?: string | null;
+  scheduledPlan?: SubscriptionTier | null;
+  cancelAtPeriodEnd?: boolean;
 }
 
 const UPGRADE_PLANS: {
@@ -51,10 +55,14 @@ const UPGRADE_PLANS: {
 export function ManagePlanGrid({
   currentPlan,
   isUpgrading,
+  isCancelling = false,
   onUpgrade,
+  onCancelToDiscovery,
   onManageBilling,
   isOpeningPortal,
   nextBillingDate,
+  scheduledPlan = null,
+  cancelAtPeriodEnd = false,
 }: ManagePlanGridProps) {
   return (
     <section
@@ -167,20 +175,39 @@ export function ManagePlanGrid({
                   {isPaid ? (
                     <button
                       type="button"
-                      disabled={isUpgrading}
+                      disabled={
+                        isUpgrading ||
+                        scheduledPlan === plan.slug
+                      }
                       onClick={() => onUpgrade(plan.slug)}
                       className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
-                      {isUpgrading ? "Scheduling..." : "Schedule downgrade"}
+                      {scheduledPlan === plan.slug
+                        ? "Scheduled"
+                        : isUpgrading
+                          ? "Scheduling..."
+                          : "Schedule downgrade"}
                     </button>
                   ) : (
                     <button
                       type="button"
-                      disabled={isOpeningPortal}
-                      onClick={onManageBilling}
+                      disabled={
+                        isCancelling ||
+                        cancelAtPeriodEnd ||
+                        scheduledPlan === "discovery"
+                      }
+                      onClick={() =>
+                        onCancelToDiscovery
+                          ? onCancelToDiscovery()
+                          : onManageBilling()
+                      }
                       className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
-                      {isOpeningPortal ? "Opening..." : "Cancel in Stripe"}
+                      {cancelAtPeriodEnd || scheduledPlan === "discovery"
+                        ? "Scheduled"
+                        : isCancelling
+                          ? "Scheduling..."
+                          : "Move to Discovery"}
                     </button>
                   )}
                   <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">

@@ -1,7 +1,11 @@
 import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getAccountSettings, getEmployerPlanUsage } from "@/actions/employer/billing";
+import {
+  getAccountSettings,
+  getEmployerPlanUsage,
+  listEmployerInvoices,
+} from "@/actions/employer/billing";
 import { getEmployerAccountDetails } from "@/actions/employer/account";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 import {
@@ -16,7 +20,10 @@ export const metadata = {
 
 export default async function AccountSettingsPage() {
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   if (authError || !user) {
     redirect("/signin");
@@ -32,11 +39,13 @@ export default async function AccountSettingsPage() {
     redirect("/dashboard");
   }
 
-  const [initialSettings, planUsage, accountDetails] = await Promise.all([
-    getAccountSettings(),
-    getEmployerPlanUsage(),
-    getEmployerAccountDetails(),
-  ]);
+  const [initialSettings, planUsage, accountDetails, invoiceResult] =
+    await Promise.all([
+      getAccountSettings(),
+      getEmployerPlanUsage(),
+      getEmployerAccountDetails(),
+      listEmployerInvoices(),
+    ]);
 
   const defaultSettings = initialSettings || {
     plan: "discovery" as const,
@@ -47,13 +56,15 @@ export default async function AccountSettingsPage() {
     status: "Inactive",
     cancelAtPeriodEnd: false,
     hasStripeSubscription: false,
+    scheduledPlan: null,
+    scheduledEffectiveAt: null,
   };
 
   return (
     <EmployerPageShell width="wide" className="gap-8">
       <EmployerPageHeader
         title="Account settings"
-        subhead="Manage your profile, security, and subscription plan."
+        subhead="Manage your profile, security, subscription, and invoices."
       />
 
       <Suspense fallback={null}>
@@ -61,6 +72,10 @@ export default async function AccountSettingsPage() {
           initialSettings={defaultSettings}
           planUsage={planUsage}
           accountDetails={accountDetails}
+          invoices={
+            "invoices" in invoiceResult ? [...(invoiceResult.invoices ?? [])] : []
+          }
+          invoicesError={"error" in invoiceResult ? invoiceResult.error : null}
         />
       </Suspense>
     </EmployerPageShell>

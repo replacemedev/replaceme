@@ -658,6 +658,9 @@ export async function fetchAdminSubscriptions(): Promise<
       job_posts_used,
       unlocks_used,
       created_at,
+      scheduled_plan_slug,
+      scheduled_effective_at,
+      cancel_at_period_end,
       billing_plans!employer_subscriptions_plan_id_fkey (
         name,
         price,
@@ -708,6 +711,9 @@ export async function fetchAdminSubscriptions(): Promise<
       job_posts_used: row.job_posts_used,
       unlocks_used: row.unlocks_used,
       created_at: row.created_at,
+      scheduled_plan_slug: row.scheduled_plan_slug ?? null,
+      scheduled_effective_at: row.scheduled_effective_at ?? null,
+      cancel_at_period_end: Boolean(row.cancel_at_period_end),
     };
   });
 }

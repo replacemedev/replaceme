@@ -1137,6 +1137,8 @@ export type Database = {
           override_reason: string | null
           plan_id: string | null
           plan_slug: string | null
+          scheduled_effective_at: string | null
+          scheduled_plan_slug: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -1166,6 +1168,8 @@ export type Database = {
           override_reason?: string | null
           plan_id?: string | null
           plan_slug?: string | null
+          scheduled_effective_at?: string | null
+          scheduled_plan_slug?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -1195,6 +1199,8 @@ export type Database = {
           override_reason?: string | null
           plan_id?: string | null
           plan_slug?: string | null
+          scheduled_effective_at?: string | null
+          scheduled_plan_slug?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

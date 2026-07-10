@@ -215,6 +215,9 @@ export interface AdminSubscriptionRow {
   job_posts_used: number;
   unlocks_used: number;
   created_at: string;
+  scheduled_plan_slug: string | null;
+  scheduled_effective_at: string | null;
+  cancel_at_period_end: boolean;
 }
 
 export interface AdminBillingLedgerRow {
@@ -227,6 +230,7 @@ export interface AdminBillingLedgerRow {
   plan_slug: string | null;
   subscription_status: string | null;
   occurred_at: string;
+  stripe_invoice_id: string | null;
 }
 
 export interface AdminBillingTierBreakdown {
@@ -242,6 +246,7 @@ export interface AdminBillingMetrics {
   total_accounts: number;
   failed_payments_30d: number;
   tier_breakdown: AdminBillingTierBreakdown[];
+  scheduled_changes?: number;
 }
 
 export interface AdminBillingPageData {

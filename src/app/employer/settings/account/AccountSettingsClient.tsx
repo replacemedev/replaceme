@@ -10,27 +10,42 @@ import {
   createCustomerPortalSession,
 } from "@/actions/employer/billing";
 import { toast } from "sonner";
-import { CheckCircle2, RefreshCw } from "lucide-react";
+import { CalendarClock, CheckCircle2, RefreshCw } from "lucide-react";
 
 import Link from "next/link";
 import type { EmployerAccountDetails } from "@/actions/employer/account";
+import type { EmployerInvoiceRow } from "@/lib/server/stripe/list-invoices";
 import { AccountDetailsList } from "@/components/employer/settings/account/AccountDetailsList";
 import { EmployerPersonalProfileCard } from "@/components/employer/settings/account/EmployerPersonalProfileCard";
 import { ManagePlanGrid } from "@/components/employer/settings/account/ManagePlanGrid";
 import { ActivePlanSidebar } from "@/components/employer/settings/account/ActivePlanSidebar";
+import { EmployerInvoicesPanel } from "@/components/employer/settings/account/EmployerInvoicesPanel";
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
+import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
 interface AccountSettingsClientProps {
   initialSettings: AccountSettings;
   planUsage: EmployerPlanUsage | null;
   accountDetails: EmployerAccountDetails | null;
+  invoices: EmployerInvoiceRow[];
+  invoicesError?: string | null;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export function AccountSettingsClient({
   initialSettings,
   planUsage,
   accountDetails,
+  invoices,
+  invoicesError,
 }: AccountSettingsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,7 +57,10 @@ export function AccountSettingsClient({
   const [isOpeningPortal, startPortalTransition] = useTransition();
 
   const handleUpgrade = (planId: SubscriptionTier) => {
-    if (planId === "discovery") return;
+    if (planId === "discovery") {
+      handleCancelToDiscovery();
+      return;
+    }
 
     startUpgradeTransition(async () => {
       const toastId = toast.loading(`Updating plan to ${planId}...`);
@@ -77,15 +95,26 @@ export function AccountSettingsClient({
     });
   };
 
+  const handleCancelToDiscovery = () => {
+    if (
+      !confirm(
+        "Switch to Discovery at period end? You keep your current plan until then, then move to the free Discovery tier."
+      )
+    ) {
+      return;
+    }
+    handleCancel();
+  };
+
   const handleCancel = () => {
     startCancelTransition(async () => {
-      const toastId = toast.loading("Processing subscription cancellation...");
+      const toastId = toast.loading("Scheduling move to Discovery...");
       try {
         const result = await cancelSubscription();
         if (result.error) {
           toast.error(result.error, { id: toastId });
         } else if (result.success) {
-          toast.success(result.message || "Subscription cancelled.", {
+          toast.success(result.message || "Cancellation scheduled.", {
             id: toastId,
           });
           router.refresh();
@@ -113,6 +142,9 @@ export function AccountSettingsClient({
       }
     });
   };
+
+  const scheduled = initialSettings.scheduledPlan;
+  const scheduledAt = initialSettings.scheduledEffectiveAt;
 
   return (
     <div className="space-y-8">
@@ -159,6 +191,35 @@ export function AccountSettingsClient({
         </div>
       ) : null}
 
+      {scheduled && !checkoutSuccess ? (
+        <div
+          className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+          role="status"
+        >
+          <div className="flex items-start gap-3">
+            <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+            <div>
+              <p className="text-sm font-bold text-amber-900">
+                {scheduled === "discovery"
+                  ? "Moving to Discovery at period end"
+                  : `Downgrade to ${TIER_LABELS[scheduled]} scheduled`}
+              </p>
+              <p className="mt-1 text-xs font-medium text-amber-900/80">
+                You keep {TIER_LABELS[initialSettings.plan]} until{" "}
+                {scheduledAt ? formatDate(scheduledAt) : "the end of this billing period"}
+                . Upgrade anytime to cancel this change.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="#manage-plan"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl border border-amber-300/80 bg-white px-4 py-2 text-xs font-bold text-amber-900 hover:bg-amber-50"
+          >
+            Manage plan
+          </Link>
+        </div>
+      ) : null}
+
       {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
 
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
@@ -188,10 +249,18 @@ export function AccountSettingsClient({
           <ManagePlanGrid
             currentPlan={initialSettings.plan}
             isUpgrading={isUpgrading}
+            isCancelling={isCancelling}
             onUpgrade={handleUpgrade}
+            onCancelToDiscovery={handleCancelToDiscovery}
             onManageBilling={handleManageBilling}
             isOpeningPortal={isOpeningPortal}
             nextBillingDate={initialSettings.nextBillingDate}
+            scheduledPlan={initialSettings.scheduledPlan}
+            cancelAtPeriodEnd={initialSettings.cancelAtPeriodEnd}
+          />
+          <EmployerInvoicesPanel
+            invoices={invoices}
+            error={invoicesError}
           />
         </div>
 
@@ -203,6 +272,8 @@ export function AccountSettingsClient({
             hasStripeSubscription={initialSettings.hasStripeSubscription}
             isOpeningPortal={isOpeningPortal}
             nextBillingDate={initialSettings.nextBillingDate}
+            scheduledPlan={initialSettings.scheduledPlan}
+            scheduledEffectiveAt={initialSettings.scheduledEffectiveAt}
             onCancel={handleCancel}
             onManageBilling={handleManageBilling}
           />

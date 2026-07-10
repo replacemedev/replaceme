@@ -83,6 +83,7 @@ export async function fetchAdminBillingPageData(): Promise<AdminBillingPageData>
       plan_slug,
       subscription_status,
       occurred_at,
+      stripe_invoice_id,
       profiles!billing_ledger_events_employer_id_fkey (
         company_profiles (
           company_name
@@ -112,11 +113,19 @@ export async function fetchAdminBillingPageData(): Promise<AdminBillingPageData>
       plan_slug: row.plan_slug,
       subscription_status: row.subscription_status,
       occurred_at: row.occurred_at,
+      stripe_invoice_id: row.stripe_invoice_id ?? null,
     };
   });
 
+  const scheduledChanges = subscriptions.filter(
+    (s) => s.scheduled_plan_slug || s.cancel_at_period_end
+  ).length;
+
   return {
-    metrics: buildMetrics(subscriptions),
+    metrics: {
+      ...buildMetrics(subscriptions),
+      scheduled_changes: scheduledChanges,
+    },
     subscriptions,
     ledger,
   };

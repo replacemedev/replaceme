@@ -223,6 +223,13 @@ export async function syncEmployerSubscriptionFromStripe(
     existing?.billing_period_start &&
     existing.billing_period_start !== periodStart;
 
+  const scheduledFromMeta = subscription.metadata?.scheduled_plan_slug?.trim() || null;
+  const liveSlug = (planSlug ?? "").toLowerCase();
+  // Period flip: once Stripe price matches the scheduled tier, clear the schedule marker.
+  const scheduleCleared =
+    !scheduledFromMeta ||
+    (scheduledFromMeta && liveSlug === scheduledFromMeta.toLowerCase());
+
   const { error: subError } = await supabase.from("employer_subscriptions").upsert(
     {
       employer_id: employerId,
@@ -239,6 +246,11 @@ export async function syncEmployerSubscriptionFromStripe(
       last_stripe_event_id: stripeEventId ?? null,
       unit_amount_cents: unitAmountCents,
       billing_interval: billingInterval,
+      ...(scheduleCleared
+        ? { scheduled_plan_slug: null, scheduled_effective_at: null }
+        : {
+            scheduled_plan_slug: scheduledFromMeta,
+          }),
       updated_at: new Date().toISOString(),
     },
     { onConflict: "employer_id" }
@@ -307,6 +319,8 @@ export async function downgradeEmployerToDiscovery(
       status: "canceled",
       stripe_subscription_id: null,
       cancel_at_period_end: false,
+      scheduled_plan_slug: null,
+      scheduled_effective_at: null,
       last_stripe_event_id: stripeEventId ?? null,
       updated_at: new Date().toISOString(),
     })

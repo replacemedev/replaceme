@@ -435,6 +435,17 @@ async function applyImmediateUpgrade(input: {
       safeError("[Billing] Post-upgrade sync failed", sync.error);
     }
 
+    // Clear any pending period-end downgrade after an immediate upgrade.
+    const supabase = await createAdminClient();
+    await supabase
+      .from("employer_subscriptions")
+      .update({
+        scheduled_plan_slug: null,
+        scheduled_effective_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("employer_id", input.employerId);
+
     safeLog(
       `[Billing] Upgrade ${input.currentSlug}->${input.planSlug} sub=${input.subscriptionId}`
     );
@@ -580,6 +591,8 @@ async function schedulePeriodEndDowngrade(input: {
       .from("employer_subscriptions")
       .update({
         cancel_at_period_end: false,
+        scheduled_plan_slug: input.planSlug,
+        scheduled_effective_at: effectiveAt,
         updated_at: new Date().toISOString(),
       })
       .eq("employer_id", input.employerId);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   AlertTriangle,
+  CalendarClock,
   CreditCard,
   DollarSign,
   TrendingUp,
@@ -76,7 +77,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
         <div className="space-y-6">
           <section className="space-y-4">
             <AdminSectionLabel>Billing overview</AdminSectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
               <StatCard
                 variant="dashboard"
                 title="Active Subscriptions"
@@ -108,6 +109,14 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                 icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
                 iconBgClass="bg-amber-50"
                 iconColorClass="text-amber-600"
+              />
+              <StatCard
+                variant="dashboard"
+                title="Scheduled changes"
+                value={metrics.scheduled_changes ?? 0}
+                icon={<CalendarClock className="h-4 w-4" aria-hidden />}
+                iconBgClass="bg-sky-50"
+                iconColorClass="text-sky-700"
               />
             </div>
           </section>
@@ -148,12 +157,13 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
             ) : (
               <div className="space-y-4">
                 <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-                  <table className="w-full min-w-[720px] text-sm">
+                  <table className="w-full min-w-[860px] text-sm">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                         <th className="px-4 py-3">Employer</th>
                         <th className="px-4 py-3">Plan</th>
                         <th className="px-4 py-3">Status</th>
+                        <th className="hidden md:table-cell px-4 py-3">Scheduled</th>
                         <th className="hidden md:table-cell px-4 py-3">Payment</th>
                         <th className="hidden lg:table-cell px-4 py-3">Period end</th>
                         <th className="px-4 py-3">Stripe</th>
@@ -183,6 +193,32 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                           </td>
                           <td className="px-4 py-3">
                             <StatusBadge status={sub.status} />
+                          </td>
+                          <td className="hidden md:table-cell px-4 py-3">
+                            {sub.scheduled_plan_slug || sub.cancel_at_period_end ? (
+                              <div className="space-y-0.5">
+                                <p className="text-xs font-semibold text-amber-800">
+                                  →{" "}
+                                  {sub.cancel_at_period_end &&
+                                  !sub.scheduled_plan_slug
+                                    ? "Discovery"
+                                    : sub.scheduled_plan_slug}
+                                </p>
+                                <p className="text-[10px] text-slate-500">
+                                  {sub.scheduled_effective_at
+                                    ? new Date(
+                                        sub.scheduled_effective_at
+                                      ).toLocaleDateString()
+                                    : sub.current_period_end
+                                      ? new Date(
+                                          sub.current_period_end
+                                        ).toLocaleDateString()
+                                      : "period end"}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-slate-400">—</span>
+                            )}
                           </td>
                           <td className="hidden md:table-cell px-4 py-3">
                             {sub.last_payment_status ? (
@@ -246,7 +282,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
           ) : (
             <div className="space-y-4">
               <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-                <table className="w-full min-w-[640px] text-sm">
+                <table className="w-full min-w-[720px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <th className="px-4 py-3">When</th>
@@ -254,6 +290,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                       <th className="px-4 py-3">Event</th>
                       <th className="px-4 py-3">Amount</th>
                       <th className="hidden sm:table-cell px-4 py-3">Plan</th>
+                      <th className="px-4 py-3">Invoice</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
@@ -286,6 +323,20 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                         <td className="hidden sm:table-cell px-4 py-3">
                           {row.plan_slug ? (
                             <PlanTierBadge tier={row.plan_slug} size="sm" />
+                          ) : (
+                            <span className="text-xs text-slate-400">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {row.stripe_invoice_id ? (
+                            <a
+                              href={`https://dashboard.stripe.com/invoices/${row.stripe_invoice_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-semibold text-[#006e2f] hover:underline"
+                            >
+                              View
+                            </a>
                           ) : (
                             <span className="text-xs text-slate-400">—</span>
                           )}

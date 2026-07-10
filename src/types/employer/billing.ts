@@ -13,6 +13,9 @@ export interface AccountSettings {
   status: string;
   cancelAtPeriodEnd: boolean;
   hasStripeSubscription: boolean;
+  /** Paid tier scheduled at period end (Stripe subscription schedule). */
+  scheduledPlan: SubscriptionTier | null;
+  scheduledEffectiveAt: string | null;
 }
 
 export interface PricingPlan {

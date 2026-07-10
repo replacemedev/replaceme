@@ -13,6 +13,7 @@ import { safeError, safeLog } from "@/utils/logger";
 import { AccountSettings, SubscriptionTier } from "@/types/employer/billing";
 import { getEmployerPlanUsage as loadEmployerPlanUsage } from "@/lib/server/entitlements";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
+import type { EmployerInvoiceRow } from "@/lib/server/stripe/list-invoices";
 
 const PAID_TIERS = new Set<SubscriptionTier>(["starter", "growth", "scale"]);
 
@@ -53,6 +54,8 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         cancel_at_period_end,
         stripe_subscription_id,
         unlocks_used,
+        scheduled_plan_slug,
+        scheduled_effective_at,
         billing_plans!employer_subscriptions_plan_id_fkey (
           name,
           slug,
@@ -77,6 +80,8 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         status: "Active",
         cancelAtPeriodEnd: false,
         hasStripeSubscription: false,
+        scheduledPlan: null,
+        scheduledEffectiveAt: null,
       };
     }
 
@@ -94,6 +99,14 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
     const periodEnd =
       subscription.billing_period_end ?? subscription.current_period_end;
 
+    const scheduledRaw = subscription.scheduled_plan_slug;
+    const scheduledPlan =
+      scheduledRaw && PAID_TIERS.has(normalizePlanSlug(scheduledRaw, null))
+        ? normalizePlanSlug(scheduledRaw, null)
+        : scheduledRaw?.toLowerCase() === "discovery"
+          ? ("discovery" as const)
+          : null;
+
     return {
       plan,
       unlocksUsed: subscription.unlocks_used,
@@ -108,6 +121,8 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         subscription.status.slice(1),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       hasStripeSubscription: Boolean(subscription.stripe_subscription_id),
+      scheduledPlan,
+      scheduledEffectiveAt: subscription.scheduled_effective_at,
     };
   } catch {
     return null;
@@ -251,7 +266,9 @@ export async function cancelSubscription() {
 
     const { data: subscription } = await admin
       .from("employer_subscriptions")
-      .select("stripe_subscription_id, plan_slug")
+      .select(
+        "stripe_subscription_id, plan_slug, billing_period_end, current_period_end"
+      )
       .eq("employer_id", profile.id)
       .maybeSingle();
 
@@ -262,15 +279,32 @@ export async function cancelSubscription() {
 
     const stripe = getStripe();
     if (stripe && subscription?.stripe_subscription_id) {
+      const sub = await stripe.subscriptions.retrieve(
+        subscription.stripe_subscription_id
+      );
+      if (sub.schedule) {
+        const scheduleId =
+          typeof sub.schedule === "string" ? sub.schedule : sub.schedule.id;
+        try {
+          await stripe.subscriptionSchedules.release(scheduleId);
+        } catch {
+          /* schedule may already be released */
+        }
+      }
       await stripe.subscriptions.update(subscription.stripe_subscription_id, {
         cancel_at_period_end: true,
       });
     }
 
+    const periodEnd =
+      subscription?.billing_period_end ?? subscription?.current_period_end ?? null;
+
     const { error: cancelError } = await admin
       .from("employer_subscriptions")
       .update({
         cancel_at_period_end: true,
+        scheduled_plan_slug: "discovery",
+        scheduled_effective_at: periodEnd,
         updated_at: new Date().toISOString(),
       })
       .eq("employer_id", profile.id);
@@ -288,6 +322,27 @@ export async function cancelSubscription() {
 
   if (!result.success) return { error: result.error };
   return { success: true as const, message: result.data?.message };
+}
+
+export async function listEmployerInvoices() {
+  const result = await runAction("listEmployerInvoices", async () => {
+    const { profile } = await requireRole("employer");
+    if (!getStripe()) {
+      return fail("Stripe is not configured.");
+    }
+    const { listInvoicesForEmployer } = await import(
+      "@/lib/server/stripe/list-invoices"
+    );
+    const listed = await listInvoicesForEmployer(profile.id);
+    if ("error" in listed) return fail(listed.error);
+    return ok({ invoices: listed.invoices });
+  });
+
+  if (!result.success) return { error: result.error, invoices: [] as EmployerInvoiceRow[] };
+  return {
+    success: true as const,
+    invoices: result.data?.invoices ?? [],
+  };
 }
 
 export async function getCurrentEmployerSubscription(): Promise<{
