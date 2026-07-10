@@ -9,7 +9,7 @@ import { forwardRef, useImperativeHandle, useRef } from "react";
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export function isTurnstileClientEnabled(): boolean {
-  return Boolean(SITE_KEY);
+  return Boolean(SITE_KEY?.trim());
 }
 
 export interface TurnstileWidgetHandle {
@@ -38,10 +38,15 @@ export const TurnstileWidget = forwardRef<
     },
   }));
 
-  if (!SITE_KEY) return null;
+  if (!SITE_KEY?.trim()) return null;
 
   return (
-    <div className={className ?? "flex justify-center"}>
+    <div
+      className={
+        className ??
+        "flex w-full max-w-full justify-center overflow-x-auto origin-left scale-[0.92] sm:scale-100"
+      }
+    >
       <Turnstile
         ref={ref}
         siteKey={SITE_KEY}

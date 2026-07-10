@@ -33,6 +33,7 @@ Rotate credentials on a schedule and after any suspected leak. Prefer rotating o
 ## Production must-haves
 
 - `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` set (rate limits fail closed without them).
-- `TURNSTILE_SECRET_KEY` set when `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is set.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` **and** `TURNSTILE_SECRET_KEY` set in Vercel (Production + Preview).
+  Without the secret, the app still accepts a widget token (presence) and passes it to Supabase as `captchaToken`, but Cloudflare Siteverify is skipped — add the secret ASAP.
 - HTTPS only; HSTS is set in `next.config.ts`.
-- Supabase Auth CAPTCHA (Turnstile) enabled in the Supabase dashboard as defense-in-depth.
+- Optionally enable Supabase Auth CAPTCHA (Turnstile) in the Supabase dashboard as defense-in-depth.
