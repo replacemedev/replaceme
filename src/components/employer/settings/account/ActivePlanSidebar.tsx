@@ -143,8 +143,8 @@ export function ActivePlanSidebar({
             {isOpeningPortal ? "Opening portal..." : "Manage billing in Stripe"}
           </button>
           <p className="text-[11px] text-center font-medium text-slate-400 leading-relaxed">
-            Change payment method, view invoices, or downgrade your plan. Plan
-            downgrades take effect at the end of your current billing period.
+                Change payment method, view invoices, or manage cards. Plan
+                upgrades are immediate; downgrades schedule at period end in-app.
           </p>
         </div>
       ) : null}

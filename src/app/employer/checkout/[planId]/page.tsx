@@ -83,11 +83,11 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     );
   }
 
-  // Existing subscriber: plan was swapped on the Stripe subscription item
-  // (no second Checkout subscription).
-  if (checkout.upgraded) {
+  // Existing subscriber: plan changed in place (upgrade) or scheduled (downgrade).
+  if (checkout.upgraded || checkout.downgradeScheduled) {
+    const flag = checkout.downgradeScheduled ? "downgraded=1" : "upgraded=1";
     redirect(
-      `/employer/settings/account?checkout=success&upgraded=1&plan=${encodeURIComponent(
+      `/employer/settings/account?checkout=success&${flag}&plan=${encodeURIComponent(
         checkout.planSlug ?? targetPlan
       )}`
     );

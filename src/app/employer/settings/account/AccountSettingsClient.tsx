@@ -36,6 +36,7 @@ export function AccountSettingsClient({
   const searchParams = useSearchParams();
   const checkoutSuccess = searchParams.get("checkout") === "success";
   const upgradedInPlace = searchParams.get("upgraded") === "1";
+  const downgradeScheduled = searchParams.get("downgraded") === "1";
   const [isUpgrading, startUpgradeTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
   const [isOpeningPortal, startPortalTransition] = useTransition();
@@ -49,6 +50,12 @@ export function AccountSettingsClient({
         const result = await createUpgradeCheckout(planId);
         if (result.error) {
           toast.error(result.error, { id: toastId });
+        } else if (result.success && result.downgradeScheduled) {
+          toast.success(
+            result.message ?? `Downgrade to ${planId} scheduled.`,
+            { id: toastId }
+          );
+          router.refresh();
         } else if (result.success && result.upgraded) {
           toast.success(result.message ?? `You're now on ${planId}.`, {
             id: toastId,
@@ -118,14 +125,18 @@ export function AccountSettingsClient({
             <CheckCircle2 className="h-5 w-5 text-[#006e2f] shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-[#006e2f]">
-                {upgradedInPlace
-                  ? "Plan updated — you're on your new tier"
-                  : "Payment successful — welcome to your new plan"}
+                {downgradeScheduled
+                  ? "Downgrade scheduled"
+                  : upgradedInPlace
+                    ? "Plan updated — you're on your new tier"
+                    : "Payment successful — welcome to your new plan"}
               </p>
               <p className="text-xs text-emerald-900/80 font-medium mt-1">
-                {upgradedInPlace
-                  ? "Your existing subscription was upgraded in place (with proration). Entitlements are available now."
-                  : "Your entitlements update within a minute after Stripe confirms payment. Post a job or review applicants to use your new limits."}
+                {downgradeScheduled
+                  ? "Your lower tier starts at the end of the current billing period. You keep current entitlements until then."
+                  : upgradedInPlace
+                    ? "Your existing subscription was upgraded in place (with proration). Entitlements are available now."
+                    : "Your entitlements update within a minute after Stripe confirms payment. Post a job or review applicants to use your new limits."}
               </p>
             </div>
           </div>

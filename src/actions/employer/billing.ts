@@ -6,7 +6,7 @@ import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { upgradeCheckoutSchema } from "@/lib/validations/billing";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
-import { upgradeExistingSubscription } from "@/lib/server/stripe/upgrade-subscription";
+import { changeEmployerSubscription } from "@/lib/server/stripe/change-subscription";
 import { createBillingPortalSession } from "@/lib/server/stripe/portal-session";
 import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
@@ -116,15 +116,18 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
 
 type UpgradeCheckoutData = {
   upgraded: boolean;
+  downgradeScheduled?: boolean;
   checkoutUrl?: string;
   planSlug?: string;
   message?: string;
+  effectiveAt?: string;
 };
 
 /**
- * Change plan: update existing Stripe subscription in place (with proration),
- * or open Checkout only when the employer has no active paid subscription.
+ * Change plan: immediate in-place upgrade, period-end scheduled downgrade,
+ * or Checkout only when the employer has no active paid subscription.
  * @see https://docs.stripe.com/billing/subscriptions/change-price
+ * @see https://docs.stripe.com/billing/subscriptions/subscription-schedules
  */
 export async function createUpgradeCheckout(planId: string) {
   const result = await runAction("createUpgradeCheckout", async () => {
@@ -139,23 +142,26 @@ export async function createUpgradeCheckout(planId: string) {
       );
     }
 
-    const inPlace = await upgradeExistingSubscription({
+    const change = await changeEmployerSubscription({
       employerId: profile.id,
       planRef: parsed.planId,
     });
 
-    if ("error" in inPlace) {
-      return fail(inPlace.error);
+    if ("error" in change) {
+      return fail(change.error);
     }
 
-    if (inPlace.mode === "updated") {
+    if (change.mode === "upgraded" || change.mode === "downgrade_scheduled") {
       revalidatePath("/employer/settings/account");
       revalidatePath("/employer/pricing");
       revalidatePath("/employer/dashboard");
       return ok<UpgradeCheckoutData>({
-        upgraded: true,
-        planSlug: inPlace.planSlug,
-        message: `Your plan is now ${inPlace.planSlug}. Proration will appear on your next Stripe invoice.`,
+        upgraded: change.mode === "upgraded",
+        downgradeScheduled: change.mode === "downgrade_scheduled",
+        planSlug: change.planSlug,
+        message: change.message,
+        effectiveAt:
+          change.mode === "downgrade_scheduled" ? change.effectiveAt : undefined,
       });
     }
 
@@ -192,9 +198,11 @@ export async function createUpgradeCheckout(planId: string) {
   return {
     success: true as const,
     upgraded: result.data?.upgraded ?? false,
+    downgradeScheduled: result.data?.downgradeScheduled ?? false,
     checkoutUrl: result.data?.checkoutUrl,
     planSlug: result.data?.planSlug,
     message: result.data?.message,
+    effectiveAt: result.data?.effectiveAt,
   };
 }
 

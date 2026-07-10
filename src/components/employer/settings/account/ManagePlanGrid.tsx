@@ -71,8 +71,9 @@ export function ManagePlanGrid({
               Manage plan
             </h2>
             <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
-              Upgrades take effect immediately. Downgrades apply at the end of
-              your billing period via the Stripe billing portal.
+              Upgrades take effect immediately with proration. Downgrades are
+              scheduled for the end of your billing period — you keep your
+              current plan until then.
             </p>
           </div>
           {nextBillingDate && currentPlan !== "discovery" ? (
@@ -163,14 +164,25 @@ export function ManagePlanGrid({
                 </button>
               ) : isDowngrade ? (
                 <div className="mt-4 space-y-2">
-                  <button
-                    type="button"
-                    disabled={isOpeningPortal}
-                    onClick={onManageBilling}
-                    className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
-                  >
-                    {isOpeningPortal ? "Opening..." : "Downgrade in Stripe"}
-                  </button>
+                  {isPaid ? (
+                    <button
+                      type="button"
+                      disabled={isUpgrading}
+                      onClick={() => onUpgrade(plan.slug)}
+                      className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    >
+                      {isUpgrading ? "Scheduling..." : "Schedule downgrade"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isOpeningPortal}
+                      onClick={onManageBilling}
+                      className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    >
+                      {isOpeningPortal ? "Opening..." : "Cancel in Stripe"}
+                    </button>
+                  )}
                   <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
                     Takes effect at period end
                   </p>

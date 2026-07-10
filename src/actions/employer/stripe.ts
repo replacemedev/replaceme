@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
-import { upgradeExistingSubscription } from "@/lib/server/stripe/upgrade-subscription";
+import { changeEmployerSubscription } from "@/lib/server/stripe/change-subscription";
 import { getStripe } from "@/lib/server/stripe/client";
 import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
 import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
@@ -12,6 +12,7 @@ import { safeError, safeLog } from "@/utils/logger";
 export type StripeCheckoutResult = {
   /** True when an existing Stripe subscription was updated in place (no Checkout). */
   upgraded?: boolean;
+  downgradeScheduled?: boolean;
   checkoutUrl?: string;
   planName?: string;
   planPrice?: number;
@@ -21,7 +22,7 @@ export type StripeCheckoutResult = {
 };
 
 /**
- * Start a paid plan: update an existing Stripe subscription in place when
+ * Start a paid plan: update/schedule an existing Stripe subscription when
  * possible; otherwise open Checkout (subscription mode) for first-time paid.
  * @see https://docs.stripe.com/billing/subscriptions/change-price
  */
@@ -57,26 +58,27 @@ export async function createStripeCheckoutSession(
       };
     }
 
-    const inPlace = await upgradeExistingSubscription({
+    const change = await changeEmployerSubscription({
       employerId: profile.id,
       planRef: parsed.planId,
     });
 
-    if ("error" in inPlace) {
-      return { error: inPlace.error };
+    if ("error" in change) {
+      return { error: change.error };
     }
 
-    if (inPlace.mode === "updated") {
+    if (change.mode === "upgraded" || change.mode === "downgrade_scheduled") {
       revalidatePath("/employer/settings/account");
       revalidatePath("/employer/pricing");
       revalidatePath("/employer/dashboard");
       revalidatePath(`/employer/checkout/${parsed.planId}`);
       return {
-        upgraded: true,
+        upgraded: change.mode === "upgraded",
+        downgradeScheduled: change.mode === "downgrade_scheduled",
         planName: plan.name,
         planPrice: Number(plan.price),
-        planSlug: inPlace.planSlug,
-        message: `Your plan is now ${inPlace.planSlug}. Proration will appear on your next Stripe invoice.`,
+        planSlug: change.planSlug,
+        message: change.message,
       };
     }
 
