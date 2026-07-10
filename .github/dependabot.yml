@@ -6,6 +6,15 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    # Next.js 16 + eslint-config-next require eslint 9 and typescript 5.x.
+    # Major bumps (eslint 10 / typescript 7) break `next build` on Vercel.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       production-deps:
         dependency-type: production
