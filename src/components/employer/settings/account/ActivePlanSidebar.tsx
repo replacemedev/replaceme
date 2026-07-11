@@ -185,13 +185,7 @@ export function ActivePlanSidebar({
             type="button"
             disabled={isCancelling || movingToDiscovery}
             onClick={() => {
-              if (
-                confirm(
-                  "Move to Discovery at period end? You will keep access until the current billing cycle ends."
-                )
-              ) {
-                onCancel();
-              }
+              onCancel();
             }}
             className="w-full h-10 text-xs font-bold text-slate-400 hover:text-red-500 hover:bg-red-50/20 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 border border-slate-100 hover:border-red-100"
           >

@@ -55,6 +55,7 @@ export function AccountSettingsClient({
   const [isUpgrading, startUpgradeTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
   const [isOpeningPortal, startPortalTransition] = useTransition();
+  const [isDowngradeModalOpen, setIsDowngradeModalOpen] = React.useState(false);
 
   const handleUpgrade = (planId: SubscriptionTier) => {
     if (planId === "discovery") {
@@ -96,14 +97,7 @@ export function AccountSettingsClient({
   };
 
   const handleCancelToDiscovery = () => {
-    if (
-      !confirm(
-        "Switch to Discovery at period end? You keep your current plan until then, then move to the free Discovery tier."
-      )
-    ) {
-      return;
-    }
-    handleCancel();
+    setIsDowngradeModalOpen(true);
   };
 
   const handleCancel = () => {
@@ -117,6 +111,7 @@ export function AccountSettingsClient({
           toast.success(result.message || "Cancellation scheduled.", {
             id: toastId,
           });
+          setIsDowngradeModalOpen(false);
           router.refresh();
         }
       } catch {
@@ -274,11 +269,57 @@ export function AccountSettingsClient({
             nextBillingDate={initialSettings.nextBillingDate}
             scheduledPlan={initialSettings.scheduledPlan}
             scheduledEffectiveAt={initialSettings.scheduledEffectiveAt}
-            onCancel={handleCancel}
+            onCancel={() => setIsDowngradeModalOpen(true)}
             onManageBilling={handleManageBilling}
           />
         </div>
       </div>
+
+      {/* Downgrade Confirmation Modal */}
+      {isDowngradeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm"
+            onClick={() => {
+              if (!isCancelling) setIsDowngradeModalOpen(false);
+            }}
+          />
+
+          {/* Modal Container */}
+          <div className="relative bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden w-full max-w-md mx-auto z-10 flex flex-col">
+            {/* Header / Body */}
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Confirm Plan Downgrade
+              </h3>
+              <p className="mt-3 text-sm text-slate-500 leading-relaxed">
+                Are you sure you want to switch to the Discovery plan? You will keep your current plan&apos;s features until the end of your billing period, after which you will be moved to the free tier.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-2 p-6 bg-slate-50/50 border-t border-slate-100 sm:flex-row sm:justify-end sm:gap-3">
+              <button
+                type="button"
+                disabled={isCancelling}
+                onClick={() => setIsDowngradeModalOpen(false)}
+                className="w-full min-h-[44px] sm:min-h-0 sm:w-auto text-slate-600 hover:bg-slate-100 font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isCancelling}
+                onClick={handleCancel}
+                className="w-full min-h-[44px] sm:min-h-0 sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+              >
+                {isCancelling ? "Scheduling..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
