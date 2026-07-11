@@ -445,3 +445,126 @@ export async function removeWorkerAvatar() {
 
   return { success: true };
 }
+
+export async function uploadWorkerResume(formData: FormData) {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "No file was uploaded." };
+  }
+
+  // 5MB limit
+  if (file.size > 5242880) {
+    return { error: "File exceeds 5MB maximum limit." };
+  }
+
+  if (file.type !== "application/pdf") {
+    return { error: "Only PDF documents are allowed." };
+  }
+
+  const fileBuffer = await file.arrayBuffer();
+  if (fileBuffer.byteLength === 0) {
+    return { error: "Uploaded file is empty." };
+  }
+
+  const admin = await createAdminClient();
+  const storagePath = `${ctx.user.id}/resume.pdf`;
+
+  const { error: uploadError } = await admin.storage
+    .from("resumes")
+    .upload(storagePath, fileBuffer, {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+
+  if (uploadError) {
+    safeError("uploadWorkerResume storage:", uploadError);
+    return { error: "Failed to upload resume to secure storage." };
+  }
+
+  const { data: updatedRow, error: updateError } = await ctx.supabase
+    .from("profiles")
+    .update({
+      resume_url: storagePath,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", ctx.profile.id)
+    .select("id")
+    .maybeSingle();
+
+  if (updateError || !updatedRow) {
+    safeError("uploadWorkerResume profile update:", updateError ?? "no row updated");
+    await admin.storage.from("resumes").remove([storagePath]);
+    return { error: "Your resume uploaded but we couldn't link it to your profile." };
+  }
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/dashboard");
+  revalidatePath("/worker/onboarding");
+  revalidatePath("/", "layout");
+
+  return { success: true, resumeUrl: storagePath };
+}
+
+export async function deleteWorkerResume() {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const admin = await createAdminClient();
+  const storagePath = `${ctx.user.id}/resume.pdf`;
+
+  await admin.storage.from("resumes").remove([storagePath]);
+
+  const { data: updatedRow, error } = await ctx.supabase
+    .from("profiles")
+    .update({
+      resume_url: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", ctx.profile.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !updatedRow) return { error: "Failed to remove resume." };
+
+  await invalidateWorkerCache(ctx.profile.id);
+  await invalidateEmployerCachesForWorker(ctx.profile.id);
+  revalidatePath("/worker/profile");
+  revalidatePath("/worker/dashboard");
+  revalidatePath("/worker/onboarding");
+  revalidatePath("/", "layout");
+
+  return { success: true };
+}
+
+export async function getWorkerResumePreviewUrl() {
+  const ctx = await requireWorker();
+  if (!ctx) return { error: "Unauthorized" };
+
+  const { data: profile, error: dbError } = await ctx.supabase
+    .from("profiles")
+    .select("resume_url")
+    .eq("id", ctx.profile.id)
+    .single();
+
+  if (dbError || !profile || !profile.resume_url) {
+    return { error: "No resume uploaded." };
+  }
+
+  const admin = await createAdminClient();
+  const { data, error } = await admin.storage
+    .from("resumes")
+    .createSignedUrl(profile.resume_url, 60 * 5); // 5 minutes validity
+
+  if (error || !data?.signedUrl) {
+    safeError("getWorkerResumePreviewUrl signed url:", error);
+    return { error: "Failed to generate preview link." };
+  }
+
+  return { success: true, previewUrl: data.signedUrl };
+}
+

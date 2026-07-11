@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { showErrorToast } from "@/utils/toast";
+import { ResumeUpload } from "./ResumeUpload";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
@@ -601,36 +602,21 @@ export function WorkerProfileEditor({
                 onSave={(v) => saveProfileField({ portfolioUrl: v })}
               />
               {isOwner ? (
-                <>
-                  <InlineEditableRow
-                    label="Resume"
-                    value={profile.resume_url ?? ""}
-                    inputType="url"
-                    editable
-                    displayValue={
-                      profile.resume_url ? "Link set" : undefined
-                    }
-                    onSave={(v) => saveProfileField({ resumeUrl: v })}
+                <div className="space-y-1 text-left">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Resume</span>
+                  <ResumeUpload
+                    resumeUrl={profile.resume_url}
                   />
-                </>
+                </div>
               ) : (
-                <>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Resume</span>
-                    {profile.resume_url ? (
-                      <a
-                        href={profile.resume_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#006e2f] hover:underline flex items-center gap-1"
-                      >
-                        View <ExternalLink size={12} />
-                      </a>
-                    ) : (
-                      <span className="text-slate-400">Not specified</span>
-                    )}
-                  </div>
-                </>
+                <div className="flex justify-between items-center text-left">
+                  <span className="text-slate-400">Resume</span>
+                  {profile.resume_url ? (
+                    <span className="text-slate-500 font-medium">Uploaded</span>
+                  ) : (
+                    <span className="text-slate-400">Not specified</span>
+                  )}
+                </div>
               )}
             </div>
 

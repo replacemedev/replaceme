@@ -12,6 +12,7 @@ import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
 import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import { InterviewDetailModal } from "../interviews/InterviewDetailModal";
+import { DownloadResumeButton } from "../candidates/DownloadResumeButton";
 
 const AGENT_SKILLS = new Set([
   "ponytail",
@@ -178,7 +179,7 @@ export function ApplicantCard({
         isUnlocked={applicant.isUnlocked}
       />
 
-      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 mt-4 pt-4 border-t border-gray-100">
         {isRejected ? (
           <>
             <button
@@ -207,33 +208,38 @@ export function ApplicantCard({
                 {isPreview ? "Preview profile" : "View profile"}
               </Link>
             ) : null}
+            {!isPreview && applicant.resumeUrl ? (
+              <DownloadResumeButton
+                candidateId={applicant.candidateId}
+                resumeUrl={applicant.resumeUrl}
+                planSlug={planSlug}
+                resumeDownloadEnabled={!!resumeDownloadEnabled}
+                className="w-full md:w-auto"
+              />
+            ) : null}
             {messagingEnabled ? (
               <button
                 onClick={onMessageClick}
                 type="button"
-                className="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 rounded-xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-full md:w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 rounded-xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                 title="Chat with candidate"
               >
                 <MessageSquare size={15} />
+                <span className="md:hidden ml-2 font-bold text-xs">Message Candidate</span>
               </button>
             ) : (
               <Link
                 href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
-                className="w-10 h-10 bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 text-[#006e2f] rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                className="w-full md:w-10 h-10 bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 text-[#006e2f] rounded-xl flex items-center justify-center shrink-0 transition-colors"
                 title="Upgrade to message"
               >
                 <MessageSquare size={15} />
+                <span className="md:hidden ml-2 font-bold text-xs">Upgrade to message</span>
               </Link>
             )}
           </>
         )}
       </div>
-
-      {!isPreview && !resumeDownloadEnabled ? (
-        <p className="mt-2 text-[10px] font-medium text-slate-400">
-          Resume downloads unlock on your current plan settings.
-        </p>
-      ) : null}
 
       {isRescheduleOpen && (
         <InterviewDetailModal

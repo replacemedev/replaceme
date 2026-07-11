@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { MessageSquare, Bookmark, Paperclip, Download } from "lucide-react";
+import { MessageSquare, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { EmployerOpenMessagingThreadButton } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
 import { togglePin } from "@/actions/employer/pinned";
-import { FeatureGate } from "@/components/shared/entitlements/FeatureGate";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
+import { DownloadResumeButton } from "./DownloadResumeButton";
 
 interface CandidateProfileActionsProps {
   candidateId: string;
@@ -105,28 +105,13 @@ export function CandidateProfileActions({
           <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-1">
             Documents
           </p>
-
-          <FeatureGate
-            allowed={resumeDownloadEnabled}
-            feature="resume"
-            currentPlan={planSlug}
-            preview={
-              <UnlockOverlay feature="resume" currentPlan={planSlug} compact />
-            }
-          >
-            <a
-              href={resumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-between rounded-xl bg-slate-50 hover:bg-slate-100 p-3.5 text-xs font-bold text-slate-700 transition-colors group cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <Paperclip className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                <span>Resume</span>
-              </div>
-              <Download className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-            </a>
-          </FeatureGate>
+          <DownloadResumeButton
+            candidateId={candidateId}
+            resumeUrl={resumeUrl}
+            planSlug={planSlug}
+            resumeDownloadEnabled={resumeDownloadEnabled}
+            className="w-full"
+          />
         </div>
       )}
     </div>
