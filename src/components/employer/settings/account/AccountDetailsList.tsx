@@ -52,28 +52,6 @@ export function AccountDetailsList() {
           </div>
           <PasswordResetButton />
         </div>
-
-        <div className="flex flex-col gap-3 p-6 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-4 min-w-0">
-            <div className="shrink-0 rounded-xl bg-slate-50 p-2.5 text-slate-500">
-              <CreditCard size={20} />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-sm font-bold text-slate-800">
-                Billing (USD)
-              </h3>
-              <p className="mt-0.5 text-xs text-slate-400">
-                Subscriptions billed monthly in US dollars via Stripe
-              </p>
-            </div>
-          </div>
-          <Link
-            href="#manage-plan"
-            className="shrink-0 text-sm font-bold text-emerald-600 transition-colors hover:text-emerald-700"
-          >
-            Manage plan
-          </Link>
-        </div>
       </div>
     </div>
   );
