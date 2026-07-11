@@ -100,12 +100,12 @@ export function ActivePlanSidebar({
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0a4a29] text-white rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+      <div className="bg-[#0a4a29] text-white rounded-xl border border-[#0a4a29] p-5 sm:p-6 shadow-sm relative overflow-hidden">
         <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#22c55e]/20 rounded-full blur-2xl pointer-events-none" />
 
         <div className="space-y-6 relative z-10">
           <div>
-            <h3 className="text-lg font-bold">{planLabel} Plan Features</h3>
+            <h3 className="text-base font-bold">{planLabel} Plan Features</h3>
             <p className="text-sm text-emerald-200/90 font-medium mt-1">
               {planPrice(currentPlan)}
             </p>
@@ -149,26 +149,31 @@ export function ActivePlanSidebar({
       </div>
 
       {isPaid && hasStripeSubscription ? (
-        <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm space-y-3">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm space-y-3">
+          <h4 className="text-sm font-semibold text-slate-900">Stripe Billing</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Update payment method or open Stripe for receipts. Invoices also
+            appear below on this page.
+          </p>
           <button
             type="button"
             disabled={isOpeningPortal}
             onClick={onManageBilling}
-            className="w-full h-11 text-xs font-bold text-[#006e2f] hover:bg-emerald-50 rounded-xl transition-all duration-200 disabled:opacity-50"
+            className="w-full h-10 text-xs font-bold text-[#006e2f] hover:bg-emerald-50 rounded-xl border border-emerald-100 transition-all duration-200 disabled:opacity-50"
           >
             {isOpeningPortal ? "Opening portal..." : "Manage billing in Stripe"}
           </button>
-          <p className="text-[11px] text-center font-medium text-slate-400 leading-relaxed">
-            Update payment method or open Stripe for receipts. Invoices also
-            appear below on this page.
-          </p>
         </div>
       ) : null}
 
       {isPaid ? (
-        <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm space-y-3">
+          <h4 className="text-sm font-semibold text-slate-900">Cancel Plan</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Move to the free Discovery plan at the end of your current billing cycle. You will keep all premium access until then.
+          </p>
           {movingToDiscovery ? (
-            <p className="text-xs font-medium text-amber-700 text-center mb-3">
+            <p className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-2 text-center leading-normal mb-3">
               Moving to Discovery
               {scheduledEffectiveAt
                 ? ` on ${formatBillingDate(scheduledEffectiveAt)}`
@@ -188,7 +193,7 @@ export function ActivePlanSidebar({
                 onCancel();
               }
             }}
-            className="w-full h-11 text-xs font-bold text-slate-400 hover:text-red-500 hover:bg-red-50/20 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50"
+            className="w-full h-10 text-xs font-bold text-slate-400 hover:text-red-500 hover:bg-red-50/20 rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 disabled:opacity-50 border border-slate-100 hover:border-red-100"
           >
             <AlertTriangle size={14} />
             {isCancelling

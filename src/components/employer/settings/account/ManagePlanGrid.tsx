@@ -100,7 +100,7 @@ export function ManagePlanGrid({
       </div>
 
       <div className="p-6 sm:p-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {UPGRADE_PLANS.map((plan) => {
           const isCurrent = isCurrentTier(plan.slug, currentPlan);
           const isUpgrade = isHigherTier(plan.slug, currentPlan);
@@ -110,10 +110,10 @@ export function ManagePlanGrid({
           return (
             <div
               key={plan.slug}
-              className={`relative flex min-h-0 flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+              className={`relative flex min-h-0 flex-col justify-between rounded-xl border p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                 isCurrent
                   ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
-                  : "border-slate-100 bg-white hover:border-slate-200"
+                  : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
               {isCurrent ? (
@@ -124,8 +124,8 @@ export function ManagePlanGrid({
 
               <div>
                 <p
-                  className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
-                    plan.highlight ? "text-emerald-600" : "text-slate-400"
+                  className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase flex items-center gap-1 ${
+                    plan.highlight ? "text-emerald-600" : "text-slate-500"
                   }`}
                 >
                   {plan.label}
@@ -136,14 +136,14 @@ export function ManagePlanGrid({
                     />
                   ) : null}
                 </p>
-                <p className="text-2xl font-extrabold text-slate-800 mt-2">
+                <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">
                   {plan.price}
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
                   per month
                 </p>
                 {plan.detail ? (
-                  <p className="text-xs text-slate-500 font-medium mt-2">
+                  <p className="text-xs sm:text-sm text-slate-600 mt-2">
                     {plan.detail}
                   </p>
                 ) : null}

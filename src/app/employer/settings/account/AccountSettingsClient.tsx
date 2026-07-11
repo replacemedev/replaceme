@@ -193,18 +193,18 @@ export function AccountSettingsClient({
 
       {scheduled && !checkoutSuccess ? (
         <div
-          className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-3 rounded-xl border border-orange-200 bg-orange-50/50 p-5 sm:flex-row sm:items-center sm:justify-between"
           role="status"
         >
           <div className="flex items-start gap-3">
-            <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+            <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" />
             <div>
-              <p className="text-sm font-bold text-amber-900">
+              <p className="text-sm font-semibold text-orange-950">
                 {scheduled === "discovery"
                   ? "Moving to Discovery at period end"
                   : `Downgrade to ${TIER_LABELS[scheduled]} scheduled`}
               </p>
-              <p className="mt-1 text-xs font-medium text-amber-900/80">
+              <p className="mt-1 text-xs font-medium text-orange-700/90 leading-relaxed">
                 You keep {TIER_LABELS[initialSettings.plan]} until{" "}
                 {scheduledAt ? formatDate(scheduledAt) : "the end of this billing period"}
                 . Upgrade anytime to cancel this change.
@@ -213,7 +213,7 @@ export function AccountSettingsClient({
           </div>
           <Link
             href="#manage-plan"
-            className="inline-flex shrink-0 items-center justify-center rounded-xl border border-amber-300/80 bg-white px-4 py-2 text-xs font-bold text-amber-900 hover:bg-amber-50"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white px-4 py-2 text-xs font-bold text-orange-900 hover:bg-orange-50"
           >
             Manage plan
           </Link>
@@ -240,8 +240,8 @@ export function AccountSettingsClient({
         planUsage={planUsage}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="w-full flex flex-col lg:grid lg:grid-cols-3 gap-8 items-start">
+        <div className="w-full lg:col-span-2 space-y-8">
           {accountDetails ? (
             <EmployerPersonalProfileCard account={accountDetails} />
           ) : null}
@@ -264,7 +264,7 @@ export function AccountSettingsClient({
           />
         </div>
 
-        <div className="lg:col-span-1 lg:sticky lg:top-24">
+        <div className="w-full lg:col-span-1 lg:sticky lg:top-24">
           <ActivePlanSidebar
             currentPlan={initialSettings.plan}
             isCancelling={isCancelling}
