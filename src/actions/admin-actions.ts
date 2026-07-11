@@ -577,7 +577,12 @@ export async function fetchVerificationQueue(): Promise<
     .from("profiles")
     .select("id, first_name, last_name, email, verification_status, created_at")
     .eq("role", "worker")
-    .in("verification_status", ["documents_submitted", "under_review"])
+    .in("verification_status", [
+      "documents_submitted",
+      "under_review",
+      "approved",
+      "rejected",
+    ])
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
