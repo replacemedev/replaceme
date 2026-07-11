@@ -53,3 +53,15 @@ export interface RecentMessage {
   other_company_logo: string | null;
 }
 
+export interface WorkerTransaction {
+  id: string;
+  date: string; // ISO string format (e.g. YYYY-MM-DD)
+  job_title: string;
+  client_name: string;
+  amount: number;
+  currency: string;
+  status: "paid" | "pending" | "processing";
+  reference_number: string;
+}
+
+
