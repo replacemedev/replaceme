@@ -66,7 +66,7 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   }
   if (data.resumeUrl !== undefined) update.resume_url = emptyToNull(data.resumeUrl);
   if (data.cvUrl !== undefined) update.cv_url = emptyToNull(data.cvUrl);
-  if (data.birthYear !== undefined) update.birth_year = data.birthYear;
+  if (data.birthDate !== undefined) update.birth_date = data.birthDate;
 
   const { error } = await ctx.supabase
     .from("profiles")

@@ -47,11 +47,9 @@ export const workerCompensationStepSchema = z.object({
 
 export const workerAboutStepSchema = z.object({
   bio: z.string().max(2000).optional(),
-  birthYear: z
-    .number()
-    .int()
-    .min(1940)
-    .max(currentYear)
+  birthDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD)")
     .nullable()
     .optional(),
 });

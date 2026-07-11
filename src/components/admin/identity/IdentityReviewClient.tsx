@@ -29,6 +29,7 @@ import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
+import { calculateAge } from "@/utils/date";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
@@ -798,9 +799,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   Age
                 </p>
                 <p className="mt-2 text-sm font-bold text-slate-900">
-                  {viewData.birthYear
-                    ? `${new Date().getFullYear() - viewData.birthYear}`
-                    : "—"}
+                  {calculateAge(viewData.birthDate)}
                 </p>
               </div>
             </div>

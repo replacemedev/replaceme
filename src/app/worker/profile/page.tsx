@@ -73,7 +73,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     portfolio_url: profileRow.portfolio_url,
     resume_url: profileRow.resume_url,
     cv_url: profileRow.cv_url,
-    birth_year: profileRow.birth_year,
+    birth_date: profileRow.birth_date,
     is_top_rated: profileRow.is_top_rated,
     is_remote: profileRow.is_remote,
     created_at: profileRow.created_at,

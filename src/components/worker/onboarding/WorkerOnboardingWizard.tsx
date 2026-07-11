@@ -69,8 +69,8 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
     draft.expectedSalaryMax != null ? String(draft.expectedSalaryMax) : ""
   );
   const [bio, setBio] = useState(draft.bio);
-  const [birthYear, setBirthYear] = useState(
-    draft.birthYear != null ? String(draft.birthYear) : ""
+  const [birthDate, setBirthDate] = useState(
+    draft.birthDate ?? ""
   );
   const [projectTitle, setProjectTitle] = useState("");
   const [projectRole, setProjectRole] = useState("");
@@ -396,7 +396,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("about", {
               bio: bio.trim() || undefined,
-              birthYear: birthYear.trim() ? Number(birthYear) : null,
+              birthDate: birthDate.trim() ? birthDate : null,
             });
             if (!result.success) {
               toast.error(result.error);
@@ -417,14 +417,12 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           />
         </label>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Birth year (optional)
+          Date of birth (optional)
           <input
-            type="number"
-            min={1940}
-            max={new Date().getFullYear()}
-            value={birthYear}
-            onChange={(e) => setBirthYear(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 px-4 py-3"
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
           />
         </label>
       </OnboardingWizardShell>

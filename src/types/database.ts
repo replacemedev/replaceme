@@ -1840,7 +1840,7 @@ export type Database = {
           availability_status: string | null
           avatar_url: string | null
           bio: string | null
-          birth_year: number | null
+          birth_date: string | null
           created_at: string
           cv_url: string | null
           email: string | null
@@ -1879,7 +1879,7 @@ export type Database = {
           availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
-          birth_year?: number | null
+          birth_date?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string | null
@@ -1918,7 +1918,7 @@ export type Database = {
           availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
-          birth_year?: number | null
+          birth_date?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string | null

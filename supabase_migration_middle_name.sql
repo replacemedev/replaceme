@@ -3,6 +3,9 @@
 -- 1. Add middle_name column if it does not exist
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS middle_name TEXT;
 
+-- Drop the dependent worker_profiles view first so we can drop the full_name column
+DROP VIEW IF EXISTS public.worker_profiles;
+
 -- 2. Drop the existing full_name generated column to modify its generation expression
 ALTER TABLE public.profiles DROP COLUMN IF EXISTS full_name;
 
@@ -14,7 +17,8 @@ ALTER TABLE public.profiles ADD COLUMN full_name TEXT GENERATED ALWAYS AS (
 ) STORED;
 
 -- 4. Recreate the worker_profiles view incorporating middle_name
-CREATE OR REPLACE VIEW public.worker_profiles AS
+CREATE OR REPLACE VIEW public.worker_profiles 
+WITH (security_invoker = true) AS
 SELECT
   id AS worker_id,
   id AS profile_id,
@@ -34,6 +38,8 @@ SELECT
   updated_at
 FROM public.profiles
 WHERE role = 'worker'::public.user_role;
+
+COMMENT ON VIEW public.worker_profiles IS 'Worker-facing profile projection including verification trust signals';
 
 -- 5. Update the handle_new_user trigger function to map middle_name
 CREATE OR REPLACE FUNCTION public.handle_new_user()

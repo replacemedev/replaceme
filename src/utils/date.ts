@@ -47,3 +47,26 @@ export function formatDateTimeWithTimezone(dateInput: Date | string | number | n
 
   return `${weekday}, ${month} ${day}, ${year} at ${hour}:${minute} ${dayPeriod} (${tzString})`;
 }
+
+/**
+ * Calculates a person's exact age in years based on their birthdate (YYYY-MM-DD)
+ * and the current system date.
+ * Accounts for leap years and specific month/day boundaries.
+ * Returns the numeric age as a number, or "N/A" if the input is missing/invalid.
+ */
+export function calculateAge(birthDate: string | Date | null | undefined): number | string {
+  if (!birthDate) return "N/A";
+  const birth = new Date(birthDate);
+  if (isNaN(birth.getTime())) return "N/A";
+
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age >= 0 ? age : "N/A";
+}
+

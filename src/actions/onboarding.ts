@@ -43,7 +43,7 @@ export type WorkerOnboardingDraft = {
   expectedSalaryMin: number | null;
   expectedSalaryMax: number | null;
   bio: string;
-  birthYear: number | null;
+  birthDate: string | null;
 };
 
 export type EmployerOnboardingDraft = {
@@ -144,7 +144,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, middle_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_year"
+        "professional_title, first_name, middle_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
       )
       .eq("id", user.id)
       .single();
@@ -166,7 +166,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       expectedSalaryMin: profile.expected_salary_min ?? null,
       expectedSalaryMax: profile.expected_salary_max ?? null,
       bio: profile.bio ?? "",
-      birthYear: profile.birth_year ?? null,
+      birthDate: profile.birth_date ?? null,
     };
   } catch {
     return null;
@@ -273,7 +273,7 @@ export async function saveWorkerOnboardingStep(
           .from("profiles")
           .update({
             bio: parsed.bio?.trim() ? parsed.bio.trim() : null,
-            birth_year: parsed.birthYear ?? null,
+            birth_date: parsed.birthDate ?? null,
             updated_at: now,
           })
           .eq("id", user.id);

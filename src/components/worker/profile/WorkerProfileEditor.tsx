@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
+import { calculateAge } from "@/utils/date";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperText } from "@/lib/storage/profile-image";
@@ -38,9 +39,6 @@ import type {
   WorkerProject,
   EmployerTestimonial,
 } from "@/types/worker-profile";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const BIRTH_YEARS = Array.from({ length: 82 }, (_, i) => CURRENT_YEAR - 18 - i);
 
 export interface WorkerProfileEditorProps {
   profile: WorkerProfile;
@@ -71,9 +69,9 @@ export function WorkerProfileEditor({
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [bioEditing, setBioEditing] = useState(false);
   const [bioDraft, setBioDraft] = useState(profile.bio ?? "");
-  const [birthYearEditing, setBirthYearEditing] = useState(false);
-  const [birthYearDraft, setBirthYearDraft] = useState(
-    profile.birth_year ? String(profile.birth_year) : ""
+  const [birthDateEditing, setBirthDateEditing] = useState(false);
+  const [birthDateDraft, setBirthDateDraft] = useState(
+    profile.birth_date ? String(profile.birth_date) : ""
   );
   const [titleEditing, setTitleEditing] = useState(false);
   const [titleDraft, setTitleDraft] = useState(profile.professional_title ?? "");
@@ -106,9 +104,9 @@ export function WorkerProfileEditor({
       })
     : "N/A";
 
-  const age = profile.birth_year ? CURRENT_YEAR - profile.birth_year : null;
+  const age = calculateAge(profile.birth_date);
   const ageString =
-    age && profile.birth_year ? `${age} (${profile.birth_year})` : "Not specified";
+    age !== "N/A" && profile.birth_date ? `${age} (${profile.birth_date})` : "Not specified";
 
   const fullName =
     profile.full_name ||
@@ -139,7 +137,7 @@ export function WorkerProfileEditor({
         : {}),
       ...(patch.resumeUrl !== undefined ? { resume_url: patch.resumeUrl || null } : {}),
       ...(patch.cvUrl !== undefined ? { cv_url: patch.cvUrl || null } : {}),
-      ...(patch.birthYear !== undefined ? { birth_year: patch.birthYear } : {}),
+      ...(patch.birthDate !== undefined ? { birth_date: patch.birthDate } : {}),
     }));
     return { success: true as const };
   }
@@ -154,13 +152,13 @@ export function WorkerProfileEditor({
     });
   }
 
-  function saveBirthYear() {
+  function saveBirthDate() {
     startTransition(async () => {
-      const year = birthYearDraft ? Number(birthYearDraft) : null;
-      const result = await saveProfileField({ birthYear: year });
+      const date = birthDateDraft ? birthDateDraft : null;
+      const result = await saveProfileField({ birthDate: date });
       if (!("error" in result)) {
-        setBirthYearEditing(false);
-        toast.success("Birth year updated");
+        setBirthDateEditing(false);
+        toast.success("Birthdate updated");
       }
     });
   }
@@ -525,24 +523,18 @@ export function WorkerProfileEditor({
               </div>
               <div className="flex justify-between items-center gap-3">
                 <span className="text-slate-400 shrink-0">Age</span>
-                {birthYearEditing ? (
+                {birthDateEditing ? (
                   <div className="flex items-center gap-1.5">
-                    <select
-                      value={birthYearDraft}
-                      onChange={(e) => setBirthYearDraft(e.target.value)}
-                      className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold"
-                    >
-                      <option value="">Not specified</option>
-                      {BIRTH_YEARS.map((y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      ))}
-                    </select>
-                    <button type="button" onClick={saveBirthYear} className="text-[#006e2f]">
+                    <input
+                      type="date"
+                      value={birthDateDraft}
+                      onChange={(e) => setBirthDateDraft(e.target.value)}
+                      className="rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                    />
+                    <button type="button" onClick={saveBirthDate} className="text-[#006e2f]">
                       <Check size={14} />
                     </button>
-                    <button type="button" onClick={() => setBirthYearEditing(false)}>
+                    <button type="button" onClick={() => setBirthDateEditing(false)}>
                       <X size={14} className="text-slate-400" />
                     </button>
                   </div>
@@ -553,13 +545,13 @@ export function WorkerProfileEditor({
                       <button
                         type="button"
                         onClick={() => {
-                          setBirthYearDraft(
-                            profile.birth_year ? String(profile.birth_year) : ""
+                          setBirthDateDraft(
+                            profile.birth_date ? String(profile.birth_date) : ""
                           );
-                          setBirthYearEditing(true);
+                          setBirthDateEditing(true);
                         }}
                         className="text-slate-300 hover:text-slate-500"
-                        aria-label="Edit birth year"
+                        aria-label="Edit birthdate"
                       >
                         <Edit size={12} />
                       </button>

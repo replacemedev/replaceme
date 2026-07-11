@@ -14,7 +14,7 @@ export const patchWorkerProfileSchema = z
     portfolioUrl: optionalUrl,
     resumeUrl: optionalUrl,
     cvUrl: optionalUrl,
-    birthYear: z.number().int().min(1940).max(currentYear).nullable(),
+    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD)").nullable(),
   })
   .partial()
   .strict();
