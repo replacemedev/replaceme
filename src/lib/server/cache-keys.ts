@@ -38,8 +38,6 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:worker:${workerId}:messaging-threads`,
   workerInterviews: (workerId: string) =>
     `rm:${CACHE_VERSION}:worker:${workerId}:interviews`,
-  workerJobAlerts: (workerId: string) =>
-    `rm:${CACHE_VERSION}:worker:${workerId}:job-alerts`,
   workerEarnings: (workerId: string) =>
     `rm:${CACHE_VERSION}:worker:${workerId}:earnings`,
   adminPlatformMetrics: () =>
@@ -66,7 +64,6 @@ export const CACHE_TTL_SECONDS = {
   savedJobs: 60,
   employerHiring: 45,
   workerInterviews: 45,
-  workerJobAlerts: 60,
   workerEarnings: 120,
   adminMetrics: 30,
   adminAuditLogs: 30,
@@ -95,7 +92,6 @@ export function workerCacheKeys(workerId: string): string[] {
     CacheKeys.workerSavedJobs(workerId),
     CacheKeys.workerMessagingThreads(workerId),
     CacheKeys.workerInterviews(workerId),
-    CacheKeys.workerJobAlerts(workerId),
     CacheKeys.workerEarnings(workerId),
   ];
 }

@@ -35,7 +35,6 @@ export const WORKER_ACCOUNT_NAV_ITEMS: WorkerNavItem[] = [
   { href: "/worker/profile", label: "Profile", icon: User },
   { href: "/worker/settings", label: "Account Settings", icon: Settings },
   { href: "/worker/earnings", label: "Earnings", icon: DollarSign },
-  { href: "/worker/job-alerts", label: "Job Alerts", icon: Bell },
   { href: "/worker/notifications", label: "Notifications", icon: Bell },
   { href: "/worker/verification", label: "Verification", icon: ShieldCheck },
 ];

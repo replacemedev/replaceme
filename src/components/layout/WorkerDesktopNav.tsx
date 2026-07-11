@@ -17,7 +17,6 @@ const PRIMARY = [
 const MORE = [
   { href: "/worker/interviews", label: "Interviews" },
   { href: "/worker/earnings", label: "Earnings" },
-  { href: "/worker/job-alerts", label: "Job Alerts" },
 ];
 
 function isActive(pathname: string, href: string) {

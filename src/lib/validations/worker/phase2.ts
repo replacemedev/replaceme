@@ -36,13 +36,6 @@ export const updateWorkerSettingsSchema = z
   })
   .strict();
 
-export const jobAlertSchema = z
-  .object({
-    label: z.string().min(2).max(80),
-    searchQuery: z.string().min(2).max(200),
-    frequency: z.enum(["instant", "daily", "weekly"]),
-  })
-  .strict();
 
 export const reportEmployerSchema = z
   .object({
@@ -90,11 +83,3 @@ export interface WorkerInterviewRow {
   status: string;
 }
 
-export interface WorkerJobAlertRow {
-  id: string;
-  label: string;
-  searchQuery: string;
-  frequency: string;
-  isActive: boolean;
-  createdAt: string;
-}
