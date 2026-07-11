@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
-import { getWorkerFinancials } from "@/lib/worker/mock-earnings";
+import { getWorkerFinancials } from "@/lib/worker/earnings";
 import { EarningsDashboardClient } from "@/components/worker/earnings/EarningsDashboardClient";
 
 export const metadata = {

@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { TrendingUp, Clock, Wallet, DollarSign, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
-import { WorkerFinancials } from "@/lib/worker/mock-earnings";
+import { WorkerFinancials } from "@/lib/worker/earnings";
 import { formatMoney } from "@/lib/format/currency";
 import { WORKER_CARD, WORKER_CARD_HOVER } from "@/lib/worker/ui-tokens";
 import { TablePagination } from "@/components/shared/TablePagination";
