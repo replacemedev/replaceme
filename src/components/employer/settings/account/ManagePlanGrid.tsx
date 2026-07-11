@@ -8,7 +8,6 @@ import {
   isHigherTier,
   isLowerTier,
 } from "@/lib/entitlements/ui-copy";
-import { formatMoney } from "@/lib/format/currency";
 
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
@@ -26,28 +25,28 @@ interface ManagePlanGridProps {
 const UPGRADE_PLANS: {
   slug: SubscriptionTier;
   label: string;
-  price: string;
+  price: number;
   detail?: string;
   highlight?: boolean;
 }[] = [
-  { slug: "discovery", label: "Discovery", price: formatMoney(0, "USD") },
+  { slug: "discovery", label: "Discovery", price: 0 },
   {
     slug: "starter",
     label: "Starter",
-    price: formatMoney(19, "USD"),
+    price: 19,
     detail: "3 jobs · 20 applicants/job",
   },
   {
     slug: "growth",
     label: "Growth",
-    price: formatMoney(39, "USD"),
+    price: 39,
     detail: "10 jobs · 50 applicants/job",
     highlight: true,
   },
   {
     slug: "scale",
     label: "Scale",
-    price: formatMoney(79, "USD"),
+    price: 79,
     detail: "Unlimited jobs & applicants",
   },
 ];
@@ -100,7 +99,7 @@ export function ManagePlanGrid({
       </div>
 
       <div className="p-6 sm:p-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {UPGRADE_PLANS.map((plan) => {
           const isCurrent = isCurrentTier(plan.slug, currentPlan);
           const isUpgrade = isHigherTier(plan.slug, currentPlan);
@@ -136,14 +135,17 @@ export function ManagePlanGrid({
                     />
                   ) : null}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">
-                  {plan.price}
+                <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 flex items-baseline">
+                  ${plan.price}
+                  <span className="text-sm sm:text-base font-semibold text-slate-500 ml-1">
+                    USD
+                  </span>
                 </p>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
                   per month
                 </p>
                 {plan.detail ? (
-                  <p className="text-xs sm:text-sm text-slate-600 mt-2">
+                  <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                     {plan.detail}
                   </p>
                 ) : null}
@@ -153,7 +155,7 @@ export function ManagePlanGrid({
                 <button
                   type="button"
                   disabled
-                  className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-600 bg-white mt-4 disabled:opacity-70"
+                  className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white mt-4 disabled:opacity-70 transition-colors"
                 >
                   Current plan
                 </button>
@@ -162,10 +164,10 @@ export function ManagePlanGrid({
                   type="button"
                   disabled={isUpgrading}
                   onClick={() => onUpgrade(plan.slug)}
-                  className={`w-full min-h-[44px] rounded-xl text-xs font-extrabold transition-colors mt-4 disabled:opacity-50 ${
+                  className={`w-full min-h-[44px] py-2 px-4 rounded-lg text-sm font-medium transition-colors mt-4 disabled:opacity-50 ${
                     plan.highlight
                       ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                      : "bg-[#006e2f] hover:bg-[#005321] text-white shadow-sm"
+                      : "bg-[#006e2f] hover:bg-[#005c26] text-white shadow-sm"
                   }`}
                 >
                   {isUpgrading ? "Redirecting..." : "Upgrade"}
@@ -180,7 +182,7 @@ export function ManagePlanGrid({
                         scheduledPlan === plan.slug
                       }
                       onClick={() => onUpgrade(plan.slug)}
-                      className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                      className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {scheduledPlan === plan.slug
                         ? "Scheduled"
@@ -201,7 +203,7 @@ export function ManagePlanGrid({
                           ? onCancelToDiscovery()
                           : onManageBilling()
                       }
-                      className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                      className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {cancelAtPeriodEnd || scheduledPlan === "discovery"
                         ? "Scheduled"
@@ -218,7 +220,7 @@ export function ManagePlanGrid({
                 <button
                   type="button"
                   disabled
-                  className="w-full min-h-[44px] border border-slate-200 rounded-xl text-xs font-extrabold text-slate-400 bg-slate-50 mt-4"
+                  className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 bg-slate-50 mt-4"
                 >
                   Free tier
                 </button>
