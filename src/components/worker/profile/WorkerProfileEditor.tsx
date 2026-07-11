@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { showErrorToast } from "@/utils/toast";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
@@ -119,7 +120,7 @@ export function WorkerProfileEditor({
   ) {
     const result = await patchWorkerProfile(patch);
     if (result.error) {
-      toast.error(result.error);
+      showErrorToast(result.error);
       return { error: result.error };
     }
     setProfile((prev) => ({
@@ -180,7 +181,7 @@ export function WorkerProfileEditor({
     startTransition(async () => {
       const result = await deleteWorkerProject(deleteProjectId);
       if (result.error) {
-        toast.error(result.error);
+        showErrorToast(result.error);
         return;
       }
       setProjects((prev) => prev.filter((p) => p.id !== deleteProjectId));

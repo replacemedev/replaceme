@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { showErrorToast } from "@/utils/toast";
 import {
   finishWorkerOnboarding,
   saveWorkerOnboardingStep,
@@ -145,7 +146,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               lastName: lastName.trim(),
             });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
             goNext("location");
@@ -220,7 +221,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               isRemote,
             });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
             goNext("skills");
@@ -281,7 +282,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("skills", { skills });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
             goNext("compensation");
@@ -324,7 +325,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
                 : null,
             });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
             goNext("about");
@@ -399,7 +400,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               birthDate: birthDate.trim() ? birthDate : null,
             });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
             goNext("project");
@@ -447,7 +448,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         startTransition(async () => {
           const result = await finishWorkerOnboarding();
           if (!result.success) {
-            toast.error(result.error);
+            showErrorToast(result.error);
             return;
           }
           toast.success("Profile ready!");
@@ -474,13 +475,13 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               skillsUsed: projectSkills,
             });
             if (!result.success) {
-              toast.error(result.error);
+              showErrorToast(result.error);
               return;
             }
           }
           const result = await finishWorkerOnboarding();
           if (!result.success) {
-            toast.error(result.error);
+            showErrorToast(result.error);
             return;
           }
           toast.success("Profile ready!");

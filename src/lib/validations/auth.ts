@@ -9,16 +9,17 @@ const termsSchema = z
 const signUpSharedFields = {
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
+    .min(3, "Username must be at least 3 characters.")
+    .max(30, "Username cannot exceed 30 characters.")
     .regex(
       /^[a-zA-Z0-9_]+$/,
-      "Username can only contain letters, numbers, and underscores"
+      "Username can only contain letters, numbers, and underscores."
     ),
-  firstName: z.string().min(1, "First name is required").max(80),
-  middleName: z.string().max(80).optional(),
-  lastName: z.string().min(1, "Last name is required").max(80),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().min(1, "First name is required.").max(80, "First name cannot exceed 80 characters."),
+  middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional(),
+  lastName: z.string().min(1, "Last name is required.").max(80, "Last name cannot exceed 80 characters."),
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters.").max(100, "Password cannot exceed 100 characters."),
   confirmPassword: z.string(),
   terms: termsSchema,
 };

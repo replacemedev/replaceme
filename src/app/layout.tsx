@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
+import { ResponsiveToaster } from "@/components/shared/ResponsiveToaster";
 import { CookieConsentRoot } from "@/components/shared/cookie-consent";
 import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/cookie-consent/types";
 import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
@@ -120,16 +120,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-body-base bg-background text-on-background antialiased min-h-screen flex flex-col">
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          offset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16 }}
-          mobileOffset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16, left: 16, bottom: 16 }}
-          toastOptions={{
-            className: "w-[calc(100vw-2rem)] mx-auto max-w-sm sm:max-w-md md:max-w-md md:w-full md:mx-0",
-          }}
-        />
+        <ResponsiveToaster />
         <OrganizationSchema />
         <SessionProvider initialSession={session}>
           {children}
