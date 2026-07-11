@@ -27,7 +27,6 @@ export const WORKER_NAV_ITEMS: WorkerNavItem[] = [
   { href: "/worker/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { href: "/worker/applications", label: "Applications", icon: FileText },
   { href: "/worker/interviews", label: "Interviews", icon: Calendar },
-  { href: "/worker/contracts", label: "Offers", icon: Handshake },
   { href: "/worker/messages", label: "Messages", icon: MessageSquare },
 ];
 

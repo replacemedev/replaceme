@@ -12,7 +12,6 @@ const PRIMARY = [
   { href: "/worker/saved-jobs", label: "Saved" },
   { href: "/worker/applications", label: "Applications" },
   { href: "/worker/messages", label: "Messages" },
-  { href: "/worker/contracts", label: "Offers" },
 ];
 
 const MORE = [

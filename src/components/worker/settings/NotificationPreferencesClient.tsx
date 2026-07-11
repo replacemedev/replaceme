@@ -35,7 +35,6 @@ export function NotificationPreferencesClient({
   const rows: { key: keyof NotificationPreferences; label: string }[] = [
     { key: "emailApplications", label: "Email: application updates" },
     { key: "emailMessages", label: "Email: new messages" },
-    { key: "emailOffers", label: "Email: contract offers" },
     { key: "inAppEnabled", label: "In-app notifications" },
   ];
 

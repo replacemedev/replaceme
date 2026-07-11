@@ -3,7 +3,6 @@ import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 function visibleSteps(status: string) {
   const steps = [
-    { key: "offered", label: "Offer sent" },
     { key: "active", label: "Active" },
   ];
   if (status === "paused") {

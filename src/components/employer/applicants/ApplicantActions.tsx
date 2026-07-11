@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useTransition } from "react";
-import Link from "next/link";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, Handshake, Loader2 } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { scheduleInterview, sendJobOffer } from "@/actions/employer/hiring";
+import { scheduleInterview } from "@/actions/employer/hiring";
 
 interface ApplicantActionsProps {
   applicationId: string;
@@ -25,8 +24,6 @@ export function ApplicantActions({
 
   const canSchedule =
     status === "PENDING" || status === "UNDER_REVIEW";
-  const canOffer =
-    status === "INTERVIEW_SCHEDULED" || status === "UNDER_REVIEW";
 
   const handleSchedule = () => {
     startTransition(async () => {
@@ -41,20 +38,7 @@ export function ApplicantActions({
     });
   };
 
-  const handleOffer = () => {
-    startTransition(async () => {
-      const toastId = toast.loading("Sending offer...");
-      const result = await sendJobOffer(applicationId);
-      if (result.success) {
-        toast.success(result.message ?? "Offer sent", { id: toastId });
-        router.refresh();
-      } else {
-        toast.error(result.error ?? "Failed to send offer", { id: toastId });
-      }
-    });
-  };
-
-  if (!canSchedule && !canOffer) return null;
+  if (!canSchedule) return null;
 
   return (
     <div className="flex flex-wrap gap-2 border-t border-slate-50 pt-3">
@@ -71,21 +55,6 @@ export function ApplicantActions({
             <Calendar className="h-3 w-3" />
           )}
           Schedule Interview
-        </button>
-      ) : null}
-      {canOffer ? (
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={handleOffer}
-          className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-[#006e2f] px-3 text-[10px] font-bold text-white hover:bg-[#005c26] disabled:opacity-50"
-        >
-          {isPending ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Handshake className="h-3 w-3" />
-          )}
-          Send Offer
         </button>
       ) : null}
     </div>

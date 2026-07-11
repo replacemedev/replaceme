@@ -31,7 +31,7 @@ export function ContractDetailClient({
         contractId: contract.id,
         hourlyRate,
         weeklyHours,
-        status: status as "active" | "paused" | "terminated" | "offered",
+        status: status as "active" | "paused" | "terminated",
       });
       if (result.success) {
         toast.success("Contract updated", { id: toastId });
@@ -96,7 +96,6 @@ export function ContractDetailClient({
           >
             <option value="active">Active</option>
             <option value="paused">Paused</option>
-            <option value="offered">Offered</option>
             <option value="terminated">Terminated</option>
           </select>
         </label>

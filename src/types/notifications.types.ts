@@ -84,7 +84,7 @@ export function getNotificationHref(notification: Notification): string | null {
     case "new_message":
       return notification.action_url ?? "/worker/messages";
     case "worker_acceptance":
-      return notification.action_url ?? "/worker/contracts";
+      return notification.action_url ?? "/worker/dashboard";
     case "verification_update":
       return notification.action_url ?? "/worker/verification";
     case "identity_verification_request": {

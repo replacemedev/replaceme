@@ -5,12 +5,10 @@ import {
   Briefcase,
   Calendar,
   CheckCircle,
-  Handshake,
   Plus,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMessagingThreads } from "@/actions/messaging";
-import { getWorkerContracts } from "@/actions/worker/contracts";
 import { ProfileStrengthCard } from "@/components/worker/ProfileStrengthCard";
 import { RecommendedJobCard } from "@/components/worker/RecommendedJobCard";
 import { EarningsOverviewCard } from "@/components/worker/EarningsOverviewCard";
@@ -56,7 +54,6 @@ export default async function WorkerDashboard() {
     { data: earnings },
     { data: recommendedJobs },
     threads,
-    contracts,
   ] = await Promise.all([
     supabase.from("applications").select("status").eq("candidate_id", profile.id),
     supabase
@@ -71,15 +68,12 @@ export default async function WorkerDashboard() {
       .order("created_at", { ascending: true }),
     supabase.from("job_posts").select("*").eq("status", "Active").limit(2),
     getMessagingThreads("worker"),
-    getWorkerContracts(),
   ]);
 
   const appliedCount = apps?.length ?? 0;
   const interviewsCount =
     apps?.filter((a) => a.status === "INTERVIEW_SCHEDULED").length ?? 0;
   const hiredCount = apps?.filter((a) => a.status === "HIRED").length ?? 0;
-  const pendingOffers =
-    contracts?.filter((c) => c.status.toLowerCase() === "offered").length ?? 0;
 
   const profileStrength = computeWorkerProfileStrength({
     professionalTitle: profile.professional_title,
@@ -162,13 +156,6 @@ export default async function WorkerDashboard() {
             hint: "Scheduled",
             icon: Calendar,
             href: "/worker/interviews",
-          },
-          {
-            label: "Offers",
-            value: pendingOffers,
-            hint: "Pending response",
-            icon: Handshake,
-            href: "/worker/contracts",
           },
           {
             label: "Hired",
