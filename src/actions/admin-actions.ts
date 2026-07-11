@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
+import { formatFullName } from "@/lib/format/name";
 import {
   CacheKeys,
   CACHE_TTL_SECONDS,
@@ -790,12 +791,11 @@ export async function fetchAdminDisputes(
   if (workerIds.length > 0) {
     const { data: workers } = await adminClient
       .from("profiles")
-      .select("id, first_name, last_name, email")
+      .select("id, first_name, middle_name, last_name, email")
       .in("id", workerIds);
 
     for (const w of workers ?? []) {
-      const name =
-        [w.first_name, w.last_name].filter(Boolean).join(" ") || "Worker";
+      const name = formatFullName(w.first_name, w.middle_name, w.last_name) || "Worker";
       workerById.set(w.id, { name, email: w.email });
     }
   }
@@ -882,6 +882,7 @@ export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
       ),
       profiles!applications_candidate_id_fkey (
         first_name,
+        middle_name,
         last_name,
         email
       )
@@ -911,7 +912,7 @@ export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
       company_name: company?.company_name ?? null,
       worker_id: row.candidate_id,
       worker_name:
-        [worker?.first_name, worker?.last_name].filter(Boolean).join(" ") ||
+        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
         null,
       worker_email: worker?.email ?? null,
       status: row.status,
@@ -934,7 +935,7 @@ export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
       updated_at,
       jobs ( title ),
       company_profiles ( company_name ),
-      profiles!chat_threads_worker_id_fkey ( first_name, last_name )
+      profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name )
     `
     )
     .order("updated_at", { ascending: false })
@@ -972,7 +973,7 @@ export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
       id: thread.id,
       worker_id: thread.worker_id,
       worker_name:
-        [worker?.first_name, worker?.last_name].filter(Boolean).join(" ") ||
+        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
         null,
       company_name: company?.company_name ?? null,
       job_title: job?.title ?? null,

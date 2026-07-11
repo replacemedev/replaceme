@@ -1,6 +1,7 @@
 export interface WorkerProfile {
   id: string;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
   full_name: string | null;
   professional_title: string | null;
@@ -52,6 +53,7 @@ export interface EmployerTestimonial {
   company_name: string;
   company_logo: string | null;
   employer_first_name: string | null;
+  employer_middle_name: string | null;
   employer_last_name: string | null;
   employer_role: string | null;
 }

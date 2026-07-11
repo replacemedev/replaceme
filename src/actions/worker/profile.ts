@@ -54,6 +54,7 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   };
 
   if (data.firstName !== undefined) update.first_name = data.firstName;
+  if (data.middleName !== undefined) update.middle_name = data.middleName || null;
   if (data.lastName !== undefined) update.last_name = data.lastName;
   if (data.professionalTitle !== undefined) {
     update.professional_title = data.professionalTitle;

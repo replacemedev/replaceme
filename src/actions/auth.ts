@@ -194,10 +194,10 @@ export async function signUp(formData: SignUpFormValues) {
       return { success: false, error: turnstile.error };
     }
 
-    // Split fullName into first and last name
-    const nameParts = data.fullName.trim().split(" ");
-    const firstName = nameParts[0];
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+    const firstName = data.firstName.trim();
+    const middleName = data.middleName?.trim() || "";
+    const lastName = data.lastName.trim();
+    const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
 
     // 2. Sign up with Supabase Auth
     // We pass metadata that the Postgres trigger will use to populate the profile
@@ -210,8 +210,9 @@ export async function signUp(formData: SignUpFormValues) {
         data: {
           role: data.role,
           username: data.username,
-          full_name: data.fullName,
+          full_name: fullName,
           first_name: firstName,
+          middle_name: middleName || null,
           last_name: lastName,
         },
       },

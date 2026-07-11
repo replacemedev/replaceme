@@ -6,6 +6,7 @@ import { safeError } from "@/utils/logger";
 
 export type EmployerAccountDetails = {
   firstName: string | null;
+  middleName: string | null;
   lastName: string | null;
   username: string | null;
   email: string | null;
@@ -25,7 +26,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("first_name, last_name, username, email, avatar_url, role")
+      .select("first_name, middle_name, last_name, username, email, avatar_url, role")
       .eq("id", user.id)
       .single();
 
@@ -33,6 +34,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     return {
       firstName: profile.first_name,
+      middleName: profile.middle_name,
       lastName: profile.last_name,
       username: profile.username,
       email: profile.email ?? user.email ?? null,

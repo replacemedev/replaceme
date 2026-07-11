@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { safeError } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { uuidSchema } from "@/lib/validations/common";
@@ -169,7 +170,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           job_id,
           candidate_id,
           created_at,
-          profiles ( first_name, last_name ),
+          profiles ( first_name, middle_name, last_name ),
           interviews (
             id,
             scheduled_at,
@@ -190,10 +191,11 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
       return (applications ?? []).map((app: any) => {
         const candidate = app.profiles as {
           first_name?: string;
+          middle_name?: string;
           last_name?: string;
         } | null;
         const name = candidate
-          ? `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim()
+          ? formatFullName(candidate.first_name, candidate.middle_name, candidate.last_name)
           : "Candidate";
 
         const interview = Array.isArray(app.interviews)
@@ -333,7 +335,7 @@ export async function getEmployerCandidateProfile(
     coverLetter: (application?.cover_letter as string | null) ?? null,
     candidate: {
       id: String(candidate.id ?? parsed.data.candidateId),
-      name: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim(),
+      name: formatFullName(candidate.first_name as string | null, candidate.middle_name as string | null, candidate.last_name as string | null),
       title: String(candidate.professional_title ?? "Professional"),
       bio: (candidate.bio as string | null) ?? null,
       skills,

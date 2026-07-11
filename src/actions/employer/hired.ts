@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 import {
   HiredWorker,
   HiredStats,
@@ -38,6 +39,7 @@ async function loadHiredDataForEmployer(
         profiles!contracts_worker_id_fkey (
           id,
           first_name,
+          middle_name,
           last_name,
           avatar_url,
           professional_title
@@ -61,6 +63,7 @@ async function loadHiredDataForEmployer(
   for (const contract of contracts || []) {
     const worker = contract.profiles as {
       first_name?: string | null;
+      middle_name?: string | null;
       last_name?: string | null;
       avatar_url?: string | null;
       professional_title?: string | null;
@@ -68,7 +71,7 @@ async function loadHiredDataForEmployer(
     if (!worker) continue;
 
     const name =
-      `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || "Worker";
+      formatFullName(worker.first_name, worker.middle_name, worker.last_name) || "Worker";
 
     const nameLower = name.toLowerCase();
     const online = !(

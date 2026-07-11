@@ -6,6 +6,7 @@ const currentYear = new Date().getFullYear();
 export const patchWorkerProfileSchema = z
   .object({
     firstName: z.string().min(1).max(80),
+    middleName: z.string().max(80).optional(),
     lastName: z.string().min(1).max(80),
     professionalTitle: z.string().min(2).max(120),
     bio: z.string().max(2000),

@@ -8,6 +8,7 @@ import { getStripe } from "@/lib/server/stripe/client";
 import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
 import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
 import { safeError, safeLog } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 
 export type StripeCheckoutResult = {
   /** True when an existing Stripe subscription was updated in place (no Checkout). */
@@ -40,7 +41,7 @@ export async function createStripeCheckoutSession(
 
     const { data: employerProfile } = await supabase
       .from("profiles")
-      .select("first_name, last_name")
+      .select("first_name, middle_name, last_name")
       .eq("id", profile.id)
       .single();
 
@@ -83,7 +84,7 @@ export async function createStripeCheckoutSession(
     }
 
     const name =
-      `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
+      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
       "Employer";
 
     const session = await createSubscriptionCheckoutSession({

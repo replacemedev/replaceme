@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { formatFullName } from "@/lib/format/name";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { upgradeCheckoutSchema } from "@/lib/validations/billing";
@@ -184,12 +185,12 @@ export async function createUpgradeCheckout(planId: string) {
       await createClient()
     )
       .from("profiles")
-      .select("first_name, last_name")
+      .select("first_name, middle_name, last_name")
       .eq("id", profile.id)
       .single();
 
     const name =
-      `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
+      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
       "Employer";
 
     const session = await createSubscriptionCheckoutSession({
@@ -233,12 +234,12 @@ export async function createCustomerPortalSession() {
       await createClient()
     )
       .from("profiles")
-      .select("first_name, last_name")
+      .select("first_name, middle_name, last_name")
       .eq("id", profile.id)
       .single();
 
     const name =
-      `${employerProfile?.first_name || ""} ${employerProfile?.last_name || ""}`.trim() ||
+      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
       "Employer";
 
     const session = await createBillingPortalSession({

@@ -28,6 +28,7 @@ import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { formatMoney } from "@/lib/format/currency";
+import { formatFullName } from "@/lib/format/name";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
@@ -396,9 +397,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
             <ul className="space-y-3">
               {paginatedRows.map((worker) => {
                 const name =
-                  [worker.first_name, worker.last_name]
-                    .filter(Boolean)
-                    .join(" ") ||
+                  formatFullName(worker.first_name, worker.middle_name, worker.last_name) ||
                   worker.email ||
                   "Unknown worker";
                 const isExpanded = expandedId === worker.id;
@@ -561,9 +560,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 <tbody className="divide-y divide-slate-50">
                   {paginatedRows.map((worker) => {
                     const name =
-                      [worker.first_name, worker.last_name]
-                        .filter(Boolean)
-                        .join(" ") ||
+                      formatFullName(worker.first_name, worker.middle_name, worker.last_name) ||
                       worker.email ||
                       "Unknown worker";
                     return (
@@ -621,9 +618,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
             <div className="block md:hidden space-y-3">
               {paginatedRows.map((worker) => {
                 const name =
-                  [worker.first_name, worker.last_name]
-                    .filter(Boolean)
-                    .join(" ") ||
+                  formatFullName(worker.first_name, worker.middle_name, worker.last_name) ||
                   worker.email ||
                   "Unknown worker";
                 return (

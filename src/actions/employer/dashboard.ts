@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 import { JobPost, RecentApplicant } from "@/types/employer";
 import { employerHasFullIdentity } from "@/lib/server/entitlements";
 import {
@@ -163,6 +164,7 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
         profiles (
           id,
           first_name,
+          middle_name,
           last_name,
           avatar_url,
           professional_title
@@ -195,7 +197,7 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
           const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
 
           const name = hasFullIdentity
-            ? `${candidate?.first_name || ""} ${candidate?.last_name || ""}`.trim()
+            ? formatFullName(candidate?.first_name, candidate?.middle_name, candidate?.last_name)
             : `Applicant #${appCode}`;
 
           const avatarUrl = hasFullIdentity

@@ -16,6 +16,7 @@ const currentYear = new Date().getFullYear();
 export const workerIdentityStepSchema = z.object({
   professionalTitle: nonEmptyStringSchema.max(100),
   firstName: nonEmptyStringSchema.max(80),
+  middleName: z.string().max(80).optional(),
   lastName: nonEmptyStringSchema.max(80),
 });
 

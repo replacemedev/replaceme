@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
+import { formatFullName } from "@/lib/format/name";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import {
   CacheKeys,
@@ -606,6 +607,7 @@ export async function getAdminJobReports(input: unknown): Promise<{
         profiles:reporter_id (
           email,
           first_name,
+          middle_name,
           last_name
         )
         `,
@@ -639,14 +641,14 @@ export async function getAdminJobReports(input: unknown): Promise<{
       job_id: string;
       reporter_id: string;
       jobs: { title: string; employer_id: string } | { title: string; employer_id: string }[] | null;
-      profiles: { email: string; first_name: string | null; last_name: string | null } | { email: string; first_name: string | null; last_name: string | null }[] | null;
+      profiles: { email: string; first_name: string | null; middle_name: string | null; last_name: string | null } | { email: string; first_name: string | null; middle_name: string | null; last_name: string | null }[] | null;
     }
 
     const items: AdminJobReportRow[] = (data as unknown as DbJobReport[] ?? []).map((r) => {
       const job = Array.isArray(r.jobs) ? r.jobs[0] : r.jobs;
       const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
       const reporterName = profile
-        ? `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim()
+        ? formatFullName(profile.first_name, profile.middle_name, profile.last_name)
         : "";
 
       return {

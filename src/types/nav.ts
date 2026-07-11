@@ -3,6 +3,7 @@ export type UserRole = "worker" | "employer" | "admin";
 export interface NavProfile {
   id: string;
   first_name: string | null;
+  middle_name?: string | null;
   last_name: string | null;
   username: string | null;
   avatar_url: string | null;

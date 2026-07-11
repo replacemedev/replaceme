@@ -48,8 +48,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const [professionalTitle, setProfessionalTitle] = useState(
     draft.professionalTitle
   );
-  const [firstName, setFirstName] = useState(draft.firstName);
-  const [lastName, setLastName] = useState(draft.lastName);
+  const firstName = draft.firstName;
+  const middleName = draft.middleName;
+  const lastName = draft.lastName;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
   const [location, setLocation] = useState(
     draft.location || WORKER_LOCATION_OPTIONS[0]
@@ -140,6 +141,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             const result = await saveWorkerOnboardingStep("identity", {
               professionalTitle: professionalTitle.trim(),
               firstName: firstName.trim(),
+              middleName: middleName.trim(),
               lastName: lastName.trim(),
             });
             if (!result.success) {
@@ -153,7 +155,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         <ProfileAvatarUpload
           avatarUrl={avatarUrl}
           displayName={
-            `${firstName} ${lastName}`.trim() || professionalTitle.trim() || "Worker"
+            [firstName, middleName, lastName].filter(Boolean).join(" ").trim() || professionalTitle.trim() || "Worker"
           }
           size="md"
           onAvatarChange={setAvatarUrl}
@@ -169,23 +171,32 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             placeholder="e.g. Senior React Developer"
           />
         </label>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             First name
             <input
               required
+              readOnly
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
+            />
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Middle name (Optional)
+            <input
+              readOnly
+              value={middleName || ""}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
+              placeholder="Optional"
             />
           </label>
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             Last name
             <input
               required
+              readOnly
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
             />
           </label>
         </div>

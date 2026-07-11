@@ -59,6 +59,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
   const profile: WorkerProfile = {
     id: profileRow.id,
     first_name: profileRow.first_name,
+    middle_name: profileRow.middle_name,
     last_name: profileRow.last_name,
     full_name: profileRow.full_name,
     professional_title: profileRow.professional_title,
@@ -125,6 +126,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
         logo_url,
         profile:profiles!company_profiles_employer_id_fkey (
           first_name,
+          middle_name,
           last_name,
           avatar_url
         )
@@ -147,6 +149,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
       company_name: comp?.company_name || "Employer Partner",
       company_logo: comp?.logo_url || null,
       employer_first_name: prof?.first_name || null,
+      employer_middle_name: prof?.middle_name || null,
       employer_last_name: prof?.last_name || null,
       employer_role: "Hiring Manager",
     };

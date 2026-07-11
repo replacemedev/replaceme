@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
 import { formatMoney } from "@/lib/format/currency";
+import { formatFullName } from "@/lib/format/name";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperText } from "@/lib/storage/profile-image";
@@ -111,7 +112,7 @@ export function WorkerProfileEditor({
 
   const fullName =
     profile.full_name ||
-    `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+    formatFullName(profile.first_name, profile.middle_name, profile.last_name) ||
     "Worker Profile";
   const initials = profile.first_name ? profile.first_name[0].toUpperCase() : "W";
 
@@ -126,6 +127,7 @@ export function WorkerProfileEditor({
     setProfile((prev) => ({
       ...prev,
       ...(patch.firstName !== undefined ? { first_name: patch.firstName } : {}),
+      ...(patch.middleName !== undefined ? { middle_name: patch.middleName } : {}),
       ...(patch.lastName !== undefined ? { last_name: patch.lastName } : {}),
       ...(patch.professionalTitle !== undefined
         ? { professional_title: patch.professionalTitle }

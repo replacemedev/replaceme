@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { EmployerTestimonial } from "@/types/worker-profile";
+import { formatFullName } from "@/lib/format/name";
 
 interface TestimonialCardProps {
   testimonial: EmployerTestimonial;
@@ -15,10 +16,9 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
     testimonial.company_name
   ].filter(Boolean).join(", ");
 
-  const fullName = [
-    testimonial.employer_first_name,
-    testimonial.employer_last_name
-  ].filter(Boolean).join(" ") || "Employer Partner";
+  const fullName =
+    formatFullName(testimonial.employer_first_name, testimonial.employer_middle_name, testimonial.employer_last_name) ||
+    "Employer Partner";
 
   const initials = testimonial.employer_first_name 
     ? testimonial.employer_first_name[0].toUpperCase() 

@@ -20,6 +20,7 @@ import {
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { AdminSelfPasswordActions } from "@/components/admin/settings/AdminSelfPasswordActions";
 import type { AdminRole, AdminTeamRow } from "@/types/admin.types";
+import { formatFullName } from "@/lib/format/name";
 
 interface AdminTeamActionsMenuProps {
   member: AdminTeamRow;
@@ -45,7 +46,7 @@ export function AdminTeamActionsMenu({
 
   const isSelf = member.id === currentUserId;
   const displayLabel =
-    [member.first_name, member.last_name].filter(Boolean).join(" ").trim() ||
+    formatFullName(member.first_name, member.middle_name, member.last_name).trim() ||
     member.email ||
     "this admin";
 

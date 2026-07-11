@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/server/auth/session";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { uuidSchema } from "@/lib/validations/common";
 import { invalidateEmployerHiringCache } from "@/lib/server/redis-cache";
+import { formatFullName } from "@/lib/format/name";
 
 const contractIdSchema = z.object({ contractId: uuidSchema }).strict();
 
@@ -52,7 +53,7 @@ export async function getEmployerContract(
       employment_type,
       status,
       start_date,
-      profiles!contracts_worker_id_fkey ( first_name, last_name, professional_title ),
+      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, professional_title ),
       jobs ( title )
     `
     )
@@ -64,6 +65,7 @@ export async function getEmployerContract(
 
   const worker = contract.profiles as {
     first_name?: string;
+    middle_name?: string;
     last_name?: string;
     professional_title?: string;
   } | null;
@@ -73,7 +75,7 @@ export async function getEmployerContract(
     id: contract.id,
     workerId: contract.worker_id,
     workerName:
-      `${worker?.first_name ?? ""} ${worker?.last_name ?? ""}`.trim() || "Worker",
+      formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) || "Worker",
     workerRole: worker?.professional_title ?? "Professional",
     jobId: contract.job_id,
     jobTitle: job?.title ?? null,

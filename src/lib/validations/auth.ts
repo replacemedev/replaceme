@@ -14,7 +14,9 @@ const signUpSharedFields = {
       /^[a-zA-Z0-9_]+$/,
       "Username can only contain letters, numbers, and underscores"
     ),
-  fullName: z.string().min(2, "Full name is required"),
+  firstName: z.string().min(1, "First name is required").max(80),
+  middleName: z.string().max(80).optional(),
+  lastName: z.string().min(1, "Last name is required").max(80),
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),

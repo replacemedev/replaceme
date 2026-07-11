@@ -12,6 +12,7 @@ import { getRecentJobs, getRecentApplicants } from "@/actions/employer/dashboard
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { getEmployerInterviews } from "@/actions/employer/hiring";
 import { getHiredData } from "@/actions/employer/hired";
+import { formatFullName } from "@/lib/format/name";
 import { JobCard } from "@/components/employer/JobCard";
 import { RecentApplicantRow } from "@/components/employer/RecentApplicantRow";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
@@ -47,7 +48,7 @@ export default async function EmployerDashboard() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, first_name, last_name, role")
+    .select("id, first_name, middle_name, last_name, role")
     .eq("id", user.id)
     .single();
 
@@ -55,11 +56,9 @@ export default async function EmployerDashboard() {
     redirect("/signin");
   }
 
-  const employerName = profile.first_name
-    ? profile.last_name
-      ? `${profile.first_name} ${profile.last_name}`
-      : profile.first_name
-    : "Employer";
+  const employerName =
+    formatFullName(profile.first_name, profile.middle_name, profile.last_name) ||
+    "Employer";
 
   const [jobs, recentApplicants, planUsage, interviews, hiredData] =
     await Promise.all([

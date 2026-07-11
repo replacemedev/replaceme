@@ -7,7 +7,7 @@ const APPLICATION_WITH_CANDIDATE_SELECT = `
   status,
   match_score,
   created_at,
-  profiles(first_name, last_name, avatar_url, email, role, bio, skills, professional_title, is_verified, experience_years, resume_url)
+  profiles(first_name, middle_name, last_name, avatar_url, email, role, bio, skills, professional_title, is_verified, experience_years, resume_url)
 `;
 
 export async function getApplicationsForJob(

@@ -23,6 +23,7 @@ import type {
   AdminUserTab,
   AdminWorkerRow,
 } from "@/types/admin.types";
+import { formatFullName } from "@/lib/format/name";
 
 interface UsersClientProps {
   tab: AdminUserTab;
@@ -32,11 +33,12 @@ interface UsersClientProps {
 }
 
 function displayName(
-  first: string | null,
-  last: string | null,
+  first: string | null | undefined,
+  middle: string | null | undefined,
+  last: string | null | undefined,
   fallback: string
 ): string {
-  const name = [first, last].filter(Boolean).join(" ").trim();
+  const name = formatFullName(first, middle, last).trim();
   return name || fallback;
 }
 
@@ -144,7 +146,7 @@ export function UsersClient({
       list = list.filter((row) => {
         if (tab === "workers") {
           const w = row as AdminWorkerRow;
-          const name = displayName(w.first_name, w.last_name, "");
+          const name = displayName(w.first_name, w.middle_name, w.last_name, "");
           return (
             name.toLowerCase().includes(q) ||
             (w.email?.toLowerCase().includes(q) ?? false) ||
@@ -162,7 +164,7 @@ export function UsersClient({
           );
         } else {
           const a = row as AdminAdminRow;
-          const name = displayName(a.first_name, a.last_name, "");
+          const name = displayName(a.first_name, a.middle_name, a.last_name, "");
           return (
             name.toLowerCase().includes(q) ||
             (a.email?.toLowerCase().includes(q) ?? false) ||
@@ -331,6 +333,7 @@ export function UsersClient({
                 const worker = row as AdminWorkerRow;
                 const name = displayName(
                   worker.first_name,
+                  worker.middle_name,
                   worker.last_name,
                   "Unnamed"
                 );
@@ -426,7 +429,7 @@ export function UsersClient({
                 );
               }
               const admin = row as AdminAdminRow;
-              const name = displayName(admin.first_name, admin.last_name, "Unnamed");
+              const name = displayName(admin.first_name, admin.middle_name, admin.last_name, "Unnamed");
               return (
                 <AdminMobileCard
                   key={admin.id}
@@ -489,6 +492,7 @@ export function UsersClient({
                   ? (paginatedFiltered as AdminWorkerRow[]).map((worker) => {
                       const name = displayName(
                         worker.first_name,
+                        worker.middle_name,
                         worker.last_name,
                         "Unnamed"
                       );
@@ -599,6 +603,7 @@ export function UsersClient({
                               <p className="font-semibold text-slate-900">
                                 {displayName(
                                   admin.first_name,
+                                  admin.middle_name,
                                   admin.last_name,
                                   "Unnamed"
                                 )}
@@ -628,6 +633,7 @@ export function UsersClient({
                                     action: "suspend",
                                     label: displayName(
                                       admin.first_name,
+                                      admin.middle_name,
                                       admin.last_name,
                                       admin.email ?? "admin"
                                     ),
@@ -639,6 +645,7 @@ export function UsersClient({
                                     action: "unsuspend",
                                     label: displayName(
                                       admin.first_name,
+                                      admin.middle_name,
                                       admin.last_name,
                                       admin.email ?? "admin"
                                     ),

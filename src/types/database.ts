@@ -1848,6 +1848,7 @@ export type Database = {
           expected_salary_min: number | null
           experience_years: number | null
           first_name: string | null
+          middle_name: string | null
           full_name: string | null
           hourly_rate: number | null
           id: string
@@ -1886,6 +1887,7 @@ export type Database = {
           expected_salary_min?: number | null
           experience_years?: number | null
           first_name?: string | null
+          middle_name?: string | null
           full_name?: string | null
           hourly_rate?: number | null
           id: string
@@ -1924,6 +1926,7 @@ export type Database = {
           expected_salary_min?: number | null
           experience_years?: number | null
           first_name?: string | null
+          middle_name?: string | null
           full_name?: string | null
           hourly_rate?: number | null
           id?: string
@@ -2560,6 +2563,7 @@ export type Database = {
           email: string | null
           experience_years: number | null
           first_name: string | null
+          middle_name: string | null
           full_name: string | null
           hourly_rate: number | null
           is_verified: boolean | null
@@ -2579,6 +2583,7 @@ export type Database = {
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
+          middle_name?: string | null
           full_name?: string | null
           hourly_rate?: number | null
           is_verified?: boolean | null
@@ -2598,6 +2603,7 @@ export type Database = {
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
+          middle_name?: string | null
           full_name?: string | null
           hourly_rate?: number | null
           is_verified?: boolean | null

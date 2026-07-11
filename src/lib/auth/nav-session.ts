@@ -49,13 +49,13 @@ function buildDisplayName(
     );
   }
   if (role === "admin") {
-    const fullName = [profile.first_name, profile.last_name]
+    const fullName = [profile.first_name, profile.middle_name, profile.last_name]
       .filter(Boolean)
       .join(" ")
       .trim();
     return fullName || profile.username || email?.split("@")[0] || "Admin";
   }
-  const fullName = [profile.first_name, profile.last_name]
+  const fullName = [profile.first_name, profile.middle_name, profile.last_name]
     .filter(Boolean)
     .join(" ")
     .trim();
@@ -73,9 +73,12 @@ function buildFallbackProfile(user: User): NavProfile {
       (typeof meta.first_name === "string" ? meta.first_name : null) ??
       nameParts[0] ??
       null,
+    middle_name:
+      (typeof meta.middle_name === "string" ? meta.middle_name : null) ??
+      (nameParts.length > 2 ? nameParts[1] : null),
     last_name:
       (typeof meta.last_name === "string" ? meta.last_name : null) ??
-      (nameParts.length > 1 ? nameParts.slice(1).join(" ") : null),
+      (nameParts.length > 2 ? nameParts.slice(2).join(" ") : nameParts.length > 1 ? nameParts[1] : null),
     username: typeof meta.username === "string" ? meta.username : null,
     avatar_url: avatarFromUserMeta(user),
     is_verified: false,
@@ -116,6 +119,7 @@ async function loadUnreadCount(role: UserRole): Promise<number> {
 type ProfileRow = {
   id: string;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
   username: string | null;
   avatar_url: string | null;
@@ -138,6 +142,7 @@ function mapProfileRow(row: ProfileRow, user: User): NavProfile {
   return {
     id: row.id,
     first_name: row.first_name,
+    middle_name: row.middle_name,
     last_name: row.last_name,
     username: row.username,
     avatar_url: row.avatar_url ?? avatarFromUserMeta(user),
@@ -162,6 +167,7 @@ export const getNavSession = cache(async (): Promise<NavSession> => {
       `
       id,
       first_name,
+      middle_name,
       last_name,
       username,
       avatar_url,

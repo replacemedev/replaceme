@@ -20,6 +20,7 @@ import { AdminTeamActivityTab } from "@/components/admin/settings/team/AdminTeam
 import { CreateAdminDialog } from "@/components/admin/settings/team/CreateAdminDialog";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminAuditLogRow, AdminTeamRow } from "@/types/admin.types";
+import { formatFullName } from "@/lib/format/name";
 
 type TeamTab = "team" | "activity";
 
@@ -30,7 +31,7 @@ interface AdminTeamClientProps {
 }
 
 function displayName(member: AdminTeamRow): string {
-  const name = [member.first_name, member.last_name].filter(Boolean).join(" ").trim();
+  const name = formatFullName(member.first_name, member.middle_name, member.last_name).trim();
   return name || member.display_name || member.email || "Admin";
 }
 

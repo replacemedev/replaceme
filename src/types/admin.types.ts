@@ -64,6 +64,7 @@ export const verificationStatusSchema = z.enum([
 export const adminWorkerRowSchema = z.object({
   id: z.string().uuid(),
   first_name: z.string().nullable(),
+  middle_name: z.string().nullable(),
   last_name: z.string().nullable(),
   email: z.string().nullable(),
   professional_title: z.string().nullable(),
@@ -87,6 +88,7 @@ export const adminEmployerRowSchema = z.object({
 export const adminAdminRowSchema = z.object({
   id: z.string().uuid(),
   first_name: z.string().nullable(),
+  middle_name: z.string().nullable(),
   last_name: z.string().nullable(),
   email: z.string().nullable(),
   account_status: accountStatusSchema.catch("active"),
@@ -124,6 +126,7 @@ export type VerificationStatus = z.infer<typeof verificationStatusSchema>;
 export interface AdminWorkerRow {
   id: string;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
   email: string | null;
   professional_title: string | null;
@@ -147,6 +150,7 @@ export interface AdminEmployerRow {
 export interface AdminAdminRow {
   id: string;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
   email: string | null;
   account_status: AccountStatus;
@@ -179,6 +183,7 @@ export interface AdminJobRow {
 export interface AdminVerificationQueueRow {
   id: string;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
   email: string | null;
   verification_status: VerificationStatus;

@@ -31,6 +31,7 @@ export type OnboardingStatus = {
 export type WorkerOnboardingDraft = {
   professionalTitle: string;
   firstName: string;
+  middleName: string;
   lastName: string;
   avatarUrl: string | null;
   location: string;
@@ -143,7 +144,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_year"
+        "professional_title, first_name, middle_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_year"
       )
       .eq("id", user.id)
       .single();
@@ -153,6 +154,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     return {
       professionalTitle: profile.professional_title ?? "",
       firstName: profile.first_name ?? "",
+      middleName: profile.middle_name ?? "",
       lastName: profile.last_name ?? "",
       avatarUrl: profile.avatar_url ?? null,
       location: profile.location ?? "",
@@ -214,6 +216,7 @@ export async function saveWorkerOnboardingStep(
           .update({
             professional_title: parsed.professionalTitle,
             first_name: parsed.firstName,
+            middle_name: parsed.middleName || null,
             last_name: parsed.lastName,
             updated_at: now,
           })

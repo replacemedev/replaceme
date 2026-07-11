@@ -7,6 +7,7 @@ import { fetchEmployerEntitlements } from "@/lib/server/entitlements";
 import { previewDisplayName } from "@/lib/entitlements/ui-copy";
 import { togglePinSchema } from "@/lib/validations/pinned";
 import { safeError, safeLog } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 import { PinnedWorker } from "@/types/employer/pinned";
 import { assertEmployerCanPinWorker } from "@/lib/server/entitlements";
 import {
@@ -30,6 +31,7 @@ async function loadPinnedWorkersForEmployer(
         profiles!pinned_workers_worker_id_fkey (
           id,
           first_name,
+          middle_name,
           last_name,
           avatar_url,
           professional_title,
@@ -54,6 +56,7 @@ async function loadPinnedWorkersForEmployer(
     const worker = (Array.isArray(profileRow) ? profileRow[0] : profileRow) as {
       id: string;
       first_name?: string | null;
+      middle_name?: string | null;
       last_name?: string | null;
       avatar_url?: string | null;
       professional_title?: string | null;
@@ -66,7 +69,7 @@ async function loadPinnedWorkersForEmployer(
     if (!worker) continue;
 
     const name =
-      `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || "Worker";
+      formatFullName(worker.first_name, worker.middle_name, worker.last_name) || "Worker";
 
     pinnedList.push({
       id: worker.id,
