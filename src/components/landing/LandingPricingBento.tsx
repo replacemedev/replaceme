@@ -58,11 +58,10 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
         return (
           <article
             key={plan.id}
-            className={`landing-pricing-card group relative flex flex-col justify-between rounded-2xl bg-white p-6 min-w-0 transition-all duration-300 ${
-              isGrowth
-                ? "landing-pricing-growth border-2 border-[#10b981] shadow-[0_0_48px_-10px_rgba(34,197,94,0.65)] xl:-translate-y-3 z-10"
-                : "border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-slate-300"
-            }`}
+            className={`landing-pricing-card group relative flex flex-col justify-between rounded-2xl bg-white p-6 min-w-0 transition-all duration-300 ${isGrowth
+              ? "landing-pricing-growth border-2 border-[#10b981] shadow-[0_0_48px_-10px_rgba(34,197,94,0.65)] xl:-translate-y-3 z-10"
+              : "border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-slate-300"
+              }`}
             style={{ transitionDelay: `${index * 60}ms` }}
           >
             {isPopular ? (
@@ -88,9 +87,8 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
 
               <div className="mt-3 flex items-baseline gap-1">
                 <span
-                  className={`font-extrabold text-slate-900 tracking-tight flex items-baseline ${
-                    isGrowth ? "text-4xl" : "text-3xl"
-                  }`}
+                  className={`font-extrabold text-slate-900 tracking-tight flex items-baseline ${isGrowth ? "text-4xl" : "text-3xl"
+                    }`}
                 >
                   {formatMoney(plan.price, "USD", { asReact: true, codeClassName: "text-slate-500 text-sm font-semibold ml-1" })}
                 </span>
@@ -101,14 +99,12 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2.5">
                     <span
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                        isGrowth ? "bg-[#d1fae5]" : "bg-[#e6fbf2]"
-                      }`}
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${isGrowth ? "bg-[#d1fae5]" : "bg-[#e6fbf2]"
+                        }`}
                     >
                       <Check
-                        className={`h-3.5 w-3.5 stroke-[3] ${
-                          isGrowth ? "text-[#059669]" : "text-[#10b981]"
-                        }`}
+                        className={`h-3.5 w-3.5 stroke-[3] ${isGrowth ? "text-[#059669]" : "text-[#10b981]"
+                          }`}
                         aria-hidden
                       />
                     </span>
@@ -130,7 +126,7 @@ export function LandingPricingBento({ plans }: LandingPricingBentoProps) {
       })}
       <div className="col-span-full text-center mt-6">
         <p className="text-xs text-slate-400 font-semibold leading-relaxed">
-          All prices are billed exclusively in USD (United States Dollars) through Stripe. Cancel anytime.
+          All prices are billed exclusively in USD through Stripe. Cancel anytime.
         </p>
       </div>
     </div>

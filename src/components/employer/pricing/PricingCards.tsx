@@ -71,13 +71,12 @@ export function PricingCards({
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col justify-between p-6 rounded-2xl bg-white transition-all duration-300 ${
-                isCurrent
+              className={`relative flex flex-col justify-between p-6 rounded-2xl bg-white transition-all duration-300 ${isCurrent
                   ? "border-2 border-[#006e2f] shadow-md ring-2 ring-[#006e2f]/10"
                   : isPopular
                     ? "border-2 border-[#10b981] shadow-lg xl:-translate-y-2"
                     : "border border-gray-200 shadow-sm hover:shadow-md"
-              }`}
+                }`}
             >
               {isCurrent ? (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white text-[10px] uppercase font-bold tracking-wider px-3.5 py-1 rounded-full whitespace-nowrap">
@@ -140,15 +139,14 @@ export function PricingCards({
                   <button
                     type="button"
                     onClick={() => onSelectPlan(plan.slug)}
-                    className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${
-                      isGrowth && isUpgrade
+                    className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer ${isGrowth && isUpgrade
                         ? "bg-[#10b981] text-white hover:bg-[#0d9668] shadow-sm hover:shadow"
                         : isScale && isUpgrade
                           ? "bg-white border border-[#10b981] text-[#10b981] hover:bg-[#e6fbf2]"
                           : plan.slug === "discovery"
                             ? "bg-[#e8edfb] text-[#5569ff] hover:bg-[#d8e0fa]"
                             : "bg-slate-900 text-white hover:bg-slate-800"
-                    }`}
+                      }`}
                   >
                     {ctaLabel(plan, currentPlanSlug)}
                   </button>
@@ -164,7 +162,7 @@ export function PricingCards({
         })}
       </div>
       <p className="text-center text-xs text-slate-400 font-semibold max-w-xl mx-auto leading-relaxed">
-        All prices are billed exclusively in USD (United States Dollars) through Stripe. Cancel anytime.
+        All prices are billed exclusively in USD through Stripe. Cancel anytime.
       </p>
     </div>
   );
