@@ -132,15 +132,15 @@ export function deriveVerificationSteps(
 }
 
 export const DOCUMENT_TYPE_LABELS: Record<VerificationDocumentType, string> = {
-  id_front: "Government ID — Front",
-  id_back: "Government ID — Back",
-  selfie: "Selfie Verification",
+  id_front: "Philippine Government ID — Front",
+  id_back: "Philippine Government ID — Back",
+  selfie: "Selfie Verification Photo",
 };
 
 export const DOCUMENT_TYPE_HINTS: Record<VerificationDocumentType, string> = {
-  id_front: "Upload a clear photo of the front of your government-issued ID.",
-  id_back: "Upload a clear photo of the back of your government-issued ID.",
-  selfie: "Take a selfie holding your ID next to your face.",
+  id_front: "Upload a clear photo of the front of your Philippine government-issued ID.",
+  id_back: "Upload a clear photo of the back of your Philippine government-issued ID.",
+  selfie: "Take a selfie holding your Philippine ID next to your face.",
 };
 
 export const VERIFICATION_BENEFITS = [

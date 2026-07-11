@@ -73,6 +73,13 @@ export function VerificationUploadPanel({
         </div>
       )}
 
+      <div className="rounded-xl border border-emerald-100 bg-[#ebfdf2]/50 p-4 text-xs sm:text-sm text-emerald-950 flex items-start gap-2.5 shadow-sm">
+        <span className="text-base shrink-0" aria-hidden="true">💡</span>
+        <div>
+          <strong className="font-bold text-emerald-900">Accepted IDs:</strong> Unified Multi-Purpose ID (UMID), Driver&apos;s License, Philippine Passport, National ID (PhilID), SSS/GSIS, PRC ID, or Postal ID.
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-4">
         {VERIFICATION_DOCUMENT_TYPES.map((type) => (
           <DocumentDropzone
@@ -100,7 +107,7 @@ export function VerificationUploadPanel({
                 router.refresh();
               });
             }}
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 cursor-pointer w-full md:w-auto"
           >
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

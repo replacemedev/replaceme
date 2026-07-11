@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useRef, useState, useTransition } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FileUp, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -78,11 +77,11 @@ export function DocumentDropzone({
     preview?.mimeType.startsWith("image/") && preview.previewUrl;
 
   return (
-    <article className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+    <article className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
       <h3 className="text-sm font-bold text-slate-900">
         {DOCUMENT_TYPE_LABELS[documentType]}
       </h3>
-      <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+      <p className="text-xs font-medium text-slate-500 mt-1 leading-relaxed">
         {DOCUMENT_TYPE_HINTS[documentType]}
       </p>
 
@@ -106,14 +105,14 @@ export function DocumentDropzone({
           setIsDragging(false);
           if (!disabled) handleFiles(e.dataTransfer.files);
         }}
-        className={`mt-4 relative flex flex-col items-center justify-center min-h-[140px] rounded-xl border-2 border-dashed transition-colors cursor-pointer ${
+        className={`mt-4 relative flex flex-col items-center justify-center min-h-[140px] rounded-xl border-dashed border-2 transition-colors cursor-pointer ${
           disabled
-            ? "border-slate-100 bg-slate-50 opacity-60 cursor-not-allowed"
+            ? "border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed"
             : isDragging
-              ? "border-[#006e2f] bg-[#ebfdf2]/60"
+              ? "border-emerald-500 bg-emerald-50/50"
               : preview
-                ? "border-[#006e2f]/40 bg-[#f6fdf9]"
-                : "border-slate-200 bg-slate-50/50 hover:border-[#006e2f]/40 hover:bg-[#ebfdf2]/30"
+                ? "border-slate-300 bg-[#f6fdf9] hover:border-emerald-500"
+                : "border-slate-300 bg-white hover:border-emerald-500"
         }`}
       >
         <input
@@ -133,16 +132,13 @@ export function DocumentDropzone({
         ) : preview ? (
           <div className="flex flex-col items-center gap-2 p-3 w-full">
             {isImage ? (
-              <div className="relative h-20 w-full max-w-[200px] rounded-lg overflow-hidden border border-slate-200">
-                <Image
-                  src={preview.previewUrl!}
-                  alt={preview.fileName}
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                  unoptimized
-                />
-              </div>
+              // ponytail: standard img tag preserves dynamic aspect ratio without cropping
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={preview.previewUrl!}
+                alt={preview.fileName}
+                className="object-contain max-h-48 w-auto mx-auto rounded-lg shadow-sm border border-slate-200"
+              />
             ) : (
               <CheckCircle2 className="h-8 w-8 text-[#006e2f]" aria-hidden />
             )}

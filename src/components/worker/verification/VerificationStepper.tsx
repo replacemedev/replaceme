@@ -32,7 +32,7 @@ function StepCircle({ state, index }: { state: VerificationStep["state"]; index:
 function Connector({ filled }: { filled: boolean }) {
   return (
     <div
-      className={`hidden sm:block flex-1 h-0.5 mx-2 rounded-full ${
+      className={`hidden md:block flex-1 h-0.5 mx-2 rounded-full ${
         filled ? "bg-[#006e2f]" : "bg-slate-200"
       }`}
       aria-hidden
@@ -43,7 +43,7 @@ function Connector({ filled }: { filled: boolean }) {
 export function VerificationStepper({ steps }: VerificationStepperProps) {
   return (
     <nav aria-label="Verification progress" className="mb-8">
-      <ol className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
+      <ol className="flex flex-col md:flex-row md:items-center gap-4 md:gap-0">
         {steps.map((step, index) => {
           const connectorFilled =
             step.state === "completed" &&
@@ -53,16 +53,18 @@ export function VerificationStepper({ steps }: VerificationStepperProps) {
           return (
             <li
               key={step.id}
-              className="flex sm:flex-1 sm:items-center min-w-0"
+              className="flex md:flex-1 md:items-center min-w-0"
               aria-current={step.state === "active" ? "step" : undefined}
             >
-              <div className="flex items-center gap-3 sm:flex-col sm:gap-2 sm:text-center sm:flex-1 min-w-0">
+              <div className="flex items-center gap-3 md:flex-col md:gap-2 md:text-center md:flex-1 min-w-0">
                 <StepCircle state={step.state} index={step.id} />
                 <span
-                  className={`text-sm font-semibold truncate ${
-                    step.state === "pending"
-                      ? "text-slate-400"
-                      : "text-slate-800"
+                  className={`text-xs md:text-sm font-semibold leading-tight text-left md:text-center whitespace-normal break-words max-w-[120px] md:max-w-none ${
+                    step.state === "active"
+                      ? "text-[#006e2f]"
+                      : step.state === "completed"
+                        ? "text-slate-800"
+                        : "text-slate-400"
                   }`}
                 >
                   {step.label}
