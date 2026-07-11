@@ -48,13 +48,15 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
   const activeSearch = searchParams.get("search") ?? "";
   const activePlan = searchParams.get("plan") ?? "all";
   const activeStatus = searchParams.get("status") ?? "all";
+  const activeEventType = searchParams.get("event_type") ?? "all";
 
   const [searchTerm, setSearchTerm] = useState(activeSearch);
+  const [prevActiveSearch, setPrevActiveSearch] = useState(activeSearch);
 
-  // Sync local search term if URL changes externally
-  useEffect(() => {
+  if (activeSearch !== prevActiveSearch) {
     setSearchTerm(activeSearch);
-  }, [activeSearch]);
+    setPrevActiveSearch(activeSearch);
+  }
 
   // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
@@ -98,14 +100,34 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const handleEventTypeChange = (val: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (val && val !== "all") {
+      params.set("event_type", val);
+    } else {
+      params.delete("event_type");
+    }
+    params.delete("page"); // Reset page on filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const [subPage, setSubPage] = useState(1);
   const [ledgerPage, setLedgerPage] = useState(1);
   const itemsPerPage = 20;
 
-  // Reset subscription page when filter parameters change
-  useEffect(() => {
+  const [prevSubFilterKey, setPrevSubFilterKey] = useState(activeSearch + activePlan + activeStatus);
+  const currentSubFilterKey = activeSearch + activePlan + activeStatus;
+  if (currentSubFilterKey !== prevSubFilterKey) {
     setSubPage(1);
-  }, [activeSearch, activePlan, activeStatus]);
+    setPrevSubFilterKey(currentSubFilterKey);
+  }
+
+  const [prevLedgerFilterKey, setPrevLedgerFilterKey] = useState(activeSearch + activePlan + activeEventType);
+  const currentLedgerFilterKey = activeSearch + activePlan + activeEventType;
+  if (currentLedgerFilterKey !== prevLedgerFilterKey) {
+    setLedgerPage(1);
+    setPrevLedgerFilterKey(currentLedgerFilterKey);
+  }
 
   // Filter subscriptions array case-insensitively
   const filteredSubscriptions = subscriptions.filter((sub) => {
@@ -142,11 +164,37 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
     activeSubPage * itemsPerPage
   );
 
+  // Filter ledger events case-insensitively
+  const filteredLedger = ledger.filter((row) => {
+    if (activeSearch) {
+      const searchLower = activeSearch.toLowerCase();
+      const companyMatch = row.company_name?.toLowerCase().includes(searchLower) ?? false;
+      const invoiceMatch = row.stripe_invoice_id?.toLowerCase().includes(searchLower) ?? false;
+      if (!companyMatch && !invoiceMatch) {
+        return false;
+      }
+    }
+
+    if (activePlan !== "all") {
+      if (row.plan_slug?.toLowerCase() !== activePlan.toLowerCase()) {
+        return false;
+      }
+    }
+
+    if (activeEventType !== "all") {
+      if (row.event_type?.toLowerCase() !== activeEventType.toLowerCase()) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   // Ledger pagination
-  const totalLedgerItems = ledger.length;
+  const totalLedgerItems = filteredLedger.length;
   const totalLedgerPages = Math.ceil(totalLedgerItems / itemsPerPage);
   const activeLedgerPage = Math.min(ledgerPage, totalLedgerPages || 1);
-  const paginatedLedger = ledger.slice(
+  const paginatedLedger = filteredLedger.slice(
     (activeLedgerPage - 1) * itemsPerPage,
     activeLedgerPage * itemsPerPage
   );
@@ -279,6 +327,24 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                     <option value="canceled">Canceled</option>
                   </select>
                 </div>
+
+                {(activeSearch !== "" || activePlan !== "all" || activeStatus !== "all") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm("");
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete("search");
+                      params.delete("plan");
+                      params.delete("status");
+                      params.delete("page");
+                      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                    }}
+                    className="px-3.5 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
             </div>
 
@@ -413,11 +479,78 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
       {tab === "ledger" ? (
         <section className="space-y-4">
           <AdminSectionLabel>Recent transactions</AdminSectionLabel>
+
+          {/* Search and Filters Bar */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white p-4 rounded-xl border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search employer or invoice ID..."
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-800 placeholder-slate-400 bg-white"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 md:flex md:items-center md:gap-3">
+              <div className="flex flex-col min-w-[140px]">
+                <select
+                  value={activePlan}
+                  onChange={(e) => handlePlanChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+                >
+                  <option value="all">All Plans</option>
+                  <option value="discovery">Discovery</option>
+                  <option value="starter">Starter</option>
+                  <option value="growth">Growth</option>
+                  <option value="scale">Scale</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col min-w-[170px]">
+                <select
+                  value={activeEventType}
+                  onChange={(e) => handleEventTypeChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+                >
+                  <option value="all">All Event Types</option>
+                  <option value="invoice.paid">Invoice Paid</option>
+                  <option value="invoice.payment_failed">Payment Failed</option>
+                </select>
+              </div>
+
+              {(activeSearch !== "" || activePlan !== "all" || activeEventType !== "all") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    const params = new URLSearchParams(window.location.search);
+                    params.delete("search");
+                    params.delete("plan");
+                    params.delete("event_type");
+                    params.delete("page");
+                    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+                  }}
+                  className="px-3.5 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
           {ledger.length === 0 ? (
             <EmptyState
               icon={<CreditCard className="h-5 w-5" aria-hidden />}
               title="No ledger events yet"
               description="Invoice payments and failures from Stripe webhooks will appear here."
+            />
+          ) : filteredLedger.length === 0 ? (
+            <EmptyState
+              icon={<Search className="h-5 w-5 text-slate-400" aria-hidden />}
+              title="No transactions match your filters"
+              description="Try clearing your search query or choosing different filters."
             />
           ) : (
             <div className="space-y-4">

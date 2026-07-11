@@ -47,6 +47,12 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   const activeSort = searchParams.get("sort") ?? "newest";
 
   const [searchTerm, setSearchTerm] = useState(searchQuery);
+  const [prevSearchQuery, setPrevSearchQuery] = useState(searchQuery);
+
+  if (searchQuery !== prevSearchQuery) {
+    setSearchTerm(searchQuery);
+    setPrevSearchQuery(searchQuery);
+  }
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [documents, setDocuments] = useState<
@@ -67,11 +73,6 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
     null
   );
   const [reason, setReason] = useState("");
-
-  // Sync state if URL changes externally
-  useEffect(() => {
-    setSearchTerm(searchQuery);
-  }, [searchQuery]);
 
   // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
@@ -207,12 +208,14 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [prevFilterKey, setPrevFilterKey] = useState(searchQuery + activeTab + activeSort);
   const itemsPerPage = 20;
 
-  // Reset pagination to page 1 on filter changes
-  useEffect(() => {
+  const currentFilterKey = searchQuery + activeTab + activeSort;
+  if (currentFilterKey !== prevFilterKey) {
     setCurrentPage(1);
-  }, [searchQuery, activeTab, activeSort]);
+    setPrevFilterKey(currentFilterKey);
+  }
 
   const paginatedRows = sortedRows.slice(
     (currentPage - 1) * itemsPerPage,
@@ -313,6 +316,23 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
               <option value="oldest">Oldest First</option>
             </select>
           </div>
+
+          {(searchQuery !== "" || activeSort !== "newest") && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm("");
+                const params = new URLSearchParams(window.location.search);
+                params.delete("search");
+                params.delete("sort");
+                params.delete("page");
+                router.push(`${pathname}?${params.toString()}`, { scroll: false });
+              }}
+              className="px-3.5 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
 

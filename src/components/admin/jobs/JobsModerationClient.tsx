@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Briefcase, Check, Trash2, X, Eye } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Briefcase, Check, Trash2, X, Eye, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
   approveJobPost,
@@ -12,7 +12,6 @@ import {
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminJobRow } from "@/types/admin.types";
@@ -23,14 +22,6 @@ import {
   AdminDataTable,
   AdminMobileCard,
 } from "@/components/admin/shared/AdminDataTable";
-
-const STATUS_FILTERS = [
-  "All",
-  "Pending Review",
-  "Active",
-  "Closed",
-  "Draft",
-] as const;
 
 const PLAN_LABELS: Record<string, string> = {
   discovery: "Discovery",
@@ -71,21 +62,127 @@ interface JobsModerationClientProps {
 
 export function JobsModerationClient({
   jobs,
-  initialFilter = "Pending Review",
 }: JobsModerationClientProps) {
-  const [filter, setFilter] = useState(initialFilter);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const activeSearch = searchParams.get("search") ?? "";
+  const activeStatus = searchParams.get("status") ?? "Pending Review";
+  const activePlan = searchParams.get("plan") ?? "all";
+  const activeEmploymentType = searchParams.get("employment_type") ?? "all";
+  const currentPage = Number(searchParams.get("page") ?? "1");
+
+  const [searchTerm, setSearchTerm] = useState(activeSearch);
+  const [prevActiveSearch, setPrevActiveSearch] = useState(activeSearch);
+
+  if (activeSearch !== prevActiveSearch) {
+    setSearchTerm(activeSearch);
+    setPrevActiveSearch(activeSearch);
+  }
+
   const [pending, startTransition] = useTransition();
   const [rejectTarget, setRejectTarget] = useState<AdminJobRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminJobRow | null>(null);
   const [viewTarget, setViewTarget] = useState<AdminJobRow | null>(null);
   const [viewData, setViewData] = useState<AdminJobDeepDive | null>(null);
   const [reason, setReason] = useState("");
-  const router = useRouter();
+
+  // Debounced search logic to sync input search query to URL query parameters
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const currentSearch = new URLSearchParams(window.location.search).get("search") ?? "";
+      if (currentSearch === searchTerm) return;
+
+      const params = new URLSearchParams(window.location.search);
+      if (searchTerm) {
+        params.set("search", searchTerm);
+      } else {
+        params.delete("search");
+      }
+      params.delete("page"); // Reset page when search query changes
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm, pathname, router]);
+
+  const handleStatusChange = (val: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (val && val !== "all") {
+      params.set("status", val);
+    } else {
+      params.delete("status");
+    }
+    params.delete("page"); // Reset page on filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handlePlanChange = (val: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (val && val !== "all") {
+      params.set("plan", val);
+    } else {
+      params.delete("plan");
+    }
+    params.delete("page"); // Reset page on filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleEmploymentTypeChange = (val: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (val && val !== "all") {
+      params.set("employment_type", val);
+    } else {
+      params.delete("employment_type");
+    }
+    params.delete("page"); // Reset page on filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (page > 1) {
+      params.set("page", String(page));
+    } else {
+      params.delete("page");
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const filtered = useMemo(() => {
-    if (filter === "All") return jobs;
-    return jobs.filter((j) => j.status === filter);
-  }, [jobs, filter]);
+    let list = jobs;
+
+    // 1. Search Query filtering (multi-field)
+    if (activeSearch) {
+      const q = activeSearch.toLowerCase().trim();
+      list = list.filter((j) => {
+        return (
+          j.title.toLowerCase().includes(q) ||
+          (j.company_name?.toLowerCase().includes(q) ?? false) ||
+          j.id.toLowerCase().includes(q) ||
+          j.employer_id.toLowerCase().includes(q)
+        );
+      });
+    }
+
+    // 2. Status filtering
+    if (activeStatus !== "all") {
+      list = list.filter((j) => j.status === activeStatus);
+    }
+
+    // 3. Plan Tier filtering
+    if (activePlan !== "all") {
+      list = list.filter((j) => j.plan_slug === activePlan);
+    }
+
+    // 4. Employment Type filtering
+    if (activeEmploymentType !== "all") {
+      list = list.filter((j) => j.employment_type === activeEmploymentType);
+    }
+
+    return list;
+  }, [jobs, activeSearch, activeStatus, activePlan, activeEmploymentType]);
 
   const handleApprove = (jobId: string) => {
     startTransition(async () => {
@@ -132,22 +229,24 @@ export function JobsModerationClient({
     });
   };
 
-  const filterCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: jobs.length };
-    for (const status of STATUS_FILTERS) {
-      if (status === "All") continue;
-      counts[status] = jobs.filter((j) => j.status === status).length;
-    }
-    return counts;
-  }, [jobs]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [prevFilter, setPrevFilter] = useState(filter);
 
-  if (filter !== prevFilter) {
-    setPrevFilter(filter);
-    setCurrentPage(1);
-  }
+  const isFilterActive =
+    activeSearch !== "" ||
+    activeStatus !== "Pending Review" ||
+    activePlan !== "all" ||
+    activeEmploymentType !== "all";
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    const params = new URLSearchParams(window.location.search);
+    params.delete("search");
+    params.set("status", "Pending Review");
+    params.delete("plan");
+    params.delete("employment_type");
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const itemsPerPage = 20;
   const totalItems = filtered.length;
@@ -160,18 +259,88 @@ export function JobsModerationClient({
 
   return (
     <div className="space-y-4">
-      <AdminFilterPills
-        options={STATUS_FILTERS}
-        value={filter}
-        onChange={setFilter}
-        counts={filterCounts}
-      />
+      {/* Search & Multi-faceted Filter Bar */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white p-4 rounded-xl border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search job title, company, or ID..."
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-800 placeholder-slate-400 bg-white"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* Status Filter */}
+          <div className="flex-1 md:flex-initial min-w-[140px]">
+            <select
+              value={activeStatus}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              <option value="Pending Review">Pending Review</option>
+              <option value="Active">Active</option>
+              <option value="Closed">Closed</option>
+              <option value="Draft">Draft</option>
+            </select>
+          </div>
+
+          {/* Plan Tier Filter */}
+          <div className="flex-1 md:flex-initial min-w-[140px]">
+            <select
+              value={activePlan}
+              onChange={(e) => handlePlanChange(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+            >
+              <option value="all">All Plans</option>
+              <option value="discovery">Discovery</option>
+              <option value="starter">Starter</option>
+              <option value="growth">Growth</option>
+              <option value="scale">Scale</option>
+            </select>
+          </div>
+
+          {/* Employment Type Filter */}
+          <div className="flex-1 md:flex-initial min-w-[150px]">
+            <select
+              value={activeEmploymentType}
+              onChange={(e) => handleEmploymentTypeChange(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+            >
+              <option value="all">All Types</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {isFilterActive && (
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="px-3.5 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100/50 rounded-lg transition-colors cursor-pointer"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<Briefcase className="h-5 w-5" aria-hidden />}
-          title="No jobs in this queue"
-          description="Job posts matching this filter will appear here."
+          icon={<Briefcase className="h-5 w-5 text-slate-400" aria-hidden />}
+          title={activeSearch ? "No matching jobs" : "No jobs in this queue"}
+          description={
+            activeSearch
+              ? "Try adjusting your filters or search term."
+              : "Job posts matching this filter will appear here."
+          }
         />
       ) : (
         <div className="space-y-4">
@@ -361,9 +530,9 @@ export function JobsModerationClient({
             currentPage={activePage}
             totalItems={totalItems}
             pageSize={itemsPerPage}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
           />
-      </div>
+        </div>
       )}
 
       <ConfirmDialog
