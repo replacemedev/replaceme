@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { submitJobApplication } from "@/actions/job-application";
+import { getWorkerResumePreviewUrl } from "@/actions/worker/profile";
 import {
   CONTACT_METHOD_TYPES,
   type ApplyJobSummary,
@@ -51,6 +52,7 @@ function ProfileAssetButton({
   trailing: typeof Eye;
   external?: boolean;
 }) {
+  const [loading, setLoading] = useState(false);
   const baseClass =
     "flex items-center justify-between gap-3 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors";
 
@@ -68,6 +70,48 @@ function ProfileAssetButton({
           Not set
         </span>
       </div>
+    );
+  }
+
+  const handleViewResume = async (e: React.MouseEvent) => {
+    if (label === "View Resume") {
+      e.preventDefault();
+      setLoading(true);
+      const toastId = toast.loading("Generating secure preview link...");
+      try {
+        const result = await getWorkerResumePreviewUrl();
+        if (result.error || !result.previewUrl) {
+          toast.error(result.error ?? "Failed to generate preview link.", { id: toastId });
+        } else {
+          toast.dismiss(toastId);
+          window.open(result.previewUrl, "_blank", "noopener,noreferrer");
+        }
+      } catch {
+        toast.error("Failed to generate preview link.", { id: toastId });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  if (label === "View Resume") {
+    return (
+      <button
+        type="button"
+        disabled={loading}
+        onClick={handleViewResume}
+        className={`${baseClass} hover:border-[#006e2f]/30 hover:bg-[#ebfdf2] disabled:opacity-50 cursor-pointer`}
+      >
+        <span className="flex items-center gap-2.5">
+          {loading ? (
+            <Loader2 className="h-4 w-4 text-[#006e2f] animate-spin" aria-hidden />
+          ) : (
+            <Icon className="h-4 w-4 text-[#006e2f]" aria-hidden />
+          )}
+          {label}
+        </span>
+        <Trailing className="h-4 w-4 text-slate-400" aria-hidden />
+      </button>
     );
   }
 
