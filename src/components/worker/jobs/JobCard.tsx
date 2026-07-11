@@ -46,7 +46,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
   };
 
   const cardStyles =
-    "bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md";
+    "bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-full before:h-1 before:bg-gradient-to-r before:from-emerald-500 before:to-teal-400";
 
   return (
     <article className={`flex flex-col h-full p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
@@ -64,7 +64,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
           </div>
           <div className="min-w-0">
             <h3 className="text-base md:text-lg font-bold text-gray-900 break-words leading-snug">
-              {job.title}
+               {job.title}
             </h3>
             <p className="text-xs font-semibold text-gray-500 truncate mt-1">
               {job.companyName}
@@ -104,31 +104,21 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
         </span>
       </div>
 
-      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 flex-1">
+      <p className="text-sm text-slate-500 leading-relaxed line-clamp-2 md:line-clamp-3 flex-1">
         {job.description}
       </p>
 
-      <footer className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3 mt-auto w-full">
-        <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">
-            <Clock className="h-3.5 w-3.5" aria-hidden />
-            {daysSincePosted(job.createdAt)}
-          </span>
-          {job.skills.slice(0, 3).map((skill) => (
-            <span
-              key={skill}
-              className="inline-flex rounded-full bg-gray-50 border border-gray-200 px-2 py-0.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap"
-            >
-              {skill}
-            </span>
-          ))}
+      <footer className="pt-4 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 mt-auto w-full">
+        <div className="flex items-center gap-1 text-xs font-medium text-slate-500">
+          <Clock className="h-3.5 w-3.5" aria-hidden />
+          {daysSincePosted(job.createdAt)}
         </div>
 
         <Link
           href={`/worker/jobs/${job.id}`}
-          className="text-sm font-bold text-[#006e2f] hover:translate-x-0.5 transition-transform shrink-0 whitespace-nowrap"
+          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg shadow-sm transition-colors w-full md:w-auto text-center shrink-0 cursor-pointer"
         >
-          View Details →
+          View Details
         </Link>
       </footer>
     </article>
