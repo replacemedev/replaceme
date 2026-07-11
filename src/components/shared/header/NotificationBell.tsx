@@ -8,6 +8,10 @@ import {
   Loader2,
   AlertCircle,
   Inbox,
+  Calendar,
+  MessageSquare,
+  Briefcase,
+  CheckCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -232,32 +236,54 @@ function NotificationItem({
   const typeLabel =
     NOTIFICATION_TYPE_LABELS[notification.type] ?? notification.type;
 
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "interview_rescheduled":
+        return <Calendar className="h-4 w-4 text-amber-500" />;
+      case "new_message":
+        return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      case "application_status":
+      case "new_applicant":
+        return <Briefcase className="h-4 w-4 text-emerald-600" />;
+      case "verification_update":
+      case "identity_verification_request":
+        return <CheckCircle className="h-4 w-4 text-teal-600" />;
+      default:
+        return <Bell className="h-4 w-4 text-slate-400" />;
+    }
+  };
+
   const content = (
-    <>
-      <div className="flex items-start justify-between gap-2">
-        <p
-          className={`text-sm font-semibold break-words whitespace-normal ${
-            notification.is_read ? "text-slate-600" : "text-slate-900"
-          }`}
-        >
-          {notification.title}
+    <div className="flex gap-3 text-left">
+      <div className="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-slate-50 border border-slate-100">
+        {getNotificationIcon(notification.type)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <p
+            className={`text-xs font-bold break-words whitespace-normal ${
+              notification.is_read ? "text-slate-600" : "text-slate-900"
+            }`}
+          >
+            {notification.title}
+          </p>
+          {!notification.is_read ? (
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+          ) : null}
+        </div>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 break-words whitespace-normal">
+          {notification.message}
         </p>
-        {!notification.is_read ? (
-          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
-        ) : null}
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-slate-500">
+            {typeLabel}
+          </span>
+          <time className="text-[9px] text-slate-400">
+            {formatRelativeTime(notification.created_at)}
+          </time>
+        </div>
       </div>
-      <p className="mt-0.5 text-xs leading-relaxed text-slate-500 break-words whitespace-normal">
-        {notification.message}
-      </p>
-      <div className="mt-2 flex items-center justify-between gap-2">
-        <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-          {typeLabel}
-        </span>
-        <time className="text-[10px] text-slate-400">
-          {formatRelativeTime(notification.created_at)}
-        </time>
-      </div>
-    </>
+    </div>
   );
 
   if (href) {

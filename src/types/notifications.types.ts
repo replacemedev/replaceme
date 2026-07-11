@@ -13,6 +13,7 @@ export const notificationTypeSchema = z.enum([
   "billing_update",
   "subscription_update",
   "worker_acceptance",
+  "interview_rescheduled",
 ]);
 
 export const notificationSchema = z.object({
@@ -57,6 +58,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   billing_update: "Billing",
   subscription_update: "Subscription",
   worker_acceptance: "Hiring",
+  interview_rescheduled: "Scheduling",
 };
 
 function metaId(

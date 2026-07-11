@@ -472,6 +472,72 @@ export async function updateInterviewSchedule(input: {
       return { success: false, error: "Failed to update interview schedule." };
     }
 
+    try {
+      // Fetch Employer Company Name
+      const { data: company } = await supabase
+        .from("company_profiles")
+        .select("company_name")
+        .eq("employer_id", profile.id)
+        .maybeSingle();
+
+      let employerName = company?.company_name;
+
+      if (!employerName) {
+        const { data: empProfile } = await supabase
+          .from("profiles")
+          .select("first_name, last_name")
+          .eq("id", profile.id)
+          .maybeSingle();
+        employerName = empProfile
+          ? `${empProfile.first_name || ""} ${empProfile.last_name || ""}`.trim()
+          : "";
+      }
+
+      if (!employerName) {
+        employerName = "An Employer";
+      }
+
+      // Fetch Job Title
+      const { data: job } = await supabase
+        .from("jobs")
+        .select("title")
+        .eq("id", interview.job_id)
+        .maybeSingle();
+
+      const jobTitle = job?.title ?? "Job";
+
+      // Format Date and Time
+      const formattedDate = new Date(parsed.scheduledAt).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const formattedTime = new Date(parsed.scheduledAt).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short",
+      });
+
+      const messageText = `${employerName} has rescheduled your interview for the ${jobTitle} role to ${formattedDate} at ${formattedTime}.`;
+
+      // Trigger DB Notification
+      await supabase.rpc("create_notification", {
+        p_user_id: interview.worker_id,
+        p_type: "interview_rescheduled",
+        p_title: "Interview Rescheduled",
+        p_message: messageText,
+        p_action_url: "/worker/interviews",
+        p_metadata: {
+          interview_id: parsed.interviewId,
+          job_id: interview.job_id,
+          application_id: interview.application_id,
+        },
+      });
+    } catch (notifyErr) {
+      safeError("Failed to create reschedule notification:", notifyErr);
+    }
+
     // Invalidate caches
     await invalidateEmployerHiringCache(profile.id);
     await invalidateWorkerCache(interview.worker_id);
