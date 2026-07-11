@@ -29,6 +29,7 @@ export function DocumentDropzone({
   const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<VerificationDocumentRecord | null>(
     existing ?? null
   );
@@ -37,13 +38,19 @@ export function DocumentDropzone({
     (file: File) => {
       if (disabled) return;
 
+      setError(null);
+
       if (!ALLOWED_VERIFICATION_MIME_TYPES.includes(file.type as (typeof ALLOWED_VERIFICATION_MIME_TYPES)[number])) {
-        toast.error("Invalid file format.");
+        const errorMsg = "Invalid file type. Please upload a valid JPEG or PNG image.";
+        toast.error(errorMsg);
+        setError(errorMsg);
         return;
       }
 
       if (file.size > MAX_VERIFICATION_FILE_BYTES) {
-        toast.error("File too large (max 5MB).");
+        const errorMsg = "File too large (max 5MB).";
+        toast.error(errorMsg);
+        setError(errorMsg);
         return;
       }
 
@@ -54,7 +61,9 @@ export function DocumentDropzone({
 
         const result = await uploadVerificationDocument(formData);
         if (!result.success) {
-          toast.error(result.error ?? "Upload failed.");
+          const errorMsg = result.error ?? "Upload failed.";
+          toast.error(errorMsg);
+          setError(errorMsg);
           return;
         }
 
@@ -146,9 +155,14 @@ export function DocumentDropzone({
               {preview.fileName}
             </p>
             {!disabled && (
-              <span className="text-[11px] font-bold text-[#006e2f]">
-                Click or drop to replace
-              </span>
+              <>
+                <span className="text-[11px] font-bold text-[#006e2f]">
+                  Click or drop to replace
+                </span>
+                <span className="text-xs text-slate-500 mt-2 text-center whitespace-normal break-words max-w-full px-4">
+                  Supported formats: JPEG, JPG, PNG (Max 5MB)
+                </span>
+              </>
             )}
           </div>
         ) : (
@@ -157,12 +171,18 @@ export function DocumentDropzone({
             <span className="text-xs font-semibold text-center">
               Drag & drop or click to upload
             </span>
-            <span className="text-[10px] text-slate-400">
-              Max 5 MB · JPG, PNG, WebP, PDF
+            <span className="text-xs text-slate-500 mt-2 text-center whitespace-normal break-words max-w-full px-4">
+              Supported formats: JPEG, JPG, PNG (Max 5MB)
             </span>
           </div>
         )}
       </div>
+
+      {error && (
+        <p className="mt-2 text-xs font-semibold text-red-600 text-center whitespace-normal break-words max-w-full px-4">
+          {error}
+        </p>
+      )}
     </article>
   );
 }

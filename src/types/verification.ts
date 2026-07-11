@@ -22,8 +22,6 @@ export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
 export const ALLOWED_VERIFICATION_MIME_TYPES = [
   "image/jpeg",
   "image/png",
-  "image/webp",
-  "application/pdf",
 ] as const;
 
 export const MAX_VERIFICATION_FILE_BYTES = 5 * 1024 * 1024;
