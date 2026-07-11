@@ -46,14 +46,14 @@ export function UpgradeCTA({
   }
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <Link href={href} className={VARIANT_CLASSES[variant]}>
+    <div className={`flex flex-wrap items-center gap-2 w-full lg:w-auto ${className}`}>
+      <Link href={href} className={`${VARIANT_CLASSES[variant]} w-full lg:w-auto`}>
         {text}
       </Link>
       {compareHref ? (
         <Link
           href={compareHref}
-          className="text-[11px] font-semibold text-slate-500 hover:text-slate-700"
+          className="hidden lg:inline-flex text-[11px] font-semibold text-slate-500 hover:text-slate-700"
         >
           Compare plans
         </Link>
