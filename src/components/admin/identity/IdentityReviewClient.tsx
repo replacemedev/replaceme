@@ -26,6 +26,7 @@ import { StatCard } from "@/components/shared/StatCard";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
+import { TablePagination } from "@/components/shared/TablePagination";
 import { formatMoney } from "@/lib/format/currency";
 import type {
   AdminVerificationDocument,
@@ -205,6 +206,21 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
     return timeB - timeA;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  // Reset pagination to page 1 on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTab, activeSort]);
+
+  const paginatedRows = sortedRows.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalItems = sortedRows.length;
+
   // Totals for Stats
   const totalPending = queue.filter(
     (w) =>
@@ -356,151 +372,160 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
             }
           />
         ) : activeTab === "pending" ? (
-          <ul className="space-y-3">
-            {sortedRows.map((worker) => {
-              const name =
-                [worker.first_name, worker.last_name]
-                  .filter(Boolean)
-                  .join(" ") ||
-                worker.email ||
-                "Unknown worker";
-              const isExpanded = expandedId === worker.id;
-              const docs = documents[worker.id] ?? [];
+          <div className="space-y-4">
+            <ul className="space-y-3">
+              {paginatedRows.map((worker) => {
+                const name =
+                  [worker.first_name, worker.last_name]
+                    .filter(Boolean)
+                    .join(" ") ||
+                  worker.email ||
+                  "Unknown worker";
+                const isExpanded = expandedId === worker.id;
+                const docs = documents[worker.id] ?? [];
 
-              return (
-                <li
-                  key={worker.id}
-                  className="rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
-                >
-                  <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-900">{name}</p>
-                      <p className="text-xs text-slate-400">{worker.email}</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <StatusBadge status={worker.verification_status} />
-                        <span className="text-xs text-slate-500">
-                          {worker.document_count} document
-                          {worker.document_count === 1 ? "" : "s"}
-                        </span>
+                return (
+                  <li
+                    key={worker.id}
+                    className="rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
+                  >
+                    <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900">{name}</p>
+                        <p className="text-xs text-slate-400">{worker.email}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <StatusBadge status={worker.verification_status} />
+                          <span className="text-xs text-slate-500">
+                            {worker.document_count} document
+                            {worker.document_count === 1 ? "" : "s"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setViewTarget({ workerId: worker.id, name });
+                            setViewData(null);
+                            startTransition(async () => {
+                              const full = await getAdminWorkerProfileDeepDive(
+                                worker.id
+                              );
+                              if (!full) {
+                                toast.error("Failed to load worker profile");
+                                return;
+                              }
+                              setViewData(full);
+                            });
+                          }}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          <Eye className="h-3.5 w-3.5" aria-hidden />
+                          Deep dive
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(worker.id)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          {isExpanded ? (
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          ) : (
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          )}
+                          Documents
+                        </button>
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() =>
+                            setDecision({
+                              workerId: worker.id,
+                              name,
+                              type: "approved",
+                            })
+                          }
+                          className="inline-flex items-center gap-1 rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
+                        >
+                          <Check className="h-3.5 w-3.5" aria-hidden />
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() =>
+                            setDecision({
+                              workerId: worker.id,
+                              name,
+                              type: "rejected",
+                            })
+                          }
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                          <X className="h-3.5 w-3.5" aria-hidden />
+                          Reject
+                        </button>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setViewTarget({ workerId: worker.id, name });
-                          setViewData(null);
-                          startTransition(async () => {
-                            const full = await getAdminWorkerProfileDeepDive(
-                              worker.id
-                            );
-                            if (!full) {
-                              toast.error("Failed to load worker profile");
-                              return;
-                            }
-                            setViewData(full);
-                          });
-                        }}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                      >
-                        <Eye className="h-3.5 w-3.5" aria-hidden />
-                        Deep dive
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toggleExpand(worker.id)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-3.5 w-3.5" />
-                        ) : (
-                          <ChevronDown className="h-3.5 w-3.5" />
-                        )}
-                        Documents
-                      </button>
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() =>
-                          setDecision({
-                            workerId: worker.id,
-                            name,
-                            type: "approved",
-                          })
-                        }
-                        className="inline-flex items-center gap-1 rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
-                      >
-                        <Check className="h-3.5 w-3.5" aria-hidden />
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() =>
-                          setDecision({
-                            workerId: worker.id,
-                            name,
-                            type: "rejected",
-                          })
-                        }
-                        className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
-                      >
-                        <X className="h-3.5 w-3.5" aria-hidden />
-                        Reject
-                      </button>
-                    </div>
-                  </div>
 
-                  {isExpanded ? (
-                    <div className="border-t border-slate-100 px-4 py-4">
-                      {loadingDocs === worker.id ? (
-                        <p className="text-sm text-slate-400 font-medium">
-                          Loading documents…
-                        </p>
-                      ) : docs.length === 0 ? (
-                        <p className="text-sm text-slate-400 font-medium">
-                          No documents on file.
-                        </p>
-                      ) : (
-                        <ul className="grid gap-3 sm:grid-cols-3">
-                          {docs.map((doc) => (
-                            <li
-                              key={doc.id}
-                              className="rounded-xl border border-slate-100 bg-slate-50 p-3"
-                            >
-                              <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                                <FileImage className="h-4 w-4 text-slate-400" />
-                                {doc.document_type.replace(/_/g, " ")}
-                              </div>
-                              <p className="mt-1 truncate text-[11px] text-slate-400">
-                                {doc.file_name}
-                              </p>
-                              {doc.signed_url ? (
-                                <a
-                                  href={doc.signed_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
-                                >
-                                  View file
-                                </a>
-                              ) : (
-                                <p className="mt-2 text-xs text-red-500 font-semibold">
-                                  Unable to generate preview URL
+                    {isExpanded ? (
+                      <div className="border-t border-slate-100 px-4 py-4">
+                        {loadingDocs === worker.id ? (
+                          <p className="text-sm text-slate-400 font-medium">
+                            Loading documents…
+                          </p>
+                        ) : docs.length === 0 ? (
+                          <p className="text-sm text-slate-400 font-medium">
+                            No documents on file.
+                          </p>
+                        ) : (
+                          <ul className="grid gap-3 sm:grid-cols-3">
+                            {docs.map((doc) => (
+                              <li
+                                key={doc.id}
+                                className="rounded-xl border border-slate-100 bg-slate-50 p-3"
+                              >
+                                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                  <FileImage className="h-4 w-4 text-slate-400" />
+                                  {doc.document_type.replace(/_/g, " ")}
+                                </div>
+                                <p className="mt-1 truncate text-[11px] text-slate-400">
+                                  {doc.file_name}
                                 </p>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
+                                {doc.signed_url ? (
+                                  <a
+                                    href={doc.signed_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
+                                  >
+                                    View file
+                                  </a>
+                                ) : (
+                                  <p className="mt-2 text-xs text-red-500 font-semibold">
+                                    Unable to generate preview URL
+                                  </p>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+            <TablePagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+              label="workers"
+            />
+          </div>
         ) : (
-          <>
+          <div className="space-y-4">
             {/* Desktop Table View */}
             <div className="hidden md:block overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
               <table className="w-full text-sm">
@@ -514,7 +539,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {sortedRows.map((worker) => {
+                  {paginatedRows.map((worker) => {
                     const name =
                       [worker.first_name, worker.last_name]
                         .filter(Boolean)
@@ -574,7 +599,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
 
             {/* Mobile Stacked Cards View */}
             <div className="block md:hidden space-y-3">
-              {sortedRows.map((worker) => {
+              {paginatedRows.map((worker) => {
                 const name =
                   [worker.first_name, worker.last_name]
                     .filter(Boolean)
@@ -636,7 +661,15 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 );
               })}
             </div>
-          </>
+
+            <TablePagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={itemsPerPage}
+              onPageChange={setCurrentPage}
+              label="workers"
+            />
+          </div>
         )}
       </section>
 
