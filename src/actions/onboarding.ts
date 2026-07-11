@@ -22,6 +22,7 @@ import {
   workerSkillsStepSchema,
   WorkerOnboardingStep,
 } from "@/lib/validations/onboarding";
+import { formatLocation } from "@/utils/locationFormatter";
 
 export type OnboardingStatus = {
   complete: boolean;
@@ -35,6 +36,10 @@ export type WorkerOnboardingDraft = {
   lastName: string;
   avatarUrl: string | null;
   location: string;
+  region: string;
+  province: string;
+  city: string;
+  addressLine1: string;
   availability: string;
   isRemote: boolean;
   skills: string[];
@@ -144,7 +149,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, middle_name, last_name, avatar_url, location, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
+        "professional_title, first_name, middle_name, last_name, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
       )
       .eq("id", user.id)
       .single();
@@ -158,6 +163,10 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       lastName: profile.last_name ?? "",
       avatarUrl: profile.avatar_url ?? null,
       location: profile.location ?? "",
+      region: profile.region ?? "",
+      province: profile.province ?? "",
+      city: profile.city ?? "",
+      addressLine1: profile.address_line_1 ?? "",
       availability: profile.availability ?? "Full-time",
       isRemote: profile.is_remote ?? false,
       skills: profile.skills ?? [],
@@ -226,10 +235,20 @@ export async function saveWorkerOnboardingStep(
       }
       case "location": {
         const parsed = workerLocationStepSchema.parse(input);
+        const formatted = formatLocation(
+          parsed.addressLine1 || "",
+          parsed.city,
+          parsed.province,
+          parsed.region
+        );
         const { error } = await supabase
           .from("profiles")
           .update({
-            location: parsed.location,
+            region: parsed.region,
+            province: parsed.province,
+            city: parsed.city,
+            address_line_1: parsed.addressLine1 || null,
+            location: formatted || null,
             availability: parsed.availability,
             is_remote: parsed.isRemote,
             updated_at: now,

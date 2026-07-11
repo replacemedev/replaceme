@@ -11,6 +11,10 @@ export interface WorkerProfile {
   salary_currency: string | null;
   experience_years: number | null;
   location: string | null;
+  region?: string | null;
+  province?: string | null;
+  city?: string | null;
+  address_line_1?: string | null;
   availability: string | null;
   portfolio_url: string | null;
   resume_url: string | null;

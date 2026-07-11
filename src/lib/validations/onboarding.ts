@@ -21,7 +21,10 @@ export const workerIdentityStepSchema = z.object({
 });
 
 export const workerLocationStepSchema = z.object({
-  location: nonEmptyStringSchema.max(120, "Location cannot exceed 120 characters."),
+  region: nonEmptyStringSchema.max(100, "Region cannot exceed 100 characters."),
+  province: nonEmptyStringSchema.max(100, "Province cannot exceed 100 characters."),
+  city: nonEmptyStringSchema.max(100, "City/Municipality cannot exceed 100 characters."),
+  addressLine1: z.string().max(200, "Address Line 1 cannot exceed 200 characters.").optional(),
   availability: z.enum([
     "Full-time",
     "Part-time",

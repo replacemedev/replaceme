@@ -1857,6 +1857,10 @@ export type Database = {
           is_verified: boolean
           last_name: string | null
           location: string | null
+          region: string | null
+          province: string | null
+          city: string | null
+          address_line_1: string | null
           onboarding_completed_at: string | null
           phone_number: string | null
           portfolio_url: string | null
@@ -1896,6 +1900,10 @@ export type Database = {
           is_verified?: boolean
           last_name?: string | null
           location?: string | null
+          region?: string | null
+          province?: string | null
+          city?: string | null
+          address_line_1?: string | null
           onboarding_completed_at?: string | null
           phone_number?: string | null
           portfolio_url?: string | null
@@ -1935,6 +1943,10 @@ export type Database = {
           is_verified?: boolean
           last_name?: string | null
           location?: string | null
+          region?: string | null
+          province?: string | null
+          city?: string | null
+          address_line_1?: string | null
           onboarding_completed_at?: string | null
           phone_number?: string | null
           portfolio_url?: string | null

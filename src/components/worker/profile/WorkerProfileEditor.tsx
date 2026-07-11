@@ -23,6 +23,7 @@ import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profil
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
 import { calculateAge } from "@/utils/date";
+import { formatLocation } from "@/utils/locationFormatter";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperText } from "@/lib/storage/profile-image";
@@ -33,6 +34,7 @@ import { TestimonialCard } from "@/components/worker/profile/TestimonialCard";
 import { InlineEditableRow } from "@/components/worker/profile/inline/InlineEditableRow";
 import { RateAvailabilityModal } from "@/components/worker/profile/inline/RateAvailabilityModal";
 import { SkillsManageModal } from "@/components/worker/profile/inline/SkillsManageModal";
+import { LocationManageModal } from "@/components/worker/profile/inline/LocationManageModal";
 import { ProjectFormModal } from "@/components/worker/profile/inline/ProjectFormModal";
 import type {
   WorkerProfile,
@@ -66,6 +68,7 @@ export function WorkerProfileEditor({
   const [rateModalOpen, setRateModalOpen] = useState(false);
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<WorkerProject | null>(null);
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [bioEditing, setBioEditing] = useState(false);
@@ -132,7 +135,24 @@ export function WorkerProfileEditor({
         ? { professional_title: patch.professionalTitle }
         : {}),
       ...(patch.bio !== undefined ? { bio: patch.bio || null } : {}),
-      ...(patch.location !== undefined ? { location: patch.location || null } : {}),
+      ...(patch.region !== undefined ? { region: patch.region || null } : {}),
+      ...(patch.province !== undefined ? { province: patch.province || null } : {}),
+      ...(patch.city !== undefined ? { city: patch.city || null } : {}),
+      ...(patch.addressLine1 !== undefined ? { address_line_1: patch.addressLine1 || null } : {}),
+      ...((patch.region !== undefined ||
+      patch.province !== undefined ||
+      patch.city !== undefined ||
+      patch.addressLine1 !== undefined)
+        ? {
+            location:
+              formatLocation(
+                patch.addressLine1 !== undefined ? patch.addressLine1 : prev.address_line_1,
+                patch.city !== undefined ? patch.city : prev.city,
+                patch.province !== undefined ? patch.province : prev.province,
+                patch.region !== undefined ? patch.region : prev.region
+              ) || null,
+          }
+        : {}),
       ...(patch.portfolioUrl !== undefined
         ? { portfolio_url: patch.portfolioUrl || null }
         : {}),
@@ -512,12 +532,22 @@ export function WorkerProfileEditor({
             </button>
 
             <div className="space-y-3.5 pt-2 border-t border-slate-100 text-left text-xs font-bold text-slate-600">
-              <InlineEditableRow
-                label="Location"
-                value={profile.location ?? ""}
-                editable={isOwner}
-                onSave={(v) => saveProfileField({ location: v })}
-              />
+              <div className="flex justify-between items-center gap-3">
+                <span className="text-slate-400 shrink-0">Location</span>
+                <div className="flex items-center gap-1.5 text-slate-800 min-w-0 justify-end">
+                  <span className="truncate">{profile.location || "Not specified"}</span>
+                  {isOwner ? (
+                    <button
+                      type="button"
+                      onClick={() => setLocationModalOpen(true)}
+                      className="text-slate-300 hover:text-slate-500 shrink-0"
+                      aria-label="Edit Location"
+                    >
+                      <Edit size={12} />
+                    </button>
+                  ) : null}
+                </div>
+              </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400">Member Since</span>
                 <span className="text-slate-800">{memberSince}</span>
@@ -668,6 +698,26 @@ export function WorkerProfileEditor({
                 }
                 return [saved, ...prev];
               });
+            }}
+          />
+          <LocationManageModal
+            open={locationModalOpen}
+            onClose={() => setLocationModalOpen(false)}
+            initial={{
+              region: profile.region || "",
+              province: profile.province || "",
+              city: profile.city || "",
+              addressLine1: profile.address_line_1 || "",
+            }}
+            onSaved={(saved) => {
+              setProfile((prev) => ({
+                ...prev,
+                region: saved.region,
+                province: saved.province,
+                city: saved.city,
+                address_line_1: saved.addressLine1,
+                location: saved.location,
+              }));
             }}
           />
           <ConfirmDialog

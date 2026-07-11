@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { showErrorToast } from "@/utils/toast";
+import { usePhilippineLocations } from "@/hooks/usePhilippineLocations";
 import {
   finishWorkerOnboarding,
   saveWorkerOnboardingStep,
@@ -44,6 +45,7 @@ interface WorkerOnboardingWizardProps {
 export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { isLoading: isLocationsLoading, regions, getProvincesForRegion, getCitiesForProvince } = usePhilippineLocations();
   const [phase, setPhase] = useState<WizardPhase>("welcome");
 
   const [professionalTitle, setProfessionalTitle] = useState(
@@ -53,9 +55,10 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const middleName = draft.middleName;
   const lastName = draft.lastName;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
-  const [location, setLocation] = useState(
-    draft.location || WORKER_LOCATION_OPTIONS[0]
-  );
+  const [region, setRegion] = useState(draft.region || "");
+  const [province, setProvince] = useState(draft.province || "");
+  const [city, setCity] = useState(draft.city || "");
+  const [addressLine1, setAddressLine1] = useState(draft.addressLine1 || "");
   const [availability, setAvailability] = useState(draft.availability);
   const [isRemote, setIsRemote] = useState(draft.isRemote);
   const [skills, setSkills] = useState<string[]>(draft.skills);
@@ -213,10 +216,14 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         title="Where are you based?"
         description="Helps employers match you with remote-friendly roles."
         onBack={() => goBack("identity")}
+        isNextDisabled={!region || !province || !city}
         onNext={() => {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("location", {
-              location,
+              region,
+              province,
+              city,
+              addressLine1: addressLine1.trim() || undefined,
               availability,
               isRemote,
             });
@@ -228,34 +235,101 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Location
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className={ONBOARDING_SELECT_CLASS}
-          >
-            {WORKER_LOCATION_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Availability
-          <select
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value)}
-            className={ONBOARDING_SELECT_CLASS}
-          >
-            {AVAILABILITY_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="space-y-4">
+          {isLocationsLoading ? (
+            <div className="flex items-center gap-2 text-sm text-slate-500 font-medium py-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-600" />
+              Loading Philippine location data...
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label className="block space-y-2 text-sm font-medium text-slate-700">
+                Region *
+                <select
+                  value={region}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setRegion(val);
+                    setProvince("");
+                    setCity("");
+                  }}
+                  className={ONBOARDING_SELECT_CLASS}
+                >
+                  <option value="">Select Region</option>
+                  {regions.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block space-y-2 text-sm font-medium text-slate-700">
+                Province *
+                <select
+                  value={province}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setProvince(val);
+                    setCity("");
+                  }}
+                  disabled={!region}
+                  className={ONBOARDING_SELECT_CLASS}
+                >
+                  <option value="">Select Province</option>
+                  {getProvincesForRegion(region).map((p) => (
+                    <option key={p.key} value={p.name}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block space-y-2 text-sm font-medium text-slate-700">
+                City / Municipality *
+                <select
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  disabled={!province}
+                  className={ONBOARDING_SELECT_CLASS}
+                >
+                  <option value="">Select City / Municipality</option>
+                  {getCitiesForProvince(province).map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block space-y-2 text-sm font-medium text-slate-700 col-span-full">
+                Address Line 1 (Optional)
+                <input
+                  type="text"
+                  value={addressLine1}
+                  onChange={(e) => setAddressLine1(e.target.value)}
+                  placeholder="e.g. House No., Street, Barangay"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+                />
+              </label>
+            </div>
+          )}
+
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Availability
+            <select
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+              className={ONBOARDING_SELECT_CLASS}
+            >
+              {AVAILABILITY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"

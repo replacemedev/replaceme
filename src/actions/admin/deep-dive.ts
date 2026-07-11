@@ -239,6 +239,10 @@ export type AdminWorkerProfileDeepDive = {
   bio: string | null;
   birthDate: string | null;
   location: string | null;
+  region: string | null;
+  province: string | null;
+  city: string | null;
+  addressLine1: string | null;
   availability: string | null;
   isRemote: boolean | null;
   hourlyRate: number | null;
@@ -273,7 +277,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, last_name, email, professional_title, bio, birth_date, location, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
+            "id, first_name, last_name, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -302,6 +306,10 @@ export async function getAdminWorkerProfileDeepDive(
       bio: profile.bio,
       birthDate: profile.birth_date,
       location: profile.location,
+      region: profile.region,
+      province: profile.province,
+      city: profile.city,
+      addressLine1: profile.address_line_1,
       availability: profile.availability,
       isRemote: profile.is_remote,
       hourlyRate: profile.hourly_rate,

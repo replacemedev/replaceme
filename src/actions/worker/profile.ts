@@ -20,6 +20,7 @@ import {
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 import { safeError } from "@/utils/logger";
+import { formatLocation } from "@/utils/locationFormatter";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
   PROFILE_IMAGE_MAX_BYTES,
@@ -60,7 +61,29 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
     update.professional_title = data.professionalTitle;
   }
   if (data.bio !== undefined) update.bio = data.bio || null;
-  if (data.location !== undefined) update.location = data.location || null;
+  if (
+    data.region !== undefined ||
+    data.province !== undefined ||
+    data.city !== undefined ||
+    data.addressLine1 !== undefined
+  ) {
+    const { data: current } = await ctx.supabase
+      .from("profiles")
+      .select("region, province, city, address_line_1")
+      .eq("id", ctx.profile.id)
+      .single();
+
+    const r = data.region !== undefined ? data.region : (current?.region || "");
+    const p = data.province !== undefined ? data.province : (current?.province || "");
+    const c = data.city !== undefined ? data.city : (current?.city || "");
+    const a = data.addressLine1 !== undefined ? data.addressLine1 : (current?.address_line_1 || "");
+
+    update.region = r || null;
+    update.province = p || null;
+    update.city = c || null;
+    update.address_line_1 = a || null;
+    update.location = formatLocation(a, c, p, r) || null;
+  }
   if (data.portfolioUrl !== undefined) {
     update.portfolio_url = emptyToNull(data.portfolioUrl);
   }
