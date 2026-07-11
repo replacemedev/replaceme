@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
-import { getWorkerFinancials } from "@/lib/worker/earnings";
+import { getWorkerEarningsSummary } from "@/lib/worker/earnings";
 import { EarningsDashboardClient } from "@/components/worker/earnings/EarningsDashboardClient";
 
 export const metadata = {
@@ -14,7 +14,6 @@ interface PageProps {
   searchParams: Promise<{
     search?: string;
     range?: string;
-    status?: string;
     page?: string;
   }>;
 }
@@ -26,10 +25,8 @@ export default async function WorkerEarningsPage({ searchParams }: PageProps) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/signin");
 
-  // Await searchParams in Next.js 16.
   const resolvedParams = await searchParams;
 
-  // Retrieve the worker's profile currency (defaults to PHP)
   const { data: profile } = await supabase
     .from("profiles")
     .select("salary_currency")
@@ -38,26 +35,21 @@ export default async function WorkerEarningsPage({ searchParams }: PageProps) {
 
   const currency = profile?.salary_currency ?? "PHP";
 
-  // Fetch filtered and paginated financials data
-  const financials = await getWorkerFinancials(user.id, currency, {
+  const summary = await getWorkerEarningsSummary(user.id, currency, {
     search: resolvedParams.search,
     range: resolvedParams.range,
-    status: resolvedParams.status,
     page: resolvedParams.page ? Number(resolvedParams.page) : 1,
-    limit: 5, // 5 transactions per page for clean visual pagination
+    limit: 8,
   });
 
   return (
     <WorkerPageShell width="content">
       <WorkerPageHeader
         title="Earnings"
-        subhead="Track your financial metrics, contract payouts, and processing invoices."
+        subhead="Track your contracted work, agreed rates, and income history."
       />
-      
-      <EarningsDashboardClient
-        initialFinancials={financials}
-        profileCurrency={currency}
-      />
+
+      <EarningsDashboardClient summary={summary} profileCurrency={currency} />
     </WorkerPageShell>
   );
 }
