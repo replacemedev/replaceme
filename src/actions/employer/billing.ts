@@ -15,6 +15,8 @@ import { AccountSettings, SubscriptionTier } from "@/types/employer/billing";
 import { getEmployerPlanUsage as loadEmployerPlanUsage } from "@/lib/server/entitlements";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import type { EmployerInvoiceRow } from "@/lib/server/stripe/list-invoices";
+import { getSiteUrl } from "@/lib/auth/site-url";
+import { resolveBillingPlan, resolveStripePriceIdFromEnv } from "@/lib/server/stripe/plan";
 
 const PAID_TIERS = new Set<SubscriptionTier>(["starter", "growth", "scale"]);
 
@@ -158,26 +160,59 @@ export async function createUpgradeCheckout(planId: string) {
       );
     }
 
-    const change = await changeEmployerSubscription({
-      employerId: profile.id,
-      planRef: parsed.planId,
-    });
-
-    if ("error" in change) {
-      return fail(change.error);
+    const plan = await resolveBillingPlan(parsed.planId);
+    if (!plan) {
+      return fail("Billing plan not found.");
     }
 
-    if (change.mode === "upgraded" || change.mode === "downgrade_scheduled") {
-      revalidatePath("/employer/settings/account");
-      revalidatePath("/employer/pricing");
-      revalidatePath("/employer/dashboard");
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+
+    const { data: subscription } = await supabase
+      .from("employer_subscriptions")
+      .select("stripe_subscription_id, stripe_customer_id, status")
+      .eq("employer_id", profile.id)
+      .maybeSingle();
+
+    const subscriptionId = subscription?.stripe_subscription_id?.trim() || null;
+    const customerId = subscription?.stripe_customer_id?.trim() || null;
+    const status = subscription?.status || null;
+    const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
+    const hasActiveSub = subscriptionId && status && ACTIVE_STATUSES.has(status);
+
+    if (hasActiveSub) {
+      const stripe = getStripe()!;
+      const liveSub = await stripe.subscriptions.retrieve(subscriptionId);
+      const item = liveSub.items.data[0];
+      if (!item) {
+        return fail("No active subscription item found.");
+      }
+      const priceId = plan.stripe_price_id ?? resolveStripePriceIdFromEnv(plan.slug ?? "");
+      if (!priceId) {
+        return fail("Target plan is missing a Stripe price ID.");
+      }
+
+      const siteUrl = getSiteUrl();
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId!,
+        return_url: `${siteUrl}/employer/settings/account`,
+        flow_data: {
+          type: "subscription_update_confirm",
+          subscription_update_confirm: {
+            subscription: subscriptionId,
+            items: [
+              {
+                id: item.id,
+                price: priceId,
+              },
+            ],
+          },
+        },
+      });
+
       return ok<UpgradeCheckoutData>({
-        upgraded: change.mode === "upgraded",
-        downgradeScheduled: change.mode === "downgrade_scheduled",
-        planSlug: change.planSlug,
-        message: change.message,
-        effectiveAt:
-          change.mode === "downgrade_scheduled" ? change.effectiveAt : undefined,
+        upgraded: false,
+        checkoutUrl: portalSession.url,
       });
     }
 
@@ -261,68 +296,48 @@ export async function createCustomerPortalSession() {
 
 export async function cancelSubscription() {
   const result = await runAction("cancelSubscription", async () => {
-    safeLog("[Billing] Cancel subscription initiated");
+    safeLog("[Billing] Cancel subscription portal session initiated");
     const { profile } = await requireRole("employer");
     const admin = await createAdminClient();
 
     const { data: subscription } = await admin
       .from("employer_subscriptions")
       .select(
-        "stripe_subscription_id, plan_slug, billing_period_end, current_period_end"
+        "stripe_subscription_id, stripe_customer_id, plan_slug"
       )
       .eq("employer_id", profile.id)
       .maybeSingle();
 
+    const subscriptionId = subscription?.stripe_subscription_id?.trim() || null;
+    const customerId = subscription?.stripe_customer_id?.trim() || null;
     const planSlug = normalizePlanSlug(subscription?.plan_slug, null);
-    if (!PAID_TIERS.has(planSlug)) {
+
+    if (!PAID_TIERS.has(planSlug) || !subscriptionId || !customerId) {
       return fail("No active paid subscription to cancel.");
     }
 
     const stripe = getStripe();
-    if (stripe && subscription?.stripe_subscription_id) {
-      const sub = await stripe.subscriptions.retrieve(
-        subscription.stripe_subscription_id
-      );
-      if (sub.schedule) {
-        const scheduleId =
-          typeof sub.schedule === "string" ? sub.schedule : sub.schedule.id;
-        try {
-          await stripe.subscriptionSchedules.release(scheduleId);
-        } catch {
-          /* schedule may already be released */
-        }
-      }
-      await stripe.subscriptions.update(subscription.stripe_subscription_id, {
-        cancel_at_period_end: true,
-      });
+    if (!stripe) {
+      return fail("Stripe is not configured.");
     }
 
-    const periodEnd =
-      subscription?.billing_period_end ?? subscription?.current_period_end ?? null;
-
-    const { error: cancelError } = await admin
-      .from("employer_subscriptions")
-      .update({
-        cancel_at_period_end: true,
-        scheduled_plan_slug: "discovery",
-        scheduled_effective_at: periodEnd,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("employer_id", profile.id);
-
-    if (cancelError) {
-      return fail("Failed to cancel subscription in database.");
-    }
-
-    revalidatePath("/employer/settings/account");
-    return ok({
-      message:
-        "Your subscription will cancel at the end of the current billing period.",
+    const siteUrl = getSiteUrl();
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${siteUrl}/employer/settings/account`,
+      flow_data: {
+        type: "subscription_cancel",
+        subscription_cancel: {
+          subscription: subscriptionId,
+        },
+      },
     });
+
+    return ok({ portalUrl: session.url });
   });
 
   if (!result.success) return { error: result.error };
-  return { success: true as const, message: result.data?.message };
+  return { success: true as const, portalUrl: result.data?.portalUrl };
 }
 
 export async function listEmployerInvoices() {

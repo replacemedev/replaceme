@@ -102,17 +102,18 @@ export function AccountSettingsClient({
 
   const handleCancel = () => {
     startCancelTransition(async () => {
-      const toastId = toast.loading("Scheduling move to Discovery...");
+      const toastId = toast.loading("Opening billing portal...");
       try {
         const result = await cancelSubscription();
         if (result.error) {
           toast.error(result.error, { id: toastId });
-        } else if (result.success) {
-          toast.success(result.message || "Cancellation scheduled.", {
+        } else if (result.success && result.portalUrl) {
+          toast.success("Redirecting to Stripe...", { id: toastId });
+          window.location.href = result.portalUrl;
+        } else {
+          toast.error("Unexpected billing response. Please try again.", {
             id: toastId,
           });
-          setIsDowngradeModalOpen(false);
-          router.refresh();
         }
       } catch {
         toast.error("Failed to cancel subscription. Please try again.", {

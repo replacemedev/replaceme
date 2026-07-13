@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SubscriptionTier } from "@/types/employer/billing";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import {
   isCurrentTier,
   isHigherTier,
@@ -162,12 +162,19 @@ export function ManagePlanGrid({
                     type="button"
                     disabled={isUpgrading}
                     onClick={() => onUpgrade(plan.slug)}
-                    className={`w-full min-h-[44px] py-2 px-4 rounded-lg text-sm font-medium transition-colors mt-4 disabled:opacity-50 ${plan.highlight
+                    className={`w-full min-h-[44px] py-2 px-4 rounded-lg text-sm font-medium transition-colors mt-4 disabled:opacity-50 flex items-center justify-center gap-2 ${plan.highlight
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
                         : "bg-[#006e2f] hover:bg-[#005c26] text-white shadow-sm"
                       }`}
                   >
-                    {isUpgrading ? "Redirecting..." : "Upgrade"}
+                    {isUpgrading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Redirecting to Stripe...
+                      </>
+                    ) : (
+                      "Upgrade"
+                    )}
                   </button>
                 ) : isDowngrade ? (
                   <div className="mt-4 space-y-2">
@@ -179,13 +186,18 @@ export function ManagePlanGrid({
                           scheduledPlan === plan.slug
                         }
                         onClick={() => onUpgrade(plan.slug)}
-                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                       >
-                        {scheduledPlan === plan.slug
-                          ? "Scheduled"
-                          : isUpgrading
-                            ? "Scheduling..."
-                            : "Schedule downgrade"}
+                        {scheduledPlan === plan.slug ? (
+                          "Scheduled"
+                        ) : isUpgrading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Redirecting to Stripe...
+                          </>
+                        ) : (
+                          "Schedule downgrade"
+                        )}
                       </button>
                     ) : (
                       <button
@@ -200,13 +212,18 @@ export function ManagePlanGrid({
                             ? onCancelToDiscovery()
                             : onManageBilling()
                         }
-                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50"
+                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                       >
-                        {cancelAtPeriodEnd || scheduledPlan === "discovery"
-                          ? "Scheduled"
-                          : isCancelling
-                            ? "Scheduling..."
-                            : "Move to Discovery"}
+                        {cancelAtPeriodEnd || scheduledPlan === "discovery" ? (
+                          "Scheduled"
+                        ) : isCancelling ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Redirecting to Stripe...
+                          </>
+                        ) : (
+                          "Move to Discovery"
+                        )}
                       </button>
                     )}
                     <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">

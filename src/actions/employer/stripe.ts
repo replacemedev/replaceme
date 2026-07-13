@@ -9,6 +9,8 @@ import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription"
 import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
 import { safeError, safeLog } from "@/utils/logger";
 import { formatFullName } from "@/lib/format/name";
+import { getSiteUrl } from "@/lib/auth/site-url";
+import { resolveStripePriceIdFromEnv } from "@/lib/server/stripe/plan";
 
 export type StripeCheckoutResult = {
   /** True when an existing Stripe subscription was updated in place (no Checkout). */
@@ -59,27 +61,53 @@ export async function createStripeCheckoutSession(
       };
     }
 
-    const change = await changeEmployerSubscription({
-      employerId: profile.id,
-      planRef: parsed.planId,
-    });
+    const { data: subscription } = await supabase
+      .from("employer_subscriptions")
+      .select("stripe_subscription_id, stripe_customer_id, status")
+      .eq("employer_id", profile.id)
+      .maybeSingle();
 
-    if ("error" in change) {
-      return { error: change.error };
-    }
+    const subscriptionId = subscription?.stripe_subscription_id?.trim() || null;
+    const customerId = subscription?.stripe_customer_id?.trim() || null;
+    const status = subscription?.status || null;
+    const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
+    const hasActiveSub = subscriptionId && status && ACTIVE_STATUSES.has(status);
 
-    if (change.mode === "upgraded" || change.mode === "downgrade_scheduled") {
-      revalidatePath("/employer/settings/account");
-      revalidatePath("/employer/pricing");
-      revalidatePath("/employer/dashboard");
-      revalidatePath(`/employer/checkout/${parsed.planId}`);
+    if (hasActiveSub) {
+      const stripe = getStripe()!;
+      const liveSub = await stripe.subscriptions.retrieve(subscriptionId);
+      const item = liveSub.items.data[0];
+      if (!item) {
+        return { error: "No active subscription item found." };
+      }
+      const priceId = plan.stripe_price_id ?? resolveStripePriceIdFromEnv(plan.slug ?? "");
+      if (!priceId) {
+        return { error: "Target plan is missing a Stripe price ID." };
+      }
+
+      const siteUrl = getSiteUrl();
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId!,
+        return_url: `${siteUrl}/employer/settings/account`,
+        flow_data: {
+          type: "subscription_update_confirm",
+          subscription_update_confirm: {
+            subscription: subscriptionId,
+            items: [
+              {
+                id: item.id,
+                price: priceId,
+              },
+            ],
+          },
+        },
+      });
+
       return {
-        upgraded: change.mode === "upgraded",
-        downgradeScheduled: change.mode === "downgrade_scheduled",
+        upgraded: false,
+        checkoutUrl: portalSession.url,
         planName: plan.name,
         planPrice: Number(plan.price),
-        planSlug: change.planSlug,
-        message: change.message,
       };
     }
 
