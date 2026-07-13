@@ -242,13 +242,21 @@ export function ApplicationForm({
           >
             Application Subject *
           </label>
-          <Input
-            id="applicationSubject"
-            placeholder="e.g. Experienced Thumbnail Designer Application"
-            error={errors.applicationSubject?.message}
-            aria-invalid={Boolean(errors.applicationSubject)}
-            {...register("applicationSubject")}
-          />
+          <div className="flex flex-col w-full">
+            <Input
+              id="applicationSubject"
+              placeholder="e.g. Experienced Thumbnail Designer Application"
+              error={errors.applicationSubject?.message}
+              showErrorMessage={false}
+              aria-invalid={Boolean(errors.applicationSubject)}
+              {...register("applicationSubject")}
+            />
+            {errors.applicationSubject && (
+              <span className="text-xs text-red-500 mt-1 block">
+                {errors.applicationSubject.message}
+              </span>
+            )}
+          </div>
         </fieldset>
 
         <fieldset className="space-y-2">
@@ -258,23 +266,25 @@ export function ApplicationForm({
           >
             Cover Letter / Message *
           </label>
-          <textarea
-            id="coverLetter"
-            rows={6}
-            placeholder="Tell us why you're a great fit..."
-            className={`w-full rounded-xl border ${
-              errors.coverLetter
-                ? "border-red-500 focus:ring-red-500"
-                : "border-slate-200 focus:ring-[#22c55e]"
-            } bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 resize-y min-h-[140px]`}
-            aria-invalid={Boolean(errors.coverLetter)}
-            {...register("coverLetter")}
-          />
-          {errors.coverLetter && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.coverLetter.message}
-            </p>
-          )}
+          <div className="flex flex-col w-full">
+            <textarea
+              id="coverLetter"
+              rows={6}
+              placeholder="Tell us why you're a great fit..."
+              className={`w-full rounded-xl border ${
+                errors.coverLetter
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-slate-200 focus:ring-[#22c55e]"
+              } bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 resize-y min-h-[140px]`}
+              aria-invalid={Boolean(errors.coverLetter)}
+              {...register("coverLetter")}
+            />
+            {errors.coverLetter && (
+              <span className="text-xs text-red-500 mt-1 block">
+                {errors.coverLetter.message}
+              </span>
+            )}
+          </div>
         </fieldset>
 
         <fieldset className="space-y-3">
@@ -336,9 +346,9 @@ export function ApplicationForm({
                   key={field.id}
                   className={`flex ${
                     isOther ? "flex-col md:flex-row" : "flex-col sm:flex-row"
-                  } gap-2 md:gap-3 items-stretch md:items-start`}
+                  } gap-2 md:gap-3 items-stretch md:items-start w-full`}
                 >
-                  <div className={`flex flex-col ${isOther ? "w-full md:w-1/3" : "w-full sm:w-36"} shrink-0 gap-2`}>
+                  <div className={`flex flex-col ${isOther ? "w-full md:w-1/4" : "w-full sm:w-36"} shrink-0 gap-2`}>
                     <select
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#22c55e] cursor-pointer"
                       {...register(`contactMethods.${index}.type`)}
@@ -349,19 +359,27 @@ export function ApplicationForm({
                     </select>
 
                     {isOther && (
-                      <Input
-                        placeholder="e.g., WhatsApp, Telegram"
-                        error={errors.contactMethods?.[index]?.customType?.message}
-                        aria-invalid={Boolean(
-                          errors.contactMethods?.[index]?.customType
+                      <div className="flex flex-col w-full">
+                        <Input
+                          placeholder="e.g., WhatsApp, Telegram"
+                          error={errors.contactMethods?.[index]?.customType?.message}
+                          showErrorMessage={false}
+                          aria-invalid={Boolean(
+                            errors.contactMethods?.[index]?.customType
+                          )}
+                          {...register(`contactMethods.${index}.customType`)}
+                        />
+                        {errors.contactMethods?.[index]?.customType?.message && (
+                          <span className="text-xs text-red-500 mt-1 block">
+                            {errors.contactMethods[index].customType.message}
+                          </span>
                         )}
-                        {...register(`contactMethods.${index}.customType`)}
-                      />
+                      </div>
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0 flex items-start gap-2 md:gap-3">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex items-start gap-2 md:gap-3 w-full">
+                    <div className="flex flex-col flex-1 min-w-0">
                       <Input
                         placeholder={
                           currentType === "phone"
@@ -371,11 +389,17 @@ export function ApplicationForm({
                             : "Contact value"
                         }
                         error={errors.contactMethods?.[index]?.value?.message}
+                        showErrorMessage={false}
                         aria-invalid={Boolean(
                           errors.contactMethods?.[index]?.value
                         )}
                         {...register(`contactMethods.${index}.value`)}
                       />
+                      {errors.contactMethods?.[index]?.value?.message && (
+                        <span className="text-xs text-red-500 mt-1 block">
+                          {errors.contactMethods[index].value.message}
+                        </span>
+                      )}
                     </div>
 
                     <button
