@@ -34,6 +34,7 @@ import {
 import {
   requireTurnstileToken,
   isTurnstileEnabled,
+  shouldDeferTurnstileToSupabase,
 } from "@/lib/turnstile/verify";
 import { isRedisInfrastructureError, REDIS_UNAVAILABLE_ERROR } from "@/lib/server/redis";
 import {
@@ -45,7 +46,8 @@ import {
 function captchaAuthOptions(
   token: string
 ): { captchaToken: string } | Record<string, never> {
-  if (!isTurnstileEnabled()) return {};
+  if (!isTurnstileEnabled() || !shouldDeferTurnstileToSupabase()) return {};
+  if (!token.trim()) return {};
   return { captchaToken: token };
 }
 
@@ -395,7 +397,22 @@ export async function signIn(formData: LoginCredentials) {
         error.message.toLowerCase().includes("captcha") ||
         error.message.toLowerCase().includes("turnstile")
       ) {
-        safeError("[Auth] signIn captcha rejected:", error.message);
+        const captchaMode = shouldDeferTurnstileToSupabase()
+          ? "supabase_only"
+          : "app_siteverify";
+        safeError("[Auth] signIn captcha rejected", {
+          supabaseMessage: error.message,
+          status: error.status,
+          captchaMode,
+          turnstileWidgetEnabled: isTurnstileEnabled(),
+          captchaTokenForwarded: Boolean(turnstile.token?.trim()),
+          hint:
+            error.message.includes("timeout-or-duplicate")
+              ? "Turnstile token was reused — deploy latest code (single verifier) or complete a fresh widget challenge"
+              : error.message.includes("invalid")
+                ? "Verify Supabase Auth → CAPTCHA secret matches TURNSTILE_SECRET_KEY and Cloudflare widget hostnames include this domain"
+                : undefined,
+        });
         return {
           success: false,
           error: "Security check failed. Please complete it again and retry.",
