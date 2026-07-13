@@ -1,6 +1,11 @@
 import { headers } from "next/headers";
 import { Ratelimit } from "@upstash/ratelimit";
-import { getRedis, isRedisConfigured } from "@/lib/server/redis";
+import {
+  getRedis,
+  isRedisConfigured,
+  REDIS_UNAVAILABLE_ERROR,
+  runRedis,
+} from "@/lib/server/redis";
 
 export type RateLimitResult =
   | { success: true }
@@ -14,8 +19,7 @@ type AssertRateLimitOptions = {
 
 const limiterCache = new Map<string, Ratelimit>();
 
-const REDIS_REQUIRED_ERROR =
-  "Security controls unavailable. Please try again later.";
+const REDIS_REQUIRED_ERROR = REDIS_UNAVAILABLE_ERROR;
 
 function mustEnforceRateLimit(): boolean {
   return (
@@ -103,7 +107,19 @@ export async function assertRateLimit(
   }
 
   const identifier = await resolveIdentifier(options.identifier);
-  const { success, reset } = await limiter.limit(identifier);
+  const result = await runRedis(
+    () => limiter.limit(identifier),
+    null as { success: boolean; reset: number } | null
+  );
+
+  if (!result) {
+    if (mustEnforceRateLimit()) {
+      return { ok: false, error: REDIS_REQUIRED_ERROR };
+    }
+    return { ok: true };
+  }
+
+  const { success, reset } = result;
   if (success) {
     return { ok: true };
   }
@@ -135,7 +151,19 @@ async function limitedOrFailOpen(
     return { success: true };
   }
 
-  const { success, reset } = await limiter.limit(key);
+  const result = await runRedis(
+    () => limiter.limit(key),
+    null as { success: boolean; reset: number } | null
+  );
+
+  if (!result) {
+    if (mustEnforceRateLimit()) {
+      return { success: false, error: REDIS_REQUIRED_ERROR };
+    }
+    return { success: true };
+  }
+
+  const { success, reset } = result;
   if (success) return { success: true };
 
   const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));

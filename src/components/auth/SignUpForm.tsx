@@ -120,13 +120,16 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
         const errMsg = result.error;
         if (errMsg === "auth/username-already-exists") {
           toast.error("Username taken.");
+          resetCaptcha();
           return;
         }
         if (errMsg === "auth/email-already-exists") {
           toast.error("Email already registered.");
+          resetCaptcha();
           return;
         }
         toast.error(formatSignUpError(errMsg));
+        resetCaptcha();
         return;
       }
 
@@ -146,7 +149,6 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
         throw error;
       }
       toast.error("Error occurred. Please retry.");
-    } finally {
       resetCaptcha();
     }
   };

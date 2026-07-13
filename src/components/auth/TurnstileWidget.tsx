@@ -4,7 +4,7 @@ import {
   Turnstile,
   type TurnstileInstance,
 } from "@marsidev/react-turnstile";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -31,6 +31,8 @@ export const TurnstileWidget = forwardRef<
   forwardedRef
 ) {
   const ref = useRef<TurnstileInstance>(null);
+  const callbacksRef = useRef({ onToken, onExpire, onError });
+  callbacksRef.current = { onToken, onExpire, onError };
 
   useImperativeHandle(forwardedRef, () => ({
     reset: () => {
@@ -38,31 +40,31 @@ export const TurnstileWidget = forwardRef<
     },
   }));
 
+  const options = useMemo(
+    () => ({
+      theme: "light" as const,
+      size: "normal" as const,
+      refreshExpired: "auto" as const,
+    }),
+    []
+  );
+
   if (!SITE_KEY?.trim()) return null;
 
   return (
     <div
       className={
         className ??
-        "flex w-full max-w-full justify-center overflow-x-auto origin-left scale-[0.92] sm:scale-100"
+        "flex min-h-[65px] w-full items-center justify-center overflow-hidden"
       }
     >
       <Turnstile
         ref={ref}
         siteKey={SITE_KEY}
-        onSuccess={onToken}
-        onExpire={() => {
-          onExpire?.();
-          ref.current?.reset();
-        }}
-        onError={() => {
-          onError?.();
-          ref.current?.reset();
-        }}
-        options={{
-          theme: "light",
-          size: "flexible",
-        }}
+        onSuccess={(token) => callbacksRef.current.onToken(token)}
+        onExpire={() => callbacksRef.current.onExpire?.()}
+        onError={() => callbacksRef.current.onError?.()}
+        options={options}
       />
     </div>
   );

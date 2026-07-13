@@ -35,6 +35,7 @@ import {
   requireTurnstileToken,
   isTurnstileEnabled,
 } from "@/lib/turnstile/verify";
+import { isRedisInfrastructureError, REDIS_UNAVAILABLE_ERROR } from "@/lib/server/redis";
 import {
   clearLoginFailures,
   isLoginLocked,
@@ -317,6 +318,21 @@ export async function signUp(formData: SignUpFormValues) {
 const GENERIC_LOGIN_ERROR =
   "Invalid email, username, or password. Please try again.";
 
+function isNextRedirectError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  return (
+    "digest" in error &&
+    String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+  );
+}
+
+function mapSignInInfrastructureError(error: unknown): string | null {
+  if (isRedisInfrastructureError(error)) {
+    return REDIS_UNAVAILABLE_ERROR;
+  }
+  return null;
+}
+
 export async function signIn(formData: LoginCredentials) {
   try {
     safeLog("[Auth] Sign-in initiated");
@@ -375,6 +391,17 @@ export async function signIn(formData: LoginCredentials) {
             "Please confirm your email address before logging in. A confirmation link was sent to your email.",
         };
       }
+      if (
+        error.message.toLowerCase().includes("captcha") ||
+        error.message.toLowerCase().includes("turnstile")
+      ) {
+        safeError("[Auth] signIn captcha rejected:", error.message);
+        return {
+          success: false,
+          error: "Security check failed. Please complete it again and retry.",
+        };
+      }
+      safeError("[Auth] signInWithPassword failed:", error.message);
       await recordLoginFailure(emailKey);
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
@@ -433,16 +460,15 @@ export async function signIn(formData: LoginCredentials) {
     revalidatePath("/", "layout");
     redirect(`${redirectUrl}${separator}${welcomeQuery.toString()}`);
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "digest" in error &&
-      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-    ) {
+    if (isNextRedirectError(error)) {
       throw error;
     }
+    const infrastructureError = mapSignInInfrastructureError(error);
     safeError("signIn error:", error);
-    return { success: false, error: GENERIC_LOGIN_ERROR };
+    return {
+      success: false,
+      error: infrastructureError ?? GENERIC_LOGIN_ERROR,
+    };
   }
 }
 

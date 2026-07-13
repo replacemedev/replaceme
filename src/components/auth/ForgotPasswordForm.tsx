@@ -55,13 +55,15 @@ export function ForgotPasswordForm() {
 
       if (!result.success) {
         toast.error(result.error ?? "Failed to send link.");
+        resetCaptcha();
         return;
       }
 
       setSentToEmail(data.email.trim());
       setEmailSent(true);
       toast.success(result.message);
-    } finally {
+    } catch {
+      toast.error("Error occurred. Please retry.");
       resetCaptcha();
     }
   };

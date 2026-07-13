@@ -1,4 +1,4 @@
-import { getRedis, isRedisConfigured } from "@/lib/server/redis";
+import { getRedis, isRedisConfigured, runRedis } from "@/lib/server/redis";
 import {
   LOCKOUT_COUNTER_TTL_SECONDS,
   failuresKey,
@@ -32,7 +32,10 @@ export async function isLoginLocked(accountKey: string): Promise<boolean> {
   const redis = getRedis();
 
   if (redis) {
-    const until = await redis.get<number | string>(lockedUntilKey(key));
+    const until = await runRedis(
+      () => redis.get<number | string>(lockedUntilKey(key)),
+      null
+    );
     if (until == null) return false;
     const untilMs = typeof until === "number" ? until : Number(until);
     return Number.isFinite(untilMs) && untilMs > Date.now();
@@ -53,16 +56,20 @@ export async function recordLoginFailure(accountKey: string): Promise<void> {
   const redis = getRedis();
 
   if (redis) {
-    const failKey = failuresKey(key);
-    const failures = await redis.incr(failKey);
-    if (failures === 1) {
-      await redis.expire(failKey, LOCKOUT_COUNTER_TTL_SECONDS);
-    }
-    const lockSeconds = lockoutSecondsForFailures(failures);
-    if (lockSeconds > 0) {
-      const until = Date.now() + lockSeconds * 1000;
-      await redis.set(lockedUntilKey(key), until, { ex: lockSeconds });
-    }
+    const failures = await runRedis(async () => {
+      const failKey = failuresKey(key);
+      const count = await redis.incr(failKey);
+      if (count === 1) {
+        await redis.expire(failKey, LOCKOUT_COUNTER_TTL_SECONDS);
+      }
+      const lockSeconds = lockoutSecondsForFailures(count);
+      if (lockSeconds > 0) {
+        const until = Date.now() + lockSeconds * 1000;
+        await redis.set(lockedUntilKey(key), until, { ex: lockSeconds });
+      }
+      return count;
+    }, null);
+    if (failures == null) return;
     return;
   }
 
@@ -84,7 +91,10 @@ export async function clearLoginFailures(accountKey: string): Promise<void> {
   const redis = getRedis();
 
   if (redis) {
-    await redis.del(failuresKey(key), lockedUntilKey(key));
+    await runRedis(
+      () => redis.del(failuresKey(key), lockedUntilKey(key)),
+      null
+    );
     return;
   }
 

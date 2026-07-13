@@ -75,6 +75,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
 
       if (result && !result.success) {
         toast.error(result.error ?? "Invalid credentials.");
+        resetCaptcha();
       } else if (data.rememberMe) {
         localStorage.setItem("remember_email", data.email);
       } else {
@@ -90,8 +91,8 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
         throw error;
       }
       toast.error("Error occurred. Please retry.");
-    } finally {
       resetCaptcha();
+    } finally {
       setIsLoading(false);
     }
   };
