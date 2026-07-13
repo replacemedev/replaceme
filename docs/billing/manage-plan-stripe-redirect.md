@@ -36,6 +36,8 @@ Customer Portal (test + live):
 3. Optionally configure **Manage downgrades** (immediate vs period end)
 4. Enable **Cancel subscription** for Discovery path
 
+Runtime helper `ensurePortalPlanChangeConfiguration()` will enable `subscription_update` and attach paid products if the default portal config is missing them.
+
 Docs: https://docs.stripe.com/customer-management/portal-deep-links
 
 ## Security

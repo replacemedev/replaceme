@@ -3,6 +3,7 @@ import { getSiteUrl } from "@/lib/auth/site-url";
 import { requireStripe } from "@/lib/server/stripe/client";
 import { ensureStripeCustomer } from "@/lib/server/stripe/ensure-customer";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
+import { ensurePortalPlanChangeConfiguration } from "@/lib/server/stripe/ensure-portal-plan-change";
 import {
   resolveBillingPlan,
   resolveStripePriceIdFromEnv,
@@ -183,11 +184,18 @@ async function createPortalUpdateConfirmSession(input: {
     };
   }
 
+  const portalConfig = await ensurePortalPlanChangeConfiguration();
+  if ("error" in portalConfig) {
+    return { error: portalConfig.error };
+  }
+
   try {
     // Deep link into confirm screen — customer must explicitly confirm on Stripe.
+    // Requires portal features.subscription_update.enabled + product catalog.
     // @see https://docs.stripe.com/customer-management/portal-deep-links
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId!,
+      configuration: portalConfig.configurationId,
       return_url: returnUrl,
       flow_data: {
         type: "subscription_update_confirm",
@@ -227,11 +235,10 @@ async function createPortalUpdateConfirmSession(input: {
       err && typeof err === "object" && "message" in err
         ? String((err as { message?: string }).message)
         : "";
-    // Portal "subscription update" must be enabled in Stripe Dashboard.
-    if (/flow_data|subscription_update|not enabled|invalid/i.test(message)) {
+    if (/subscription update feature|portal configuration is disabled/i.test(message)) {
       return {
         error:
-          "Stripe Customer Portal plan switching is not enabled. In Stripe Dashboard → Settings → Billing → Customer portal, enable subscription updates, then try again.",
+          "Stripe Customer Portal plan switching is still disabled. Open Stripe Dashboard → Settings → Billing → Customer portal, enable Switch plan, then retry.",
       };
     }
     return {
