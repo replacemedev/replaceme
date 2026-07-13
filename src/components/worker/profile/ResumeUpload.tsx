@@ -114,14 +114,14 @@ export function ResumeUpload({
   return (
     <div className="w-full">
       {resumeUrl ? (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200/80 rounded-2xl w-full overflow-hidden">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl w-full">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
               <FileText className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-slate-800 truncate">Uploaded Resume</p>
-              <p className="text-[10px] font-medium text-slate-400">PDF Document</p>
+              <p className="text-sm font-semibold text-slate-900 truncate block">Uploaded Resume</p>
+              <p className="text-xs text-slate-500 truncate block">PDF Document</p>
             </div>
           </div>
 
