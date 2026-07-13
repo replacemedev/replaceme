@@ -18,7 +18,7 @@ import {
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
 
-const CONTENT_STEPS = 3;
+const CONTENT_STEPS = 4;
 
 const INDUSTRIES = [
   "Technology",
@@ -29,7 +29,7 @@ const INDUSTRIES = [
   "Other",
 ] as const;
 
-type WizardPhase = "welcome" | "company" | "hiring" | "details";
+type WizardPhase = "welcome" | "company" | "hiring" | "details" | "personal";
 
 interface EmployerOnboardingWizardProps {
   draft: EmployerOnboardingDraft;
@@ -48,11 +48,27 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
   const [companyBio, setCompanyBio] = useState(draft.companyBio);
   const [logoUrl, setLogoUrl] = useState<string | null>(draft.logoUrl);
 
+  // Employer Personal KYC State
+  const [birthDate, setBirthDate] = useState(draft.birthDate || "");
+  const [gender, setGender] = useState(draft.gender || "");
+  const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
+  const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
+  const [tinNumber, setTinNumber] = useState(draft.tinNumber || "");
+  const [idType, setIdType] = useState(draft.idType || "");
+  const [idNumber, setIdNumber] = useState(draft.idNumber || "");
+  const [idExpirationDate, setIdExpirationDate] = useState(draft.idExpirationDate || "");
+  const [idIssuingCountry, setIdIssuingCountry] = useState(draft.idIssuingCountry || "");
+  const [personalAddress, setPersonalAddress] = useState(draft.personalAddress || "");
+  const [personalCity, setPersonalCity] = useState(draft.personalCity || "");
+  const [personalStateProvince, setPersonalStateProvince] = useState(draft.personalStateProvince || "");
+  const [country, setCountry] = useState(draft.country || "");
+
   const stepIndex: Record<WizardPhase, number> = {
     welcome: 0,
     company: 1,
     hiring: 2,
     details: 3,
+    personal: 4,
   };
 
   const finish = async () => {
@@ -211,25 +227,93 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
     );
   }
 
+  if (phase === "details") {
+    return (
+      <OnboardingWizardShell
+        {...shellProps}
+        stepLabel="Details"
+        title="Polish your company page"
+        description="Optional links and bio — you can update these anytime in settings."
+        onBack={() => setPhase("hiring")}
+        canSkip
+        onSkip={() => setPhase("personal")}
+        onNext={() => {
+          startTransition(async () => {
+            const result = await saveEmployerOnboardingStep("details", {
+              websiteUrl: websiteUrl.trim(),
+              companyBio: companyBio.trim() || undefined,
+            });
+            if (!result.success) {
+              toast.error(result.error);
+              return;
+            }
+            setPhase("personal");
+          });
+        }}
+      >
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Website (optional)
+          <input
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            placeholder="https://"
+          />
+        </label>
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Company bio (optional)
+          <textarea
+            value={companyBio}
+            onChange={(e) => setCompanyBio(e.target.value)}
+            rows={3}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+          />
+        </label>
+      </OnboardingWizardShell>
+    );
+  }
+
+  const isPersonalNextDisabled =
+    !birthDate ||
+    !gender ||
+    !civilStatus ||
+    !phoneNumber.trim() ||
+    !tinNumber.trim() ||
+    !idType ||
+    !idNumber.trim() ||
+    !idExpirationDate ||
+    !idIssuingCountry.trim() ||
+    !personalAddress.trim() ||
+    !personalCity.trim() ||
+    !personalStateProvince.trim() ||
+    !country.trim();
+
   return (
     <OnboardingWizardShell
       {...shellProps}
-      stepLabel="Details"
-      title="Polish your company page"
-      description="Optional links and bio — you can update these anytime in settings."
-      onBack={() => setPhase("hiring")}
-      canSkip
-      nextLabel="Go to dashboard"
-      onSkip={() => {
-        startTransition(async () => {
-          await finish();
-        });
-      }}
+      stepLabel="Personal details"
+      title="Personal & KYC Verification"
+      description="Tell us about yourself to complete your profile verification."
+      onBack={() => setPhase("details")}
+      nextLabel="Complete Onboarding"
+      isNextDisabled={isPersonalNextDisabled}
       onNext={() => {
         startTransition(async () => {
-          const result = await saveEmployerOnboardingStep("details", {
-            websiteUrl: websiteUrl.trim(),
-            companyBio: companyBio.trim() || undefined,
+          const result = await saveEmployerOnboardingStep("personal", {
+            birthDate,
+            gender,
+            civilStatus,
+            phoneNumber: phoneNumber.trim(),
+            tinNumber: tinNumber.trim(),
+            idType,
+            idNumber: idNumber.trim(),
+            idExpirationDate,
+            idIssuingCountry: idIssuingCountry.trim(),
+            personalAddress: personalAddress.trim(),
+            personalCity: personalCity.trim(),
+            personalStateProvince: personalStateProvince.trim(),
+            country: country.trim(),
           });
           if (!result.success) {
             toast.error(result.error);
@@ -239,25 +323,181 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
         });
       }}
     >
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Website (optional)
-        <input
-          type="url"
-          value={websiteUrl}
-          onChange={(e) => setWebsiteUrl(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-          placeholder="https://"
-        />
-      </label>
-      <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Company bio (optional)
-        <textarea
-          value={companyBio}
-          onChange={(e) => setCompanyBio(e.target.value)}
-          rows={3}
-          className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-        />
-      </label>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Birth Date
+            <input
+              type="date"
+              required
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            />
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Gender
+            <select
+              required
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className={ONBOARDING_SELECT_CLASS}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Civil Status
+            <select
+              required
+              value={civilStatus}
+              onChange={(e) => setCivilStatus(e.target.value)}
+              className={ONBOARDING_SELECT_CLASS}
+            >
+              <option value="">Select Status</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Phone Number
+            <input
+              type="tel"
+              required
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+1 234 567 8900"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            />
+          </label>
+        </div>
+
+        <div className="border-t border-slate-100 pt-4 space-y-4">
+          <h3 className="text-sm font-bold text-slate-900">Personal Address (Manual Input)</h3>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Address Line
+            <input
+              type="text"
+              required
+              value={personalAddress}
+              onChange={(e) => setPersonalAddress(e.target.value)}
+              placeholder="e.g. 123 Main St, Apt 4B"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            />
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              City
+              <input
+                type="text"
+                required
+                value={personalCity}
+                onChange={(e) => setPersonalCity(e.target.value)}
+                placeholder="City"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              State/Province
+              <input
+                type="text"
+                required
+                value={personalStateProvince}
+                onChange={(e) => setPersonalStateProvince(e.target.value)}
+                placeholder="State/Province"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              Country
+              <input
+                type="text"
+                required
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Country"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 pt-4 space-y-4">
+          <h3 className="text-sm font-bold text-slate-900">Statutory & Identity</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              TIN / EIN Number
+              <input
+                type="text"
+                required
+                value={tinNumber}
+                onChange={(e) => setTinNumber(e.target.value)}
+                placeholder="Tax ID Number"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              ID Type
+              <select
+                required
+                value={idType}
+                onChange={(e) => setIdType(e.target.value)}
+                className={ONBOARDING_SELECT_CLASS}
+              >
+                <option value="">Select ID Type</option>
+                <option value="Passport">Passport</option>
+                <option value="Driver's License">Driver&apos;s License</option>
+                <option value="National ID">National ID</option>
+                <option value="UMID">UMID</option>
+                <option value="Other">Other Government ID</option>
+              </select>
+            </label>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              ID Number
+              <input
+                type="text"
+                required
+                value={idNumber}
+                onChange={(e) => setIdNumber(e.target.value)}
+                placeholder="ID Number"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              ID Expiration Date
+              <input
+                type="date"
+                required
+                value={idExpirationDate}
+                onChange={(e) => setIdExpirationDate(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+            <label className="block space-y-2 text-sm font-medium text-slate-700">
+              ID Issuing Country
+              <input
+                type="text"
+                required
+                value={idIssuingCountry}
+                onChange={(e) => setIdIssuingCountry(e.target.value)}
+                placeholder="e.g. Philippines"
+                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
     </OnboardingWizardShell>
   );
 }

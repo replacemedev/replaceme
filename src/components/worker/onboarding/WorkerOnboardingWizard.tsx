@@ -55,6 +55,11 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const middleName = draft.middleName;
   const lastName = draft.lastName;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
+  const [suffix, setSuffix] = useState(draft.suffix || "");
+  const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
+  const [gender, setGender] = useState(draft.gender || "");
+  const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
+  const [preferredLanguage, setPreferredLanguage] = useState(draft.preferredLanguage || "");
   const [region, setRegion] = useState(draft.region || "");
   const [province, setProvince] = useState(draft.province || "");
   const [city, setCity] = useState(draft.city || "");
@@ -130,6 +135,15 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   };
 
   if (phase === "identity") {
+    const isIdentityNextDisabled =
+      !professionalTitle.trim() ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !phoneNumber.trim() ||
+      !gender ||
+      !civilStatus ||
+      !preferredLanguage.trim();
+
     return (
       <OnboardingWizardShell
         {...shellProps}
@@ -137,9 +151,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         title="How should employers know you?"
         description="Your name and title appear on applications and your public profile."
         onBack={() => goBack("welcome")}
-        isNextDisabled={
-          !professionalTitle.trim() || !firstName.trim() || !lastName.trim()
-        }
+        isNextDisabled={isIdentityNextDisabled}
         onNext={() => {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("identity", {
@@ -147,6 +159,11 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               firstName: firstName.trim(),
               middleName: middleName.trim(),
               lastName: lastName.trim(),
+              suffix: suffix.trim() || null,
+              phoneNumber: phoneNumber.trim(),
+              gender,
+              civilStatus,
+              preferredLanguage: preferredLanguage.trim(),
             });
             if (!result.success) {
               showErrorToast(result.error);
@@ -159,7 +176,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         <ProfileAvatarUpload
           avatarUrl={avatarUrl}
           displayName={
-            [firstName, middleName, lastName].filter(Boolean).join(" ").trim() || professionalTitle.trim() || "Worker"
+            [firstName, middleName, lastName, suffix].filter(Boolean).join(" ").trim() || professionalTitle.trim() || "Worker"
           }
           size="md"
           onAvatarChange={setAvatarUrl}
@@ -175,7 +192,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             placeholder="e.g. Senior React Developer"
           />
         </label>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             First name
             <input
@@ -202,6 +219,73 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               value={lastName}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
             />
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Suffix (Optional)
+            <input
+              value={suffix}
+              onChange={(e) => setSuffix(e.target.value)}
+              placeholder="e.g. Jr."
+              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Phone Number
+            <input
+              type="tel"
+              required
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+63 912 345 6789"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+            />
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Preferred Language
+            <input
+              type="text"
+              required
+              value={preferredLanguage}
+              onChange={(e) => setPreferredLanguage(e.target.value)}
+              placeholder="e.g. English, Tagalog"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3"
+            />
+          </label>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Gender
+            <select
+              required
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-white"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Civil Status
+            <select
+              required
+              value={civilStatus}
+              onChange={(e) => setCivilStatus(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-white"
+            >
+              <option value="">Select Status</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
           </label>
         </div>
       </OnboardingWizardShell>

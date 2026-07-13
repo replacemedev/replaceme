@@ -18,6 +18,11 @@ export const workerIdentityStepSchema = z.object({
   firstName: nonEmptyStringSchema.max(80, "First name cannot exceed 80 characters."),
   middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional(),
   lastName: nonEmptyStringSchema.max(80, "Last name cannot exceed 80 characters."),
+  suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional().nullable(),
+  gender: z.string().optional().nullable(),
+  civilStatus: z.string().optional().nullable(),
+  preferredLanguage: z.string().optional().nullable(),
+  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25).optional().nullable(),
 });
 
 export const workerLocationStepSchema = z.object({
@@ -121,6 +126,22 @@ export const employerOnboardingSchema = z.object({
   companyBio: z.string().max(500).optional(),
 });
 
+export const employerPersonalStepSchema = z.object({
+  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid birthdate (YYYY-MM-DD)."),
+  gender: z.string().min(1, "Gender is required."),
+  civilStatus: z.string().min(1, "Civil status is required."),
+  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25),
+  tinNumber: z.string().min(1, "TIN/EIN is required."),
+  idType: z.string().min(1, "ID Type is required."),
+  idNumber: z.string().min(1, "ID Number is required."),
+  idExpirationDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD)."),
+  idIssuingCountry: z.string().min(1, "ID Issuing Country is required."),
+  personalAddress: z.string().min(1, "Address is required."),
+  personalCity: z.string().min(1, "City is required."),
+  personalStateProvince: z.string().min(1, "State/Province is required."),
+  country: z.string().min(1, "Country is required."),
+});
+
 export type WorkerOnboardingStep =
   | "identity"
   | "location"
@@ -129,4 +150,4 @@ export type WorkerOnboardingStep =
   | "about"
   | "project";
 
-export type EmployerOnboardingStep = "company" | "hiring" | "details";
+export type EmployerOnboardingStep = "company" | "hiring" | "details" | "personal";

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/shared/FormField";
-import { Lock, Mail, User, Loader2 } from "lucide-react";
+import { Lock, Mail, User, Loader2, Phone } from "lucide-react";
 import { signUp } from "@/actions/auth";
 import {
   employerSignUpSchema,
@@ -43,6 +43,8 @@ const WORKER_DEFAULTS: WorkerSignUpFormValues = {
   firstName: "",
   middleName: "",
   lastName: "",
+  suffix: "",
+  phoneNumber: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -51,8 +53,18 @@ const WORKER_DEFAULTS: WorkerSignUpFormValues = {
 };
 
 const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
-  ...WORKER_DEFAULTS,
   role: "employer",
+  username: "",
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  suffix: "",
+  phoneNumber: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  terms: false,
+  turnstileToken: undefined,
 };
 
 interface SignUpFormProps {
@@ -174,7 +186,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           />
         </FormField>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <FormField
             label="First Name"
             htmlFor="signup-firstName"
@@ -227,7 +239,41 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
               aria-describedby="signup-lastName-error"
             />
           </FormField>
+
+          <FormField
+            label="Suffix"
+            htmlFor="signup-suffix"
+            error={errors.suffix?.message}
+          >
+            <Input
+              id="signup-suffix"
+              {...register("suffix")}
+              placeholder="e.g. Jr."
+              icon={<User size={18} />}
+              error={errors.suffix?.message}
+              showErrorMessage={false}
+              aria-describedby="signup-suffix-error"
+            />
+          </FormField>
         </div>
+
+        <FormField
+          label="Phone Number"
+          htmlFor="signup-phoneNumber"
+          required
+          error={errors.phoneNumber?.message}
+        >
+          <Input
+            id="signup-phoneNumber"
+            {...register("phoneNumber")}
+            placeholder="+1 234 567 8900"
+            icon={<Phone size={18} />}
+            autoComplete="tel"
+            error={errors.phoneNumber?.message}
+            showErrorMessage={false}
+            aria-describedby="signup-phoneNumber-error"
+          />
+        </FormField>
 
         <FormField
           label="Email Address"

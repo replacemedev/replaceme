@@ -25,6 +25,7 @@ import {
   type ForgotPasswordFormValues,
 } from "@/lib/validations/auth";
 import Stripe from "stripe";
+import { formatFullName } from "@/lib/format/name";
 import { assertRateLimit } from "@/lib/server/rate-limit";
 import {
   extractErrorMessage,
@@ -197,7 +198,9 @@ export async function signUp(formData: SignUpFormValues) {
     const firstName = data.firstName.trim();
     const middleName = data.middleName?.trim() || "";
     const lastName = data.lastName.trim();
-    const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
+    const suffix = "suffix" in data ? (data.suffix as string | undefined)?.trim() : "";
+    const phoneNumber = "phoneNumber" in data ? (data.phoneNumber as string | undefined)?.trim() : "";
+    const fullName = formatFullName(firstName, middleName, lastName, suffix);
 
     // 2. Sign up with Supabase Auth
     // We pass metadata that the Postgres trigger will use to populate the profile
@@ -214,6 +217,8 @@ export async function signUp(formData: SignUpFormValues) {
           first_name: firstName,
           middle_name: middleName || null,
           last_name: lastName,
+          suffix: suffix || null,
+          phone_number: phoneNumber || null,
         },
       },
     });

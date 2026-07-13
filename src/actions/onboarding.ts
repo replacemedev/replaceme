@@ -11,6 +11,7 @@ import {
   employerCompanyStepSchema,
   employerDetailsStepSchema,
   employerHiringStepSchema,
+  employerPersonalStepSchema,
   employerOnboardingSchema,
   EmployerOnboardingStep,
   workerAboutStepSchema,
@@ -34,6 +35,11 @@ export type WorkerOnboardingDraft = {
   firstName: string;
   middleName: string;
   lastName: string;
+  suffix: string;
+  phoneNumber: string;
+  gender: string;
+  civilStatus: string;
+  preferredLanguage: string;
   avatarUrl: string | null;
   location: string;
   region: string;
@@ -59,6 +65,19 @@ export type EmployerOnboardingDraft = {
   websiteUrl: string;
   companyBio: string;
   logoUrl: string | null;
+  birthDate: string | null;
+  gender: string;
+  civilStatus: string;
+  phoneNumber: string;
+  tinNumber: string;
+  idType: string;
+  idNumber: string;
+  idExpirationDate: string | null;
+  idIssuingCountry: string;
+  personalAddress: string;
+  personalCity: string;
+  personalStateProvince: string;
+  country: string;
 };
 
 async function syncOnboardingWorkerSkills(
@@ -149,7 +168,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, middle_name, last_name, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
+        "professional_title, first_name, middle_name, last_name, suffix, phone_number, gender, civil_status, preferred_language, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
       )
       .eq("id", user.id)
       .single();
@@ -161,6 +180,11 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       firstName: profile.first_name ?? "",
       middleName: profile.middle_name ?? "",
       lastName: profile.last_name ?? "",
+      suffix: profile.suffix ?? "",
+      phoneNumber: profile.phone_number ?? "",
+      gender: profile.gender ?? "",
+      civilStatus: profile.civil_status ?? "",
+      preferredLanguage: profile.preferred_language ?? "",
       avatarUrl: profile.avatar_url ?? null,
       location: profile.location ?? "",
       region: profile.region ?? "",
@@ -187,7 +211,11 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
     const { supabase, user } = await requireRole("employer");
 
     const [{ data: profile }, { data: company }] = await Promise.all([
-      supabase.from("profiles").select("skills").eq("id", user.id).single(),
+      supabase
+        .from("profiles")
+        .select("skills, birth_date, gender, civil_status, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, personal_address, personal_city, personal_state_province, country")
+        .eq("id", user.id)
+        .single(),
       supabase
         .from("company_profiles")
         .select("company_name, industry, company_size, website_url, company_bio, logo_url")
@@ -203,6 +231,19 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       websiteUrl: company?.website_url ?? "",
       companyBio: company?.company_bio ?? "",
       logoUrl: company?.logo_url ?? null,
+      birthDate: profile?.birth_date ?? null,
+      gender: profile?.gender ?? "",
+      civilStatus: profile?.civil_status ?? "",
+      phoneNumber: profile?.phone_number ?? "",
+      tinNumber: profile?.tin_number ?? "",
+      idType: profile?.id_type ?? "",
+      idNumber: profile?.id_number ?? "",
+      idExpirationDate: profile?.id_expiration_date ?? null,
+      idIssuingCountry: profile?.id_issuing_country ?? "",
+      personalAddress: profile?.personal_address ?? "",
+      personalCity: profile?.personal_city ?? "",
+      personalStateProvince: profile?.personal_state_province ?? "",
+      country: profile?.country ?? "",
     };
   } catch {
     return null;
@@ -227,6 +268,11 @@ export async function saveWorkerOnboardingStep(
             first_name: parsed.firstName,
             middle_name: parsed.middleName || null,
             last_name: parsed.lastName,
+            suffix: parsed.suffix || null,
+            phone_number: parsed.phoneNumber || null,
+            gender: parsed.gender || null,
+            civil_status: parsed.civilStatus || null,
+            preferred_language: parsed.preferredLanguage || null,
             updated_at: now,
           })
           .eq("id", user.id);
@@ -375,6 +421,30 @@ export async function saveEmployerOnboardingStep(
           })
           .eq("employer_id", user.id);
         if (error) return fail("Failed to save company details.");
+        break;
+      }
+      case "personal": {
+        const parsed = employerPersonalStepSchema.parse(input);
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            birth_date: parsed.birthDate,
+            gender: parsed.gender || null,
+            civil_status: parsed.civilStatus || null,
+            phone_number: parsed.phoneNumber,
+            tin_number: parsed.tinNumber || null,
+            id_type: parsed.idType || null,
+            id_number: parsed.idNumber || null,
+            id_expiration_date: parsed.idExpirationDate || null,
+            id_issuing_country: parsed.idIssuingCountry || null,
+            personal_address: parsed.personalAddress || null,
+            personal_city: parsed.personalCity || null,
+            personal_state_province: parsed.personalStateProvince || null,
+            country: parsed.country || null,
+            updated_at: now,
+          })
+          .eq("id", user.id);
+        if (error) return fail("Failed to save personal identity details.");
         break;
       }
       default:

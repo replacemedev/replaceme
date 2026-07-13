@@ -18,6 +18,8 @@ const signUpSharedFields = {
   firstName: z.string().min(1, "First name is required.").max(80, "First name cannot exceed 80 characters."),
   middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional(),
   lastName: z.string().min(1, "Last name is required.").max(80, "Last name cannot exceed 80 characters."),
+  suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional(),
+  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25, "Phone number cannot exceed 25 characters."),
   email: z.string().email("Please enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters.").max(100, "Password cannot exceed 100 characters."),
   confirmPassword: z.string(),

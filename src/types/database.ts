@@ -1886,6 +1886,26 @@ export type Database = {
           stripe_customer_id: string | null
           updated_at: string
           username: string | null
+          suffix: string | null
+          gender: string | null
+          civil_status: string | null
+          id_type: string | null
+          id_number: string | null
+          id_expiration_date: string | null
+          id_issuing_country: string | null
+          tin_number: string | null
+          sss_number: string | null
+          philhealth_number: string | null
+          pagibig_number: string | null
+          emergency_contact_name: string | null
+          emergency_contact_relationship: string | null
+          emergency_contact_phone: string | null
+          preferred_language: string | null
+          timezone: string | null
+          country: string | null
+          personal_address: string | null
+          personal_city: string | null
+          personal_state_province: string | null
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
@@ -1929,6 +1949,26 @@ export type Database = {
           stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
+          suffix?: string | null
+          gender?: string | null
+          civil_status?: string | null
+          id_type?: string | null
+          id_number?: string | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          tin_number?: string | null
+          sss_number?: string | null
+          philhealth_number?: string | null
+          pagibig_number?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_relationship?: string | null
+          emergency_contact_phone?: string | null
+          preferred_language?: string | null
+          timezone?: string | null
+          country?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Update: {
@@ -1972,6 +2012,26 @@ export type Database = {
           stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
+          suffix?: string | null
+          gender?: string | null
+          civil_status?: string | null
+          id_type?: string | null
+          id_number?: string | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          tin_number?: string | null
+          sss_number?: string | null
+          philhealth_number?: string | null
+          pagibig_number?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_relationship?: string | null
+          emergency_contact_phone?: string | null
+          preferred_language?: string | null
+          timezone?: string | null
+          country?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Relationships: []
