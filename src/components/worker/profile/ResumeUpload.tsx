@@ -114,23 +114,23 @@ export function ResumeUpload({
   return (
     <div className="w-full">
       {resumeUrl ? (
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200/80 rounded-2xl w-full">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50 border border-slate-200/80 rounded-2xl w-full overflow-hidden">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
               <FileText className="h-5 w-5" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-slate-800 truncate">Uploaded Resume</p>
               <p className="text-[10px] font-medium text-slate-400">PDF Document</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <button
               type="button"
               disabled={busy}
               onClick={handlePreview}
-              className="flex-1 w-full sm:w-auto sm:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors cursor-pointer"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>View</span>
@@ -139,7 +139,7 @@ export function ResumeUpload({
               type="button"
               disabled={busy}
               onClick={handleDelete}
-              className="flex-1 w-full sm:w-auto sm:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-100 bg-red-50 px-3.5 text-xs font-bold text-red-600 hover:bg-red-100/70 disabled:opacity-50 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-100 bg-red-50 px-3.5 text-xs font-bold text-red-600 hover:bg-red-100/70 disabled:opacity-50 transition-colors cursor-pointer"
             >
               {isDeleting ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
