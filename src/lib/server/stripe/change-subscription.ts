@@ -88,15 +88,14 @@ export type ChangeSubscriptionResult =
   | { error: string };
 
 /**
- * Single orchestration path for paid plan changes.
+ * @deprecated Do **not** use for employer Manage Plan / checkout UX.
+ * Plan changes must go through Stripe Checkout or Customer Portal
+ * (`createPlanChangeSession`) so the customer explicitly confirms.
+ * This module performs direct `subscriptions.update` / schedules and is
+ * reserved for emergency/admin tooling only — never call from UI actions.
  *
- * Upgrades: update the existing subscription *item* price immediately
- * (never create a second Checkout subscription).
- * Downgrades: Subscription Schedule phase at current_period_end.
- *
- * @see https://docs.stripe.com/billing/subscriptions/change-price
- * @see https://docs.stripe.com/billing/subscriptions/pending-updates
- * @see https://docs.stripe.com/billing/subscriptions/subscription-schedules
+ * @see src/lib/server/stripe/plan-change-session.ts
+ * @see https://docs.stripe.com/customer-management/portal-deep-links
  */
 export async function changeEmployerSubscription(input: {
   employerId: string;

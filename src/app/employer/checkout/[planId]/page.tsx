@@ -83,16 +83,6 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     );
   }
 
-  // Existing subscriber: plan changed in place (upgrade) or scheduled (downgrade).
-  if (checkout.upgraded || checkout.downgradeScheduled) {
-    const flag = checkout.downgradeScheduled ? "downgraded=1" : "upgraded=1";
-    redirect(
-      `/employer/settings/account?checkout=success&${flag}&plan=${encodeURIComponent(
-        checkout.planSlug ?? targetPlan
-      )}`
-    );
-  }
-
   if (!checkout.checkoutUrl) {
     redirect(
       `/employer/pricing?checkout=error&message=${encodeURIComponent(
@@ -101,14 +91,29 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     );
   }
 
+  const isPortalUpdate = checkout.mode === "portal_update";
+
   return (
     <EmployerPageShell width="content" className="gap-8">
       <EmployerPageHeader
         title={`Upgrade to ${plan.name}`}
-        subhead="Review your order and continue to secure Stripe checkout."
+        subhead={
+          isPortalUpdate
+            ? "Confirm your plan change securely on Stripe Billing."
+            : "Review your order and continue to secure Stripe checkout."
+        }
         bordered={false}
       />
-      <EmployerCheckoutClient plan={plan} checkoutUrl={checkout.checkoutUrl} />
+      <EmployerCheckoutClient
+        plan={plan}
+        checkoutUrl={checkout.checkoutUrl}
+        autoRedirect={isPortalUpdate}
+        ctaLabel={
+          isPortalUpdate
+            ? "Continue to Stripe to confirm"
+            : "Continue to Stripe Checkout (USD)"
+        }
+      />
     </EmployerPageShell>
   );
 }

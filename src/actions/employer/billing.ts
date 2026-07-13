@@ -1,13 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { runAction, ok, fail } from "@/lib/server/action-result";
 import { requireRole } from "@/lib/server/auth/session";
 import { upgradeCheckoutSchema } from "@/lib/validations/billing";
-import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
-import { changeEmployerSubscription } from "@/lib/server/stripe/change-subscription";
+import { createPlanChangeSession } from "@/lib/server/stripe/plan-change-session";
 import { createBillingPortalSession } from "@/lib/server/stripe/portal-session";
 import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
@@ -16,7 +14,6 @@ import { getEmployerPlanUsage as loadEmployerPlanUsage } from "@/lib/server/enti
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import type { EmployerInvoiceRow } from "@/lib/server/stripe/list-invoices";
 import { getSiteUrl } from "@/lib/auth/site-url";
-import { resolveBillingPlan, resolveStripePriceIdFromEnv } from "@/lib/server/stripe/plan";
 
 const PAID_TIERS = new Set<SubscriptionTier>(["starter", "growth", "scale"]);
 
@@ -133,24 +130,23 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
 }
 
 type UpgradeCheckoutData = {
-  upgraded: boolean;
-  downgradeScheduled?: boolean;
-  checkoutUrl?: string;
-  planSlug?: string;
-  message?: string;
-  effectiveAt?: string;
+  checkoutUrl: string;
+  mode: "checkout" | "portal_update";
+  planSlug: string;
 };
 
 /**
- * Change plan: immediate in-place upgrade, period-end scheduled downgrade,
- * or Checkout only when the employer has no active paid subscription.
- * @see https://docs.stripe.com/billing/subscriptions/change-price
- * @see https://docs.stripe.com/billing/subscriptions/subscription-schedules
+ * Manage Plan: never mutates Stripe subscriptions directly.
+ * Returns a Checkout URL (first paid) or Customer Portal confirm URL
+ * (existing subscription). DB tier updates only via webhooks.
+ *
+ * @see https://docs.stripe.com/customer-management/portal-deep-links
+ * @see https://docs.stripe.com/payments/checkout
  */
 export async function createUpgradeCheckout(planId: string) {
   const result = await runAction("createUpgradeCheckout", async () => {
     const parsed = upgradeCheckoutSchema.parse({ planId });
-    safeLog(`[Billing] Plan change requested: ${parsed.planId}`);
+    safeLog(`[Billing] Plan change session requested: ${parsed.planId}`);
 
     const { user, profile } = await requireRole("employer");
 
@@ -160,75 +156,21 @@ export async function createUpgradeCheckout(planId: string) {
       );
     }
 
-    const plan = await resolveBillingPlan(parsed.planId);
-    if (!plan) {
-      return fail("Billing plan not found.");
-    }
-
-    const { createClient } = await import("@/lib/supabase/server");
     const supabase = await createClient();
-
-    const { data: subscription } = await supabase
-      .from("employer_subscriptions")
-      .select("stripe_subscription_id, stripe_customer_id, status")
-      .eq("employer_id", profile.id)
-      .maybeSingle();
-
-    const subscriptionId = subscription?.stripe_subscription_id?.trim() || null;
-    const customerId = subscription?.stripe_customer_id?.trim() || null;
-    const status = subscription?.status || null;
-    const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
-    const hasActiveSub = subscriptionId && status && ACTIVE_STATUSES.has(status);
-
-    if (hasActiveSub) {
-      const stripe = getStripe()!;
-      const liveSub = await stripe.subscriptions.retrieve(subscriptionId);
-      const item = liveSub.items.data[0];
-      if (!item) {
-        return fail("No active subscription item found.");
-      }
-      const priceId = plan.stripe_price_id ?? resolveStripePriceIdFromEnv(plan.slug ?? "");
-      if (!priceId) {
-        return fail("Target plan is missing a Stripe price ID.");
-      }
-
-      const siteUrl = getSiteUrl();
-      const portalSession = await stripe.billingPortal.sessions.create({
-        customer: customerId!,
-        return_url: `${siteUrl}/employer/settings/account`,
-        flow_data: {
-          type: "subscription_update_confirm",
-          subscription_update_confirm: {
-            subscription: subscriptionId,
-            items: [
-              {
-                id: item.id,
-                price: priceId,
-              },
-            ],
-          },
-        },
-      });
-
-      return ok<UpgradeCheckoutData>({
-        upgraded: false,
-        checkoutUrl: portalSession.url,
-      });
-    }
-
-    const { data: employerProfile } = await (
-      await createClient()
-    )
+    const { data: employerProfile } = await supabase
       .from("profiles")
       .select("first_name, middle_name, last_name")
       .eq("id", profile.id)
       .single();
 
     const name =
-      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
-      "Employer";
+      formatFullName(
+        employerProfile?.first_name,
+        employerProfile?.middle_name,
+        employerProfile?.last_name
+      ) || "Employer";
 
-    const session = await createSubscriptionCheckoutSession({
+    const session = await createPlanChangeSession({
       employerId: profile.id,
       email: user.email || "",
       name,
@@ -240,20 +182,18 @@ export async function createUpgradeCheckout(planId: string) {
     }
 
     return ok<UpgradeCheckoutData>({
-      upgraded: false,
-      checkoutUrl: session.checkoutUrl,
+      checkoutUrl: session.url,
+      mode: session.mode,
+      planSlug: session.planSlug,
     });
   });
 
   if (!result.success) return { error: result.error };
   return {
     success: true as const,
-    upgraded: result.data?.upgraded ?? false,
-    downgradeScheduled: result.data?.downgradeScheduled ?? false,
     checkoutUrl: result.data?.checkoutUrl,
+    mode: result.data?.mode,
     planSlug: result.data?.planSlug,
-    message: result.data?.message,
-    effectiveAt: result.data?.effectiveAt,
   };
 }
 
@@ -274,8 +214,11 @@ export async function createCustomerPortalSession() {
       .single();
 
     const name =
-      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
-      "Employer";
+      formatFullName(
+        employerProfile?.first_name,
+        employerProfile?.middle_name,
+        employerProfile?.last_name
+      ) || "Employer";
 
     const session = await createBillingPortalSession({
       employerId: profile.id,
@@ -294,6 +237,10 @@ export async function createCustomerPortalSession() {
   return { success: true as const, portalUrl: result.data?.portalUrl };
 }
 
+/**
+ * Cancel → Discovery: portal deep link `subscription_cancel`.
+ * Does not mutate cancel_at_period_end in-app — webhook syncs after Stripe confirm.
+ */
 export async function cancelSubscription() {
   const result = await runAction("cancelSubscription", async () => {
     safeLog("[Billing] Cancel subscription portal session initiated");
@@ -302,9 +249,7 @@ export async function cancelSubscription() {
 
     const { data: subscription } = await admin
       .from("employer_subscriptions")
-      .select(
-        "stripe_subscription_id, stripe_customer_id, plan_slug"
-      )
+      .select("stripe_subscription_id, stripe_customer_id, plan_slug")
       .eq("employer_id", profile.id)
       .maybeSingle();
 
@@ -322,18 +267,35 @@ export async function cancelSubscription() {
     }
 
     const siteUrl = getSiteUrl();
-    const session = await stripe.billingPortal.sessions.create({
-      customer: customerId,
-      return_url: `${siteUrl}/employer/settings/account`,
-      flow_data: {
-        type: "subscription_cancel",
-        subscription_cancel: {
-          subscription: subscriptionId,
-        },
-      },
-    });
+    const returnUrl = `${siteUrl}/employer/settings/account`;
 
-    return ok({ portalUrl: session.url });
+    try {
+      const session = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: returnUrl,
+        flow_data: {
+          type: "subscription_cancel",
+          subscription_cancel: {
+            subscription: subscriptionId,
+          },
+          after_completion: {
+            type: "redirect",
+            redirect: { return_url: returnUrl },
+          },
+        },
+      });
+
+      if (!session.url) {
+        return fail("Stripe did not return a portal URL.");
+      }
+
+      return ok({ portalUrl: session.url });
+    } catch (err) {
+      safeError("[Billing] cancel portal session failed", err);
+      return fail(
+        "Could not open Stripe to confirm cancellation. Please try Manage billing."
+      );
+    }
   });
 
   if (!result.success) return { error: result.error };
@@ -354,7 +316,8 @@ export async function listEmployerInvoices() {
     return ok({ invoices: listed.invoices });
   });
 
-  if (!result.success) return { error: result.error, invoices: [] as EmployerInvoiceRow[] };
+  if (!result.success)
+    return { error: result.error, invoices: [] as EmployerInvoiceRow[] };
   return {
     success: true as const,
     invoices: result.data?.invoices ?? [],
@@ -382,7 +345,9 @@ export async function getCurrentEmployerSubscription(): Promise<{
 
     const { data: subscription } = await supabase
       .from("employer_subscriptions")
-      .select(`status, plan_slug, billing_plans!employer_subscriptions_plan_id_fkey (name, slug)`)
+      .select(
+        `status, plan_slug, billing_plans!employer_subscriptions_plan_id_fkey (name, slug)`
+      )
       .eq("employer_id", profile.id)
       .maybeSingle();
 
@@ -399,8 +364,7 @@ export async function getCurrentEmployerSubscription(): Promise<{
       billingPlan?.name
     );
     const planName =
-      billingPlan?.name ??
-      slug.charAt(0).toUpperCase() + slug.slice(1);
+      billingPlan?.name ?? slug.charAt(0).toUpperCase() + slug.slice(1);
     const active =
       subscription.status === "active" || subscription.status === "trialing";
 

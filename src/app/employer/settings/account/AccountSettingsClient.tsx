@@ -50,8 +50,6 @@ export function AccountSettingsClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const checkoutSuccess = searchParams.get("checkout") === "success";
-  const upgradedInPlace = searchParams.get("upgraded") === "1";
-  const downgradeScheduled = searchParams.get("downgraded") === "1";
   const [isUpgrading, startUpgradeTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
   const [isOpeningPortal, startPortalTransition] = useTransition();
@@ -64,32 +62,23 @@ export function AccountSettingsClient({
     }
 
     startUpgradeTransition(async () => {
-      const toastId = toast.loading(`Updating plan to ${planId}...`);
+      const toastId = toast.loading("Redirecting to Stripe...");
       try {
         const result = await createUpgradeCheckout(planId);
         if (result.error) {
           toast.error(result.error, { id: toastId });
-        } else if (result.success && result.downgradeScheduled) {
-          toast.success(
-            result.message ?? `Downgrade to ${planId} scheduled.`,
-            { id: toastId }
-          );
-          router.refresh();
-        } else if (result.success && result.upgraded) {
-          toast.success(result.message ?? `You're now on ${planId}.`, {
-            id: toastId,
-          });
-          router.refresh();
-        } else if (result.success && result.checkoutUrl) {
-          toast.success("Redirecting to Stripe checkout...", { id: toastId });
-          window.location.href = result.checkoutUrl;
-        } else {
-          toast.error("Unexpected billing response. Please try again.", {
-            id: toastId,
-          });
+          return;
         }
+        if (result.success && result.checkoutUrl) {
+          toast.dismiss(toastId);
+          window.location.href = result.checkoutUrl;
+          return;
+        }
+        toast.error("Could not open Stripe. Please try again.", {
+          id: toastId,
+        });
       } catch {
-        toast.error("Failed to change plan. Please try again.", {
+        toast.error("Failed to start Stripe checkout. Please try again.", {
           id: toastId,
         });
       }
@@ -153,18 +142,11 @@ export function AccountSettingsClient({
             <CheckCircle2 className="h-5 w-5 text-[#006e2f] shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-[#006e2f]">
-                {downgradeScheduled
-                  ? "Downgrade scheduled"
-                  : upgradedInPlace
-                    ? "Plan updated — you're on your new tier"
-                    : "Payment successful — welcome to your new plan"}
+                Stripe confirmation received
               </p>
               <p className="text-xs text-emerald-900/80 font-medium mt-1">
-                {downgradeScheduled
-                  ? "Your lower tier starts at the end of the current billing period. You keep current entitlements until then."
-                  : upgradedInPlace
-                    ? "Your existing subscription was upgraded in place (with proration). Entitlements are available now."
-                    : "Your entitlements update within a minute after Stripe confirms payment. Post a job or review applicants to use your new limits."}
+                Your plan updates after Stripe webhooks sync — usually within a
+                minute. Refresh if entitlements still look stale.
               </p>
             </div>
           </div>
@@ -295,7 +277,9 @@ export function AccountSettingsClient({
                 Confirm Plan Downgrade
               </h3>
               <p className="mt-3 text-sm text-slate-500 leading-relaxed">
-                Are you sure you want to switch to the Discovery plan? You will keep your current plan&apos;s features until the end of your billing period, after which you will be moved to the free tier.
+                You&apos;ll confirm cancellation on Stripe. You keep your current
+                plan&apos;s features until the end of your billing period (per
+                Stripe portal settings), then move to the free Discovery tier.
               </p>
             </div>
 
@@ -315,7 +299,7 @@ export function AccountSettingsClient({
                 onClick={handleCancel}
                 className="w-full min-h-[44px] sm:min-h-0 sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
               >
-                {isCancelling ? "Scheduling..." : "Confirm"}
+                {isCancelling ? "Redirecting to Stripe..." : "Continue to Stripe"}
               </button>
             </div>
           </div>

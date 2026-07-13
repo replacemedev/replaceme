@@ -1,40 +1,37 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
-import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
-import { changeEmployerSubscription } from "@/lib/server/stripe/change-subscription";
+import { createPlanChangeSession } from "@/lib/server/stripe/plan-change-session";
 import { getStripe } from "@/lib/server/stripe/client";
 import { syncEmployerSubscription } from "@/lib/server/stripe/sync-subscription";
 import { planIdSchema, paymentIntentIdSchema } from "@/lib/validations/stripe";
 import { safeError, safeLog } from "@/utils/logger";
 import { formatFullName } from "@/lib/format/name";
-import { getSiteUrl } from "@/lib/auth/site-url";
-import { resolveStripePriceIdFromEnv } from "@/lib/server/stripe/plan";
 
 export type StripeCheckoutResult = {
-  /** True when an existing Stripe subscription was updated in place (no Checkout). */
-  upgraded?: boolean;
-  downgradeScheduled?: boolean;
+  /** Stripe Checkout or Customer Portal URL — never mutates subscription here. */
   checkoutUrl?: string;
+  mode?: "checkout" | "portal_update";
   planName?: string;
   planPrice?: number;
   planSlug?: string;
-  message?: string;
   error?: string;
 };
 
 /**
- * Start a paid plan: update/schedule an existing Stripe subscription when
- * possible; otherwise open Checkout (subscription mode) for first-time paid.
- * @see https://docs.stripe.com/billing/subscriptions/change-price
+ * Start a paid plan change via Stripe-hosted confirmation only.
+ * Existing sub → Portal `subscription_update_confirm`.
+ * First paid → Checkout Session.
+ * DB updates only via webhooks after the customer confirms on Stripe.
+ *
+ * @see https://docs.stripe.com/customer-management/portal-deep-links
  */
 export async function createStripeCheckoutSession(
   planId: string
 ): Promise<StripeCheckoutResult> {
   try {
     const parsed = planIdSchema.parse({ planId });
-    safeLog(`[Stripe] Initiating plan change for: ${parsed.planId}`);
+    safeLog(`[Stripe] Plan change session for: ${parsed.planId}`);
 
     const { user, profile } = await requireRole("employer");
 
@@ -61,61 +58,14 @@ export async function createStripeCheckoutSession(
       };
     }
 
-    const { data: subscription } = await supabase
-      .from("employer_subscriptions")
-      .select("stripe_subscription_id, stripe_customer_id, status")
-      .eq("employer_id", profile.id)
-      .maybeSingle();
-
-    const subscriptionId = subscription?.stripe_subscription_id?.trim() || null;
-    const customerId = subscription?.stripe_customer_id?.trim() || null;
-    const status = subscription?.status || null;
-    const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
-    const hasActiveSub = subscriptionId && status && ACTIVE_STATUSES.has(status);
-
-    if (hasActiveSub) {
-      const stripe = getStripe()!;
-      const liveSub = await stripe.subscriptions.retrieve(subscriptionId);
-      const item = liveSub.items.data[0];
-      if (!item) {
-        return { error: "No active subscription item found." };
-      }
-      const priceId = plan.stripe_price_id ?? resolveStripePriceIdFromEnv(plan.slug ?? "");
-      if (!priceId) {
-        return { error: "Target plan is missing a Stripe price ID." };
-      }
-
-      const siteUrl = getSiteUrl();
-      const portalSession = await stripe.billingPortal.sessions.create({
-        customer: customerId!,
-        return_url: `${siteUrl}/employer/settings/account`,
-        flow_data: {
-          type: "subscription_update_confirm",
-          subscription_update_confirm: {
-            subscription: subscriptionId,
-            items: [
-              {
-                id: item.id,
-                price: priceId,
-              },
-            ],
-          },
-        },
-      });
-
-      return {
-        upgraded: false,
-        checkoutUrl: portalSession.url,
-        planName: plan.name,
-        planPrice: Number(plan.price),
-      };
-    }
-
     const name =
-      formatFullName(employerProfile?.first_name, employerProfile?.middle_name, employerProfile?.last_name) ||
-      "Employer";
+      formatFullName(
+        employerProfile?.first_name,
+        employerProfile?.middle_name,
+        employerProfile?.last_name
+      ) || "Employer";
 
-    const session = await createSubscriptionCheckoutSession({
+    const session = await createPlanChangeSession({
       employerId: profile.id,
       email: user.email || "",
       name,
@@ -127,10 +77,11 @@ export async function createStripeCheckoutSession(
     }
 
     return {
-      upgraded: false,
-      checkoutUrl: session.checkoutUrl,
+      checkoutUrl: session.url,
+      mode: session.mode,
       planName: plan.name,
       planPrice: Number(plan.price),
+      planSlug: session.planSlug,
     };
   } catch (err) {
     safeError("createStripeCheckoutSession error:", err);
@@ -175,7 +126,8 @@ export async function reconcilePaymentIntent(
     if (!stripe) {
       return {
         success: false,
-        error: "Stripe is not configured. Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET.",
+        error:
+          "Stripe is not configured. Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET.",
       };
     }
 
@@ -186,7 +138,10 @@ export async function reconcilePaymentIntent(
     }
 
     if (intent.metadata?.employer_id !== profile.id) {
-      return { success: false, error: "Payment does not belong to this account." };
+      return {
+        success: false,
+        error: "Payment does not belong to this account.",
+      };
     }
 
     const planId = intent.metadata?.plan_id;
@@ -198,7 +153,9 @@ export async function reconcilePaymentIntent(
       employerId: profile.id,
       planId,
       stripeCustomerId:
-        typeof intent.customer === "string" ? intent.customer : intent.customer?.id,
+        typeof intent.customer === "string"
+          ? intent.customer
+          : intent.customer?.id,
       paymentIntentId: intent.id,
     });
   } catch (err) {

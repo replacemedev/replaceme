@@ -196,7 +196,7 @@ export function ManagePlanGrid({
                             Redirecting to Stripe...
                           </>
                         ) : (
-                          "Schedule downgrade"
+                          "Change plan on Stripe"
                         )}
                       </button>
                     ) : (
@@ -227,7 +227,7 @@ export function ManagePlanGrid({
                       </button>
                     )}
                     <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
-                      Takes effect at period end
+                      Confirm change on Stripe
                     </p>
                   </div>
                 ) : (
