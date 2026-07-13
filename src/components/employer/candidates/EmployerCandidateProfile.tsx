@@ -1,7 +1,7 @@
 "use client";
 
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { ExternalLink, MapPin, Phone, Briefcase, Clock, Wallet } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Briefcase, Clock, Wallet, Mail, MessageSquare } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
@@ -18,6 +18,7 @@ export type EmployerCandidateProfileData = {
   isPinned: boolean;
   messagingThreadId?: string | null;
   coverLetter?: string | null;
+  contactMethods?: Array<{ type: string; value: string }> | null;
   candidate: {
     id: string;
     name: string;
@@ -68,6 +69,7 @@ export function EmployerCandidateProfile({
     isPinned,
     messagingThreadId,
     coverLetter,
+    contactMethods,
   } = profile;
   const isPreview = identityMode === "anonymous_preview";
   const salary = formatSalaryRange(
@@ -340,8 +342,9 @@ export function EmployerCandidateProfile({
               )}
 
               {(candidate.location ||
+                candidate.portfolioUrl ||
                 candidate.phoneNumber ||
-                candidate.portfolioUrl) && (
+                (contactMethods && contactMethods.length > 0)) && (
                 <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Contact &amp; location
@@ -359,25 +362,87 @@ export function EmployerCandidateProfile({
                         </div>
                       </div>
                     ) : null}
-                    {candidate.phoneNumber ? (
-                      <div className="flex items-start gap-2 text-slate-600">
-                        <Phone
-                          className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
-                          aria-hidden
-                        />
-                        <div className="space-y-0.5">
-                          <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Phone Number</span>
-                          <dd>
-                            <a
-                              href={`tel:${candidate.phoneNumber}`}
-                              className="font-semibold text-slate-800 hover:text-[#006e2f] transition-colors"
-                            >
-                              {candidate.phoneNumber}
-                            </a>
-                          </dd>
+
+                    {contactMethods && contactMethods.length > 0 ? (
+                      contactMethods.map((method, idx) => {
+                        const typeLower = method.type.toLowerCase();
+                        let Icon = MessageSquare;
+                        let href = "";
+                        let label = method.type.charAt(0).toUpperCase() + method.type.slice(1);
+
+                        if (typeLower === "email") {
+                          Icon = Mail;
+                          href = `mailto:${method.value}`;
+                          label = "Email";
+                        } else if (typeLower === "phone") {
+                          Icon = Phone;
+                          href = `tel:${method.value}`;
+                          label = "Phone Number";
+                        } else {
+                          if (method.value.startsWith("http://") || method.value.startsWith("https://")) {
+                            href = method.value;
+                            Icon = ExternalLink;
+                          } else {
+                            if (typeLower === "skype") {
+                              href = `skype:${method.value}?chat`;
+                            } else if (typeLower === "whatsapp") {
+                              href = `https://wa.me/${method.value.replace(/[^0-9]/g, "")}`;
+                            } else if (typeLower === "telegram") {
+                              href = `https://t.me/${method.value.replace("@", "")}`;
+                            }
+                          }
+                        }
+
+                        return (
+                          <div key={idx} className="flex items-start gap-2 text-slate-600">
+                            <Icon
+                              className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
+                              aria-hidden
+                            />
+                            <div className="space-y-0.5 min-w-0 flex-1">
+                              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                                {label}
+                              </span>
+                              <dd className="truncate">
+                                {href ? (
+                                  <a
+                                    href={href}
+                                    target={typeLower !== "email" && typeLower !== "phone" ? "_blank" : undefined}
+                                    rel={typeLower !== "email" && typeLower !== "phone" ? "noopener noreferrer" : undefined}
+                                    className="font-semibold text-slate-800 hover:text-[#006e2f] transition-colors"
+                                  >
+                                    {method.value}
+                                  </a>
+                                ) : (
+                                  <span className="font-semibold text-slate-800">{method.value}</span>
+                                )}
+                              </dd>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      candidate.phoneNumber ? (
+                        <div className="flex items-start gap-2 text-slate-600">
+                          <Phone
+                            className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
+                            aria-hidden
+                          />
+                          <div className="space-y-0.5">
+                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Phone Number</span>
+                            <dd>
+                              <a
+                                href={`tel:${candidate.phoneNumber}`}
+                                className="font-semibold text-slate-800 hover:text-[#006e2f] transition-colors"
+                              >
+                                {candidate.phoneNumber}
+                              </a>
+                            </dd>
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
+                      ) : null
+                    )}
+
                     {candidate.portfolioUrl ? (
                       <div className="flex items-start gap-2 sm:col-span-2">
                         <ExternalLink

@@ -4,14 +4,25 @@ import { formatMoney } from "@/lib/format/currency";
 export const CONTACT_METHOD_TYPES = ["email", "phone"] as const;
 export type ContactMethodType = (typeof CONTACT_METHOD_TYPES)[number];
 
-export const contactMethodSchema = z.object({
-  type: z.enum(CONTACT_METHOD_TYPES),
-  value: z
-    .string()
-    .trim()
-    .min(1, "Contact value is required")
-    .max(200, "Contact value is too long"),
-});
+export const contactMethodSchema = z
+  .object({
+    type: z.string().min(1, "Contact type is required"),
+    customType: z.string().optional(),
+    value: z
+      .string()
+      .trim()
+      .min(1, "Contact value is required")
+      .max(200, "Contact value is too long"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === "other" && (!data.customType || data.customType.trim().length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Custom contact method name is required",
+        path: ["customType"],
+      });
+    }
+  });
 
 export const jobApplicationFormSchema = z.object({
   jobId: z.string().uuid("Invalid job"),

@@ -161,6 +161,7 @@ export function ApplicationForm({
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<JobApplicationFormValues>({
     resolver: zodResolver(jobApplicationFormSchema),
@@ -172,6 +173,8 @@ export function ApplicationForm({
     },
   });
 
+  const contactMethodsValues = watch("contactMethods");
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "contactMethods",
@@ -180,7 +183,23 @@ export function ApplicationForm({
   const onSubmit = async (data: JobApplicationFormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await submitJobApplication(data);
+      const mappedContactMethods = data.contactMethods.map((m: any) => {
+        if (m.type === "other") {
+          return {
+            type: m.customType?.trim() || "Other",
+            value: m.value,
+          };
+        }
+        return {
+          type: m.type,
+          value: m.value,
+        };
+      });
+      const submissionData = {
+        ...data,
+        contactMethods: mappedContactMethods,
+      };
+      const result = await submitJobApplication(submissionData);
       if (!result.success) {
         toast.error(result.error ?? "Submission failed.");
         return;
@@ -308,45 +327,70 @@ export function ApplicationForm({
           )}
 
           <ul className="space-y-3">
-            {fields.map((field, index) => (
-              <li key={field.id} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <select
-                  className="h-12 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#22c55e] sm:w-36 shrink-0"
-                  {...register(`contactMethods.${index}.type`)}
-                >
-                  {CONTACT_METHOD_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {contactTypeLabels[type]}
-                    </option>
-                  ))}
-                </select>
+            {fields.map((field, index) => {
+              const currentType = contactMethodsValues?.[index]?.type;
+              const isOther = currentType === "other" || (currentType && currentType !== "email" && currentType !== "phone");
 
-                <div className="flex-1 min-w-0">
-                  <Input
-                    placeholder={
-                      field.type === "phone"
-                        ? "+1 234 567 8900"
-                        : "user.professional@email.com"
-                    }
-                    error={errors.contactMethods?.[index]?.value?.message}
-                    aria-invalid={Boolean(
-                      errors.contactMethods?.[index]?.value
+              return (
+                <li
+                  key={field.id}
+                  className={`flex ${
+                    isOther ? "flex-col md:flex-row" : "flex-col sm:flex-row"
+                  } gap-2 md:gap-3 items-stretch md:items-start`}
+                >
+                  <div className={`flex flex-col ${isOther ? "w-full md:w-1/3" : "w-full sm:w-36"} shrink-0 gap-2`}>
+                    <select
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#22c55e] cursor-pointer"
+                      {...register(`contactMethods.${index}.type`)}
+                    >
+                      <option value="email">Email</option>
+                      <option value="phone">Phone</option>
+                      <option value="other">Other (Specify)</option>
+                    </select>
+
+                    {isOther && (
+                      <Input
+                        placeholder="e.g., WhatsApp, Telegram"
+                        error={errors.contactMethods?.[index]?.customType?.message}
+                        aria-invalid={Boolean(
+                          errors.contactMethods?.[index]?.customType
+                        )}
+                        {...register(`contactMethods.${index}.customType`)}
+                      />
                     )}
-                    {...register(`contactMethods.${index}.value`)}
-                  />
-                </div>
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  disabled={fields.length <= 1}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0 cursor-pointer"
-                  aria-label="Remove contact method"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </li>
-            ))}
+                  <div className="flex-1 min-w-0 flex items-start gap-2 md:gap-3">
+                    <div className="flex-1 min-w-0">
+                      <Input
+                        placeholder={
+                          currentType === "phone"
+                            ? "+1 234 567 8900"
+                            : currentType === "email"
+                            ? "user.professional@email.com"
+                            : "Contact value"
+                        }
+                        error={errors.contactMethods?.[index]?.value?.message}
+                        aria-invalid={Boolean(
+                          errors.contactMethods?.[index]?.value
+                        )}
+                        {...register(`contactMethods.${index}.value`)}
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      disabled={fields.length <= 1}
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0 cursor-pointer"
+                      aria-label="Remove contact method"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
           <button
