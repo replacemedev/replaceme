@@ -72,7 +72,7 @@ export async function getWorkerVerificationState(): Promise<WorkerVerificationSt
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "id, role, first_name, last_name, email, professional_title, verification_status, is_verified"
+        "id, role, first_name, last_name, email, professional_title, verification_status, is_verified, phone_number, gender, civil_status, id_type, id_number, id_expiration_date, id_issuing_country"
       )
       .eq("id", user.id)
       .single();
@@ -125,6 +125,10 @@ export async function getWorkerVerificationState(): Promise<WorkerVerificationSt
         personalInfoComplete,
         documentsComplete
       ),
+      idType: profile.id_type ?? null,
+      idNumber: profile.id_number ?? null,
+      idExpirationDate: profile.id_expiration_date ?? null,
+      idIssuingCountry: profile.id_issuing_country ?? null,
     };
   } catch (err) {
     safeError("getWorkerVerificationState:", err);

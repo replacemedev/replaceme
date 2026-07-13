@@ -52,6 +52,10 @@ export default async function WorkerVerificationPage() {
             verificationStatus={state.verificationStatus}
             personalInfoComplete={state.personalInfoComplete}
             canSubmitForReview={state.canSubmitForReview}
+            idType={state.idType}
+            idNumber={state.idNumber}
+            idExpirationDate={state.idExpirationDate}
+            idIssuingCountry={state.idIssuingCountry}
           />
         </div>
         <VerificationSidebar />

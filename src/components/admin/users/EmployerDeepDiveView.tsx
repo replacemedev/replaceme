@@ -62,19 +62,19 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 border-b border-slate-100 pb-5 text-sm">
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Primary contact
               </p>
-              <p className="font-medium text-slate-700 mt-1">{data.companyName}</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.companyName}</p>
               <p className="text-xs text-slate-500 mt-0.5">{data.email}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Industry
               </p>
-              <p className="font-medium text-slate-700 mt-1">
+              <p className="font-semibold text-slate-700 mt-1">
                 {data.industry ?? "—"}
               </p>
             </div>
@@ -91,13 +91,70 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-emerald-700 hover:underline mt-1"
+                  className="inline-flex items-center gap-1 font-semibold text-[#006e2f] hover:underline mt-1"
                 >
                   {data.websiteUrl}
                   <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
             ) : null}
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Birthdate</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.birthDate ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gender</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.gender ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Civil Status</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.civilStatus ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Phone Number</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.phoneNumber ?? "—"}</p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
+            <div className="sm:col-span-2">
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Personal Address</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.personalAddress ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">City & Province/State</p>
+              <p className="font-semibold text-slate-700 mt-1">
+                {[data.personalCity, data.personalStateProvince].filter(Boolean).join(", ") || "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Country</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.country ?? "—"}</p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-4 text-sm">
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">TIN</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.tinNumber ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">ID Verification</p>
+              <p className="font-semibold text-slate-700 mt-1">
+                {data.idType ? `${data.idType} (${data.idNumber})` : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">ID Expiration & Issuing Country</p>
+              <p className="font-semibold text-slate-700 mt-1">
+                {data.idExpirationDate
+                  ? `${data.idExpirationDate} (${data.idIssuingCountry || "—"})`
+                  : "—"}
+              </p>
+            </div>
           </div>
         </div>
 

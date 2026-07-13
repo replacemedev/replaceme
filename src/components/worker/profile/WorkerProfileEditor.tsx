@@ -37,6 +37,7 @@ import { RateAvailabilityModal } from "@/components/worker/profile/inline/RateAv
 import { SkillsManageModal } from "@/components/worker/profile/inline/SkillsManageModal";
 import { LocationManageModal } from "@/components/worker/profile/inline/LocationManageModal";
 import { ProjectFormModal } from "@/components/worker/profile/inline/ProjectFormModal";
+import { WorkerEditDetailsModal } from "@/components/worker/profile/inline/WorkerEditDetailsModal";
 import type {
   WorkerProfile,
   WorkerSkillDetailed,
@@ -53,6 +54,7 @@ export interface WorkerProfileEditorProps {
   averageRating: number;
   isOwner: boolean;
   hiredBadge?: { employmentStatus: string | null } | null;
+  canViewFullIdentity?: boolean;
 }
 
 export function WorkerProfileEditor({
@@ -64,6 +66,7 @@ export function WorkerProfileEditor({
   averageRating,
   isOwner,
   hiredBadge,
+  canViewFullIdentity = false,
 }: WorkerProfileEditorProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [skills, setSkills] = useState(initialSkills);
@@ -72,6 +75,7 @@ export function WorkerProfileEditor({
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<WorkerProject | null>(null);
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [bioEditing, setBioEditing] = useState(false);
@@ -117,7 +121,7 @@ export function WorkerProfileEditor({
 
   const fullName =
     profile.full_name ||
-    formatFullName(profile.first_name, profile.middle_name, profile.last_name) ||
+    formatFullName(profile.first_name, profile.middle_name, profile.last_name, profile.suffix) ||
     "Worker Profile";
   const initials = profile.first_name ? profile.first_name[0].toUpperCase() : "W";
 
@@ -134,6 +138,22 @@ export function WorkerProfileEditor({
       ...(patch.firstName !== undefined ? { first_name: patch.firstName } : {}),
       ...(patch.middleName !== undefined ? { middle_name: patch.middleName } : {}),
       ...(patch.lastName !== undefined ? { last_name: patch.lastName } : {}),
+      ...(patch.suffix !== undefined ? { suffix: patch.suffix } : {}),
+      ...(patch.phoneNumber !== undefined ? { phone_number: patch.phoneNumber } : {}),
+      ...(patch.gender !== undefined ? { gender: patch.gender } : {}),
+      ...(patch.civilStatus !== undefined ? { civil_status: patch.civilStatus } : {}),
+      ...(patch.preferredLanguage !== undefined ? { preferred_language: patch.preferredLanguage } : {}),
+      ...(patch.tinNumber !== undefined ? { tin_number: patch.tinNumber } : {}),
+      ...(patch.sssNumber !== undefined ? { sss_number: patch.sssNumber } : {}),
+      ...(patch.philhealthNumber !== undefined ? { philhealth_number: patch.philhealthNumber } : {}),
+      ...(patch.pagibigNumber !== undefined ? { pagibig_number: patch.pagibigNumber } : {}),
+      ...(patch.emergencyContactName !== undefined ? { emergency_contact_name: patch.emergencyContactName } : {}),
+      ...(patch.emergencyContactRelationship !== undefined ? { emergency_contact_relationship: patch.emergencyContactRelationship } : {}),
+      ...(patch.emergencyContactPhone !== undefined ? { emergency_contact_phone: patch.emergencyContactPhone } : {}),
+      ...(patch.idType !== undefined ? { id_type: patch.idType } : {}),
+      ...(patch.idNumber !== undefined ? { id_number: patch.idNumber } : {}),
+      ...(patch.idExpirationDate !== undefined ? { id_expiration_date: patch.idExpirationDate } : {}),
+      ...(patch.idIssuingCountry !== undefined ? { id_issuing_country: patch.idIssuingCountry } : {}),
       ...(patch.professionalTitle !== undefined
         ? { professional_title: patch.professionalTitle }
         : {}),
@@ -291,6 +311,161 @@ export function WorkerProfileEditor({
                   ? "Add your story — click Edit above."
                   : "No bio provided yet."}
               </p>
+            )}
+          </div>
+
+          {/* Personal & Statutory Details Card */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-[#ebfdf2] text-[#006e2f] rounded-lg">
+                  <User size={18} className="stroke-[2.5]" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 tracking-tight uppercase">
+                  Personal & Statutory Details
+                </h3>
+              </div>
+              {isOwner ? (
+                <button
+                  type="button"
+                  onClick={() => setDetailsModalOpen(true)}
+                  className="text-xs font-bold text-[#006e2f] hover:text-[#005321] flex items-center gap-1 transition-colors"
+                >
+                  <Edit size={12} />
+                  Edit Details
+                </button>
+              ) : null}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+              <div className="space-y-4">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Demographics & Contact</h4>
+                <div className="space-y-2.5">
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-500 font-medium">Gender</span>
+                    <span className="text-slate-800 font-semibold">{profile.gender || "Not specified"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-500 font-medium">Civil Status</span>
+                    <span className="text-slate-800 font-semibold">{profile.civil_status || "Not specified"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-500 font-medium">Preferred Language</span>
+                    <span className="text-slate-800 font-semibold">{profile.preferred_language || "Not specified"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-500 font-medium">Phone Number</span>
+                    {canViewFullIdentity ? (
+                      <span className="text-slate-800 font-semibold">{profile.phone_number || "Not specified"}</span>
+                    ) : (
+                      <span className="text-slate-400 font-semibold select-none flex items-center gap-1.5">
+                        <span className="blur-xs font-mono">0917-123-XXXX</span>
+                        <span className="text-[9px] font-black uppercase tracking-tight bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200/50">
+                          🔒 Premium
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Statutory Information</h4>
+                {canViewFullIdentity ? (
+                  <div className="space-y-2.5">
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">TIN</span>
+                      <span className="text-slate-800 font-semibold">{profile.tin_number || "Not specified"}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">SSS Number</span>
+                      <span className="text-slate-800 font-semibold">{profile.sss_number || "Not specified"}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">PhilHealth</span>
+                      <span className="text-slate-800 font-semibold">{profile.philhealth_number || "Not specified"}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-500 font-medium">Pag-IBIG</span>
+                      <span className="text-slate-800 font-semibold">{profile.pagibig_number || "Not specified"}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+                    <p className="text-xs font-bold text-slate-500">🔒 Statutory info locked</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-1">
+                      Upgrade to Growth or Scale plan to see government numbers.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ID Verification details */}
+            <div className="border-t border-slate-100 pt-4 text-sm space-y-3">
+              <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Identity Verification Details</h4>
+              {canViewFullIdentity ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID Type</span>
+                    <span className="text-slate-800 font-semibold mt-0.5 block">{profile.id_type || "Not specified"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID Number</span>
+                    <span className="text-slate-800 font-semibold mt-0.5 block">{profile.id_number || "Not specified"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID Expiry</span>
+                    <span className="text-slate-800 font-semibold mt-0.5 block">{profile.id_expiration_date || "Not specified"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Issuing Country</span>
+                    <span className="text-slate-800 font-semibold mt-0.5 block">{profile.id_issuing_country || "Not specified"}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-3 text-center">
+                  <p className="text-xs font-bold text-slate-500">🔒 ID Verification details locked</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Emergency Contacts Card */}
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-[#ebfdf2] text-[#006e2f] rounded-lg">
+                  <User size={18} className="stroke-[2.5]" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 tracking-tight uppercase">
+                  Emergency Contacts
+                </h3>
+              </div>
+            </div>
+
+            {canViewFullIdentity ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-xs font-semibold text-slate-400 block">Contact Name</span>
+                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_name || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold text-slate-400 block">Relationship</span>
+                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_relationship || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold text-slate-400 block">Phone Number</span>
+                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_phone || "Not specified"}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+                <p className="text-xs font-bold text-slate-500">🔒 Emergency contacts locked</p>
+                <p className="text-[10px] text-slate-400 font-medium mt-1">
+                  Upgrade to Growth or Scale plan to see emergency contact information.
+                </p>
+              </div>
             )}
           </div>
 
@@ -723,6 +898,39 @@ export function WorkerProfileEditor({
             variant="danger"
             onConfirm={confirmDeleteProject}
             onCancel={() => setDeleteProjectId(null)}
+          />
+          <WorkerEditDetailsModal
+            open={detailsModalOpen}
+            onClose={() => setDetailsModalOpen(false)}
+            initial={{
+              firstName: profile.first_name || "",
+              middleName: profile.middle_name || "",
+              lastName: profile.last_name || "",
+              suffix: profile.suffix || "",
+              birthDate: profile.birth_date || "",
+              gender: profile.gender || "",
+              civilStatus: profile.civil_status || "",
+              preferredLanguage: profile.preferred_language || "",
+              phoneNumber: profile.phone_number || "",
+              tinNumber: profile.tin_number || "",
+              sssNumber: profile.sss_number || "",
+              philhealthNumber: profile.philhealth_number || "",
+              pagibigNumber: profile.pagibig_number || "",
+              emergencyContactName: profile.emergency_contact_name || "",
+              emergencyContactRelationship: profile.emergency_contact_relationship || "",
+              emergencyContactPhone: profile.emergency_contact_phone || "",
+              idType: profile.id_type || "",
+              idNumber: profile.id_number || "",
+              idExpirationDate: profile.id_expiration_date || "",
+              idIssuingCountry: profile.id_issuing_country || "",
+            }}
+            onSaved={async (data) => {
+              const res = await saveProfileField(data);
+              if (!res.error) {
+                setDetailsModalOpen(false);
+                toast.success("Personal details updated successfully.");
+              }
+            }}
           />
         </>
       ) : null}

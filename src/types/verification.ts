@@ -64,6 +64,10 @@ export interface WorkerVerificationState {
   requiredDocumentTypes: VerificationDocumentType[];
   canSubmitForReview: boolean;
   steps: VerificationStep[];
+  idType?: string | null;
+  idNumber?: string | null;
+  idExpirationDate?: string | null;
+  idIssuingCountry?: string | null;
 }
 
 export const VERIFICATION_STEP_LABELS = [
@@ -77,12 +81,26 @@ export function isPersonalInfoComplete(profile: {
   last_name: string | null;
   email: string | null;
   professional_title: string | null;
+  phone_number?: string | null;
+  gender?: string | null;
+  civil_status?: string | null;
+  id_type?: string | null;
+  id_number?: string | null;
+  id_expiration_date?: string | null;
+  id_issuing_country?: string | null;
 }): boolean {
   return Boolean(
     profile.first_name?.trim() &&
       profile.last_name?.trim() &&
       profile.email?.trim() &&
-      profile.professional_title?.trim()
+      profile.professional_title?.trim() &&
+      profile.phone_number?.trim() &&
+      profile.gender?.trim() &&
+      profile.civil_status?.trim() &&
+      profile.id_type?.trim() &&
+      profile.id_number?.trim() &&
+      profile.id_expiration_date?.trim() &&
+      profile.id_issuing_country?.trim()
   );
 }
 

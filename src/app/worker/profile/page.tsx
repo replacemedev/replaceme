@@ -56,11 +56,51 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     );
   }
 
+  let userRole: string | null = null;
+  let canViewFullIdentity = false;
+
+  if (user) {
+    const { data: viewerProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    userRole = viewerProfile?.role || null;
+
+    if (isOwner || userRole === "admin") {
+      canViewFullIdentity = true;
+    } else if (userRole === "employer") {
+      const { fetchEmployerEntitlements } = await import("@/lib/server/entitlements");
+      const entitlements = await fetchEmployerEntitlements(user.id, supabase);
+      if (entitlements) {
+        canViewFullIdentity =
+          entitlements.planSlug === "growth" || entitlements.planSlug === "scale";
+      }
+    }
+  }
+
   const profile: WorkerProfile = {
     id: profileRow.id,
     first_name: profileRow.first_name,
     middle_name: profileRow.middle_name,
     last_name: profileRow.last_name,
+    suffix: profileRow.suffix,
+    phone_number: profileRow.phone_number,
+    gender: profileRow.gender,
+    civil_status: profileRow.civil_status,
+    preferred_language: profileRow.preferred_language,
+    tin_number: profileRow.tin_number,
+    sss_number: profileRow.sss_number,
+    philhealth_number: profileRow.philhealth_number,
+    pagibig_number: profileRow.pagibig_number,
+    emergency_contact_name: profileRow.emergency_contact_name,
+    emergency_contact_relationship: profileRow.emergency_contact_relationship,
+    emergency_contact_phone: profileRow.emergency_contact_phone,
+    id_type: profileRow.id_type,
+    id_number: profileRow.id_number,
+    id_expiration_date: profileRow.id_expiration_date,
+    id_issuing_country: profileRow.id_issuing_country,
     full_name: profileRow.full_name,
     professional_title: profileRow.professional_title,
     bio: profileRow.bio,
@@ -191,6 +231,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
       averageRating={averageRating}
       isOwner={isOwner}
       hiredBadge={hiredBadge}
+      canViewFullIdentity={canViewFullIdentity}
     />
   );
 }

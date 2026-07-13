@@ -35,8 +35,8 @@ import {
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
 
-function emptyToNull(value: string | undefined) {
-  if (value === undefined) return undefined;
+function emptyToNull(value: string | null | undefined) {
+  if (value === null || value === undefined) return value;
   return value.trim() === "" ? null : value;
 }
 

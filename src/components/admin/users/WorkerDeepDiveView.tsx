@@ -38,18 +38,18 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
           {data.bio ? (
             <p className="mt-4 text-sm leading-relaxed text-slate-700">{data.bio}</p>
           ) : null}
-          <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
+          <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Location</dt>
-              <dd className="text-slate-800">{data.location ?? "—"}</dd>
+              <dd className="text-slate-800 font-semibold">{data.location ?? "—"}</dd>
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Availability</dt>
-              <dd className="text-slate-800">{data.availability ?? "—"}</dd>
+              <dd className="text-slate-800 font-semibold">{data.availability ?? "—"}</dd>
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Hourly rate</dt>
-              <dd className="text-slate-800 font-mono">
+              <dd className="text-slate-800 font-mono font-semibold">
                 {data.hourlyRate != null
                   ? `${data.hourlyRate} ${data.salaryCurrency}`
                   : "—"}
@@ -57,10 +57,97 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Remote</dt>
-              <dd className="text-slate-800">{data.isRemote ? "Yes" : "No"}</dd>
+              <dd className="text-slate-800 font-semibold">{data.isRemote ? "Yes" : "No"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Suffix</dt>
+              <dd className="text-slate-800 font-semibold">{data.suffix ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Phone Number</dt>
+              <dd className="text-slate-800 font-semibold">{data.phoneNumber ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Gender</dt>
+              <dd className="text-slate-800 font-semibold">{data.gender ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Civil Status</dt>
+              <dd className="text-slate-800 font-semibold">{data.civilStatus ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Preferred Language</dt>
+              <dd className="text-slate-800 font-semibold">{data.preferredLanguage ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase text-slate-400">Birthdate</dt>
+              <dd className="text-slate-800 font-semibold">{data.birthDate ?? "—"}</dd>
             </div>
           </dl>
-          <p className="mt-4 text-xs text-slate-400">
+
+          <div className="mt-6 border-t border-slate-100 pt-5 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Statutory Details</h3>
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">TIN</dt>
+                <dd className="text-slate-800 font-semibold">{data.tinNumber ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">SSS Number</dt>
+                <dd className="text-slate-800 font-semibold">{data.sssNumber ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">PhilHealth</dt>
+                <dd className="text-slate-800 font-semibold">{data.philhealthNumber ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">Pag-IBIG</dt>
+                <dd className="text-slate-800 font-semibold">{data.pagibigNumber ?? "—"}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="mt-6 border-t border-slate-100 pt-5 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Identity Document verification</h3>
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">ID Type</dt>
+                <dd className="text-slate-800 font-semibold">{data.idType ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">ID Number</dt>
+                <dd className="text-slate-800 font-semibold">{data.idNumber ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">ID Expiration Date</dt>
+                <dd className="text-slate-800 font-semibold">{data.idExpirationDate ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">ID Issuing Country</dt>
+                <dd className="text-slate-800 font-semibold">{data.idIssuingCountry ?? "—"}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="mt-6 border-t border-slate-100 pt-5 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Emergency Contact</h3>
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3 text-sm">
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">Contact Name</dt>
+                <dd className="text-slate-800 font-semibold">{data.emergencyContactName ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">Relationship</dt>
+                <dd className="text-slate-800 font-semibold">{data.emergencyContactRelationship ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase text-slate-400">Phone Number</dt>
+                <dd className="text-slate-800 font-semibold">{data.emergencyContactPhone ?? "—"}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <p className="mt-6 text-xs text-slate-400">
             Joined {new Date(data.createdAt).toLocaleDateString()}
           </p>
         </div>
