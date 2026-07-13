@@ -52,6 +52,7 @@ export interface WorkerProfileEditorProps {
   reviewCount: number;
   averageRating: number;
   isOwner: boolean;
+  hiredBadge?: { employmentStatus: string | null } | null;
 }
 
 export function WorkerProfileEditor({
@@ -62,6 +63,7 @@ export function WorkerProfileEditor({
   reviewCount,
   averageRating,
   isOwner,
+  hiredBadge,
 }: WorkerProfileEditorProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [skills, setSkills] = useState(initialSkills);
@@ -449,10 +451,17 @@ export function WorkerProfileEditor({
             )}
 
             <div className="space-y-2 flex flex-col items-center">
-              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
-                {fullName}
-                <VerifiedBadge show={Boolean(profile.is_verified)} size="md" />
-              </h3>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 flex-wrap">
+                <h3 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
+                  {fullName}
+                  <VerifiedBadge show={Boolean(profile.is_verified)} size="md" />
+                </h3>
+                {hiredBadge && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black capitalize tracking-tight bg-emerald-50 text-[#006e2f] border border-emerald-100/80">
+                    Hired • {hiredBadge.employmentStatus}
+                  </span>
+                )}
+              </div>
               {titleEditing ? (
                 <div className="flex items-center justify-center gap-1 mt-1">
                   <input

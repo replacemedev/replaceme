@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
 import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
+import { updateHiredBadgeVisibility } from "@/actions/employer/contracts";
+import { toast } from "sonner";
 
 interface HiredWorkerCardProps {
   worker: HiredWorker;
@@ -18,6 +20,23 @@ export function HiredWorkerCard({
   planSlug,
   messagingEnabled = true,
 }: HiredWorkerCardProps) {
+  const [isPending, startTransition] = useTransition();
+  const [showBadge, setShowBadge] = useState(worker.showHiredBadge ?? true);
+
+  const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nextVal = e.target.checked;
+    setShowBadge(nextVal);
+    startTransition(async () => {
+      const result = await updateHiredBadgeVisibility(worker.id, nextVal);
+      if (result.success) {
+        toast.success(nextVal ? "Hired badge is now visible on profile." : "Hired badge hidden from profile.");
+      } else {
+        toast.error(result.error ?? "Failed to update visibility.");
+        setShowBadge(!nextVal);
+      }
+    });
+  };
+
   const initials = worker.name
     .split(" ")
     .map((n) => n[0])
@@ -120,7 +139,7 @@ export function HiredWorkerCard({
       </div>
 
       {/* Mid Area: Contract Rates and Stats */}
-      <div className="grid grid-cols-3 gap-4 lg:gap-8 flex-1 lg:max-w-xl py-3 lg:py-0 border-y lg:border-y-0 border-slate-50">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 flex-1 lg:max-w-xl py-3 lg:py-0 border-y lg:border-y-0 border-slate-50">
         <div>
           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none block mb-1.5">
             Salary
@@ -147,6 +166,22 @@ export function HiredWorkerCard({
             <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
             {worker.status}
           </div>
+        </div>
+
+        <div className="col-span-2 lg:col-span-1 flex flex-row lg:flex-col items-center lg:items-start justify-between lg:justify-start gap-1 w-full">
+          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none block lg:mb-1.5">
+            Show Badge
+          </span>
+          <label className="relative inline-flex items-center cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showBadge}
+              disabled={isPending}
+              onChange={handleToggleChange}
+              className="sr-only peer"
+            />
+            <div className="w-8 h-4.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-[#006e2f]" />
+          </label>
         </div>
       </div>
 

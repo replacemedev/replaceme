@@ -29,10 +29,17 @@ export type UpdateApplicationStatusResult = {
  */
 export async function updateApplicationStatus(
   applicationId: string,
-  status: ApplicationStatus
+  status: ApplicationStatus,
+  employmentStatus?: string | null,
+  showHiredBadge?: boolean
 ): Promise<UpdateApplicationStatusResult> {
   const result = await runAction("updateApplicationStatus", async () => {
-    const parsed = updateApplicationStatusSchema.parse({ applicationId, status });
+    const parsed = updateApplicationStatusSchema.parse({
+      applicationId,
+      status,
+      employmentStatus,
+      showHiredBadge,
+    });
     const { supabase, profile } = await requireRole("employer");
 
     const { data: application, error: appError } = await supabase
@@ -69,13 +76,76 @@ export async function updateApplicationStatus(
       }
     }
 
+    const updatePayload: any = { status: parsed.status };
+    if (parsed.status === "HIRED") {
+      updatePayload.employment_status = parsed.employmentStatus || "Full-time";
+      updatePayload.show_hired_badge = parsed.showHiredBadge ?? true;
+    }
+
     const { error: updateError } = await supabase
       .from("applications")
-      .update({ status: parsed.status })
+      .update(updatePayload)
       .eq("id", parsed.applicationId);
 
     if (updateError) {
       return fail("Failed to update status in the database.");
+    }
+
+    if (parsed.status === "HIRED") {
+      // Fetch details to auto-provision contract
+      const { data: workerProfile } = await supabase
+        .from("profiles")
+        .select("hourly_rate")
+        .eq("id", application.candidate_id)
+        .single();
+      
+      const { data: jobDetails } = await supabase
+        .from("jobs")
+        .select("hours_per_week")
+        .eq("id", application.job_id)
+        .maybeSingle();
+
+      const hourlyRate = workerProfile?.hourly_rate ?? 0;
+      const weeklyHours = jobDetails?.hours_per_week ?? 40;
+      const employmentType = (parsed.employmentStatus || "Full-time").toLowerCase();
+
+      // Check if a contract already exists for this application/job/worker
+      const { data: existingContract } = await supabase
+        .from("contracts")
+        .select("id")
+        .eq("employer_id", profile.id)
+        .eq("worker_id", application.candidate_id)
+        .eq("job_id", application.job_id)
+        .maybeSingle();
+
+      if (existingContract) {
+        await supabase
+          .from("contracts")
+          .update({
+            status: "active",
+            employment_status: parsed.employmentStatus || "Full-time",
+            employment_type: employmentType === "contractual" || employmentType === "contract" ? "contract" : employmentType,
+            show_hired_badge: parsed.showHiredBadge ?? true,
+            hourly_rate: hourlyRate,
+            weekly_hours: weeklyHours,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingContract.id);
+      } else {
+        await supabase
+          .from("contracts")
+          .insert({
+            employer_id: profile.id,
+            worker_id: application.candidate_id,
+            job_id: application.job_id,
+            hourly_rate: hourlyRate,
+            weekly_hours: weeklyHours,
+            employment_type: employmentType === "contractual" || employmentType === "contract" ? "contract" : employmentType,
+            employment_status: parsed.employmentStatus || "Full-time",
+            show_hired_badge: parsed.showHiredBadge ?? true,
+            status: "active",
+          });
+      }
     }
 
     // Sync associated interview status

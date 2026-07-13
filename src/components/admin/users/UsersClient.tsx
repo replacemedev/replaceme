@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { UserX, UserCheck, ShieldCheck, Search } from "lucide-react";
+import { UserX, UserCheck, ShieldCheck, Search, AlertCircle, LayoutGrid, Table2, KanbanSquare, AlertTriangle, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   AdminDataTable,
@@ -482,6 +482,9 @@ export function UsersClient({
                   ) : tab === "employers" ? (
                     <th className={ADMIN_TABLE_TH}>Plan</th>
                   ) : null}
+                  {tab === "workers" && (
+                    <th className={`${ADMIN_TABLE_TH} whitespace-nowrap`}>Hire Badge</th>
+                  )}
                   <th className={ADMIN_TABLE_TH}>Status</th>
                   <th className={ADMIN_TABLE_TH}>Joined</th>
                   <th className="px-4 py-3 text-right">Actions</th>
@@ -516,6 +519,28 @@ export function UsersClient({
                           </td>
                           <td className={ADMIN_TABLE_TD}>
                             <StatusBadge status={worker.verification_status} />
+                          </td>
+                          <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                            {(() => {
+                              const activeContract = worker.contracts?.find(c => c.status === "active");
+                              if (!activeContract) {
+                                return <span className="text-slate-400 font-semibold text-xs">—</span>;
+                              }
+                              const employmentStatus = activeContract.employment_status || "Full-time";
+                              const isVisible = activeContract.show_hired_badge;
+                              return (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#006e2f] border border-emerald-100">
+                                    Hired • {employmentStatus}
+                                  </span>
+                                  {!isVisible && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200">
+                                      <EyeOff size={10} /> Hidden
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </td>
                           <td className={ADMIN_TABLE_TD}>
                             <StatusBadge status={worker.account_status} />

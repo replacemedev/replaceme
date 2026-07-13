@@ -22,6 +22,8 @@ export function ContractDetailClient({
   const [hourlyRate, setHourlyRate] = useState(contract.hourlyRate);
   const [weeklyHours, setWeeklyHours] = useState(contract.weeklyHours);
   const [status, setStatus] = useState(contract.status);
+  const [employmentStatus, setEmploymentStatus] = useState(contract.employmentStatus || "Full-time");
+  const [showHiredBadge, setShowHiredBadge] = useState(contract.showHiredBadge);
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
 
   const save = () => {
@@ -32,6 +34,8 @@ export function ContractDetailClient({
         hourlyRate,
         weeklyHours,
         status: status as "active" | "paused" | "terminated",
+        employmentStatus,
+        showHiredBadge,
       });
       if (result.success) {
         toast.success("Contract updated", { id: toastId });
@@ -99,6 +103,37 @@ export function ContractDetailClient({
             <option value="terminated">Terminated</option>
           </select>
         </label>
+
+        <label className="block text-sm font-semibold text-slate-700">
+          Employment Status
+          <select
+            value={employmentStatus}
+            onChange={(e) => setEmploymentStatus(e.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30 bg-white"
+          >
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Contract">Contract</option>
+          </select>
+        </label>
+
+        <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
+          <input
+            type="checkbox"
+            id="show-hired-badge-detail-checkbox"
+            checked={showHiredBadge}
+            onChange={(e) => setShowHiredBadge(e.target.checked)}
+            className="w-4.5 h-4.5 rounded-md border-slate-350 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer mt-0.5 shrink-0"
+          />
+          <label htmlFor="show-hired-badge-detail-checkbox" className="select-none cursor-pointer">
+            <span className="block text-xs font-bold text-slate-850">
+              Display 'Hired' badge on Worker's public profile
+            </span>
+            <span className="block text-[10px] text-slate-500 font-semibold mt-0.5">
+              This badge will be visible to everyone when checked. Toggle off to remove visibility immediately.
+            </span>
+          </label>
+        </div>
 
         <div className="hidden lg:flex flex-wrap gap-3 pt-2">
           <button

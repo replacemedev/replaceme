@@ -12,6 +12,8 @@ export interface HiredWorker {
   weeklyHours: number;
   status: ContractStatus;
   online: boolean; // Dynamic status indicator
+  showHiredBadge: boolean;
+  employmentStatus: string | null;
 }
 
 export interface HiredStats {

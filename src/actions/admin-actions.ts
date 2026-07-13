@@ -340,7 +340,23 @@ export async function fetchAdminWorkersSafe(): Promise<
     const { data, error } = await supabase
       .from("profiles")
       .select(
-        "id, first_name, last_name, email, professional_title, account_status, verification_status, is_verified, created_at"
+        `
+        id,
+        first_name,
+        last_name,
+        email,
+        professional_title,
+        account_status,
+        verification_status,
+        is_verified,
+        created_at,
+        contracts!contracts_worker_id_fkey (
+          id,
+          employment_status,
+          show_hired_badge,
+          status
+        )
+        `
       )
       .eq("role", "worker")
       .order("created_at", { ascending: false });

@@ -117,6 +117,7 @@ export function ApplicantTrackerTable({
                     <ApplicationStatusDropdown
                       applicationId={row.id}
                       status={row.status}
+                      candidateName={row.name}
                     />
                   )}
                 </td>

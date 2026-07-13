@@ -7,6 +7,8 @@ export const updateApplicationStatusSchema = z.object({
   status: z.enum(APPLICATION_STATUSES, {
     message: "Invalid application status.",
   }),
+  employmentStatus: z.string().optional().nullable(),
+  showHiredBadge: z.boolean().optional(),
 });
 
 export const deleteApplicationSchema = z.object({

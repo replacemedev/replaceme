@@ -72,6 +72,12 @@ export const adminWorkerRowSchema = z.object({
   verification_status: verificationStatusSchema.catch("unverified"),
   is_verified: z.boolean().catch(false),
   created_at: z.string(),
+  contracts: z.array(z.object({
+    id: z.string().uuid(),
+    employment_status: z.string().nullable(),
+    show_hired_badge: z.boolean(),
+    status: z.string()
+  })).optional().nullable(),
 });
 
 export const adminEmployerRowSchema = z.object({
@@ -134,6 +140,12 @@ export interface AdminWorkerRow {
   verification_status: VerificationStatus;
   is_verified: boolean;
   created_at: string;
+  contracts?: {
+    id: string;
+    employment_status: string | null;
+    show_hired_badge: boolean;
+    status: string;
+  }[] | null;
 }
 
 export interface AdminEmployerRow {

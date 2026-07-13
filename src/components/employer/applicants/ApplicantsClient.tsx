@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { AlertCircle, LayoutGrid, Table2, KanbanSquare, AlertTriangle } from "lucide-react";
+import { HireWorkerModal } from "./HireWorkerModal";
 import { Applicant } from "@/types/employer/applicants";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { useOpenEmployerMessagingThread } from "@/components/shared/messaging/useOpenEmployerMessagingThread";
@@ -49,6 +51,8 @@ export function ApplicantsClient({
   applicantsPerJobLimit,
   hiddenApplicantCount,
 }: ApplicantsClientProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const { openThread } = useOpenEmployerMessagingThread();
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,6 +60,7 @@ export function ApplicantsClient({
   const [sortKey, setSortKey] = useState<ApplicantSortKey>("newest");
   const [viewMode, setViewMode] = useState<"pipeline" | "cards" | "table">("pipeline");
   const [schedulingApp, setSchedulingApp] = useState<{ id: string; name: string } | null>(null);
+  const [hiringApp, setHiringApp] = useState<{ id: string; name: string } | null>(null);
   const [expandedMobileStage, setExpandedMobileStage] = useState<ApplicationStatus | null>("PENDING");
   const [deletingApp, setDeletingApp] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -95,9 +100,32 @@ export function ApplicantsClient({
 
     if (targetStatus === "INTERVIEW_SCHEDULED") {
       setSchedulingApp({ id, name: app.name });
+    } else if (targetStatus === "HIRED") {
+      setHiringApp({ id, name: app.name });
     } else {
       await triggerStatusChange(id, targetStatus);
     }
+  };
+
+  const handleConfirmHire = (employmentStatus: string, showHiredBadge: boolean) => {
+    if (!hiringApp) return;
+    const { id } = hiringApp;
+    setHiringApp(null);
+
+    setApplicants((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: "HIRED" } : a))
+    );
+
+    startTransition(async () => {
+      const result = await updateApplicationStatus(id, "HIRED", employmentStatus, showHiredBadge);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to update status.");
+        setApplicants(initialApplicants);
+        return;
+      }
+      toast.success("Candidate successfully hired!");
+      router.refresh();
+    });
   };
 
   const triggerStatusChange = async (id: string, nextStatus: ApplicationStatus) => {
@@ -506,6 +534,16 @@ export function ApplicantsClient({
             </div>
           </div>
         </div>
+      )}
+
+      {hiringApp && (
+        <HireWorkerModal
+          open={!!hiringApp}
+          onClose={() => setHiringApp(null)}
+          candidateName={hiringApp.name}
+          onConfirm={handleConfirmHire}
+          isPending={isPending}
+        />
       )}
     </div>
   );

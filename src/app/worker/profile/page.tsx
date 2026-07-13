@@ -167,6 +167,20 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
         )
       : 0;
 
+  const { data: activeContract } = await supabase
+    .from("contracts")
+    .select("employment_status, show_hired_badge")
+    .eq("worker_id", workerId)
+    .eq("status", "active")
+    .eq("show_hired_badge", true)
+    .maybeSingle();
+
+  const hiredBadge = activeContract
+    ? {
+        employmentStatus: activeContract.employment_status,
+      }
+    : null;
+
   return (
     <WorkerProfileEditor
       profile={profile}
@@ -176,6 +190,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
       reviewCount={reviewCount}
       averageRating={averageRating}
       isOwner={isOwner}
+      hiredBadge={hiredBadge}
     />
   );
 }

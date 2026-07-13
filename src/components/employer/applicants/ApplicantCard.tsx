@@ -127,6 +127,7 @@ export function ApplicantCard({
           <ApplicationStatusDropdown
             applicationId={applicant.id}
             status={applicant.status}
+            candidateName={applicant.name}
           />
         </div>
 

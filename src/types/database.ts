@@ -124,6 +124,8 @@ export type Database = {
           match_score: number
           received_at: string | null
           status: Database["public"]["Enums"]["application_status"]
+          employment_status: string | null
+          show_hired_badge: boolean
         }
         Insert: {
           application_subject?: string | null
@@ -138,6 +140,8 @@ export type Database = {
           match_score?: number
           received_at?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          employment_status?: string | null
+          show_hired_badge?: boolean
         }
         Update: {
           application_subject?: string | null
@@ -152,6 +156,8 @@ export type Database = {
           match_score?: number
           received_at?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          employment_status?: string | null
+          show_hired_badge?: boolean
         }
         Relationships: [
           {
@@ -786,6 +792,8 @@ export type Database = {
           updated_at: string
           weekly_hours: number
           worker_id: string
+          employment_status: string | null
+          show_hired_badge: boolean
         }
         Insert: {
           created_at?: string
@@ -799,6 +807,8 @@ export type Database = {
           updated_at?: string
           weekly_hours: number
           worker_id: string
+          employment_status?: string | null
+          show_hired_badge?: boolean
         }
         Update: {
           created_at?: string
@@ -812,6 +822,8 @@ export type Database = {
           updated_at?: string
           weekly_hours?: number
           worker_id?: string
+          employment_status?: string | null
+          show_hired_badge?: boolean
         }
         Relationships: [
           {

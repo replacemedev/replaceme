@@ -16,6 +16,8 @@ const updateContractSchema = z
     hourlyRate: z.number().min(0),
     weeklyHours: z.number().min(1).max(168),
     status: z.enum(["active", "paused", "terminated", "offered"]),
+    employmentStatus: z.string().optional().nullable(),
+    showHiredBadge: z.boolean().optional(),
   })
   .strict();
 
@@ -31,6 +33,8 @@ export interface EmployerContractDetail {
   employmentType: string;
   status: string;
   startDate: string;
+  employmentStatus: string | null;
+  showHiredBadge: boolean;
 }
 
 export async function getEmployerContract(
@@ -53,6 +57,8 @@ export async function getEmployerContract(
       employment_type,
       status,
       start_date,
+      show_hired_badge,
+      employment_status,
       profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, professional_title ),
       jobs ( title )
     `
@@ -84,6 +90,8 @@ export async function getEmployerContract(
     employmentType: contract.employment_type,
     status: contract.status,
     startDate: contract.start_date,
+    employmentStatus: contract.employment_status || null,
+    showHiredBadge: Boolean(contract.show_hired_badge),
   };
 }
 
@@ -92,14 +100,28 @@ export async function updateEmployerContract(payload: unknown) {
     const parsed = updateContractSchema.parse(payload);
     const { supabase, profile } = await requireRole("employer");
 
+    const updateFields: any = {
+      hourly_rate: parsed.hourlyRate,
+      weekly_hours: parsed.weeklyHours,
+      status: parsed.status,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (parsed.employmentStatus !== undefined) {
+      updateFields.employment_status = parsed.employmentStatus;
+      if (parsed.employmentStatus) {
+        const s = parsed.employmentStatus.toLowerCase();
+        updateFields.employment_type = s.includes("part-time") ? "part-time" : s.includes("contract") ? "contract" : "full-time";
+      }
+    }
+
+    if (parsed.showHiredBadge !== undefined) {
+      updateFields.show_hired_badge = parsed.showHiredBadge;
+    }
+
     const { error } = await supabase
       .from("contracts")
-      .update({
-        hourly_rate: parsed.hourlyRate,
-        weekly_hours: parsed.weeklyHours,
-        status: parsed.status,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateFields)
       .eq("id", parsed.contractId)
       .eq("employer_id", profile.id);
 
@@ -139,4 +161,20 @@ export async function terminateEmployerContract(contractId: string) {
   });
 
   return result.success ? { success: true } : { error: result.error };
+}
+
+export async function updateHiredBadgeVisibility(contractId: string, show: boolean) {
+  const { supabase, profile } = await requireRole("employer");
+  const { error } = await supabase
+    .from("contracts")
+    .update({ show_hired_badge: show, updated_at: new Date().toISOString() })
+    .eq("id", contractId)
+    .eq("employer_id", profile.id);
+
+  if (error) return { success: false, error: "Failed to update badge visibility." };
+
+  await invalidateEmployerHiringCache(profile.id);
+  revalidatePath(`/employer/contracts/${contractId}`);
+  revalidatePath("/employer/hired");
+  return { success: true };
 }

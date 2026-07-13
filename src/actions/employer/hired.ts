@@ -36,6 +36,8 @@ async function loadHiredDataForEmployer(
         employment_type,
         status,
         worker_id,
+        show_hired_badge,
+        employment_status,
         profiles!contracts_worker_id_fkey (
           id,
           first_name,
@@ -89,6 +91,8 @@ async function loadHiredDataForEmployer(
       weeklyHours: Number(contract.weekly_hours) || 0,
       status: contract.status as ContractStatus,
       online,
+      showHiredBadge: Boolean(contract.show_hired_badge),
+      employmentStatus: contract.employment_status || null,
     });
 
     if (contract.status === "active") {
