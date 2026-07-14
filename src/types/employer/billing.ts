@@ -11,8 +11,11 @@ export interface AccountSettings {
   active: boolean;
   nextBillingDate: string | null;
   status: string;
+  /** Raw DB status for gating UI (past_due, unpaid, incomplete, …) */
+  statusRaw: string;
   cancelAtPeriodEnd: boolean;
   hasStripeSubscription: boolean;
+  lastPaymentError: string | null;
   /** Paid tier scheduled at period end (Stripe subscription schedule). */
   scheduledPlan: SubscriptionTier | null;
   scheduledEffectiveAt: string | null;

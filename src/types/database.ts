@@ -1141,7 +1141,9 @@ export type Database = {
           id: string
           job_posts_used: number
           last_payment_at: string | null
+          last_payment_error: string | null
           last_payment_status: string | null
+          last_stripe_event_created: number | null
           last_stripe_event_id: string | null
           override_by: string | null
           override_expires_at: string | null
@@ -1153,6 +1155,8 @@ export type Database = {
           scheduled_plan_slug: string | null
           status: string
           stripe_customer_id: string | null
+          stripe_dispute_id: string | null
+          stripe_dispute_status: string | null
           stripe_subscription_id: string | null
           trial_end: string | null
           unit_amount_cents: number | null
@@ -1172,7 +1176,9 @@ export type Database = {
           id?: string
           job_posts_used?: number
           last_payment_at?: string | null
+          last_payment_error?: string | null
           last_payment_status?: string | null
+          last_stripe_event_created?: number | null
           last_stripe_event_id?: string | null
           override_by?: string | null
           override_expires_at?: string | null
@@ -1184,6 +1190,8 @@ export type Database = {
           scheduled_plan_slug?: string | null
           status?: string
           stripe_customer_id?: string | null
+          stripe_dispute_id?: string | null
+          stripe_dispute_status?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
           unit_amount_cents?: number | null
@@ -1203,12 +1211,16 @@ export type Database = {
           id?: string
           job_posts_used?: number
           last_payment_at?: string | null
+          last_payment_error?: string | null
           last_payment_status?: string | null
+          last_stripe_event_created?: number | null
           last_stripe_event_id?: string | null
           override_by?: string | null
           override_expires_at?: string | null
           override_plan_id?: string | null
           override_reason?: string | null
+          stripe_dispute_id?: string | null
+          stripe_dispute_status?: string | null
           plan_id?: string | null
           plan_slug?: string | null
           scheduled_effective_at?: string | null

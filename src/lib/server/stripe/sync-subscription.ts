@@ -24,10 +24,9 @@ function mapStripeSubscriptionStatus(
     case "past_due":
     case "canceled":
     case "unpaid":
-      return status;
     case "incomplete":
+      return status;
     case "incomplete_expired":
-      return "inactive";
     case "paused":
       return "inactive";
     default:
@@ -171,7 +170,8 @@ export async function syncEmployerSubscription(
 
 export async function syncEmployerSubscriptionFromStripe(
   subscription: Stripe.Subscription,
-  stripeEventId?: string
+  stripeEventId?: string,
+  stripeEventCreated?: number
 ): Promise<{ success: boolean; error?: string }> {
   const employerId = subscription.metadata?.employer_id;
 
@@ -182,8 +182,35 @@ export async function syncEmployerSubscriptionFromStripe(
 
   const supabase = await createAdminClient();
 
-  if (subscription.status === "canceled") {
-    return downgradeEmployerToDiscovery(employerId, stripeEventId);
+  // 2026: ignore stale deliveries — Stripe does not guarantee event order.
+  if (stripeEventCreated != null) {
+    const { data: existingGuard } = await supabase
+      .from("employer_subscriptions")
+      .select("last_stripe_event_created")
+      .eq("employer_id", employerId)
+      .maybeSingle();
+
+    if (
+      existingGuard?.last_stripe_event_created != null &&
+      stripeEventCreated < existingGuard.last_stripe_event_created
+    ) {
+      safeLog(
+        `[Stripe] Skipping stale event ${stripeEventId ?? "?"} (created=${stripeEventCreated} < ${existingGuard.last_stripe_event_created})`
+      );
+      return { success: true };
+    }
+  }
+
+  // incomplete_expired = checkout abandoned within ~23h — revoke paid access.
+  if (
+    subscription.status === "canceled" ||
+    subscription.status === "incomplete_expired"
+  ) {
+    return downgradeEmployerToDiscovery(
+      employerId,
+      stripeEventId,
+      stripeEventCreated
+    );
   }
 
   const resolved = await resolvePlanForSubscription(subscription);
@@ -244,6 +271,7 @@ export async function syncEmployerSubscriptionFromStripe(
       cancel_at_period_end: subscription.cancel_at_period_end,
       trial_end: stripeTimestampToIso(subscription.trial_end),
       last_stripe_event_id: stripeEventId ?? null,
+      last_stripe_event_created: stripeEventCreated ?? null,
       unit_amount_cents: unitAmountCents,
       billing_interval: billingInterval,
       ...(scheduleCleared
@@ -302,7 +330,8 @@ export async function syncEmployerSubscriptionFromStripe(
 
 export async function downgradeEmployerToDiscovery(
   employerId: string,
-  stripeEventId?: string
+  stripeEventId?: string,
+  stripeEventCreated?: number
 ): Promise<{ success: boolean; error?: string }> {
   const discovery = await getDiscoveryPlan();
   if (!discovery) {
@@ -322,6 +351,7 @@ export async function downgradeEmployerToDiscovery(
       scheduled_plan_slug: null,
       scheduled_effective_at: null,
       last_stripe_event_id: stripeEventId ?? null,
+      last_stripe_event_created: stripeEventCreated ?? null,
       updated_at: new Date().toISOString(),
     })
     .eq("employer_id", employerId);

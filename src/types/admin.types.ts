@@ -228,6 +228,7 @@ export interface AdminSubscriptionRow {
   current_period_end: string | null;
   last_payment_status: string | null;
   last_payment_at: string | null;
+  last_payment_error: string | null;
   failed_payment_count: number;
   job_posts_used: number;
   unlocks_used: number;
@@ -235,6 +236,10 @@ export interface AdminSubscriptionRow {
   scheduled_plan_slug: string | null;
   scheduled_effective_at: string | null;
   cancel_at_period_end: boolean;
+  stripe_dispute_status: string | null;
+  override_plan_id: string | null;
+  override_expires_at: string | null;
+  override_reason: string | null;
 }
 
 export interface AdminBillingLedgerRow {
@@ -262,6 +267,7 @@ export interface AdminBillingMetrics {
   estimated_mrr_cents: number;
   total_accounts: number;
   failed_payments_30d: number;
+  at_risk_count: number;
   tier_breakdown: AdminBillingTierBreakdown[];
   scheduled_changes?: number;
 }
@@ -355,6 +361,29 @@ export const adminSubscriptionOverrideSchema = z.object({
   subscriptionId: z.string().uuid(),
   jobPostsUsed: z.number().int().min(0).max(9999),
   unlocksUsed: z.number().int().min(0).max(9999),
+  note: z.string().min(3).max(500),
+});
+
+export const adminPlanOverrideSchema = z.object({
+  employerId: z.string().uuid(),
+  planSlug: z.enum(["discovery", "starter", "growth", "scale"]),
+  /** Days until override expires; null = permanent until revoked */
+  expiresInDays: z.number().int().min(1).max(365).nullable(),
+  reason: z.string().min(3).max(500),
+});
+
+export const adminRevokePlanOverrideSchema = z.object({
+  employerId: z.string().uuid(),
+  reason: z.string().min(3).max(500),
+});
+
+export const adminIssueRefundSchema = z.object({
+  employerId: z.string().uuid(),
+  /** PaymentIntent id (pi_...) or Charge id (ch_...) */
+  stripePaymentRef: z.string().min(3).max(128),
+  /** Full refund when omitted / null */
+  amountCents: z.number().int().positive().nullable(),
+  reason: z.enum(["duplicate", "fraudulent", "requested_by_customer"]).default("requested_by_customer"),
   note: z.string().min(3).max(500),
 });
 

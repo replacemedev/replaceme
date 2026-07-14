@@ -56,6 +56,7 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         unlocks_used,
         scheduled_plan_slug,
         scheduled_effective_at,
+        last_payment_error,
         billing_plans!employer_subscriptions_plan_id_fkey (
           name,
           slug,
@@ -78,8 +79,10 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         active: true,
         nextBillingDate: null,
         status: "Active",
+        statusRaw: "active",
         cancelAtPeriodEnd: false,
         hasStripeSubscription: false,
+        lastPaymentError: null,
         scheduledPlan: null,
         scheduledEffectiveAt: null,
       };
@@ -119,8 +122,10 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
       status:
         subscription.status.charAt(0).toUpperCase() +
         subscription.status.slice(1),
+      statusRaw: subscription.status,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       hasStripeSubscription: Boolean(subscription.stripe_subscription_id),
+      lastPaymentError: subscription.last_payment_error ?? null,
       scheduledPlan,
       scheduledEffectiveAt: subscription.scheduled_effective_at,
     };

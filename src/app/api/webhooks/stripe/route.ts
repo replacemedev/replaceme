@@ -15,16 +15,22 @@ import {
   handleInvoicePaid,
   handleInvoicePaymentFailed,
 } from "@/lib/server/stripe/invoice-handlers";
+import { handleChargeDispute } from "@/lib/server/stripe/dispute-handlers";
 import { getInvoiceSubscriptionRef } from "@/lib/server/stripe/invoice-utils";
 import { safeError, safeLog } from "@/utils/logger";
 
-async function retrieveSubscription(
+/**
+ * 2026 best practice: event payloads can be stale / out of order.
+ * Refetch the live Subscription from Stripe before projecting to DB.
+ */
+async function retrieveLiveSubscription(
   stripe: Stripe,
   subscriptionRef: string | Stripe.Subscription | null | undefined
 ): Promise<Stripe.Subscription | null> {
   if (!subscriptionRef) return null;
-  if (typeof subscriptionRef !== "string") return subscriptionRef;
-  return stripe.subscriptions.retrieve(subscriptionRef);
+  const id =
+    typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef.id;
+  return stripe.subscriptions.retrieve(id);
 }
 
 async function handleStripeEvent(event: Stripe.Event): Promise<void> {
@@ -38,14 +44,15 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.mode !== "subscription") break;
 
-      const subscription = await retrieveSubscription(
+      const subscription = await retrieveLiveSubscription(
         stripe,
         session.subscription
       );
       if (subscription) {
         const result = await syncEmployerSubscriptionFromStripe(
           subscription,
-          event.id
+          event.id,
+          event.created
         );
         if (!result.success) {
           throw new Error(result.error ?? "Subscription sync failed");
@@ -56,10 +63,13 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
 
     case "customer.subscription.created":
     case "customer.subscription.updated": {
-      const subscription = event.data.object as Stripe.Subscription;
+      const payload = event.data.object as Stripe.Subscription;
+      const subscription = await retrieveLiveSubscription(stripe, payload.id);
+      if (!subscription) break;
       const result = await syncEmployerSubscriptionFromStripe(
         subscription,
-        event.id
+        event.id,
+        event.created
       );
       if (!result.success) {
         throw new Error(result.error ?? "Subscription sync failed");
@@ -68,11 +78,32 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
     }
 
     case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      const employerId = subscription.metadata?.employer_id;
+      const payload = event.data.object as Stripe.Subscription;
+      // Still refetch — a newer create/update may have already won.
+      const live = await retrieveLiveSubscription(stripe, payload.id).catch(
+        () => null
+      );
+      if (live && live.status !== "canceled") {
+        const result = await syncEmployerSubscriptionFromStripe(
+          live,
+          event.id,
+          event.created
+        );
+        if (!result.success) {
+          throw new Error(result.error ?? "Subscription sync failed");
+        }
+        break;
+      }
+
+      const employerId =
+        live?.metadata?.employer_id ?? payload.metadata?.employer_id;
       if (!employerId) break;
 
-      const result = await downgradeEmployerToDiscovery(employerId, event.id);
+      const result = await downgradeEmployerToDiscovery(
+        employerId,
+        event.id,
+        event.created
+      );
       if (!result.success) {
         throw new Error(result.error ?? "Downgrade failed");
       }
@@ -84,11 +115,15 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       const subscriptionRef = getInvoiceSubscriptionRef(invoice);
       if (!subscriptionRef) break;
       await handleInvoicePaid(invoice, event.id);
-      const subscription = await retrieveSubscription(stripe, subscriptionRef);
+      const subscription = await retrieveLiveSubscription(
+        stripe,
+        subscriptionRef
+      );
       if (subscription) {
         const result = await syncEmployerSubscriptionFromStripe(
           subscription,
-          event.id
+          event.id,
+          event.created
         );
         if (!result.success) {
           throw new Error(result.error ?? "Invoice paid sync failed");
@@ -99,11 +134,25 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
-      const subscription = await retrieveSubscription(
+      const subscription = await retrieveLiveSubscription(
         stripe,
         getInvoiceSubscriptionRef(invoice)
       );
-      await handleInvoicePaymentFailed(invoice, event.id, subscription);
+      await handleInvoicePaymentFailed(
+        invoice,
+        event.id,
+        subscription,
+        event.created
+      );
+      break;
+    }
+
+    case "charge.dispute.created":
+    case "charge.dispute.updated":
+    case "charge.dispute.closed":
+    case "charge.dispute.funds_withdrawn": {
+      const dispute = event.data.object as Stripe.Dispute;
+      await handleChargeDispute(dispute, event.type, event.id, event.created);
       break;
     }
 
@@ -153,6 +202,7 @@ export async function POST(request: Request) {
     );
   }
 
+  // Raw body required for signature verification — never use parsed JSON.
   const body = await request.text();
   const headerStore = await headers();
   const signature = headerStore.get("stripe-signature");

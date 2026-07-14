@@ -54,8 +54,10 @@ export default async function AccountSettingsPage() {
     active: false,
     nextBillingDate: null,
     status: "Inactive",
+    statusRaw: "inactive",
     cancelAtPeriodEnd: false,
     hasStripeSubscription: false,
+    lastPaymentError: null,
     scheduledPlan: null,
     scheduledEffectiveAt: null,
   };

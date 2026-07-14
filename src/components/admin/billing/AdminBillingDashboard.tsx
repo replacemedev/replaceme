@@ -215,7 +215,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
         <div className="space-y-6">
           <section className="space-y-4">
             <AdminSectionLabel>Billing overview</AdminSectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
               <StatCard
                 variant="dashboard"
                 title="Active Subscriptions"
@@ -247,6 +247,14 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                 icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
                 iconBgClass="bg-amber-50"
                 iconColorClass="text-amber-600"
+              />
+              <StatCard
+                variant="dashboard"
+                title="At risk"
+                value={metrics.at_risk_count ?? 0}
+                icon={<AlertTriangle className="h-4 w-4" aria-hidden />}
+                iconBgClass="bg-red-50"
+                iconColorClass="text-red-600"
               />
               <StatCard
                 variant="dashboard"
@@ -323,8 +331,12 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                   >
                     <option value="all">All Statuses</option>
                     <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="trialing">Trialing</option>
+                    <option value="past_due">Past due</option>
+                    <option value="unpaid">Unpaid</option>
+                    <option value="incomplete">Incomplete</option>
                     <option value="canceled">Canceled</option>
+                    <option value="inactive">Inactive</option>
                   </select>
                 </div>
 

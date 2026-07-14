@@ -44,6 +44,7 @@ export async function handleInvoicePaid(
     .update({
       last_payment_status: "paid",
       last_payment_at: now,
+      last_payment_error: null,
       failed_payment_count: 0,
       updated_at: now,
     })
@@ -66,7 +67,8 @@ export async function handleInvoicePaid(
 export async function handleInvoicePaymentFailed(
   invoice: Stripe.Invoice,
   stripeEventId: string,
-  subscription: Stripe.Subscription | null
+  subscription: Stripe.Subscription | null,
+  stripeEventCreated?: number
 ): Promise<void> {
   const employerId =
     subscription?.metadata?.employer_id ??
@@ -77,7 +79,8 @@ export async function handleInvoicePaymentFailed(
   if (subscription) {
     const result = await syncEmployerSubscriptionFromStripe(
       subscription,
-      stripeEventId
+      stripeEventId,
+      stripeEventCreated
     );
     if (!result.success) {
       throw new Error(result.error ?? "Past-due sync failed");
@@ -94,11 +97,18 @@ export async function handleInvoicePaymentFailed(
   const failedCount = (sub?.failed_payment_count ?? 0) + 1;
   const now = new Date().toISOString();
 
+  const lastError =
+    invoice.last_finalization_error?.message ||
+    (invoice as Stripe.Invoice & { last_payment_error?: { message?: string } })
+      .last_payment_error?.message ||
+    `Invoice ${invoice.id} payment failed`;
+
   await supabase
     .from("employer_subscriptions")
     .update({
       last_payment_status: "failed",
       last_payment_at: now,
+      last_payment_error: lastError,
       failed_payment_count: failedCount,
       updated_at: now,
     })

@@ -104,7 +104,8 @@ function portalFeatures(
     subscription_update: {
       enabled: true,
       default_allowed_updates: ["price"],
-      proration_behavior: "create_prorations",
+      // Immediate invoice on upgrades; portal schedules downgrades when configured.
+      proration_behavior: "always_invoice",
       products,
     },
   };

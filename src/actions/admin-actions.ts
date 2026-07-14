@@ -676,6 +676,7 @@ export async function fetchAdminSubscriptions(): Promise<
       current_period_end,
       last_payment_status,
       last_payment_at,
+      last_payment_error,
       failed_payment_count,
       job_posts_used,
       unlocks_used,
@@ -683,6 +684,10 @@ export async function fetchAdminSubscriptions(): Promise<
       scheduled_plan_slug,
       scheduled_effective_at,
       cancel_at_period_end,
+      stripe_dispute_status,
+      override_plan_id,
+      override_expires_at,
+      override_reason,
       billing_plans!employer_subscriptions_plan_id_fkey (
         name,
         price,
@@ -729,6 +734,7 @@ export async function fetchAdminSubscriptions(): Promise<
       current_period_end: row.current_period_end,
       last_payment_status: row.last_payment_status ?? null,
       last_payment_at: row.last_payment_at ?? null,
+      last_payment_error: row.last_payment_error ?? null,
       failed_payment_count: row.failed_payment_count ?? 0,
       job_posts_used: row.job_posts_used,
       unlocks_used: row.unlocks_used,
@@ -736,6 +742,10 @@ export async function fetchAdminSubscriptions(): Promise<
       scheduled_plan_slug: row.scheduled_plan_slug ?? null,
       scheduled_effective_at: row.scheduled_effective_at ?? null,
       cancel_at_period_end: Boolean(row.cancel_at_period_end),
+      stripe_dispute_status: row.stripe_dispute_status ?? null,
+      override_plan_id: row.override_plan_id ?? null,
+      override_expires_at: row.override_expires_at ?? null,
+      override_reason: row.override_reason ?? null,
     };
   });
 }
