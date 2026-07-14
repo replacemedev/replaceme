@@ -54,10 +54,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
   const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
   const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
   const [tinNumber, setTinNumber] = useState(draft.tinNumber || "");
-  const [idType, setIdType] = useState(draft.idType || "");
-  const [idNumber, setIdNumber] = useState(draft.idNumber || "");
-  const [idExpirationDate, setIdExpirationDate] = useState(draft.idExpirationDate || "");
-  const [idIssuingCountry, setIdIssuingCountry] = useState(draft.idIssuingCountry || "");
   const [personalAddress, setPersonalAddress] = useState(draft.personalAddress || "");
   const [personalCity, setPersonalCity] = useState(draft.personalCity || "");
   const [personalStateProvince, setPersonalStateProvince] = useState(draft.personalStateProvince || "");
@@ -280,10 +276,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
     !civilStatus ||
     !phoneNumber.trim() ||
     !tinNumber.trim() ||
-    !idType ||
-    !idNumber.trim() ||
-    !idExpirationDate ||
-    !idIssuingCountry.trim() ||
     !personalAddress.trim() ||
     !personalCity.trim() ||
     !personalStateProvince.trim() ||
@@ -306,10 +298,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
             civilStatus,
             phoneNumber: phoneNumber.trim(),
             tinNumber: tinNumber.trim(),
-            idType,
-            idNumber: idNumber.trim(),
-            idExpirationDate,
-            idIssuingCountry: idIssuingCountry.trim(),
             personalAddress: personalAddress.trim(),
             personalCity: personalCity.trim(),
             personalStateProvince: personalStateProvince.trim(),
@@ -432,70 +420,18 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
         </div>
 
         <div className="border-t border-slate-100 pt-4 space-y-4">
-          <h3 className="text-sm font-bold text-slate-900">Statutory & Identity</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              TIN / EIN Number
-              <input
-                type="text"
-                required
-                value={tinNumber}
-                onChange={(e) => setTinNumber(e.target.value)}
-                placeholder="Tax ID Number"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-              />
-            </label>
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              ID Type
-              <select
-                required
-                value={idType}
-                onChange={(e) => setIdType(e.target.value)}
-                className={ONBOARDING_SELECT_CLASS}
-              >
-                <option value="">Select ID Type</option>
-                <option value="Passport">Passport</option>
-                <option value="Driver's License">Driver&apos;s License</option>
-                <option value="National ID">National ID</option>
-                <option value="UMID">UMID</option>
-                <option value="Other">Other Government ID</option>
-              </select>
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              ID Number
-              <input
-                type="text"
-                required
-                value={idNumber}
-                onChange={(e) => setIdNumber(e.target.value)}
-                placeholder="ID Number"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-              />
-            </label>
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              ID Expiration Date
-              <input
-                type="date"
-                required
-                value={idExpirationDate}
-                onChange={(e) => setIdExpirationDate(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-              />
-            </label>
-            <label className="block space-y-2 text-sm font-medium text-slate-700">
-              ID Issuing Country
-              <input
-                type="text"
-                required
-                value={idIssuingCountry}
-                onChange={(e) => setIdIssuingCountry(e.target.value)}
-                placeholder="e.g. Philippines"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-              />
-            </label>
-          </div>
+          <h3 className="text-sm font-bold text-slate-900">Statutory Details</h3>
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            TIN / EIN Number
+            <input
+              type="text"
+              required
+              value={tinNumber}
+              onChange={(e) => setTinNumber(e.target.value)}
+              placeholder="Tax ID Number"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            />
+          </label>
         </div>
       </div>
     </OnboardingWizardShell>

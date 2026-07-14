@@ -106,25 +106,11 @@ export function EmployerPersonalProfileCard({
         </div>
 
         <div className="border-t border-slate-50 pt-6">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">KYC & Statutory</h3>
-          <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Statutory Details</h3>
+          <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">TIN</dt>
+              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">TIN / EIN Number</dt>
               <dd className="mt-1 text-sm font-semibold text-slate-800">{account.tinNumber ?? "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">ID Verification</dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.idType ? `${account.idType} (${account.idNumber})` : "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">ID Expiration & Country</dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.idExpirationDate
-                  ? `${account.idExpirationDate} (${account.idIssuingCountry || "—"})`
-                  : "—"}
-              </dd>
             </div>
           </dl>
         </div>
@@ -142,10 +128,6 @@ export function EmployerPersonalProfileCard({
           civilStatus: account.civilStatus || "",
           phoneNumber: account.phoneNumber || "",
           tinNumber: account.tinNumber || "",
-          idType: account.idType || "",
-          idNumber: account.idNumber || "",
-          idExpirationDate: account.idExpirationDate || "",
-          idIssuingCountry: account.idIssuingCountry || "",
           personalAddress: account.personalAddress || "",
           personalCity: account.personalCity || "",
           personalStateProvince: account.personalStateProvince || "",

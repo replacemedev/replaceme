@@ -17,10 +17,6 @@ export type EmployerAccountDetails = {
   civilStatus: string | null;
   phoneNumber: string | null;
   tinNumber: string | null;
-  idType: string | null;
-  idNumber: string | null;
-  idExpirationDate: string | null;
-  idIssuingCountry: string | null;
   personalAddress: string | null;
   personalCity: string | null;
   personalStateProvince: string | null;
@@ -39,7 +35,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name, username, email, avatar_url, role, birth_date, gender, civil_status, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, personal_address, personal_city, personal_state_province, country")
+      .select("first_name, middle_name, last_name, username, email, avatar_url, role, birth_date, gender, civil_status, phone_number, tin_number, personal_address, personal_city, personal_state_province, country")
       .eq("id", user.id)
       .single();
 
@@ -58,10 +54,6 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
       civilStatus: profile.civil_status,
       phoneNumber: profile.phone_number,
       tinNumber: profile.tin_number,
-      idType: profile.id_type,
-      idNumber: profile.id_number,
-      idExpirationDate: profile.id_expiration_date,
-      idIssuingCountry: profile.id_issuing_country,
       personalAddress: profile.personal_address,
       personalCity: profile.personal_city,
       personalStateProvince: profile.personal_state_province,
@@ -96,10 +88,6 @@ export async function updateEmployerAccountDetails(data: {
   civilStatus?: string | null;
   phoneNumber?: string | null;
   tinNumber?: string | null;
-  idType?: string | null;
-  idNumber?: string | null;
-  idExpirationDate?: string | null;
-  idIssuingCountry?: string | null;
   personalAddress?: string | null;
   personalCity?: string | null;
   personalStateProvince?: string | null;
@@ -125,10 +113,6 @@ export async function updateEmployerAccountDetails(data: {
         civil_status: data.civilStatus || null,
         phone_number: data.phoneNumber || null,
         tin_number: data.tinNumber || null,
-        id_type: data.idType || null,
-        id_number: data.idNumber || null,
-        id_expiration_date: data.idExpirationDate || null,
-        id_issuing_country: data.idIssuingCountry || null,
         personal_address: data.personalAddress || null,
         personal_city: data.personalCity || null,
         personal_state_province: data.personalStateProvince || null,

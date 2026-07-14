@@ -18,10 +18,6 @@ interface EmployerEditDetailsModalProps {
     civilStatus: string;
     phoneNumber: string;
     tinNumber: string;
-    idType: string;
-    idNumber: string;
-    idExpirationDate: string;
-    idIssuingCountry: string;
     personalAddress: string;
     personalCity: string;
     personalStateProvince: string;
@@ -46,10 +42,6 @@ export function EmployerEditDetailsModal({
   const [civilStatus, setCivilStatus] = useState(initial.civilStatus);
   const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
   const [tinNumber, setTinNumber] = useState(initial.tinNumber);
-  const [idType, setIdType] = useState(initial.idType);
-  const [idNumber, setIdNumber] = useState(initial.idNumber);
-  const [idExpirationDate, setIdExpirationDate] = useState(initial.idExpirationDate);
-  const [idIssuingCountry, setIdIssuingCountry] = useState(initial.idIssuingCountry);
   const [personalAddress, setPersonalAddress] = useState(initial.personalAddress);
   const [personalCity, setPersonalCity] = useState(initial.personalCity);
   const [personalStateProvince, setPersonalStateProvince] = useState(initial.personalStateProvince);
@@ -66,10 +58,6 @@ export function EmployerEditDetailsModal({
         civilStatus: civilStatus || null,
         phoneNumber: phoneNumber || null,
         tinNumber: tinNumber || null,
-        idType: idType || null,
-        idNumber: idNumber || null,
-        idExpirationDate: idExpirationDate || null,
-        idIssuingCountry: idIssuingCountry || null,
         personalAddress: personalAddress || null,
         personalCity: personalCity || null,
         personalStateProvince: personalStateProvince || null,
@@ -252,7 +240,7 @@ export function EmployerEditDetailsModal({
           </div>
         </div>
 
-        {/* Statutory Numbers */}
+        {/* Statutory Details */}
         <div className="space-y-3 pt-4 border-t border-slate-100">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Statutory Details</h3>
           <label className="block space-y-1 text-xs font-bold text-slate-500">
@@ -264,56 +252,6 @@ export function EmployerEditDetailsModal({
               className={inputClass}
             />
           </label>
-        </div>
-
-        {/* ID Verification Details */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Identity Document Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              ID Type
-              <select
-                value={idType}
-                onChange={(e) => setIdType(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">Select...</option>
-                <option value="Passport">Passport</option>
-                <option value="Driver's License">Driver's License</option>
-                <option value="National ID">National ID</option>
-                <option value="UMID">UMID</option>
-                <option value="Other">Other</option>
-              </select>
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              ID Number
-              <input
-                value={idNumber}
-                onChange={(e) => setIdNumber(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              ID Expiration Date
-              <input
-                type="date"
-                value={idExpirationDate}
-                onChange={(e) => setIdExpirationDate(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              ID Issuing Country
-              <input
-                value={idIssuingCountry}
-                onChange={(e) => setIdIssuingCountry(e.target.value)}
-                placeholder="e.g. United States"
-                className={inputClass}
-              />
-            </label>
-          </div>
         </div>
       </div>
     </ProfileModal>
