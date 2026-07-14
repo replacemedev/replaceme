@@ -21,13 +21,29 @@ export default async function EmployerLayout({
 
   if (session.userId) {
     const supabase = await createClient();
-    const { data } = await supabase
+    const withError = await supabase
       .from("employer_subscriptions")
       .select("status, last_payment_error")
       .eq("employer_id", session.userId)
       .maybeSingle();
-    billingStatus = data?.status ?? null;
-    lastPaymentError = data?.last_payment_error ?? null;
+
+    if (
+      withError.error &&
+      /last_payment_error|does not exist|schema cache/i.test(
+        withError.error.message
+      )
+    ) {
+      const fallback = await supabase
+        .from("employer_subscriptions")
+        .select("status")
+        .eq("employer_id", session.userId)
+        .maybeSingle();
+      billingStatus = fallback.data?.status ?? null;
+      lastPaymentError = null;
+    } else {
+      billingStatus = withError.data?.status ?? null;
+      lastPaymentError = withError.data?.last_payment_error ?? null;
+    }
   }
 
   return (

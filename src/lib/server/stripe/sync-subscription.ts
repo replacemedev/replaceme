@@ -10,7 +10,7 @@ import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
 import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
-import { extractSubscriptionPrice } from "@/lib/server/stripe/subscription-price";
+import { extractSubscriptionPrice, extractSubscriptionPeriod, getPrimaryPrice } from "@/lib/server/stripe/subscription-price";
 
 export type SyncMetaOverrides = {
   employer_id?: string;
@@ -43,17 +43,39 @@ function mapStripeSubscriptionStatus(
 }
 
 function priceIdOf(subscription: Stripe.Subscription): string | null {
-  const price = subscription.items.data[0]?.price;
-  if (!price) return null;
-  return typeof price === "string" ? price : price.id;
+  const price = getPrimaryPrice(subscription);
+  return price?.id ?? null;
 }
 
 function productIdOf(subscription: Stripe.Subscription): string | null {
-  const price = subscription.items.data[0]?.price;
-  if (!price || typeof price === "string") return null;
+  const price = getPrimaryPrice(subscription);
+  if (!price) return null;
   const product = price.product;
   if (!product) return null;
   return typeof product === "string" ? product : product.id;
+}
+
+/** Last-resort map when Stripe price IDs drift from billing_plans (sandbox rename). */
+async function resolvePlanByUnitAmount(
+  subscription: Stripe.Subscription
+): Promise<{ id: string; slug: string } | null> {
+  const { unitAmountCents } = extractSubscriptionPrice(subscription);
+  if (!unitAmountCents) return null;
+
+  const byAmount: Record<number, string> = {
+    1900: "starter",
+    3900: "growth",
+    7900: "scale",
+  };
+  const slug = byAmount[unitAmountCents];
+  if (!slug) return null;
+
+  const plan = await resolveBillingPlan(slug);
+  if (!plan) return null;
+  safeLog(
+    `[Stripe] Plan resolved by unit_amount=${unitAmountCents} → ${plan.slug}`
+  );
+  return { id: plan.id, slug: plan.slug ?? slug };
 }
 
 /**
@@ -86,6 +108,9 @@ async function resolvePlanForSubscription(
     }
   }
 
+  const byAmount = await resolvePlanByUnitAmount(subscription);
+  if (byAmount) return byAmount;
+
   // Fallbacks only when price/product not mapped in billing_plans
   const planId = overrides?.plan_id || subscription.metadata?.plan_id;
   if (planId) {
@@ -106,6 +131,7 @@ async function resolvePlanForSubscription(
   safeError("[Stripe] resolvePlanForSubscription: no mapping", {
     priceId,
     productId,
+    unitAmount: extractSubscriptionPrice(subscription).unitAmountCents,
     metadata: subscription.metadata,
   });
   return null;
@@ -357,12 +383,9 @@ export async function syncEmployerSubscriptionFromStripe(
   const planId = resolved.id;
   const planSlug = resolved.slug;
 
-  const periodFields = subscription as Stripe.Subscription & {
-    current_period_start?: number;
-    current_period_end?: number;
-  };
-  const periodStart = stripeTimestampToIso(periodFields.current_period_start);
-  const periodEnd = stripeTimestampToIso(periodFields.current_period_end);
+  const period = extractSubscriptionPeriod(subscription);
+  const periodStart = stripeTimestampToIso(period.start);
+  const periodEnd = stripeTimestampToIso(period.end);
   const customerId =
     typeof subscription.customer === "string"
       ? subscription.customer

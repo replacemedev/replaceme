@@ -46,27 +46,64 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
   try {
     const { supabase, profile } = await requireRole("employer");
 
-    const { data: subscription, error: subError } = await supabase
-      .from("employer_subscriptions")
-      .select(`
-        status,
-        plan_slug,
-        current_period_end,
-        billing_period_end,
-        cancel_at_period_end,
-        stripe_subscription_id,
-        unlocks_used,
-        scheduled_plan_slug,
-        scheduled_effective_at,
-        last_payment_error,
-        billing_plans!employer_subscriptions_plan_id_fkey (
-          name,
-          slug,
-          candidate_unlocks
-        )
-      `)
-      .eq("employer_id", profile.id)
-      .maybeSingle();
+    // Prefer full select; fall back if hardening columns are missing (schema drift).
+    let subscription: Record<string, unknown> | null = null;
+    let subError: { message?: string; code?: string } | null = null;
+
+    {
+      const full = await supabase
+        .from("employer_subscriptions")
+        .select(`
+          status,
+          plan_slug,
+          current_period_end,
+          billing_period_end,
+          cancel_at_period_end,
+          stripe_subscription_id,
+          unlocks_used,
+          scheduled_plan_slug,
+          scheduled_effective_at,
+          last_payment_error,
+          billing_plans!employer_subscriptions_plan_id_fkey (
+            name,
+            slug,
+            candidate_unlocks
+          )
+        `)
+        .eq("employer_id", profile.id)
+        .maybeSingle();
+
+      if (
+        full.error &&
+        /last_payment_error|does not exist|schema cache/i.test(full.error.message)
+      ) {
+        const fallback = await supabase
+          .from("employer_subscriptions")
+          .select(`
+            status,
+            plan_slug,
+            current_period_end,
+            billing_period_end,
+            cancel_at_period_end,
+            stripe_subscription_id,
+            unlocks_used,
+            scheduled_plan_slug,
+            scheduled_effective_at,
+            billing_plans!employer_subscriptions_plan_id_fkey (
+              name,
+              slug,
+              candidate_unlocks
+            )
+          `)
+          .eq("employer_id", profile.id)
+          .maybeSingle();
+        subscription = fallback.data as Record<string, unknown> | null;
+        subError = fallback.error;
+      } else {
+        subscription = full.data as Record<string, unknown> | null;
+        subError = full.error;
+      }
+    }
 
     if (subError) {
       safeError("Error fetching subscription:", subError);
@@ -97,14 +134,15 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
     } | null;
 
     const plan = normalizePlanSlug(
-      subscription.plan_slug ?? billingPlan?.slug,
+      (subscription.plan_slug as string | null) ?? billingPlan?.slug,
       billingPlan?.name
     );
     const unlocksTotal = billingPlan?.candidate_unlocks ?? 5;
     const periodEnd =
-      subscription.billing_period_end ?? subscription.current_period_end;
+      (subscription.billing_period_end as string | null) ??
+      (subscription.current_period_end as string | null);
 
-    const scheduledRaw = subscription.scheduled_plan_slug;
+    const scheduledRaw = subscription.scheduled_plan_slug as string | null;
     const scheduledPlan =
       scheduledRaw && PAID_TIERS.has(normalizePlanSlug(scheduledRaw, null))
         ? normalizePlanSlug(scheduledRaw, null)
@@ -112,24 +150,24 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
           ? ("discovery" as const)
           : null;
 
+    const status = String(subscription.status ?? "active");
+
     return {
       plan,
-      unlocksUsed: subscription.unlocks_used,
+      unlocksUsed: Number(subscription.unlocks_used ?? 0),
       unlocksTotal,
-      active:
-        subscription.status === "active" || subscription.status === "trialing",
+      active: status === "active" || status === "trialing",
       nextBillingDate: periodEnd
         ? new Date(periodEnd).toISOString().split("T")[0]
         : null,
-      status:
-        subscription.status.charAt(0).toUpperCase() +
-        subscription.status.slice(1),
-      statusRaw: subscription.status,
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      status: status.charAt(0).toUpperCase() + status.slice(1),
+      statusRaw: status,
+      cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
       hasStripeSubscription: Boolean(subscription.stripe_subscription_id),
-      lastPaymentError: subscription.last_payment_error ?? null,
+      lastPaymentError: (subscription.last_payment_error as string | null) ?? null,
       scheduledPlan,
-      scheduledEffectiveAt: subscription.scheduled_effective_at,
+      scheduledEffectiveAt:
+        (subscription.scheduled_effective_at as string | null) ?? null,
     };
   } catch {
     return null;

@@ -1,6 +1,8 @@
 -- Billing production hardening (2026):
--- out-of-order webhook guard, payment error capture, chargeback flags,
--- entitlement gating by subscription status (grace = past_due only).
+-- out-of-order webhook guard, payment error capture, chargeback flags.
+-- IMPORTANT: plan_slug drives entitlements; Discovery signup uses status=active.
+-- Do NOT gate paid plan_slug behind status=active only in a way that breaks reads —
+-- unpaid / dispute lost still force Discovery.
 
 ALTER TABLE public.employer_subscriptions
   ADD COLUMN IF NOT EXISTS last_payment_error TEXT,
@@ -23,8 +25,6 @@ CREATE INDEX IF NOT EXISTS idx_employer_subscriptions_dispute
   ON public.employer_subscriptions (stripe_dispute_status)
   WHERE stripe_dispute_status IS NOT NULL;
 
--- Paid entitlements only for active/trialing/past_due (grace).
--- unpaid / canceled / inactive / incomplete → Discovery unless admin override.
 CREATE OR REPLACE FUNCTION public.resolve_employer_plan_slug(p_employer_id UUID)
 RETURNS TEXT
 LANGUAGE sql
@@ -47,11 +47,11 @@ AS $$
       FROM public.employer_subscriptions es
       LEFT JOIN public.billing_plans bp ON bp.id = es.plan_id
       WHERE es.employer_id = p_employer_id
-        AND es.status IN ('active', 'trialing', 'past_due')
         AND (
           es.stripe_dispute_status IS NULL
           OR es.stripe_dispute_status NOT IN ('lost', 'charge_refunded')
         )
+        AND COALESCE(es.status, 'inactive') NOT IN ('unpaid', 'incomplete_expired')
       LIMIT 1
     ),
     'discovery'

@@ -2,8 +2,12 @@ import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { recordBillingLedgerEvent } from "@/lib/server/stripe/billing-ledger";
 import { syncEmployerSubscriptionFromStripe } from "@/lib/server/stripe/sync-subscription";
-import { getInvoiceSubscriptionRef, getInvoiceSubscriptionId } from "@/lib/server/stripe/invoice-utils";
-import { safeError } from "@/utils/logger";
+import {
+  getInvoiceSubscriptionRef,
+  getInvoiceSubscriptionId,
+  getInvoiceCustomerId,
+} from "@/lib/server/stripe/invoice-utils";
+import { safeError, safeLog } from "@/utils/logger";
 
 async function resolveEmployerIdFromInvoice(
   invoice: Stripe.Invoice
@@ -11,20 +15,49 @@ async function resolveEmployerIdFromInvoice(
   const metadataEmployer = invoice.metadata?.employer_id;
   if (metadataEmployer) return metadataEmployer;
 
-  const subscriptionRef = getInvoiceSubscriptionRef(invoice);
-  if (!subscriptionRef) return null;
-
-  const subscriptionId =
-    typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef.id;
-
   const supabase = await createAdminClient();
-  const { data } = await supabase
-    .from("employer_subscriptions")
-    .select("employer_id")
-    .eq("stripe_subscription_id", subscriptionId)
-    .maybeSingle();
 
-  return data?.employer_id ?? null;
+  const subscriptionRef = getInvoiceSubscriptionRef(invoice);
+  if (subscriptionRef) {
+    const subscriptionId =
+      typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef.id;
+
+    const { data } = await supabase
+      .from("employer_subscriptions")
+      .select("employer_id")
+      .eq("stripe_subscription_id", subscriptionId)
+      .maybeSingle();
+
+    if (data?.employer_id) return data.employer_id;
+  }
+
+  // Portal / first invoice race: subscription row may not exist yet — use customer.
+  const customerId = getInvoiceCustomerId(invoice);
+  if (customerId) {
+    const { data } = await supabase
+      .from("employer_subscriptions")
+      .select("employer_id")
+      .eq("stripe_customer_id", customerId)
+      .maybeSingle();
+
+    if (data?.employer_id) {
+      safeLog(
+        `[Stripe] invoice employer resolved via customer_id=${customerId}`
+      );
+      return data.employer_id;
+    }
+  }
+
+  safeError("[Stripe] resolveEmployerIdFromInvoice: unresolved", {
+    invoiceId: invoice.id,
+    subscriptionRef: subscriptionRef
+      ? typeof subscriptionRef === "string"
+        ? subscriptionRef
+        : subscriptionRef.id
+      : null,
+    customerId,
+  });
+  return null;
 }
 
 export async function handleInvoicePaid(

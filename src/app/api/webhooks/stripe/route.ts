@@ -1,4 +1,6 @@
 import { headers } from "next/headers";
+import { after } from "next/server";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/server/stripe/client";
@@ -17,8 +19,20 @@ import {
   handleInvoicePaymentFailed,
 } from "@/lib/server/stripe/invoice-handlers";
 import { handleChargeDispute } from "@/lib/server/stripe/dispute-handlers";
-import { getInvoiceSubscriptionRef } from "@/lib/server/stripe/invoice-utils";
+import {
+  getInvoiceCustomerId,
+  getInvoiceSubscriptionRef,
+} from "@/lib/server/stripe/invoice-utils";
 import { safeError, safeLog } from "@/utils/logger";
+
+function bustEmployerBillingCache(): void {
+  after(() => {
+    revalidatePath("/employer/settings/account");
+    revalidatePath("/employer/dashboard");
+    revalidatePath("/employer/pricing");
+    revalidatePath("/employer", "layout");
+  });
+}
 
 /**
  * Live Subscription with expanded price — required for price→plan mapping.
@@ -75,6 +89,7 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
         if (!result.success) {
           throw new Error(result.error ?? "Subscription sync failed");
         }
+        bustEmployerBillingCache();
       }
       break;
     }
@@ -82,6 +97,13 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const payload = event.data.object as Stripe.Subscription;
+      safeLog(
+        `[Stripe] ${event.type} sub=${payload.id} status=${payload.status} customer=${
+          typeof payload.customer === "string"
+            ? payload.customer
+            : payload.customer?.id ?? "?"
+        }`
+      );
       const subscription = await retrieveLiveSubscription(stripe, payload.id);
       if (!subscription) break;
       const result = await syncEmployerSubscriptionFromStripe(
@@ -92,6 +114,7 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       if (!result.success) {
         throw new Error(result.error ?? "Subscription sync failed");
       }
+      bustEmployerBillingCache();
       break;
     }
 
@@ -144,31 +167,57 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       if (!result.success) {
         throw new Error(result.error ?? "Downgrade failed");
       }
+      bustEmployerBillingCache();
       break;
     }
 
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice;
-      const subscriptionRef = getInvoiceSubscriptionRef(invoice);
-      if (!subscriptionRef) break;
-      await handleInvoicePaid(invoice, event.id);
-      const subscription = await retrieveLiveSubscription(
-        stripe,
-        subscriptionRef
-      );
-      if (subscription) {
-        const result = await syncEmployerSubscriptionFromStripe(
-          subscription,
-          event.id,
-          event.created,
-          {
-            employer_id: invoice.metadata?.employer_id || undefined,
-          }
+      let subscriptionRef = getInvoiceSubscriptionRef(invoice);
+
+      // Newer Stripe invoice shapes / races: fall back to customer's active sub.
+      if (!subscriptionRef) {
+        const customerId = getInvoiceCustomerId(invoice);
+        safeLog(
+          `[Stripe] invoice.paid missing subscription ref invoice=${invoice.id} customer=${customerId ?? "?"}`
         );
-        if (!result.success) {
-          throw new Error(result.error ?? "Invoice paid sync failed");
+        if (customerId) {
+          const list = await stripe.subscriptions.list({
+            customer: customerId,
+            status: "all",
+            limit: 5,
+            expand: ["data.items.data.price"],
+          });
+          const preferred =
+            list.data.find((s) => s.status === "active" || s.status === "trialing") ??
+            list.data.find((s) => s.status === "past_due") ??
+            list.data[0];
+          subscriptionRef = preferred?.id ?? null;
         }
       }
+
+      await handleInvoicePaid(invoice, event.id);
+
+      if (subscriptionRef) {
+        const subscription = await retrieveLiveSubscription(
+          stripe,
+          subscriptionRef
+        );
+        if (subscription) {
+          const result = await syncEmployerSubscriptionFromStripe(
+            subscription,
+            event.id,
+            event.created,
+            {
+              employer_id: invoice.metadata?.employer_id || undefined,
+            }
+          );
+          if (!result.success) {
+            throw new Error(result.error ?? "Invoice paid sync failed");
+          }
+        }
+      }
+      bustEmployerBillingCache();
       break;
     }
 
@@ -184,6 +233,7 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
         subscription,
         event.created
       );
+      bustEmployerBillingCache();
       break;
     }
 
