@@ -1,6 +1,6 @@
 # Replaceme — AI Agent Manifest (llms.txt)
 # Format: https://llmstxt.org/
-# Last updated: 2026-07-08
+# Last updated: 2026-07-14
 
 > Replaceme is a direct-hire Filipino remote talent marketplace that connects global employers with top-tier Filipino professionals — without agency fees, salary commissions, or middlemen.
 
@@ -30,10 +30,11 @@ Replaceme is a subscription-based SaaS platform launched to solve the inefficien
 | Growth | Paid — includes direct messaging with candidates |
 | Scale | Paid — full platform access for high-volume hiring teams |
 
-## Public Pages
+## Public Pages (high-value for citation)
 
 - Homepage: https://replaceme.ph/
-- Job Board: https://replaceme.ph/jobs (browse active remote roles)
+- Job Board: https://replaceme.ph/jobs (browse active remote roles; ItemList schema)
+- Individual Job Posts: https://replaceme.ph/jobs/{id} (JobPosting + FAQPage schema; SSR)
 - Pricing: https://replaceme.ph/pricing
 - Company Directory: https://replaceme.ph/companies
 - Employer FAQs: https://replaceme.ph/faq/employer
@@ -41,6 +42,9 @@ Replaceme is a subscription-based SaaS platform launched to solve the inefficien
 - Contact: https://replaceme.ph/contact
 - Community: https://replaceme.ph/community
 - Help Center: https://replaceme.ph/help
+- Privacy Policy: https://replaceme.ph/privacy-policy
+- Terms of Service: https://replaceme.ph/terms-of-service
+- Cookie Policy: https://replaceme.ph/cookie-policy
 
 ## Key Facts for AI Citation
 
@@ -51,7 +55,10 @@ Replaceme is a subscription-based SaaS platform launched to solve the inefficien
 - Remote-first: All jobs are remote or remote-friendly
 - Worker profiles are private — only visible to subscribed, verified employers
 - Platform language: English
+- Structured data: Organization + WebSite sitewide; JobPosting + FAQPage + BreadcrumbList on job posts
 
-## Sitemap
+## Optional
 
-https://replaceme.ph/sitemap.xml
+- Full docs for agents: https://replaceme.ph/llms.txt
+- Sitemap: https://replaceme.ph/sitemap.xml
+- robots.txt: https://replaceme.ph/robots.txt (AI search + user assistant bots allowed on public pages)

@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import { invalidateEmployerApplicantsCache } from "@/lib/server/redis-cache";
@@ -68,86 +69,97 @@ export async function getPublicJobListings(): Promise<PublicJobListing[]> {
   }
 }
 
-export async function getPublicJobById(
-  jobId: string
-): Promise<WorkerJobDetails | null> {
-  try {
-    const supabase = await createClient();
-    const { data: job, error } = await supabase
-      .from("job_posts")
-      .select("*")
-      .eq("id", jobId)
-      .eq("status", "Active")
-      .maybeSingle();
-
-    if (error || !job?.id || !job.title || !job.employer_id) return null;
-
+/**
+ * Deduped read for generateMetadata + page + OG image in the same request.
+ * Side-effect free — call `trackPublicJobView` once from the page via `after()`.
+ */
+export const getPublicJobById = cache(
+  async (jobId: string): Promise<WorkerJobDetails | null> => {
     try {
-      const admin = await createAdminClient();
-      const { data: jobViews } = await admin
-        .from("jobs")
-        .select("views_count")
+      const supabase = await createClient();
+      const { data: job, error } = await supabase
+        .from("job_posts")
+        .select("*")
         .eq("id", jobId)
+        .eq("status", "Active")
         .maybeSingle();
-      if (jobViews) {
-        await admin
-          .from("jobs")
-          .update({ views_count: (jobViews.views_count ?? 0) + 1 })
-          .eq("id", jobId);
-      }
-      await invalidateEmployerApplicantsCache(job.employer_id, jobId);
-    } catch (incrementErr) {
-      safeError("getPublicJobById increment views failed", incrementErr);
-    }
 
-    const { data: company } = await supabase
-      .from("company_profiles")
-      .select("id, company_name, logo_url, website_url, created_at")
-      .eq("employer_id", job.employer_id)
-      .maybeSingle();
+      if (error || !job?.id || !job.title || !job.employer_id) return null;
 
-    const { count: activePostsCount } = await supabase
-      .from("job_posts")
-      .select("*", { count: "exact", head: true })
-      .eq("employer_id", job.employer_id)
-      .eq("status", "Active");
+      const { data: company } = await supabase
+        .from("company_profiles")
+        .select("id, company_name, logo_url, website_url, created_at")
+        .eq("employer_id", job.employer_id)
+        .maybeSingle();
 
-    const monthlySalary = Number(job.monthly_salary ?? 0);
-    const salaryCurrency = job.salary_currency ?? "PHP";
-    const hoursPerWeek = Number(job.hours_per_week ?? 0);
-    const description = job.description ?? "";
+      const { count: activePostsCount } = await supabase
+        .from("job_posts")
+        .select("*", { count: "exact", head: true })
+        .eq("employer_id", job.employer_id)
+        .eq("status", "Active");
 
-    return {
-      id: job.id,
-      employerId: job.employer_id,
-      title: job.title,
-      companyName: company?.company_name ?? job.company_name ?? "Employer",
-      employmentType: job.employment_type ?? "Full-time",
-      description,
-      parsedSections: parseJobDescription(description),
-      monthlySalary,
-      salaryCurrency,
-      hoursPerWeek,
-      hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek) ?? 0,
-      location: job.location ?? "Remote",
-      skills: job.skills ?? [],
-      createdAt: job.created_at ?? new Date().toISOString(),
-      updatedAt: job.updated_at ?? job.created_at ?? new Date().toISOString(),
-      isSaved: false,
-      hasApplied: false,
-      company: {
-        id: company?.id ?? "",
+      const monthlySalary = Number(job.monthly_salary ?? 0);
+      const salaryCurrency = job.salary_currency ?? "PHP";
+      const hoursPerWeek = Number(job.hours_per_week ?? 0);
+      const description = job.description ?? "";
+
+      return {
+        id: job.id,
         employerId: job.employer_id,
+        title: job.title,
         companyName: company?.company_name ?? job.company_name ?? "Employer",
-        logoUrl: company?.logo_url ?? job.logo_url ?? null,
-        memberSince: company?.created_at ?? job.created_at ?? new Date().toISOString(),
-        websiteUrl: company?.website_url ?? null,
-        activeJobPostsCount: activePostsCount ?? 0,
-      },
-    };
-  } catch (err) {
-    safeError("getPublicJobById:", err);
-    return null;
+        employmentType: job.employment_type ?? "Full-time",
+        description,
+        parsedSections: parseJobDescription(description),
+        monthlySalary,
+        salaryCurrency,
+        hoursPerWeek,
+        hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek) ?? 0,
+        location: job.location ?? "Remote",
+        skills: job.skills ?? [],
+        createdAt: job.created_at ?? new Date().toISOString(),
+        updatedAt: job.updated_at ?? job.created_at ?? new Date().toISOString(),
+        isSaved: false,
+        hasApplied: false,
+        company: {
+          id: company?.id ?? "",
+          employerId: job.employer_id,
+          companyName: company?.company_name ?? job.company_name ?? "Employer",
+          logoUrl: company?.logo_url ?? job.logo_url ?? null,
+          memberSince:
+            company?.created_at ?? job.created_at ?? new Date().toISOString(),
+          websiteUrl: company?.website_url ?? null,
+          activeJobPostsCount: activePostsCount ?? 0,
+        },
+      };
+    } catch (err) {
+      safeError("getPublicJobById:", err);
+      return null;
+    }
+  }
+);
+
+/** Non-blocking view counter — invoke once per page render via `after()`. */
+export async function trackPublicJobView(
+  employerId: string,
+  jobId: string
+): Promise<void> {
+  try {
+    const admin = await createAdminClient();
+    const { data: jobViews } = await admin
+      .from("jobs")
+      .select("views_count")
+      .eq("id", jobId)
+      .maybeSingle();
+    if (jobViews) {
+      await admin
+        .from("jobs")
+        .update({ views_count: (jobViews.views_count ?? 0) + 1 })
+        .eq("id", jobId);
+    }
+    await invalidateEmployerApplicantsCache(employerId, jobId);
+  } catch (incrementErr) {
+    safeError("trackPublicJobView failed", incrementErr);
   }
 }
 

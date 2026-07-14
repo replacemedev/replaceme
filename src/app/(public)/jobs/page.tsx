@@ -1,5 +1,6 @@
 import { getPublicJobListings } from "@/actions/public/growth";
 import { PublicJobBoardClient } from "@/components/public/PublicJobBoardClient";
+import { JsonLd } from "@/components/seo";
 import type { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -31,5 +32,28 @@ export const dynamic = "force-dynamic";
 
 export default async function PublicJobsPage() {
   const jobs = await getPublicJobListings();
-  return <PublicJobBoardClient jobs={jobs} />;
+
+  // ItemList helps Google for Jobs + AI engines discover active listings.
+  const itemList =
+    jobs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Active remote jobs on Replaceme",
+          numberOfItems: jobs.length,
+          itemListElement: jobs.slice(0, 50).map((job, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${BASE_URL}/jobs/${job.id}`,
+            name: `${job.title} at ${job.companyName}`,
+          })),
+        }
+      : null;
+
+  return (
+    <>
+      {itemList ? <JsonLd schema={itemList} /> : null}
+      <PublicJobBoardClient jobs={jobs} />
+    </>
+  );
 }
