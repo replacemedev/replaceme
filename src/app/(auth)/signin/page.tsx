@@ -36,10 +36,11 @@ export default async function SignInPage({
       marketing={view === "login" ? <SignInWelcomePanel /> : undefined}
       marketingPosition="right"
       footer={<AuthFooter />}
+      centered={view === "forgot_password"}
     >
       <AuthFlashToast />
 
-      <header className="mb-6 space-y-2">
+      <header className={`${view === "forgot_password" ? "" : "mb-6"} space-y-2`}>
         <h1 className={AUTH_TITLE}>{copy.headline}</h1>
         <p className={AUTH_SUBTITLE}>{copy.description}</p>
       </header>

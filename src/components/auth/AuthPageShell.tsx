@@ -17,6 +17,7 @@ interface AuthPageShellProps {
   marketingPosition?: "left" | "right";
   footer?: ReactNode;
   brandHref?: string;
+  centered?: boolean;
 }
 
 export function AuthPageShell({
@@ -25,7 +26,22 @@ export function AuthPageShell({
   marketingPosition = "left",
   footer,
   brandHref = "/",
+  centered = false,
 }: AuthPageShellProps) {
+  if (centered) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50/background px-4 py-12 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-6">
+          <div className="flex justify-start">
+            <NavBrand homeHref={brandHref} compact />
+          </div>
+          {children}
+          {footer}
+        </div>
+      </main>
+    );
+  }
+
   const marketingPanel = (
     <div className={`hidden lg:flex lg:w-1/2 ${AUTH_MARKETING_DESKTOP}`}>
       {marketing}

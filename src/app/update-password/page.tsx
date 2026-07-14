@@ -34,13 +34,12 @@ export default async function UpdatePasswordPage() {
 
   return (
     <AuthPageShell
-      marketing={<AuthMarketingPanel content={content} variant="testimonial" />}
-      marketingPosition="right"
+      centered={true}
       footer={<AuthFooter />}
     >
       <AuthFlashToast />
 
-      <header className="mb-6 space-y-2">
+      <header className="space-y-2">
         <h1 className={AUTH_TITLE}>{headline}</h1>
         <p className={AUTH_SUBTITLE}>{description}</p>
       </header>
