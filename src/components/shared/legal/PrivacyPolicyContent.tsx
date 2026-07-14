@@ -59,10 +59,18 @@ function RolePanel({
   );
 }
 
-export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: boolean }) {
+export function PrivacyPolicyContent({
+  hideSidebar = false,
+  isModal = false,
+}: {
+  hideSidebar?: boolean;
+  isModal?: boolean;
+}) {
   const articleContent = (
     <article
-      className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 lg:p-10 ${hideSidebar ? "" : "order-1 lg:order-2"}`}
+      className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 ${
+        isModal ? "md:p-10" : "lg:p-10"
+      } ${hideSidebar ? "" : isModal ? "order-1 md:order-2" : "order-1 lg:order-2"}`}
     >
       <div className="mb-10 rounded-xl border border-slate-100 bg-slate-50 p-5 sm:p-6">
         <h2 className="mb-3 flex items-center gap-2 font-bold text-[#22c55e]">
@@ -481,9 +489,19 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
     return articleContent;
   }
 
+  const gridClasses = isModal
+    ? "grid grid-cols-1 items-start gap-6 md:grid-cols-[240px_minmax(0,1fr)] md:gap-8"
+    : "grid grid-cols-1 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10";
+
+  const asideClasses = isModal
+    ? "order-2 self-start md:sticky md:top-4 md:order-1 w-full"
+    : "order-2 self-start lg:sticky lg:top-28 lg:order-1";
+
+  const listMaxHeightClass = isModal ? "max-h-[50vh]" : "max-h-[70vh]";
+
   return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-      <aside className="order-2 self-start lg:sticky lg:top-28 lg:order-1">
+    <div className={gridClasses}>
+      <aside className={asideClasses}>
         <nav
           className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
           aria-label="Table of contents"
@@ -491,7 +509,7 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
           <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
             Contents
           </p>
-          <ol className="max-h-[70vh] space-y-2.5 overflow-y-auto text-sm">
+          <ol className={`${listMaxHeightClass} space-y-2.5 overflow-y-auto text-sm`}>
             {tocItems.map((item) => (
               <li key={item.href}>
                 <Link

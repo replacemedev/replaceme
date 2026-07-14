@@ -39,6 +39,7 @@ export function LegalDocumentModal({
 
   const isTerms = documentType === "terms";
   const title = isTerms ? "Terms of Service" : "Privacy Policy";
+  const maxWidthClass = isTerms ? "max-w-2xl" : "md:max-w-4xl max-w-2xl";
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const dialog = dialogRef.current;
@@ -51,7 +52,7 @@ export function LegalDocumentModal({
     <dialog
       ref={dialogRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-2xl h-[80vh] max-h-[750px] rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs open:flex open:flex-col animate-in fade-in zoom-in-95 duration-200 focus:outline-none"
+      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidthClass} h-[80vh] max-h-[750px] rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs open:flex open:flex-col animate-in fade-in zoom-in-95 duration-200 focus:outline-none`}
       onClose={onClose}
     >
       {/* Modal Header */}
@@ -78,7 +79,7 @@ export function LegalDocumentModal({
           {isTerms ? (
             <TermsOfServiceContent hideSidebar={true} />
           ) : (
-            <PrivacyPolicyContent />
+            <PrivacyPolicyContent isModal={true} />
           )}
         </div>
       </div>
