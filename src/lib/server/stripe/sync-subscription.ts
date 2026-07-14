@@ -4,11 +4,19 @@ import {
   getDiscoveryPlan,
   resolveBillingPlan,
   resolveBillingPlanByStripePriceId,
+  resolveBillingPlanByStripeProductId,
 } from "@/lib/server/stripe/plan";
+import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
 import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
 import { extractSubscriptionPrice } from "@/lib/server/stripe/subscription-price";
+
+export type SyncMetaOverrides = {
+  employer_id?: string;
+  plan_id?: string;
+  plan_slug?: string;
+};
 
 function stripeTimestampToIso(value: number | null | undefined): string | null {
   if (!value) return null;
@@ -31,6 +39,158 @@ function mapStripeSubscriptionStatus(
       return "inactive";
     default:
       return "inactive";
+  }
+}
+
+function priceIdOf(subscription: Stripe.Subscription): string | null {
+  const price = subscription.items.data[0]?.price;
+  if (!price) return null;
+  return typeof price === "string" ? price : price.id;
+}
+
+function productIdOf(subscription: Stripe.Subscription): string | null {
+  const price = subscription.items.data[0]?.price;
+  if (!price || typeof price === "string") return null;
+  const product = price.product;
+  if (!product) return null;
+  return typeof product === "string" ? product : product.id;
+}
+
+/**
+ * Live Stripe price is source of truth.
+ * Metadata plan_slug/plan_id are stale after Customer Portal upgrades.
+ */
+async function resolvePlanForSubscription(
+  subscription: Stripe.Subscription,
+  overrides?: SyncMetaOverrides
+): Promise<{ id: string; slug: string } | null> {
+  const priceId = priceIdOf(subscription);
+  if (priceId) {
+    const byPrice = await resolveBillingPlanByStripePriceId(priceId);
+    if (byPrice) {
+      safeLog(
+        `[Stripe] Plan resolved by price_id=${priceId} → ${byPrice.slug}`
+      );
+      return { id: byPrice.id, slug: byPrice.slug ?? "discovery" };
+    }
+  }
+
+  const productId = productIdOf(subscription);
+  if (productId) {
+    const byProduct = await resolveBillingPlanByStripeProductId(productId);
+    if (byProduct) {
+      safeLog(
+        `[Stripe] Plan resolved by product_id=${productId} → ${byProduct.slug}`
+      );
+      return { id: byProduct.id, slug: byProduct.slug ?? "discovery" };
+    }
+  }
+
+  // Fallbacks only when price/product not mapped in billing_plans
+  const planId = overrides?.plan_id || subscription.metadata?.plan_id;
+  if (planId) {
+    const plan = await resolveBillingPlan(planId);
+    if (plan) {
+      return { id: plan.id, slug: plan.slug ?? "discovery" };
+    }
+  }
+
+  const planSlug = overrides?.plan_slug || subscription.metadata?.plan_slug;
+  if (planSlug) {
+    const plan = await resolveBillingPlan(planSlug);
+    if (plan) {
+      return { id: plan.id, slug: plan.slug ?? planSlug };
+    }
+  }
+
+  safeError("[Stripe] resolvePlanForSubscription: no mapping", {
+    priceId,
+    productId,
+    metadata: subscription.metadata,
+  });
+  return null;
+}
+
+async function resolveEmployerId(
+  subscription: Stripe.Subscription,
+  overrides?: SyncMetaOverrides
+): Promise<string | null> {
+  const fromOverride = overrides?.employer_id?.trim();
+  if (fromOverride) return fromOverride;
+
+  const fromMeta = subscription.metadata?.employer_id?.trim();
+  if (fromMeta) return fromMeta;
+
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer?.id;
+
+  if (!customerId) return null;
+
+  const supabase = await createAdminClient();
+  const { data: byCustomer } = await supabase
+    .from("employer_subscriptions")
+    .select("employer_id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+
+  if (byCustomer?.employer_id) return byCustomer.employer_id;
+
+  // Stripe customer.metadata.employer_id (set in ensureStripeCustomer)
+  const stripe = getStripe();
+  if (!stripe) return null;
+
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    if (customer && !customer.deleted) {
+      const eid = customer.metadata?.employer_id?.trim();
+      if (eid) return eid;
+    }
+  } catch (err) {
+    safeError("[Stripe] customer retrieve for employer_id failed", err);
+  }
+
+  return null;
+}
+
+/**
+ * Keep Stripe subscription metadata aligned after Portal price switches.
+ * Non-fatal — DB sync already succeeded.
+ */
+async function repairSubscriptionMetadata(
+  subscription: Stripe.Subscription,
+  employerId: string,
+  plan: { id: string; slug: string }
+): Promise<void> {
+  const stripe = getStripe();
+  if (!stripe) return;
+
+  const current = subscription.metadata ?? {};
+  if (
+    current.employer_id === employerId &&
+    current.plan_id === plan.id &&
+    current.plan_slug === plan.slug
+  ) {
+    return;
+  }
+
+  try {
+    await stripe.subscriptions.update(subscription.id, {
+      metadata: {
+        ...current,
+        employer_id: employerId,
+        plan_id: plan.id,
+        plan_slug: plan.slug,
+        // Clear stale schedule marker once live price matches entitlements
+        scheduled_plan_slug: "",
+      },
+    });
+    safeLog(
+      `[Stripe] Repaired subscription metadata sub=${subscription.id} plan=${plan.slug}`
+    );
+  } catch (err) {
+    safeError("[Stripe] metadata repair failed (non-fatal)", err);
   }
 }
 
@@ -58,38 +218,6 @@ async function resetEmployerUsageForNewPeriod(employerId: string): Promise<void>
       { onConflict: "employer_id" }
     ),
   ]);
-}
-
-async function resolvePlanForSubscription(
-  subscription: Stripe.Subscription
-): Promise<{ id: string; slug: string } | null> {
-  const metadata = subscription.metadata ?? {};
-  const planId = metadata.plan_id;
-  const planSlug = metadata.plan_slug;
-
-  if (planId) {
-    const plan = await resolveBillingPlan(planId);
-    if (plan) {
-      return { id: plan.id, slug: plan.slug ?? planSlug ?? "discovery" };
-    }
-  }
-
-  if (planSlug) {
-    const plan = await resolveBillingPlan(planSlug);
-    if (plan) {
-      return { id: plan.id, slug: plan.slug ?? planSlug };
-    }
-  }
-
-  const priceId = subscription.items.data[0]?.price?.id;
-  if (priceId) {
-    const plan = await resolveBillingPlanByStripePriceId(priceId);
-    if (plan) {
-      return { id: plan.id, slug: plan.slug ?? "discovery" };
-    }
-  }
-
-  return null;
 }
 
 export type SyncSubscriptionInput = {
@@ -171,12 +299,16 @@ export async function syncEmployerSubscription(
 export async function syncEmployerSubscriptionFromStripe(
   subscription: Stripe.Subscription,
   stripeEventId?: string,
-  stripeEventCreated?: number
+  stripeEventCreated?: number,
+  overrides?: SyncMetaOverrides
 ): Promise<{ success: boolean; error?: string }> {
-  const employerId = subscription.metadata?.employer_id;
+  const employerId = await resolveEmployerId(subscription, overrides);
 
   if (!employerId) {
-    safeError("syncEmployerSubscriptionFromStripe: missing employer_id metadata");
+    safeError(
+      "syncEmployerSubscriptionFromStripe: missing employer_id (metadata, customer, and DB lookup all failed)",
+      { subscriptionId: subscription.id }
+    );
     return { success: false, error: "Missing employer metadata." };
   }
 
@@ -213,7 +345,7 @@ export async function syncEmployerSubscriptionFromStripe(
     );
   }
 
-  const resolved = await resolvePlanForSubscription(subscription);
+  const resolved = await resolvePlanForSubscription(subscription, overrides);
   if (!resolved) {
     safeError(
       "syncEmployerSubscriptionFromStripe: could not resolve plan",
@@ -250,9 +382,9 @@ export async function syncEmployerSubscriptionFromStripe(
     existing?.billing_period_start &&
     existing.billing_period_start !== periodStart;
 
+  // Prefer live resolved slug over stale scheduled_* metadata from Portal upgrades.
   const scheduledFromMeta = subscription.metadata?.scheduled_plan_slug?.trim() || null;
   const liveSlug = (planSlug ?? "").toLowerCase();
-  // Period flip: once Stripe price matches the scheduled tier, clear the schedule marker.
   const scheduleCleared =
     !scheduledFromMeta ||
     (scheduledFromMeta && liveSlug === scheduledFromMeta.toLowerCase());
@@ -297,12 +429,12 @@ export async function syncEmployerSubscriptionFromStripe(
   }
 
   safeLog(
-    `[Stripe] Subscription synced employer=[REDACTED] plan=${planSlug} status=${status}`
+    `[Stripe] Subscription synced employer=[REDACTED] plan=${planSlug} status=${status} price=${priceIdOf(subscription)}`
   );
 
   await invalidateEmployerCache(employerId);
+  await repairSubscriptionMetadata(subscription, employerId, resolved);
 
-  // Resend contact sync (tier/segments) for broadcasts.
   try {
     const { data: profile } = await supabase
       .from("profiles")
@@ -364,6 +496,82 @@ export async function downgradeEmployerToDiscovery(
   await invalidateEmployerCache(employerId);
 
   return { success: true };
+}
+
+/**
+ * Pull live Stripe subscription for an employer and project to DB.
+ * Same path as webhooks — safe to run in sandbox when a webhook was missed.
+ */
+export async function reconcileEmployerSubscriptionFromStripe(
+  employerId: string
+): Promise<{ success: boolean; planSlug?: string; error?: string }> {
+  const stripe = getStripe();
+  if (!stripe) {
+    return { success: false, error: "Stripe is not configured." };
+  }
+
+  const supabase = await createAdminClient();
+  const { data: row } = await supabase
+    .from("employer_subscriptions")
+    .select("stripe_customer_id, stripe_subscription_id")
+    .eq("employer_id", employerId)
+    .maybeSingle();
+
+  let subscription: Stripe.Subscription | null = null;
+
+  if (row?.stripe_subscription_id) {
+    try {
+      subscription = await stripe.subscriptions.retrieve(
+        row.stripe_subscription_id,
+        { expand: ["items.data.price"] }
+      );
+    } catch (err) {
+      safeError("[Stripe] reconcile: retrieve by subscription id failed", err);
+    }
+  }
+
+  if (
+    (!subscription ||
+      subscription.status === "canceled" ||
+      subscription.status === "incomplete_expired") &&
+    row?.stripe_customer_id
+  ) {
+    const listed = await stripe.subscriptions.list({
+      customer: row.stripe_customer_id,
+      status: "all",
+      limit: 10,
+      expand: ["data.items.data.price"],
+    });
+    subscription =
+      listed.data.find((s) =>
+        ["active", "trialing", "past_due", "incomplete"].includes(s.status)
+      ) ??
+      listed.data[0] ??
+      null;
+  }
+
+  if (!subscription) {
+    return {
+      success: false,
+      error: "No Stripe subscription found for this account.",
+    };
+  }
+
+  const result = await syncEmployerSubscriptionFromStripe(subscription, undefined, undefined, {
+    employer_id: employerId,
+  });
+
+  if (!result.success) {
+    return { success: false, error: result.error };
+  }
+
+  const { data: updated } = await supabase
+    .from("employer_subscriptions")
+    .select("plan_slug")
+    .eq("employer_id", employerId)
+    .maybeSingle();
+
+  return { success: true, planSlug: updated?.plan_slug ?? undefined };
 }
 
 export async function isEmployerSubscriptionActive(

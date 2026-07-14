@@ -10,6 +10,7 @@ import {
   downgradeEmployerToDiscovery,
   syncEmployerSubscription,
   syncEmployerSubscriptionFromStripe,
+  type SyncMetaOverrides,
 } from "@/lib/server/stripe/sync-subscription";
 import {
   handleInvoicePaid,
@@ -20,8 +21,7 @@ import { getInvoiceSubscriptionRef } from "@/lib/server/stripe/invoice-utils";
 import { safeError, safeLog } from "@/utils/logger";
 
 /**
- * 2026 best practice: event payloads can be stale / out of order.
- * Refetch the live Subscription from Stripe before projecting to DB.
+ * Live Subscription with expanded price — required for price→plan mapping.
  */
 async function retrieveLiveSubscription(
   stripe: Stripe,
@@ -30,7 +30,19 @@ async function retrieveLiveSubscription(
   if (!subscriptionRef) return null;
   const id =
     typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef.id;
-  return stripe.subscriptions.retrieve(id);
+  return stripe.subscriptions.retrieve(id, {
+    expand: ["items.data.price"],
+  });
+}
+
+function sessionMetaOverrides(
+  session: Stripe.Checkout.Session
+): SyncMetaOverrides {
+  return {
+    employer_id: session.metadata?.employer_id || session.client_reference_id || undefined,
+    plan_id: session.metadata?.plan_id || undefined,
+    plan_slug: session.metadata?.plan_slug || undefined,
+  };
 }
 
 async function handleStripeEvent(event: Stripe.Event): Promise<void> {
@@ -38,6 +50,11 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
   if (!stripe) {
     throw new Error("Stripe not configured");
   }
+
+  const mode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live")
+    ? "live"
+    : "test";
+  safeLog(`[Stripe] Processing ${event.type} id=${event.id} mode=${mode}`);
 
   switch (event.type) {
     case "checkout.session.completed": {
@@ -52,7 +69,8 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
         const result = await syncEmployerSubscriptionFromStripe(
           subscription,
           event.id,
-          event.created
+          event.created,
+          sessionMetaOverrides(session)
         );
         if (!result.success) {
           throw new Error(result.error ?? "Subscription sync failed");
@@ -79,7 +97,6 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
 
     case "customer.subscription.deleted": {
       const payload = event.data.object as Stripe.Subscription;
-      // Still refetch — a newer create/update may have already won.
       const live = await retrieveLiveSubscription(stripe, payload.id).catch(
         () => null
       );
@@ -95,8 +112,28 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
         break;
       }
 
-      const employerId =
-        live?.metadata?.employer_id ?? payload.metadata?.employer_id;
+      const sub = live ?? payload;
+      let employerId = sub.metadata?.employer_id?.trim() || undefined;
+
+      if (!employerId) {
+        const customerId =
+          typeof sub.customer === "string"
+            ? sub.customer
+            : sub.customer && typeof sub.customer === "object"
+              ? sub.customer.id
+              : null;
+        if (customerId) {
+          const { createAdminClient } = await import("@/lib/supabase/server");
+          const supabase = await createAdminClient();
+          const { data } = await supabase
+            .from("employer_subscriptions")
+            .select("employer_id")
+            .eq("stripe_customer_id", customerId)
+            .maybeSingle();
+          employerId = data?.employer_id ?? undefined;
+        }
+      }
+
       if (!employerId) break;
 
       const result = await downgradeEmployerToDiscovery(
@@ -123,7 +160,10 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
         const result = await syncEmployerSubscriptionFromStripe(
           subscription,
           event.id,
-          event.created
+          event.created,
+          {
+            employer_id: invoice.metadata?.employer_id || undefined,
+          }
         );
         if (!result.success) {
           throw new Error(result.error ?? "Invoice paid sync failed");

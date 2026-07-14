@@ -8,6 +8,7 @@ import {
   createUpgradeCheckout,
   cancelSubscription,
   createCustomerPortalSession,
+  reconcileBillingFromStripe,
 } from "@/actions/employer/billing";
 import { toast } from "sonner";
 import { CalendarClock, CheckCircle2, RefreshCw } from "lucide-react";
@@ -54,7 +55,43 @@ export function AccountSettingsClient({
   const [isUpgrading, startUpgradeTransition] = useTransition();
   const [isCancelling, startCancelTransition] = useTransition();
   const [isOpeningPortal, startPortalTransition] = useTransition();
+  const [isReconciling, startReconcileTransition] = useTransition();
   const [isDowngradeModalOpen, setIsDowngradeModalOpen] = React.useState(false);
+  const didAutoReconcile = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!checkoutSuccess || didAutoReconcile.current) return;
+    didAutoReconcile.current = true;
+    startReconcileTransition(async () => {
+      const result = await reconcileBillingFromStripe();
+      if (result.success) {
+        toast.success(
+          result.planSlug
+            ? `Plan synced: ${result.planSlug}`
+            : "Billing synced from Stripe"
+        );
+        router.refresh();
+      }
+    });
+  }, [checkoutSuccess, router]);
+
+  const handleReconcile = () => {
+    startReconcileTransition(async () => {
+      const toastId = toast.loading("Syncing plan from Stripe...");
+      const result = await reconcileBillingFromStripe();
+      if (result.success) {
+        toast.success(
+          result.planSlug
+            ? `Plan is now ${result.planSlug}`
+            : "Billing synced",
+          { id: toastId }
+        );
+        router.refresh();
+      } else {
+        toast.error(result.error ?? "Sync failed", { id: toastId });
+      }
+    });
+  };
 
   const handleUpgrade = (planId: SubscriptionTier) => {
     if (planId === "discovery") {
@@ -154,11 +191,15 @@ export function AccountSettingsClient({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => router.refresh()}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-white/70 px-4 py-2 text-xs font-bold text-[#006e2f] hover:bg-white transition-colors"
+              onClick={handleReconcile}
+              disabled={isReconciling}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-white/70 px-4 py-2 text-xs font-bold text-[#006e2f] hover:bg-white transition-colors disabled:opacity-60"
             >
-              <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-              Refresh plan status
+              <RefreshCw
+                className={`h-3.5 w-3.5 ${isReconciling ? "animate-spin" : ""}`}
+                aria-hidden
+              />
+              {isReconciling ? "Syncing…" : "Sync plan from Stripe"}
             </button>
             <Link
               href="/employer/dashboard"

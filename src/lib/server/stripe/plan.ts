@@ -55,6 +55,24 @@ export async function resolveBillingPlanByStripePriceId(
   return data;
 }
 
+export async function resolveBillingPlanByStripeProductId(
+  stripeProductId: string
+): Promise<BillingPlanRow | null> {
+  const supabase = await createAdminClient();
+
+  const { data, error } = await supabase
+    .from("billing_plans")
+    .select("id, slug, name, price, stripe_price_id, stripe_product_id")
+    .eq("stripe_product_id", stripeProductId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data;
+}
+
 export async function getDiscoveryPlan(): Promise<BillingPlanRow | null> {
   return resolveBillingPlan("discovery");
 }

@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/server/auth/session";
 import { upgradeCheckoutSchema } from "@/lib/validations/billing";
 import { createPlanChangeSession } from "@/lib/server/stripe/plan-change-session";
 import { createBillingPortalSession } from "@/lib/server/stripe/portal-session";
+import { reconcileEmployerSubscriptionFromStripe } from "@/lib/server/stripe/sync-subscription";
 import { getStripe } from "@/lib/server/stripe/client";
 import { safeError, safeLog } from "@/utils/logger";
 import { AccountSettings, SubscriptionTier } from "@/types/employer/billing";
@@ -14,6 +15,7 @@ import { getEmployerPlanUsage as loadEmployerPlanUsage } from "@/lib/server/enti
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import type { EmployerInvoiceRow } from "@/lib/server/stripe/list-invoices";
 import { getSiteUrl } from "@/lib/auth/site-url";
+import { revalidatePath } from "next/cache";
 
 const PAID_TIERS = new Set<SubscriptionTier>(["starter", "growth", "scale"]);
 
@@ -240,6 +242,37 @@ export async function createCustomerPortalSession() {
 
   if (!result.success) return { error: result.error };
   return { success: true as const, portalUrl: result.data?.portalUrl };
+}
+
+/**
+ * Reconcile DB tier from live Stripe (same projection as webhooks).
+ * Use after Checkout/Portal return when webhooks are delayed — sandbox-safe.
+ */
+export async function reconcileBillingFromStripe() {
+  const result = await runAction("reconcileBillingFromStripe", async () => {
+    const { profile } = await requireRole("employer");
+
+    if (!getStripe()) {
+      return fail("Stripe is not configured.");
+    }
+
+    const sync = await reconcileEmployerSubscriptionFromStripe(profile.id);
+    if (!sync.success) {
+      return fail(sync.error ?? "Could not sync billing from Stripe.");
+    }
+
+    revalidatePath("/employer/settings/account");
+    revalidatePath("/employer/dashboard");
+    revalidatePath("/employer", "layout");
+
+    return ok({ planSlug: sync.planSlug ?? null });
+  });
+
+  if (!result.success) return { success: false as const, error: result.error };
+  return {
+    success: true as const,
+    planSlug: result.data?.planSlug ?? null,
+  };
 }
 
 /**

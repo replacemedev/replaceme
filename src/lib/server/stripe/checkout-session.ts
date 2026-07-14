@@ -90,6 +90,7 @@ export async function createSubscriptionCheckoutSession(
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerResult.customerId,
+    client_reference_id: input.employerId,
     line_items: [resolveCheckoutLineItem(plan)],
     success_url: `${siteUrl}/employer/settings/account?checkout=success`,
     cancel_url: `${siteUrl}/employer/pricing?checkout=canceled`,
