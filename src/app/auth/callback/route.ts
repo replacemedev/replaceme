@@ -1,18 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getSiteUrl } from "@/lib/auth/site-url";
-
-function resolveRedirectOrigin(request: NextRequest): string {
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  if (forwardedHost) {
-    return `https://${forwardedHost}`;
-  }
-  return getSiteUrl();
-}
+import { resolveSafeRedirectOrigin } from "@/lib/auth/safe-redirect-origin";
+import { sanitizeRedirectPath } from "@/lib/auth/safe-callback-url";
 
 function authFailureRedirect(request: NextRequest): NextResponse {
-  const url = new URL("/signin", resolveRedirectOrigin(request));
+  const url = new URL("/signin", resolveSafeRedirectOrigin(request));
   url.searchParams.set("error", "auth_callback_failed");
   return NextResponse.redirect(url);
 }
@@ -61,7 +54,7 @@ export async function GET(request: NextRequest) {
     return authFailureRedirect(request);
   }
 
-  const origin = resolveRedirectOrigin(request);
+  const origin = resolveSafeRedirectOrigin(request);
   const isSignup = type === "signup" || next === "/signin";
   const isRecovery = type === "recovery" || next === "/update-password";
 
@@ -83,8 +76,9 @@ export async function GET(request: NextRequest) {
     return attachRedirect(`${origin}/update-password`);
   }
 
-  if (next?.startsWith("/")) {
-    return attachRedirect(`${origin}${next}`);
+  const safeNext = sanitizeRedirectPath(next, "");
+  if (safeNext) {
+    return attachRedirect(`${origin}${safeNext}`);
   }
 
   await supabase.auth.signOut();

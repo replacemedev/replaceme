@@ -138,6 +138,7 @@ export async function assertRateLimit(
 const applyLimiter = createLimiter("job-apply", 10, "1 h");
 const messageLimiter = createLimiter("messaging", 60, "1 h");
 const reportLimiter = createLimiter("reports", 6, "1 h");
+const jobAnalyticsLimiter = createLimiter("job-analytics", 60, "1 m");
 
 async function limitedOrFailOpen(
   limiter: Ratelimit | null,
@@ -204,5 +205,15 @@ export async function rateLimitReportSubmission(
     `report:${profileId}`,
     (s) =>
       `Report limit reached. Please wait ${Math.ceil(s / 60)} minutes before submitting another.`
+  );
+}
+
+/** IP-based throttle for unauthenticated job view/click counters (abuse / inflation). */
+export async function rateLimitJobAnalytics(): Promise<RateLimitResult> {
+  const ip = await resolveIdentifier();
+  return limitedOrFailOpen(
+    jobAnalyticsLimiter,
+    `analytics:${ip}`,
+    () => "Too many analytics events. Please slow down."
   );
 }

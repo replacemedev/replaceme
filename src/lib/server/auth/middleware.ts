@@ -103,6 +103,11 @@ export async function updateSession(request: NextRequest) {
     if (user.app_metadata?.role !== "admin") {
       return NextResponse.redirect(new URL("/403", request.url));
     }
+    const { data: aalData } =
+      await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
+      return NextResponse.redirect(new URL(MFA_CHALLENGE_PATH, request.url));
+    }
   }
 
   if (isMfaChallenge) {

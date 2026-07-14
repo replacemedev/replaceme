@@ -1,0 +1,115 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "description": "Reference WAF custom rules for Replaceme. Apply via Vercel Dashboard → Firewall, CLI (`vercel firewall`), or Terraform. Do not rely on this file alone — Pro custom rules are managed in the project Firewall UI unless Enterprise IaC is enabled.",
+  "firewall": {
+    "rules": [
+      {
+        "name": "Rate limit auth actions",
+        "description": "Throttle sign-in / sign-up / password-reset Server Action posts and auth pages",
+        "active": true,
+        "conditionGroup": [
+          {
+            "conditions": [
+              {
+                "type": "path",
+                "op": "pre",
+                "value": "/signin"
+              }
+            ]
+          },
+          {
+            "conditions": [
+              {
+                "type": "path",
+                "op": "pre",
+                "value": "/signup"
+              }
+            ]
+          },
+          {
+            "conditions": [
+              {
+                "type": "path",
+                "op": "pre",
+                "value": "/forgot-password"
+              }
+            ]
+          }
+        ],
+        "action": {
+          "mitigate": {
+            "action": "rate_limit",
+            "rateLimit": {
+              "algo": "fixed_window",
+              "window": 60,
+              "limit": 20,
+              "keys": ["ip"],
+              "action": "challenge"
+            }
+          }
+        }
+      },
+      {
+        "name": "Rate limit API surface",
+        "description": "General API throttle excluding verified Stripe/Resend webhooks",
+        "active": true,
+        "conditionGroup": [
+          {
+            "conditions": [
+              {
+                "type": "path",
+                "op": "pre",
+                "value": "/api/"
+              },
+              {
+                "type": "path",
+                "op": "nre",
+                "value": "^/api/webhooks/"
+              }
+            ]
+          }
+        ],
+        "action": {
+          "mitigate": {
+            "action": "rate_limit",
+            "rateLimit": {
+              "algo": "fixed_window",
+              "window": 60,
+              "limit": 120,
+              "keys": ["ip"],
+              "action": "deny"
+            }
+          }
+        }
+      },
+      {
+        "name": "Challenge suspicious bots on public growth",
+        "description": "Challenge automated traffic hitting public job/company listings",
+        "active": true,
+        "conditionGroup": [
+          {
+            "conditions": [
+              {
+                "type": "path",
+                "op": "pre",
+                "value": "/jobs"
+              }
+            ]
+          }
+        ],
+        "action": {
+          "mitigate": {
+            "action": "rate_limit",
+            "rateLimit": {
+              "algo": "fixed_window",
+              "window": 60,
+              "limit": 90,
+              "keys": ["ip"],
+              "action": "challenge"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

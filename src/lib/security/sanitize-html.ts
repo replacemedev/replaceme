@@ -1,10 +1,10 @@
 /**
- * Allowlist HTML sanitizer for trusted-admin CMS content.
- * Blocks script/event-handler XSS without a new dependency.
- * // ponytail: upgrade to isomorphic-dompurify if CMS needs richer HTML
+ * DOMPurify-backed HTML sanitizer for CMS content rendered via dangerouslySetInnerHTML.
+ * Allowlist mirrors the previous regex sanitizer; DOMPurify handles mutation XSS properly.
  */
+import DOMPurify from "isomorphic-dompurify";
 
-const ALLOWED_TAGS = new Set([
+const ALLOWED_TAGS = [
   "p",
   "br",
   "strong",
@@ -35,12 +35,9 @@ const ALLOWED_TAGS = new Set([
   "tr",
   "th",
   "td",
-]);
+];
 
-const ALLOWED_ATTRS: Record<string, Set<string>> = {
-  a: new Set(["href", "title", "rel", "target"]),
-  "*": new Set(["class"]),
-};
+const ALLOWED_ATTR = ["href", "title", "rel", "target", "class"];
 
 function isSafeHref(value: string): boolean {
   const v = value.trim().toLowerCase();
@@ -56,55 +53,48 @@ function isSafeHref(value: string): boolean {
 export function sanitizeCmsHtml(dirty: string): string {
   if (!dirty) return "";
 
-  // Drop script/style/iframe entirely (content + tags)
-  let html = dirty
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
-    .replace(/<object[\s\S]*?<\/object>/gi, "")
-    .replace(/<embed[\s\S]*?>/gi, "")
-    .replace(/<link[\s\S]*?>/gi, "")
-    .replace(/<meta[\s\S]*?>/gi, "");
+  const clean = DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS,
+    ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ["style", "script", "iframe", "object", "embed", "form"],
+    FORBID_ATTR: ["style"],
+  });
 
-  html = html.replace(
-    /<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/g,
-    (full, rawTag: string, rawAttrs: string) => {
-      const isClose = full.startsWith("</");
-      const tag = rawTag.toLowerCase();
-      if (!ALLOWED_TAGS.has(tag)) return "";
-      if (isClose) return `</${tag}>`;
-
-      const allowed = new Set([
-        ...(ALLOWED_ATTRS["*"] ?? []),
-        ...(ALLOWED_ATTRS[tag] ?? []),
-      ]);
-
-      const attrs: string[] = [];
+  // Enforce safe href / target after DOMPurify (defense in depth)
+  return clean.replace(
+    /<a\b([^>]*)>/gi,
+    (full, rawAttrs: string) => {
+      let href = "";
+      let title = "";
+      let target = "";
+      let className = "";
       const attrRe =
         /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g;
       let match: RegExpExecArray | null;
       while ((match = attrRe.exec(rawAttrs)) !== null) {
         const name = match[1].toLowerCase();
         const value = match[2] ?? match[3] ?? match[4] ?? "";
-        if (name.startsWith("on")) continue;
-        if (!allowed.has(name)) continue;
-        if (name === "href" && !isSafeHref(value)) continue;
-        if (name === "target" && value !== "_blank" && value !== "_self") {
-          continue;
-        }
-        const safe = value.replace(/"/g, "&quot;");
-        attrs.push(`${name}="${safe}"`);
+        if (name === "href") href = value;
+        if (name === "title") title = value;
+        if (name === "target") target = value;
+        if (name === "class") className = value;
       }
 
-      if (tag === "a" && attrs.some((a) => a.startsWith("target="))) {
-        if (!attrs.some((a) => a.startsWith("rel="))) {
-          attrs.push('rel="noopener noreferrer"');
-        }
+      if (href && !isSafeHref(href)) return "";
+
+      const attrs: string[] = [];
+      if (href) attrs.push(`href="${href.replace(/"/g, "&quot;")}"`);
+      if (title) attrs.push(`title="${title.replace(/"/g, "&quot;")}"`);
+      if (className) attrs.push(`class="${className.replace(/"/g, "&quot;")}"`);
+      if (target === "_blank" || target === "_self") {
+        attrs.push(`target="${target}"`);
+        attrs.push('rel="noopener noreferrer"');
+      } else {
+        attrs.push('rel="noopener noreferrer"');
       }
 
-      return attrs.length ? `<${tag} ${attrs.join(" ")}>` : `<${tag}>`;
+      return attrs.length ? `<a ${attrs.join(" ")}>` : "<a>";
     }
   );
-
-  return html;
 }

@@ -2,15 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { EmailOtpType } from "@supabase/supabase-js";
-import { getSiteUrl } from "@/lib/auth/site-url";
-
-function resolveRedirectOrigin(request: NextRequest): string {
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  if (forwardedHost) {
-    return `https://${forwardedHost}`;
-  }
-  return getSiteUrl();
-}
+import { resolveSafeRedirectOrigin } from "@/lib/auth/safe-redirect-origin";
+import { sanitizeRedirectPath } from "@/lib/auth/safe-callback-url";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -18,13 +11,11 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next");
 
-  const origin = resolveRedirectOrigin(request);
+  const origin = resolveSafeRedirectOrigin(request);
   const destinationPath =
     type === "recovery" || next === "/update-password"
       ? "/update-password"
-      : next?.startsWith("/")
-        ? next
-        : "/signin";
+      : sanitizeRedirectPath(next, "/signin");
 
   const successUrl = new URL(destinationPath, origin);
   const failureUrl = new URL("/signin", origin);

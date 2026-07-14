@@ -194,15 +194,29 @@ export async function getJobSearchData(
         .order("priority_score", { ascending: false })
         .order("created_at", { ascending: false });
 
-      // Apply employment type filter
+      // Apply employment type filter (enum-normalized + escaped PostgREST values)
       if (filters?.employmentTypes && filters.employmentTypes.length > 0) {
-        const parts = filters.employmentTypes.map((t) => `employment_type.ilike.${t}`);
-        query = query.or(parts.join(","));
+        const { escapePostgrestValue } = await import(
+          "@/lib/security/postgrest-filter"
+        );
+        const ALLOWED = new Set(["Full-time", "Part-time", "Contract"]);
+        const safeTypes = filters.employmentTypes
+          .map((t) => normalizeEmploymentType(t))
+          .filter((t) => ALLOWED.has(t));
+        if (safeTypes.length > 0) {
+          const parts = safeTypes.map(
+            (t) => `employment_type.eq.${escapePostgrestValue(t)}`
+          );
+          query = query.or(parts.join(","));
+        }
       }
 
-      // Apply keyword filter (strictly query title column only)
+      // Apply keyword filter (strictly query title column only — parameterized)
       if (filters?.keyword) {
-        query = query.ilike("title", `%${filters.keyword.trim()}%`);
+        const keyword = filters.keyword.trim().slice(0, 120);
+        if (keyword) {
+          query = query.ilike("title", `%${keyword}%`);
+        }
       }
 
       const { data, error } = await query;

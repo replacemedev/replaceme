@@ -1,6 +1,7 @@
 "use server";
 
 import { cache } from "react";
+import { z } from "zod";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import { invalidateEmployerApplicantsCache } from "@/lib/server/redis-cache";
@@ -145,19 +146,31 @@ export async function trackPublicJobView(
   jobId: string
 ): Promise<void> {
   try {
+    const ids = z
+      .object({
+        employerId: z.string().uuid(),
+        jobId: z.string().uuid(),
+      })
+      .safeParse({ employerId, jobId });
+    if (!ids.success) return;
+
+    const { rateLimitJobAnalytics } = await import("@/lib/server/rate-limit");
+    const rate = await rateLimitJobAnalytics();
+    if (!rate.success) return;
+
     const admin = await createAdminClient();
     const { data: jobViews } = await admin
       .from("jobs")
       .select("views_count")
-      .eq("id", jobId)
+      .eq("id", ids.data.jobId)
       .maybeSingle();
     if (jobViews) {
       await admin
         .from("jobs")
         .update({ views_count: (jobViews.views_count ?? 0) + 1 })
-        .eq("id", jobId);
+        .eq("id", ids.data.jobId);
     }
-    await invalidateEmployerApplicantsCache(employerId, jobId);
+    await invalidateEmployerApplicantsCache(ids.data.employerId, ids.data.jobId);
   } catch (incrementErr) {
     safeError("trackPublicJobView failed", incrementErr);
   }

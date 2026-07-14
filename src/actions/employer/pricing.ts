@@ -93,8 +93,14 @@ export async function getPlanDetails(planId: string): Promise<PricingPlan | null
     if (isUuid) {
       query = query.eq("id", planId);
     } else {
-      const slug = planId.toLowerCase();
-      query = query.or(`slug.eq.${slug},name.ilike.${slug}`);
+      const { escapePostgrestValue } = await import(
+        "@/lib/security/postgrest-filter"
+      );
+      const slug = planId.toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 64);
+      if (!slug) return null;
+      query = query.or(
+        `slug.eq.${escapePostgrestValue(slug)},name.ilike.${escapePostgrestValue(slug)}`
+      );
     }
 
     const { data: p, error } = await query.maybeSingle();

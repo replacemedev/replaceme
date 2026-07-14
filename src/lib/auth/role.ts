@@ -24,5 +24,8 @@ export function resolveRoleFromUser(
   return "worker";
 }
 
-export const profileIdFilter = (userId: string) =>
-  `id.eq.${userId},auth_user_id.eq.${userId}`;
+export const profileIdFilter = (userId: string) => {
+  // UUIDs from auth are safe; quote defensively for PostgREST `.or()` syntax.
+  const safe = userId.replace(/[^0-9a-fA-F-]/g, "");
+  return `id.eq.${safe},auth_user_id.eq.${safe}`;
+};

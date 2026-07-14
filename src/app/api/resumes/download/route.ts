@@ -65,12 +65,20 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Resume file not found in storage", { status: 404 });
   }
 
-  const filename = `${worker.first_name || "worker"}_${worker.last_name || "resume"}_resume.pdf`.replace(/\s+/g, "_");
+  const filename = [
+    worker.first_name || "worker",
+    worker.last_name || "resume",
+    "resume",
+  ]
+    .join("_")
+    .replace(/[^\w.-]+/g, "_")
+    .replace(/_+/g, "_")
+    .slice(0, 120);
 
   return new NextResponse(data, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Disposition": `attachment; filename="${filename}.pdf"`,
     },
   });
 }

@@ -12,7 +12,7 @@ import {
   type NavSession,
   type UserRole,
 } from "@/types/nav";
-import { resolveRoleFromUser } from "@/lib/auth/role";
+import { resolveRoleFromUser, profileIdFilter } from "@/lib/auth/role";
 
 function avatarFromUserMeta(user: User): string | null {
   const meta = user.user_metadata ?? {};
@@ -179,7 +179,7 @@ export const getNavSession = cache(async (): Promise<NavSession> => {
       )
     `
     )
-    .or(`id.eq.${user.id},auth_user_id.eq.${user.id}`)
+    .or(profileIdFilter(user.id))
     .maybeSingle();
 
   const role = resolveRoleFromUser(user, row?.role);

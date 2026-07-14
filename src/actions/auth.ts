@@ -466,8 +466,8 @@ export async function signIn(formData: LoginCredentials) {
     const emailKey = email.trim().toLowerCase();
 
     const rateLimit = await assertRateLimit("signin", {
-      maxAttempts: 10,
-      windowMs: 15 * 60 * 1000,
+      maxAttempts: 5,
+      windowMs: 60 * 1000,
       identifier: `${ip}:${emailKey}`,
     });
     if (!rateLimit.ok) {

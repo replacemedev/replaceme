@@ -409,6 +409,9 @@ export async function deactivateJob(jobId: string) {
 export async function trackJobView(jobId: string) {
   try {
     const parsed = jobIdSchema.parse({ jobId });
+    const { rateLimitJobAnalytics } = await import("@/lib/server/rate-limit");
+    const rate = await rateLimitJobAnalytics();
+    if (!rate.success) return;
     const supabase = await createAdminClient();
     await supabase.rpc("increment_job_views", { target_job_id: parsed.jobId });
   } catch (err) {
@@ -423,6 +426,9 @@ export async function trackJobView(jobId: string) {
 export async function trackJobClick(jobId: string) {
   try {
     const parsed = jobIdSchema.parse({ jobId });
+    const { rateLimitJobAnalytics } = await import("@/lib/server/rate-limit");
+    const rate = await rateLimitJobAnalytics();
+    if (!rate.success) return;
     const supabase = await createAdminClient();
     await supabase.rpc("increment_job_clicks", { target_job_id: parsed.jobId });
   } catch (err) {

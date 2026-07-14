@@ -320,9 +320,16 @@ export async function getAdminReports(input: unknown): Promise<{
       if (parsed.status) query = query.eq("status", parsed.status);
       if (parsed.reporterRole) query = query.eq("reporter_role", parsed.reporterRole);
       if (parsed.q) {
-        // simple ilike; avoid exposing FTS complexity
-        const like = `%${parsed.q}%`;
-        query = query.or(`title.ilike.${like},description_markdown.ilike.${like},reported_url.ilike.${like}`);
+        const { postgrestIlikeClause } = await import(
+          "@/lib/security/postgrest-filter"
+        );
+        query = query.or(
+          [
+            postgrestIlikeClause("title", parsed.q),
+            postgrestIlikeClause("description_markdown", parsed.q),
+            postgrestIlikeClause("reported_url", parsed.q),
+          ].join(",")
+        );
       }
 
       const { data, count, error } = await query;
@@ -620,8 +627,15 @@ export async function getAdminJobReports(input: unknown): Promise<{
       query = query.eq("status", parsed.status);
     }
     if (parsed.q) {
-      const like = `%${parsed.q}%`;
-      query = query.or(`reason.ilike.${like},description.ilike.${like}`);
+      const { postgrestIlikeClause } = await import(
+        "@/lib/security/postgrest-filter"
+      );
+      query = query.or(
+        [
+          postgrestIlikeClause("reason", parsed.q),
+          postgrestIlikeClause("description", parsed.q),
+        ].join(",")
+      );
     }
 
     const { data, count, error } = await query;

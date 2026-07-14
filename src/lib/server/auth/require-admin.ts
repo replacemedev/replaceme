@@ -19,6 +19,13 @@ export const requireAdmin = cache(async (): Promise<{
     throw new AdminAuthError();
   }
 
+  // Enforce AAL2 when MFA is enrolled — layout alone is not enough for Server Actions.
+  const { data: aalData } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
+    throw new AdminAuthError("MFA challenge required before admin actions");
+  }
+
   return { supabase, user };
 });
 

@@ -9,9 +9,12 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-site" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    value: "camera=(), microphone=(), geolocation=(), payment=(self)",
   },
   {
     key: "Strict-Transport-Security",
@@ -21,12 +24,14 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
+      // Nonce CSP deferred: Stripe + Turnstile + static pages need proxy migration.
       `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://js.stripe.com https://challenges.cloudflare.com`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https:",
+      "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://js.stripe.com",
       "font-src 'self' data:",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://challenges.cloudflare.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
+      "worker-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

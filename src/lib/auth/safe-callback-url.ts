@@ -3,15 +3,25 @@ import { ROLE_HOME_PATH } from "@/config/navigation";
 
 const WORKER_PROFILE_PREFIXES = ["/workers/", "/profile/", "/candidates"] as const;
 
-function decodePath(raw: string): string | null {
+/** Reject protocol-relative (`//evil.com`) and traversal paths. */
+export function decodePath(raw: string): string | null {
   try {
     const path = decodeURIComponent(raw.trim());
     if (!path.startsWith("/") || path.startsWith("//")) return null;
     if (path.includes("..") || path.includes("\\")) return null;
+    if (path.includes(":") || path.includes("@")) return null;
     return path;
   } catch {
     return null;
   }
+}
+
+/** Safe relative redirect for auth callback / confirm `next` params. */
+export function sanitizeRedirectPath(
+  raw: string | null | undefined,
+  fallback = "/signin"
+): string {
+  return decodePath(raw ?? "") ?? fallback;
 }
 
 /** Guest-safe callback paths stored on auth links (job funnel). */
