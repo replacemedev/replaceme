@@ -34,8 +34,6 @@ const TIER_DETAILS: Record<string, TierDetail> = {
       { text: "Anonymous Candidate Previews", included: true },
       { text: "Skills, Experience & Salary Visible", included: true },
       { text: "Names, Contact Details & Resume Locked", included: true },
-      { text: "No Messaging", included: false },
-      { text: "No Resume Downloads", included: false },
     ],
     ctaText: "Post a Job for Free",
   },
@@ -207,14 +205,14 @@ export function PricingCards({
                 {/* Features List */}
                 <ul className="space-y-3 flex-1">
                   {detail.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
+                    <li key={idx} className="flex items-start gap-3">
                       {feature.included ? (
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center mt-0.5">
-                          <Check className="w-3.5 h-3.5 text-[#006e2f] stroke-[3]" />
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center mt-0.5 shrink-0">
+                          <Check className="w-3.5 h-3.5 text-[#006e2f] stroke-[3] shrink-0" />
                         </div>
                       ) : (
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-50 flex items-center justify-center mt-0.5">
-                          <X className="w-3.5 h-3.5 text-red-500 stroke-[3]" />
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-50 flex items-center justify-center mt-0.5 shrink-0">
+                          <X className="w-3.5 h-3.5 text-red-500 stroke-[3] shrink-0" />
                         </div>
                       )}
                       <span
