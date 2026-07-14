@@ -59,13 +59,6 @@ export function FAQ(props: { items?: FAQItem[] }) {
           </div>
         ))}
       </div>
-
-      {/* View all FAQs Outline Button */}
-      <div className="text-center mt-10">
-        <button className="py-3 px-8 rounded-xl border border-[#10b981] text-[#10b981] font-bold text-sm hover:bg-[#e6fbf2] transition-all cursor-pointer">
-          View all FAQs
-        </button>
-      </div>
     </div>
   );
 }

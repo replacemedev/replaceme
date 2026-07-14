@@ -4,7 +4,7 @@ import { getPricingData } from "@/actions/employer/pricing";
 import { PublicPricingClient } from "@/components/public/PublicPricingClient";
 import { PRICING_FALLBACK } from "@/lib/content/page-fallbacks";
 import type { PricingPageConfig } from "@/types/page-content";
-import { FAQSchema, FactBox } from "@/components/seo";
+import { FAQSchema } from "@/components/seo";
 import type { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -32,15 +32,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const PRICING_FACTS = [
-  { label: "Worker fee", value: "Free — $0 forever", highlight: true },
-  { label: "Employer pricing model", value: "Flat monthly subscription (4 tiers)" },
-  { label: "Placement commission", value: "0% — none charged", highlight: true },
-  { label: "Salary markup", value: "0% — workers receive 100% of agreed pay", highlight: true },
-  { label: "Contract management", value: "Included in paid plans" },
-  { label: "Applicant messaging", value: "Included from Growth plan onwards" },
-];
 
 const PRICING_FAQ_FALLBACK = [
   {
@@ -88,15 +79,6 @@ export default async function PublicPricingPage() {
           </h1>
           <p className="text-slate-500 font-medium text-lg mt-4">{config.description}</p>
         </header>
-
-        {/* GEO: Data-dense FactBox for LLM citation of pricing structure */}
-        <div className="max-w-2xl mx-auto px-4 mb-12">
-          <FactBox
-            title="Replaceme Pricing Facts"
-            items={PRICING_FACTS}
-            variant="table"
-          />
-        </div>
 
         <PublicPricingClient
           plans={pricing.plans}

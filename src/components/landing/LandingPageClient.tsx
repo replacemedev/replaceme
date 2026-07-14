@@ -25,7 +25,8 @@ import {
 
 import type { FAQItem, PricingPlan } from "@/types/employer/billing";
 import { LandingSkillsShowcase } from "@/components/landing/LandingSkillsShowcase";
-import { LandingPricingBento } from "@/components/landing/LandingPricingBento";
+import { PricingCards } from "@/components/employer/pricing/PricingCards";
+import { useRouter } from "next/navigation";
 import { CitationBlock } from "@/components/seo";
 import {
   LANDING_AMBIENT_GLOW,
@@ -70,6 +71,7 @@ const LANDING_FAQ_FALLBACK: FAQItem[] = [
 export function LandingPageClient({
   pricingPlans,
 }: LandingPageClientProps) {
+  const router = useRouter();
   const faqs = LANDING_FAQ_FALLBACK;
 
   // State for FAQ Accordion
@@ -491,7 +493,12 @@ export function LandingPageClient({
             </p>
           </div>
 
-          <LandingPricingBento plans={pricingPlans} />
+          <div className="text-left text-slate-900 mt-8">
+            <PricingCards
+              plans={pricingPlans}
+              onSelectPlan={() => router.push("/signup/employer")}
+            />
+          </div>
           <Link
             href="/pricing"
             className="inline-flex mt-8 items-center gap-2 bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 text-lg reveal-item min-h-[44px]"

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { PricingCards } from "@/components/employer/pricing/PricingCards";
 import { CompareTable } from "@/components/employer/pricing/CompareTable";
 import { FAQ } from "@/components/employer/pricing/FAQ";
-import { Testimonials } from "@/components/employer/pricing/Testimonials";
 import type { FAQItem, PricingPlan, TestimonialItem } from "@/types/employer/billing";
 
 interface PublicPricingClientProps {
@@ -15,7 +14,6 @@ interface PublicPricingClientProps {
 
 export function PublicPricingClient({
   plans,
-  testimonials,
   faqs,
 }: PublicPricingClientProps) {
   const router = useRouter();
@@ -24,7 +22,6 @@ export function PublicPricingClient({
     <>
       <PricingCards plans={plans} onSelectPlan={() => router.push("/signup/employer")} />
       <CompareTable plans={plans} />
-      <Testimonials items={testimonials} />
       <FAQ items={faqs} />
     </>
   );

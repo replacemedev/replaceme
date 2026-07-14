@@ -6,7 +6,6 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import { PricingCards } from "@/components/employer/pricing/PricingCards";
 import { CompareTable } from "@/components/employer/pricing/CompareTable";
-import { Testimonials } from "@/components/employer/pricing/Testimonials";
 import { FAQ } from "@/components/employer/pricing/FAQ";
 import type {
   FAQItem,
@@ -35,7 +34,6 @@ interface EmployerPricingClientProps {
 
 export function EmployerPricingClient({
   plans,
-  testimonials,
   faqs,
   currentPlanSlug,
   planUsage,
@@ -112,7 +110,6 @@ export function EmployerPricingClient({
       />
 
       <CompareTable plans={plans} currentPlanSlug={currentPlanSlug} />
-      <Testimonials items={testimonials} />
       <FAQ items={faqs} />
 
       {jobLimitGateOpen ? (
