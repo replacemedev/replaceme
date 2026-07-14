@@ -53,19 +53,20 @@ export const TurnstileWidget = forwardRef<
 
   return (
     <div
-      className={
-        className ??
-        "flex min-h-[65px] w-full items-center justify-center overflow-hidden"
-      }
+      className={`flex min-h-[65px] w-full items-center justify-center py-2 overflow-hidden sm:px-2 ${
+        className || ""
+      }`}
     >
-      <Turnstile
-        ref={ref}
-        siteKey={SITE_KEY}
-        onSuccess={(token) => callbacksRef.current.onToken(token)}
-        onExpire={() => callbacksRef.current.onExpire?.()}
-        onError={() => callbacksRef.current.onError?.()}
-        options={options}
-      />
+      <div className="transform scale-90 sm:scale-100 origin-center">
+        <Turnstile
+          ref={ref}
+          siteKey={SITE_KEY}
+          onSuccess={(token) => callbacksRef.current.onToken(token)}
+          onExpire={() => callbacksRef.current.onExpire?.()}
+          onError={() => callbacksRef.current.onError?.()}
+          options={options}
+        />
+      </div>
     </div>
   );
 });
