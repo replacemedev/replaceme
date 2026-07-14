@@ -9,14 +9,15 @@ const tocItems = [
   { href: "#4-employer-data", label: "4. Employer Data" },
   { href: "#5-purposes", label: "5. Purposes & Legal Bases" },
   { href: "#6-sharing", label: "6. Sharing & PIC Obligations" },
-  { href: "#7-cross-border", label: "7. Cross-Border Transfers" },
-  { href: "#8-retention", label: "8. Retention & Security" },
-  { href: "#9-breach", label: "9. Breach Notification (NPC 2026-02)" },
-  { href: "#10-rights", label: "10. Your Rights" },
-  { href: "#11-cookies", label: "11. Cookies" },
-  { href: "#12-children", label: "12. Children" },
-  { href: "#13-changes", label: "13. Changes" },
-  { href: "#14-contact", label: "14. Contact" },
+  { href: "#7-payment-data", label: "7. Payment Data & Cross-Border" },
+  { href: "#8-cross-border", label: "8. Cross-Border Transfers" },
+  { href: "#9-retention", label: "9. Retention & Security" },
+  { href: "#10-breach", label: "10. Breach Notification (NPC 2026-02)" },
+  { href: "#11-rights", label: "11. Your Rights" },
+  { href: "#12-cookies", label: "12. Cookies" },
+  { href: "#13-children", label: "13. Children" },
+  { href: "#14-changes", label: "14. Changes" },
+  { href: "#15-contact", label: "15. Contact" },
 ];
 
 function CheckItem({ label, children }: { label?: string; children: React.ReactNode }) {
@@ -72,7 +73,8 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
           Replaceme protects personal data under the Philippine Data Privacy Act of 2012 (Republic
           Act No. 10173) and its IRR, NPC circulars and advisories, and—where applicable—the EU/UK
           GDPR and California CCPA/CPRA for international visitors and Employers. This Policy
-          explains what we collect from Workers and Employers, how we use it, when Employers become
+          explains what we collect from Workers and Employers, how we use it, how Stripe handles
+          payment credentials (PCI), when data leaves your home country, when Employers become
           separate controllers of Worker data, and how we notify breaches within NPC timelines.
         </p>
       </div>
@@ -143,9 +145,11 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
             billing contacts.
           </CheckItem>
           <CheckItem label="Financial / billing:">
-            subscription tier, invoices, and payment status. Card and bank details are collected and
-            processed by <strong className="font-semibold text-slate-800">Stripe</strong> as a
-            payment processor; Replaceme does not store full payment card numbers on its servers.
+            subscription tier, invoices, payment status, and billing contact details. Full payment
+            card numbers, expiration dates, and CVV/CVC codes are{" "}
+            <strong className="font-semibold text-slate-800">not</strong> collected or stored on
+            Replaceme servers; they are transmitted directly to and vaulted by{" "}
+            <strong className="font-semibold text-slate-800">Stripe</strong>. See Section 7.
           </CheckItem>
           <CheckItem label="Hiring activity:">
             jobs posted, candidates viewed/unlocked, messages, interview notes you enter, and
@@ -227,32 +231,149 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
         </div>
       </div>
 
-      <LegalSectionHeading id="7-cross-border" number={7} title="Cross-Border & B2B Transfers" />
+      <LegalSectionHeading
+        id="7-payment-data"
+        number={7}
+        title="Payment Information, Data Sharing, and Cross-Border Transfers"
+      />
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <h3
+          id="71-pci"
+          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+        >
+          7.1 PCI-DSS Compliance &amp; Card Data Storage
+        </h3>
+        <p>
+          Replaceme{" "}
+          <strong className="font-semibold text-slate-800">
+            does not collect, process, or store full credit or debit card numbers, card expiration
+            dates, or CVV/CVC security codes on our servers
+          </strong>
+          . All sensitive payment credentials are entered by you directly into Stripe-hosted Checkout
+          or Elements interfaces and are transmitted to and vaulted by Stripe under Stripe&apos;s PCI
+          DSS–compliant infrastructure. Replaceme may receive limited payment metadata only (for
+          example, Stripe customer ID, payment method brand/last four digits, invoice status,
+          subscription status, and dispute status) necessary to provision entitlements, display
+          billing history, and prevent fraud.
+        </p>
+
+        <h3
+          id="72-sharing-stripe"
+          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+        >
+          7.2 Data Sharing with Stripe &amp; Cross-Border Transfers
+        </h3>
+        <p>
+          To facilitate payments, prevent fraud, manage subscriptions, issue invoices, and handle
+          chargebacks, we share necessary personal and business data with Stripe—including name,
+          email address, billing address, company details, tax identifiers where provided, and
+          transaction history. The primary lawful basis for this sharing under the Philippine Data
+          Privacy Act of 2012 (RA 10173) and, where applicable, the GDPR is{" "}
+          <strong className="font-semibold text-slate-800">contractual necessity</strong> (performance
+          of the subscription contract and related payment obligations). Additional bases may include
+          legal obligation (tax, AML, and dispute-handling rules) and legitimate interests in
+          securing the Platform against fraud, balanced against your rights.
+        </p>
+        <p>
+          Because Replaceme serves international Employers worldwide, payment-related and account
+          data may be{" "}
+          <strong className="font-semibold text-slate-800">
+            transferred to and processed on servers located outside your home country
+          </strong>
+          —including in the United States, the European Union / European Economic Area, the United
+          Kingdom, Singapore, and other regions where Stripe or its sub-processors operate—under the
+          same contractual-necessity basis and subject to the safeguards below.
+        </p>
+
+        <h3
+          id="73-global-privacy"
+          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+        >
+          7.3 Global Privacy Compliance (RA 10173, GDPR, CCPA)
+        </h3>
+        <p>
+          This payment data sharing complies with the Philippine Data Privacy Act of 2012 (RA 10173)
+          and its IRR. Stripe acts as a legitimate third-party Personal Information Processor (and,
+          under GDPR terminology, a data processor) bound by Stripe&apos;s{" "}
+          <a
+            href="https://stripe.com/legal/dpa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Data Processing Agreement
+          </a>
+          , which incorporates the{" "}
+          <a
+            href="https://stripe.com/legal/dta"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Data Transfers Addendum
+          </a>
+          . Cross-border transfers to Stripe, LLC in the United States rely on internationally
+          recognized transfer mechanisms, including the EU-U.S. Data Privacy Framework where
+          available and the European Commission&apos;s Standard Contractual Clauses (SCCs), together
+          with the UK International Data Transfer Addendum where UK GDPR applies.
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong className="font-semibold text-slate-800">GDPR:</strong> Where we process personal
+            data of individuals in the EEA/UK, payment processing by Stripe is conducted under
+            Article 28 processor terms and Article 46 transfer safeguards (SCCs / DPF) as described
+            in Stripe&apos;s DPA.
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">CCPA/CPRA:</strong> Stripe certifies, in
+            its processor capacity, that it does not sell or share personal information as those
+            terms are defined under California law except as permitted to provide the payment
+            services. Replaceme does not sell Employer or Worker personal information.
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Your choices:</strong> You may update
+            billing contacts and payment methods via the Stripe Customer Portal. Card-detail
+            corrections and deletion of vaulted PAN data are handled by Stripe as the card vault
+            operator; contact us at{" "}
+            <a
+              href="mailto:support@replaceme.ph"
+              className="font-semibold text-[#006e2f] hover:underline"
+            >
+              support@replaceme.ph
+            </a>{" "}
+            and we will coordinate deletion or restriction requests consistent with retention needed
+            for invoices, tax, and dispute defense.
+          </li>
+        </ul>
+      </div>
+
+      <LegalSectionHeading id="8-cross-border" number={8} title="Cross-Border & B2B Transfers" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        Worker data may be accessed by Employers and service providers outside the Philippines,
-        including in the United States, EU/EEA, UK, Singapore, and other regions. We implement
-        appropriate safeguards consistent with RA 10173 / NPC rules and, for GDPR-covered transfers,
-        mechanisms such as Standard Contractual Clauses or adequacy decisions where available. US
-        Employers handling California residents&apos; data must also meet CCPA/CPRA business
-        obligations. Employers receiving Filipino Worker data must ensure their own cross-border
-        compliance programs.
+        Apart from payment processing described in Section 7, Worker data may be accessed by
+        Employers and service providers outside the Philippines, including in the United States,
+        EU/EEA, UK, Singapore, and other regions. We implement appropriate safeguards consistent with
+        RA 10173 / NPC rules and, for GDPR-covered transfers, mechanisms such as Standard Contractual
+        Clauses or adequacy decisions where available. US Employers handling California residents&apos;
+        data must also meet CCPA/CPRA business obligations. Employers receiving Filipino Worker data
+        must ensure their own cross-border compliance programs.
       </p>
 
-      <LegalSectionHeading id="8-retention" number={8} title="Retention & Security" />
+      <LegalSectionHeading id="9-retention" number={9} title="Retention & Security" />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
           We retain account and verification data for as long as your account is active and for a
           reasonable period thereafter to meet legal, tax, dispute, and security obligations
           (typically up to the longer of applicable statutory periods or our documented retention
-          schedules). Resume and application data may be retained while relevant to open roles or
-          your profile settings. We use encryption in transit, access controls, logging, and vendor
-          diligence. No method of transmission or storage is 100% secure.
+          schedules). Billing metadata and invoices may be retained for longer where tax or
+          accounting law requires. Resume and application data may be retained while relevant to open
+          roles or your profile settings. We use encryption in transit, access controls, logging, and
+          vendor diligence. No method of transmission or storage is 100% secure.
         </p>
       </div>
 
       <LegalSectionHeading
-        id="9-breach"
-        number={9}
+        id="10-breach"
+        number={10}
         title="Personal Data Breach Notification (NPC Advisory 2026-02)"
       />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
@@ -292,7 +413,7 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
         </p>
       </div>
 
-      <LegalSectionHeading id="10-rights" number={10} title="Rights of the Data Subject" />
+      <LegalSectionHeading id="11-rights" number={11} title="Rights of the Data Subject" />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
           Under <strong className="font-semibold text-slate-800">RA 10173</strong>, you have the
@@ -313,7 +434,7 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
         </p>
       </div>
 
-      <LegalSectionHeading id="11-cookies" number={11} title="Cookies & Similar Technologies" />
+      <LegalSectionHeading id="12-cookies" number={12} title="Cookies & Similar Technologies" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         We use strictly necessary cookies to operate the Platform. Analytics and marketing cookies
         require prior opt-in consent consistent with NPC Circular No. 2023-04 (Guidelines on Consent)
@@ -324,20 +445,20 @@ export function PrivacyPolicyContent({ hideSidebar = false }: { hideSidebar?: bo
         .
       </p>
 
-      <LegalSectionHeading id="12-children" number={12} title="Children" />
+      <LegalSectionHeading id="13-children" number={13} title="Children" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         The Platform is not directed to individuals under 18. We do not knowingly collect personal
         data from children. If you believe a minor has provided data, contact us for deletion.
       </p>
 
-      <LegalSectionHeading id="13-changes" number={13} title="Changes to This Policy" />
+      <LegalSectionHeading id="14-changes" number={14} title="Changes to This Policy" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         We may update this Policy to reflect legal or operational changes (including NPC advisories
         and international privacy laws). We will revise the &quot;Last Updated&quot; date and provide
         additional notice when changes are material.
       </p>
 
-      <LegalSectionHeading id="14-contact" number={14} title="Contact" />
+      <LegalSectionHeading id="15-contact" number={15} title="Contact" />
       <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-5 py-4 text-center text-base leading-relaxed text-slate-700 sm:px-6 sm:py-5 sm:text-[17px]">
         <p>
           For privacy requests and general support:{" "}

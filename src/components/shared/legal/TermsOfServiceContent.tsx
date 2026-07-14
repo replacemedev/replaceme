@@ -14,7 +14,13 @@ const tocItems = [
   { href: "#52-extraterritoriality", label: "5.2 Extraterritoriality", indent: true },
   { href: "#53-employer-obligations", label: "5.3 Employer Obligations", indent: true },
   { href: "#54-non-circumvention", label: "5.4 Non-Circumvention", indent: true },
-  { href: "#6-payments", label: "6. Payments, Fees & Refunds" },
+  { href: "#6-payments", label: "6. Billing, Subscriptions & Payments" },
+  { href: "#61-stripe-processor", label: "6.1 Global Payment Processor", indent: true },
+  { href: "#62-currency-taxes", label: "6.2 Currency, FX & Taxes", indent: true },
+  { href: "#63-auto-renewal", label: "6.3 Auto-Renewal", indent: true },
+  { href: "#64-plan-changes", label: "6.4 Upgrades, Downgrades & Proration", indent: true },
+  { href: "#65-refunds-chargebacks", label: "6.5 Refunds & Chargebacks", indent: true },
+  { href: "#66-billing-redress", label: "6.6 Billing Dispute Redress", indent: true },
   { href: "#7-acceptable-use", label: "7. Acceptable Use" },
   { href: "#8-intellectual-property", label: "8. Intellectual Property" },
   { href: "#9-disclaimers", label: "9. Disclaimers" },
@@ -274,13 +280,19 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
               </li>
             </ul>
             <p>
-              Payments are processed by <strong className="font-semibold text-slate-800">Stripe</strong>. By subscribing, you
-              authorize recurring charges to your selected payment method until you cancel through
-              the Stripe Customer Portal or in-product billing settings. Feature entitlements
-              (including full profile unlocks and resume downloads) are gated by tier as described
-              in-product. Workers join and maintain profiles free of charge; Replaceme does not
-              charge placement fees or salary commissions on Worker engagements arranged through the
-              Platform.
+              Payments (domestic and international) are processed by{" "}
+              <strong className="font-semibold text-slate-800">Stripe</strong>. By
+              subscribing, you authorize recurring charges to your selected payment method until you
+              cancel through the Stripe Customer Portal or in-product billing settings. Feature
+              entitlements (including full profile unlocks and resume downloads) are gated by tier
+              as described in-product. Workers join and maintain profiles free of charge; Replaceme
+              does not charge placement fees or salary commissions on Worker engagements arranged
+              through the Platform. Full billing, proration, refund, chargeback, and dispute rules
+              appear in{" "}
+              <a href="#6-payments" className="font-semibold text-[#006e2f] hover:underline">
+                Section 6
+              </a>
+              .
             </p>
           </div>
         </RoleCard>
@@ -358,37 +370,264 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         </RoleCard>
       </div>
 
-      <LegalSectionHeading id="6-payments" number={6} title="Payments, Fees & Refunds" />
+      <LegalSectionHeading
+        id="6-payments"
+        number={6}
+        title="Billing, Subscriptions, and Payments"
+      />
+      <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        This Section applies to all paid Employer subscriptions on Replaceme—whether the Employer is
+        located in the Philippines or anywhere else in the world. By purchasing or renewing a paid
+        plan, you acknowledge that you have read and agree to the payment and dispute rules below.
+      </p>
+
+      <h3
+        id="61-stripe-processor"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.1 Global Third-Party Payment Processor (Stripe)
+      </h3>
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
-          Subscription fees are billed in advance for each billing period via Stripe. Taxes may be
-          added where required. Unless required by law or expressly stated otherwise:
+          All payments—domestic and international—are processed securely through our third-party
+          payment provider,{" "}
+          <strong className="font-semibold text-slate-800">Stripe, Inc. and its affiliates</strong>{" "}
+          (&quot;Stripe&quot;). Replaceme does not act as a bank, remittance operator, or money
+          transmitter. Stripe Checkout and the Stripe Customer Portal are the authorized channels for
+          collecting payment methods, charging subscriptions, and managing plan changes.
+        </p>
+        <p>
+          By making a purchase or subscribing, global Employers agree to be bound by Stripe&apos;s
+          applicable terms in their respective jurisdictions, including the{" "}
+          <a
+            href="https://stripe.com/legal/ssa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Stripe Services Agreement
+          </a>{" "}
+          and, where Stripe Connect or connected-account features apply to your workflow, the{" "}
+          <a
+            href="https://stripe.com/legal/connect-account"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Stripe Connected Account Agreement
+          </a>
+          . Stripe&apos;s privacy practices are described in the{" "}
+          <a
+            href="https://stripe.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Stripe Privacy Policy
+          </a>
+          . Consistent with Stripe&apos;s Services Terms on subscriptions and invoicing, before the
+          first recurring charge we inform you that transactions occur on an ongoing basis and
+          explain how to cancel (in-product billing settings or the Stripe Customer Portal).
+        </p>
+      </div>
+
+      <h3
+        id="62-currency-taxes"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.2 International Billing, Currency &amp; Taxes
+      </h3>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          The primary currency of billing for Employer subscriptions is{" "}
+          <strong className="font-semibold text-slate-800">United States Dollars (USD)</strong>.
+          Published list prices (for example, Starter USD&nbsp;19 / month, Growth USD&nbsp;39 /
+          month, and Scale USD&nbsp;79 / month) are denominated in USD unless a written enterprise
+          agreement or the Pricing page expressly states otherwise.
         </p>
         <ul className="list-disc space-y-2 pl-5">
           <li>
-            Fees for commenced subscription periods are generally <strong className="font-semibold text-slate-800">non-refundable</strong>;
+            <strong className="font-semibold text-slate-800">Foreign transaction &amp; FX fees:</strong>{" "}
+            If your card or bank is denominated in a currency other than USD, your issuing bank,
+            card network, or local payment institution may apply foreign-transaction fees, currency
+            conversion rates, and/or cross-border markup. Those fees are charged by your financial
+            institution—not by Replaceme—and are your sole responsibility.
           </li>
           <li>
-            You may cancel renewal at any time; access continues until the end of the paid period;
+            <strong className="font-semibold text-slate-800">Local taxes, VAT, GST &amp; withholding:</strong>{" "}
+            Unless Replaceme expressly collects and remits a tax on an invoice (for example, where
+            Stripe Tax or similar tooling is enabled for a jurisdiction), international Employers
+            remain responsible for any sales tax, value-added tax (VAT), goods and services tax
+            (GST), digital-services tax, withholding tax, or similar levy imposed by their home
+            country or by the place where they consume the Services. Replaceme remains the merchant
+            of record for standard Stripe Billing subscriptions unless a separate merchant-of-record
+            arrangement applies.
           </li>
           <li>
-            Chargebacks initiated in bad faith after service delivery may result in account
-            suspension; and
+            <strong className="font-semibold text-slate-800">Invoices &amp; tax IDs:</strong> You
+            agree to provide accurate billing contact, company, and tax-identification details when
+            requested so that invoices and tax documentation can be issued correctly.
+          </li>
+        </ul>
+      </div>
+
+      <h3
+        id="63-auto-renewal"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.3 Subscription Lifecycle &amp; Recurring Billing
+      </h3>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          Paid subscriptions are billed{" "}
+          <strong className="font-semibold text-slate-800">in advance</strong> for each billing
+          cycle (typically monthly) and{" "}
+          <strong className="font-semibold text-slate-800">
+            auto-renew automatically at the end of each billing cycle
+          </strong>{" "}
+          unless you cancel before renewal. By subscribing, you authorize Replaceme (through Stripe)
+          to charge your saved payment method on each renewal date for the then-current plan fees
+          and any applicable taxes displayed at checkout or on your invoice.
+        </p>
+        <p>
+          You may cancel auto-renewal at any time via the Stripe Customer Portal or in-product
+          billing settings. Cancellation stops future renewals; your paid access continues through
+          the end of the current paid period. Failed renewals may result in dunning attempts, a
+          limited{" "}
+          <strong className="font-semibold text-slate-800">past-due grace period</strong>, and
+          eventual suspension of paid entitlements if payment is not restored.
+        </p>
+      </div>
+
+      <h3
+        id="64-plan-changes"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.4 Upgrades, Downgrades &amp; Proration
+      </h3>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          Plan changes are confirmed exclusively through Stripe Checkout or the Stripe Customer
+          Portal. Our scheduling logic is:
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong className="font-semibold text-slate-800">Upgrades</strong> take effect{" "}
+            <strong className="font-semibold text-slate-800">immediately</strong>, with applicable
+            prorated charges for the unused portion of the higher-tier period invoiced at the time of
+            the upgrade (or as otherwise configured in Stripe for immediate proration);
           </li>
           <li>
-            If we terminate your account without cause before a paid period ends, we may provide a
-            pro-rata credit or refund at our discretion or as required by law.
+            <strong className="font-semibold text-slate-800">Downgrades</strong> are scheduled to take
+            effect at the <strong className="font-semibold text-slate-800">end of the current billing cycle</strong>. You
+            retain your current tier&apos;s entitlements until that date;
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Cancellations</strong> take effect at the
+            end of the current billing cycle (cancel-at-period-end). You will not be charged for the
+            next cycle after a timely cancellation; and
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">No partial refunds</strong> are provided
+            for mid-cycle downgrades or for unused time after voluntary cancellation, except where
+            required by mandatory consumer law or where Replaceme terminates your account without
+            cause before a paid period ends (in which case we may issue a pro-rata credit or refund
+            at our discretion or as required by law).
+          </li>
+        </ul>
+      </div>
+
+      <h3
+        id="65-refunds-chargebacks"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.5 Refunds &amp; Chargebacks
+      </h3>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          Unless required by applicable law or expressly agreed in writing by Replaceme:
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            Fees for commenced subscription periods are generally{" "}
+            <strong className="font-semibold text-slate-800">non-refundable</strong>;
+          </li>
+          <li>
+            Billing errors (duplicate charges, incorrect plan billed) should be reported promptly to{" "}
+            <a
+              href="mailto:support@replaceme.ph"
+              className="font-semibold text-[#006e2f] hover:underline"
+            >
+              support@replaceme.ph
+            </a>{" "}
+            so we can investigate and, where appropriate, issue a refund or credit through Stripe;
+            and
+          </li>
+          <li>
+            Initiating a{" "}
+            <strong className="font-semibold text-slate-800">
+              fraudulent, abusive, or bad-faith chargeback or dispute
+            </strong>{" "}
+            with your card issuer, bank, or payment provider after you have received paid Platform
+            access—especially without first exhausting our internal billing redress process—will
+            result in{" "}
+            <strong className="font-semibold text-slate-800">
+              immediate account suspension
+            </strong>{" "}
+            and may result in permanent termination, recovery of unpaid amounts, and reporting of the
+            dispute outcome as permitted by card-network and Stripe rules.
           </li>
         </ul>
         <p>
-          For billing support, contact{" "}
+          Legitimate disputes (unauthorized card use, verified billing errors) should still be
+          raised first with Replaceme support so we can resolve them quickly without interrupting
+          your hiring workflow. Card-network chargebacks remain available where law or network rules
+          require, subject to Section 6.6.
+        </p>
+      </div>
+
+      <h3
+        id="66-billing-redress"
+        className="mb-3 mt-6 scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
+      >
+        6.6 Internal Redress for Billing Disputes (RA 11967)
+      </h3>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          In accordance with{" "}
+          <strong className="font-semibold text-slate-800">
+            Section 24 of the Internet Transactions Act of 2023 (Republic Act No. 11967)
+          </strong>
+          , and as a condition of using paid Services,{" "}
+          <strong className="font-semibold text-slate-800">
+            all users—both Philippine and international Employers and Workers—
+          </strong>{" "}
+          must first exhaust Replaceme&apos;s internal support and dispute-resolution process for
+          billing, subscription, refund, proration, and charge issues{" "}
+          <strong className="font-semibold text-slate-800">
+            before initiating an external chargeback
+          </strong>{" "}
+          with a card issuer or payment provider, and before filing a complaint with a regulatory
+          body such as the Philippine Department of Trade and Industry (DTI), a foreign consumer
+          protection authority, a court, or an alternative dispute-resolution body.
+        </p>
+        <p>
+          File a billing redress request by emailing{" "}
           <a
             href="mailto:support@replaceme.ph"
             className="font-semibold text-[#006e2f] hover:underline"
           >
             support@replaceme.ph
-          </a>
-          .
+          </a>{" "}
+          with the subject &quot;Billing Dispute / Redress Request,&quot; including your account
+          email, invoice or Stripe receipt ID, amount disputed, and supporting documents. Under RA
+          11967, the internal mechanism is deemed exhausted if the matter remains unresolved after{" "}
+          <strong className="font-semibold text-slate-800">seven (7) calendar days</strong> from
+          filing. See also{" "}
+          <a href="#12-dispute-resolution" className="font-semibold text-[#006e2f] hover:underline">
+            Section 12
+          </a>{" "}
+          for the general Platform redress procedure.
         </p>
       </div>
 
@@ -465,10 +704,14 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
           In compliance with <strong className="font-semibold text-slate-800">Section 24 of Republic Act No. 11967</strong>, Workers and
-          Employers who have a dispute arising from internet transactions on the Platform{" "}
+          Employers—including international Employers who avail of the Philippine market—who have a
+          dispute arising from internet transactions on the Platform (including billing,
+          subscriptions, refunds, and charge disputes described in Section 6){" "}
           <strong className="font-semibold text-slate-800">must first avail of Replaceme&apos;s internal redress mechanism</strong> before
           filing a complaint with any court, the Department of Trade and Industry (DTI), other
-          government agencies, or alternative dispute resolution bodies.
+          government agencies, or alternative dispute resolution bodies, and before escalating to an
+          external payment chargeback except where network rules or law require otherwise for
+          confirmed unauthorized transactions.
         </p>
         <p>How to file an internal complaint:</p>
         <ol className="list-decimal space-y-2 pl-5">
