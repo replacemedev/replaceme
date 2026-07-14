@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Loader2, Briefcase, Eye } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X, Loader2, Briefcase } from "lucide-react";
 
 interface HireWorkerModalProps {
   open: boolean;
@@ -18,18 +19,23 @@ export function HireWorkerModal({
   onConfirm,
   isPending,
 }: HireWorkerModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [employmentStatus, setEmploymentStatus] = useState("Full-time");
   const [showHiredBadge, setShowHiredBadge] = useState(true);
 
-  if (!open) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!open || !mounted) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onConfirm(employmentStatus, showHiredBadge);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       <button
         type="button"
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
@@ -123,4 +129,6 @@ export function HireWorkerModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

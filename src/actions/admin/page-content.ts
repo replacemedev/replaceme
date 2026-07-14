@@ -151,11 +151,6 @@ export async function upsertPageContent(
       return { success: false, error: error.message };
     }
 
-    const { logAdminAction } = await import("@/actions/admin-actions");
-    await logAdminAction("upsert_page_content", "page_content", parsed.data.slug, {
-      is_published: payload.is_published,
-    });
-
     revalidateTag(PAGE_CONTENT_TAG, "max");
     revalidateTag(`page-content-${parsed.data.slug}`, "max");
     revalidatePath(def.publicPath);
