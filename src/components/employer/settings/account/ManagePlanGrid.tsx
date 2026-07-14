@@ -78,9 +78,9 @@ export function ManagePlanGrid({
               Manage plan
             </h2>
             <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
-              Upgrades take effect immediately with proration. Downgrades are
-              scheduled for the end of your billing period — you keep your
-              current plan until then.
+              Upgrades apply immediately (prorated invoice). Downgrades and
+              cancellations take effect at the end of your billing period — you
+              keep your current plan until then.
             </p>
           </div>
           {nextBillingDate && currentPlan !== "discovery" ? (
@@ -227,7 +227,9 @@ export function ManagePlanGrid({
                       </button>
                     )}
                     <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
-                      Confirm change on Stripe
+                      {isPaid
+                        ? "Takes effect at period end on Stripe"
+                        : "Confirm on Stripe"}
                     </p>
                   </div>
                 ) : (

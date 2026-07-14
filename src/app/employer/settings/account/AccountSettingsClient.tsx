@@ -220,14 +220,50 @@ export function AccountSettingsClient({
             <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" />
             <div>
               <p className="text-sm font-semibold text-orange-950">
-                {scheduled === "discovery"
-                  ? "Moving to Discovery at period end"
-                  : `Downgrade to ${TIER_LABELS[scheduled]} scheduled`}
+                {scheduled === "discovery" || initialSettings.cancelAtPeriodEnd
+                  ? "Your subscription will cancel at period end"
+                  : `Your plan will change to ${TIER_LABELS[scheduled]} on ${
+                      scheduledAt ? formatDate(scheduledAt) : "period end"
+                    }`}
               </p>
               <p className="mt-1 text-xs font-medium text-orange-700/90 leading-relaxed">
                 You keep {TIER_LABELS[initialSettings.plan]} until{" "}
-                {scheduledAt ? formatDate(scheduledAt) : "the end of this billing period"}
-                . Upgrade anytime to cancel this change.
+                {scheduledAt
+                  ? formatDate(scheduledAt)
+                  : "the end of this billing period"}
+                .{" "}
+                {scheduled === "discovery" || initialSettings.cancelAtPeriodEnd
+                  ? "Upgrade anytime to keep a paid plan."
+                  : "Upgrade anytime to apply a higher plan immediately and cancel this downgrade."}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="#manage-plan"
+            className="inline-flex shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white px-4 py-2 text-xs font-bold text-orange-900 hover:bg-orange-50"
+          >
+            Manage plan
+          </Link>
+        </div>
+      ) : null}
+
+      {!scheduled && initialSettings.cancelAtPeriodEnd && !checkoutSuccess ? (
+        <div
+          className="flex flex-col gap-3 rounded-xl border border-orange-200 bg-orange-50/50 p-5 sm:flex-row sm:items-center sm:justify-between"
+          role="status"
+        >
+          <div className="flex items-start gap-3">
+            <CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" />
+            <div>
+              <p className="text-sm font-semibold text-orange-950">
+                Your subscription will cancel at the end of your billing cycle
+                {initialSettings.nextBillingDate
+                  ? ` on ${formatDate(initialSettings.nextBillingDate)}`
+                  : ""}
+              </p>
+              <p className="mt-1 text-xs font-medium text-orange-700/90 leading-relaxed">
+                You keep {TIER_LABELS[initialSettings.plan]} until then. Upgrade
+                anytime to stay on a paid plan.
               </p>
             </div>
           </div>

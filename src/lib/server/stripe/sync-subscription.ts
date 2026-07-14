@@ -11,6 +11,7 @@ import { safeError, safeLog } from "@/utils/logger";
 import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
 import { extractSubscriptionPrice, extractSubscriptionPeriod, getPrimaryPrice } from "@/lib/server/stripe/subscription-price";
+import { resolvePendingPlanChange } from "@/lib/server/stripe/pending-schedule";
 
 export type SyncMetaOverrides = {
   employer_id?: string;
@@ -406,11 +407,7 @@ export async function syncEmployerSubscriptionFromStripe(
     existing.billing_period_start !== periodStart;
 
   // Prefer live resolved slug over stale scheduled_* metadata from Portal upgrades.
-  const scheduledFromMeta = subscription.metadata?.scheduled_plan_slug?.trim() || null;
-  const liveSlug = (planSlug ?? "").toLowerCase();
-  const scheduleCleared =
-    !scheduledFromMeta ||
-    (scheduledFromMeta && liveSlug === scheduledFromMeta.toLowerCase());
+  const pending = await resolvePendingPlanChange(subscription, planSlug);
 
   const { error: subError } = await supabase.from("employer_subscriptions").upsert(
     {
@@ -429,11 +426,8 @@ export async function syncEmployerSubscriptionFromStripe(
       last_stripe_event_created: stripeEventCreated ?? null,
       unit_amount_cents: unitAmountCents,
       billing_interval: billingInterval,
-      ...(scheduleCleared
-        ? { scheduled_plan_slug: null, scheduled_effective_at: null }
-        : {
-            scheduled_plan_slug: scheduledFromMeta,
-          }),
+      scheduled_plan_slug: pending.scheduledPlanSlug,
+      scheduled_effective_at: pending.scheduledEffectiveAt,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "employer_id" }
@@ -452,7 +446,7 @@ export async function syncEmployerSubscriptionFromStripe(
   }
 
   safeLog(
-    `[Stripe] Subscription synced employer=[REDACTED] plan=${planSlug} status=${status} price=${priceIdOf(subscription)}`
+    `[Stripe] Subscription synced employer=[REDACTED] plan=${planSlug} status=${status} price=${priceIdOf(subscription)} pending=${pending.scheduledPlanSlug ?? "none"}`
   );
 
   await invalidateEmployerCache(employerId);

@@ -66,6 +66,21 @@ stripe trigger invoice.paid
 4. Land on `/employer/settings/account?checkout=success` → auto “Sync plan from Stripe”.
 5. UI shows Growth; Email Support / paid limits unlock.
 6. Upgrade Growth → Scale via Portal → confirm DB `plan_slug` follows **price**, not old metadata.
+7. Downgrade Scale → Growth via Portal → expect **no mid-cycle charge**; UI banner shows pending Growth at period end; `scheduled_plan_slug=growth`.
+8. Cancel → Discovery → `cancel_at_period_end=true`; access until period end.
+
+## Period-end policy (hybrid)
+
+| Action | Timing |
+|--------|--------|
+| Upgrade | Immediate + prorated invoice (`always_invoice`) |
+| Downgrade | End of period (`schedule_at_period_end` / Subscription Schedule) |
+| Cancel | End of period (`cancel_at_period_end`) |
+
+Portal config is upserted by `ensurePortalPlanChangeConfiguration()` on plan-change / portal session open.
+
+Webhook events to subscribe (add):
+- `subscription_schedule.created|updated|released|completed|canceled|aborted`
 
 ## Vercel preview (sandbox)
 
@@ -73,6 +88,7 @@ stripe trigger invoice.paid
 2. Subscribe these events (test endpoint):
    - `checkout.session.completed`
    - `customer.subscription.created|updated|deleted`
+   - `subscription_schedule.*`
    - `invoice.paid` / `invoice.payment_failed`
    - `charge.dispute.*` (optional for this bug)
 3. Complete a Growth Checkout in the preview URL; confirm logs + UI.

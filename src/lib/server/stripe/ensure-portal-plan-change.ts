@@ -52,10 +52,15 @@ export async function ensurePortalPlanChangeConfiguration(): Promise<
 
     const update = defaultConfig.features.subscription_update;
     const catalogOk = portalCatalogCovers(update?.products, products);
+    const cancelMode =
+      defaultConfig.features.subscription_cancel?.mode ?? null;
     const needsUpdate =
       !update?.enabled ||
       !(update.default_allowed_updates ?? []).includes("price") ||
-      !catalogOk;
+      !catalogOk ||
+      !hasPeriodEndDowngradeScheduling(update) ||
+      update.proration_behavior !== "always_invoice" ||
+      cancelMode !== "at_period_end";
 
     if (!needsUpdate) {
       return { configurationId: defaultConfig.id };
@@ -69,7 +74,7 @@ export async function ensurePortalPlanChangeConfiguration(): Promise<
     );
 
     safeLog(
-      `[Billing] Enabled portal subscription_update on ${updated.id} (${products.length} products)`
+      `[Billing] Portal config ${updated.id}: upgrades immediate, downgrades at period end (${products.length} products)`
     );
     return { configurationId: updated.id };
   } catch (err) {
@@ -87,6 +92,14 @@ export async function ensurePortalPlanChangeConfiguration(): Promise<
   }
 }
 
+/**
+ * Hybrid SaaS billing (Stripe + industry norm):
+ * - Upgrades: immediate + always_invoice prorations
+ * - Downgrades: schedule_at_period_end (decreasing_item_amount)
+ * - Cancel: at_period_end (already)
+ *
+ * @see https://docs.stripe.com/changelog/acacia/2024-10-28/customer-portal-schedule-downgrades
+ */
 function portalFeatures(
   products: PortalProduct[]
 ): Stripe.BillingPortal.ConfigurationCreateParams.Features {
@@ -100,15 +113,31 @@ function portalFeatures(
     subscription_cancel: {
       enabled: true,
       mode: "at_period_end",
+      proration_behavior: "none",
     },
     subscription_update: {
       enabled: true,
       default_allowed_updates: ["price"],
-      // Immediate invoice on upgrades; portal schedules downgrades when configured.
       proration_behavior: "always_invoice",
+      schedule_at_period_end: {
+        conditions: [
+          { type: "decreasing_item_amount" },
+          { type: "shortening_interval" },
+        ],
+      },
       products,
     },
   };
+}
+
+function hasPeriodEndDowngradeScheduling(
+  update:
+    | Stripe.BillingPortal.Configuration.Features.SubscriptionUpdate
+    | null
+    | undefined
+): boolean {
+  const conditions = update?.schedule_at_period_end?.conditions ?? [];
+  return conditions.some((c) => c.type === "decreasing_item_amount");
 }
 
 function portalCatalogCovers(

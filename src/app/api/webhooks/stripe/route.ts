@@ -98,7 +98,11 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
     case "customer.subscription.updated": {
       const payload = event.data.object as Stripe.Subscription;
       safeLog(
-        `[Stripe] ${event.type} sub=${payload.id} status=${payload.status} customer=${
+        `[Stripe] ${event.type} sub=${payload.id} status=${payload.status} cancel_at_period_end=${payload.cancel_at_period_end} schedule=${
+          typeof payload.schedule === "string"
+            ? payload.schedule
+            : payload.schedule?.id ?? "none"
+        } customer=${
           typeof payload.customer === "string"
             ? payload.customer
             : payload.customer?.id ?? "?"
@@ -113,6 +117,35 @@ async function handleStripeEvent(event: Stripe.Event): Promise<void> {
       );
       if (!result.success) {
         throw new Error(result.error ?? "Subscription sync failed");
+      }
+      bustEmployerBillingCache();
+      break;
+    }
+
+    case "subscription_schedule.created":
+    case "subscription_schedule.updated":
+    case "subscription_schedule.released":
+    case "subscription_schedule.completed":
+    case "subscription_schedule.canceled":
+    case "subscription_schedule.aborted": {
+      const schedule = event.data.object as Stripe.SubscriptionSchedule;
+      const subId =
+        typeof schedule.subscription === "string"
+          ? schedule.subscription
+          : schedule.subscription?.id ?? null;
+      safeLog(
+        `[Stripe] ${event.type} schedule=${schedule.id} status=${schedule.status} sub=${subId ?? "?"}`
+      );
+      if (!subId) break;
+      const subscription = await retrieveLiveSubscription(stripe, subId);
+      if (!subscription) break;
+      const result = await syncEmployerSubscriptionFromStripe(
+        subscription,
+        event.id,
+        event.created
+      );
+      if (!result.success) {
+        throw new Error(result.error ?? "Schedule sync failed");
       }
       bustEmployerBillingCache();
       break;
