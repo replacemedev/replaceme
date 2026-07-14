@@ -4,7 +4,7 @@ import { LegalSectionHeading } from "./LegalSectionHeading";
 
 const tocItems = [
   { href: "#1-acceptance-of-terms", label: "1. Acceptance of Terms" },
-  { href: "#2-platform-role", label: "2. Platform Role" },
+  { href: "#2-platform-role", label: "2. Platform Role (Digital Conduit)" },
   { href: "#3-eligibility-accounts", label: "3. Eligibility & Accounts" },
   { href: "#4-workers", label: "4. Workers (Philippines)" },
   { href: "#41-id-verification", label: "4.1 ID Verification (RA 11967)", indent: true },
@@ -23,14 +23,18 @@ const tocItems = [
   { href: "#66-billing-redress", label: "6.6 Billing Dispute Redress", indent: true },
   { href: "#7-acceptable-use", label: "7. Acceptable Use" },
   { href: "#8-intellectual-property", label: "8. Intellectual Property" },
-  { href: "#9-disclaimers", label: "9. Disclaimers" },
-  { href: "#10-limitation-of-liability", label: "10. Limitation of Liability" },
-  { href: "#11-indemnification", label: "11. Indemnification" },
-  { href: "#12-dispute-resolution", label: "12. Internal Redress (RA 11967)" },
-  { href: "#13-termination", label: "13. Suspension & Termination" },
-  { href: "#14-governing-law", label: "14. Governing Law" },
-  { href: "#15-changes", label: "15. Changes to These Terms" },
-  { href: "#16-contact", label: "16. Contact & Support" },
+  { href: "#9-liability-shield", label: "9. LIMITATION OF LIABILITY & WAIVERS" },
+  { href: "#91-conduit", label: "9.1 Digital Conduit & Non-Agency", indent: true },
+  { href: "#92-non-employment", label: "9.2 Absolute Non-Employment", indent: true },
+  { href: "#93-tax-labor", label: "9.3 Tax, Labor & Statutory Disclaimer", indent: true },
+  { href: "#94-liability-cap", label: "9.4 Waiver of Damages & Liability Cap", indent: true },
+  { href: "#95-indemnification", label: "9.5 Indemnification & Hold Harmless", indent: true },
+  { href: "#96-user-disputes", label: "9.6 User Disputes & Class Action Waiver", indent: true },
+  { href: "#10-dispute-resolution", label: "10. Internal Redress (RA 11967)" },
+  { href: "#11-termination", label: "11. Suspension & Termination" },
+  { href: "#12-governing-law", label: "12. Governing Law" },
+  { href: "#13-changes", label: "13. Changes to These Terms" },
+  { href: "#14-contact", label: "14. Contact & Support" },
 ];
 
 function RoleCard({
@@ -103,20 +107,47 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
       <LegalSectionHeading
         id="2-platform-role"
         number={2}
-        title="Platform Role as E-Marketplace / Intermediary"
+        title="Platform Role — Pure Digital Conduit & Directory"
       />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
-          Replaceme operates as an <strong className="font-semibold text-slate-800">electronic marketplace and digital intermediary</strong> under the Internet Transactions Act of 2023
-          (Republic Act No. 11967). We facilitate discovery, profile access, messaging, and hiring
-          workflows between Workers and Employers. We are <strong className="font-semibold text-slate-800">not</strong> the employer of Workers listed on
-          the Platform, nor a party to any employment, consultancy, or contractor agreement you
-          enter with another user, unless we expressly agree in a separate written contract.
+          Replaceme is an <strong className="font-semibold text-slate-800">independent, neutral software provider and introductory directory</strong>.
+          Under the Philippine Internet Transactions Act of 2023 (Republic Act No. 11967) we operate as
+          an electronic marketplace / digital intermediary; under international marketplace norms we
+          function solely as a{" "}
+          <strong className="font-semibold text-slate-800">blind digital conduit</strong> that
+          enables Employers and Workers to discover one another, exchange information, and—if they
+          choose—form their own off-platform or private relationships.
         </p>
         <p>
-          Workers are generally engaged as independent contractors or employees of the hiring
-          Employer (as the parties agree). Employers alone determine the nature of the engagement,
-          compensation, working conditions, and compliance with applicable labor and tax laws.
+          Replaceme is{" "}
+          <strong className="font-semibold text-slate-800">
+            not an employment agency, recruiter, staffing firm, temporary work agency, professional
+            employer organization (PEO), Employer of Record (EOR), payroll provider, labor broker,
+            or joint employer
+          </strong>{" "}
+          under the laws of the Philippines, the United States, the European Union / UK, Canada,
+          Australia, Singapore, or any other jurisdiction. We do not place Workers into jobs for a
+          fee, do not assign tasks, do not manage work product, and do not process Worker payroll or
+          statutory benefits.
+        </p>
+        <p>
+          Replaceme is{" "}
+          <strong className="font-semibold text-slate-800">strictly not a party</strong> to any
+          employment contract, independent-contractor agreement, NDA, SOW, consultancy, agency, or
+          other working arrangement formed between an Employer and a Worker. Any such contract is
+          solely between those users. We do not guarantee the quality, safety, legality, truthfulness,
+          timeliness, or delivery of any work, nor the solvency, identity accuracy, or fitness of any
+          user. Platform tools (profiles, messaging, unlocks, badges) are informational only and do
+          not create endorsements or warranties.
+        </p>
+        <p className="text-sm text-slate-500 sm:text-[15px]">
+          Detailed liability caps, indemnification, non-employment findings under DOLE / FLSA / ABC /
+          IR35-style tests, tax disclaimers, and class-action waivers appear in{" "}
+          <a href="#9-liability-shield" className="font-semibold text-[#006e2f] hover:underline">
+            Section 9
+          </a>
+          .
         </p>
       </div>
 
@@ -657,48 +688,299 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         written permission.
       </p>
 
-      <LegalSectionHeading id="9-disclaimers" number={9} title="Disclaimers" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE.&quot; TO THE MAXIMUM
-        EXTENT PERMITTED BY LAW, WE DISCLAIM WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-        PURPOSE, AND NON-INFRINGEMENT. WE DO NOT GUARANTEE that any Worker will be hired, that any
-        Employer will fill a role, or that user-submitted information is accurate. You are solely
-        responsible for vetting counterparties and for the contracts you form with them.
-      </p>
+      {/* ── MAXIMUM LIABILITY PROTECTION BLOCK ── */}
+      <div
+        id="9-liability-shield"
+        className="scroll-mt-28 mt-10 rounded-2xl border-2 border-slate-800 bg-slate-50 p-5 shadow-sm sm:p-8"
+      >
+        <h2 className="mb-2 text-center text-base font-black tracking-wide text-slate-900 sm:text-lg">
+          LIMITATION OF LIABILITY, INDEMNIFICATION, AND WAIVERS
+        </h2>
+        <p className="mb-6 text-center text-xs uppercase tracking-wider text-slate-500">
+          Section 9 — Please read carefully. This allocates risk between you and Replaceme.
+        </p>
 
-      <LegalSectionHeading
-        id="10-limitation-of-liability"
-        number={10}
-        title="Limitation of Liability"
-      />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>
-          TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, REPLACEME AND ITS OFFICERS, DIRECTORS,
-          EMPLOYEES, AND AGENTS SHALL NOT BE LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL,
-          CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR LOST PROFITS, REVENUE, DATA, OR
-          GOODWILL, ARISING FROM YOUR USE OF THE PLATFORM OR FROM ANY ENGAGEMENT BETWEEN USERS.
-        </p>
-        <p>
-          OUR TOTAL AGGREGATE LIABILITY FOR CLAIMS RELATING TO THE SERVICES SHALL NOT EXCEED THE
-          GREATER OF (A) THE AMOUNTS YOU PAID TO REPLACEME IN THE TWELVE (12) MONTHS PRECEDING THE
-          CLAIM, OR (B) ONE HUNDRED US DOLLARS (USD&nbsp;100). Some jurisdictions do not allow
-          certain limitations; in those cases, our liability is limited to the fullest extent
-          permitted.
-        </p>
+        <div className="mb-6 flex items-start gap-3">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white">
+            9
+          </span>
+          <p className="pt-0.5 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+            To the maximum extent permitted by the laws of every jurisdiction in which you access
+            the Platform—including the Philippines, the United States (federal and state), the
+            European Union and United Kingdom, Canada, Australia, Singapore, and elsewhere—you agree
+            to the following risk allocation. Where a provision is held unenforceable, the remainder
+            survives and liability is limited to the fullest extent still allowed.
+          </p>
+        </div>
+
+        <h3
+          id="91-conduit"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.1 Digital Conduit; No Agency; No Work Guarantee
+        </h3>
+        <div className="mb-6 space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p>
+            Replaceme provides software and directory tools only. We are a{" "}
+            <strong className="font-semibold text-slate-800">neutral conduit</strong>, not a party
+            to—and not a guarantor of—any engagement between users. Consistent with leading
+            global marketplace practice, Replaceme does not supervise, direct, control, or monitor
+            Workers in the performance of any work for Employers, and does not evaluate, procure,
+            or deliver Freelancer / Worker services itself.
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              We do <strong className="font-semibold text-slate-800">not</strong> warrant the
+              accuracy, legality, or completeness of User Content;
+            </li>
+            <li>
+              We do <strong className="font-semibold text-slate-800">not</strong> warrant that any
+              Worker or Employer will perform, pay, hire, or deliver; and
+            </li>
+            <li>
+              Nothing on the Platform creates a partnership, joint venture, franchise,
+              agency, or fiduciary relationship between Replaceme and any user.
+            </li>
+          </ul>
+        </div>
+
+        <h3
+          id="92-non-employment"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.2 Absolute Disclaimer of Employment Relationship
+        </h3>
+        <div className="mb-6 space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p>
+            Workers are{" "}
+            <strong className="font-semibold text-slate-800">
+              not employees, co-employees, joint employees, partners, agents, representatives, or
+              joint venturers of Replaceme
+            </strong>{" "}
+            under any jurisdiction&apos;s laws, including without limitation:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              the Philippine Department of Labor and Employment (DOLE){" "}
+              <strong className="font-semibold text-slate-800">four-fold test</strong> and{" "}
+              <strong className="font-semibold text-slate-800">economic-dependence test</strong>;
+            </li>
+            <li>
+              United States federal common-law / IRS control factors and the FLSA{" "}
+              <strong className="font-semibold text-slate-800">economic-reality test</strong>, and
+              state tests including California&apos;s{" "}
+              <strong className="font-semibold text-slate-800">ABC test (AB 5 / Dynamex)</strong> and
+              similar statutes;
+            </li>
+            <li>
+              United Kingdom / EU status determinations (including IR35-style assessments and the EU
+              Platform Work Directive framework), Australian Fair Work multi-factor tests, and
+              Canadian common-law control tests.
+            </li>
+          </ul>
+          <p>
+            Replaceme exercises{" "}
+            <strong className="font-semibold text-slate-800">zero control</strong> over a
+            Worker&apos;s hours, methods, means, tools, equipment, work location, dress, scripts,
+            rates charged to Employers, acceptance or rejection of opportunities, or working
+            conditions with any Employer. Selection and engagement of a Worker for any engagement,
+            payment of wages or fees for that engagement, and the power to discipline or dismiss a
+            Worker from that engagement belong exclusively to the Employer (and/or the Worker as
+            counterparties)—<strong className="font-semibold text-slate-800">never to Replaceme</strong>.
+            Platform account moderation (suspension for Terms violations) is not employment
+            dismissal and does not constitute control over means and methods of client work.
+          </p>
+          <p>
+            Employers alone are responsible for correctly classifying Workers as employees or
+            independent contractors under every applicable law, and for structuring engagements
+            accordingly. Labels in these Terms do not create an employment relationship that the
+            facts otherwise negate; conversely, Users may not re-characterize Replaceme as an
+            employer, joint employer, or EOR based solely on using our directory software.
+          </p>
+        </div>
+
+        <h3
+          id="93-tax-labor"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.3 Tax, Labor &amp; Statutory Disclaimer — Total Burden Transfer
+        </h3>
+        <div className="mb-6 space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p>
+            Replaceme does{" "}
+            <strong className="font-semibold text-slate-800">
+              not withhold taxes, provide HMOs, health insurance, pensions, paid leave, or other
+              employment benefits, handle Worker payroll, issue wage slips, or remit statutory
+              contributions
+            </strong>{" "}
+            on behalf of Workers or Employers. Without limitation, Replaceme does not collect or
+            remit Philippine SSS, PhilHealth, or Pag-IBIG contributions; does not file or furnish US
+            IRS Forms W-2, 1099, or equivalent; does not operate PAYE / National Insurance schemes;
+            and does not act as a withholding agent for any cross-border engagement between users.
+          </p>
+          <p>
+            The <strong className="font-semibold text-slate-800">Employer and the Worker accept one hundred percent (100%) absolute responsibility</strong>{" "}
+            for complying with all applicable local, national, and international labor laws, wage
+            and hour rules, immigration and work-authorization requirements, tax registration and
+            reporting, VAT/GST, social-security contributions, and cross-border withholding
+            obligations arising from their relationship. Replaceme{" "}
+            <strong className="font-semibold text-slate-800">universally disclaims all liability</strong>{" "}
+            for tax evasion, misclassification, unpaid wages, overtime, severance, unfair dismissal,
+            workplace injury, harassment, discrimination, IP ownership disputes, or any labor-law
+            violation allegedly committed by any user.
+          </p>
+          <p>
+            Nothing in these Terms requires Replaceme to build, operate, or maintain tax collection,
+            payroll tracking, or benefits enrollment forms for user-to-user engagements.
+          </p>
+        </div>
+
+        <h3
+          id="94-liability-cap"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.4 Total Waiver of Consequential Damages &amp; Liability Cap
+        </h3>
+        <div className="mb-6 space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p className="font-semibold uppercase text-slate-800">
+            THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE.&quot; TO THE MAXIMUM
+            EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+            PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, WHETHER EXPRESS, IMPLIED, OR STATUTORY.
+          </p>
+          <p className="font-semibold uppercase text-slate-800">
+            UNDER NO CIRCUMSTANCES SHALL REPLACEME, ITS PARENTS, SUBSIDIARIES, AFFILIATES, OR THEIR
+            RESPECTIVE FOUNDERS, OFFICERS, DIRECTORS, EMPLOYEES, CONTRACTORS, OR AGENTS BE LIABLE FOR
+            ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES,
+            INCLUDING WITHOUT LIMITATION LOST PROFITS, LOST REVENUE, LOST DATA, LOST GOODWILL, STOLEN
+            OR MISAPPROPRIATED INTELLECTUAL PROPERTY, BUSINESS INTERRUPTION, PERSONAL INJURY, OR
+            SUBSTITUTE SERVICES, ARISING OUT OF OR RELATED TO THESE TERMS, THE PLATFORM, OR ANY
+            USER-TO-USER ENGAGEMENT, WHETHER BASED IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT
+            LIABILITY, STATUTE, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+          </p>
+          <p className="font-semibold uppercase text-slate-800">
+            IF A COURT OR TRIBUNAL OF COMPETENT JURISDICTION DETERMINES THAT ANY LIMITATION IS
+            UNENFORCEABLE OR &quot;PIERCES&quot; THIS AGREEMENT, REPLACEME&apos;S TOTAL AGGREGATE
+            LIABILITY FOR ALL CLAIMS ARISING OUT OF OR RELATED TO THE SERVICES SHALL NOT EXCEED THE
+            TOTAL AMOUNT OF SUBSCRIPTION FEES ACTUALLY PAID BY YOU TO REPLACEME IN THE THREE (3)
+            MONTHS IMMEDIATELY PRECEDING THE CLAIM. IF YOU PAID NO SUBSCRIPTION FEES DURING THAT
+            PERIOD, OUR MAXIMUM AGGREGATE LIABILITY SHALL BE FIFTY US DOLLARS (USD&nbsp;50).
+          </p>
+          <p>
+            Some jurisdictions (including certain EU consumer protections) do not allow exclusion of
+            liability for death, personal injury caused by negligence, fraud, or gross negligence; in
+            those cases, liability is limited only as far as mandatory law requires. Nothing in this
+            Section limits your payment obligations for subscription fees due.
+          </p>
+        </div>
+
+        <h3
+          id="95-indemnification"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.5 Aggressive Indemnification &amp; Hold Harmless
+        </h3>
+        <div className="mb-6 space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p>
+            You (whether Employer or Worker) agree to{" "}
+            <strong className="font-semibold text-slate-800">
+              defend, fully indemnify, and hold harmless
+            </strong>{" "}
+            Replaceme and its founders, officers, directors, employees, contractors, agents,
+            affiliates, successors, and assigns (the &quot;Indemnified Parties&quot;) from and
+            against{" "}
+            <strong className="font-semibold text-slate-800">any and all</strong> claims, demands,
+            actions, suits, investigations, audits, proceedings, damages, losses, liabilities,
+            judgments, penalties, fines, costs, and expenses—including without limitation{" "}
+            <strong className="font-semibold text-slate-800">
+              attorneys&apos; fees, experts&apos; fees, court costs, settlement amounts, and
+              reasonable costs of legal defense
+            </strong>
+            —arising out of or related to:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>your use or misuse of the Platform;</li>
+            <li>your breach of these Terms or of any representation or warranty herein;</li>
+            <li>
+              any engagement, contract, NDA, payment, tax, labor, immigration, or IP dispute between
+              you and another user;
+            </li>
+            <li>
+              worker classification, wage-and-hour, benefits, unfair dismissal, discrimination,
+              workplace safety, or similar claims under DOLE, NLRC, DOL, EEOC, HMRC, Fair Work, or
+              any other labor authority;
+            </li>
+            <li>
+              tax assessments, withholding failures, SSS / PhilHealth / Pag-IBIG / IRS / VAT / GST /
+              social-security exposures arising from user-to-user relationships; and
+            </li>
+            <li>
+              any governmental investigation, subpoena response costs voluntarily or involuntarily
+              incurred because you or another user named Replaceme in a user-to-user dispute.
+            </li>
+          </ul>
+          <p>
+            Replaceme may, at its option, assume exclusive control of the defense with counsel of
+            its choosing; you remain responsible for indemnified amounts and must cooperate fully.
+            You may not settle any claim that admits fault by or imposes obligations on an
+            Indemnified Party without Replaceme&apos;s prior written consent. This indemnification
+            survives termination of your account and these Terms.
+          </p>
+        </div>
+
+        <h3
+          id="96-user-disputes"
+          className="mb-3 scroll-mt-28 text-base font-bold uppercase tracking-wide text-slate-900"
+        >
+          9.6 User-to-User Dispute Resolution &amp; Class Action Waiver
+        </h3>
+        <div className="space-y-3 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p>
+            Disputes between users—including without limitation unpaid wages or fees, incomplete
+            work, quality complaints, IP theft or ownership, confidentiality breaches, harassment,
+            or failed engagements—must be resolved{" "}
+            <strong className="font-semibold text-slate-800">strictly between those users</strong>.
+            Replaceme is{" "}
+            <strong className="font-semibold text-slate-800">
+              not a mediator, arbitrator, escrow agent (unless separately contracted in writing),
+              judge, or insurer
+            </strong>{" "}
+            of user-to-user relationships and has no obligation to investigate, intervene in, or
+            decide such disputes. Replaceme will not voluntarily join, intervene in, or take sides
+            in user-to-user litigation or regulatory complaints; if lawfully compelled by a valid
+            court order, subpoena, or governmental demand, Replaceme may produce only what the
+            process requires and may seek reimbursement of compliance costs from the requesting or
+            responsible user(s) under Section 9.5.
+          </p>
+          <p className="font-semibold uppercase text-slate-800">
+            CLASS ACTION WAIVER. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AND
+            REPLACEME AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL
+            CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS, COLLECTIVE,
+            CONSOLIDATED, PRIVATE ATTORNEY GENERAL, OR REPRESENTATIVE PROCEEDING. THE COURT OR
+            ARBITRATOR MAY NOT CONSOLIDATE MORE THAN ONE PERSON&apos;S CLAIMS OR OTHERWISE PRESIDE
+            OVER ANY FORM OF A REPRESENTATIVE OR CLASS PROCEEDING AGAINST REPLACEME.
+          </p>
+          <p>
+            If this class-action waiver is held unenforceable as to a particular claim, that claim
+            must proceed in court on an individual basis to the extent required, and the remainder of
+            this Section remains in force. Where mandatory consumer or labor law of your residence
+            prohibits class or representative waivers, those non-waivable rights are preserved, but
+            only to the minimum extent required. Users located in the United States may opt out of
+            this class-action waiver by sending written notice to{" "}
+            <a
+              href="mailto:support@replaceme.ph"
+              className="font-semibold text-[#006e2f] hover:underline"
+            >
+              support@replaceme.ph
+            </a>{" "}
+            within thirty (30) days of first accepting these Terms (subject line: &quot;Class Action
+            Waiver Opt-Out&quot;); opt-out does not affect other Sections.
+          </p>
+        </div>
       </div>
 
-      <LegalSectionHeading id="11-indemnification" number={11} title="Indemnification" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        You agree to indemnify and hold harmless Replaceme from claims, damages, losses, and
-        expenses (including reasonable attorneys&apos; fees) arising from your misuse of the
-        Platform, your violation of these Terms or applicable law, your job posts or profile
-        content, or disputes between you and another user (including labor, tax, or privacy claims
-        arising from an engagement you formed).
-      </p>
-
       <LegalSectionHeading
-        id="12-dispute-resolution"
-        number={12}
+        id="10-dispute-resolution"
+        number={10}
         title="Internal Redress Mechanism (RA 11967)"
       />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
@@ -712,6 +994,12 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           government agencies, or alternative dispute resolution bodies, and before escalating to an
           external payment chargeback except where network rules or law require otherwise for
           confirmed unauthorized transactions.
+        </p>
+        <p>
+          Platform billing redress does{" "}
+          <strong className="font-semibold text-slate-800">not</strong> convert Replaceme into a
+          mediator of Employer–Worker engagement disputes (see Section 9.6). Those remain
+          user-to-user matters.
         </p>
         <p>How to file an internal complaint:</p>
         <ol className="list-decimal space-y-2 pl-5">
@@ -750,8 +1038,8 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
       </div>
 
       <LegalSectionHeading
-        id="13-termination"
-        number={13}
+        id="11-termination"
+        number={11}
         title="Suspension & Termination"
       />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
@@ -760,28 +1048,30 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           verification requirements, receive a lawful takedown order, pose a security risk, or engage
           in abuse. You may close your account through in-product settings or by contacting support.
           Provisions that by their nature should survive (including IP, liability limits,
-          indemnity, and dispute clauses) survive termination.
+          indemnity, class-action waiver, and dispute clauses) survive termination.
         </p>
       </div>
 
-      <LegalSectionHeading id="14-governing-law" number={14} title="Governing Law" />
+      <LegalSectionHeading id="12-governing-law" number={12} title="Governing Law" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         These Terms are governed by the laws of the Republic of the Philippines, without regard to
-        conflict-of-law principles, except that mandatory consumer or privacy protections of your
-        place of residence may also apply. Subject to the internal redress requirement above,
-        exclusive venue for disputes that may be brought in court shall be the competent courts of
-        Metro Manila, Philippines, unless applicable law requires otherwise.
+        conflict-of-law principles, except that mandatory consumer, labor, or privacy protections of
+        your place of residence that cannot be waived by contract may also apply. Subject to the
+        internal redress requirement and Section 9, exclusive venue for disputes that may be brought
+        in court shall be the competent courts of Metro Manila, Philippines, unless applicable law
+        requires otherwise.
       </p>
 
-      <LegalSectionHeading id="15-changes" number={15} title="Changes to These Terms" />
+      <LegalSectionHeading id="13-changes" number={13} title="Changes to These Terms" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         We may update these Terms to reflect product, legal, or regulatory changes (including RA
-        11967, BIR regulations, and NPC guidance). Material changes will be signaled by updating the
-        &quot;Last Updated&quot; date and, where appropriate, by in-product or email notice. Your
-        continued use after the effective date constitutes acceptance.
+        11967, BIR regulations, NPC guidance, and international marketplace / classification laws).
+        Material changes will be signaled by updating the &quot;Last Updated&quot; date and, where
+        appropriate, by in-product or email notice. Your continued use after the effective date
+        constitutes acceptance.
       </p>
 
-      <LegalSectionHeading id="16-contact" number={16} title="Contact & Support" />
+      <LegalSectionHeading id="14-contact" number={14} title="Contact & Support" />
       <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-5 py-4 text-base leading-relaxed text-slate-700 sm:px-6 sm:py-5 sm:text-[17px]">
         <p>
           Platform, disputes, and privacy:{" "}
