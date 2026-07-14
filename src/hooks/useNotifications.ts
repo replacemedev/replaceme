@@ -1,11 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import {
   notificationSchema,
-  getNotificationHref,
   type Notification,
   type NotificationBootstrap,
 } from "@/types/notifications.types";
@@ -133,20 +131,6 @@ export function useNotifications(
           const notification = parseNotificationRow(payload.new);
           if (notification) {
             upsertLocal(notification);
-            if (!notification.is_read) {
-              toast(notification.title, {
-                description: notification.message,
-                action: {
-                  label: "View",
-                  onClick: () => {
-                    const href = getNotificationHref(notification);
-                    if (href) {
-                      window.location.href = href;
-                    }
-                  },
-                },
-              });
-            }
           }
         }
       )
