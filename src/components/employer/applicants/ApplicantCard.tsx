@@ -206,7 +206,7 @@ export function ApplicantCard({
                 className="flex-1 h-10 flex items-center justify-center gap-1.5 rounded-xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26] whitespace-nowrap min-w-0"
               >
                 <Eye size={14} className="shrink-0" />
-                <span className="truncate">{isPreview ? "Preview profile" : "View profile"}</span>
+                <span className="truncate">{isPreview ? "Preview" : "View"}</span>
               </Link>
             ) : null}
             {!isPreview && applicant.resumeUrl ? (
