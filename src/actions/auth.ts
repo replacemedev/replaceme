@@ -28,6 +28,8 @@ import Stripe from "stripe";
 import { formatFullName } from "@/lib/format/name";
 import { assertRateLimit } from "@/lib/server/rate-limit";
 import {
+  AUTH_ERROR,
+  AUTH_ERROR_MESSAGE,
   extractErrorMessage,
   mapSignupDatabaseError,
 } from "@/lib/auth/error-message";
@@ -79,6 +81,11 @@ function handleAuthError(error: unknown): string {
   return message;
 }
 
+/** Escape `%` / `_` so PostgREST `ilike` behaves as exact case-insensitive match. */
+function escapeIlikeExact(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+}
+
 async function profileExistsByEmail(email: string): Promise<boolean> {
   const normalized = email.trim().toLowerCase();
 
@@ -89,7 +96,8 @@ async function profileExistsByEmail(email: string): Promise<boolean> {
     const { data, error } = await admin
       .from("profiles")
       .select("id")
-      .eq("email", normalized)
+      .ilike("email", escapeIlikeExact(normalized))
+      .limit(1)
       .maybeSingle();
 
     if (error) {
@@ -102,6 +110,96 @@ async function profileExistsByEmail(email: string): Promise<boolean> {
     safeError("[Auth] profile email lookup unexpected error:", error);
     return false;
   }
+}
+
+type IdentityConflict =
+  | { conflict: "email" }
+  | { conflict: "username" }
+  | { conflict: null };
+
+/**
+ * Pre-flight uniqueness check (service role) before Supabase Auth signUp.
+ * Covers workers + employers: both store email on profiles; usernames must be
+ * free on profiles and company_profiles.
+ */
+async function checkSignupIdentityAvailable(
+  email: string,
+  username: string
+): Promise<IdentityConflict> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedUsername = username.trim();
+
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/server");
+    const admin = await createAdminClient();
+
+    const [emailResult, profileUsernameResult, companyUsernameResult] =
+      await Promise.all([
+        admin
+          .from("profiles")
+          .select("id")
+          .ilike("email", escapeIlikeExact(normalizedEmail))
+          .limit(1)
+          .maybeSingle(),
+        admin
+          .from("profiles")
+          .select("id")
+          .eq("username", normalizedUsername)
+          .limit(1)
+          .maybeSingle(),
+        admin
+          .from("company_profiles")
+          .select("employer_id")
+          .eq("username", normalizedUsername)
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+    if (emailResult.error) {
+      safeError("[Auth] signup email uniqueness check failed:", emailResult.error);
+    } else if (emailResult.data) {
+      return { conflict: "email" };
+    }
+
+    if (profileUsernameResult.error) {
+      safeError(
+        "[Auth] signup profile username uniqueness check failed:",
+        profileUsernameResult.error
+      );
+    } else if (profileUsernameResult.data) {
+      return { conflict: "username" };
+    }
+
+    if (companyUsernameResult.error) {
+      safeError(
+        "[Auth] signup company username uniqueness check failed:",
+        companyUsernameResult.error
+      );
+    } else if (companyUsernameResult.data) {
+      return { conflict: "username" };
+    }
+
+    return { conflict: null };
+  } catch (error) {
+    safeError("[Auth] checkSignupIdentityAvailable unexpected error:", error);
+    // Fail open to Auth + DB unique constraints rather than blocking legitimate signups.
+    return { conflict: null };
+  }
+}
+
+function identityConflictResponse(conflict: "email" | "username") {
+  if (conflict === "email") {
+    return {
+      success: false as const,
+      error: AUTH_ERROR.EMAIL_EXISTS,
+      message: AUTH_ERROR_MESSAGE.EMAIL_EXISTS,
+    };
+  }
+  return {
+    success: false as const,
+    error: AUTH_ERROR.USERNAME_EXISTS,
+    message: AUTH_ERROR_MESSAGE.USERNAME_EXISTS,
+  };
 }
 
 /** Login identifier → auth email. Usernames require service role (RLS blocks anon SELECT on profiles). */
@@ -204,18 +302,29 @@ export async function signUp(formData: SignUpFormValues) {
     const suffix = "suffix" in data ? (data.suffix as string | undefined)?.trim() : "";
     const phoneNumber = "phoneNumber" in data ? (data.phoneNumber as string | undefined)?.trim() : "";
     const fullName = formatFullName(firstName, middleName, lastName, suffix);
+    const normalizedEmail = data.email.trim().toLowerCase();
+    const normalizedUsername = data.username.trim();
 
-    // 2. Sign up with Supabase Auth
+    // 2. Uniqueness pre-check (before Auth) — workers and employers share the namespace
+    const identity = await checkSignupIdentityAvailable(
+      normalizedEmail,
+      normalizedUsername
+    );
+    if (identity.conflict) {
+      return identityConflictResponse(identity.conflict);
+    }
+
+    // 3. Sign up with Supabase Auth
     // We pass metadata that the Postgres trigger will use to populate the profile
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
+      email: normalizedEmail,
       password: data.password,
       options: {
         ...captchaAuthOptions(turnstile.token),
         emailRedirectTo: authCallbackUrl("signup", "/signin"),
         data: {
           role: data.role,
-          username: data.username,
+          username: normalizedUsername,
           full_name: fullName,
           first_name: firstName,
           middle_name: middleName || null,
@@ -229,28 +338,30 @@ export async function signUp(formData: SignUpFormValues) {
     if (authError) {
       const msg = extractErrorMessage(authError);
       const mapped = mapSignupDatabaseError(msg);
-      if (mapped === "auth/username-already-exists") {
-        return { success: false, error: "auth/username-already-exists" };
+      if (mapped === AUTH_ERROR.USERNAME_EXISTS) {
+        return identityConflictResponse("username");
       }
-      if (mapped === "auth/email-already-exists") {
-        return { success: false, error: "auth/email-already-exists" };
+      if (mapped === AUTH_ERROR.EMAIL_EXISTS) {
+        return identityConflictResponse("email");
       }
+      const lower = msg.toLowerCase();
       if (
         msg.includes("profiles_username_key") ||
         msg.includes("company_profiles_username_key") ||
-        msg.includes("username") ||
-        msg.includes("Username") ||
-        msg.includes("already exists") ||
-        msg.includes("23505")
+        msg.includes("unique_username") ||
+        (lower.includes("username") &&
+          (lower.includes("already") || msg.includes("23505")))
       ) {
-        return { success: false, error: "auth/username-already-exists" };
+        return identityConflictResponse("username");
       }
       if (
-        msg.includes("already registered") ||
-        msg.includes("Email already exists") ||
-        (msg.includes("email") && msg.includes("already exists"))
+        lower.includes("already registered") ||
+        lower.includes("email already") ||
+        msg.includes("unique_email") ||
+        msg.includes("profiles_email_unique_lower_idx") ||
+        (lower.includes("email") && lower.includes("already"))
       ) {
-        return { success: false, error: "auth/email-already-exists" };
+        return identityConflictResponse("email");
       }
       return { success: false, error: handleAuthError(authError) };
     }
@@ -264,7 +375,7 @@ export async function signUp(formData: SignUpFormValues) {
       const isEmployer = role === "employer";
       await syncResendContactForUser({
         userId: authData.user.id,
-        email: authData.user.email ?? data.email,
+        email: authData.user.email ?? normalizedEmail,
         firstName,
         lastName: lastName || null,
         role: isEmployer ? "employer" : "worker",
@@ -516,8 +627,11 @@ export async function sendPasswordResetLink(
       return { success: false, error: rateLimit.error };
     }
 
+    // String input = authenticated "reset my password" path (no public Turnstile widget).
+    const isAuthenticatedCaller = typeof input === "string";
+
     const parsed = forgotPasswordSchema.safeParse(
-      typeof input === "string" ? { email: input } : input
+      isAuthenticatedCaller ? { email: input } : input
     );
     if (!parsed.success) {
       return { success: false, error: parsed.error.issues[0].message };
@@ -529,41 +643,54 @@ export async function sendPasswordResetLink(
       headerStore.get("x-real-ip") ??
       "anonymous";
 
-    const turnstile = await requireTurnstileToken(
-      parsed.data.turnstileToken,
-      ip
-    );
-    if (!turnstile.success) {
-      return { success: false, error: turnstile.error };
+    let captchaToken = "";
+    if (!isAuthenticatedCaller) {
+      const turnstile = await requireTurnstileToken(
+        parsed.data.turnstileToken,
+        ip
+      );
+      if (!turnstile.success) {
+        return { success: false, error: turnstile.error };
+      }
+      captchaToken = turnstile.token;
     }
 
     const normalizedEmail = parsed.data.email.trim().toLowerCase();
     const exists = await profileExistsByEmail(normalizedEmail);
 
-    if (exists) {
-      const supabase = await createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: authCallbackUrl("recovery", "/update-password"),
-        ...captchaAuthOptions(turnstile.token),
-      });
+    if (!exists) {
+      return {
+        success: false,
+        error: AUTH_ERROR.EMAIL_NOT_FOUND,
+        message: AUTH_ERROR_MESSAGE.EMAIL_NOT_FOUND,
+      };
+    }
 
-      if (error) {
-        safeError(
-          `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
-        );
-        if (error.status === 429) {
-          return {
-            success: false,
-            error: "Too many requests. Please wait a few minutes before trying again.",
-          };
-        }
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      redirectTo: authCallbackUrl("recovery", "/update-password"),
+      ...captchaAuthOptions(captchaToken),
+    });
+
+    if (error) {
+      safeError(
+        `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
+      );
+      if (error.status === 429) {
+        return {
+          success: false,
+          error: "Too many requests. Please wait a few minutes before trying again.",
+        };
       }
+      return {
+        success: false,
+        error: "Failed to send reset link. Please try again.",
+      };
     }
 
     return {
       success: true,
-      message:
-        "If an account exists for this email, a password reset link has been sent.",
+      message: "Password reset link sent. Check your email inbox.",
     };
   } catch (error) {
     safeError("[Auth] sendPasswordResetLink unexpected error:", error);

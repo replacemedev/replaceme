@@ -13,6 +13,10 @@ import { FormField } from "@/components/shared/FormField";
 import { Lock, Mail, User, Loader2, Phone } from "lucide-react";
 import { signUp } from "@/actions/auth";
 import {
+  AUTH_ERROR,
+  AUTH_ERROR_MESSAGE,
+} from "@/lib/auth/error-message";
+import {
   employerSignUpSchema,
   workerSignUpSchema,
   type EmployerSignUpFormValues,
@@ -92,12 +96,17 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
     register,
     handleSubmit,
     control,
+    setError,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<WorkerSignUpFormValues | EmployerSignUpFormValues>({
     resolver: zodResolver(schema),
     defaultValues,
     mode: "onSubmit",
   });
+
+  const usernameRegister = register("username");
+  const emailRegister = register("email");
 
   const onSubmit = async (
     data: WorkerSignUpFormValues | EmployerSignUpFormValues
@@ -117,18 +126,39 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
       });
 
       if (!result.success) {
-        const errMsg = result.error;
-        if (errMsg === "auth/username-already-exists") {
-          toast.error("Username taken.");
+        const errCode = result.error;
+        const errMessage =
+          ("message" in result && typeof result.message === "string"
+            ? result.message
+            : null) ?? formatSignUpError(errCode);
+
+        if (
+          errCode === AUTH_ERROR.USERNAME_EXISTS ||
+          errCode === "auth/username-already-exists"
+        ) {
+          toast.error(AUTH_ERROR_MESSAGE.USERNAME_EXISTS);
+          setError("username", {
+            type: "server",
+            message: AUTH_ERROR_MESSAGE.USERNAME_EXISTS,
+          });
+          setFocus("username");
           resetCaptcha();
           return;
         }
-        if (errMsg === "auth/email-already-exists") {
-          toast.error("Email already registered.");
+        if (
+          errCode === AUTH_ERROR.EMAIL_EXISTS ||
+          errCode === "auth/email-already-exists"
+        ) {
+          toast.error(AUTH_ERROR_MESSAGE.EMAIL_EXISTS);
+          setError("email", {
+            type: "server",
+            message: AUTH_ERROR_MESSAGE.EMAIL_EXISTS,
+          });
+          setFocus("email");
           resetCaptcha();
           return;
         }
-        toast.error(formatSignUpError(errMsg));
+        toast.error(errMessage);
         resetCaptcha();
         return;
       }
@@ -178,7 +208,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
         >
           <Input
             id="signup-username"
-            {...register("username")}
+            {...usernameRegister}
             placeholder="janesmith"
             icon={<User size={18} />}
             autoComplete="username"
@@ -285,7 +315,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
         >
           <Input
             id="signup-email"
-            {...register("email")}
+            {...emailRegister}
             type="email"
             placeholder="jane@example.com"
             icon={<Mail size={18} />}

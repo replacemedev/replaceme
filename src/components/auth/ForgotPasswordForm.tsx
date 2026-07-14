@@ -11,6 +11,10 @@ import { FormField } from "@/components/shared/FormField";
 import { Mail, Loader2, CheckCircle2 } from "lucide-react";
 import { sendPasswordResetLink } from "@/actions/auth";
 import {
+  AUTH_ERROR,
+  AUTH_ERROR_MESSAGE,
+} from "@/lib/auth/error-message";
+import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/lib/validations/auth";
@@ -35,11 +39,16 @@ export function ForgotPasswordForm() {
   const {
     register,
     handleSubmit,
+    setError,
+    setFocus,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });
+
+  const emailRegister = register("email");
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
     if (turnstileRequired && !turnstileToken) {
@@ -54,14 +63,36 @@ export function ForgotPasswordForm() {
       });
 
       if (!result.success) {
-        toast.error(result.error ?? "Failed to send link.");
+        const errCode = result.error;
+        const errMessage =
+          ("message" in result && typeof result.message === "string"
+            ? result.message
+            : null) ??
+          errCode ??
+          "Failed to send link.";
+
+        if (errCode === AUTH_ERROR.EMAIL_NOT_FOUND) {
+          toast.error(AUTH_ERROR_MESSAGE.EMAIL_NOT_FOUND);
+          setError("email", {
+            type: "server",
+            message: AUTH_ERROR_MESSAGE.EMAIL_NOT_FOUND,
+          });
+          setFocus("email");
+          resetCaptcha();
+          return;
+        }
+
+        toast.error(errMessage);
         resetCaptcha();
         return;
       }
 
       setSentToEmail(data.email.trim());
       setEmailSent(true);
-      toast.success(result.message);
+      reset({ email: "" });
+      toast.success(
+        result.message ?? "Password reset link sent. Check your email inbox."
+      );
     } catch {
       toast.error("Error occurred. Please retry.");
       resetCaptcha();
@@ -113,7 +144,7 @@ export function ForgotPasswordForm() {
       >
         <Input
           id="forgot-email"
-          {...register("email")}
+          {...emailRegister}
           type="email"
           placeholder="Enter your email"
           icon={<Mail size={18} />}
