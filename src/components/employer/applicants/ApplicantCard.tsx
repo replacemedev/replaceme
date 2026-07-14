@@ -180,12 +180,12 @@ export function ApplicantCard({
         isUnlocked={applicant.isUnlocked}
       />
 
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex w-full items-center gap-2 mt-4 pt-4 border-t border-gray-100">
         {isRejected ? (
           <>
             <button
               type="button"
-              className="flex-1 h-10 bg-white hover:bg-slate-50 border border-slate-200 text-slate-705 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+              className="flex-1 h-10 bg-white hover:bg-slate-50 border border-slate-200 text-slate-705 font-bold text-xs rounded-xl transition-colors cursor-pointer whitespace-nowrap min-w-0"
             >
               View History
             </button>
@@ -195,7 +195,7 @@ export function ApplicantCard({
               className="w-10 h-10 border border-red-100 hover:bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               title="Delete application"
             >
-              <Trash2 size={15} />
+              <Trash2 size={15} className="shrink-0" />
             </button>
           </>
         ) : (
@@ -203,10 +203,10 @@ export function ApplicantCard({
             {jobId ? (
               <Link
                 href={`/employer/candidates/${applicant.candidateId}?jobId=${jobId}`}
-                className="flex-1 h-10 flex items-center justify-center gap-1.5 rounded-xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
+                className="flex-1 h-10 flex items-center justify-center gap-1.5 rounded-xl bg-[#006e2f] text-xs font-bold text-white transition-colors hover:bg-[#005c26] whitespace-nowrap min-w-0"
               >
-                <Eye size={14} />
-                {isPreview ? "Preview profile" : "View profile"}
+                <Eye size={14} className="shrink-0" />
+                <span className="truncate">{isPreview ? "Preview profile" : "View profile"}</span>
               </Link>
             ) : null}
             {!isPreview && applicant.resumeUrl ? (
@@ -215,27 +215,25 @@ export function ApplicantCard({
                 resumeUrl={applicant.resumeUrl}
                 planSlug={planSlug}
                 resumeDownloadEnabled={!!resumeDownloadEnabled}
-                className="w-full md:w-auto"
+                className="flex-1 min-w-0"
               />
             ) : null}
             {messagingEnabled ? (
               <button
                 onClick={onMessageClick}
                 type="button"
-                className="w-full md:w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 rounded-xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                className="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 rounded-xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                 title="Chat with candidate"
               >
-                <MessageSquare size={15} />
-                <span className="md:hidden ml-2 font-bold text-xs">Message Candidate</span>
+                <MessageSquare size={15} className="shrink-0" />
               </button>
             ) : (
               <Link
                 href={`/employer/checkout/${suggestedUpgradeTier(planSlug, "messaging")}`}
-                className="w-full md:w-10 h-10 bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 text-[#006e2f] rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                className="w-10 h-10 bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 text-[#006e2f] rounded-xl flex items-center justify-center shrink-0 transition-colors"
                 title="Upgrade to message"
               >
-                <MessageSquare size={15} />
-                <span className="md:hidden ml-2 font-bold text-xs">Upgrade to message</span>
+                <MessageSquare size={15} className="shrink-0" />
               </Link>
             )}
           </>
