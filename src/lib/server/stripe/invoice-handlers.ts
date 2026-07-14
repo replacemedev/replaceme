@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { recordBillingLedgerEvent } from "@/lib/server/stripe/billing-ledger";
 import { syncEmployerSubscriptionFromStripe } from "@/lib/server/stripe/sync-subscription";
 import { getInvoiceSubscriptionRef, getInvoiceSubscriptionId } from "@/lib/server/stripe/invoice-utils";
+import { safeError } from "@/utils/logger";
 
 async function resolveEmployerIdFromInvoice(
   invoice: Stripe.Invoice
@@ -117,4 +118,23 @@ export async function handleInvoicePaymentFailed(
     subscriptionStatus: sub?.status ?? subscription?.status ?? null,
     occurredAt: now,
   });
+
+  try {
+    const { notifyEmployerSubscriptionAlert } = await import("@/actions/email");
+    const amountDue = invoice.amount_due ?? 0;
+    const currency = (invoice.currency ?? "usd").toUpperCase();
+    const amountLabel =
+      amountDue > 0
+        ? `${currency} ${(amountDue / 100).toFixed(2)}`
+        : null;
+    await notifyEmployerSubscriptionAlert({
+      employerId,
+      kind: "payment_failed",
+      planSlug: sub?.plan_slug ?? subscription?.metadata?.plan_slug ?? "discovery",
+      amountLabel,
+      idempotencyKey: `subscription-payment-failed/${invoice.id}`,
+    });
+  } catch (err) {
+    safeError("[Billing] payment_failed email failed", err);
+  }
 }

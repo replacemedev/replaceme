@@ -363,6 +363,30 @@ export async function sendMessagingMessage(
       await invalidateWorkerMessagingCache(user.id);
     }
 
+    // Transactional email alerts (employer alerts are paid-tier gated inside the action).
+    try {
+      const { notifyWorkerNewMessage, notifyEmployerNewMessage } = await import(
+        "@/actions/email"
+      );
+      if (employerId && user.id === employerId) {
+        await notifyWorkerNewMessage({
+          threadId: parsed.threadId,
+          senderId: user.id,
+          recipientId: thread.worker_id,
+          messagePreview: parsed.content,
+        });
+      } else if (employerId && user.id === thread.worker_id) {
+        await notifyEmployerNewMessage({
+          threadId: parsed.threadId,
+          senderId: user.id,
+          recipientId: employerId,
+          messagePreview: parsed.content,
+        });
+      }
+    } catch (err) {
+      safeError("sendMessagingMessage: email notify failed", err);
+    }
+
     revalidatePath(parsed.basePath);
     return ok();
   });

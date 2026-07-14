@@ -11,6 +11,8 @@ import {
   invalidateEmployerApplicantsCache,
   invalidateWorkerCache,
 } from "@/lib/server/redis-cache";
+import { notifyWorkerStatusUpdate } from "@/actions/email";
+import { safeError } from "@/utils/logger";
 
 const ADVANCE_STATUSES = new Set<ApplicationStatus>([
   "UNDER_REVIEW",
@@ -189,6 +191,15 @@ export async function updateApplicationStatus(
 
     await invalidateEmployerApplicantsCache(profile.id, application.job_id);
     await invalidateWorkerCache(application.candidate_id);
+
+    try {
+      await notifyWorkerStatusUpdate({
+        applicationId: parsed.applicationId,
+        status: parsed.status,
+      });
+    } catch (err) {
+      safeError("updateApplicationStatus: worker email failed", err);
+    }
 
     const jobId = application.job_id;
     revalidatePath(`/employer/jobs/${jobId}`);

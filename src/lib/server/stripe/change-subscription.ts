@@ -449,6 +449,19 @@ async function applyImmediateUpgrade(input: {
       `[Billing] Upgrade ${input.currentSlug}->${input.planSlug} sub=${input.subscriptionId}`
     );
 
+    try {
+      const { notifyEmployerSubscriptionAlert } = await import("@/actions/email");
+      await notifyEmployerSubscriptionAlert({
+        employerId: input.employerId,
+        kind: "upgraded",
+        planSlug: input.planSlug,
+        previousPlanSlug: input.currentSlug,
+        idempotencyKey: `subscription-upgrade/${input.employerId}/${input.planSlug}/${input.subscriptionId}`,
+      });
+    } catch (err) {
+      safeError("[Billing] upgrade email failed", err);
+    }
+
     return {
       mode: "upgraded",
       subscriptionId: input.subscriptionId,

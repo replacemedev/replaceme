@@ -49,7 +49,7 @@ export const CONTACT_FALLBACK: ContactPageConfig = {
   badge: "Support",
   title: "Contact Us",
   description: "We're here to help with account, billing, or platform questions.",
-  email: "support@replaceme.com",
+  email: "support@replaceme.ph",
 };
 
 export const AUTH_LOGIN_FALLBACK: AuthScreenConfig = {

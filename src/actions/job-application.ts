@@ -12,14 +12,12 @@ import {
 } from "@/types/job-application";
 import { createAdminClient } from "@/lib/supabase/server";
 import { resolveApplicantCapForJob } from "@/lib/server/entitlements";
-import { fetchEmployerEntitlements } from "@/lib/server/entitlements";
 import {
   invalidateEmployerApplicantsCache,
   invalidateWorkerCache,
 } from "@/lib/server/redis-cache";
 import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
-import { sendTransactionalEmail } from "@/lib/server/email/mailer";
-import { renderNewApplicationAlertEmail } from "@/lib/server/email/email-templates";
+import { notifyEmployerNewApplicant } from "@/actions/email";
 
 export interface SubmitJobApplicationResult {
   success: boolean;
@@ -216,54 +214,13 @@ export async function submitJobApplication(
     revalidatePath(`/employer/jobs/${jobId}/applicants`);
     revalidatePath("/employer/dashboard");
 
-    // Transactional email: instant alerts for Growth/Scale.
-    // (Starter weekly digest will be handled by a scheduled job in Phase 3.)
+    // Paid-plan instant applicant alert (Starter / Growth / Scale). Discovery aborts silently.
     try {
-      const entitlements = await fetchEmployerEntitlements(job.employer_id, admin);
-      const planSlug = (entitlements?.planSlug ?? "discovery").toLowerCase();
-      const notifyInstant = planSlug === "growth" || planSlug === "scale";
-
-      if (notifyInstant) {
-        const { data: company } = await admin
-          .from("company_profiles")
-          .select("company_name")
-          .eq("employer_id", job.employer_id)
-          .maybeSingle();
-
-        const { data: employerProfile } = await admin
-          .from("profiles")
-          .select("id, email, role")
-          .eq("id", job.employer_id)
-          .maybeSingle();
-
-        if (employerProfile?.email) {
-          const ctaUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/employer/jobs/${jobId}/applicants`;
-          const planLabel = planSlug === "growth" ? "Growth" : "Scale";
-          const email = renderNewApplicationAlertEmail({
-            companyName: company?.company_name ?? "there",
-            jobTitle: `your job post`,
-            ctaUrl,
-            planLabel,
-          });
-
-          await sendTransactionalEmail({
-            templateKey: "employer.new_application.instant_alert",
-            to: employerProfile.email,
-            subject: email.subject,
-            html: email.html,
-            text: email.text,
-            userId: employerProfile.id,
-            role: employerProfile.role,
-            tierSlug: planSlug === "growth" ? "growth" : "scale",
-            tags: {
-              category: "application",
-              job_id: jobId,
-              application_id: inserted.id,
-            },
-            idempotencyKey: `new-application/${inserted.id}`,
-          });
-        }
-      }
+      await notifyEmployerNewApplicant({
+        applicationId: inserted.id,
+        jobId,
+        employerId: job.employer_id,
+      });
     } catch (err) {
       safeError("submitJobApplication: failed to send employer email", err);
     }
