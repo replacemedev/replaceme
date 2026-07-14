@@ -67,6 +67,17 @@ export function safeLog(message: string, meta?: unknown): void {
 }
 
 /**
+ * Standardized warn logging utility that ensures metadata is sanitized before console output.
+ */
+export function safeWarn(message: string, meta?: unknown): void {
+  if (meta !== undefined) {
+    console.warn(message, JSON.stringify(sanitizeLogData(meta), null, 2));
+  } else {
+    console.warn(message);
+  }
+}
+
+/**
  * Standardized error logging utility that ensures error details are sanitized before console output.
  */
 export function safeError(message: string, error?: unknown): void {

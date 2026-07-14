@@ -259,7 +259,9 @@ export async function getAdminEmployerDeepDive(
 export type AdminWorkerProfileDeepDive = {
   id: string;
   firstName: string | null;
+  middleName: string | null;
   lastName: string | null;
+  username: string | null;
   email: string | null;
   professionalTitle: string | null;
   bio: string | null;
@@ -319,7 +321,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, last_name, suffix, phone_number, gender, civil_status, preferred_language, tin_number, sss_number, philhealth_number, pagibig_number, emergency_contact_name, emergency_contact_relationship, emergency_contact_phone, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
+            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, sss_number, philhealth_number, pagibig_number, emergency_contact_name, emergency_contact_relationship, emergency_contact_phone, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -342,7 +344,9 @@ export async function getAdminWorkerProfileDeepDive(
     return {
       id: profile.id,
       firstName: profile.first_name,
+      middleName: profile.middle_name,
       lastName: profile.last_name,
+      username: profile.username ?? null,
       email: profile.email,
       professionalTitle: profile.professional_title,
       bio: profile.bio,

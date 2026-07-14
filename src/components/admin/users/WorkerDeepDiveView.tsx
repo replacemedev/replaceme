@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { formatFullName } from "@/lib/format/name";
 import type { AdminWorkerProfileDeepDive } from "@/actions/admin/deep-dive";
 
 interface WorkerDeepDiveViewProps {
@@ -10,7 +11,8 @@ interface WorkerDeepDiveViewProps {
 
 export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
   const name =
-    [data.firstName, data.lastName].filter(Boolean).join(" ").trim() || "Unnamed worker";
+    formatFullName(data.firstName, data.middleName, data.lastName, data.suffix).trim() ||
+    "Unnamed worker";
 
   return (
     <div className="space-y-6">
@@ -26,6 +28,9 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
         <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           <h2 className="text-xl font-bold text-slate-900">{name}</h2>
           <p className="mt-1 text-sm text-slate-500">{data.email}</p>
+          {data.username ? (
+            <p className="mt-0.5 text-xs text-slate-400">@{data.username}</p>
+          ) : null}
           <p className="mt-2 text-sm font-medium text-slate-700">
             {data.professionalTitle ?? "—"}
           </p>

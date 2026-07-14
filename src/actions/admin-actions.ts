@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
+import { safeWarn } from "@/utils/logger";
 import {
   CacheKeys,
   CACHE_TTL_SECONDS,
@@ -19,8 +20,8 @@ import {
   reviewVerificationSchema,
   suspendUserSchema,
   adminEmployerListSchema,
-  adminAdminListSchema,
-  adminWorkerListSchema,
+  adminAdminRowSchema,
+  adminWorkerRowSchema,
   type AdminAdminRow,
   type AdminAuditLogRow,
   type AdminEmployerRow,
@@ -260,7 +261,10 @@ export async function reviewWorkerVerification(
 
     const { error } = await supabase
       .from("profiles")
-      .update({ verification_status: nextStatus })
+      .update({
+        verification_status: nextStatus,
+        is_verified: parsed.decision === "approved",
+      })
       .eq("id", parsed.workerId)
       .eq("role", "worker");
 
@@ -343,6 +347,7 @@ export async function fetchAdminWorkersSafe(): Promise<
         `
         id,
         first_name,
+        middle_name,
         last_name,
         email,
         professional_title,
@@ -365,15 +370,37 @@ export async function fetchAdminWorkersSafe(): Promise<
       return { success: false, error: error.message };
     }
 
-    const parsed = adminWorkerListSchema.safeParse(data ?? []);
-    if (!parsed.success) {
+    const rows = data ?? [];
+    const valid: AdminWorkerRow[] = [];
+    const failedFields = new Set<string>();
+
+    for (const row of rows) {
+      const parsed = adminWorkerRowSchema.safeParse(row);
+      if (parsed.success) {
+        valid.push(parsed.data);
+        continue;
+      }
+      for (const issue of parsed.error.issues) {
+        failedFields.add(issue.path.join(".") || "(root)");
+      }
+      safeWarn("fetchAdminWorkersSafe: skipped invalid worker row", {
+        id: (row as { id?: string }).id,
+        issues: parsed.error.issues.map((i) => ({
+          path: i.path.join("."),
+          message: i.message,
+        })),
+      });
+    }
+
+    if (valid.length === 0 && rows.length > 0) {
+      const fields = [...failedFields].slice(0, 8).join(", ");
       return {
         success: false,
-        error: "Worker records failed validation. Check database schema alignment.",
+        error: `Worker records failed validation (${fields}). Check database schema alignment.`,
       };
     }
 
-    return { success: true, data: parsed.data };
+    return { success: true, data: valid };
   } catch (err) {
     return {
       success: false,
@@ -463,7 +490,9 @@ export async function fetchAdminAdminsSafe(): Promise<
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name, email, account_status, created_at")
+      .select(
+        "id, first_name, middle_name, last_name, email, account_status, created_at"
+      )
       .eq("role", "admin")
       .order("created_at", { ascending: false });
 
@@ -471,15 +500,37 @@ export async function fetchAdminAdminsSafe(): Promise<
       return { success: false, error: error.message };
     }
 
-    const parsed = adminAdminListSchema.safeParse(data ?? []);
-    if (!parsed.success) {
+    const rows = data ?? [];
+    const valid: AdminAdminRow[] = [];
+    const failedFields = new Set<string>();
+
+    for (const row of rows) {
+      const parsed = adminAdminRowSchema.safeParse(row);
+      if (parsed.success) {
+        valid.push(parsed.data);
+        continue;
+      }
+      for (const issue of parsed.error.issues) {
+        failedFields.add(issue.path.join(".") || "(root)");
+      }
+      safeWarn("fetchAdminAdminsSafe: skipped invalid admin row", {
+        id: (row as { id?: string }).id,
+        issues: parsed.error.issues.map((i) => ({
+          path: i.path.join("."),
+          message: i.message,
+        })),
+      });
+    }
+
+    if (valid.length === 0 && rows.length > 0) {
+      const fields = [...failedFields].slice(0, 8).join(", ");
       return {
         success: false,
-        error: "Admin records failed validation. Check database schema alignment.",
+        error: `Admin records failed validation (${fields}). Check database schema alignment.`,
       };
     }
 
-    return { success: true, data: parsed.data };
+    return { success: true, data: valid };
   } catch (err) {
     return {
       success: false,
@@ -592,7 +643,9 @@ export async function fetchVerificationQueue(): Promise<
 
   const { data: workers, error } = await supabase
     .from("profiles")
-    .select("id, first_name, last_name, email, verification_status, created_at")
+    .select(
+      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, created_at"
+    )
     .eq("role", "worker")
     .in("verification_status", [
       "documents_submitted",
@@ -618,9 +671,22 @@ export async function fetchVerificationQueue(): Promise<
   }
 
   return (workers ?? []).map((w) => ({
-    ...w,
+    id: w.id,
+    first_name: w.first_name,
+    middle_name: w.middle_name,
+    last_name: w.last_name,
+    email: w.email,
+    username: w.username ?? null,
+    phone_number: w.phone_number ?? null,
+    tin_number: w.tin_number ?? null,
+    id_type: w.id_type ?? null,
+    id_number: w.id_number ?? null,
+    id_expiration_date: w.id_expiration_date ?? null,
+    id_issuing_country: w.id_issuing_country ?? null,
+    verification_status: w.verification_status,
     document_count: counts.get(w.id) ?? 0,
-  })) as AdminVerificationQueueRow[];
+    created_at: w.created_at,
+  }));
 }
 
 export async function fetchWorkerVerificationDocuments(

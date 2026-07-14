@@ -61,23 +61,36 @@ export const verificationStatusSchema = z.enum([
   "rejected",
 ]);
 
+/** Nullable string that also accepts missing keys (legacy / partial selects). */
+const nullableOptionalString = z
+  .string()
+  .nullable()
+  .optional()
+  .transform((v) => v ?? null);
+
+export const adminWorkerContractSchema = z.object({
+  id: z.string().uuid(),
+  employment_status: z.string().nullable().optional().transform((v) => v ?? null),
+  show_hired_badge: z.boolean().catch(true),
+  status: z.string().catch("unknown"),
+});
+
 export const adminWorkerRowSchema = z.object({
   id: z.string().uuid(),
-  first_name: z.string().nullable(),
-  middle_name: z.string().nullable(),
-  last_name: z.string().nullable(),
-  email: z.string().nullable(),
-  professional_title: z.string().nullable(),
+  first_name: nullableOptionalString,
+  middle_name: nullableOptionalString,
+  last_name: nullableOptionalString,
+  email: nullableOptionalString,
+  professional_title: nullableOptionalString,
   account_status: accountStatusSchema.catch("active"),
   verification_status: verificationStatusSchema.catch("unverified"),
-  is_verified: z.boolean().catch(false),
+  is_verified: z.boolean().nullable().optional().transform((v) => v ?? false),
   created_at: z.string(),
-  contracts: z.array(z.object({
-    id: z.string().uuid(),
-    employment_status: z.string().nullable(),
-    show_hired_badge: z.boolean(),
-    status: z.string()
-  })).optional().nullable(),
+  contracts: z
+    .array(adminWorkerContractSchema)
+    .optional()
+    .nullable()
+    .transform((v) => v ?? []),
 });
 
 export const adminEmployerRowSchema = z.object({
@@ -93,10 +106,10 @@ export const adminEmployerRowSchema = z.object({
 
 export const adminAdminRowSchema = z.object({
   id: z.string().uuid(),
-  first_name: z.string().nullable(),
-  middle_name: z.string().nullable(),
-  last_name: z.string().nullable(),
-  email: z.string().nullable(),
+  first_name: nullableOptionalString,
+  middle_name: nullableOptionalString,
+  last_name: nullableOptionalString,
+  email: nullableOptionalString,
   account_status: accountStatusSchema.catch("active"),
   created_at: z.string(),
 });
@@ -198,6 +211,13 @@ export interface AdminVerificationQueueRow {
   middle_name: string | null;
   last_name: string | null;
   email: string | null;
+  username: string | null;
+  phone_number: string | null;
+  tin_number: string | null;
+  id_type: string | null;
+  id_number: string | null;
+  id_expiration_date: string | null;
+  id_issuing_country: string | null;
   verification_status: VerificationStatus;
   document_count: number;
   created_at: string;

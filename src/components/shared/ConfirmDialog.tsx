@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, X } from "lucide-react";
 
@@ -12,6 +12,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   variant?: "danger" | "default";
   loading?: boolean;
+  children?: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -24,6 +25,7 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   variant = "default",
   loading = false,
+  children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -69,6 +71,9 @@ export function ConfirmDialog({
           <X className="h-4 w-4" />
         </button>
       </div>
+      {children ? (
+        <div className="border-b border-slate-100 px-5 py-4">{children}</div>
+      ) : null}
       <div className="flex justify-end gap-2 px-5 py-4">
         <Button
           type="button"

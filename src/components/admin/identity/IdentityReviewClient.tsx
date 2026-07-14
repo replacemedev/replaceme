@@ -27,9 +27,7 @@ import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
-import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
-import { calculateAge } from "@/utils/date";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
@@ -152,9 +150,41 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
         setDecision(null);
         setReason("");
         setExpandedId(null);
+        setViewTarget(null);
+        setViewData(null);
         router.refresh();
       } else {
         toast.error(result.error);
+      }
+    });
+  };
+
+  const openDeepDive = (workerId: string, name: string) => {
+    setViewTarget({ workerId, name });
+    setViewData(null);
+    setLoadingDocs(workerId);
+    startTransition(async () => {
+      try {
+        const [full, docs] = await Promise.all([
+          getAdminWorkerProfileDeepDive(workerId),
+          documents[workerId]
+            ? Promise.resolve(documents[workerId]!)
+            : fetchWorkerVerificationDocuments(workerId),
+        ]);
+        if (!full) {
+          toast.error("Failed to load worker profile");
+          setViewTarget(null);
+          return;
+        }
+        setDocuments((prev) =>
+          prev[workerId] ? prev : { ...prev, [workerId]: docs }
+        );
+        setViewData(full);
+      } catch {
+        toast.error("Failed to load worker profile");
+        setViewTarget(null);
+      } finally {
+        setLoadingDocs(null);
       }
     });
   };
@@ -424,20 +454,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
-                          onClick={() => {
-                            setViewTarget({ workerId: worker.id, name });
-                            setViewData(null);
-                            startTransition(async () => {
-                              const full = await getAdminWorkerProfileDeepDive(
-                                worker.id
-                              );
-                              if (!full) {
-                                toast.error("Failed to load worker profile");
-                                return;
-                              }
-                              setViewData(full);
-                            });
-                          }}
+                          onClick={() => openDeepDive(worker.id, name)}
                           className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                         >
                           <Eye className="h-3.5 w-3.5" aria-hidden />
@@ -489,17 +506,45 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     </div>
 
                     {isExpanded ? (
-                      <div className="border-t border-slate-100 px-4 py-4">
+                      <div className="space-y-4 border-t border-slate-100 px-4 py-4">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                          <KycField label="ID type" value={worker.id_type} />
+                          <KycField label="ID number" value={worker.id_number} />
+                          <KycField
+                            label="ID expiration"
+                            value={
+                              worker.id_expiration_date
+                                ? new Date(
+                                    worker.id_expiration_date
+                                  ).toLocaleDateString()
+                                : null
+                            }
+                          />
+                          <KycField
+                            label="Issuing country"
+                            value={worker.id_issuing_country}
+                          />
+                          <KycField label="TIN" value={worker.tin_number} />
+                          <KycField label="Username" value={worker.username} />
+                          <KycField label="Phone" value={worker.phone_number} />
+                          <KycField
+                            label="Registered"
+                            value={new Date(
+                              worker.created_at
+                            ).toLocaleDateString()}
+                          />
+                        </div>
+
                         {loadingDocs === worker.id ? (
-                          <p className="text-sm text-slate-400 font-medium">
+                          <p className="text-sm font-medium text-slate-400">
                             Loading documents…
                           </p>
                         ) : docs.length === 0 ? (
-                          <p className="text-sm text-slate-400 font-medium">
+                          <p className="text-sm font-medium text-slate-400">
                             No documents on file.
                           </p>
                         ) : (
-                          <ul className="grid gap-3 sm:grid-cols-3">
+                          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             {docs.map((doc) => (
                               <li
                                 key={doc.id}
@@ -519,10 +564,10 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                                     rel="noopener noreferrer"
                                     className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
                                   >
-                                    View file
+                                    View / download
                                   </a>
                                 ) : (
-                                  <p className="mt-2 text-xs text-red-500 font-semibold">
+                                  <p className="mt-2 text-xs font-semibold text-red-500">
                                     Unable to generate preview URL
                                   </p>
                                 )}
@@ -587,21 +632,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                         <td className="px-6 py-4 text-right">
                           <button
                             type="button"
-                            onClick={() => {
-                              setViewTarget({ workerId: worker.id, name });
-                              setViewData(null);
-                              startTransition(async () => {
-                                const full =
-                                  await getAdminWorkerProfileDeepDive(
-                                    worker.id
-                                  );
-                                if (!full) {
-                                  toast.error("Failed to load worker profile");
-                                  return;
-                                }
-                                setViewData(full);
-                              });
-                            }}
+                            onClick={() => openDeepDive(worker.id, name)}
                             className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                           >
                             <Eye className="h-3.5 w-3.5" aria-hidden />
@@ -653,20 +684,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     <div className="flex items-center justify-end border-t border-slate-50 pt-3">
                       <button
                         type="button"
-                        onClick={() => {
-                          setViewTarget({ workerId: worker.id, name });
-                          setViewData(null);
-                          startTransition(async () => {
-                            const full = await getAdminWorkerProfileDeepDive(
-                              worker.id
-                            );
-                            if (!full) {
-                              toast.error("Failed to load worker profile");
-                              return;
-                            }
-                            setViewData(full);
-                          });
-                        }}
+                        onClick={() => openDeepDive(worker.id, name)}
                         className="w-full inline-flex items-center justify-center gap-1 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                       >
                         <Eye className="h-3.5 w-3.5" aria-hidden />
@@ -709,21 +727,22 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           setReason("");
         }}
         onConfirm={handleDecision}
-      />
-
-      {decision?.type === "rejected" ? (
-        <label className="block max-w-md">
+      >
+        <label className="block">
           <span className="text-xs font-medium text-slate-600">
-            Rejection reason (optional, logged)
+            {decision?.type === "approved"
+              ? "Approval note (optional, sent to worker)"
+              : "Rejection feedback (recommended, sent to worker)"}
           </span>
-          <input
-            type="text"
+          <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            rows={3}
+            placeholder="Add custom feedback for the worker…"
+            className="mt-1.5 w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
         </label>
-      ) : null}
+      </ConfirmDialog>
 
       <AdminSlideover
         open={viewTarget !== null}
@@ -735,9 +754,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
         description={
           viewData
             ? `${viewData.professionalTitle ?? "Worker"} • ${
-                viewData.hourlyRate != null
-                  ? formatMoney(viewData.hourlyRate, viewData.salaryCurrency, { perHour: true })
-                  : "No hourly rate"
+                viewData.verificationStatus?.replace(/_/g, " ") ?? "unverified"
               }`
             : "Loading…"
         }
@@ -749,30 +766,173 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Identity
+                  Core profile
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-900">
-                  {[viewData.firstName, viewData.lastName].filter(Boolean).join(" ") || "—"}
+                  {formatFullName(
+                    viewData.firstName,
+                    viewData.middleName,
+                    viewData.lastName,
+                    viewData.suffix
+                  ) || "—"}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">{viewData.email ?? "—"}</p>
-                <p className="mt-2 text-xs font-mono text-slate-500">{viewData.id}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {viewData.email ?? "—"}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  @{viewData.username?.trim() || "—"} ·{" "}
+                  {viewData.phoneNumber ?? "No phone"}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Registered{" "}
+                  {new Date(viewData.createdAt).toLocaleDateString()}
+                </p>
+                <p className="mt-1 font-mono text-[11px] text-slate-400">
+                  {viewData.id}
+                </p>
               </div>
               <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Location & availability
+                  Verification status
                 </p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
+                <div className="mt-2">
+                  <StatusBadge
+                    status={viewData.verificationStatus ?? "unverified"}
+                  />
+                </div>
+                <p className="mt-2 text-xs font-medium text-slate-600">
                   {viewData.location ?? "—"}
-                </p>
-                <p className="mt-1 text-xs font-medium text-slate-600">
-                  {viewData.availability ?? "—"}
                   {viewData.isRemote ? " • Remote" : ""}
                 </p>
-                <p className="mt-2 text-xs text-slate-500">
-                  Joined {new Date(viewData.createdAt).toLocaleDateString()}
+                <p className="mt-1 text-xs text-slate-500">
+                  {viewData.availability ?? "Availability not set"}
                 </p>
               </div>
             </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Statutory identification
+              </p>
+              <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <KycField label="ID type" value={viewData.idType} />
+                <KycField label="ID number" value={viewData.idNumber} />
+                <KycField
+                  label="ID expiration"
+                  value={
+                    viewData.idExpirationDate
+                      ? new Date(
+                          viewData.idExpirationDate
+                        ).toLocaleDateString()
+                      : null
+                  }
+                />
+                <KycField
+                  label="Issuing country"
+                  value={viewData.idIssuingCountry}
+                />
+                <KycField label="TIN" value={viewData.tinNumber} />
+                <KycField label="SSS" value={viewData.sssNumber} />
+                <KycField label="PhilHealth" value={viewData.philhealthNumber} />
+                <KycField label="Pag-IBIG" value={viewData.pagibigNumber} />
+              </dl>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Verification documents
+              </p>
+              {loadingDocs === viewData.id ? (
+                <p className="mt-3 text-sm font-medium text-slate-500">
+                  Loading documents…
+                </p>
+              ) : (documents[viewData.id] ?? []).length === 0 ? (
+                <p className="mt-3 text-sm font-medium text-slate-500">
+                  No documents on file.
+                </p>
+              ) : (
+                <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {(documents[viewData.id] ?? []).map((doc) => (
+                    <li
+                      key={doc.id}
+                      className="rounded-xl border border-slate-100 bg-slate-50 p-3"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                        <FileImage className="h-4 w-4 text-slate-400" />
+                        {doc.document_type.replace(/_/g, " ")}
+                      </div>
+                      <p className="mt-1 truncate text-[11px] text-slate-400">
+                        {doc.file_name}
+                      </p>
+                      {doc.signed_url ? (
+                        <a
+                          href={doc.signed_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
+                        >
+                          View / download
+                        </a>
+                      ) : (
+                        <p className="mt-2 text-xs font-semibold text-red-500">
+                          Unable to generate preview URL
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {(viewData.verificationStatus === "documents_submitted" ||
+              viewData.verificationStatus === "under_review") && (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    setDecision({
+                      workerId: viewData.id,
+                      name:
+                        formatFullName(
+                          viewData.firstName,
+                          viewData.middleName,
+                          viewData.lastName
+                        ) ||
+                        viewData.email ||
+                        "Worker",
+                      type: "approved",
+                    })
+                  }
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl bg-[#006e2f] px-3 py-2.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
+                >
+                  <Check className="h-3.5 w-3.5" aria-hidden />
+                  Approve verification
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    setDecision({
+                      workerId: viewData.id,
+                      name:
+                        formatFullName(
+                          viewData.firstName,
+                          viewData.middleName,
+                          viewData.lastName
+                        ) ||
+                        viewData.email ||
+                        "Worker",
+                      type: "rejected",
+                    })
+                  }
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-red-200 px-3 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden />
+                  Reject / suspend
+                </button>
+              </div>
+            )}
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -781,27 +941,6 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
               <p className="mt-2 whitespace-pre-wrap text-sm font-medium text-slate-800">
                 {viewData.bio?.trim() ? viewData.bio : "—"}
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Compensation
-                </p>
-                <p className="mt-2 text-sm font-bold text-slate-900">
-                  {viewData.hourlyRate != null
-                    ? formatMoney(viewData.hourlyRate, viewData.salaryCurrency, { perHour: true })
-                    : "—"}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Age
-                </p>
-                <p className="mt-2 text-sm font-bold text-slate-900">
-                  {calculateAge(viewData.birthDate)}
-                </p>
-              </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -826,50 +965,28 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 </div>
               )}
             </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Projects
-              </p>
-              {viewData.projects.length === 0 ? (
-                <p className="mt-2 text-sm font-medium text-slate-500">—</p>
-              ) : (
-                <ul className="mt-3 space-y-3">
-                  {viewData.projects.map((p) => (
-                    <li key={p.id} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-slate-900">
-                            {p.title}
-                          </p>
-                          <p className="text-xs font-medium text-slate-600">
-                            {p.role} • {p.year}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
-                        {p.description}
-                      </p>
-                      {p.skillsUsed.length > 0 ? (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {p.skillsUsed.map((s) => (
-                            <span
-                              key={`${p.id}-${s}`}
-                              className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-600 border border-slate-200"
-                            >
-                              {s}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
           </div>
         )}
       </AdminSlideover>
+    </div>
+  );
+}
+
+function KycField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        {label}
+      </p>
+      <p className="mt-0.5 text-sm font-semibold text-slate-800">
+        {value?.trim() ? value : "—"}
+      </p>
     </div>
   );
 }
