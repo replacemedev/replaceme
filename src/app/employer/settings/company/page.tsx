@@ -10,7 +10,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Company Account Settings | ReplaceMe",
+  title: "Company Account Settings | Replaceme",
   description: "Build your brand presence to attract top remote talent.",
 };
 

@@ -6,7 +6,7 @@ import { EmployerPageShell } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
-  title: "Notifications | ReplaceMe",
+  title: "Notifications | Replaceme",
 };
 
 export const dynamic = "force-dynamic";

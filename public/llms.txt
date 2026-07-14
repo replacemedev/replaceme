@@ -1,14 +1,14 @@
-# Replace Me — AI Agent Manifest (llms.txt)
+# Replaceme — AI Agent Manifest (llms.txt)
 # Format: https://llmstxt.org/
 # Last updated: 2026-07-08
 
-> Replace Me is a direct-hire Filipino remote talent marketplace that connects global employers with top-tier Filipino professionals — without agency fees, salary commissions, or middlemen.
+> Replaceme is a direct-hire Filipino remote talent marketplace that connects global employers with top-tier Filipino professionals — without agency fees, salary commissions, or middlemen.
 
-## What is Replace Me?
+## What is Replaceme?
 
-Replace Me is a subscription-based SaaS platform launched to solve the inefficiency of traditional overseas recruitment agencies. Employers pay a flat monthly fee to access a vetted pool of Filipino remote professionals. Workers join and apply for free.
+Replaceme is a subscription-based SaaS platform launched to solve the inefficiency of traditional overseas recruitment agencies. Employers pay a flat monthly fee to access a vetted pool of Filipino remote professionals. Workers join and apply for free.
 
-## Who uses Replace Me?
+## Who uses Replaceme?
 
 - **Employers**: Small to medium businesses (SMBs), startups, and scale-ups looking to hire full-time or long-term remote Filipino staff at competitive rates without agency overhead.
 - **Workers (Job Seekers)**: Filipino professionals seeking remote work with international employers across roles in tech, design, marketing, operations, customer support, and more.

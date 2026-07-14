@@ -23,7 +23,7 @@ import {
 } from "@/types/admin.types";
 
 export const metadata = {
-  title: "Admin Dashboard | ReplaceMe",
+  title: "Admin Dashboard | Replaceme",
 };
 
 export const dynamic = "force-dynamic";

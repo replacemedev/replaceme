@@ -12,7 +12,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Pricing Plans — Hire Filipino Remote Talent at a Flat Rate",
   description:
-    "Compare Replace Me's employer subscription plans. Start free with Discovery, then unlock full applicant profiles, messaging, and instant job approval. No placement fees, no salary commissions.",
+    "Compare Replaceme's employer subscription plans. Start free with Discovery, then unlock full applicant profiles, messaging, and instant job approval. No placement fees, no salary commissions.",
   keywords: [
     "Filipino remote hiring pricing",
     "hire remote workers subscription",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     canonical: `${BASE_URL}/pricing`,
   },
   openGraph: {
-    title: "Pricing Plans — Replace Me",
+    title: "Pricing Plans — Replaceme",
     description:
       "Flat subscription pricing for employers. No agency fees. No salary commissions. Workers always join free.",
     url: `${BASE_URL}/pricing`,
@@ -44,22 +44,22 @@ const PRICING_FACTS = [
 
 const PRICING_FAQ_FALLBACK = [
   {
-    question: "How much does it cost to hire Filipino remote workers on Replace Me?",
+    question: "How much does it cost to hire Filipino remote workers on Replaceme?",
     answer:
-      "Replace Me charges employers a flat monthly subscription fee with no placement commissions or salary percentages. Plans start with a free Discovery tier, with paid Starter, Growth, and Scale tiers unlocking additional features like full profiles, messaging, and instant job approval.",
+      "Replaceme charges employers a flat monthly subscription fee with no placement commissions or salary percentages. Plans start with a free Discovery tier, with paid Starter, Growth, and Scale tiers unlocking additional features like full profiles, messaging, and instant job approval.",
   },
   {
-    question: "Do workers pay any fees to use Replace Me?",
+    question: "Do workers pay any fees to use Replaceme?",
     answer:
-      "No. Replace Me is completely free for job seekers. Workers can create a profile, browse job listings, and apply to positions at zero cost.",
+      "No. Replaceme is completely free for job seekers. Workers can create a profile, browse job listings, and apply to positions at zero cost.",
   },
   {
-    question: "Does Replace Me take a percentage of worker salaries?",
+    question: "Does Replaceme take a percentage of worker salaries?",
     answer:
-      "No. Replace Me never takes a cut of worker earnings. Employers pay workers 100% of the agreed salary directly. The platform fee is a separate flat subscription paid by the employer.",
+      "No. Replaceme never takes a cut of worker earnings. Employers pay workers 100% of the agreed salary directly. The platform fee is a separate flat subscription paid by the employer.",
   },
   {
-    question: "Can I cancel my Replace Me subscription at any time?",
+    question: "Can I cancel my Replaceme subscription at any time?",
     answer:
       "Yes. Employers can upgrade, downgrade, or cancel their subscription at any time from the employer billing dashboard with no lock-in period.",
   },
@@ -92,7 +92,7 @@ export default async function PublicPricingPage() {
         {/* GEO: Data-dense FactBox for LLM citation of pricing structure */}
         <div className="max-w-2xl mx-auto px-4 mb-12">
           <FactBox
-            title="Replace Me Pricing Facts"
+            title="Replaceme Pricing Facts"
             items={PRICING_FACTS}
             variant="table"
           />

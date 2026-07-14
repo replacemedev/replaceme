@@ -6,7 +6,7 @@ import { WorkerInterviewsList } from "@/components/worker/interviews/WorkerInter
 import { groupWorkerInterviewsByWeek } from "@/lib/worker/interviews";
 
 export const metadata = {
-  title: "Interviews | ReplaceMe",
+  title: "Interviews | Replaceme",
 };
 
 export const dynamic = "force-dynamic";

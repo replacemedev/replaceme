@@ -8,13 +8,13 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy — How Replace Me Uses Cookies",
+  title: "Cookie Policy — How Replaceme Uses Cookies",
   description:
-    "Learn how Replace Me uses cookies and similar tracking technologies to keep the platform secure, remember your preferences, and improve your experience as an employer or job seeker.",
+    "Learn how Replaceme uses cookies and similar tracking technologies to keep the platform secure, remember your preferences, and improve your experience as an employer or job seeker.",
   alternates: { canonical: `${BASE_URL}/cookie-policy` },
   openGraph: {
-    title: "Cookie Policy — Replace Me",
-    description: "Read Replace Me's cookie policy and learn how to manage your cookie preferences.",
+    title: "Cookie Policy — Replaceme",
+    description: "Read Replaceme's cookie policy and learn how to manage your cookie preferences.",
     url: `${BASE_URL}/cookie-policy`,
     type: "website",
   },

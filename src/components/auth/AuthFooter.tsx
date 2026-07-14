@@ -17,7 +17,7 @@ export function AuthFooter() {
           Help
         </Link>
       </div>
-      <p>© {new Date().getFullYear()} Replace Me. All rights reserved.</p>
+      <p>© {new Date().getFullYear()} Replaceme. All rights reserved.</p>
     </footer>
   );
 }

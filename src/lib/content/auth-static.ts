@@ -7,7 +7,7 @@ export const AUTH_STATIC_COPY = {
     signupPrompt: "Don't have an account?",
     signupLinkLabel: "Sign up",
     testimonialQuote:
-      "ReplaceMe helped us hire a senior developer in under two weeks — no agency fees, direct communication from day one.",
+      "Replaceme helped us hire a senior developer in under two weeks — no agency fees, direct communication from day one.",
     testimonialName: "Maria Santos",
     testimonialRole: "HR Director, TechScale PH",
   },
@@ -32,7 +32,7 @@ export const AUTH_STATIC_COPY = {
     headline: "Set a new password",
     description: "Choose a strong password for your account.",
     testimonialQuote:
-      "Account security matters. ReplaceMe makes it straightforward to keep your credentials safe.",
+      "Account security matters. Replaceme makes it straightforward to keep your credentials safe.",
     testimonialName: "Ana Delgado",
     testimonialRole: "Freelance Designer",
   },

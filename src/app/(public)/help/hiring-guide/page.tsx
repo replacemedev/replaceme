@@ -11,17 +11,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Employer Hiring Guide — How to Hire Filipino Remote Workers",
   description:
-    "A step-by-step guide for employers using Replace Me: post your first job, review applicants, unlock full profiles, message candidates, and make your first direct hire — all without agency fees.",
+    "A step-by-step guide for employers using Replaceme: post your first job, review applicants, unlock full profiles, message candidates, and make your first direct hire — all without agency fees.",
   keywords: [
     "how to hire Filipino workers online",
     "employer hiring guide remote Philippines",
-    "Replace Me hiring tutorial",
+    "Replaceme hiring tutorial",
     "direct hire remote talent guide",
   ],
   alternates: { canonical: `${BASE_URL}/help/hiring-guide` },
   openGraph: {
-    title: "Employer Hiring Guide — Replace Me",
-    description: "Step-by-step guide to posting jobs, reviewing applicants, and hiring Filipino remote talent directly on Replace Me.",
+    title: "Employer Hiring Guide — Replaceme",
+    description: "Step-by-step guide to posting jobs, reviewing applicants, and hiring Filipino remote talent directly on Replaceme.",
     url: `${BASE_URL}/help/hiring-guide`,
     type: "article",
   },

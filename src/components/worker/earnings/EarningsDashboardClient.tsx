@@ -89,7 +89,7 @@ export function EarningsDashboardClient({ summary, profileCurrency }: Props) {
           aria-hidden
         />
         <p className="text-sm font-medium text-blue-800 leading-relaxed">
-          <span className="font-bold">Note:</span> ReplaceMe does not process
+          <span className="font-bold">Note:</span> Replaceme does not process
           direct payments. All compensation is settled directly between you and
           your employer off-platform. This dashboard is for tracking your
           contracted work.

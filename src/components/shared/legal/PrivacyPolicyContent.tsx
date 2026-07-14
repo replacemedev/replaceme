@@ -28,7 +28,7 @@ export function PrivacyPolicyContent() {
           Summary
         </h2>
         <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed">
-          At ReplaceMe, we believe in transparency and the protection of your personal
+          At Replaceme, we believe in transparency and the protection of your personal
           information. This Privacy Policy outlines how we collect, use, and safeguard your data
           when you use our platform to find work, hire talent, or communicate within our network. Our
           commitment to your privacy is rooted in maintaining a secure, professional environment for
@@ -43,7 +43,7 @@ export function PrivacyPolicyContent() {
         <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed mb-5">
           We collect information necessary to provide and improve our services. This includes data
           you provide directly, as well as information collected automatically during your
-          interaction with ReplaceMe.
+          interaction with Replaceme.
         </p>
         <ul className="space-y-4">
           <CheckItem label="Account Data:">
@@ -62,7 +62,7 @@ export function PrivacyPolicyContent() {
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">2. Use of Data</h2>
         <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed mb-5">
           The information we collect is utilized to ensure a seamless, secure, and personalized
-          experience on the ReplaceMe platform.
+          experience on the Replaceme platform.
         </p>
         <ul className="space-y-4">
           <CheckItem>Facilitating connections between freelancers and clients.</CheckItem>
@@ -79,7 +79,7 @@ export function PrivacyPolicyContent() {
           3. Cookies & Tracking
         </h2>
         <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed">
-          ReplaceMe uses cookies and similar tracking technologies to track activity on our
+          Replaceme uses cookies and similar tracking technologies to track activity on our
           service and hold certain information. Cookies are files with a small amount of data which
           may include an anonymous unique identifier. You can instruct your browser to refuse all
           cookies or to indicate when a cookie is being sent. However, if you do not accept cookies,

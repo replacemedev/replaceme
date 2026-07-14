@@ -18,9 +18,9 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Create a Job Post | ReplaceMe",
+  title: "Create a Job Post | Replaceme",
   description:
-    "Create a new remote job post on ReplaceMe and hire specialized talent.",
+    "Create a new remote job post on Replaceme and hire specialized talent.",
 };
 
 export default async function CreateJobPage({

@@ -10,17 +10,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Help Center — Guides for Employers & Job Seekers",
   description:
-    "Find answers and guides for using Replace Me. Learn how to post jobs, manage your employer subscription, build a worker profile, apply to remote roles, and navigate the hiring pipeline.",
+    "Find answers and guides for using Replaceme. Learn how to post jobs, manage your employer subscription, build a worker profile, apply to remote roles, and navigate the hiring pipeline.",
   keywords: [
-    "Replace Me help",
-    "how to use Replace Me",
+    "Replaceme help",
+    "how to use Replaceme",
     "employer hiring guide Philippines",
     "remote job application guide",
   ],
   alternates: { canonical: `${BASE_URL}/help` },
   openGraph: {
-    title: "Help Center — Replace Me",
-    description: "Guides and documentation for employers and Filipino job seekers using Replace Me.",
+    title: "Help Center — Replaceme",
+    description: "Guides and documentation for employers and Filipino job seekers using Replaceme.",
     url: `${BASE_URL}/help`,
     type: "website",
   },

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReportIssueForm } from "@/components/shared/reporting/ReportIssueForm";
 
 export const metadata = {
-  title: "Report an issue | ReplaceMe",
+  title: "Report an issue | Replaceme",
 };
 
 export default async function ReportPage() {

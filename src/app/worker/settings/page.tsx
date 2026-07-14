@@ -4,7 +4,7 @@ import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSetting
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
-  title: "Account Settings | ReplaceMe",
+  title: "Account Settings | Replaceme",
 };
 
 export const dynamic = "force-dynamic";

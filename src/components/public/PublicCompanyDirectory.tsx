@@ -17,7 +17,7 @@ export function PublicCompanyDirectory({
           Company Directory
         </h1>
         <p className="text-sm text-slate-500 mt-2">
-          Employers currently hiring on ReplaceMe.
+          Employers currently hiring on Replaceme.
         </p>
       </header>
 

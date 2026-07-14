@@ -1,5 +1,5 @@
 /**
- * OrganizationSchema — global entity graph for Replace Me.
+ * OrganizationSchema — global entity graph for Replaceme.
  *
  * Injects stacked JSON-LD covering:
  *  - @type: Organization  (brand identity)
@@ -20,8 +20,8 @@ export function OrganizationSchema() {
       {
         "@type": "Organization",
         "@id": `${BASE_URL}/#organization`,
-        name: "Replace Me",
-        alternateName: "ReplaceMe",
+        name: "Replaceme",
+        alternateName: "Replaceme",
         url: BASE_URL,
         logo: {
           "@type": "ImageObject",
@@ -39,7 +39,7 @@ export function OrganizationSchema() {
           availableLanguage: ["English"],
         },
         description:
-          "Replace Me is a direct-hire Filipino remote talent marketplace connecting global employers with top-tier Filipino professionals — without agency fees or salary commissions.",
+          "Replaceme is a direct-hire Filipino remote talent marketplace connecting global employers with top-tier Filipino professionals — without agency fees or salary commissions.",
         areaServed: {
           "@type": "Country",
           name: "Philippines",
@@ -52,7 +52,7 @@ export function OrganizationSchema() {
       {
         "@type": "SoftwareApplication",
         "@id": `${BASE_URL}/#software`,
-        name: "Replace Me",
+        name: "Replaceme",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: BASE_URL,
@@ -84,7 +84,7 @@ export function OrganizationSchema() {
           "@id": `${BASE_URL}/#organization`,
         },
         description:
-          "Replace Me is a subscription-based SaaS platform for direct remote hiring. Employers access a curated Filipino talent pool at a flat subscription rate — zero agency markups, zero salary commissions.",
+          "Replaceme is a subscription-based SaaS platform for direct remote hiring. Employers access a curated Filipino talent pool at a flat subscription rate — zero agency markups, zero salary commissions.",
         featureList: [
           "Direct-hire marketplace",
           "Zero placement fees",
@@ -100,7 +100,7 @@ export function OrganizationSchema() {
         "@type": "WebSite",
         "@id": `${BASE_URL}/#website`,
         url: BASE_URL,
-        name: "Replace Me",
+        name: "Replaceme",
         description: "Hire top Filipino remote talent directly — no agency fees, no middlemen.",
         publisher: {
           "@id": `${BASE_URL}/#organization`,

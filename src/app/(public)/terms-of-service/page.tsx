@@ -8,13 +8,13 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Replace Me Platform Agreement",
+  title: "Terms of Service — Replaceme Platform Agreement",
   description:
-    "The Replace Me Terms of Service govern your use of the platform as an employer or job seeker. Review your rights, obligations, and our service agreement before registering.",
+    "The Replaceme Terms of Service govern your use of the platform as an employer or job seeker. Review your rights, obligations, and our service agreement before registering.",
   alternates: { canonical: `${BASE_URL}/terms-of-service` },
   openGraph: {
-    title: "Terms of Service — Replace Me",
-    description: "Read the Replace Me platform terms of service for employers and Filipino job seekers.",
+    title: "Terms of Service — Replaceme",
+    description: "Read the Replaceme platform terms of service for employers and Filipino job seekers.",
     url: `${BASE_URL}/terms-of-service`,
     type: "website",
   },

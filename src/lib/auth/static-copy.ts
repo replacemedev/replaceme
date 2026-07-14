@@ -59,7 +59,7 @@ export const SIGNUP_MARKETING = {
   ],
   testimonial: {
     quote:
-      "Replace Me cut our time-to-hire in half. We found skilled operators without wading through recruiter noise.",
+      "Replaceme cut our time-to-hire in half. We found skilled operators without wading through recruiter noise.",
     name: "Sarah J.",
     role: "Operations Manager · Logistics",
     initials: "SJ",

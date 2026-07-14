@@ -11,7 +11,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Pinned Workers - Manage Bookmarked Talent | ReplaceMe",
+  title: "Pinned Workers - Manage Bookmarked Talent | Replaceme",
   description:
     "Review, compare, and manage candidate profiles pinned during your remote talent search.",
 };

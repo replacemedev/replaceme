@@ -17,14 +17,14 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
     <article className={`bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 lg:p-10 shadow-xs ${hideSidebar ? "" : "order-1 lg:order-2"}`}>
       <div className="space-y-4 text-sm sm:text-[15px] text-slate-600 leading-relaxed">
         <p>
-          Welcome to ReplaceMe (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;).
+          Welcome to Replaceme (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;).
           These Terms of Service (&quot;Terms&quot;) govern your use of our website, platform, and
           related services (collectively, the &quot;Services&quot;). By accessing or using our
           Services, you agree to be bound by these Terms and our Privacy Policy.
         </p>
         <p>
           If you do not agree to these Terms, you may not access or use the Services. These Terms
-          constitute a legally binding agreement between you and ReplaceMe.
+          constitute a legally binding agreement between you and Replaceme.
         </p>
       </div>
 
@@ -94,7 +94,7 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           may update them from time to time.
         </p>
         <p>
-          ReplaceMe reserves the right to change its price list and to institute new charges at
+          Replaceme reserves the right to change its price list and to institute new charges at
           any time, upon notice to you, which may be sent by email or posted on the Platform. Your
           use of the Services following such notification constitutes your acceptance of any new or
           increased charges.

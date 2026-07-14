@@ -14,7 +14,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Account Settings | ReplaceMe",
+  title: "Account Settings | Replaceme",
   description: "Manage your profile, security, and subscription plan.",
 };
 

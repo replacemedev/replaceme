@@ -16,7 +16,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Interviews | ReplaceMe",
+  title: "Interviews | Replaceme",
   description:
     "Candidates you have moved to interview stage across all jobs.",
 };

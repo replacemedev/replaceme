@@ -1,9 +1,9 @@
 import { getSiteUrl } from "@/lib/auth/site-url";
 
 const BRAND = {
-  appName: "Replace Me",
+  appName: "Replaceme",
   supportEmail: "support@replaceme.ph",
-  logoAlt: "Replace Me",
+  logoAlt: "Replaceme",
   primary: "#0a4a29",
   accent: "#006e2f",
   accentSoft: "#ebfdf2",
@@ -187,7 +187,7 @@ export function renderEmployerSupportEmail(input: {
     : "";
 
   const bodyHtml = `
-    <p style="margin:0 0 16px 0;">A paid-plan employer submitted a support request from the Replace Me dashboard.</p>
+    <p style="margin:0 0 16px 0;">A paid-plan employer submitted a support request from the Replaceme dashboard.</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.accentSoft};border-radius:14px;padding:4px 16px;margin:0 0 18px 0;">
       ${companyLine}
       <tr><td style="padding:8px 0;color:${BRAND.muted};width:120px;">Employer</td><td style="padding:8px 0;color:${BRAND.text};font-weight:600;">${escapeHtml(input.employerName)}</td></tr>
@@ -261,7 +261,7 @@ export function getSupabaseConfirmSignupHtml(): string {
 
   return renderEmailLayout({
     title: "Confirm your email",
-    preheader: "Activate your Replace Me account in one click.",
+    preheader: "Activate your Replaceme account in one click.",
     bodyHtml,
     footerNote: `This link expires for your security. Need help? ${BRAND.supportEmail}`,
     siteUrl: BRAND.productionSiteUrl,
@@ -290,7 +290,7 @@ export function getSupabaseResetPasswordHtml(): string {
 
   return renderEmailLayout({
     title: "Reset your password",
-    preheader: "Secure link to choose a new Replace Me password.",
+    preheader: "Secure link to choose a new Replaceme password.",
     bodyHtml,
     footerNote: `This link expires for your security. Need help? ${BRAND.supportEmail}`,
     siteUrl: BRAND.productionSiteUrl,

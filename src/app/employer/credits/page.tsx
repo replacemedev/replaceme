@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export const metadata = { title: "Credits | ReplaceMe" };
+export const metadata = { title: "Credits | Replaceme" };
 
 /** Credits-based unlocks are deprecated — redirect to subscription settings. */
 export default function EmployerCreditsPage() {

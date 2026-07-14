@@ -36,13 +36,13 @@ export const PRICING_FALLBACK: PricingPageConfig = {
 
 export const HELP_INDEX_FALLBACK: HelpIndexConfig = {
   title: "Help Center",
-  description: "Guides and policies for workers and employers on ReplaceMe.",
+  description: "Guides and policies for workers and employers on Replaceme.",
   articles: [...PUBLIC_HELP_ARTICLES],
 };
 
 export const HIRING_GUIDE_FALLBACK_META: PageContentMeta = {
   description:
-    "A practical playbook for posting jobs, reviewing applicants, and hiring remote talent through ReplaceMe.",
+    "A practical playbook for posting jobs, reviewing applicants, and hiring remote talent through Replaceme.",
 };
 
 export const CONTACT_FALLBACK: ContactPageConfig = {

@@ -4,14 +4,14 @@ export const EMPLOYER_FAQ_FALLBACK_META: PageContentMeta = {
   lastUpdated: "June 26, 2026",
   badge: "Employers",
   badgeVariant: "pill",
-  description: "Answers for companies hiring through ReplaceMe.",
+  description: "Answers for companies hiring through Replaceme.",
 };
 
 export const WORKER_FAQ_FALLBACK_META: PageContentMeta = {
   lastUpdated: "June 26, 2026",
   badge: "Jobseekers",
   badgeVariant: "pill",
-  description: "Answers for professionals finding remote work on ReplaceMe.",
+  description: "Answers for professionals finding remote work on Replaceme.",
 };
 
 export const EMPLOYER_FAQ_FALLBACK: FaqPageConfig = {
@@ -41,7 +41,7 @@ export const WORKER_FAQ_FALLBACK: FaqPageConfig = {
   items: [
     {
       id: "worker-faq-1",
-      question: "Is ReplaceMe free for workers?",
+      question: "Is Replaceme free for workers?",
       answer:
         "Yes. Creating a profile, browsing jobs, and applying are free for jobseekers.",
     },

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = `${job.title} at ${job.companyName} \u2014 Remote Job Philippines`;
-  const description = `${job.companyName} is hiring a ${job.title} on Replace Me. ${job.employmentType} remote role${job.monthlySalary > 0 ? ` \u2014 ${job.salaryCurrency} ${job.monthlySalary.toLocaleString()}/month` : ""}. Apply directly with no agency fees.`;
+  const description = `${job.companyName} is hiring a ${job.title} on Replaceme. ${job.employmentType} remote role${job.monthlySalary > 0 ? ` \u2014 ${job.salaryCurrency} ${job.monthlySalary.toLocaleString()}/month` : ""}. Apply directly with no agency fees.`;
 
   return {
     title,

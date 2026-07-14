@@ -5,7 +5,7 @@ import { getEmployerOnboardingDraft } from "@/actions/onboarding";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Employer Onboarding | ReplaceMe",
+  title: "Employer Onboarding | Replaceme",
   description:
     "Set up your company profile and start hiring on the Discovery plan.",
 };
@@ -18,7 +18,7 @@ export default async function EmployerOnboardingPage() {
     <EmployerPageShell width="wide" className="gap-8 sm:gap-10">
       <header className="space-y-2 text-center">
         <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
-          Welcome to ReplaceMe
+          Welcome to Replaceme
         </p>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
           Set up your employer account

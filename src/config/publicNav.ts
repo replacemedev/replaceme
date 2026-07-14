@@ -24,7 +24,7 @@ export const PUBLIC_HELP_ARTICLES = [
     href: "/help/hiring-guide",
     title: "Employer Hiring Guide",
     description:
-      "How to write job posts, evaluate applicants, and hire remote talent on ReplaceMe.",
+      "How to write job posts, evaluate applicants, and hire remote talent on Replaceme.",
   },
   {
     href: "/contact",

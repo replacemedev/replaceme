@@ -3,7 +3,7 @@
 **Purpose:** Mandatory release gate before production.  
 **Audited:** 2026-07-10  
 **Hardened:** 2026-07-10  
-**Repo:** `01_replace_me` (Replace Me — Next.js + Supabase)
+**Repo:** `01_replace_me` (Replaceme — Next.js + Supabase)
 
 ## Legend
 

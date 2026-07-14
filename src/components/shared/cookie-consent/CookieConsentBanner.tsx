@@ -32,7 +32,7 @@ export function CookieConsentBanner({
               We use cookies
             </h2>
             <p id="cookie-consent-desc" className="mt-1 text-sm leading-relaxed text-slate-600">
-              Strictly necessary cookies keep Replace Me secure and working. Analytics and
+              Strictly necessary cookies keep Replaceme secure and working. Analytics and
               marketing cookies are optional — we only enable them if you agree. Read our{" "}
               <Link href="/cookie-policy" className="font-semibold text-[#006e2f] hover:underline">
                 Cookie Policy

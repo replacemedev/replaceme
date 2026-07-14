@@ -16,7 +16,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Job Posts | ReplaceMe",
+  title: "Job Posts | Replaceme",
   description: "View and manage all your employer job listings.",
 };
 

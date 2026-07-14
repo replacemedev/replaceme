@@ -20,7 +20,7 @@ export function NavBrand({ homeHref, compact = false, onClick, className = "" }:
       >
         <Image
           src="/images/logo.png"
-          alt="Replace Me Logo"
+          alt="Replaceme Logo"
           fill
           className="object-contain"
           sizes={compact ? "36px" : "48px"}
@@ -31,7 +31,7 @@ export function NavBrand({ homeHref, compact = false, onClick, className = "" }:
         className={`-translate-y-[2px] font-display-md font-bold text-[#0a4a29] truncate ${compact ? "text-[15px] sm:text-lg" : "text-xl sm:text-2xl"
           }`}
       >
-        Replace Me
+        Replaceme
       </span>
     </Link>
   );

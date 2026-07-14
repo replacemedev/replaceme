@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShieldX } from "lucide-react";
 
 export const metadata = {
-  title: "Forbidden | ReplaceMe",
+  title: "Forbidden | Replaceme",
 };
 
 export default function ForbiddenPage() {

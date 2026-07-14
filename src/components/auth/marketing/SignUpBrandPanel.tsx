@@ -11,14 +11,14 @@ export function SignUpBrandPanel() {
   return (
     <section
       className="relative flex h-full min-h-[28rem] w-full flex-col justify-center lg:justify-start overflow-hidden px-8 py-12 lg:pt-24 lg:pb-12 xl:px-14 xl:pt-32 xl:pb-16"
-      aria-label="Why Replace Me"
+      aria-label="Why Replaceme"
     >
       <AuthPanelBackdrop variant="dark" />
 
       <div className="relative z-10 mx-auto w-full max-w-lg space-y-10">
         <header className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/80">
-            Replace Me
+            Replaceme
           </p>
           <h2 className="text-balance font-display-lg text-3xl font-bold leading-tight tracking-tight text-white xl:text-4xl">
             {headline}

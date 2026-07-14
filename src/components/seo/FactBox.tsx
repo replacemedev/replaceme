@@ -10,7 +10,7 @@
  *
  * Usage:
  *   <FactBox
- *     title="Replace Me Platform Facts"
+ *     title="Replaceme Platform Facts"
  *     items={[
  *       { label: "Worker fee", value: "Free — $0 forever" },
  *       { label: "Employer pricing", value: "4 flat-rate subscription tiers" },

@@ -32,11 +32,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Replace Me — Hire Top Filipino Remote Talent",
-    template: "%s | Replace Me",
+    default: "Replaceme — Hire Top Filipino Remote Talent",
+    template: "%s | Replaceme",
   },
   description:
-    "Connect directly with top-tier Filipino remote talent or find your dream remote job. No agency fees, no salary commissions. Replace Me is the direct-hire marketplace for global employers and Filipino professionals.",
+    "Connect directly with top-tier Filipino remote talent or find your dream remote job. No agency fees, no salary commissions. Replaceme is the direct-hire marketplace for global employers and Filipino professionals.",
   keywords: [
     "hire Filipino remote workers",
     "Filipino remote talent",
@@ -47,9 +47,9 @@ export const metadata: Metadata = {
     "remote jobs for Filipinos",
     "SaaS hiring platform Philippines",
   ],
-  authors: [{ name: "Replace Me", url: BASE_URL }],
-  creator: "Replace Me",
-  publisher: "Replace Me",
+  authors: [{ name: "Replaceme", url: BASE_URL }],
+  creator: "Replaceme",
+  publisher: "Replaceme",
   robots: {
     index: true,
     follow: true,
@@ -65,8 +65,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_PH",
     url: BASE_URL,
-    siteName: "Replace Me",
-    title: "Replace Me — Hire Top Filipino Remote Talent",
+    siteName: "Replaceme",
+    title: "Replaceme — Hire Top Filipino Remote Talent",
     description:
       "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
     images: [
@@ -74,13 +74,13 @@ export const metadata: Metadata = {
         url: "/images/og-default.png",
         width: 1200,
         height: 630,
-        alt: "Replace Me — Direct Filipino Remote Talent Marketplace",
+        alt: "Replaceme — Direct Filipino Remote Talent Marketplace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Replace Me — Hire Top Filipino Remote Talent",
+    title: "Replaceme — Hire Top Filipino Remote Talent",
     description:
       "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
     images: ["/images/og-default.png"],

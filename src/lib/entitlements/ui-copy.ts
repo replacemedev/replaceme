@@ -119,7 +119,7 @@ export function featureGateCopy(
       return {
         title: "Unlock direct messaging",
         description:
-          "Message candidates in real time, move faster on interviews, and close hires without leaving ReplaceMe.",
+          "Message candidates in real time, move faster on interviews, and close hires without leaving Replaceme.",
         tier,
         price,
         tierLabel,

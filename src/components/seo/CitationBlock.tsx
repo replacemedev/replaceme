@@ -14,7 +14,7 @@
  *   <CitationBlock
  *     label="Key Fact"
  *     headline="Workers receive 100% of their agreed salary"
- *     body="Replace Me does not take a commission or percentage cut from worker earnings. The full salary negotiated between employer and worker is paid directly by the employer."
+ *     body="Replaceme does not take a commission or percentage cut from worker earnings. The full salary negotiated between employer and worker is paid directly by the employer."
  *     stat="0%"
  *     statLabel="Platform fee on worker earnings"
  *   />

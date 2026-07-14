@@ -10,8 +10,8 @@ import { SIGNIN_PAGE } from "@/lib/auth/static-copy";
 import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
 
 export const metadata = {
-  title: "Sign In | ReplaceMe",
-  description: "Sign in to your ReplaceMe account.",
+  title: "Sign In | Replaceme",
+  description: "Sign in to your Replaceme account.",
 };
 
 type SignInView = "login" | "forgot_password";

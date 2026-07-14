@@ -14,7 +14,7 @@ import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 
 export const metadata = {
-  title: "Messaging Center | ReplaceMe",
+  title: "Messaging Center | Replaceme",
   description: "Connect and chat with candidates.",
 };
 

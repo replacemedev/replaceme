@@ -21,7 +21,7 @@ export function CookiePolicyContent() {
           Summary
         </h2>
         <p className="text-sm sm:text-[15px] text-slate-600 leading-relaxed">
-          Replace Me uses cookies and similar technologies to keep the platform secure,
+          Replaceme uses cookies and similar technologies to keep the platform secure,
           remember your preferences, and—only with your consent—understand how the site is used
           or show relevant marketing. You can accept all cookies, reject non-essential cookies,
           or manage categories at any time via the cookie banner or footer settings link.

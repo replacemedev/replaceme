@@ -78,7 +78,7 @@ export function Footer() {
       {/* Copyright */}
       <div className="mt-16 pt-8 border-t border-slate-100 px-4 md:px-margin-desktop max-w-container-max mx-auto flex items-center justify-between relative z-10">
         <p className="text-slate-400 font-body-base text-sm">
-          © {new Date().getFullYear()} Replace Me. All rights reserved.
+          © {new Date().getFullYear()} Replaceme. All rights reserved.
         </p>
       </div>
     </footer>

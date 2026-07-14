@@ -8,13 +8,13 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — How Replace Me Handles Your Data",
+  title: "Privacy Policy — How Replaceme Handles Your Data",
   description:
-    "Replace Me's privacy policy explains what personal data we collect, how it is used, and your rights as an employer or job seeker on the platform.",
+    "Replaceme's privacy policy explains what personal data we collect, how it is used, and your rights as an employer or job seeker on the platform.",
   alternates: { canonical: `${BASE_URL}/privacy-policy` },
   openGraph: {
-    title: "Privacy Policy — Replace Me",
-    description: "Read how Replace Me collects, uses, and protects your personal data.",
+    title: "Privacy Policy — Replaceme",
+    description: "Read how Replaceme collects, uses, and protects your personal data.",
     url: `${BASE_URL}/privacy-policy`,
     type: "website",
   },

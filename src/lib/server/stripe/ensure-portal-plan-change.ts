@@ -42,7 +42,7 @@ export async function ensurePortalPlanChangeConfiguration(): Promise<
     if (!defaultConfig) {
       const created = await stripe.billingPortal.configurations.create({
         business_profile: {
-          headline: "Manage your Replace Me subscription",
+          headline: "Manage your Replaceme subscription",
         },
         features: portalFeatures(products),
       });
@@ -158,7 +158,7 @@ async function resolvePortalProducts(
     }
   }
 
-  // Fallback: discover Replace Me recurring products from Stripe catalog
+  // Fallback: discover Replaceme recurring products from Stripe catalog
   if (byProduct.size === 0) {
     const products = await stripe.products.list({ active: true, limit: 50 });
     for (const product of products.data) {

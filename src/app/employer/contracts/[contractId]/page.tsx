@@ -12,7 +12,7 @@ import {
 import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
-export const metadata = { title: "Contract | ReplaceMe" };
+export const metadata = { title: "Contract | Replaceme" };
 export const dynamic = "force-dynamic";
 
 export default async function EmployerContractPage({

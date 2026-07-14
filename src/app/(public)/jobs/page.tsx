@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Remote Jobs in the Philippines \u2014 Browse Active Roles",
   description:
-    "Browse active remote job listings on Replace Me. Find full-time, long-term remote roles across tech, design, marketing, and operations posted by global employers hiring Filipino professionals.",
+    "Browse active remote job listings on Replaceme. Find full-time, long-term remote roles across tech, design, marketing, and operations posted by global employers hiring Filipino professionals.",
   keywords: [
     "remote jobs Philippines",
     "Filipino remote work",

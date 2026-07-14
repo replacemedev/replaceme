@@ -4,8 +4,8 @@ import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Sign Up | ReplaceMe",
-  description: "Create your ReplaceMe account.",
+  title: "Sign Up | Replaceme",
+  description: "Create your Replaceme account.",
 };
 
 export default async function SignUpPage({

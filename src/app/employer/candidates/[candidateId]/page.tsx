@@ -3,7 +3,7 @@ import { getEmployerCandidateProfile } from "@/actions/employer/hiring";
 import { EmployerCandidateProfile } from "@/components/employer/candidates/EmployerCandidateProfile";
 
 export const metadata = {
-  title: "Candidate Profile | ReplaceMe",
+  title: "Candidate Profile | Replaceme",
 };
 
 export const dynamic = "force-dynamic";

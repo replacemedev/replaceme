@@ -5,7 +5,7 @@ import { getWorkerEarningsSummary } from "@/lib/worker/earnings";
 import { EarningsDashboardClient } from "@/components/worker/earnings/EarningsDashboardClient";
 
 export const metadata = {
-  title: "Earnings | ReplaceMe",
+  title: "Earnings | Replaceme",
 };
 
 export const dynamic = "force-dynamic";
