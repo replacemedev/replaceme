@@ -21,6 +21,7 @@ import { ManagePlanGrid } from "@/components/employer/settings/account/ManagePla
 import { ActivePlanSidebar } from "@/components/employer/settings/account/ActivePlanSidebar";
 import { EmployerInvoicesPanel } from "@/components/employer/settings/account/EmployerInvoicesPanel";
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
+import { EmployerEmailSupportCard } from "@/components/employer/settings/account/EmployerEmailSupportCard";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
@@ -217,6 +218,8 @@ export function AccountSettingsClient({
         currentPlan={initialSettings.plan}
         planUsage={planUsage}
       />
+
+      <EmployerEmailSupportCard currentPlan={initialSettings.plan} />
 
       <div className="w-full flex flex-col lg:grid lg:grid-cols-3 gap-8 items-start">
         <div className="w-full lg:col-span-2 space-y-8">

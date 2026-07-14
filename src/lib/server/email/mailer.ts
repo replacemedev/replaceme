@@ -29,6 +29,7 @@ export async function sendTransactionalEmail(input: {
   subject: string;
   html: string;
   text?: string;
+  replyTo?: string | string[];
   userId?: string | null;
   role?: UserRole | null;
   tierSlug?: EmailTierSlug | null;
@@ -74,11 +75,11 @@ export async function sendTransactionalEmail(input: {
     subject: input.subject,
     html: input.html,
     text: input.text,
+    ...(input.replyTo ? { replyTo: input.replyTo } : {}),
     tags: Object.entries(input.tags ?? {}).map(([name, value]) => ({ name, value })),
   }, {
     idempotencyKey: input.idempotencyKey,
   });
-
   if (error || !data?.id) {
     await admin
       .from("email_messages")

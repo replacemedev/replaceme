@@ -1,5 +1,8 @@
 import { Resend } from "resend";
 
+/** Canonical sender for all Replace Me transactional email. */
+export const RESEND_DEFAULT_FROM = "ReplaceMe <noreply@replaceme.ph>";
+
 export function createResendClient(): Resend {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -8,11 +11,18 @@ export function createResendClient(): Resend {
   return new Resend(apiKey);
 }
 
+/**
+ * Prefer RESEND_FROM_EMAIL when set (e.g. staging), otherwise always
+ * send as ReplaceMe &lt;noreply@replaceme.ph&gt;.
+ */
 export function getResendFromEmail(): string {
-  const from = process.env.RESEND_FROM_EMAIL;
-  if (!from) {
-    throw new Error("Missing RESEND_FROM_EMAIL");
-  }
-  return from;
+  const from = process.env.RESEND_FROM_EMAIL?.trim();
+  if (from) return from;
+  return RESEND_DEFAULT_FROM;
 }
 
+export function getSupportInboxEmail(): string {
+  return (
+    process.env.SUPPORT_INBOX_EMAIL?.trim() || "support@replaceme.ph"
+  );
+}
