@@ -263,7 +263,7 @@ Items **not** on the original gate image, but required (or strongly recommended)
 
 ## G. Content & XSS hardening (beyond gate)
 
-- [ ] **Sanitize CMS HTML (DOMPurify or equivalent server-side)** — Not yet  
+- [x] **Sanitize CMS HTML (server-side allowlist; no jsdom)** — `sanitizeCmsHtml` (BUG-003: do not use isomorphic-dompurify on Vercel)  
 - [ ] **Strict CSP with nonces (remove `unsafe-eval`)** — Not yet  
 - [ ] **CSP report-only → enforce rollout** — Not yet
 

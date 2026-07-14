@@ -1,10 +1,13 @@
 /**
- * DOMPurify-backed HTML sanitizer for CMS content rendered via dangerouslySetInnerHTML.
- * Allowlist mirrors the previous regex sanitizer; DOMPurify handles mutation XSS properly.
+ * Allowlist HTML sanitizer for trusted-admin CMS content.
+ *
+ * Intentionally dependency-free: `isomorphic-dompurify` pulls `jsdom`, which
+ * crashes Vercel Node serverless under Turbopack with ERR_REQUIRE_ESM
+ * (@exodus/bytes). That took down every route importing CmsHtmlContent
+ * (/privacy-policy, /terms-of-service, /cookie-policy, /help/hiring-guide).
  */
-import DOMPurify from "isomorphic-dompurify";
 
-const ALLOWED_TAGS = [
+const ALLOWED_TAGS = new Set([
   "p",
   "br",
   "strong",
@@ -35,9 +38,12 @@ const ALLOWED_TAGS = [
   "tr",
   "th",
   "td",
-];
+]);
 
-const ALLOWED_ATTR = ["href", "title", "rel", "target", "class"];
+const ALLOWED_ATTRS: Record<string, Set<string>> = {
+  a: new Set(["href", "title", "rel", "target"]),
+  "*": new Set(["class"]),
+};
 
 function isSafeHref(value: string): boolean {
   const v = value.trim().toLowerCase();
@@ -53,48 +59,57 @@ function isSafeHref(value: string): boolean {
 export function sanitizeCmsHtml(dirty: string): string {
   if (!dirty) return "";
 
-  const clean = DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
-    FORBID_TAGS: ["style", "script", "iframe", "object", "embed", "form"],
-    FORBID_ATTR: ["style"],
-  });
+  // Drop high-risk tags and their content entirely
+  let html = dirty
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
+    .replace(/<object[\s\S]*?<\/object>/gi, "")
+    .replace(/<embed[\s\S]*?>/gi, "")
+    .replace(/<form[\s\S]*?<\/form>/gi, "")
+    .replace(/<link[\s\S]*?>/gi, "")
+    .replace(/<meta[\s\S]*?>/gi, "");
 
-  // Enforce safe href / target after DOMPurify (defense in depth)
-  return clean.replace(
-    /<a\b([^>]*)>/gi,
-    (full, rawAttrs: string) => {
-      let href = "";
-      let title = "";
-      let target = "";
-      let className = "";
+  html = html.replace(
+    /<\/?([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>/g,
+    (full, rawTag: string, rawAttrs: string) => {
+      const isClose = full.startsWith("</");
+      const tag = rawTag.toLowerCase();
+      if (!ALLOWED_TAGS.has(tag)) return "";
+      if (isClose) return `</${tag}>`;
+
+      const allowed = new Set([
+        ...(ALLOWED_ATTRS["*"] ?? []),
+        ...(ALLOWED_ATTRS[tag] ?? []),
+      ]);
+
+      const attrs: string[] = [];
       const attrRe =
         /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g;
       let match: RegExpExecArray | null;
       while ((match = attrRe.exec(rawAttrs)) !== null) {
         const name = match[1].toLowerCase();
         const value = match[2] ?? match[3] ?? match[4] ?? "";
-        if (name === "href") href = value;
-        if (name === "title") title = value;
-        if (name === "target") target = value;
-        if (name === "class") className = value;
+        if (name.startsWith("on") || name === "style") continue;
+        if (name.startsWith("data-")) continue;
+        if (!allowed.has(name)) continue;
+        if (name === "href" && !isSafeHref(value)) continue;
+        if (name === "target" && value !== "_blank" && value !== "_self") {
+          continue;
+        }
+        const safe = value.replace(/"/g, "&quot;");
+        attrs.push(`${name}="${safe}"`);
       }
 
-      if (href && !isSafeHref(href)) return "";
-
-      const attrs: string[] = [];
-      if (href) attrs.push(`href="${href.replace(/"/g, "&quot;")}"`);
-      if (title) attrs.push(`title="${title.replace(/"/g, "&quot;")}"`);
-      if (className) attrs.push(`class="${className.replace(/"/g, "&quot;")}"`);
-      if (target === "_blank" || target === "_self") {
-        attrs.push(`target="${target}"`);
-        attrs.push('rel="noopener noreferrer"');
-      } else {
-        attrs.push('rel="noopener noreferrer"');
+      if (tag === "a") {
+        if (!attrs.some((a) => a.startsWith("rel="))) {
+          attrs.push('rel="noopener noreferrer"');
+        }
       }
 
-      return attrs.length ? `<a ${attrs.join(" ")}>` : "<a>";
+      return attrs.length ? `<${tag} ${attrs.join(" ")}>` : `<${tag}>`;
     }
   );
+
+  return html;
 }
