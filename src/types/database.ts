@@ -200,7 +200,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action_type: string
-          admin_id: string
+          admin_id: string | null
           created_at: string
           id: string
           ip_address: unknown
@@ -210,7 +210,7 @@ export type Database = {
         }
         Insert: {
           action_type: string
-          admin_id: string
+          admin_id?: string | null
           created_at?: string
           id?: string
           ip_address?: unknown
@@ -220,7 +220,7 @@ export type Database = {
         }
         Update: {
           action_type?: string
-          admin_id?: string
+          admin_id?: string | null
           created_at?: string
           id?: string
           ip_address?: unknown
@@ -2066,6 +2066,24 @@ export type Database = {
           payload_hash?: string | null
           processed_at?: string
           type?: string
+        }
+        Relationships: []
+      }
+      resend_webhook_events: {
+        Row: {
+          svix_id: string
+          event_type: string
+          processed_at: string
+        }
+        Insert: {
+          svix_id: string
+          event_type: string
+          processed_at?: string
+        }
+        Update: {
+          svix_id?: string
+          event_type?: string
+          processed_at?: string
         }
         Relationships: []
       }

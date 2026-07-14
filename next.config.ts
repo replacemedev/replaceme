@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
-const isDev = process.env.NODE_ENV === "development";
-
-// Next.js docs (v16): keep unsafe-inline for styles; unsafe-eval only in dev.
-// Full nonce CSP deferred — breaks static/Stripe without proxy.ts migration.
+// CSP (enforce + report-only nonce rollout) is set per-request in `src/proxy.ts`
+// so we can attach a unique nonce. Do not also set Content-Security-Policy here
+// (duplicate CSP headers are AND-combined by browsers and break the rollout).
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -19,25 +19,6 @@ const securityHeaders = [
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
-  },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      // Nonce CSP deferred: Stripe + Turnstile + static pages need proxy migration.
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://js.stripe.com https://challenges.cloudflare.com`,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://js.stripe.com",
-      "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://challenges.cloudflare.com",
-      "frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
-      "worker-src 'self' blob:",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'self'",
-      "upgrade-insecure-requests",
-    ].join("; "),
   },
 ];
 
@@ -116,4 +97,19 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  // Source maps upload only when auth token is present (CI / release).
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});

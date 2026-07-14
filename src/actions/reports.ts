@@ -492,6 +492,11 @@ export async function updateReportStatus(input: unknown) {
       return fail("Failed to update report.");
     }
 
+    const { logAdminAction } = await import("@/actions/admin-actions");
+    await logAdminAction("update_report_status", "report", parsed.data.reportId, {
+      status: parsed.data.status,
+    });
+
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");
     return ok();
@@ -723,6 +728,11 @@ export async function updateJobReportStatus(input: unknown) {
       safeError("updateJobReportStatus:", error);
       return fail("Failed to update job report.");
     }
+
+    const { logAdminAction } = await import("@/actions/admin-actions");
+    await logAdminAction("update_job_report_status", "job_report", parsed.data.reportId, {
+      status: parsed.data.status,
+    });
 
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");

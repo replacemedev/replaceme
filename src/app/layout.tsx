@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { ResponsiveToaster } from "@/components/shared/ResponsiveToaster";
 import { CookieConsentRoot } from "@/components/shared/cookie-consent";
@@ -101,7 +102,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getNavSession();
+  const [session, headerStore] = await Promise.all([getNavSession(), headers()]);
+  const nonce = headerStore.get("x-nonce") ?? undefined;
 
   return (
     <html
@@ -114,6 +116,7 @@ export default async function RootLayout({
           rel="stylesheet"
         />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var raw=localStorage.getItem(${JSON.stringify(COOKIE_CONSENT_STORAGE_KEY)});if(!raw)return;var p=JSON.parse(raw);if(p&&p.policyVersion===${JSON.stringify(COOKIE_POLICY_VERSION)}){document.documentElement.setAttribute("data-cookie-consent","granted");}}catch(e){}})();`,
           }}

@@ -2,7 +2,7 @@
 
 import { RouteErrorFallback } from "@/components/shared/RouteErrorFallback";
 
-export default function AdminError({
+export default function AuthError({
   error,
   reset,
 }: {
@@ -13,8 +13,8 @@ export default function AdminError({
     <RouteErrorFallback
       error={error}
       reset={reset}
-      title="Something went wrong"
-      description="An unexpected error occurred in the admin panel. No technical details are shown here for security."
+      title="Sign-in unavailable"
+      description="Something went wrong with authentication. Please try again."
     />
   );
 }

@@ -220,7 +220,13 @@ export async function fetchAdminTeamActivity(
       return { success: false, error: error.message };
     }
 
-    const adminIds = [...new Set((data ?? []).map((row) => row.admin_id))];
+    const adminIds = [
+      ...new Set(
+        (data ?? [])
+          .map((row) => row.admin_id)
+          .filter((id): id is string => typeof id === "string" && id.length > 0)
+      ),
+    ];
     const emailById = new Map<string, string>();
 
     if (adminIds.length > 0) {
@@ -242,7 +248,7 @@ export async function fetchAdminTeamActivity(
       metadata: row.metadata as Record<string, unknown> | null,
       ip_address: row.ip_address,
       created_at: row.created_at,
-      admin_email: emailById.get(row.admin_id) ?? null,
+      admin_email: row.admin_id ? emailById.get(row.admin_id) ?? null : null,
     }));
 
     return { success: true, data: logs };

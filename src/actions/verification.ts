@@ -298,6 +298,11 @@ export async function submitVerificationForReview(): Promise<VerificationActionR
       return fail("Failed to submit for review.");
     }
 
+    const { emitWorkerAuditLog } = await import(
+      "@/lib/server/audit/worker-events"
+    );
+    await emitWorkerAuditLog(profile.id, "worker.verification_submitted");
+
     revalidatePath("/worker/verification");
     revalidatePath("/worker/dashboard");
     return ok();

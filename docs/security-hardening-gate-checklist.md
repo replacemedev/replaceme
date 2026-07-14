@@ -2,7 +2,7 @@
 
 **Purpose:** Mandatory release gate before production.  
 **Audited:** 2026-07-10  
-**Hardened:** 2026-07-10  
+**Hardened:** 2026-07-14  
 **Repo:** `01_replace_me` (Replaceme — Next.js + Supabase)
 
 ## Legend
@@ -167,10 +167,10 @@
 ## 7. Headers
 
 - [x] **CSP** — Full  
-  - Set in `next.config.ts` for all routes  
+  - Per-request in `src/proxy.ts` (enforce + report-only nonce path)  
   - Production: no `'unsafe-eval'`; Stripe + Turnstile + Supabase allowlisted  
   - `frame-ancestors 'self'`, `upgrade-insecure-requests`  
-  - Note: nonce/`strict-dynamic` CSP deferred (static + Stripe); sanitize + CSP allowlist is the shipped control
+  - Nonce enforce flip: `CSP_ENFORCE_NONCE=1` after report-only soak
 
 - [x] **HSTS** — Full  
   - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` in `next.config.ts`
@@ -213,14 +213,28 @@ Items **not** on the original gate image, but required (or strongly recommended)
 
 ## B. Observability, abuse & incident response
 
-- [~] **Audit logging** — Partial  
-  - `audit_logs` table + some admin/worker event writers  
-  - **Gap:** Not comprehensive across all sensitive mutations
+- [~] **Audit logging** — Partial → improved 2026-07-14  
+  - `audit_logs` (nullable `admin_id`) + service-role writer `emitAuditLog`  
+  - Admin: moderation, billing, team, reports, CMS upserts  
+  - Worker: applications, profile/settings, verification submit (fixed insert path)  
+  - Auth: session revoke (others / global)  
+  - **Remaining gap:** Employer mutations (job CRUD, unlock, messaging) not yet comprehensively audited
 
-- [ ] **Centralized error monitoring (Sentry / equivalent)** — Not yet  
-- [ ] **Uptime / health endpoint + alerting** — Not yet (`/api/health` not found)
-- [ ] **Security incident runbook (who/what/when)** — Not yet  
-- [ ] **Abuse reporting ops SLAs** — Partial product feature exists; ops process not documented here
+- [x] **Centralized error monitoring (Sentry / equivalent)** — Full (opt-in via DSN)  
+  - `@sentry/nextjs` + `instrumentation.ts` + client/server/edge configs  
+  - Route `error.tsx` / `global-error.tsx` report via `captureException`  
+  - Docs: `docs/security/observability-and-csp.md`
+
+- [x] **Uptime / health endpoint + alerting** — Full (endpoint); alerting is ops  
+  - `GET /api/health` — app + optional Supabase/Redis checks  
+  - Point external uptime monitor at production (see observability doc)
+
+- [x] **Security incident runbook (who/what/when)** — Full  
+  - `docs/security/incident-runbook.md`
+
+- [x] **Abuse reporting ops SLAs** — Full (process doc)  
+  - Product queue exists; SLAs: `docs/security/abuse-reporting-slas.md`
+
 - [x] **Log redaction helpers** — Full (`src/utils/logger.ts` safe logging)
 
 ## C. Supply chain & CI/CD
@@ -250,22 +264,35 @@ Items **not** on the original gate image, but required (or strongly recommended)
   - Legal copy exists; **Gap:** no clear self-serve data export/delete product flow verified in this audit
 - [ ] **Data residency / region strategy documented** — Not yet  
 - [ ] **PII inventory & retention policy** — Not yet  
-- [ ] **DPA with processors (Supabase, Stripe, Resend, Upstash)** — Ops/legal
-- [ ] **Subprocessor list published** — Not yet
+- [x] **DPA with processors (Supabase, Stripe, Resend, Upstash)** — Ops checklist  
+  - `docs/security/dpa-and-subprocessors.md` (sign-off table for Legal)  
+  - Vendor DPA links inventoried; executed PDFs remain outside git  
+- [x] **Subprocessor list published** — Full (`/subprocessors`, footer link)
 
 ## F. Application resilience & UX safety
 
-- [~] **Route-level error boundaries** — Partial (`error.tsx` for admin/employer/worker; verify public routes)
-- [ ] **Global `error.tsx` / `global-error.tsx`** — Verify / add if missing for public shell
-- [ ] **Maintenance mode / feature flags** — Not yet
-- [ ] **Idempotent critical writes beyond Stripe webhooks** — Partial (Stripe covered; review others)
+- [x] **Route-level error boundaries** — Full  
+  - `error.tsx` for admin / employer / worker / public / auth + root `app/error.tsx`
+- [x] **Global `error.tsx` / `global-error.tsx`** — Full (`src/app/global-error.tsx`)
+- [x] **Maintenance mode / feature flags** — Full  
+  - `MAINTENANCE_MODE` + `FEATURE_*` via `src/lib/security/feature-flags.ts`  
+  - Proxy gate → `/maintenance` (webhooks/health/cron bypass)
+- [~] **Idempotent critical writes beyond Stripe webhooks** — Improved  
+  - Stripe: `stripe_webhook_events` claim/release  
+  - Resend: `resend_webhook_events` (svix-id) claim/release — 2026-07-14  
+  - **Remaining:** application/checkout client retries (mailer has provider idempotency keys)
 - [x] **Webhook idempotency (Stripe)** — Full
 
 ## G. Content & XSS hardening (beyond gate)
 
 - [x] **Sanitize CMS HTML (server-side allowlist; no jsdom)** — `sanitizeCmsHtml` (BUG-003: do not use isomorphic-dompurify on Vercel)  
-- [ ] **Strict CSP with nonces (remove `unsafe-eval`)** — Not yet  
-- [ ] **CSP report-only → enforce rollout** — Not yet
+- [~] **Strict CSP with nonces (remove `unsafe-eval`)** — Rollout ready  
+  - Prod enforce: no `'unsafe-eval'`; allowlist scripts (Stripe/Turnstile)  
+  - Per-request nonce in `src/proxy.ts`; inline consent script nonced  
+  - Flip enforce to nonce/`strict-dynamic` with `CSP_ENFORCE_NONCE=1` after report-only soak  
+- [x] **CSP report-only → enforce rollout** — Full  
+  - Default Report-Only nonce CSP + `/api/csp-report`  
+  - Procedure: `docs/security/observability-and-csp.md`
 
 ## H. Global product readiness (security-adjacent)
 
@@ -303,13 +330,15 @@ Items **not** on the original gate image, but required (or strongly recommended)
 
 ## Still open (production-ready extras)
 
-10. **[ ]** Error monitoring + health check + incident runbook  
+10. **[x]** Error monitoring + health check + incident runbook (2026-07-14)  
 11. **[ ]** In-app admin MFA enrollment; decide MFA policy for employers *(deferred)*  
 12. **[ ]** Data export/delete flows for compliance readiness  
-13. **[ ]** Nonce / `strict-dynamic` CSP via `proxy.ts` (optional hardening)  
+13. **[~]** Nonce / `strict-dynamic` CSP via `proxy.ts` — report-only live; enforce via `CSP_ENFORCE_NONCE=1`  
 14. **[ ]** Resolve Next.js nested `postcss` moderate advisory when upstream ships fix  
 15. **[x]** Progressive login lockout (2026-07-10)  
 16. **[x]** Session revocation UI — sign out others / everywhere (2026-07-10)
+17. **[x]** Abuse SLAs + DPA checklist + public subprocessors (2026-07-14)
+18. **[x]** Resend webhook idempotency + maintenance mode (2026-07-14)
 
 ---
 
@@ -343,5 +372,10 @@ Items **not** on the original gate image, but required (or strongly recommended)
 | Admin MFA | `src/app/admin/(shell)/layout.tsx`, `src/app/admin/mfa-challenge/` |
 | CMS render | `src/components/shared/cms/CmsHtmlContent.tsx` |
 | Webhooks | `src/app/api/webhooks/stripe/`, `src/app/api/webhooks/resend/` |
+| Health | `src/app/api/health/route.ts` |
+| CSP / maintenance | `src/lib/security/csp.ts`, `src/lib/security/feature-flags.ts`, `src/proxy.ts` |
+| Sentry | `sentry.*.config.ts`, `src/instrumentation.ts` |
+| Incident / abuse / DPA | `docs/security/incident-runbook.md`, `abuse-reporting-slas.md`, `dpa-and-subprocessors.md`, `observability-and-csp.md` |
+| Subprocessors | `src/app/(public)/subprocessors/page.tsx` |
 | RLS migrations | `supabase/migrations/` |
 | Service role | `src/lib/supabase/server.ts` (`createAdminClient`) |

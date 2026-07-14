@@ -1,14 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { WorkerPageShell } from "@/components/worker/layout";
 
 export default function WorkerError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <WorkerPageShell width="narrow" className="py-16 items-center">
       <div className="flex flex-col items-center gap-4">

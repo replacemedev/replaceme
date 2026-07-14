@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createResendClient } from "@/lib/server/resend/client";
 import { createAdminClient } from "@/lib/supabase/server";
+import {
+  claimResendWebhookEvent,
+  releaseResendWebhookEvent,
+} from "@/lib/server/resend/webhook-idempotency";
 import { safeError } from "@/utils/logger";
 import type { Json } from "@/types/database";
 
@@ -70,6 +74,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  const claim = await claimResendWebhookEvent(id, event.type);
+  if (claim === "duplicate") {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
   // Store everything we can; don’t assume presence of fields for every event type.
   const data = (event.data ?? {}) as Record<string, unknown>;
   const emailId = typeof data.email_id === "string" ? data.email_id : null;
@@ -79,9 +88,6 @@ export async function POST(request: NextRequest) {
   try {
     const admin = await createAdminClient();
 
-    // Insert raw event payload for audit/analytics.
-    // We don't dedupe with svix-id yet; Resend retries are rare and we keep raw history.
-    // If you want strict idempotency, we can add a `svix_id` column + unique index later.
     let messageRowId: string | null = null;
 
     if (emailId) {
@@ -124,8 +130,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (err) {
     safeError("Resend webhook handler error:", err);
+    // Release claim so a later retry can reprocess after a transient failure.
+    await releaseResendWebhookEvent(id);
     // Return 200 to prevent retries storm; we’ll see errors in logs.
     return NextResponse.json({ received: true });
   }
 }
-

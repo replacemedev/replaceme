@@ -2,7 +2,7 @@
 
 import { RouteErrorFallback } from "@/components/shared/RouteErrorFallback";
 
-export default function AdminError({
+export default function PublicError({
   error,
   reset,
 }: {
@@ -13,8 +13,8 @@ export default function AdminError({
     <RouteErrorFallback
       error={error}
       reset={reset}
-      title="Something went wrong"
-      description="An unexpected error occurred in the admin panel. No technical details are shown here for security."
+      title="Could not load this page"
+      description="Something went wrong while loading this page. Please try again."
     />
   );
 }
