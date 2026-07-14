@@ -8,21 +8,24 @@ import type {
 } from "@/types/page-content";
 
 export const PRIVACY_FALLBACK_META: PageContentMeta = {
-  lastUpdated: "January 26, 2026",
+  lastUpdated: "July 14, 2026",
   badge: "Legal",
   badgeVariant: "pill",
+  wide: true,
 };
 
 export const COOKIE_FALLBACK_META: PageContentMeta = {
-  lastUpdated: "June 29, 2026",
+  lastUpdated: "July 14, 2026",
   badge: "Legal",
   badgeVariant: "pill",
+  wide: true,
 };
 
-export const COOKIE_POLICY_VERSION = "cookie-policy-v1";
+/** Bump when cookie purposes/categories change so the consent banner reappears. */
+export const COOKIE_POLICY_VERSION = "cookie-policy-v2";
 
 export const TERMS_FALLBACK_META: PageContentMeta = {
-  lastUpdated: "January 24, 2026",
+  lastUpdated: "July 14, 2026",
   badge: "Legal Document",
   badgeVariant: "text",
   wide: true,

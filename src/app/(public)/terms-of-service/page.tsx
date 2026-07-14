@@ -10,7 +10,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Terms of Service — Replaceme Platform Agreement",
   description:
-    "The Replaceme Terms of Service govern your use of the platform as an employer or job seeker. Review your rights, obligations, and our service agreement before registering.",
+    "Replaceme Terms of Service for Filipino Workers and Employers — covering RA 11967 ID verification, BIR RR 15-2024 tax compliance, Stripe subscriptions, and mandatory internal redress.",
   alternates: { canonical: `${BASE_URL}/terms-of-service` },
   openGraph: {
     title: "Terms of Service — Replaceme",

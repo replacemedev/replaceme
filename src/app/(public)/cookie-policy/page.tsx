@@ -10,7 +10,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Cookie Policy — How Replaceme Uses Cookies",
   description:
-    "Learn how Replaceme uses cookies and similar tracking technologies to keep the platform secure, remember your preferences, and improve your experience as an employer or job seeker.",
+    "Global Cookie Policy for Replaceme — necessary, analytics, and marketing cookies with NPC- and GDPR-aligned opt-in consent for users in the Philippines and worldwide.",
   alternates: { canonical: `${BASE_URL}/cookie-policy` },
   openGraph: {
     title: "Cookie Policy — Replaceme",
@@ -32,6 +32,7 @@ export default async function CookiePolicyPage() {
       badgeVariant={meta.badgeVariant ?? "pill"}
       title={cms?.title ?? "Cookie Policy"}
       lastUpdated={meta.lastUpdated ?? COOKIE_FALLBACK_META.lastUpdated!}
+      wide={meta.wide ?? true}
     >
       <CmsHtmlContent html={cms?.body} fallback={<CookiePolicyContent />} />
     </LegalPageLayout>

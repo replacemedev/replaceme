@@ -10,7 +10,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   title: "Privacy Policy — How Replaceme Handles Your Data",
   description:
-    "Replaceme's privacy policy explains what personal data we collect, how it is used, and your rights as an employer or job seeker on the platform.",
+    "How Replaceme protects Worker and Employer data under RA 10173, NPC Advisory 2026-02 breach rules, GDPR, and CCPA — including Employer PIC duties after profile unlock.",
   alternates: { canonical: `${BASE_URL}/privacy-policy` },
   openGraph: {
     title: "Privacy Policy — Replaceme",
@@ -32,6 +32,7 @@ export default async function PrivacyPolicyPage() {
       badgeVariant={meta.badgeVariant ?? "pill"}
       title={cms?.title ?? "Privacy Policy"}
       lastUpdated={meta.lastUpdated ?? PRIVACY_FALLBACK_META.lastUpdated!}
+      wide={meta.wide ?? true}
     >
       <CmsHtmlContent html={cms?.body} fallback={<PrivacyPolicyContent />} />
     </LegalPageLayout>
