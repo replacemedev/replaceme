@@ -218,12 +218,13 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           />
         </FormField>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <FormField
             label="First Name"
             htmlFor="signup-firstName"
             required
             error={errors.firstName?.message}
+            className="w-full"
           >
             <Input
               id="signup-firstName"
@@ -238,27 +239,11 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           </FormField>
 
           <FormField
-            label="Middle Name"
-            htmlFor="signup-middleName"
-            error={errors.middleName?.message}
-          >
-            <Input
-              id="signup-middleName"
-              {...register("middleName")}
-              placeholder="Optional"
-              icon={<User size={18} />}
-              autoComplete="additional-name"
-              error={errors.middleName?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-middleName-error"
-            />
-          </FormField>
-
-          <FormField
             label="Last Name"
             htmlFor="signup-lastName"
             required
             error={errors.lastName?.message}
+            className="w-full"
           >
             <Input
               id="signup-lastName"
@@ -273,9 +258,28 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           </FormField>
 
           <FormField
+            label="Middle Name"
+            htmlFor="signup-middleName"
+            error={errors.middleName?.message}
+            className="w-full"
+          >
+            <Input
+              id="signup-middleName"
+              {...register("middleName")}
+              placeholder="Optional"
+              icon={<User size={18} />}
+              autoComplete="additional-name"
+              error={errors.middleName?.message}
+              showErrorMessage={false}
+              aria-describedby="signup-middleName-error"
+            />
+          </FormField>
+
+          <FormField
             label="Suffix"
             htmlFor="signup-suffix"
             error={errors.suffix?.message}
+            className="w-full"
           >
             <Input
               id="signup-suffix"
