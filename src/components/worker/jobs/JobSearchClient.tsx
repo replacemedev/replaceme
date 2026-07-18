@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Filter } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Briefcase } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { JobSearchHero } from "./JobSearchHero";
 import { JobFilterSidebar, JobFilterPanel } from "./JobFilterSidebar";
 import { JobCard } from "./JobCard";
 import { JobCardGrid } from "./JobCardGrid";
+import { JobCardSkeleton } from "./JobCardSkeleton";
 import { WorkerPageShell, WorkerFilterSheet } from "@/components/worker/layout";
 import { TablePagination } from "@/components/shared/TablePagination";
-import { getJobSearchData } from "@/actions/worker/job-search";
 import {
   JobSearchFacets,
   JobSearchResult,
@@ -52,22 +53,35 @@ export function JobSearchClient({
   initialJobs,
   facets,
 }: JobSearchClientProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Single source of truth: derive search/filter inputs synchronously from searchParams
+  const keyword = searchParams.get("query") || "";
+  const appliedSkills = useMemo(() => {
+    const s = searchParams.get("skills");
+    return s ? s.split(",").filter(Boolean) : [];
+  }, [searchParams]);
+  const appliedEmploymentTypes = useMemo(() => {
+    const t = searchParams.get("type");
+    return t ? t.split(",").filter(Boolean) : [];
+  }, [searchParams]);
+
+  // Synchronize jobs state with initialJobs synchronously during render when props change
   const [jobs, setJobs] = useState(initialJobs);
-  const [keyword, setKeyword] = useState("");
+  const [prevInitialJobs, setPrevInitialJobs] = useState(initialJobs);
+
+  if (initialJobs !== prevInitialJobs) {
+    setPrevInitialJobs(initialJobs);
+    setJobs(initialJobs);
+  }
+
   const [skillQuery, setSkillQuery] = useState("");
-
-  const [appliedSkills, setAppliedSkills] = useState<string[]>([]);
-  const [appliedEmploymentTypes, setAppliedEmploymentTypes] = useState<string[]>([]);
-
   const [sortBy, setSortBy] = useState<JobSortOption>("most_relevant");
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setJobs(initialJobs);
-  }, [initialJobs]);
 
   const filtered = useMemo(() => {
     return sortJobs(jobs, sortBy);
@@ -81,35 +95,34 @@ export function JobSearchClient({
     return filtered.slice(startIndex, startIndex + PAGE_SIZE);
   }, [filtered, startIndex]);
 
+  const updateUrl = (newKeyword: string, newSkills: string[], newTypes: string[]) => {
+    const params = new URLSearchParams();
+    if (newKeyword.trim()) {
+      params.set("query", newKeyword.trim());
+    }
+    if (newSkills.length > 0) {
+      params.set("skills", newSkills.join(","));
+    }
+    if (newTypes.length > 0) {
+      params.set("type", newTypes.join(","));
+    }
+
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    });
+  };
+
   const handleApplyFilters = (filters: {
     skills: string[];
     employmentTypes: string[];
   }) => {
-    setAppliedSkills(filters.skills);
-    setAppliedEmploymentTypes(filters.employmentTypes);
     setCurrentPage(1);
-
-    startTransition(async () => {
-      const result = await getJobSearchData({
-        keyword,
-        skills: filters.skills,
-        employmentTypes: filters.employmentTypes,
-      });
-      setJobs(result.jobs);
-    });
+    updateUrl(keyword, filters.skills, filters.employmentTypes);
   };
 
   const handleSearch = (newKeyword: string) => {
-    setKeyword(newKeyword);
     setCurrentPage(1);
-    startTransition(async () => {
-      const result = await getJobSearchData({
-        keyword: newKeyword,
-        skills: appliedSkills,
-        employmentTypes: appliedEmploymentTypes,
-      });
-      setJobs(result.jobs);
-    });
+    updateUrl(newKeyword, appliedSkills, appliedEmploymentTypes);
   };
 
   const handleSkillChipToggle = (skill: string) => {
@@ -117,17 +130,8 @@ export function JobSearchClient({
       ? appliedSkills.filter((s) => s !== skill)
       : [...appliedSkills, skill];
 
-    setAppliedSkills(nextSkills);
     setCurrentPage(1);
-
-    startTransition(async () => {
-      const result = await getJobSearchData({
-        keyword,
-        skills: nextSkills,
-        employmentTypes: appliedEmploymentTypes,
-      });
-      setJobs(result.jobs);
-    });
+    updateUrl(keyword, nextSkills, appliedEmploymentTypes);
   };
 
   const handleClearAll = () => {
@@ -136,11 +140,7 @@ export function JobSearchClient({
     setAppliedSkills([]);
     setAppliedEmploymentTypes([]);
     setCurrentPage(1);
-
-    startTransition(async () => {
-      const result = await getJobSearchData({});
-      setJobs(result.jobs);
-    });
+    updateUrl("", [], []);
   };
 
   const handleSavedChange = (jobId: string, saved: boolean) => {
@@ -233,10 +233,13 @@ export function JobSearchClient({
             </div>
 
             {isPending ? (
-              <div className="flex flex-col items-center justify-center py-24 gap-4 bg-white/50 backdrop-blur-xs rounded-2xl border border-slate-100 shadow-xs">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#006e2f]" />
-                <p className="text-sm font-semibold text-slate-500">Searching active opportunities...</p>
-              </div>
+              <JobCardGrid>
+                {[...Array(5)].map((_, i) => (
+                  <li key={`skeleton-${i}`}>
+                    <JobCardSkeleton />
+                  </li>
+                ))}
+              </JobCardGrid>
             ) : filtered.length === 0 ? (
               <EmptyState
                 icon={<Briefcase className="h-6 w-6" />}
