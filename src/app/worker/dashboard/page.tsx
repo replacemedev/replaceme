@@ -6,6 +6,7 @@ import {
   Calendar,
   CheckCircle,
   Plus,
+  Bookmark,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMessagingThreads } from "@/actions/messaging";
@@ -50,6 +51,7 @@ export default async function WorkerDashboard() {
     { data: apps },
     { data: skills },
     { data: recommendedJobs },
+    { data: savedJobs },
     threads,
   ] = await Promise.all([
     supabase.from("applications").select("status").eq("candidate_id", profile.id),
@@ -59,6 +61,10 @@ export default async function WorkerDashboard() {
       .eq("worker_id", profile.id)
       .order("proficiency", { ascending: false }),
     supabase.from("job_posts").select("*").eq("status", "Active").limit(2),
+    supabase
+      .from("worker_saved_jobs")
+      .select("job_id")
+      .eq("worker_id", profile.id),
     getMessagingThreads("worker"),
   ]);
 
@@ -66,6 +72,7 @@ export default async function WorkerDashboard() {
   const interviewsCount =
     apps?.filter((a) => a.status === "INTERVIEW_SCHEDULED").length ?? 0;
   const hiredCount = apps?.filter((a) => a.status === "HIRED").length ?? 0;
+  const savedJobsCount = savedJobs?.length ?? 0;
 
   const profileStrength = computeWorkerProfileStrength({
     professionalTitle: profile.professional_title,
@@ -155,6 +162,13 @@ export default async function WorkerDashboard() {
             hint: "Active placements",
             icon: CheckCircle,
             href: "/worker/applications",
+          },
+          {
+            label: "Saved jobs",
+            value: savedJobsCount,
+            hint: "Bookmarked roles",
+            icon: Bookmark,
+            href: "/worker/saved-jobs",
           },
         ]}
       />
