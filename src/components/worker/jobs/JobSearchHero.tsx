@@ -2,23 +2,25 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { Search } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface JobSearchHeroProps {
   initialKeyword: string;
-  onSearch: (keyword: string) => void;
+  startTransition: React.TransitionStartFunction;
   activeSkills: string[];
-  onSkillChipToggle: (skill: string) => void;
   skillSuggestions: string[];
 }
 
 export function JobSearchHero({
   initialKeyword,
-  onSearch,
+  startTransition,
   activeSkills,
-  onSkillChipToggle,
   skillSuggestions,
 }: JobSearchHeroProps) {
   const [localKeyword, setLocalKeyword] = useState(initialKeyword);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -44,7 +46,15 @@ export function JobSearchHero({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              onSearch(localKeyword);
+              const params = new URLSearchParams(searchParams.toString());
+              if (localKeyword.trim()) {
+                params.set("query", localKeyword.trim());
+              } else {
+                params.delete("query");
+              }
+              startTransition(() => {
+                router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+              });
             }}
             className="flex flex-col sm:flex-row items-center gap-2 sm:gap-0 bg-white rounded-2xl sm:rounded-full p-2.5 sm:p-2 border border-slate-200/80 shadow-sm focus-within:ring-2 focus-within:ring-[#006e2f]/10 focus-within:border-[#006e2f] transition-all duration-300 w-full"
           >
@@ -80,7 +90,24 @@ export function JobSearchHero({
               <button
                 key={skill}
                 type="button"
-                onClick={() => onSkillChipToggle(skill)}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  const s = params.get("skills");
+                  let skills = s ? s.split(",").filter(Boolean) : [];
+                  if (skills.includes(skill)) {
+                    skills = skills.filter((item) => item !== skill);
+                  } else {
+                    skills = [...skills, skill];
+                  }
+                  if (skills.length > 0) {
+                    params.set("skills", skills.join(","));
+                  } else {
+                    params.delete("skills");
+                  }
+                  startTransition(() => {
+                    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+                  });
+                }}
                 className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors ${isActive
                   ? "bg-[#006e2f] text-white"
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700"

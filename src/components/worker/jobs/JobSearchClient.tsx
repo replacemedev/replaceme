@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Filter } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Briefcase } from "lucide-react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { JobSearchHero } from "./JobSearchHero";
 import { JobFilterSidebar, JobFilterPanel } from "./JobFilterSidebar";
 import { JobCard } from "./JobCard";
@@ -53,8 +53,6 @@ export function JobSearchClient({
   initialJobs,
   facets,
 }: JobSearchClientProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   // Single source of truth: derive search/filter inputs synchronously from searchParams
@@ -77,9 +75,19 @@ export function JobSearchClient({
     setJobs(initialJobs);
   }
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset currentPage to 1 when URL search params change
+  const searchParamsString = searchParams.toString();
+  const [prevParamsString, setPrevParamsString] = useState(searchParamsString);
+
+  if (searchParamsString !== prevParamsString) {
+    setPrevParamsString(searchParamsString);
+    setCurrentPage(1);
+  }
+
   const [skillQuery, setSkillQuery] = useState("");
   const [sortBy, setSortBy] = useState<JobSortOption>("most_relevant");
-  const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -95,48 +103,8 @@ export function JobSearchClient({
     return filtered.slice(startIndex, startIndex + PAGE_SIZE);
   }, [filtered, startIndex]);
 
-  const updateUrl = (newKeyword: string, newSkills: string[], newTypes: string[]) => {
-    const params = new URLSearchParams();
-    if (newKeyword.trim()) {
-      params.set("query", newKeyword.trim());
-    }
-    if (newSkills.length > 0) {
-      params.set("skills", newSkills.join(","));
-    }
-    if (newTypes.length > 0) {
-      params.set("type", newTypes.join(","));
-    }
-
-    startTransition(() => {
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    });
-  };
-
-  const handleApplyFilters = (filters: {
-    skills: string[];
-    employmentTypes: string[];
-  }) => {
-    setCurrentPage(1);
-    updateUrl(keyword, filters.skills, filters.employmentTypes);
-  };
-
-  const handleSearch = (newKeyword: string) => {
-    setCurrentPage(1);
-    updateUrl(newKeyword, appliedSkills, appliedEmploymentTypes);
-  };
-
-  const handleSkillChipToggle = (skill: string) => {
-    const nextSkills = appliedSkills.includes(skill)
-      ? appliedSkills.filter((s) => s !== skill)
-      : [...appliedSkills, skill];
-
-    setCurrentPage(1);
-    updateUrl(keyword, nextSkills, appliedEmploymentTypes);
-  };
   const handleClearAll = () => {
     setSkillQuery("");
-    setCurrentPage(1);
-    updateUrl("", [], []);
   };
   const handleSavedChange = (jobId: string, saved: boolean) => {
     setJobs((prev) =>
@@ -151,7 +119,7 @@ export function JobSearchClient({
     skillSuggestions: facets.skillSuggestions,
     employmentTypes: facets.employmentTypes,
     selectedEmploymentTypes: appliedEmploymentTypes,
-    onApplyFilters: handleApplyFilters,
+    startTransition,
     onClearAll: handleClearAll,
   };
 
@@ -159,9 +127,8 @@ export function JobSearchClient({
     <>
       <JobSearchHero
         initialKeyword={keyword}
-        onSearch={handleSearch}
+        startTransition={startTransition}
         activeSkills={appliedSkills}
-        onSkillChipToggle={handleSkillChipToggle}
         skillSuggestions={facets.skillSuggestions}
       />
 

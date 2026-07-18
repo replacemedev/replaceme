@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { EmploymentTypeFacet } from "@/types/job-search";
 
 interface JobFilterSidebarProps {
@@ -10,10 +11,7 @@ interface JobFilterSidebarProps {
   skillSuggestions: string[];
   employmentTypes: EmploymentTypeFacet[];
   selectedEmploymentTypes: string[];
-  onApplyFilters: (filters: {
-    skills: string[];
-    employmentTypes: string[];
-  }) => void;
+  startTransition: React.TransitionStartFunction;
   onClearAll: () => void;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
@@ -27,13 +25,17 @@ export function JobFilterPanel({
   skillSuggestions,
   employmentTypes,
   selectedEmploymentTypes: initialSelectedEmploymentTypes,
-  onApplyFilters,
+  startTransition,
   onClearAll,
   hideTitle = false,
   onClose,
 }: Omit<JobFilterSidebarProps, "mobileOpen" | "onMobileClose"> & {
   onClose?: () => void;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   // Local states
   const [localSkills, setLocalSkills] = useState(initialSelectedSkills);
   const [localEmploymentTypes, setLocalEmploymentTypes] = useState(initialSelectedEmploymentTypes);
@@ -64,13 +66,33 @@ export function JobFilterPanel({
   };
 
   const handleApplyClick = () => {
-    onApplyFilters({
-      skills: localSkills,
-      employmentTypes: localEmploymentTypes,
+    const params = new URLSearchParams(searchParams.toString());
+    if (localSkills.length > 0) {
+      params.set("skills", localSkills.join(","));
+    } else {
+      params.delete("skills");
+    }
+    if (localEmploymentTypes.length > 0) {
+      params.set("type", localEmploymentTypes.join(","));
+    } else {
+      params.delete("type");
+    }
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     });
     if (onClose) {
       onClose();
     }
+  };
+
+  const handleClearAll = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("skills");
+    params.delete("type");
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    });
+    onClearAll();
   };
 
   const getFacetCount = (type: string) => {
@@ -92,7 +114,7 @@ export function JobFilterPanel({
         )}
         <button
           type="button"
-          onClick={onClearAll}
+          onClick={handleClearAll}
           className={`text-[11px] font-bold uppercase tracking-wide text-[#006e2f] hover:underline cursor-pointer ${
             hideTitle ? "ml-auto" : ""
           }`}
