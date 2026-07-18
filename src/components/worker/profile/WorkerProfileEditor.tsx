@@ -9,7 +9,6 @@ import {
   Clock,
   DollarSign,
   Edit,
-  ExternalLink,
   Plus,
   Share2,
   Star,
@@ -238,8 +237,8 @@ export function WorkerProfileEditor({
     : [];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
-      <div className="relative w-full h-48 md:h-64 bg-gradient-to-r from-[#0a4a29] to-[#006e2f] select-none">
+    <div className="min-h-screen bg-slate-50/50 pb-20 overflow-x-hidden">
+      <div className="relative w-full h-48 md:h-64 bg-gradient-to-r from-[#0a4a29] to-[#006e2f] select-none overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-15" />
         <div className="absolute -left-1/4 -top-1/2 w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-3xl" />
       </div>
