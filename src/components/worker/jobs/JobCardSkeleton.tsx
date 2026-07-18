@@ -1,6 +1,6 @@
 export function JobCardSkeleton() {
   const cardStyles =
-    "bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl shadow-sm relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-full before:h-1 before:bg-slate-200";
+    "bg-gradient-to-b from-white to-slate-50 border border-slate-200 border-t-4 border-t-slate-200 rounded-xl shadow-sm relative overflow-hidden";
 
   return (
     <article className={`flex flex-col h-full p-5 md:p-8 gap-5 ${cardStyles}`}>

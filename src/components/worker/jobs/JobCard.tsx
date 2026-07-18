@@ -46,7 +46,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
   };
 
   const cardStyles =
-    "bg-gradient-to-b from-white to-slate-50 border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-full before:h-1 before:bg-gradient-to-r before:from-emerald-500 before:to-teal-400";
+    "bg-gradient-to-b from-white to-slate-50 border border-slate-200 border-t-4 border-t-primary rounded-xl shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden";
 
   return (
     <article className={`flex flex-col h-full p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
@@ -116,7 +116,7 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
 
         <Link
           href={`/worker/jobs/${job.id}`}
-          className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg shadow-sm transition-colors w-full md:w-auto text-center shrink-0 cursor-pointer"
+          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-5 py-2.5 rounded-lg shadow-sm transition-colors w-full md:w-auto text-center shrink-0 cursor-pointer"
         >
           View Details
         </Link>
