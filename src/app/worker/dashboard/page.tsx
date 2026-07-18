@@ -21,7 +21,6 @@ import {
   WorkerSectionCard,
 } from "@/components/worker/layout";
 import { WorkerDashboardOnboardedBanner } from "@/components/worker/dashboard/WorkerDashboardOnboardedBanner";
-import { WorkerDashboardQuickLinks } from "@/components/worker/dashboard/WorkerDashboardQuickLinks";
 import { computeWorkerProfileStrength } from "@/lib/worker/profile-strength";
 
 export const dynamic = "force-dynamic";
@@ -160,7 +159,6 @@ export default async function WorkerDashboard() {
         ]}
       />
 
-      <WorkerDashboardQuickLinks />
 
       <WorkerSectionCard title="Recent messages">
         {displayMessages.length > 0 ? (

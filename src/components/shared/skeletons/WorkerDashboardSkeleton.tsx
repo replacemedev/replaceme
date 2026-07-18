@@ -29,12 +29,6 @@ export function WorkerDashboardSkeleton() {
         ))}
       </div>
 
-      {/* WorkerDashboardQuickLinks skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <CardSkeleton key={i} minHeight="h-24" />
-        ))}
-      </div>
 
       {/* Recent messages skeleton */}
       <div className={`${WORKER_CARD} p-6 space-y-4`}>
