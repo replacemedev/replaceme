@@ -49,11 +49,17 @@ export default async function WorkerJobsPage({ searchParams }: PageProps) {
     ? (Array.isArray(skillsParam) ? skillsParam : skillsParam.split(","))
     : undefined;
 
-  const { jobs, facets } = await getJobSearchData({
+  const { jobs, facets, totalFilteredJobs } = await getJobSearchData({
     keyword,
     employmentTypes,
     skills,
   });
 
-  return <JobSearchClient initialJobs={jobs} facets={facets} />;
+  return (
+    <JobSearchClient
+      initialJobs={jobs}
+      facets={facets}
+      totalFilteredJobs={totalFilteredJobs}
+    />
+  );
 }

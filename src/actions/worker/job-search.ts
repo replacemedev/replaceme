@@ -85,7 +85,11 @@ function buildFacets(
     skills: string[] | null;
   }[]
 ): JobSearchFacets {
-  const employmentMap = new Map<string, number>();
+  const employmentMap = new Map<string, number>([
+    ["Full-time", 0],
+    ["Part-time", 0],
+    ["Contract", 0],
+  ]);
   const skillSet = new Set<string>();
   let salaryMax = 0;
 
@@ -119,6 +123,17 @@ function buildFacets(
     salaryMax: Math.max(salaryMax, 200_000),
     totalActiveJobs: jobs.length,
   };
+}
+
+function buildFacetsFromMapped(jobs: JobSearchResult[]): JobSearchFacets {
+  return buildFacets(
+    jobs.map((job) => ({
+      employment_type: job.employmentType,
+      monthly_salary: job.monthlySalary,
+      salary_currency: job.salaryCurrency,
+      skills: job.skills,
+    }))
+  );
 }
 
 async function getWorkerSavedJobIds(
@@ -194,28 +209,16 @@ export async function getJobSearchData(
         .order("priority_score", { ascending: false })
         .order("created_at", { ascending: false });
 
-      // Apply employment type filter (enum-normalized + escaped PostgREST values)
-      if (filters?.employmentTypes && filters.employmentTypes.length > 0) {
-        const { escapePostgrestValue } = await import(
-          "@/lib/security/postgrest-filter"
-        );
-        const ALLOWED = new Set(["Full-time", "Part-time", "Contract"]);
-        const safeTypes = filters.employmentTypes
-          .map((t) => normalizeEmploymentType(t))
-          .filter((t) => ALLOWED.has(t));
-        if (safeTypes.length > 0) {
-          const parts = safeTypes.map(
-            (t) => `employment_type.eq.${escapePostgrestValue(t)}`
-          );
-          query = query.or(parts.join(","));
-        }
-      }
-
-      // Apply keyword filter (strictly query title column only — parameterized)
+      // Apply keyword filter (query title or description column — parameterized)
       if (filters?.keyword) {
         const keyword = filters.keyword.trim().slice(0, 120);
         if (keyword) {
-          query = query.ilike("title", `%${keyword}%`);
+          const { postgrestIlikeClause } = await import(
+            "@/lib/security/postgrest-filter"
+          );
+          query = query.or(
+            `${postgrestIlikeClause("title", keyword)},${postgrestIlikeClause("description", keyword)}`
+          );
         }
       }
 
@@ -233,22 +236,9 @@ export async function getJobSearchData(
             totalActiveJobs: 0,
           },
           savedJobIds: [],
+          totalFilteredJobs: 0,
         };
       }
-
-      // Get facets from cached or fetched unfiltered dataset
-      const facets = await getOrSet(
-        "global:job-search-facets",
-        60,
-        async () => {
-          const { data: allActive } = await supabase
-            .from("jobs")
-            .select("employment_type, monthly_salary, salary_currency, skills")
-            .eq("status", "Active");
-
-          return buildFacets(allActive ?? []);
-        }
-      );
 
       const employerIds = [
         ...new Set(
@@ -277,29 +267,47 @@ export async function getJobSearchData(
         }
       }
 
-      let jobs = (data ?? [])
+      let mappedJobs = (data ?? [])
         .map((row) => mapJobRow(row, savedJobIds, companyByEmployer))
         .filter((j): j is JobSearchResult => j !== null);
 
       // Normalize employment types in output results
-      jobs = jobs.map((job) => ({
+      mappedJobs = mappedJobs.map((job) => ({
         ...job,
         employmentType: normalizeEmploymentType(job.employmentType),
       }));
 
       // Fallback in-memory check for skills filtering if skills array was passed
+      let filteredJobsBeforeType = mappedJobs;
       if (filters?.skills && filters.skills.length > 0) {
-        jobs = jobs.filter((job) =>
+        filteredJobsBeforeType = filteredJobsBeforeType.filter((job) =>
           filters.skills!.every((s) =>
             job.skills.some((js) => js.toLowerCase() === s.toLowerCase())
           )
         );
       }
 
+      // Calculate dynamic facets based on keyword- and skills-filtered dataset
+      const facets = buildFacetsFromMapped(filteredJobsBeforeType);
+
+      // Apply employment type filter in-memory
+      let finalJobs = filteredJobsBeforeType;
+      if (filters?.employmentTypes && filters.employmentTypes.length > 0) {
+        const ALLOWED = new Set(["Full-time", "Part-time", "Contract"]);
+        const safeTypes = filters.employmentTypes
+          .map((t) => normalizeEmploymentType(t))
+          .filter((t) => ALLOWED.has(t));
+        if (safeTypes.length > 0) {
+          const typeSet = new Set(safeTypes);
+          finalJobs = finalJobs.filter((job) => typeSet.has(job.employmentType));
+        }
+      }
+
       return {
-        jobs,
+        jobs: finalJobs,
         facets,
         savedJobIds: Array.from(savedJobIds),
+        totalFilteredJobs: finalJobs.length,
       };
     };
 
@@ -326,6 +334,7 @@ export async function getJobSearchData(
         totalActiveJobs: 0,
       },
       savedJobIds: [],
+      totalFilteredJobs: 0,
     };
   }
 }

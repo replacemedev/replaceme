@@ -23,6 +23,7 @@ const PAGE_SIZE = 20;
 interface JobSearchClientProps {
   initialJobs: JobSearchResult[];
   facets: JobSearchFacets;
+  totalFilteredJobs: number;
 }
 
 function sortJobs(jobs: JobSearchResult[], sort: JobSortOption) {
@@ -52,11 +53,20 @@ function sortJobs(jobs: JobSearchResult[], sort: JobSortOption) {
 export function JobSearchClient({
   initialJobs,
   facets,
+  totalFilteredJobs,
 }: JobSearchClientProps) {
   const searchParams = useSearchParams();
 
-  // Single source of truth: derive search/filter inputs synchronously from searchParams
-  const keyword = searchParams.get("query") || "";
+  // Lifted keyword state to coordinate search and filter inputs
+  const [keyword, setKeyword] = useState(() => searchParams.get("query") || "");
+
+  // Sync state if URL query changes (e.g. forward/back buttons or clear filters)
+  const urlQuery = searchParams.get("query") || "";
+  const [prevUrlQuery, setPrevUrlQuery] = useState(urlQuery);
+  if (urlQuery !== prevUrlQuery) {
+    setPrevUrlQuery(urlQuery);
+    setKeyword(urlQuery);
+  }
   const appliedSkills = useMemo(() => {
     const s = searchParams.get("skills");
     return s ? s.split(",").filter(Boolean) : [];
@@ -121,12 +131,14 @@ export function JobSearchClient({
     selectedEmploymentTypes: appliedEmploymentTypes,
     startTransition,
     onClearAll: handleClearAll,
+    keyword,
   };
 
   return (
     <>
       <JobSearchHero
-        initialKeyword={keyword}
+        keyword={keyword}
+        onKeywordChange={setKeyword}
         startTransition={startTransition}
         activeSkills={appliedSkills}
         skillSuggestions={facets.skillSuggestions}
@@ -164,15 +176,33 @@ export function JobSearchClient({
                   Filters
                 </button>
                 <p className="text-sm font-medium text-slate-600">
-                  Showing{" "}
-                  <span className="font-bold text-slate-900">
-                    {filtered.length}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-bold text-slate-900">
-                    {facets.totalActiveJobs}
-                  </span>{" "}
-                  jobs
+                  {totalFilteredJobs === 0 ? (
+                    "0 jobs found"
+                  ) : totalFilteredJobs > PAGE_SIZE ? (
+                    <>
+                      Showing{" "}
+                      <span className="font-bold text-slate-900">
+                        {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, totalFilteredJobs)}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-bold text-slate-900">
+                        {totalFilteredJobs}
+                      </span>{" "}
+                      jobs
+                    </>
+                  ) : (
+                    <>
+                      Showing{" "}
+                      <span className="font-bold text-slate-900">
+                        {totalFilteredJobs}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-bold text-slate-900">
+                        {totalFilteredJobs}
+                      </span>{" "}
+                      jobs
+                    </>
+                  )}
                 </p>
               </div>
 

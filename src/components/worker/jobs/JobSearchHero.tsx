@@ -1,31 +1,27 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Search } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface JobSearchHeroProps {
-  initialKeyword: string;
+  keyword: string;
+  onKeywordChange: (value: string) => void;
   startTransition: React.TransitionStartFunction;
   activeSkills: string[];
   skillSuggestions: string[];
 }
 
 export function JobSearchHero({
-  initialKeyword,
+  keyword,
+  onKeywordChange,
   startTransition,
   activeSkills,
   skillSuggestions,
 }: JobSearchHeroProps) {
-  const [localKeyword, setLocalKeyword] = useState(initialKeyword);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalKeyword(initialKeyword);
-  }, [initialKeyword]);
 
   const quickSkills = useMemo(() => {
     const merged = [...skillSuggestions];
@@ -47,8 +43,8 @@ export function JobSearchHero({
             onSubmit={(e) => {
               e.preventDefault();
               const params = new URLSearchParams(searchParams.toString());
-              if (localKeyword.trim()) {
-                params.set("query", localKeyword.trim());
+              if (keyword.trim()) {
+                params.set("query", keyword.trim());
               } else {
                 params.delete("query");
               }
@@ -66,8 +62,8 @@ export function JobSearchHero({
               <input
                 id="job-keyword-search"
                 type="search"
-                value={localKeyword}
-                onChange={(e) => setLocalKeyword(e.target.value)}
+                value={keyword}
+                onChange={(e) => onKeywordChange(e.target.value)}
                 placeholder="Search by job title..."
                 className="w-full bg-transparent border-0 outline-hidden text-sm text-slate-800 placeholder:text-slate-400"
               />
@@ -92,6 +88,11 @@ export function JobSearchHero({
                 type="button"
                 onClick={() => {
                   const params = new URLSearchParams(searchParams.toString());
+                  if (keyword.trim()) {
+                    params.set("query", keyword.trim());
+                  } else {
+                    params.delete("query");
+                  }
                   const s = params.get("skills");
                   let skills = s ? s.split(",").filter(Boolean) : [];
                   if (skills.includes(skill)) {

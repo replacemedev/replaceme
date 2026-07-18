@@ -42,6 +42,7 @@ export interface JobSearchPayload {
   jobs: JobSearchResult[];
   facets: JobSearchFacets;
   savedJobIds: string[];
+  totalFilteredJobs: number;
 }
 
 export function computeJobHourlyRate(

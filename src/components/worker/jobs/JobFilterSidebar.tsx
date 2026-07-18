@@ -16,6 +16,7 @@ interface JobFilterSidebarProps {
   mobileOpen?: boolean;
   onMobileClose?: () => void;
   hideTitle?: boolean;
+  keyword: string;
 }
 
 export function JobFilterPanel({
@@ -29,6 +30,7 @@ export function JobFilterPanel({
   onClearAll,
   hideTitle = false,
   onClose,
+  keyword,
 }: Omit<JobFilterSidebarProps, "mobileOpen" | "onMobileClose"> & {
   onClose?: () => void;
 }) {
@@ -67,6 +69,11 @@ export function JobFilterPanel({
 
   const handleApplyClick = () => {
     const params = new URLSearchParams(searchParams.toString());
+    if (keyword.trim()) {
+      params.set("query", keyword.trim());
+    } else {
+      params.delete("query");
+    }
     if (localSkills.length > 0) {
       params.set("skills", localSkills.join(","));
     } else {
@@ -87,6 +94,11 @@ export function JobFilterPanel({
 
   const handleClearAll = () => {
     const params = new URLSearchParams(searchParams.toString());
+    if (keyword.trim()) {
+      params.set("query", keyword.trim());
+    } else {
+      params.delete("query");
+    }
     params.delete("skills");
     params.delete("type");
     startTransition(() => {
