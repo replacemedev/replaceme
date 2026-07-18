@@ -71,8 +71,6 @@ export function WorkerDashboardSkeleton() {
         <div className="flex flex-col gap-6">
           {/* Profile Strength skeleton */}
           <CardSkeleton minHeight="min-h-[160px]" />
-          {/* Earnings Overview skeleton */}
-          <CardSkeleton minHeight="min-h-[220px]" />
         </div>
       </div>
 

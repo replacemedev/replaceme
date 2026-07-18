@@ -11,7 +11,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getMessagingThreads } from "@/actions/messaging";
 import { ProfileStrengthCard } from "@/components/worker/ProfileStrengthCard";
 import { RecommendedJobCard } from "@/components/worker/RecommendedJobCard";
-import { EarningsOverviewCard } from "@/components/worker/EarningsOverviewCard";
 import { SkillPill } from "@/components/worker/SkillPill";
 import { RecentMessageRow } from "@/components/worker/RecentMessageRow";
 import { RecentMessage } from "@/types/worker";
@@ -51,7 +50,6 @@ export default async function WorkerDashboard() {
   const [
     { data: apps },
     { data: skills },
-    { data: earnings },
     { data: recommendedJobs },
     threads,
   ] = await Promise.all([
@@ -61,11 +59,6 @@ export default async function WorkerDashboard() {
       .select("*")
       .eq("worker_id", profile.id)
       .order("proficiency", { ascending: false }),
-    supabase
-      .from("earnings_overview")
-      .select("*")
-      .eq("worker_id", profile.id)
-      .order("created_at", { ascending: true }),
     supabase.from("job_posts").select("*").eq("status", "Active").limit(2),
     getMessagingThreads("worker"),
   ]);
@@ -216,7 +209,6 @@ export default async function WorkerDashboard() {
             percentage={profileStrength.percentage}
             tierLabel={profileStrength.label}
           />
-          <EarningsOverviewCard earnings={earnings || []} currency={profile.salary_currency ?? "PHP"} />
         </div>
       </div>
 
