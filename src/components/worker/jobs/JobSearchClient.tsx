@@ -133,16 +133,11 @@ export function JobSearchClient({
     setCurrentPage(1);
     updateUrl(keyword, nextSkills, appliedEmploymentTypes);
   };
-
   const handleClearAll = () => {
-    setKeyword("");
     setSkillQuery("");
-    setAppliedSkills([]);
-    setAppliedEmploymentTypes([]);
     setCurrentPage(1);
     updateUrl("", [], []);
   };
-
   const handleSavedChange = (jobId: string, saved: boolean) => {
     setJobs((prev) =>
       prev.map((job) => (job.id === jobId ? { ...job, isSaved: saved } : job))
