@@ -110,16 +110,11 @@ function WorkerOnboardingFallback() {
                 </div>
 
                 <div className="flex-1 min-w-0 w-full">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
-                      <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                        Step {step.stepNumber}: {step.title}
-                      </h2>
-                    </div>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60 shrink-0">
-                      {step.badgeText}
-                    </span>
+                  <div className="flex items-center gap-2.5 mb-2.5 min-w-0">
+                    <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
+                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                      Step {step.stepNumber}: {step.title}
+                    </h2>
                   </div>
 
                   <p className="text-slate-600 text-sm sm:text-base font-normal mb-3.5 leading-relaxed">

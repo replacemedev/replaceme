@@ -163,16 +163,11 @@ function ProfileOptimizationFallback() {
                 </div>
 
                 <div className="flex-1 min-w-0 w-full">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
-                      <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                        Tip {step.stepNumber}: {step.title}
-                      </h2>
-                    </div>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60 shrink-0">
-                      {step.badgeText}
-                    </span>
+                  <div className="flex items-center gap-2.5 mb-2.5 min-w-0">
+                    <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
+                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                      Tip {step.stepNumber}: {step.title}
+                    </h2>
                   </div>
 
                   <p className="text-slate-600 text-sm sm:text-base font-normal mb-3.5 leading-relaxed">
@@ -228,13 +223,10 @@ function ProfileOptimizationFallback() {
                 {step.stepNumber}
               </div>
               <div className="flex-1 min-w-0 w-full">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center mb-2">
                   <h3 className="text-base sm:text-lg font-bold text-slate-900">
                     {step.title}
                   </h3>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-                    {step.badgeText}
-                  </span>
                 </div>
                 <p className="text-slate-600 text-xs sm:text-sm mb-3 leading-relaxed">
                   {step.summary}

@@ -25,9 +25,8 @@ export default function EmployerHiringGuideLoading() {
                   {/* Step Number Circle Skeleton */}
                   <SkeletonBlock className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-200 shadow-xs" />
                   <div className="flex-1 min-w-0 w-full space-y-3">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 mb-2">
                       <SkeletonBlock className="h-6 w-1/2 rounded-md bg-slate-200" />
-                      <SkeletonBlock className="h-5 w-28 rounded-full bg-slate-200 shrink-0" />
                     </div>
                     <SkeletonBlock className="h-4 w-full rounded-md bg-slate-100" />
                     <SkeletonBlock className="h-4 w-4/5 rounded-md bg-slate-100" />
