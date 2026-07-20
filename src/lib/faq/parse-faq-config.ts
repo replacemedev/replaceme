@@ -19,11 +19,19 @@ export function parseFaqPageConfig(
     return fallback;
   }
 
-  const items = raw.filter(isFaqEntry).map((item) => ({
-    id: item.id,
-    question: item.question.trim(),
-    answer: item.answer.trim(),
-  }));
+  const items = raw
+    .filter(isFaqEntry)
+    .map((item) => ({
+      id: item.id,
+      question: item.question.trim(),
+      answer: item.answer.trim(),
+    }))
+    .filter(
+      (item) =>
+        !item.question.toLowerCase().includes("e2e") &&
+        !item.answer.toLowerCase().includes("e2e") &&
+        !item.id.toLowerCase().includes("e2e")
+    );
 
   return items.length > 0 ? { items } : fallback;
 }

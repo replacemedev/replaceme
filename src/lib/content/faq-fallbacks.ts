@@ -18,21 +18,33 @@ export const EMPLOYER_FAQ_FALLBACK: FaqPageConfig = {
   items: [
     {
       id: "employer-faq-1",
-      question: "How do I post a job?",
+      question: "How does the pricing model work?",
       answer:
-        "Create a free employer account, complete your company profile, then use Post a Job from your dashboard. Jobs go live after review.",
+        "Employers pay a flat monthly subscription based on their hiring needs. We never charge placement fees or take a percentage of the worker's salary.",
     },
     {
       id: "employer-faq-2",
-      question: "What do I get on the free Discovery plan?",
+      question: "Are there any hidden fees or salary markups?",
       answer:
-        "Discovery includes 1 active job, up to 10 applicants per job, and anonymous candidate previews (skills, experience, and salary visible). Names, contact details, resumes, and messaging require a paid plan.",
+        "No. You pay 100% of the agreed salary directly to your worker. ReplaceMe takes 0% commission and adds zero markups.",
     },
     {
       id: "employer-faq-3",
-      question: "Can I change plans later?",
+      question: "Can I message candidates directly?",
       answer:
-        "Yes. Upgrade or downgrade anytime from account settings. Prorated charges or credits apply automatically.",
+        "Direct messaging is available on our Starter, Growth, and Scale plans, allowing you to seamlessly communicate with applicants right from your Employer dashboard.",
+    },
+    {
+      id: "employer-faq-4",
+      question: "How quickly will my job post be approved?",
+      answer:
+        "Job posts are approved instantly on all paid plans (Starter, Growth, and Scale). For the free Discovery plan, approval takes up to 2 days.",
+    },
+    {
+      id: "employer-faq-5",
+      question: "Can I change or cancel my subscription tier?",
+      answer:
+        "Yes. Employers have full control over their billing. You can upgrade, downgrade, or cancel your plan at any time directly from your Employer dashboard.",
     },
   ],
 };
