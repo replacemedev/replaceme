@@ -33,7 +33,7 @@ function cleanDescriptionSnippet(text: string | null): string {
 export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
   return (
     <div
-      className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 ${PUBLIC_PAGE_TOP}`}
+      className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 ${PUBLIC_PAGE_TOP}`}
     >
       <header className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">

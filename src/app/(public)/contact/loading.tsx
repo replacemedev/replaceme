@@ -3,7 +3,7 @@ import { LegalPageSkeleton } from "@/components/shared/LegalPageSkeleton";
 
 export default function ContactLoading() {
   return (
-    <main className={`${PUBLIC_PAGE_TOP} pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse`}>
+    <main className={`${PUBLIC_PAGE_TOP} min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse`}>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="h-4 w-20 bg-gray-200 rounded mx-auto mb-4" />
         <div className="h-10 w-48 bg-gray-200 rounded mx-auto mb-3" />

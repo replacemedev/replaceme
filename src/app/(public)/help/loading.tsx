@@ -3,8 +3,8 @@ import { SkeletonBlock } from "@/components/shared/skeletons/primitives";
 
 export default function PublicHelpLoading() {
   return (
-    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] pb-12 sm:pb-16 md:pb-24 ${PUBLIC_PAGE_TOP}`}>
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] ${PUBLIC_PAGE_TOP}`}>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Hero Skeleton */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 md:mb-16 flex flex-col items-center px-2 sm:px-0">
           <SkeletonBlock className="h-7 w-44 rounded-full bg-slate-200 mb-4 animate-pulse" />

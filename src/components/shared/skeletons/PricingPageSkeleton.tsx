@@ -1,10 +1,11 @@
+import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import { SkeletonBlock } from "./primitives";
 
 export function PricingPageSkeleton() {
   return (
-    <div className="bg-[#f8fafe] min-h-screen pb-16 animate-pulse">
+    <div className={`bg-[#f8fafe] min-h-screen ${PUBLIC_PAGE_TOP} animate-pulse`}>
       {/* Page Header */}
-      <header className="text-center max-w-3xl mx-auto px-4 mb-12">
+      <header className="text-center max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <SkeletonBlock className="h-10 w-64 mx-auto mb-4" />
         <SkeletonBlock className="h-5 w-full max-w-lg mx-auto" />
       </header>

@@ -113,9 +113,9 @@ export default async function HelpCenterPage() {
       : HELP_INDEX_FALLBACK.categories ?? [];
 
   return (
-    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] pb-12 sm:pb-16 md:pb-24 ${PUBLIC_PAGE_TOP}`}>
+    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] ${PUBLIC_PAGE_TOP}`}>
       {/* Defensive outer container with safe gutters */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 md:mb-16 px-2 sm:px-0">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200/80 mb-4 shadow-2xs">

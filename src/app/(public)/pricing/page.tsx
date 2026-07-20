@@ -72,12 +72,12 @@ export default async function PublicPricingPage() {
   return (
     <>
       <FAQSchema items={schemaFaqs} />
-      <div className={`bg-[#f8fafe] min-h-screen ${PUBLIC_PAGE_TOP} pb-16`}>
+      <div className={`bg-[#f8fafe] min-h-screen ${PUBLIC_PAGE_TOP}`}>
         <header className="text-center max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
             {config.headline}
           </h1>
-          <p className="text-slate-500 font-medium text-lg mt-4">{config.description}</p>
+          <p className="text-slate-500 font-medium text-base sm:text-lg mt-3 sm:mt-4">{config.description}</p>
         </header>
 
         <PublicPricingClient

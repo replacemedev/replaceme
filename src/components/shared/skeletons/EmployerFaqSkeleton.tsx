@@ -3,7 +3,7 @@ import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 export function EmployerFaqSkeleton() {
   return (
     <main
-      className={`${PUBLIC_PAGE_TOP} pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse`}
+      className={`${PUBLIC_PAGE_TOP} min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1 animate-pulse`}
       aria-busy="true"
       aria-label="Loading Employer FAQs"
     >

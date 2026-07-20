@@ -18,7 +18,7 @@ export function LegalPageLayout({
   wide = false,
 }: LegalPageLayoutProps) {
   return (
-    <main className={`${PUBLIC_PAGE_TOP} pb-16 min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1`}>
+    <main className={`${PUBLIC_PAGE_TOP} min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1`}>
       <div
         className={`mx-auto px-4 sm:px-6 lg:px-8 ${
           wide ? "max-w-6xl" : "max-w-3xl"
