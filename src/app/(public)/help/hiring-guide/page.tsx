@@ -177,7 +177,7 @@ function HiringGuideFallback() {
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Link
-              href="/signup"
+              href="/signup/employer"
               className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-900 bg-white hover:bg-emerald-50 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-95"
             >
               <span>Create Employer Account</span>

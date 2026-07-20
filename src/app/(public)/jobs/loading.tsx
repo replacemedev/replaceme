@@ -15,36 +15,41 @@ export default function PublicJobsLoading() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {Array.from({ length: 20 }).map((_, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {Array.from({ length: 8 }).map((_, index) => (
           <div
             key={index}
-            className="flex flex-col justify-between h-full bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm animate-pulse"
+            className="flex flex-col justify-between h-full bg-white p-6 rounded-xl border border-gray-100 shadow-sm animate-pulse"
           >
             <div>
-              {/* Header Skeleton */}
-              <div className="flex items-start gap-3 sm:gap-4">
-                <SkeletonBlock className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shrink-0 bg-slate-200" />
-                <div className="flex-1 space-y-1.5 min-w-0">
-                  <SkeletonBlock className="h-5 sm:h-6 w-3/4 max-w-[200px] rounded bg-slate-200" />
-                  <SkeletonBlock className="h-3.5 sm:h-4 w-1/2 max-w-[130px] rounded bg-slate-200" />
+              {/* Header Area: Logo, Title, and Company */}
+              <div className="flex items-start gap-4">
+                <SkeletonBlock className="w-12 h-12 rounded-xl shrink-0 bg-gray-200" />
+                <div className="flex-1 space-y-2 min-w-0">
+                  <SkeletonBlock className="h-5 w-3/4 max-w-[200px] rounded bg-gray-200" />
+                  <SkeletonBlock className="h-4 w-1/2 max-w-[130px] rounded bg-gray-200" />
                 </div>
               </div>
 
-              {/* Meta Row Skeleton */}
-              <SkeletonBlock className="h-3.5 w-44 sm:w-52 rounded bg-slate-200 mt-3 sm:mt-4" />
+              {/* Description Area: Multi-line placeholder */}
+              <div className="mt-4 space-y-2">
+                <SkeletonBlock className="h-3.5 w-full rounded bg-gray-200" />
+                <SkeletonBlock className="h-3.5 w-11/12 rounded bg-gray-200" />
+                <SkeletonBlock className="h-3.5 w-4/5 rounded bg-gray-200" />
+              </div>
 
-              {/* Description Snippet Skeleton (2 lines) */}
-              <div className="mt-3 space-y-1.5">
-                <SkeletonBlock className="h-3.5 w-full rounded bg-slate-200" />
-                <SkeletonBlock className="h-3.5 w-4/5 rounded bg-slate-200" />
+              {/* Skills/Tags Row */}
+              <div className="flex flex-wrap items-center gap-2 mt-4">
+                <SkeletonBlock className="h-6 w-16 rounded-full bg-gray-200" />
+                <SkeletonBlock className="h-6 w-20 rounded-full bg-gray-200" />
+                <SkeletonBlock className="h-6 w-14 rounded-full bg-gray-200" />
               </div>
             </div>
 
-            {/* Footer Skeleton */}
-            <div className="mt-5 pt-3.5 sm:pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-              <SkeletonBlock className="h-5 w-24 sm:w-28 rounded bg-slate-200" />
-              <SkeletonBlock className="h-10 w-28 rounded-xl bg-slate-200 shrink-0" />
+            {/* Footer Area: Salary / Meta & Action CTA */}
+            <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+              <SkeletonBlock className="h-4 w-28 rounded bg-gray-200" />
+              <SkeletonBlock className="h-10 w-28 rounded-xl bg-gray-200 shrink-0" />
             </div>
           </div>
         ))}
@@ -52,3 +57,4 @@ export default function PublicJobsLoading() {
     </div>
   );
 }
+
