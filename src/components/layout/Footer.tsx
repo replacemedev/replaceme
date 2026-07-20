@@ -5,81 +5,96 @@ import { NavBrand } from "@/components/shared/nav/NavBrand";
 
 export function Footer() {
   return (
-    <footer className="bg-white w-full py-20 border-t border-slate-100 relative overflow-hidden">
-      {/* Subtle grid pattern */}
+    <footer className="w-full bg-white border-t border-gray-100 py-12 md:py-16 relative overflow-hidden">
+      {/* Subtle grid pattern background */}
       <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)] opacity-30 pointer-events-none z-0" />
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-12 px-4 md:px-margin-desktop max-w-container-max mx-auto relative z-10">
-        {/* Brand Column */}
-        <div className="col-span-1 md:col-span-2 flex flex-col gap-6">
-          <NavBrand homeHref="/" />
-          <p className="text-slate-400 font-body-base text-sm mt-2 max-w-sm">
-            Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 md:gap-12">
+          {/* Brand Column */}
+          <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1 xl:col-span-2 max-w-xs mb-6 lg:mb-0">
+            <NavBrand homeHref="/" />
+            <p className="text-sm text-gray-600 mt-4 leading-relaxed">
+              Empowering global teams with elite Filipino remote talent. Building direct connections for long-term success.
+            </p>
+          </div>
+
+          {/* Employer Links Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+              Employers
+            </h3>
+            <div className="space-y-3">
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/signup">
+                Post a Job
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/help/hiring-guide">
+                Hiring Guide
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/pricing">
+                Pricing
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/faq/employer">
+                Employer FAQs
+              </Link>
+            </div>
+          </div>
+
+          {/* Jobseeker Links Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+              Jobseekers
+            </h3>
+            <div className="space-y-3">
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/jobs">
+                Browse Jobs
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/signup">
+                Create Profile
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/faq/worker">
+                Worker FAQs
+              </Link>
+            </div>
+          </div>
+
+          {/* Legal & Support Column */}
+          <div className="col-span-1">
+            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+              Company &amp; Legal
+            </h3>
+            <div className="space-y-3">
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/help">
+                Help Center
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/contact">
+                Contact Us
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/privacy-policy">
+                Privacy Policy
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/terms-of-service">
+                Terms of Service
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/subprocessors">
+                Subprocessors
+              </Link>
+              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/cookie-policy">
+                Cookie Policy
+              </Link>
+              <CookieSettingsButton className="text-left text-base text-gray-600 hover:text-emerald-600 transition-colors block w-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Copyright */}
+        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Replaceme. All rights reserved.
           </p>
         </div>
-
-        {/* Employer Links Column */}
-        <div className="col-span-1 flex flex-col gap-4 text-sm">
-          <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Employers</h4>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/signup">
-            Post a Job
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/help/hiring-guide">
-            Hiring Guide
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/pricing">
-            Pricing
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/faq/employer">
-            Employer FAQs
-          </Link>
-        </div>
-
-        {/* Jobseeker Links Column */}
-        <div className="col-span-1 flex flex-col gap-4 text-sm">
-          <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Jobseekers</h4>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/jobs">
-            Browse Jobs
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/signup">
-            Create Profile
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/faq/worker">
-            Worker FAQs
-          </Link>
-        </div>
-
-        {/* Legal & Support Column */}
-        <div className="col-span-1 flex flex-col gap-4 text-sm">
-          <h4 className="text-slate-800 font-body-bold font-bold text-base mb-1">Legal &amp; Support</h4>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/privacy-policy">
-            Privacy Policy
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/subprocessors">
-            Subprocessors
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/cookie-policy">
-            Cookie Policy
-          </Link>
-          <CookieSettingsButton className="text-left text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" />
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/terms-of-service">
-            Terms of Service
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/help">
-            Help Center
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/contact">
-            Contact Us
-          </Link>
-        </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="mt-16 pt-8 border-t border-slate-100 px-4 md:px-margin-desktop max-w-container-max mx-auto flex items-center justify-between relative z-10">
-        <p className="text-slate-400 font-body-base text-sm">
-          © {new Date().getFullYear()} Replaceme. All rights reserved.
-        </p>
       </div>
     </footer>
   );
 }
+
