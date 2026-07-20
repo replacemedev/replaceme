@@ -26,6 +26,7 @@ function mapPublicJob(row: {
   hours_per_week: number | null;
   skills: string[] | null;
   created_at: string | null;
+  description?: string | null;
 }): PublicJobListing | null {
   if (!row.id || !row.title) return null;
   const monthlySalary = Number(row.monthly_salary ?? 0);
@@ -42,6 +43,7 @@ function mapPublicJob(row: {
     hourlyRate: computeJobHourlyRate(monthlySalary, hoursPerWeek) ?? 0,
     skills: row.skills ?? [],
     createdAt: row.created_at ?? new Date().toISOString(),
+    description: row.description ?? null,
   };
 }
 
@@ -51,10 +53,11 @@ export async function getPublicJobListings(): Promise<PublicJobListing[]> {
     const { data, error } = await supabase
       .from("job_posts")
       .select(
-        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at"
+        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at, description"
       )
       .eq("status", "Active")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(20);
 
     if (error) {
       safeError("getPublicJobListings:", error);
@@ -242,7 +245,7 @@ export async function getPublicCompanyById(
     const { data: jobsData } = await supabase
       .from("job_posts")
       .select(
-        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at"
+        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at, description"
       )
       .eq("employer_id", row.employer_id)
       .eq("status", "Active")

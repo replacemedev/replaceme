@@ -22,6 +22,7 @@ export interface PublicJobListing {
   hourlyRate: number;
   skills: string[];
   createdAt: string;
+  description: string | null;
 }
 
 export interface HelpArticleLink {
