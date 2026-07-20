@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { X } from "lucide-react";
@@ -42,6 +42,10 @@ export function EmployerPricingClient({
   const [jobLimitGateOpen, setJobLimitGateOpen] = useState(false);
   const currentLabel = TIER_LABELS[currentPlanSlug];
   const isPaid = currentPlanSlug !== "discovery";
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleSelectPlan = (planSlug: string) => {
     const target = normalizePlanSlug(planSlug);

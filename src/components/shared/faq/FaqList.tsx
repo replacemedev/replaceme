@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect } from "react";
 import type { FaqEntry } from "@/types/page-content";
 
 interface FaqListProps {
@@ -5,6 +8,9 @@ interface FaqListProps {
 }
 
 export function FaqList({ items }: FaqListProps) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   if (items.length === 0) {
     return (
       <p className="text-center text-sm text-slate-500 py-8">

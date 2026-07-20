@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PricingCards } from "@/components/employer/pricing/PricingCards";
 import { CompareTable } from "@/components/employer/pricing/CompareTable";
@@ -17,6 +18,10 @@ export function PublicPricingClient({
   faqs,
 }: PublicPricingClientProps) {
   const router = useRouter();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>
