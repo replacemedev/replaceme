@@ -44,19 +44,19 @@ export const HELP_INDEX_CATEGORIES = [
     description: "Guides on posting jobs, flat-rate pricing tiers, applicant pipelines, and direct candidate messaging.",
     articles: [
       {
-        href: "/help/hiring-guide",
+        href: "/help/employer/hiring-guide",
         title: "Employer Hiring Guide",
-        description: "How to write job posts, evaluate applicants, and hire remote talent directly on ReplaceMe.",
+        description: "How to write job posts, evaluate applicants, and hire remote talent directly on Replaceme.",
         icon: "Briefcase",
       },
       {
-        href: "/help/hiring-guide#onboarding",
+        href: "/help/employer/onboarding",
         title: "Employer Onboarding",
         description: "Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline.",
         icon: "Building2",
       },
       {
-        href: "/pricing",
+        href: "/help/employer/billing-subscriptions",
         title: "Billing & Subscriptions",
         description: "Manage your flat-rate pricing tier, payment methods, and invoice history.",
         icon: "CreditCard",
@@ -69,23 +69,23 @@ export const HELP_INDEX_CATEGORIES = [
     description: "Resources for job seekers to build profiles, land remote roles, and keep 100% of their earnings.",
     articles: [
       {
-        href: "/faq/worker",
+        href: "/help/worker/application-guide",
         title: "Job Seeker Application Guide",
         description: "Learn how to build a standout profile and apply for remote roles. 100% free for workers, always.",
         icon: "UserCheck",
       },
       {
-        href: "/faq/worker#onboarding",
+        href: "/help/worker/onboarding",
         title: "Worker Onboarding",
         description: "What to expect after you get hired. Understand direct payments, setting expectations, and keeping 100% of your agreed salary.",
         icon: "ShieldCheck",
       },
       {
-        href: "/faq/worker#profile",
+        href: "/help/worker/profile-optimization",
         title: "Profile Optimization",
         description: "Tips for standing out to employers with a complete, verified, and professional profile.",
         icon: "Sparkles",
-      }
+      },
     ],
   },
   {
@@ -117,7 +117,7 @@ export const HELP_INDEX_CATEGORIES = [
 
 export const HELP_INDEX_FALLBACK: HelpIndexConfig = {
   title: "Help Center",
-  description: "Comprehensive guides, FAQs, and support resources for employers and remote job seekers on ReplaceMe.",
+  description: "Comprehensive guides, FAQs, and support resources for employers and remote job seekers on Replaceme.",
   categories: HELP_INDEX_CATEGORIES,
   articles: HELP_INDEX_CATEGORIES.flatMap((cat) => cat.articles),
 };
