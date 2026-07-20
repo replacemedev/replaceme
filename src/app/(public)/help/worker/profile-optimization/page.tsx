@@ -11,6 +11,7 @@ import {
   Zap,
   ArrowRight,
   UserCheck,
+  ShieldCheck,
 } from "lucide-react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -93,6 +94,58 @@ const OPTIMIZATION_TIPS = [
   },
 ];
 
+const VERIFICATION_STEPS = [
+  {
+    stepNumber: 1,
+    title: "Complete Personal & Profile Details",
+    badgeText: "Required Info",
+    summary:
+      "Fill out your contact details, demographic information, and professional title in your worker profile.",
+    details: [
+      "Ensure your full name, email, phone number, and professional title are filled in.",
+      "Complete demographic details (gender, civil status) and emergency contact info.",
+      "Completing your personal profile is required before submitting identity documents.",
+    ],
+  },
+  {
+    stepNumber: 2,
+    title: "Enter Government ID Information",
+    badgeText: "ID Details",
+    summary:
+      "Select your government ID type and enter official identification metadata into your account.",
+    details: [
+      "Accepted IDs: Unified Multi-Purpose ID (UMID), Driver's License, Philippine Passport, National ID (PhilID), SSS/GSIS ID, PRC ID, or Postal ID.",
+      "Input your official ID Number, Expiration Date, and Issuing Country accurately.",
+      "Accurate details ensure smooth manual verification approval by our review team.",
+    ],
+  },
+  {
+    stepNumber: 3,
+    title: "Upload ID Photos & Verification Selfie",
+    badgeText: "Document Upload",
+    summary:
+      "Upload high-quality, clear photos of your government ID along with a selfie photo.",
+    details: [
+      "Front photo of your Philippine Government ID (JPEG or PNG format, up to 5 MB).",
+      "Back photo of your Philippine Government ID (JPEG or PNG format, up to 5 MB).",
+      "Selfie verification photo holding your ID next to your face so reviewers can verify your identity.",
+      "🔒 Strict Privacy Guaranteed: Your ID documents are encrypted and seen only by verification reviewers. Employers never see your raw ID photos.",
+    ],
+  },
+  {
+    stepNumber: 4,
+    title: "Submit for Professional Review & Earn Your Badge",
+    badgeText: "Review & Approval",
+    summary:
+      "Submit your identity verification application for professional review by our compliance team.",
+    details: [
+      "Your status changes to 'Under Review' as soon as you submit your documents.",
+      "Once approved, your Verified Worker Badge appears across your public profile and candidate card.",
+      "Verified profiles rank higher in employer talent searches, gain faster trust, and access exclusive verified-only jobs.",
+    ],
+  },
+];
+
 function ProfileOptimizationFallback() {
   return (
     <div className="space-y-6 mt-6">
@@ -139,6 +192,65 @@ function ProfileOptimizationFallback() {
             </div>
           );
         })}
+      </div>
+
+      {/* Worker Verification Process Section */}
+      <div className="mt-12 pt-10 border-t border-slate-200/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 mb-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#006e2f]" />
+              <span>Identity & Trust</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              How to Get Verified
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-1.5 max-w-2xl leading-relaxed">
+              Getting verified builds immediate trust with international hiring managers. Follow these 4 simple steps to complete identity verification and earn your Verified Worker Badge.
+            </p>
+          </div>
+          <Link
+            href="/worker/verification"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#006e2f] hover:bg-[#005c26] text-white text-xs font-bold transition-all shadow-xs shrink-0 self-start sm:self-center"
+          >
+            <span>Go to Verification</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="space-y-4">
+          {VERIFICATION_STEPS.map((step) => (
+            <div
+              key={step.stepNumber}
+              className="bg-white p-5 md:p-6 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200 flex gap-4 items-start"
+            >
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-[#006e2f] flex items-center justify-center font-bold text-sm shadow-xs border border-emerald-200/60">
+                {step.stepNumber}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                  <h3 className="text-lg font-bold text-slate-900">
+                    {step.title}
+                  </h3>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                    {step.badgeText}
+                  </span>
+                </div>
+                <p className="text-slate-600 text-sm mb-3 leading-relaxed">
+                  {step.summary}
+                </p>
+                <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100 space-y-1.5">
+                  {step.details.map((detail, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                      <CheckCircle2 className="w-4 h-4 text-[#006e2f] mt-0.5 shrink-0" />
+                      <span>{detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* CTA Card */}
@@ -205,3 +317,4 @@ export default async function ProfileOptimizationPage() {
     </main>
   );
 }
+
