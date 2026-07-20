@@ -29,12 +29,21 @@ export interface HelpArticleConfig {
   href: string;
   title: string;
   description: string;
+  icon?: string;
+}
+
+export interface HelpCategoryConfig {
+  id: string;
+  title: string;
+  description?: string;
+  articles: HelpArticleConfig[];
 }
 
 export interface HelpIndexConfig {
   title: string;
   description: string;
-  articles: HelpArticleConfig[];
+  categories?: HelpCategoryConfig[];
+  articles?: HelpArticleConfig[];
 }
 
 export interface ContactPageConfig {
