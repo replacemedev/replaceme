@@ -22,7 +22,7 @@ const fallbackFaqs: FAQItem[] = [
   {
     question: "Can I change or cancel my subscription tier?",
     answer:
-      "Yes. Employers have full control over their billing. You can upgrade, downgrade, or cancel your subscription at any time directly from your Admin dashboard.",
+      "Yes. Employers have full control over their billing. You can upgrade, downgrade, or cancel your plan at any time directly from your Employer dashboard.",
   },
   {
     question: "Do job seekers have to pay to use the platform?",

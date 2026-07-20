@@ -371,7 +371,7 @@ export function LandingPageClient({
                   <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">4</div>
                   <div>
                     <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Shortlist, Message &amp; Send Offers</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Move candidates through your pipeline, chat on paid plans, and send offers/contracts. You pay talent directly with zero salary markup.</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">Move candidates through your pipeline, chat on paid plans and other features. You pay talent directly with zero salary markup.</p>
                   </div>
                 </div>
               </div>
