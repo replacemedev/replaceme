@@ -61,12 +61,6 @@ export const HELP_INDEX_CATEGORIES = [
         description: "Manage your flat-rate pricing tier, payment methods, and invoice history.",
         icon: "CreditCard",
       },
-      {
-        href: "/help/hiring-guide#messaging",
-        title: "Direct Messaging Guide",
-        description: "Best practices for communicating with top candidates using our built-in messaging system.",
-        icon: "MessageSquare",
-      },
     ],
   },
   {
@@ -91,13 +85,7 @@ export const HELP_INDEX_CATEGORIES = [
         title: "Profile Optimization",
         description: "Tips for standing out to employers with a complete, verified, and professional profile.",
         icon: "Sparkles",
-      },
-      {
-        href: "/faq/worker#interviews",
-        title: "Interview Preparation",
-        description: "How to prepare for remote interviews and align on timezone overlaps effectively.",
-        icon: "Video",
-      },
+      }
     ],
   },
   {
@@ -105,12 +93,6 @@ export const HELP_INDEX_CATEGORIES = [
     title: "General & Support",
     description: "Platform FAQs, trust & safety guidelines, legal terms, and support access.",
     articles: [
-      {
-        href: "/faq/employer",
-        title: "Platform FAQ",
-        description: "Quick answers to the most common questions about using ReplaceMe.",
-        icon: "HelpCircle",
-      },
       {
         href: "/contact",
         title: "Contact Support",
