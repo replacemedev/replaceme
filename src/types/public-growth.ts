@@ -23,6 +23,7 @@ export interface PublicJobListing {
   skills: string[];
   createdAt: string;
   description: string | null;
+  salaryCurrency: string;
 }
 
 export interface HelpArticleLink {

@@ -27,6 +27,7 @@ function mapPublicJob(row: {
   skills: string[] | null;
   created_at: string | null;
   description?: string | null;
+  salary_currency?: string | null;
 }): PublicJobListing | null {
   if (!row.id || !row.title) return null;
   const monthlySalary = Number(row.monthly_salary ?? 0);
@@ -44,6 +45,7 @@ function mapPublicJob(row: {
     skills: row.skills ?? [],
     createdAt: row.created_at ?? new Date().toISOString(),
     description: row.description ?? null,
+    salaryCurrency: row.salary_currency ?? "PHP",
   };
 }
 
@@ -53,7 +55,7 @@ export async function getPublicJobListings(): Promise<PublicJobListing[]> {
     const { data, error } = await supabase
       .from("job_posts")
       .select(
-        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at, description"
+        "id, title, company_name, logo_url, employment_type, location, monthly_salary, hours_per_week, skills, created_at, description, salary_currency"
       )
       .eq("status", "Active")
       .order("created_at", { ascending: false })

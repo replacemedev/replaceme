@@ -4,15 +4,19 @@ import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import Link from "next/link";
 import { LogoImage } from "@/components/shared/media/LogoImage";
 import { daysSincePosted } from "@/types/job-search";
+import { formatMoney } from "@/lib/format/currency";
 import type { PublicJobListing } from "@/types/public-growth";
 
 interface PublicJobBoardClientProps {
   jobs: PublicJobListing[];
 }
 
-function formatRate(hourlyRate: number) {
+function formatRate(hourlyRate: number, currency: string = "PHP") {
   if (hourlyRate <= 0) return "Rate posted on apply";
-  return `$${hourlyRate.toFixed(0)}/hr`;
+  return formatMoney(hourlyRate, currency, {
+    perHour: true,
+    maximumFractionDigits: 0,
+  });
 }
 
 function cleanDescriptionSnippet(text: string | null): string {
@@ -103,7 +107,7 @@ export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
                 {/* Footer: Salary & Action CTA */}
                 <div className="mt-5 pt-3.5 sm:pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
                   <p className="text-sm sm:text-base font-bold text-[#006e2f]">
-                    {formatRate(job.hourlyRate)}
+                    {formatRate(job.hourlyRate, job.salaryCurrency)}
                   </p>
                   <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#006e2f] group-hover:translate-x-0.5 transition-transform">
                     View Details &rarr;
