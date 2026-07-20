@@ -112,12 +112,6 @@ export const HELP_INDEX_CATEGORIES = [
         icon: "HelpCircle",
       },
       {
-        href: "/privacy-policy",
-        title: "Trust & Safety",
-        description: "Learn about our verification process and how we maintain a secure platform for everyone.",
-        icon: "Lock",
-      },
-      {
         href: "/contact",
         title: "Contact Support",
         description: "Reach our team for billing, account, or platform questions.",
