@@ -58,8 +58,8 @@
     "@types/react-dom": "^19",
     "@types/react-scroll": "^1.8.10",
     "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "react-email": "^6.8.1",
+    "eslint-config-next": "16.2.10",
+    "react-email": "^6.9.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
