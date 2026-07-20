@@ -30,7 +30,6 @@ export default function PublicHelpLoading() {
                     <SkeletonBlock className="h-4 w-64 rounded-md bg-slate-100 animate-pulse" />
                   </div>
                 </div>
-                <SkeletonBlock className="h-5 w-16 rounded-full bg-slate-200 animate-pulse self-start sm:self-auto shrink-0" />
               </div>
 
               {/* Grid Skeletons */}

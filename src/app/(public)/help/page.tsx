@@ -153,9 +153,6 @@ export default async function HelpCenterPage() {
                       )}
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/60 self-start sm:self-auto shrink-0">
-                    {category.articles.length} {category.articles.length === 1 ? "Guide" : "Guides"}
-                  </span>
                 </div>
 
                 {/* Golden Rule Responsive Grid: 1 col mobile, 2 col tablet (md:), 3 col desktop (lg:) */}

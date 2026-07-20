@@ -148,7 +148,7 @@ function WorkerApplicationFallback() {
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 mb-4">
             <ShieldCheck size={14} className="shrink-0" />
-            <span>100% Free for Job Seekers • 0% Cut</span>
+            <span>100% Free for Job Seekers</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-3">
             Ready to Land Your Next Remote Role?
