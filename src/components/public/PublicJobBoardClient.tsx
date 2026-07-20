@@ -109,8 +109,8 @@ export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
                   <p className="text-sm sm:text-base font-bold text-[#006e2f]">
                     {formatRate(job.hourlyRate, job.salaryCurrency)}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold text-[#006e2f] group-hover:translate-x-0.5 transition-transform">
-                    View Details &rarr;
+                  <span className="inline-flex items-center justify-center bg-emerald-700 text-white rounded-xl px-5 py-2.5 text-sm font-medium hover:bg-emerald-800 group-hover:bg-emerald-800 transition-colors shadow-sm shrink-0">
+                    View Details
                   </span>
                 </div>
               </Link>
