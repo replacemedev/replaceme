@@ -12,5 +12,6 @@ export type { FAQItem } from "./FAQSchema";
 export { JobPostingSchema } from "./JobPostingSchema";
 export { BreadcrumbSchema } from "./BreadcrumbSchema";
 export type { BreadcrumbItem } from "./BreadcrumbSchema";
-export { CitationBlock } from "./CitationBlock";
+export { CitationBlock, CitationBlockSkeleton, CitationBlockGridSkeleton } from "./CitationBlock";
 export { FactBox } from "./FactBox";
+

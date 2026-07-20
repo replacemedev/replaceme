@@ -1,5 +1,6 @@
 import { PUBLIC_HEADER_OFFSET } from "@/lib/layout/public-shell";
 import { SkeletonBlock } from "./primitives";
+import { CitationBlockGridSkeleton } from "@/components/seo";
 
 export function LandingPageSkeleton() {
   return (
@@ -62,13 +63,12 @@ export function LandingPageSkeleton() {
         </div>
       </section>
 
-      {/* Content below Hero */}
-      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-48 rounded-2xl" />
-        ))}
+      {/* Content below Hero - Value Proposition Cards Skeleton */}
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <CitationBlockGridSkeleton />
       </div>
       <SkeletonBlock className="h-64 w-full mt-8" />
     </div>
   );
 }
+

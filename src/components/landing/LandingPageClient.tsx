@@ -241,7 +241,7 @@ export function LandingPageClient({
           </div>
 
           {/* GEO: CitationBlock row — data-dense facts for LLM citation extraction */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
             <CitationBlock
               label="Platform Fee on Worker Salary"
               headline="Workers receive 100% of their agreed salary"
