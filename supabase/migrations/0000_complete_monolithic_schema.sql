@@ -1,4 +1,4 @@
--- Monolithic database schema migration for ReplaceMe
+-- Monolithic database schema migration for Replaceme
 -- Generates all types, tables, views, triggers, and RLS policies from scratch
 
 -- 1. Drop existing objects to allow clean, idempotent execution

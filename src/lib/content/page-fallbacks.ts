@@ -124,7 +124,7 @@ export const HELP_INDEX_FALLBACK: HelpIndexConfig = {
 
 export const HIRING_GUIDE_FALLBACK_META: PageContentMeta = {
   description:
-    "A simple, step-by-step playbook to find and hire top remote talent on ReplaceMe.",
+    "A simple, step-by-step playbook to find and hire top remote talent on Replaceme.",
 };
 
 export const CONTACT_FALLBACK: ContactPageConfig = {

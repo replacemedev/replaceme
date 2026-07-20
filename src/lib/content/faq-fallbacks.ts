@@ -53,13 +53,13 @@ export const WORKER_FAQ_FALLBACK: FaqPageConfig = {
   items: [
     {
       id: "worker-faq-1",
-      question: "Is ReplaceMe free for job seekers?",
+      question: "Is Replaceme free for job seekers?",
       answer:
         "Yes! Joining the platform, building your profile, and applying to jobs is always 100% free for workers.",
     },
     {
       id: "worker-faq-2",
-      question: "Does ReplaceMe take a cut or commission from my salary?",
+      question: "Does Replaceme take a cut or commission from my salary?",
       answer:
         "Absolutely not. You keep 100% of your agreed salary. We take 0% commission and add zero markups to your pay.",
     },
@@ -67,7 +67,7 @@ export const WORKER_FAQ_FALLBACK: FaqPageConfig = {
       id: "worker-faq-3",
       question: "How do I get paid?",
       answer:
-        "You are paid directly by your employer. ReplaceMe does not process payroll; you and your employer will agree on the payment method and schedule.",
+        "You are paid directly by your employer. Replaceme does not process payroll; you and your employer will agree on the payment method and schedule.",
     },
     {
       id: "worker-faq-4",
