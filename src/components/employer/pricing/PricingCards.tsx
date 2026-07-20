@@ -25,8 +25,8 @@ interface TierDetail {
 
 const TIER_DETAILS: Record<string, TierDetail> = {
   discovery: {
-    description: "Allow employers to experience the platform while requiring an upgrade to actually hire someone.",
-    descriptionLabel: "Purpose",
+    description: "Explore the platform, post your first job for free, and preview candidate skills.",
+    descriptionLabel: "Perfect for",
     features: [
       { text: "1 Active Job Post", included: true },
       { text: "Up to 10 Applicants", included: true },
@@ -38,7 +38,7 @@ const TIER_DETAILS: Record<string, TierDetail> = {
     ctaText: "Post a Job for Free",
   },
   starter: {
-    description: "Small businesses hiring one or two remote workers.",
+    description: "Small businesses looking to hire 1 or 2 remote team members.",
     descriptionLabel: "Perfect for",
     features: [
       { text: "Up to 3 Active Job Posts", included: true },
@@ -52,7 +52,7 @@ const TIER_DETAILS: Record<string, TierDetail> = {
     ctaText: "Start Hiring",
   },
   growth: {
-    description: "Growing businesses regularly hiring remote staff.",
+    description: "Growing companies regularly hiring remote talent.",
     descriptionLabel: "Perfect for",
     features: [
       { text: "Up to 10 Active Job Posts", included: true },
@@ -66,7 +66,7 @@ const TIER_DETAILS: Record<string, TierDetail> = {
     ctaText: "Grow Your Team",
   },
   scale: {
-    description: "Recruitment agencies and businesses building larger remote teams",
+    description: "Agencies and companies building larger remote teams.",
     descriptionLabel: "Perfect for",
     features: [
       { text: "Unlimited Active Job Posts", included: true },

@@ -7,27 +7,27 @@ const fallbackFaqs: FAQItem[] = [
   {
     question: "What is included in the free Discovery plan?",
     answer:
-      "Discovery ($0/mo) includes 1 active job post, up to 10 applicants per job, 2-day job approval, and anonymous candidate previews. Messaging and resume downloads require a paid tier.",
+      "Discovery ($0/mo) includes 1 active job post, up to 10 applicants per job, 2-day job approval, and anonymous candidate previews. Upgrading to a paid plan unlocks direct messaging and full candidate profiles.",
   },
   {
     question: "How do Starter, Growth, and Scale compare?",
     answer:
-      "Starter ($19/mo) offers 3 jobs, full profiles, and messaging. Growth ($39/mo) provides 10 jobs and priority listing. Scale ($79/mo) unlocks unlimited jobs and priority support.",
+      "Starter ($19/mo) includes 3 jobs and messaging. Growth ($39/mo) provides 10 jobs and priority listings. Scale ($79/mo) unlocks unlimited jobs, unlimited applicants, and priority support.",
   },
   {
-    question: "Are there any hidden placement fees or commissions?",
+    question: "Are there any placement fees or salary commissions?",
     answer:
-      "Absolutely not. You only pay your flat monthly subscription fee. We do not charge agency markups or commissions when you successfully hire a candidate.",
+      "No. You only pay a flat monthly subscription fee. We never charge placement fees, agency markups, or cuts from worker salaries.",
   },
   {
-    question: "Can I change or cancel my subscription tier?",
+    question: "Can I change or cancel my plan anytime?",
     answer:
-      "Yes. Employers have full control over their billing. You can upgrade, downgrade, or cancel your plan at any time directly from your Employer dashboard.",
+      "Yes! You can upgrade, downgrade, or cancel your subscription plan at any time directly from your employer billing dashboard.",
   },
   {
     question: "Do job seekers have to pay to use the platform?",
     answer:
-      "No, the platform is 100% free for job seekers. Our pricing tiers apply exclusively to employers looking to access our talent pool and post jobs.",
+      "No, Replaceme is 100% free for job seekers. Workers can create a profile, browse roles, apply, and get paid with zero fees.",
   },
 ];
 
