@@ -29,12 +29,24 @@ export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] pb-28 md:pb-12">
-      <header className="bg-[#0a4a29] text-white">
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-5 sm:px-6 sm:pb-20 lg:px-8">
-          <nav aria-label="Breadcrumb" className="mb-6">
+      <header className="relative bg-[#0a4a29] text-white overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.08] pointer-events-none"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M10 0h2v2h-2V0zm0 18h2v2h-2v-2zM0 10h2v2H0v-2zm18 0h2v2h-2v-2zM4 4h2v2H4V4zm10 0h2v2h-2V4zM4 14h2v2H4v-2zm10 0h2v2h-2v-2z'/%3E%3C/g%3E%3C/svg%3E\")",
+          }}
+          aria-hidden
+        />
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-20 sm:pb-24">
+          <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm font-semibold text-white/90">
               <li>
-                <Link href="/jobs" className="inline-flex items-center gap-1.5 hover:text-white">
+                <Link
+                  href="/jobs"
+                  className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
+                >
                   <ArrowLeft size={14} aria-hidden />
                   Job board
                 </Link>
@@ -49,17 +61,17 @@ export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
           </nav>
 
           <div className="min-w-0">
-            <h1 className="text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl lg:text-4xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight">
               {job.title}
             </h1>
-            <p className="mt-2 text-sm font-medium text-white/80 sm:text-base">
-              {job.companyName} • Posted {formatPostedDate(job.createdAt)}
+            <p className="mt-3 text-sm sm:text-base font-medium text-white/80">
+              {job.companyName} • Posted on {formatPostedDate(job.createdAt)}
             </p>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto -mt-8 max-w-6xl px-4 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto -mt-12 sm:-mt-16 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <section
