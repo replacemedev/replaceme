@@ -125,7 +125,7 @@ export function PricingCards({
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-0 sm:px-4 py-4 sm:py-8 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
         {orderedPlans.map((plan) => {
           const slug = plan.slug.toLowerCase();
@@ -149,7 +149,7 @@ export function PricingCards({
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col justify-between p-6 rounded-2xl transition-all duration-300 ${
+              className={`relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl transition-all duration-300 ${
                 isGrowth
                   ? "border-2 border-[#006e2f] bg-gradient-to-b from-[#fafdfb] to-white shadow-lg lg:scale-105 z-10 hover:shadow-xl"
                   : "border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300"

@@ -6,7 +6,7 @@ export function LandingPageSkeleton() {
   return (
     <div className={`min-h-screen bg-[#f8fafe] animate-pulse ${PUBLIC_HEADER_OFFSET}`}>
       {/* Hero Section Skeleton */}
-      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
+      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
         {/* Decorative Glowing Blobs */}
         <div className="absolute top-[-20%] left-[-10%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-emerald-100/40 blur-3xl pointer-events-none z-0" />
         <div className="absolute top-[40%] right-[-10%] w-[min(600px,85vw)] h-[min(600px,85vw)] rounded-full bg-indigo-100/30 blur-3xl pointer-events-none z-0" />
@@ -15,14 +15,14 @@ export function LandingPageSkeleton() {
         {/* Dot Pattern Overlay */}
         <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
 
-        <div className="px-6 max-w-7xl mx-auto relative z-10 w-full min-w-0">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-16 w-full min-w-0">
+        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
             {/* Left text column */}
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-10 pr-0 lg:pr-8">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-6 sm:space-y-8 pr-0 lg:pr-8">
               {/* Title lines */}
               <div className="space-y-4">
-                <SkeletonBlock className="h-10 md:h-14 w-full max-w-[420px]" />
-                <SkeletonBlock className="h-10 md:h-14 w-3/4 max-w-[340px]" />
+                <SkeletonBlock className="h-8 sm:h-10 md:h-12 lg:h-14 w-full max-w-[420px]" />
+                <SkeletonBlock className="h-8 sm:h-10 md:h-12 lg:h-14 w-3/4 max-w-[340px]" />
               </div>
               {/* Paragraph lines */}
               <div className="space-y-3">
@@ -31,9 +31,9 @@ export function LandingPageSkeleton() {
                 <SkeletonBlock className="h-4 w-4/5" />
               </div>
               {/* CTA buttons */}
-              <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                <SkeletonBlock className="h-14 w-full sm:w-[210px] rounded-xl" />
-                <SkeletonBlock className="h-14 w-full sm:w-[160px] rounded-xl" />
+              <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-5 pt-4">
+                <SkeletonBlock className="h-12 sm:h-14 w-full sm:w-[210px] rounded-xl" />
+                <SkeletonBlock className="h-12 sm:h-14 w-full sm:w-[160px] rounded-xl" />
               </div>
             </div>
 
@@ -64,7 +64,7 @@ export function LandingPageSkeleton() {
       </section>
 
       {/* Content below Hero - Value Proposition Cards Skeleton */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <CitationBlockGridSkeleton />
       </div>
       <SkeletonBlock className="h-64 w-full mt-8" />

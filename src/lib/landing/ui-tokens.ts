@@ -1,9 +1,9 @@
 /** Zoom-stable landing section shells — clamp padding, max-width containment. */
 
 export const LANDING_SECTION =
-  "relative isolate overflow-clip py-[clamp(3.5rem,7vw,6rem)] px-[clamp(1rem,4vw,var(--spacing-margin-desktop,2rem))]";
+  "relative isolate overflow-hidden py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8";
 
-export const LANDING_INNER = "mx-auto w-full min-w-0 max-w-container-max";
+export const LANDING_INNER = "mx-auto w-full min-w-0 max-w-7xl";
 
 export const LANDING_SECTION_GRID =
   "pointer-events-none absolute inset-0 bg-grid-dots opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_65%,transparent_100%)]";

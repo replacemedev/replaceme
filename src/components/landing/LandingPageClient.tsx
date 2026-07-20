@@ -132,7 +132,7 @@ export function LandingPageClient({
   return (
     <main>
       {/* Hero Section */}
-      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-8 lg:py-12 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
+      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
         {/* Decorative Glowing Blobs */}
         <div className="absolute top-[-20%] left-[-10%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
         <div className="absolute top-[40%] right-[-10%] w-[min(600px,85vw)] h-[min(600px,85vw)] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
@@ -141,23 +141,23 @@ export function LandingPageClient({
         {/* Dot Pattern Overlay */}
         <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
 
-        <div className="px-margin-desktop max-w-container-max mx-auto relative z-10 w-full min-w-0">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-16 w-full min-w-0">
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-10 pr-0 lg:pr-8 reveal-item">
-              <h1 className="text-display-xl-mobile md:text-display-xl text-slate-900 leading-[1.15] font-extrabold tracking-tight">
+        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-6 sm:space-y-8 pr-0 lg:pr-8 reveal-item">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 leading-[1.15] font-extrabold tracking-tight">
                 Connect Directly with <span className="text-[#22c55e]">Filipino</span>
                 <br />
                 <span className="text-[#22c55e]">Remote Talent</span>
               </h1>
-              <p className="font-body-base text-slate-500 max-w-2xl text-xl leading-relaxed">
+              <p className="font-body-base text-slate-600 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed">
                 Hire skilled remote professionals in the Philippines or land your next remote role. Pay zero agency fees or salary markups. Employers pay a flat subscription, and job seekers keep 100% of their pay.
               </p>
-              <div className="flex flex-col sm:flex-row gap-5 pt-4">
-                <Link href="/signup/employer" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-lg">
+              <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-5 pt-2 sm:pt-4 w-full sm:w-auto">
+                <Link href="/signup/employer" className="w-full sm:w-auto bg-[#22c55e] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2 text-base sm:text-lg">
                   <span>Hire Talent Now</span>
                   <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
-                <Link href="/signup/worker" className="bg-white text-[#22c55e] border border-slate-200 px-8 py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-lg">
+                <Link href="/signup/worker" className="w-full sm:w-auto bg-white text-[#22c55e] border border-slate-200 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-extrabold hover:bg-emerald-50/30 hover:border-[#22c55e] hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-base sm:text-lg">
                   <span>Find a Job</span>
                   <Search className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
@@ -212,36 +212,36 @@ export function LandingPageClient({
 
         <div className={`${LANDING_INNER} relative z-10`}>
           {/* AEO: Question-format H2 targets "why use Replaceme" voice & featured-snippet queries */}
-          <div className="text-center mb-16 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Why Do Employers Choose Replaceme Over Traditional Agencies?</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg">Hire directly and save thousands. Pay one low monthly subscription instead of heavy agency markups or placement fees.</p>
+          <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">Why Do Employers Choose Replaceme Over Traditional Agencies?</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto font-body-base text-base sm:text-lg leading-relaxed">Hire directly and save thousands. Pay one low monthly subscription instead of heavy agency markups or placement fees.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 animate-fade-in relative z-10">
-            <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
-              <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                <CircleDollarSign className="h-8 w-8 text-[#22c55e]" aria-hidden />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 animate-fade-in relative z-10">
+            <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 sm:mb-8 border border-slate-100">
+                <CircleDollarSign className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
-              <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">0% Salary Cut</h3>
-              <p className="text-[#475569] text-base leading-relaxed">Your subscription covers platform access only. Your hires keep 100% of their salary, so you never pay payroll commissions.</p>
+              <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">0% Salary Cut</h3>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Your subscription covers platform access only. Your hires keep 100% of their salary, so you never pay payroll commissions.</p>
             </div>
-            <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "250ms" }}>
-              <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                <Handshake className="h-8 w-8 text-[#22c55e]" aria-hidden />
+            <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "250ms" }}>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 sm:mb-8 border border-slate-100">
+                <Handshake className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
-              <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">Built-In Hiring Flow</h3>
-              <p className="text-[#475569] text-base leading-relaxed">Manage job posts, applicant pipelines, and direct messages in one clear employer dashboard.</p>
+              <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">Built-In Hiring Flow</h3>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Manage job posts, applicant pipelines, and direct messages in one clear employer dashboard.</p>
             </div>
-            <div className="bg-[#f8fafc] rounded-3xl p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
-              <div className="w-16 h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 border border-slate-100">
-                <TrendingDown className="h-8 w-8 text-[#22c55e]" aria-hidden />
+            <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 sm:mb-8 border border-slate-100">
+                <TrendingDown className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
-              <h3 className="font-body-bold text-xl mb-3 text-slate-800 font-bold">70% Cost Savings</h3>
-              <p className="text-[#475569] text-base leading-relaxed">Hire experienced developers, designers, and admins at a fraction of local costs with fluent English skills.</p>
+              <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">70% Cost Savings</h3>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Hire experienced developers, designers, and admins at a fraction of local costs with fluent English skills.</p>
             </div>
           </div>
 
           {/* GEO: CitationBlock row — data-dense facts for LLM citation extraction */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch mt-10 sm:mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
             <CitationBlock
               label="Salary Protection"
               headline="Workers receive 100% of their agreed salary"
@@ -274,43 +274,43 @@ export function LandingPageClient({
 
         <div className={`${LANDING_INNER} relative z-10`}>
           <Element name="find-work" id="find-work" className="h-0 w-0" aria-hidden />
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-            <div className="lg:col-span-5 space-y-6 reveal-item">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+            <div className="lg:col-span-5 space-y-4 sm:space-y-6 reveal-item">
               <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">For Job Seekers</div>
-              <h2 className="text-display-lg text-slate-900 leading-tight font-bold">Land Your Dream Remote Job with <span className="text-[#22c55e]">Global Companies</span></h2>
-              <p className="text-slate-500 font-body-base text-lg leading-relaxed">Build a long-term remote career with top global employers — with zero worker fees and no bidding on cheap gigs.</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 leading-tight font-bold tracking-tight">Land Your Dream Remote Job with <span className="text-[#22c55e]">Global Companies</span></h2>
+              <p className="text-slate-600 font-body-base text-base sm:text-lg leading-relaxed">Build a long-term remote career with top global employers — with zero worker fees and no bidding on cheap gigs.</p>
               <div className="pt-2">
-                <Link href="/signup/worker" className="bg-[#22c55e] text-white px-8 py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
+                <Link href="/signup/worker" className="w-full sm:w-auto bg-[#22c55e] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                   <span>Create Your Free Profile</span>
                   <UserPlus className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
               </div>
             </div>
 
-            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "100ms" }}>
-                  <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
-                    <CreditCard className="h-6 w-6 shrink-0" aria-hidden />
+            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="bg-white rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "100ms" }}>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 sm:mb-6 shrink-0 text-[#22c55e]">
+                    <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" aria-hidden />
                   </div>
-                  <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Get Paid Directly</h3>
+                  <h3 className="font-body-bold text-base sm:text-lg mb-2 text-slate-800 font-bold">Get Paid Directly</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">Agree on pay rates directly with your employer. Receive 100% of your salary with zero platform cuts.</p>
                 </div>
-                <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "200ms" }}>
-                  <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 shrink-0 text-[#22c55e]">
-                    <Wallet className="h-6 w-6 shrink-0" aria-hidden />
+                <div className="bg-white rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-slate-100 hover:border-emerald-500/30 transition-all duration-300 group reveal-item" style={{ transitionDelay: "200ms" }}>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 sm:mb-6 shrink-0 text-[#22c55e]">
+                    <Wallet className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" aria-hidden />
                   </div>
-                  <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Always 100% Free</h3>
+                  <h3 className="font-body-bold text-base sm:text-lg mb-2 text-slate-800 font-bold">Always 100% Free</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">Build your profile, apply for roles, and chat with employers without spending a dime.</p>
                 </div>
               </div>
 
               <div className="md:pt-12">
-                <div className="bg-white rounded-3xl p-8 shadow-md border-2 border-emerald-500/20 group reveal-item hover:shadow-lg transition-all duration-300" style={{ transitionDelay: "300ms" }}>
-                  <div className="w-12 h-12 bg-[#22c55e] text-white rounded-xl flex items-center justify-center mb-6 shadow-sm">
-                    <Briefcase className="h-6 w-6 shrink-0" aria-hidden />
+                <div className="bg-white rounded-3xl p-5 sm:p-6 md:p-8 shadow-md border-2 border-emerald-500/20 group reveal-item hover:shadow-lg transition-all duration-300" style={{ transitionDelay: "300ms" }}>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#22c55e] text-white rounded-xl flex items-center justify-center mb-4 sm:mb-6 shadow-sm">
+                    <Briefcase className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" aria-hidden />
                   </div>
-                  <h3 className="font-body-bold text-lg mb-2 text-slate-800 font-bold">Full-Time &amp; Long-Term Roles</h3>
+                  <h3 className="font-body-bold text-base sm:text-lg mb-2 text-slate-800 font-bold">Full-Time &amp; Long-Term Roles</h3>
                   <p className="text-slate-500 text-sm leading-relaxed mb-6">Discover full-time jobs and long-term roles in engineering, design, marketing, and admin operations.</p>
                   <div className="pt-4 border-t border-slate-100 flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase font-label-mono">
                     <BadgeCheck className="h-4 w-4 shrink-0" aria-hidden />
@@ -331,87 +331,87 @@ export function LandingPageClient({
         <div className={`${LANDING_INNER} relative z-10`}>
           <Element name="how-it-works" id="how-it-works" className="h-0 w-0" aria-hidden />
           {/* AEO: Question-format H2 targets "how does X work" voice-search and featured-snippet queries */}
-          <div className="text-center mb-20 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">How Does Remote Hiring Work on Replaceme?</h2>
-            <p className="text-slate-500 text-lg leading-relaxed max-w-2xl mx-auto">Post a job, review applicants in your pipeline, message talent directly, and hire with zero salary markups.</p>
+          <div className="text-center mb-10 sm:mb-14 md:mb-20 reveal-item">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">How Does Remote Hiring Work on Replaceme?</h2>
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">Post a job, review applicants in your pipeline, message talent directly, and hire with zero salary markups.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 relative z-10">
             {/* Employer Flow */}
-            <div className="bg-[#f8fafc] border border-slate-100 rounded-[28px] p-8 md:p-10 reveal-item" style={{ transitionDelay: "100ms" }}>
-              <h3 className="text-xl md:text-2xl text-[#0a4a29] font-bold mb-10 flex items-center gap-3">
+            <div className="bg-[#f8fafc] border border-slate-100 rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 md:p-10 reveal-item" style={{ transitionDelay: "100ms" }}>
+              <h3 className="text-lg sm:text-xl md:text-2xl text-[#0a4a29] font-bold mb-6 sm:mb-10 flex items-center gap-3">
                 <Building2 className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden /> For Employers
               </h3>
-              <div className="space-y-12 relative">
+              <div className="space-y-8 sm:space-y-12 relative">
                 {/* Vertical Connection Line */}
-                <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-slate-200 z-0" />
+                <div className="absolute left-[15px] sm:left-[19px] top-4 bottom-4 w-[2px] bg-slate-200 z-0" />
 
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">1</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">1</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Publish a Remote Job</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Define required skills, pay, and schedule. Free posts are reviewed in 2 days; paid plans post instantly.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Publish a Remote Job</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Define required skills, pay, and schedule. Free posts are reviewed in 2 days; paid plans post instantly.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">2</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">2</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Review Candidates</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">See applicants in your pipeline. Paid plans unlock full candidate profiles, contact info, and resume downloads.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Review Candidates</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">See applicants in your pipeline. Paid plans unlock full candidate profiles, contact info, and resume downloads.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">3</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">3</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Message &amp; Interview</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Chat directly with candidates on paid plans to set up interviews, evaluate fit, and discuss role expectations.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Message &amp; Interview</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Chat directly with candidates on paid plans to set up interviews, evaluate fit, and discuss role expectations.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">4</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">4</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Hire &amp; Pay Directly</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Send job offers and start working together. Pay your talent directly with zero salary markups or recruitment fees.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Hire &amp; Pay Directly</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Send job offers and start working together. Pay your talent directly with zero salary markups or recruitment fees.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Worker Flow */}
-            <div className="bg-[#f8fafc] border border-slate-100 rounded-[28px] p-8 md:p-10 reveal-item" style={{ transitionDelay: "300ms" }}>
-              <h3 className="text-xl md:text-2xl text-emerald-800 font-bold mb-10 flex items-center gap-3">
+            <div className="bg-[#f8fafc] border border-slate-100 rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 md:p-10 reveal-item" style={{ transitionDelay: "300ms" }}>
+              <h3 className="text-lg sm:text-xl md:text-2xl text-emerald-800 font-bold mb-6 sm:mb-10 flex items-center gap-3">
                 <User className="h-6 w-6 text-[#22c55e] shrink-0" aria-hidden /> For Job Seekers
               </h3>
-              <div className="space-y-12 relative">
+              <div className="space-y-8 sm:space-y-12 relative">
                 {/* Vertical Connection Line */}
-                <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-slate-200 z-0" />
+                <div className="absolute left-[15px] sm:left-[19px] top-4 bottom-4 w-[2px] bg-slate-200 z-0" />
 
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">1</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">1</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Build Your Profile</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Add your skills, work experience, portfolio links, and expected pay rates.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Build Your Profile</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Add your skills, work experience, portfolio links, and expected pay rates.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">2</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">2</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Apply to Remote Roles</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Browse active job listings from global companies and submit your application for free.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Apply to Remote Roles</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Browse active job listings from global companies and submit your application for free.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">3</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">3</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Interview &amp; Chat</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">When employers unlock your application, chat directly in the platform to discuss job details.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Interview &amp; Chat</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">When employers unlock your application, chat directly in the platform to discuss job details.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">4</div>
+                <div className="flex gap-4 sm:gap-6 items-start relative z-10">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">4</div>
                   <div>
-                    <h4 className="font-body-bold text-lg mb-1 text-slate-800 font-bold">Get Hired &amp; Paid</h4>
-                    <p className="text-slate-500 text-sm leading-relaxed">Accept job offers and receive 100% of your agreed salary with zero worker fees.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Get Hired &amp; Paid</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Accept job offers and receive 100% of your agreed salary with zero worker fees.</p>
                   </div>
                 </div>
               </div>
@@ -429,22 +429,22 @@ export function LandingPageClient({
         <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[10%] bg-emerald-50/50`} aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
-          <div className="text-center mb-20 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">Voices of <span className="text-[#22c55e]">Success</span></h2>
-            <p className="text-slate-500 max-w-2xl mx-auto font-body-base text-lg leading-relaxed">See how growing companies build great remote teams on Replaceme.</p>
+          <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight">Voices of <span className="text-[#22c55e]">Success</span></h2>
+            <p className="text-slate-600 max-w-2xl mx-auto font-body-base text-base sm:text-lg leading-relaxed">See how growing companies build great remote teams on Replaceme.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
             {/* Large Featured Testimonial */}
             <div className="lg:col-span-7 reveal-item">
-              <div className="bg-white border border-slate-100 rounded-3xl p-10 md:p-14 shadow-md relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 lg:p-14 shadow-md relative overflow-hidden group hover:shadow-lg transition-all duration-300">
                 <Quote className="absolute -top-4 -right-4 h-40 w-40 text-emerald-100/30 rotate-12 select-none pointer-events-none" aria-hidden />
                 <div className="relative z-10">
-                  <p className="text-slate-700 font-display-md text-2xl md:text-3xl italic leading-snug mb-12">
+                  <p className="text-slate-700 font-display-md text-lg sm:text-xl md:text-2xl lg:text-3xl italic leading-snug mb-6 sm:mb-10 lg:mb-12">
                     &quot;Finding reliable React developers used to take us months. With Replaceme, we hired two incredible senior engineers in a week. The quality of talent is unmatched.&quot;
                   </p>
                   <div>
-                    <h4 className="text-xl font-bold text-slate-800">Sarah Jenkins</h4>
+                    <h4 className="text-lg sm:text-xl font-bold text-slate-800">Sarah Jenkins</h4>
                     <p className="text-[#22c55e] font-body-bold uppercase tracking-widest text-xs mt-1">CTO, TechFlow Inc.</p>
                   </div>
                 </div>
@@ -452,10 +452,10 @@ export function LandingPageClient({
             </div>
 
             {/* Side Column Testimonials */}
-            <div className="lg:col-span-5 space-y-8">
+            <div className="lg:col-span-5 space-y-6 sm:space-y-8">
               {/* Card 2 */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "150ms" }}>
-                <p className="text-slate-500 font-body-base text-base italic mb-8 leading-relaxed">
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "150ms" }}>
+                <p className="text-slate-600 font-body-base text-sm sm:text-base italic mb-6 sm:mb-8 leading-relaxed">
                   &quot;Our customer support and operational tasks are now handled by an amazing team in the Philippines. The value and dedication they bring is incredible.&quot;
                 </p>
                 <div>
@@ -464,8 +464,8 @@ export function LandingPageClient({
                 </div>
               </div>
               {/* Card 3 */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "300ms" }}>
-                <p className="text-slate-500 font-body-base text-base italic mb-8 leading-relaxed">
+              <div className="bg-white border border-slate-100 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "300ms" }}>
+                <p className="text-slate-600 font-body-base text-sm sm:text-base italic mb-6 sm:mb-8 leading-relaxed">
                   &quot;We completely streamlined our design operations by hiring a full-time UI/UX designer. High-fidelity output at a fraction of local agency costs.&quot;
                 </p>
                 <div>
@@ -487,13 +487,13 @@ export function LandingPageClient({
         <div className={`${LANDING_INNER} max-w-7xl text-center relative z-10`}>
           <Element name="pricing" id="pricing" className="h-0 w-0" aria-hidden />
           <div className="reveal-item">
-            <h2 className="text-display-lg text-white mb-4 font-bold">Simple, Transparent Pricing</h2>
-            <p className="text-slate-300 mb-6 font-body-base text-lg max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-3 sm:mb-4 font-bold tracking-tight">Simple, Transparent Pricing</h2>
+            <p className="text-slate-300 mb-6 font-body-base text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
               Job seekers join 100% free. Employers can start on our free Discovery plan and upgrade anytime to unlock direct messaging and full candidate profiles.
             </p>
           </div>
 
-          <div className="text-left text-slate-900 mt-8">
+          <div className="text-left text-slate-900 mt-6 sm:mt-8">
             <PricingCards
               plans={pricingPlans}
               onSelectPlan={() => router.push("/signup/employer")}
@@ -501,7 +501,7 @@ export function LandingPageClient({
           </div>
           <Link
             href="/pricing"
-            className="inline-flex mt-8 items-center gap-2 bg-[#22c55e] text-white px-8 py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 text-lg reveal-item min-h-[44px]"
+            className="inline-flex mt-6 sm:mt-8 items-center justify-center gap-2 bg-[#22c55e] text-white w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 text-base sm:text-lg reveal-item min-h-[48px]"
             style={{ transitionDelay: "200ms" }}
           >
             Compare all plans
@@ -518,9 +518,9 @@ export function LandingPageClient({
         <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
           <Element name="faq" id="faq" className="h-0 w-0" aria-hidden />
           {/* AEO: Question-format H2 + direct answer para targets zero-click FAQ featured snippets */}
-          <div className="text-center mb-16 reveal-item">
-            <h2 className="text-display-lg text-slate-900 mb-4 font-bold">What Do Employers and Job Seekers Ask About Replaceme?</h2>
-            <p className="text-slate-500 font-body-base text-lg max-w-2xl mx-auto">Common questions about subscription plans, hiring flows, candidate privacy, and direct payments.</p>
+          <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">What Do Employers and Job Seekers Ask About Replaceme?</h2>
+            <p className="text-slate-600 font-body-base text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">Common questions about subscription plans, hiring flows, candidate privacy, and direct payments.</p>
           </div>
 
           <div className="space-y-4 reveal-item">
@@ -529,7 +529,7 @@ export function LandingPageClient({
               return (
                 <div
                   key={index}
-                  className={`group bg-[#f8fafc] rounded-2xl border p-6 transition-all duration-300 ${isOpen
+                  className={`group bg-[#f8fafc] rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${isOpen
                     ? "border-emerald-500/30 shadow-md"
                     : "border-slate-100 hover:border-emerald-500/25"
                     }`}
@@ -538,7 +538,7 @@ export function LandingPageClient({
                     onClick={() => setOpenFaqIndex(isOpen ? null : index)}
                     className="w-full flex items-center justify-between gap-1.5 text-slate-800 text-left focus:outline-none"
                   >
-                    <h3 className="text-lg font-bold">
+                    <h3 className="text-base sm:text-lg font-bold">
                       {faq.question}
                     </h3>
                     <span className="relative w-6 h-6 shrink-0 bg-white rounded-full flex items-center justify-center shadow-xs border border-slate-100">
@@ -554,7 +554,7 @@ export function LandingPageClient({
                       }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="leading-relaxed text-slate-500 font-body-base text-base pr-8">
+                      <p className="leading-relaxed text-slate-600 font-body-base text-sm sm:text-base pr-4 sm:pr-8">
                         {faq.answer}
                       </p>
                     </div>

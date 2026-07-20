@@ -53,18 +53,18 @@ export function LandingSkillsShowcase() {
         aria-hidden
       />
 
-      <div className={`${LANDING_INNER} relative z-10 space-y-10`}>
-        <div className="text-center max-w-2xl mx-auto reveal-item space-y-4">
+      <div className={`${LANDING_INNER} relative z-10 space-y-6 sm:space-y-10`}>
+        <div className="text-center max-w-2xl mx-auto reveal-item space-y-3 sm:space-y-4">
           <p className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">
             Skill Coverage
           </p>
           <h2
             id="landing-skills-heading"
-            className="text-display-lg text-slate-900 font-bold tracking-tight text-balance"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 font-bold tracking-tight text-balance"
           >
             Top Remote Roles Posted <span className="text-[#22c55e]">Every Day</span>
           </h2>
-          <p className="text-slate-500 font-body-base text-lg leading-relaxed text-pretty">
+          <p className="text-slate-600 font-body-base text-base sm:text-lg leading-relaxed text-pretty">
             Find experienced professionals across software engineering, UI/UX design, digital marketing, and administrative operations.
           </p>
         </div>
@@ -75,7 +75,7 @@ export function LandingSkillsShowcase() {
             return (
               <article
                 key={category.id}
-                className="rounded-3xl border border-slate-100 bg-white/90 p-6 shadow-sm card-premium-hover min-w-0"
+                className="rounded-3xl border border-slate-100 bg-white/90 p-5 sm:p-6 shadow-sm card-premium-hover min-w-0"
                 style={{ transitionDelay: `${index * 80}ms` }}
               >
                 <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-[#22c55e] mb-4">
