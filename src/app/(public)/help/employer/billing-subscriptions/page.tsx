@@ -4,9 +4,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   CreditCard,
-  CheckCircle2,
-  Zap,
-  Star,
   ShieldCheck,
   ArrowRight,
   HelpCircle,
@@ -39,72 +36,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const PLANS_OVERVIEW = [
-  {
-    name: "Discovery Plan",
-    price: "$0",
-    period: "Free Forever",
-    badge: "Free Forever",
-    isPopular: false,
-    description: "Explore the platform, post your first job for free, and test applicant interest.",
-    features: [
-      "1 Active Job Post",
-      "Up to 10 Applicants per job",
-      "2-Day manual job review",
-      "Anonymous Candidate Previews (skills, salary & experience visible)",
-      "Contact info & resumes locked",
-    ],
-  },
-  {
-    name: "Starter Plan",
-    price: "$19",
-    period: "/month",
-    badge: "Small Business",
-    isPopular: false,
-    description: "Ideal for small businesses hiring 1 or 2 remote team members.",
-    features: [
-      "Up to 3 Active Job Posts",
-      "Up to 20 Applicants per job",
-      "Instant Automated Job Approval",
-      "Full Candidate Profiles (names & contact info visible)",
-      "Resume Downloads & Direct Messaging",
-      "Standard Email Support",
-    ],
-  },
-  {
-    name: "Growth Plan",
-    price: "$39",
-    period: "/month",
-    badge: "Most Popular",
-    isPopular: true,
-    description: "Built for growing companies regularly recruiting remote talent.",
-    features: [
-      "Up to 10 Active Job Posts",
-      "Up to 50 Applicants per job",
-      "Instant Automated Job Approval",
-      "Full Candidate Profiles & Resume Downloads",
-      "Direct Messaging with Candidates",
-      "Priority Listing for Job Posts",
-    ],
-  },
-  {
-    name: "Scale Plan",
-    price: "$79",
-    period: "/month",
-    badge: "Agencies & Scaleups",
-    isPopular: false,
-    description: "For agencies and expanding companies building larger remote teams.",
-    features: [
-      "Unlimited Active Job Posts",
-      "Unlimited Applicants per job",
-      "Unlimited Direct Messaging",
-      "Full Candidate Profiles & Resume Downloads",
-      "Instant Job Approval",
-      "Priority Support & Early Feature Access",
-    ],
-  },
-];
-
 const BILLING_RULES = [
   {
     title: "Flat-Rate Monthly Billing (No Markups)",
@@ -131,79 +62,6 @@ const BILLING_RULES = [
 function EmployerBillingFallback() {
   return (
     <div className="space-y-10 mt-6">
-      {/* Pricing Tiers Grid */}
-      <div>
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-2 text-center">
-          Subscription Tiers & Feature Breakdown
-        </h2>
-        <p className="text-slate-600 text-sm text-center mb-8 max-w-xl mx-auto">
-          Choose a plan based on active job posts and messaging needs. All paid plans unlock full candidate profiles and direct chat.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {PLANS_OVERVIEW.map((plan, idx) => (
-            <div
-              key={idx}
-              className={`rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 ${
-                plan.isPopular
-                  ? "bg-gradient-to-b from-[#fafdfb] to-white border-2 border-[#006e2f] shadow-lg relative"
-                  : "bg-white border border-slate-200/80 shadow-xs"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${
-                      plan.isPopular
-                        ? "bg-[#e6fbf2] text-[#006e2f] border border-[#006e2f]"
-                        : "bg-slate-100 text-slate-600 border border-slate-200"
-                    }`}
-                  >
-                    {plan.badge}
-                  </span>
-                  {plan.isPopular && <Star className="w-4 h-4 fill-[#006e2f] text-[#006e2f]" />}
-                </div>
-
-                <h3 className="text-lg font-bold text-slate-900">{plan.name}</h3>
-
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-500 text-sm font-medium">{plan.period}</span>
-                </div>
-
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed font-medium min-h-[36px]">
-                  {plan.description}
-                </p>
-
-                <div className="border-t border-slate-100 my-4" />
-
-                <ul className="space-y-2.5">
-                  {plan.features.map((feat, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-2 text-xs text-slate-700">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#006e2f] mt-0.5 shrink-0" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100">
-                <Link
-                  href="/pricing"
-                  className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center ${
-                    plan.isPopular
-                      ? "bg-[#006e2f] text-white hover:bg-[#005c26] shadow-xs"
-                      : "bg-slate-50 text-slate-800 border border-slate-200 hover:bg-slate-100"
-                  }`}
-                >
-                  Select Plan
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Core Rules Section */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
         <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
