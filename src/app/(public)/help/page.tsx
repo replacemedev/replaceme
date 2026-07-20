@@ -113,69 +113,70 @@ export default async function HelpCenterPage() {
       : HELP_INDEX_FALLBACK.categories ?? [];
 
   return (
-    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] pb-16 ${PUBLIC_PAGE_TOP}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] pb-12 sm:pb-16 md:pb-24 ${PUBLIC_PAGE_TOP}`}>
+      {/* Defensive outer container with safe gutters */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
         {/* Header Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200 mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 md:mb-16 px-2 sm:px-0">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200/80 mb-4 shadow-2xs">
             <Zap size={13} className="text-[#006e2f]" />
             <span>Knowledge Base & Support</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             {config.title}
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg mt-3 sm:mt-4 leading-relaxed">
             {config.description}
           </p>
         </div>
 
         {/* Categories & Articles Grid */}
-        <div className="space-y-12 sm:space-y-16">
+        <div className="space-y-10 sm:space-y-14 md:space-y-16">
           {categories.map((category) => {
             const CategoryIcon = getCategoryIcon(category.id);
             return (
               <section key={category.id} className="space-y-6">
                 {/* Category Section Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-200/70">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100/70 text-[#006e2f] border border-emerald-200/60 flex items-center justify-center font-bold">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-slate-200/70">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100/70 text-[#006e2f] border border-emerald-200/60 flex items-center justify-center font-bold shrink-0 mt-0.5 sm:mt-0">
                       <CategoryIcon size={20} />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
                         {category.title}
                       </h2>
                       {category.description && (
-                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                        <p className="text-xs sm:text-sm md:text-base text-slate-600 leading-relaxed max-w-2xl mt-0.5 sm:mt-1">
                           {category.description}
                         </p>
                       )}
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-slate-400 self-start sm:self-auto">
+                  <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/60 self-start sm:self-auto shrink-0">
                     {category.articles.length} {category.articles.length === 1 ? "Guide" : "Guides"}
                   </span>
                 </div>
 
-                {/* Golden Rule Responsive Grid: 1 col mobile, 2 col tablet, 3 col desktop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {/* Golden Rule Responsive Grid: 1 col mobile, 2 col tablet (md:), 3 col desktop (lg:) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
                   {category.articles.map((article) => {
                     const CardIcon = getArticleIcon(article);
                     return (
                       <Link
                         key={article.href}
                         href={article.href}
-                        className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-1 transition-all duration-200 group flex flex-col justify-between h-full"
+                        className="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-1 transition-all duration-200 group flex flex-col justify-between h-full"
                       >
                         <div>
-                          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006e2f] border border-emerald-100/80 group-hover:bg-[#006e2f] group-hover:text-white group-hover:border-[#006e2f] transition-colors duration-200 flex items-center justify-center mb-4 shrink-0 shadow-xs">
-                            <CardIcon className="w-6 h-6" />
+                          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-[#006e2f] border border-emerald-100/80 group-hover:bg-[#006e2f] group-hover:text-white group-hover:border-[#006e2f] transition-colors duration-200 flex items-center justify-center mb-4 shrink-0 shadow-xs">
+                            <CardIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                           </div>
-                          <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#006e2f] transition-colors flex items-center justify-between gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#006e2f] transition-colors flex items-center justify-between gap-2 leading-snug">
                             <span>{article.title}</span>
                             <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 text-[#006e2f] shrink-0" />
                           </h3>
-                          <p className="text-sm text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 leading-relaxed">
                             {article.description}
                           </p>
                         </div>
