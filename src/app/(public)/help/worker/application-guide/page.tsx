@@ -96,42 +96,42 @@ const STEPS = [
 
 function WorkerApplicationFallback() {
   return (
-    <div className="space-y-6 mt-6">
-      <div className="grid grid-cols-1 gap-6">
+    <div className="space-y-4 mt-6">
+      <div className="grid grid-cols-1 gap-4">
         {STEPS.map((step) => {
           const Icon = step.icon;
           return (
             <div
               key={step.stepNumber}
-              className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200"
+              className="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200"
             >
-              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-[#006e2f] flex items-center justify-center font-extrabold text-lg shrink-0 shadow-xs">
+              <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-5">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100/80 text-[#006e2f] flex items-center justify-center font-bold text-sm md:text-base shadow-xs">
                   {step.stepNumber}
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <Icon className="w-5 h-5 text-[#006e2f]" />
-                      <h2 className="text-xl font-extrabold text-slate-900">
+                <div className="flex-1 min-w-0 w-full">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
+                      <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
                         Step {step.stepNumber}: {step.title}
                       </h2>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60 shrink-0">
                       {step.badgeText}
                     </span>
                   </div>
 
-                  <p className="text-slate-700 text-base font-medium mb-4 leading-relaxed">
+                  <p className="text-slate-600 text-sm sm:text-base font-normal mb-3.5 leading-relaxed">
                     {step.summary}
                   </p>
 
-                  <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-100 space-y-2">
+                  <div className="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-slate-100 space-y-2">
                     {step.details.map((detail, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 text-sm text-slate-600">
+                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600">
                         <CheckCircle2 className="w-4 h-4 text-[#006e2f] mt-0.5 shrink-0" />
-                        <span>{detail}</span>
+                        <span className="flex-1 min-w-0 leading-relaxed">{detail}</span>
                       </div>
                     ))}
                   </div>
@@ -143,12 +143,12 @@ function WorkerApplicationFallback() {
       </div>
 
       {/* CTA Card */}
-      <div className="mt-10 bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 rounded-2xl p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+      <div className="mt-10 bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 rounded-2xl p-6 sm:p-8 md:p-10 text-white shadow-xl relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 mb-4">
-            <ShieldCheck size={14} />
-            100% Free for Job Seekers • 0% Cut
+            <ShieldCheck size={14} className="shrink-0" />
+            <span>100% Free for Job Seekers • 0% Cut</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-3">
             Ready to Land Your Next Remote Role?
@@ -156,17 +156,17 @@ function WorkerApplicationFallback() {
           <p className="text-emerald-100/90 text-sm sm:text-base mb-6 leading-relaxed">
             Create your free profile today, browse active job listings, and connect directly with hiring companies.
           </p>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <Link
               href="/signup/worker"
-              className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-900 bg-white hover:bg-emerald-50 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold text-slate-900 bg-white hover:bg-emerald-50 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-95 text-center"
             >
               <span>Create Worker Account</span>
-              <ArrowRight size={16} className="text-[#006e2f]" />
+              <ArrowRight size={16} className="text-[#006e2f] shrink-0" />
             </Link>
             <Link
               href="/jobs"
-              className="inline-flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition-colors duration-200 border border-emerald-500/30"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition-colors duration-200 border border-emerald-500/30 text-center"
             >
               Browse Open Jobs
             </Link>
@@ -181,14 +181,14 @@ export default async function WorkerApplicationPage() {
   const cms = await getPublishedPageContent("help-worker-application-guide");
 
   return (
-    <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] pt-8 sm:pt-12 pb-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
+      <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200 mb-3">
-            <UserCheck size={13} className="text-[#006e2f]" />
+            <UserCheck size={13} className="text-[#006e2f] shrink-0" />
             <span>Worker Playbook</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
             {cms?.title ?? "Job Seeker Application Guide"}
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
