@@ -60,7 +60,7 @@ export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
           </Link>
         </div>
       ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <ul className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {jobs.map((job) => (
             <li key={job.id} className="h-full">
               <Link
