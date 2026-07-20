@@ -143,13 +143,13 @@ export function LandingPageClient({
 
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-6 sm:space-y-8 pr-0 lg:pr-8 reveal-item">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 leading-[1.15] font-extrabold tracking-tight">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8 reveal-item">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] 2xl:text-8xl text-slate-900 leading-tight lg:leading-[1.1] font-extrabold tracking-tight">
                 Connect Directly with <span className="text-[#22c55e]">Filipino</span>
                 <br />
                 <span className="text-[#22c55e]">Remote Talent</span>
               </h1>
-              <p className="font-body-base text-slate-600 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed">
+              <p className="font-body-base text-slate-600 max-w-2xl text-base md:text-lg lg:text-xl leading-relaxed mt-6 lg:mt-8">
                 Hire skilled remote professionals in the Philippines or land your next remote role. Pay zero agency fees or salary markups. Employers pay a flat subscription, and job seekers keep 100% of their pay.
               </p>
               <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-5 pt-2 sm:pt-4 w-full sm:w-auto">

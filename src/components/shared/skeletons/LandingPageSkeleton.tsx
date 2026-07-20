@@ -18,17 +18,18 @@ export function LandingPageSkeleton() {
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
             {/* Left text column */}
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] space-y-6 sm:space-y-8 pr-0 lg:pr-8">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8">
               {/* Title lines */}
-              <div className="space-y-4">
-                <SkeletonBlock className="h-8 sm:h-10 md:h-12 lg:h-14 w-full max-w-[420px]" />
-                <SkeletonBlock className="h-8 sm:h-10 md:h-12 lg:h-14 w-3/4 max-w-[340px]" />
+              <div className="space-y-3 sm:space-y-4">
+                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-full mb-3" />
+                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-11/12 mb-3" />
+                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-3/4" />
               </div>
               {/* Paragraph lines */}
-              <div className="space-y-3">
-                <SkeletonBlock className="h-4 w-full" />
-                <SkeletonBlock className="h-4 w-11/12" />
-                <SkeletonBlock className="h-4 w-4/5" />
+              <div className="space-y-3 mt-6 lg:mt-8">
+                <SkeletonBlock className="h-4 sm:h-5 w-full max-w-2xl" />
+                <SkeletonBlock className="h-4 sm:h-5 w-11/12 max-w-xl" />
+                <SkeletonBlock className="h-4 sm:h-5 w-4/5 max-w-lg" />
               </div>
               {/* CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-5 pt-4">
