@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { CookieSettingsButton } from "@/components/shared/cookie-consent";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
@@ -27,9 +26,6 @@ export function Footer() {
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/help/hiring-guide">
             Hiring Guide
-          </Link>
-          <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/companies">
-            Browse Companies
           </Link>
           <Link className="text-slate-400 font-body-base hover:text-[#22c55e] transition-colors" href="/pricing">
             Pricing
