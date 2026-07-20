@@ -44,7 +44,7 @@ export default function PublicJobsLoading() {
             {/* Footer Skeleton */}
             <div className="mt-5 pt-3.5 sm:pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
               <SkeletonBlock className="h-5 w-24 sm:w-28 rounded bg-slate-200" />
-              <SkeletonBlock className="h-10 w-28 rounded-xl ml-auto bg-slate-200" />
+              <SkeletonBlock className="h-10 w-28 rounded-xl bg-slate-200 shrink-0" />
             </div>
           </div>
         ))}
