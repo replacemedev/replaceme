@@ -267,7 +267,7 @@ Items **not** on the original gate image, but required (or strongly recommended)
 - [x] **DPA with processors (Supabase, Stripe, Resend, Upstash)** — Ops checklist  
   - `docs/security/dpa-and-subprocessors.md` (sign-off table for Legal)  
   - Vendor DPA links inventoried; executed PDFs remain outside git  
-- [x] **Subprocessor list published** — Full (`/subprocessors`, footer link)
+- [x] **Subprocessor list** — Internal DPA checklist (public `/subprocessors` route removed)
 
 ## F. Application resilience & UX safety
 
@@ -376,6 +376,5 @@ Items **not** on the original gate image, but required (or strongly recommended)
 | CSP / maintenance | `src/lib/security/csp.ts`, `src/lib/security/feature-flags.ts`, `src/proxy.ts` |
 | Sentry | `sentry.*.config.ts`, `src/instrumentation.ts` |
 | Incident / abuse / DPA | `docs/security/incident-runbook.md`, `abuse-reporting-slas.md`, `dpa-and-subprocessors.md`, `observability-and-csp.md` |
-| Subprocessors | `src/app/(public)/subprocessors/page.tsx` |
 | RLS migrations | `supabase/migrations/` |
 | Service role | `src/lib/supabase/server.ts` (`createAdminClient`) |

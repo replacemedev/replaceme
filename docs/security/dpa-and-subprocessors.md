@@ -2,7 +2,7 @@
 
 **Audience:** Legal + Ops  
 **Last updated:** 2026-07-14  
-**Public list:** `/subprocessors` (footer link)
+**Public list:** Removed (previously `/subprocessors`)
 
 ## Executed DPAs (ops checklist)
 
@@ -20,9 +20,8 @@ Mark when countersigned agreements are on file (shared drive / contract system).
 
 ## Subprocessor publication
 
-- Public page: `src/app/(public)/subprocessors/page.tsx`
-- Keep table in `SubprocessorsContent` aligned with this checklist when vendors change.
-- Material changes: update page `lastUpdated`, notify enterprise DPA customers per contract.
+- Public page (`/subprocessors`) removed.
+- Subprocessor inventory is managed internally via executed DPAs checklist.
 
 ## Transfer / residency notes
 

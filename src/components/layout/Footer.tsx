@@ -76,9 +76,6 @@ export function Footer() {
               <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/terms-of-service">
                 Terms of Service
               </Link>
-              <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/subprocessors">
-                Subprocessors
-              </Link>
               <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/cookie-policy">
                 Cookie Policy
               </Link>
