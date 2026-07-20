@@ -108,7 +108,7 @@ export function PricingCards({
 }: PricingCardsProps) {
   if (!plans || plans.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-2xl shadow-sm border border-gray-100 max-w-2xl mx-auto">
+      <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-white rounded-3xl shadow-sm border border-gray-100 max-w-2xl mx-auto my-8">
         <p className="text-gray-500 font-medium text-lg">
           No pricing plans available at the moment.
         </p>
@@ -125,8 +125,8 @@ export function PricingCards({
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-0 sm:px-4 py-4 sm:py-8 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 items-stretch">
         {orderedPlans.map((plan) => {
           const slug = plan.slug.toLowerCase();
           const detail = TIER_DETAILS[slug] || {
@@ -149,15 +149,15 @@ export function PricingCards({
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl transition-all duration-300 ${
+              className={`relative flex flex-col justify-between p-6 md:p-8 rounded-3xl transition-all duration-300 ${
                 isGrowth
                   ? "border-2 border-[#006e2f] bg-gradient-to-b from-[#fafdfb] to-white shadow-lg lg:scale-105 z-10 hover:shadow-xl"
-                  : "border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300"
+                  : "border border-gray-100 bg-white shadow-sm hover:shadow-md hover:border-gray-200"
               }`}
             >
               {/* Badge Pinned to the Top */}
               {isCurrent ? (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white text-[10px] uppercase font-extrabold tracking-wider px-3.5 py-1 rounded-full whitespace-nowrap shadow-sm">
                   Active Plan
                 </div>
               ) : isGrowth ? (
@@ -166,7 +166,7 @@ export function PricingCards({
                   Most Popular
                 </div>
               ) : slug === "discovery" ? (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full whitespace-nowrap">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full whitespace-nowrap">
                   Free Forever
                 </div>
               ) : null}
@@ -177,7 +177,7 @@ export function PricingCards({
                 </h3>
 
                 {/* Price Display */}
-                <div className="mt-3 flex items-baseline">
+                <div className="mt-3 flex items-baseline flex-wrap">
                   <span className="text-4xl font-extrabold text-gray-900 tracking-tight">
                     {formatMoney(plan.price, "USD", {
                       asReact: true,
@@ -216,7 +216,7 @@ export function PricingCards({
                         </div>
                       )}
                       <span
-                        className={`text-xs font-medium leading-snug ${
+                        className={`text-xs font-medium leading-snug break-words ${
                           feature.included ? "text-gray-700" : "text-gray-400 line-through"
                         }`}
                       >
@@ -232,14 +232,14 @@ export function PricingCards({
                 {isCurrent ? (
                   <Link
                     href="/employer/settings/account"
-                    className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-bold text-sm border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-xs"
+                    className="flex w-full items-center justify-center py-3.5 px-4 rounded-xl font-bold text-sm border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-xs text-center"
                   >
                     Manage Subscription
                   </Link>
                 ) : isDowngrade ? (
                   <Link
                     href="/employer/settings/account"
-                    className="flex w-full items-center justify-center py-3 px-4 rounded-xl font-bold text-sm border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-xs"
+                    className="flex w-full items-center justify-center py-3.5 px-4 rounded-xl font-bold text-sm border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-xs text-center"
                   >
                     {buttonText}
                   </Link>
@@ -247,7 +247,7 @@ export function PricingCards({
                   <button
                     type="button"
                     onClick={() => onSelectPlan(plan.slug)}
-                    className={`w-full py-3 px-4 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                    className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer flex items-center justify-center text-center ${
                       isGrowth
                         ? "bg-[#006e2f] text-white hover:bg-[#005c26] shadow-sm hover:shadow"
                         : "border-2 border-slate-200 text-slate-800 bg-white hover:bg-slate-50 hover:border-slate-300"

@@ -37,7 +37,7 @@ export function FAQ(props: { items?: FAQItem[] }) {
   if (faqs.length === 0) return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-20">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
       {/* Centered Got questions? */}
       <h3 className="text-2xl md:text-3xl font-extrabold text-[#0d1e36] text-center mb-12 tracking-tight">
         Got questions?

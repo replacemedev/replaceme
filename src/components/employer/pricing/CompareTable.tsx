@@ -25,89 +25,89 @@ export function CompareTable({
     values: Record<string, string>;
     highlight?: boolean;
   }[] = [
-    {
-      feature: "Active Job Posts",
-      values: {
-        discovery: "1",
-        starter: "3",
-        growth: "10",
-        scale: "Unlimited",
+      {
+        feature: "Active Job Posts",
+        values: {
+          discovery: "1",
+          starter: "3",
+          growth: "10",
+          scale: "Unlimited",
+        },
       },
-    },
-    {
-      feature: "Applicants per Job",
-      values: {
-        discovery: "10",
-        starter: "20",
-        growth: "50",
-        scale: "Unlimited",
+      {
+        feature: "Applicants per Job",
+        values: {
+          discovery: "10",
+          starter: "20",
+          growth: "50",
+          scale: "Unlimited",
+        },
       },
-    },
-    {
-      feature: "Job Approval Time",
-      values: {
-        discovery: "2-Day",
-        starter: "Instant",
-        growth: "Instant",
-        scale: "Instant",
+      {
+        feature: "Job Approval Time",
+        values: {
+          discovery: "2-Day",
+          starter: "Instant",
+          growth: "Instant",
+          scale: "Instant",
+        },
+        highlight: true,
       },
-      highlight: true,
-    },
-    {
-      feature: "Candidate Profiles",
-      values: {
-        discovery: "Anonymous",
-        starter: "Full",
-        growth: "Full",
-        scale: "Full",
+      {
+        feature: "Candidate Profiles",
+        values: {
+          discovery: "Anonymous",
+          starter: "Full",
+          growth: "Full",
+          scale: "Full",
+        },
       },
-    },
-    {
-      feature: "Resume Downloads",
-      values: {
-        discovery: "x",
-        starter: "check",
-        growth: "check",
-        scale: "check",
+      {
+        feature: "Resume Downloads",
+        values: {
+          discovery: "x",
+          starter: "check",
+          growth: "check",
+          scale: "check",
+        },
       },
-    },
-    {
-      feature: "Direct Messaging",
-      values: {
-        discovery: "x",
-        starter: "check",
-        growth: "check",
-        scale: "check",
+      {
+        feature: "Direct Messaging",
+        values: {
+          discovery: "x",
+          starter: "check",
+          growth: "check",
+          scale: "check",
+        },
       },
-    },
-    {
-      feature: "Priority Job Listing",
-      values: {
-        discovery: "x",
-        starter: "x",
-        growth: "check",
-        scale: "check",
+      {
+        feature: "Priority Job Listing",
+        values: {
+          discovery: "x",
+          starter: "x",
+          growth: "check",
+          scale: "check",
+        },
       },
-    },
-    {
-      feature: "Support",
-      values: {
-        discovery: "None",
-        starter: "Email",
-        growth: "Email",
-        scale: "Priority",
+      {
+        feature: "Support",
+        values: {
+          discovery: "None",
+          starter: "Email",
+          growth: "Email",
+          scale: "Priority",
+        },
       },
-    },
-    {
-      feature: "Early Access to Features",
-      values: {
-        discovery: "x",
-        starter: "x",
-        growth: "x",
-        scale: "check",
+      {
+        feature: "Early Access to Features",
+        values: {
+          discovery: "x",
+          starter: "x",
+          growth: "x",
+          scale: "check",
+        },
       },
-    },
-  ];
+    ];
 
   const renderCell = (val: string, isHighlight = false) => {
     if (val === "check") {
@@ -131,7 +131,7 @@ export function CompareTable({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
         Compare Features
       </h3>
@@ -156,13 +156,12 @@ export function CompareTable({
                   return (
                     <th
                       key={plan.id}
-                      className={`p-4 text-sm font-semibold text-center border-t-2 transition-all ${
-                        isGrowth
+                      className={`p-4 text-sm font-semibold text-center border-t-2 transition-all ${isGrowth
                           ? "border-t-[#006e2f] bg-green-50/30 text-[#006e2f] font-bold"
                           : isCurrent
                             ? "border-t-transparent bg-[#fafdfb] text-[#006e2f]"
                             : "border-t-transparent text-gray-900"
-                      }`}
+                        }`}
                     >
                       <span className="block">{plan.name}</span>
                       {isCurrent ? (
@@ -192,13 +191,12 @@ export function CompareTable({
                     return (
                       <td
                         key={plan.id}
-                        className={`p-4 text-sm text-center transition-colors ${
-                          isGrowth
+                        className={`p-4 text-sm text-center transition-colors ${isGrowth
                             ? "bg-green-50/30 group-hover:bg-green-100/20"
                             : isCurrent
                               ? "bg-[#fafdfb]/60 group-hover:bg-[#fafdfb]/30"
                               : ""
-                        }`}
+                          }`}
                       >
                         {renderCell(row.values[plan.slug.toLowerCase()] ?? "—", row.highlight)}
                       </td>
