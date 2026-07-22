@@ -29,7 +29,7 @@ export function WorkerBottomTabBar({
             tab.href === "/worker/messages" && unreadMessageCount > 0;
 
           return (
-            <li key={tab.href}>
+            <li key={tab.href} className="flex">
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
@@ -38,11 +38,11 @@ export function WorkerBottomTabBar({
                     ? `${tab.label}, ${unreadMessageCount} unread messages`
                     : tab.label
                 }
-                className={`relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 px-0.5 text-center text-[10px] tracking-tight font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
+                className={`w-full relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 px-0.5 text-center text-[10px] tracking-tight font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
                   active ? "text-[#006e2f]" : "text-slate-500"
                 }`}
               >
-                <span className="relative">
+                <span className="relative flex items-center justify-center h-5 w-5">
                   <Icon className="h-5 w-5" aria-hidden />
                   {showBadge ? (
                     <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] px-0.5 rounded-full bg-[#006e2f] text-white text-[8px] font-bold flex items-center justify-center leading-none">
@@ -50,7 +50,7 @@ export function WorkerBottomTabBar({
                     </span>
                   ) : null}
                 </span>
-                <span className="truncate max-w-full leading-tight">
+                <span className="truncate max-w-full leading-tight px-0.5 text-center">
                   {tab.label}
                 </span>
               </Link>
