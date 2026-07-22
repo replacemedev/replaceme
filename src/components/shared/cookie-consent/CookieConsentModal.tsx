@@ -84,7 +84,7 @@ export function CookieConsentModal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-[70] m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none"
+      className="fixed inset-0 z-[70] m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto h-[85dvh] sm:h-auto sm:max-h-[90vh] overflow-hidden outline-none"
       onClose={onClose}
       onClick={(e) => {
         if (e.target === dialogRef.current) {
@@ -113,7 +113,7 @@ export function CookieConsentModal({
         </button>
       </div>
 
-      <ul className="space-y-3 px-5 py-4 flex-1 min-h-[120px] max-h-[calc(85dvh-8rem)] sm:max-h-[calc(90vh-9rem)] overflow-y-auto text-slate-700">
+      <ul className="space-y-3 px-5 py-4 flex-1 min-h-0 overflow-y-auto text-slate-700">
         <ConsentToggle
           label="Strictly necessary"
           description="Required for sign-in, security, and core marketplace features. Always on."

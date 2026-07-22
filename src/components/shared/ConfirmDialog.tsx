@@ -77,7 +77,7 @@ export function ConfirmDialog({
         </button>
       </div>
       {children ? (
-        <div className="overflow-y-auto px-5 py-4 flex-1 min-h-[60px] max-h-[calc(85dvh-8rem)] text-slate-700">{children}</div>
+        <div className="overflow-y-auto px-5 py-4 flex-1 min-h-0 text-slate-700">{children}</div>
       ) : null}
       <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-4 shrink-0 bg-slate-50/50 rounded-b-2xl">
         <Button

@@ -34,7 +34,7 @@ export function ProfileModal({
   return (
     <dialog
       ref={dialogRef}
-      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none`}
+      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto h-[85dvh] sm:h-auto sm:max-h-[90vh] overflow-hidden outline-none`}
       onClose={onClose}
       onClick={(e) => {
         if (e.target === dialogRef.current) {
@@ -53,7 +53,7 @@ export function ProfileModal({
           <X className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
       </div>
-      <div className="overflow-y-auto px-4 py-4 sm:px-5 sm:py-4 flex-1 min-h-[140px] max-h-[calc(85dvh-7.5rem)] sm:max-h-[calc(90vh-8.5rem)] text-slate-700">{children}</div>
+      <div className="overflow-y-auto px-4 py-4 sm:px-5 sm:py-4 flex-1 min-h-0 text-slate-700">{children}</div>
       {footer ? (
         <div className="border-t border-slate-100 px-4 py-3.5 sm:px-5 sm:py-4 shrink-0 bg-slate-50/50 rounded-b-2xl">{footer}</div>
       ) : null}
