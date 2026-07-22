@@ -20,10 +20,10 @@ export function LandingPageSkeleton() {
             {/* Left text column */}
             <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8">
               {/* Title lines (synchronized with 3-line hero layout) */}
-              <div className="space-y-2.5 sm:space-y-3 md:space-y-3.5">
-                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-3/4" />
-                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-1/2" />
-                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-2/3" />
+              <div className="space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-3.5">
+                <SkeletonBlock className="h-9 sm:h-12 md:h-14 lg:h-20 xl:h-22 2xl:h-24 w-[82%]" />
+                <SkeletonBlock className="h-9 sm:h-12 md:h-14 lg:h-20 xl:h-22 2xl:h-24 w-[58%]" />
+                <SkeletonBlock className="h-9 sm:h-12 md:h-14 lg:h-20 xl:h-22 2xl:h-24 w-[68%]" />
               </div>
               {/* Paragraph lines */}
               <div className="space-y-3 mt-6 lg:mt-8">
