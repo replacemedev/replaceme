@@ -3,6 +3,7 @@ import { getNavSession } from "@/lib/auth/nav-session";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { GlobalHeaderActions } from "@/components/shared/header/GlobalHeader";
 import { RoleNavDropdown } from "@/components/shared/nav/RoleNavDropdown";
+import { MobileTriggerAndMenu } from "./MobileTriggerAndMenu";
 import { WorkerDesktopNav } from "./WorkerDesktopNav";
 import type { NavSession } from "@/types/nav";
 
@@ -20,6 +21,10 @@ export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
     >
       <div className="flex justify-between items-center px-4 md:px-margin-desktop max-w-7xl mx-auto w-full h-16">
         <div className="flex items-center gap-4">
+          <MobileTriggerAndMenu
+            unreadMessageCount={resolvedSession.unreadMessageCount}
+            session={resolvedSession}
+          />
           <NavBrand homeHref={resolvedSession.homeHref} compact />
         </div>
 
