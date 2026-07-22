@@ -17,7 +17,7 @@ import {
 } from "@/components/employer/layout";
 
 export const metadata = {
-  title: "Hired Workers - Team Management | Replaceme",
+  title: "Hired Workers | Team Management | Replaceme",
   description:
     "Manage your active team members, view contract terms, and monitor monthly payroll statistics.",
 };

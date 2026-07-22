@@ -33,7 +33,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Replaceme — Hire Top Filipino Remote Talent",
+    default: "Replaceme | Hire Top Filipino Remote Talent",
     template: "%s | Replaceme",
   },
   description:
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     locale: "en_PH",
     url: BASE_URL,
     siteName: "Replaceme",
-    title: "Replaceme — Hire Top Filipino Remote Talent",
+    title: "Replaceme | Hire Top Filipino Remote Talent",
     description:
       "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
     images: [
@@ -75,13 +75,13 @@ export const metadata: Metadata = {
         url: "/images/og-default.png",
         width: 1200,
         height: 630,
-        alt: "Replaceme — Direct Filipino Remote Talent Marketplace",
+        alt: "Replaceme | Direct Filipino Remote Talent Marketplace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Replaceme — Hire Top Filipino Remote Talent",
+    title: "Replaceme | Hire Top Filipino Remote Talent",
     description:
       "Skip the agencies. Hire top-tier Filipino remote professionals directly. Flat subscription, zero commission, zero middlemen.",
     images: ["/images/og-default.png"],

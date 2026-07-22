@@ -10,7 +10,7 @@ import {
 export const runtime = "edge";
 
 export const metadata = {
-  title: "Pricing - Scale Your Remote Team | Replaceme",
+  title: "Pricing | Scale Your Remote Team | Replaceme",
   description:
     "Simple, transparent pricing. Discovery is free — upgrade to Starter, Growth, or Scale when you're ready to hire.",
 };

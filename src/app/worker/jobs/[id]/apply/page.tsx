@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
   const data = await getApplyJobPageData(id);
   return {
     title: data
-      ? `Apply — ${data.job.title} | Replaceme`
+      ? `Apply | ${data.job.title} | Replaceme`
       : "Apply | Replaceme",
   };
 }

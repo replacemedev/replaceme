@@ -43,10 +43,10 @@ export const WORKER_NOTIFICATIONS_HREF = "/worker/notifications";
 
 /** Mobile bottom tab bar (primary daily workflow). */
 export const WORKER_TAB_ITEMS: WorkerNavItem[] = [
-  { href: "/worker/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/worker/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/worker/jobs", label: "Jobs", icon: Briefcase },
-  { href: "/worker/applications", label: "Apply", icon: FileText },
-  { href: "/worker/messages", label: "Chat", icon: MessageSquare },
+  { href: "/worker/applications", label: "Applications", icon: FileText },
+  { href: "/worker/messages", label: "Messages", icon: MessageSquare },
 ];
 
 export function isWorkerNavActive(pathname: string, href: string): boolean {

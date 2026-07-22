@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Pricing Plans — Hire Filipino Remote Talent at a Flat Rate",
+  title: "Pricing Plans | Hire Filipino Remote Talent at a Flat Rate",
   description:
     "Compare Replaceme's employer subscription plans. Start free with Discovery, then unlock full applicant profiles, messaging, and instant job approval. No placement fees, no salary commissions.",
   keywords: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     canonical: `${BASE_URL}/pricing`,
   },
   openGraph: {
-    title: "Pricing Plans — Replaceme",
+    title: "Pricing Plans | Replaceme",
     description:
       "Flat subscription pricing for employers. No agency fees. No salary commissions. Workers always join free.",
     url: `${BASE_URL}/pricing`,

@@ -6,14 +6,14 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Hire Top Filipino Remote Talent — No Agency Fees",
+  title: "Hire Top Filipino Remote Talent | No Agency Fees",
   description:
     "Hire skilled Filipino remote professionals with zero agency fees or salary markups. Flat monthly subscriptions for companies, 100% free for job seekers.",
   alternates: {
     canonical: BASE_URL,
   },
   openGraph: {
-    title: "Hire Top Filipino Remote Talent — No Agency Fees",
+    title: "Hire Top Filipino Remote Talent | No Agency Fees",
     description:
       "Direct-hire marketplace for remote Filipino talent. Flat monthly plans for employers and 100% free for workers.",
     url: BASE_URL,

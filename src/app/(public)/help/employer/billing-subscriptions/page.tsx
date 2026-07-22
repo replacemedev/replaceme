@@ -14,7 +14,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Employer Billing & Subscriptions Guide — Replaceme Tiers & Rules",
+  title: "Employer Billing & Subscriptions Guide | Replaceme Tiers & Rules",
   description:
     "Understand Replaceme's flat-rate employer subscription plans, Stripe USD billing, instant job approvals, and 0% salary commission rules.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/help/employer/billing-subscriptions` },
   openGraph: {
-    title: "Employer Billing & Subscriptions Guide — Replaceme",
+    title: "Employer Billing & Subscriptions Guide | Replaceme",
     description:
       "Understand Replaceme's flat-rate employer subscription plans, Stripe USD billing, instant job approvals, and 0% salary commission rules.",
     url: `${BASE_URL}/help/employer/billing-subscriptions`,

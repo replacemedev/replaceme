@@ -17,7 +17,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Worker Profile Optimization Guide — Stand Out on Replaceme",
+  title: "Worker Profile Optimization Guide | Stand Out on Replaceme",
   description:
     "Learn expert tips to optimize your Replaceme worker profile, write compelling summaries, highlight key skills, and get hired faster by top remote employers.",
   keywords: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/help/worker/profile-optimization` },
   openGraph: {
-    title: "Worker Profile Optimization Guide — Replaceme",
+    title: "Worker Profile Optimization Guide | Replaceme",
     description:
       "Learn expert tips to optimize your Replaceme worker profile, write compelling summaries, highlight key skills, and get hired faster by top remote employers.",
     url: `${BASE_URL}/help/worker/profile-optimization`,

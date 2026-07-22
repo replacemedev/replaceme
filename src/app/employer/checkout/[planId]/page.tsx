@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: CheckoutPageProps) {
   const { planId } = await params;
   const plan = await getPlanDetails(planId);
   return {
-    title: `Checkout - ${plan?.name || "Upgrade Plan"} | Replaceme`,
+    title: `Checkout | ${plan?.name || "Upgrade Plan"} | Replaceme`,
     description: "Complete your subscription upgrade securely via Stripe.",
   };
 }

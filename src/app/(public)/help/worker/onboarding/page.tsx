@@ -15,7 +15,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Worker Onboarding Guide — What to Expect When Hired on Replaceme",
+  title: "Worker Onboarding Guide | What to Expect When Hired on Replaceme",
   description:
     "Understand direct payment arrangements, working expectations, keeping 100% of your salary, and long-term remote client success on Replaceme.",
   keywords: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/help/worker/onboarding` },
   openGraph: {
-    title: "Worker Onboarding Guide — Replaceme",
+    title: "Worker Onboarding Guide | Replaceme",
     description:
       "Understand direct payment arrangements, working expectations, keeping 100% of your salary, and long-term remote client success on Replaceme.",
     url: `${BASE_URL}/help/worker/onboarding`,

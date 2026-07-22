@@ -15,7 +15,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Employer Hiring Guide — How to Hire Remote Talent on Replaceme",
+  title: "Employer Hiring Guide | How to Hire Remote Talent on Replaceme",
   description:
     "A simple, step-by-step playbook to find and hire top remote talent on Replaceme. Post jobs, review applicants, and hire directly with 0% commission.",
   keywords: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/help/employer/hiring-guide` },
   openGraph: {
-    title: "Employer Hiring Guide — Replaceme",
+    title: "Employer Hiring Guide | Replaceme",
     description:
       "A simple, step-by-step playbook to find and hire top remote talent on Replaceme.",
     url: `${BASE_URL}/help/employer/hiring-guide`,

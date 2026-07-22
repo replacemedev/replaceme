@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Contact Replaceme — Get Help & Support",
+  title: "Contact Replaceme | Get Help & Support",
   description:
     "Have a question about hiring Filipino remote talent or using the Replaceme platform? Contact our support team by email. We're here to help employers and job seekers alike.",
   keywords: [

@@ -16,7 +16,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Employer Onboarding Guide — Getting Started on Replaceme",
+  title: "Employer Onboarding Guide | Getting Started on Replaceme",
   description:
     "Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline on Replaceme.",
   keywords: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/help/employer/onboarding` },
   openGraph: {
-    title: "Employer Onboarding Guide — Replaceme",
+    title: "Employer Onboarding Guide | Replaceme",
     description:
       "Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline on Replaceme.",
     url: `${BASE_URL}/help/employer/onboarding`,
