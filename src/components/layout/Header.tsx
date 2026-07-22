@@ -75,14 +75,14 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
   const guestAuthActions = (
     <>
       <Link
-        className="text-[#475569] font-body-bold hover:text-[#22c55e] transition-colors"
+        className="text-[#475569] font-body-bold font-bold hover:text-[#22c55e] transition-colors"
         href="/signin"
         onClick={closeMobileMenu}
       >
         Sign In
       </Link>
       <Link
-        className="bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
+        className="bg-[#22c55e] text-white px-5 py-2 rounded-xl font-body-bold font-bold hover:bg-[#16a34a] transition-all duration-200 shadow-sm text-sm"
         href="/signup"
         onClick={closeMobileMenu}
       >
@@ -95,14 +95,14 @@ export function Header({ session = GUEST_NAV_SESSION }: HeaderProps) {
     <>
       <Link
         onClick={closeMobileMenu}
-        className="text-slate-700 font-body-bold py-2.5 text-center text-sm rounded-lg transition-all duration-200 hover:text-[#22c55e] active:scale-[0.98] active:bg-slate-50"
+        className="text-slate-700 font-body-bold font-bold py-2.5 text-center text-sm rounded-lg transition-all duration-200 hover:text-[#22c55e] active:scale-[0.98] active:bg-slate-50"
         href="/signin"
       >
         Sign In
       </Link>
       <Link
         onClick={closeMobileMenu}
-        className="bg-[#22c55e] text-white text-center py-2.5 rounded-xl font-body-bold text-sm transition-transform duration-200 active:scale-[0.98]"
+        className="bg-[#22c55e] text-white text-center py-2.5 rounded-xl font-body-bold font-bold text-sm transition-transform duration-200 active:scale-[0.98]"
         href="/signup"
       >
         Get Started

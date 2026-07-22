@@ -280,7 +280,7 @@ export function LandingPageClient({
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 leading-tight font-bold tracking-tight">Land Your Dream Remote Job with <span className="text-[#22c55e]">Global Companies</span></h2>
               <p className="text-slate-600 font-body-base text-base sm:text-lg leading-relaxed">Build a long-term remote career with top global employers — with zero worker fees and no bidding on cheap gigs.</p>
               <div className="pt-2">
-                <Link href="/signup/worker" className="w-full sm:w-auto bg-[#22c55e] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-body-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
+                <Link href="/signup/worker" className="w-full sm:w-auto bg-[#22c55e] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all shadow-[0_8px_20px_-4px_rgba(34,197,94,0.3)] flex items-center gap-2 text-base justify-center">
                   <span>Create Your Free Profile</span>
                   <UserPlus className="h-5 w-5 shrink-0" aria-hidden />
                 </Link>
