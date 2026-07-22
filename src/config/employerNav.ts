@@ -23,9 +23,9 @@ export interface EmployerNavItem {
 
 /** Bottom tab bar (mobile primary). */
 export const EMPLOYER_TAB_ITEMS: EmployerNavItem[] = [
-  { href: "/employer/dashboard", label: "Home", icon: LayoutDashboard },
+  { href: "/employer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/employer/jobs", label: "Jobs", icon: Briefcase },
-  { href: "/employer/messages", label: "Chat", icon: MessageSquare },
+  { href: "/employer/messages", label: "Messages", icon: MessageSquare },
 ];
 
 export const EMPLOYER_MORE_TAB = {

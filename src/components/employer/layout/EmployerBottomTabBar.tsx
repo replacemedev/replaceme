@@ -50,7 +50,7 @@ export function EmployerBottomTabBar({
                       ? `${tab.label}, ${unreadMessageCount} unread messages`
                       : tab.label
                   }
-                  className={`relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-2 text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
+                  className={`relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 px-0.5 text-center text-[10px] tracking-tight font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
                     active ? "text-[#006e2f]" : "text-slate-500"
                   }`}
                 >
@@ -62,7 +62,9 @@ export function EmployerBottomTabBar({
                       </span>
                     ) : null}
                   </span>
-                  {tab.label}
+                  <span className="truncate max-w-full leading-tight px-0.5 text-center">
+                    {tab.label}
+                  </span>
                 </Link>
               </li>
             );
@@ -73,12 +75,14 @@ export function EmployerBottomTabBar({
               onClick={() => setMoreOpen(true)}
               aria-expanded={moreOpen}
               aria-haspopup="dialog"
-              className={`relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-2 w-full text-[10px] font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
+              className={`relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] py-1.5 px-0.5 text-center text-[10px] tracking-tight font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#006e2f]/30 ${
                 moreActive ? "text-[#006e2f]" : "text-slate-500"
               }`}
             >
               <MoreIcon className="h-5 w-5" aria-hidden />
-              {EMPLOYER_MORE_TAB.label}
+              <span className="truncate max-w-full leading-tight px-0.5 text-center">
+                {EMPLOYER_MORE_TAB.label}
+              </span>
             </button>
           </li>
         </ul>
