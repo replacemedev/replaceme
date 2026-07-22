@@ -18,12 +18,12 @@ export function LandingPageSkeleton() {
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
             {/* Left text column */}
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-12 xl:pr-16">
               {/* Title lines (synchronized with 3-line hero layout) */}
               <div className="space-y-2 sm:space-y-2.5 md:space-y-3 lg:space-y-3.5">
-                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-20 xl:h-22 2xl:h-24 w-[82%]" />
-                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-20 xl:h-22 2xl:h-24 w-[58%]" />
-                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-20 xl:h-22 2xl:h-24 w-[68%]" />
+                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-14 xl:h-17 2xl:h-20 w-[82%]" />
+                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-14 xl:h-17 2xl:h-20 w-[58%]" />
+                <SkeletonBlock className="h-9 min-[375px]:h-11 sm:h-14 md:h-16 lg:h-14 xl:h-17 2xl:h-20 w-[68%]" />
               </div>
               {/* Paragraph lines */}
               <div className="space-y-3 mt-6 lg:mt-8">
@@ -43,7 +43,7 @@ export function LandingPageSkeleton() {
               <div className="relative w-full aspect-square max-w-[500px] mx-auto">
                 <SkeletonBlock className="w-full h-full rounded-[32px] border-[8px] border-white shadow-xl bg-white" />
                 {/* Floating Card 1 Skeleton */}
-                <div className="absolute -left-12 top-20 bg-white rounded-2xl p-4 shadow-xl z-20 flex items-center gap-4 border border-slate-50 w-[180px] h-[74px]">
+                <div className="absolute -left-4 xl:-left-10 top-20 bg-white rounded-2xl p-4 shadow-xl z-20 flex items-center gap-4 border border-slate-50 w-[180px] h-[74px]">
                   <SkeletonBlock className="w-12 h-12 rounded-full shrink-0" />
                   <div className="space-y-1.5 flex-1">
                     <SkeletonBlock className="h-3.5 w-16" />

@@ -143,8 +143,8 @@ export function LandingPageClient({
 
         <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full min-w-0">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
-            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8 reveal-item">
-              <h1 className="text-[2.1rem] min-[375px]:text-[2.5rem] sm:text-[3.25rem] md:text-[4rem] lg:text-[4.75rem] xl:text-[5.5rem] 2xl:text-[6rem] text-slate-900 leading-[1.08] font-extrabold tracking-tight">
+            <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-12 xl:pr-16 reveal-item">
+              <h1 className="text-[2.1rem] min-[375px]:text-[2.5rem] sm:text-[3.25rem] md:text-[3.75rem] lg:text-[3.6rem] xl:text-[4.25rem] 2xl:text-[5rem] text-slate-900 leading-[1.08] font-extrabold tracking-tight">
                 <span className="block whitespace-nowrap">Connect Directly</span>
                 <span className="block whitespace-nowrap">with <span className="text-[#22c55e]">Filipino</span></span>
                 <span className="block whitespace-nowrap text-[#22c55e]">Remote Talent</span>
@@ -179,7 +179,7 @@ export function LandingPageClient({
                   />
                 </div>
                 {/* Floating Card 1 */}
-                <div className="absolute -left-12 top-20 bg-white rounded-2xl p-4 shadow-xl z-20 flex items-center gap-4 border border-slate-50">
+                <div className="absolute -left-4 xl:-left-10 top-20 bg-white rounded-2xl p-4 shadow-xl z-20 flex items-center gap-4 border border-slate-50">
                   <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-[#22c55e] shrink-0">
                     <BadgeCheck className="h-6 w-6 shrink-0" aria-hidden />
                   </div>
