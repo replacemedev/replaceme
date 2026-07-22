@@ -43,10 +43,15 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-200 bg-white p-0 shadow-xl backdrop:bg-slate-900/40 open:flex open:flex-col"
+      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none"
       onClose={onCancel}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) {
+          onCancel();
+        }
+      }}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 shrink-0 bg-white rounded-t-2xl">
         <div className="flex items-start gap-3">
           <span
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
@@ -65,16 +70,16 @@ export function ConfirmDialog({
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
       {children ? (
-        <div className="border-b border-slate-100 px-5 py-4">{children}</div>
+        <div className="overflow-y-auto px-5 py-4 flex-1 min-h-[60px] max-h-[calc(85dvh-8rem)] text-slate-700">{children}</div>
       ) : null}
-      <div className="flex justify-end gap-2 px-5 py-4">
+      <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-4 shrink-0 bg-slate-50/50 rounded-b-2xl">
         <Button
           type="button"
           variant="outline"

@@ -74,7 +74,7 @@ export function LegalDocumentModal({
       </div>
 
       {/* Modal Scrollable Body */}
-      <div className="modal-scroll-container flex-1 overflow-y-auto px-6 py-6 bg-white font-body-base leading-relaxed text-slate-600">
+      <div className="modal-scroll-container flex-1 min-h-0 max-h-[calc(80vh-8rem)] overflow-y-auto px-6 py-6 bg-white font-body-base leading-relaxed text-slate-600">
         <div className="prose prose-slate max-w-none">
           {isTerms ? (
             <TermsOfServiceContent hideSidebar={true} />

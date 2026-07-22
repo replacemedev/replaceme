@@ -73,8 +73,13 @@ export function ReportJobModal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 m-auto w-[calc(100vw-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm open:flex open:flex-col max-h-[90vh] transition-all duration-300 transform scale-100"
+      className="fixed inset-0 z-50 m-auto w-[calc(100vw-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none"
       onClose={onClose}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) {
+          onClose();
+        }
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 shrink-0 bg-slate-50/50">
@@ -99,7 +104,7 @@ export function ReportJobModal({
 
       {/* Form Content */}
       <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-        <div className="overflow-y-auto px-5 py-5 flex-1 space-y-4">
+        <div className="overflow-y-auto px-5 py-5 flex-1 min-h-[140px] max-h-[calc(85dvh-8rem)] sm:max-h-[calc(90vh-9rem)] space-y-4">
           <div className="rounded-xl bg-slate-50 border border-slate-150 p-3.5">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               Reporting Job

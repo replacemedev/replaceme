@@ -84,10 +84,15 @@ export function CookieConsentModal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-[70] m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-xl backdrop:bg-slate-900/40 open:flex open:flex-col"
+      className="fixed inset-0 z-[70] m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none"
       onClose={onClose}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) {
+          onClose();
+        }
+      }}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 shrink-0 bg-white rounded-t-2xl">
         <div>
           <h2 className="text-base font-bold text-slate-900">Cookie preferences</h2>
           <p className="mt-1 text-sm text-slate-600">
@@ -101,14 +106,14 @@ export function CookieConsentModal({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           aria-label="Close cookie preferences"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
 
-      <ul className="space-y-3 px-5 py-4">
+      <ul className="space-y-3 px-5 py-4 flex-1 min-h-[120px] max-h-[calc(85dvh-8rem)] sm:max-h-[calc(90vh-9rem)] overflow-y-auto text-slate-700">
         <ConsentToggle
           label="Strictly necessary"
           description="Required for sign-in, security, and core marketplace features. Always on."
@@ -130,7 +135,7 @@ export function CookieConsentModal({
         />
       </ul>
 
-      <div className="flex flex-col gap-2 border-t border-slate-100 px-5 py-4 sm:flex-row sm:justify-end">
+      <div className="flex flex-col gap-2 border-t border-slate-100 px-5 py-4 shrink-0 bg-slate-50/50 rounded-b-2xl sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"
