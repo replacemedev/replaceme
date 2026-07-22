@@ -145,8 +145,8 @@ export function LandingPageClient({
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
             <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8 reveal-item">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] 2xl:text-8xl text-slate-900 leading-tight lg:leading-[1.1] font-extrabold tracking-tight">
-                Connect Directly with <span className="text-[#22c55e]">Filipino</span>
-                <br />
+                Connect Directly <br />
+                with <span className="text-[#22c55e]">Filipino</span> <br />
                 <span className="text-[#22c55e]">Remote Talent</span>
               </h1>
               <p className="font-body-base text-slate-600 max-w-2xl text-base md:text-lg lg:text-xl leading-relaxed mt-6 lg:mt-8">

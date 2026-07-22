@@ -19,11 +19,11 @@ export function LandingPageSkeleton() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 w-full min-w-0">
             {/* Left text column */}
             <div className="w-full min-w-0 lg:w-[58%] lg:max-w-[58%] max-w-3xl lg:max-w-4xl space-y-6 sm:space-y-8 pr-0 lg:pr-8">
-              {/* Title lines */}
-              <div className="space-y-3 sm:space-y-4">
-                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-full mb-3" />
-                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-11/12 mb-3" />
+              {/* Title lines (synchronized with 3-line hero layout) */}
+              <div className="space-y-2.5 sm:space-y-3 md:space-y-3.5">
                 <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-3/4" />
+                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-1/2" />
+                <SkeletonBlock className="h-10 sm:h-12 md:h-16 lg:h-20 w-2/3" />
               </div>
               {/* Paragraph lines */}
               <div className="space-y-3 mt-6 lg:mt-8">
