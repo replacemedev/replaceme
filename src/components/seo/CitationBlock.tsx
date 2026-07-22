@@ -25,7 +25,7 @@ export function CitationBlock({
     >
       {label && (
         <header>
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2 sm:mb-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-[#22c55e] mb-2 sm:mb-3">
             {label}
           </p>
         </header>
@@ -44,7 +44,7 @@ export function CitationBlock({
           aria-label={`Key statistic: ${stat} — ${statLabel}`}
         >
           <span
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-600 tracking-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22c55e] tracking-tight"
             itemProp="value"
           >
             {stat}
