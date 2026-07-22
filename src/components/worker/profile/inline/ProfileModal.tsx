@@ -9,6 +9,7 @@ interface ProfileModalProps {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  maxWidth?: string;
 }
 
 export function ProfileModal({
@@ -17,6 +18,7 @@ export function ProfileModal({
   onClose,
   children,
   footer,
+  maxWidth = "max-w-lg",
 }: ProfileModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -32,23 +34,23 @@ export function ProfileModal({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-slate-200 bg-white p-0 shadow-xl backdrop:bg-slate-900/40 open:flex open:flex-col max-h-[90vh]"
+      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col max-h-[85dvh] sm:max-h-[90vh] my-auto overflow-hidden outline-none`}
       onClose={onClose}
     >
-      <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 shrink-0">
-        <h2 className="text-sm font-bold text-slate-900">{title}</h2>
+      <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 shrink-0 bg-white rounded-t-2xl">
+        <h2 className="text-sm sm:text-base font-bold text-slate-900">{title}</h2>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
           aria-label="Close"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
       </div>
-      <div className="overflow-y-auto px-5 py-4 flex-1">{children}</div>
+      <div className="overflow-y-auto px-5 py-4 flex-1 min-h-0">{children}</div>
       {footer ? (
-        <div className="border-t border-slate-100 px-5 py-4 shrink-0">{footer}</div>
+        <div className="border-t border-slate-100 px-5 py-4 shrink-0 bg-slate-50/50 rounded-b-2xl">{footer}</div>
       ) : null}
     </dialog>
   );

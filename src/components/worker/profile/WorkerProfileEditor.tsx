@@ -109,9 +109,9 @@ export function WorkerProfileEditor({
 
   const memberSince = profile.created_at
     ? new Date(profile.created_at).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      })
+      month: "short",
+      year: "numeric",
+    })
     : "N/A";
 
   const age = calculateAge(profile.birth_date);
@@ -162,18 +162,18 @@ export function WorkerProfileEditor({
       ...(patch.city !== undefined ? { city: patch.city || null } : {}),
       ...(patch.addressLine1 !== undefined ? { address_line_1: patch.addressLine1 || null } : {}),
       ...((patch.region !== undefined ||
-      patch.province !== undefined ||
-      patch.city !== undefined ||
-      patch.addressLine1 !== undefined)
+        patch.province !== undefined ||
+        patch.city !== undefined ||
+        patch.addressLine1 !== undefined)
         ? {
-            location:
-              formatLocation(
-                patch.addressLine1 !== undefined ? patch.addressLine1 : prev.address_line_1,
-                patch.city !== undefined ? patch.city : prev.city,
-                patch.province !== undefined ? patch.province : prev.province,
-                patch.region !== undefined ? patch.region : prev.region
-              ) || null,
-          }
+          location:
+            formatLocation(
+              patch.addressLine1 !== undefined ? patch.addressLine1 : prev.address_line_1,
+              patch.city !== undefined ? patch.city : prev.city,
+              patch.province !== undefined ? patch.province : prev.province,
+              patch.region !== undefined ? patch.region : prev.region
+            ) || null,
+        }
         : {}),
       ...(patch.portfolioUrl !== undefined
         ? { portfolio_url: patch.portfolioUrl || null }
@@ -331,7 +331,7 @@ export function WorkerProfileEditor({
                   className="text-xs font-bold text-[#006e2f] hover:text-[#005321] flex items-center gap-1 transition-colors"
                 >
                   <Edit size={12} />
-                  Edit Details
+                  Edit
                 </button>
               ) : null}
             </div>
@@ -686,9 +686,8 @@ export function WorkerProfileEditor({
             <button
               type="button"
               onClick={() => isOwner && setRateModalOpen(true)}
-              className={`grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 w-full text-left ${
-                isOwner ? "cursor-pointer hover:opacity-80" : "cursor-default"
-              }`}
+              className={`grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 w-full text-left ${isOwner ? "cursor-pointer hover:opacity-80" : "cursor-default"
+                }`}
             >
               <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 space-y-0.5">
                 <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wide">

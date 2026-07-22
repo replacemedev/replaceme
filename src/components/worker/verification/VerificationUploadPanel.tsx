@@ -51,7 +51,7 @@ export function VerificationUploadPanel({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isSaving, startSaveTransition] = useTransition();
-  
+
   const [editing, setEditing] = useState(false);
   const [localIdType, setLocalIdType] = useState(idType || "");
   const [localIdNumber, setLocalIdNumber] = useState(idNumber || "");
@@ -100,13 +100,12 @@ export function VerificationUploadPanel({
 
       {banner && (
         <div
-          className={`rounded-xl border px-4 py-3 text-sm ${
-            verificationStatus === "approved"
-              ? "border-[#006e2f]/30 bg-[#ebfdf2] text-[#0a4a29]"
-              : verificationStatus === "rejected"
-                ? "border-red-200 bg-red-50 text-red-800"
-                : "border-blue-200 bg-blue-50 text-blue-900"
-          }`}
+          className={`rounded-xl border px-4 py-3 text-sm ${verificationStatus === "approved"
+            ? "border-[#006e2f]/30 bg-[#ebfdf2] text-[#0a4a29]"
+            : verificationStatus === "rejected"
+              ? "border-red-200 bg-red-50 text-red-800"
+              : "border-blue-200 bg-blue-50 text-blue-900"
+            }`}
         >
           {banner}
         </div>
@@ -132,7 +131,7 @@ export function VerificationUploadPanel({
               onClick={() => setEditing(true)}
               className="text-xs font-bold text-[#006e2f] hover:underline"
             >
-              Edit Details
+              Edit
             </button>
           ) : null}
         </div>

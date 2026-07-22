@@ -81,8 +81,9 @@ export function EmployerEditDetailsModal({
   return (
     <ProfileModal
       open={open}
-      title="Edit Profile & KYC Verification"
+      title="Edit Personal & Account details"
       onClose={onClose}
+      maxWidth="max-w-xl"
       footer={
         <div className="flex justify-end gap-2">
           <button
@@ -106,7 +107,7 @@ export function EmployerEditDetailsModal({
         </div>
       }
     >
-      <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-1">
+      <div className="space-y-6">
         {/* Name Fields */}
         <div className="space-y-3">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Legal Name</h3>
