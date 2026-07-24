@@ -192,7 +192,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             placeholder="e.g. Senior React Developer"
           />
         </label>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
             First name
             <input

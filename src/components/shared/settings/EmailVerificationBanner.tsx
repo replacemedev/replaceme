@@ -61,7 +61,7 @@ export function EmailVerificationBanner({
                 <>
                   We sent a link to{" "}
                   <span className="font-semibold break-all">{email}</span>.
-                  Confirm it when you can — you can keep using your account in
+                  Confirm it when you can. You can keep using your account in
                   the meantime.
                 </>
               ) : (

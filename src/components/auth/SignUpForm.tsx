@@ -211,7 +211,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           />
         </FormField>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
           <FormField
             label="First Name"
             htmlFor="signup-firstName"
@@ -232,6 +232,24 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           </FormField>
 
           <FormField
+            label="Middle Name"
+            htmlFor="signup-middleName"
+            error={errors.middleName?.message}
+            className="w-full"
+          >
+            <Input
+              id="signup-middleName"
+              {...register("middleName")}
+              placeholder="Optional"
+              icon={<User size={18} />}
+              autoComplete="additional-name"
+              error={errors.middleName?.message}
+              showErrorMessage={false}
+              aria-describedby="signup-middleName-error"
+            />
+          </FormField>
+
+          <FormField
             label="Last Name"
             htmlFor="signup-lastName"
             required
@@ -247,24 +265,6 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
               error={errors.lastName?.message}
               showErrorMessage={false}
               aria-describedby="signup-lastName-error"
-            />
-          </FormField>
-
-          <FormField
-            label="Middle Name"
-            htmlFor="signup-middleName"
-            error={errors.middleName?.message}
-            className="w-full"
-          >
-            <Input
-              id="signup-middleName"
-              {...register("middleName")}
-              placeholder="Optional"
-              icon={<User size={18} />}
-              autoComplete="additional-name"
-              error={errors.middleName?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-middleName-error"
             />
           </FormField>
 
