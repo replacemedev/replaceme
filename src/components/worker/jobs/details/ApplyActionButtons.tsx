@@ -61,7 +61,7 @@ export function ApplyActionButtons({
           className={
             isBar
               ? "inline-flex flex-1 items-center justify-center px-4 py-2.5 rounded-xl bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-bold transition-colors text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 focus-visible:ring-offset-2"
-              : "inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#4ade80] hover:bg-[#22c55e] text-[#0a4a29] text-sm font-extrabold uppercase tracking-wide shadow-[0_0_24px_rgba(74,222,128,0.45)] transition-colors text-center"
+              : "inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-[#4ade80] hover:bg-[#22c55e] text-[#0a4a29] text-sm font-extrabold uppercase tracking-wide transition-colors text-center"
           }
         >
           Apply for this job

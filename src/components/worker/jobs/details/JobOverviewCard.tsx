@@ -2,7 +2,6 @@ import { FileText, Check, Star, ArrowRight } from "lucide-react";
 import {
   WorkerJobDetails,
   buildListSections,
-  formatCompensation,
   JobListIcon,
 } from "@/types/job-details";
 
@@ -65,18 +64,6 @@ export function JobOverviewCard({ job }: JobOverviewCardProps) {
           {job.description}
         </div>
       )}
-
-      <aside className="mt-8 rounded-xl bg-violet-50 border border-violet-100 p-5">
-        <p className="text-sm font-semibold text-slate-800">
-          Compensation:{" "}
-          <span className="text-[#006e2f] font-extrabold">
-            {formatCompensation(job.monthlySalary, job.salaryCurrency, job.hoursPerWeek)}
-          </span>
-        </p>
-        <p className="mt-1 text-xs text-slate-500">
-          with opportunities to increase based on workload and quality.
-        </p>
-      </aside>
     </article>
   );
 }

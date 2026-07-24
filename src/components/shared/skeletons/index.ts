@@ -19,6 +19,11 @@ export { LandingPageSkeleton } from "./LandingPageSkeleton";
 export { ProfilePageSkeleton } from "./ProfilePageSkeleton";
 export { JobDetailPageSkeleton, FormPageSkeleton } from "./JobDetailPageSkeleton";
 export { SettingsPageSkeleton, GridListingPageSkeleton } from "./SettingsPageSkeleton";
-export { PricingPageSkeleton } from "./PricingPageSkeleton";
+export {
+  PricingPageSkeleton,
+  PricingCardsSkeleton,
+  PricingCompareSkeleton,
+  PricingFaqSkeleton,
+} from "./PricingPageSkeleton";
 export { EmployerFaqSkeleton } from "./EmployerFaqSkeleton";
 export { WorkerFaqSkeleton } from "./WorkerFaqSkeleton";
