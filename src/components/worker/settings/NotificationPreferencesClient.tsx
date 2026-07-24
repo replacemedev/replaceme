@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import {
   saveNotificationPreferences,
@@ -40,13 +39,6 @@ export function NotificationPreferencesClient({
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/worker/notifications"
-        className="text-sm font-bold text-[#006e2f] hover:underline"
-      >
-        View notification history →
-      </Link>
-
       <ul className="space-y-3 rounded-2xl border border-slate-100 bg-white p-5">
         {rows.map((row) => (
           <li key={row.key} className="flex items-center justify-between gap-4">

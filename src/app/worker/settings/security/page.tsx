@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
@@ -33,14 +32,6 @@ export default async function WorkerSecuritySettingsPage() {
         title="Security"
         subhead="Change your password and manage where you are signed in."
       />
-      <p className="mb-6 text-sm">
-        <Link
-          href="/worker/settings"
-          className="font-bold text-[#006e2f] hover:underline"
-        >
-          ← Account settings
-        </Link>
-      </p>
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 sm:gap-5">
         <PasswordSecurityCard />
         <SessionSecurityPanel />
