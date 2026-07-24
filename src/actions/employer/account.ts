@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendPasswordResetLink } from "@/actions/auth";
 import { safeError } from "@/utils/logger";
 
 export type EmployerAccountDetails = {
@@ -63,20 +62,6 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
     safeError("getEmployerAccountDetails error:", err);
     return null;
   }
-}
-
-export async function requestPasswordResetForCurrentUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user?.email) {
-    return { success: false, error: "No email found for your account." };
-  }
-
-  return sendPasswordResetLink(user.email);
 }
 
 export async function updateEmployerAccountDetails(data: {

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ShieldAlert, CreditCard, Building2 } from "lucide-react";
-import { PasswordResetButton } from "./PasswordResetButton";
+import { ChangePasswordButton } from "./ChangePasswordButton";
 
 export function AccountDetailsList() {
   return (
@@ -50,7 +50,7 @@ export function AccountDetailsList() {
               </p>
             </div>
           </div>
-          <PasswordResetButton />
+          <ChangePasswordButton />
         </div>
       </div>
     </div>

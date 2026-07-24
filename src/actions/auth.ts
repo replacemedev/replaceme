@@ -29,6 +29,7 @@ import {
   renderEmailLayout,
 } from "@/lib/server/email/email-templates";
 import {
+  changePasswordSchema,
   forgotPasswordSchema,
   updatePasswordSchema,
   type ForgotPasswordFormValues,
@@ -887,6 +888,76 @@ export async function updatePassword(formData: {
     }
     safeError("[Auth] updatePassword unexpected error:", error);
     return { success: false, error: "An unexpected error occurred. Please try again." };
+  }
+}
+
+/**
+ * In-app password change for an authenticated user.
+ * Verifies the current password, then updates via Supabase Auth.
+ * Does not sign the user out or send email.
+ */
+export async function changePassword(formData: {
+  currentPassword: string;
+  password: string;
+  confirmPassword: string;
+}) {
+  try {
+    safeLog("[Auth] In-app password change requested");
+
+    const parsed = changePasswordSchema.safeParse(formData);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message };
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return {
+        success: false,
+        error: "You must be signed in to change your password.",
+      };
+    }
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: parsed.data.currentPassword,
+    });
+
+    if (verifyError) {
+      return {
+        success: false,
+        error: "Current password is incorrect.",
+      };
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+    });
+
+    if (updateError) {
+      safeError(`[Auth] changePassword updateUser error: ${updateError.message}`);
+      if (updateError.message.toLowerCase().includes("same")) {
+        return {
+          success: false,
+          error: "New password must be different from your current password.",
+        };
+      }
+      return {
+        success: false,
+        error: "Failed to update password. Please try again.",
+      };
+    }
+
+    return { success: true, message: "Password updated successfully" };
+  } catch (error) {
+    safeError("[Auth] changePassword unexpected error:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
   }
 }
 

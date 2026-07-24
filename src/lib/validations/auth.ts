@@ -82,8 +82,25 @@ export const updatePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+/** In-app password change for an already-authenticated session. */
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    password: z.string().min(8, "Password must be at least 8 characters").max(100, "Password cannot exceed 100 characters."),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.password !== data.currentPassword, {
+    message: "New password must be different from your current password",
+    path: ["password"],
+  });
+
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export type UpdatePasswordFormValues = z.infer<typeof updatePasswordSchema>;
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 
 export const loginCredentialsSchema = z
   .object({
