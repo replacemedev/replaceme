@@ -74,7 +74,7 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
           Notification preferences →
         </Link>
         <Link href="/worker/settings/security" className="font-bold text-[#006e2f] hover:underline">
-          Security & sessions →
+          Password & security →
         </Link>
       </p>
       <form

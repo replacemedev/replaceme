@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ShieldAlert, Building2 } from "lucide-react";
-import { ChangePasswordButton } from "./ChangePasswordButton";
+import { ChangePasswordButton } from "@/components/shared/security/ChangePasswordButton";
 
 function AccountDetailRow({
   icon,

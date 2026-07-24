@@ -2,11 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
+import { PasswordSecurityCard } from "@/components/shared/security/PasswordSecurityCard";
 import { SessionSecurityPanel } from "@/components/shared/security/SessionSecurityPanel";
 
 export const metadata = {
   title: "Security | Replaceme",
-  description: "Manage sessions and sign out of other devices.",
+  description: "Change your password and manage signed-in devices.",
 };
 
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export default async function WorkerSecuritySettingsPage() {
     <WorkerPageShell width="content">
       <WorkerPageHeader
         title="Security"
-        subhead="Protect your account by managing where you are signed in."
+        subhead="Change your password and manage where you are signed in."
       />
       <p className="mb-6 text-sm">
         <Link
@@ -40,7 +41,8 @@ export default async function WorkerSecuritySettingsPage() {
           ← Account settings
         </Link>
       </p>
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 sm:gap-5">
+        <PasswordSecurityCard />
         <SessionSecurityPanel />
       </div>
     </WorkerPageShell>
