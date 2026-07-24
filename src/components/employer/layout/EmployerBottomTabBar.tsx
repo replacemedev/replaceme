@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -26,6 +26,11 @@ export function EmployerBottomTabBar({
   const [moreOpen, setMoreOpen] = useState(false);
   const MoreIcon = EMPLOYER_MORE_TAB.icon;
   const moreActive = isEmployerMoreActive(pathname);
+
+  // Collapse after navigation completes (covers sheet links and nested dropdown links).
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [pathname]);
 
   return (
     <>

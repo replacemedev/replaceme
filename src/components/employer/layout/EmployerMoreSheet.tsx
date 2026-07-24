@@ -1,7 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import {
   EMPLOYER_MORE_NAV_ITEMS,
@@ -17,8 +18,55 @@ interface EmployerMoreSheetProps {
   session?: NavSession;
 }
 
+/** iOS Safari can cancel Link navigation if the sheet unmounts mid-tap. */
+const CLOSE_AFTER_NAV_MS = 50;
+
 export function EmployerMoreSheet({ open, onClose, session }: EmployerMoreSheetProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      onClose();
+      closeTimerRef.current = null;
+    }, CLOSE_AFTER_NAV_MS);
+  }, [onClose]);
+
+  const handleNavClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+      // Preserve open-in-new-tab / modified clicks.
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        event.button !== 0
+      ) {
+        scheduleClose();
+        return;
+      }
+
+      event.preventDefault();
+
+      if (href === pathname) {
+        onClose();
+        return;
+      }
+
+      // Push first, then defer unmount so iOS Safari completes the gesture.
+      router.push(href);
+      scheduleClose();
+    },
+    [onClose, pathname, router, scheduleClose]
+  );
 
   if (!open) return null;
 
@@ -41,7 +89,7 @@ export function EmployerMoreSheet({ open, onClose, session }: EmployerMoreSheetP
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
+            className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -55,8 +103,8 @@ export function EmployerMoreSheet({ open, onClose, session }: EmployerMoreSheetP
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  onClick={onClose}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
+                  onClick={(event) => handleNavClick(event, item.href)}
+                  className={`flex min-h-[48px] items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
                     active
                       ? "bg-[#ebfdf2] text-[#006e2f]"
                       : "text-slate-700 hover:bg-slate-50"
