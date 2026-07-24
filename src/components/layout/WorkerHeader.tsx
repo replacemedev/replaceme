@@ -16,7 +16,7 @@ export async function WorkerHeader({ session }: WorkerHeaderProps = {}) {
 
   return (
     <header
-      className="sticky top-0 w-full z-50 transition-all duration-300 bg-white border-b border-slate-100 shadow-sm"
+      className="sticky top-0 w-full z-50 overflow-visible transition-all duration-300 bg-white border-b border-slate-100 shadow-sm"
       style={{ viewTransitionName: "worker-header" }}
     >
       <div className="flex justify-between items-center px-4 md:px-margin-desktop max-w-7xl mx-auto w-full h-16">

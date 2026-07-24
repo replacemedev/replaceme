@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { usePathname } from "next/navigation";
@@ -9,6 +10,7 @@ import { logOut } from "@/actions/auth";
 import { WORKER_ACCOUNT_NAV_ITEMS } from "@/config/workerNav";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ReportIssueSlideover } from "@/components/shared/reporting/ReportIssueSlideover";
+import { useFixedMenuPosition } from "@/hooks/useFixedMenuPosition";
 
 interface WorkerProfile {
   first_name: string | null;
@@ -35,13 +37,26 @@ export function WorkerDropdown({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuPos = useFixedMenuPosition(dropdownOpen, triggerRef);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
+      const target = event.target as Node;
+      if (
+        dropdownRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
+      ) {
+        return;
       }
+      setDropdownOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -160,9 +175,78 @@ export function WorkerDropdown({
     );
   }
 
+  const desktopMenu =
+    dropdownOpen && menuPos ? (
+      <div
+        ref={menuRef}
+        style={{ top: menuPos.top, right: menuPos.right }}
+        className="fixed w-56 max-h-[min(70vh,480px)] overflow-y-auto bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-[100] animate-fadeIn"
+        role="menu"
+        aria-label="User actions dropdown"
+      >
+        <div className="px-4 py-2 sm:hidden border-b border-slate-50 mb-1">
+          <p className="text-[10px] text-slate-400 font-medium">Logged in as</p>
+          <p className="text-xs font-bold text-slate-800 truncate inline-flex items-center gap-1">
+            {displayName}
+            <VerifiedBadge show={isVerified} size="sm" />
+          </p>
+        </div>
+
+        {WORKER_ACCOUNT_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setDropdownOpen(false)}
+              className={`flex items-center gap-3 px-4 py-2.5 text-xs transition-colors w-full text-left font-semibold ${
+                isActive
+                  ? "text-[#006e2f] bg-[#ebfdf2]/50"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              }`}
+              role="menuitem"
+            >
+              <Icon size={14} className="text-slate-400 shrink-0" />
+              {item.label}
+            </Link>
+          );
+        })}
+
+        <div className="h-px bg-slate-100 my-1" />
+
+        <button
+          type="button"
+          onClick={() => {
+            setDropdownOpen(false);
+            setReportOpen(true);
+          }}
+          className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold cursor-pointer"
+          role="menuitem"
+        >
+          <Flag size={14} className="text-slate-400 shrink-0" />
+          Report an issue
+        </button>
+
+        <button
+          type="button"
+          disabled={isPending}
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
+          role="menuitem"
+        >
+          <LogOut size={14} className="text-red-500" />
+          {isPending ? "Signing out..." : "Sign Out"}
+        </button>
+      </div>
+    ) : null;
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={triggerRef}
         onClick={() => setDropdownOpen(!dropdownOpen)}
         type="button"
         className="flex items-center gap-2 p-1 hover:bg-slate-50 rounded-2xl transition-all duration-200 cursor-pointer focus:outline-none"
@@ -192,70 +276,7 @@ export function WorkerDropdown({
         />
       </button>
 
-      {dropdownOpen && (
-        <div
-          className="absolute right-0 mt-2 w-56 max-h-[min(70vh,480px)] overflow-y-auto bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn"
-          role="menu"
-          aria-label="User actions dropdown"
-        >
-          <div className="px-4 py-2 sm:hidden border-b border-slate-50 mb-1">
-            <p className="text-[10px] text-slate-400 font-medium">Logged in as</p>
-            <p className="text-xs font-bold text-slate-800 truncate inline-flex items-center gap-1">
-              {displayName}
-              <VerifiedBadge show={isVerified} size="sm" />
-            </p>
-          </div>
-
-          {WORKER_ACCOUNT_NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setDropdownOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 text-xs transition-colors w-full text-left font-semibold ${
-                  isActive
-                    ? "text-[#006e2f] bg-[#ebfdf2]/50"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
-                role="menuitem"
-              >
-                <Icon size={14} className="text-slate-400 shrink-0" />
-                {item.label}
-              </Link>
-            );
-          })}
-
-          <div className="h-px bg-slate-100 my-1" />
-
-          <button
-            type="button"
-            onClick={() => {
-              setDropdownOpen(false);
-              setReportOpen(true);
-            }}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold cursor-pointer"
-            role="menuitem"
-          >
-            <Flag size={14} className="text-slate-400 shrink-0" />
-            Report an issue
-          </button>
-
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
-            role="menuitem"
-          >
-            <LogOut size={14} className="text-red-500" />
-            {isPending ? "Signing out..." : "Sign Out"}
-          </button>
-        </div>
-      )}
+      {mounted && desktopMenu ? createPortal(desktopMenu, document.body) : null}
 
       <ReportIssueSlideover open={reportOpen} onClose={() => setReportOpen(false)} />
     </div>
