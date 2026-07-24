@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -35,14 +34,6 @@ export default async function EmployerSecuritySettingsPage() {
         title="Security"
         subhead="Protect your hiring account by managing active sessions."
       />
-      <p className="mb-6 text-sm">
-        <Link
-          href="/employer/settings/account"
-          className="font-bold text-[#006e2f] hover:underline"
-        >
-          ← Account settings
-        </Link>
-      </p>
       <div className="mx-auto w-full max-w-2xl">
         <SessionSecurityPanel />
       </div>
