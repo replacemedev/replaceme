@@ -15,9 +15,12 @@ const BRAND = {
   productionSiteUrl: "https://replaceme.ph",
 } as const;
 
-function brandLogoUrl(siteUrl?: string): string {
-  const base = (siteUrl ?? getSiteUrl()).replace(/\/$/, "");
-  return `${base}/images/logo.png`;
+/** Optimized email logo on Supabase Storage CDN (200×200, ~20KB). */
+const EMAIL_LOGO_CDN_URL =
+  "https://dsbfudkacjrpnilqmiuy.supabase.co/storage/v1/object/public/brand-assets/email/logo.png";
+
+function brandLogoUrl(_siteUrl?: string): string {
+  return EMAIL_LOGO_CDN_URL;
 }
 
 export function escapeHtml(input: string): string {
@@ -88,7 +91,7 @@ export function renderEmailLayout(input: {
                 <table role="presentation" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="vertical-align:middle;padding-right:10px;">
-                      <img src="${logoUrl}" width="40" height="40" alt="${BRAND.logoAlt}" style="display:block;border:0;border-radius:10px;" />
+                      <img src="${logoUrl}" width="40" height="40" alt="${BRAND.logoAlt}" style="display:block;border:0;border-radius:10px;max-width:100%;height:auto;" />
                     </td>
                     <td style="vertical-align:middle;">
                       <div style="font-weight:800;font-size:20px;letter-spacing:-0.03em;color:${BRAND.primary};line-height:1;">

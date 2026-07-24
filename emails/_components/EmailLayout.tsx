@@ -77,7 +77,12 @@ export function EmailLayout({
                 width={40}
                 height={40}
                 alt={BRAND.appName}
-                className="mb-2 rounded-[10px]"
+                style={{
+                  display: "block",
+                  maxWidth: "100%",
+                  height: "auto",
+                  borderRadius: 10,
+                }}
               />
               <Text className="m-0 text-[20px] font-extrabold leading-none tracking-tight text-brand">
                 {BRAND.appName}

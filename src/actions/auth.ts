@@ -763,7 +763,7 @@ export async function sendPasswordResetLink(
       headerStore.get("x-real-ip") ??
       "anonymous";
 
-    let captchaToken = "";
+    let captchaOk = true;
     if (!isAuthenticatedCaller) {
       const turnstile = await requireTurnstileToken(
         parsed.data.turnstileToken,
@@ -772,7 +772,10 @@ export async function sendPasswordResetLink(
       if (!turnstile.success) {
         return { success: false, error: turnstile.error };
       }
-      captchaToken = turnstile.token;
+      captchaOk = Boolean(turnstile.token);
+    }
+    if (!captchaOk) {
+      return { success: false, error: "Security check failed. Please try again." };
     }
 
     const normalizedEmail = parsed.data.email.trim().toLowerCase();
@@ -786,17 +789,22 @@ export async function sendPasswordResetLink(
       };
     }
 
-    const supabase = await createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo: authCallbackUrl("recovery", "/update-password"),
-      ...captchaAuthOptions(captchaToken),
-    });
+    // Generate recovery link without Supabase Auth mailer (avoids heavy dashboard
+    // template logo). Send branded HTML via Resend with CDN-hosted ~20KB logo.
+    const admin = await createAdminClient();
+    const { data: linkData, error: linkError } =
+      await admin.auth.admin.generateLink({
+        type: "recovery",
+        email: normalizedEmail,
+        options: {
+          redirectTo: authCallbackUrl("recovery", "/update-password"),
+        },
+      });
 
-    if (error) {
-      safeError(
-        `[Auth] resetPasswordForEmail error: ${error.message} (status: ${error.status})`
-      );
-      if (error.status === 429) {
+    const tokenHash = linkData?.properties?.hashed_token;
+    if (linkError || !tokenHash) {
+      safeError("[Auth] recovery generateLink failed:", linkError);
+      if (linkError?.status === 429) {
         return {
           success: false,
           error: "Too many requests. Please wait a few minutes before trying again.",
@@ -806,6 +814,37 @@ export async function sendPasswordResetLink(
         success: false,
         error: "Failed to send reset link. Please try again.",
       };
+    }
+
+    const resetHref = `${getSiteUrl()}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=recovery&next=${encodeURIComponent("/update-password")}`;
+    const bodyHtml = `
+      <p style="margin:0 0 14px 0;">We received a request to reset the password for your <strong>Replaceme</strong> account.</p>
+      <p style="margin:0 0 18px 0;">Choose a new password using the secure link below.</p>
+      <p style="margin:0 0 18px 0;">
+        <a href="${escapeHtml(resetHref)}" style="display:inline-block;background:#006e2f;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;letter-spacing:-0.01em;line-height:1.2;">Reset password</a>
+      </p>
+      <p style="margin:0;font-size:13px;color:#64748b;line-height:1.55;">
+        If you didn’t request a reset, you can safely ignore this email. Your password won’t change.
+      </p>
+    `;
+    const rendered = renderEmailLayout({
+      title: "Reset your password",
+      preheader: "Secure link to choose a new Replaceme password.",
+      bodyHtml,
+      footerNote: "This link expires for your security. Need help? support@replaceme.ph",
+    });
+
+    const sent = await sendTransactionalEmail({
+      templateKey: "auth.password_reset",
+      to: normalizedEmail,
+      subject: "Reset your password — Replaceme",
+      html: rendered.html,
+      text: rendered.text,
+      idempotencyKey: `password-reset:${normalizedEmail}:${Math.floor(Date.now() / 60_000)}`,
+    });
+
+    if (!sent.success) {
+      return { success: false, error: sent.error };
     }
 
     return {
@@ -977,8 +1016,7 @@ export async function getEmailVerificationStatus(): Promise<{
 
 /**
  * Sends an email verification link from Account Settings (on demand only).
- * Uses auth.resend for unconfirmed users; for soft-confirmed users with a
- * pending flag, emails a magic link via Resend so they can complete verification.
+ * Always emails via Resend with the CDN logo (skips Supabase Auth mailer assets).
  */
 export async function resendEmailVerification(): Promise<{
   success: boolean;
@@ -1014,26 +1052,6 @@ export async function resendEmailVerification(): Promise<{
     const settingsPath = emailVerificationSettingsPath(String(role));
     const redirectTo = authCallbackUrl("signup", settingsPath);
 
-    if (!user.email_confirmed_at) {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: user.email,
-        options: { emailRedirectTo: redirectTo },
-      });
-      if (error) {
-        safeError("[Auth] resend signup confirmation failed:", error);
-        return {
-          success: false,
-          error: "Could not send verification email. Please try again.",
-        };
-      }
-      return {
-        success: true,
-        message: "Verification email sent. Check your inbox.",
-      };
-    }
-
-    // Soft-confirmed at signup — send a magic link so clicking it clears pending.
     const admin = await createAdminClient();
     const { data: linkData, error: linkError } =
       await admin.auth.admin.generateLink({

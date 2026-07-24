@@ -15,6 +15,10 @@ export const BRAND = {
   tagline: "Filipino remote talent, hired directly",
 } as const;
 
-export function brandLogoUrl(siteUrl: string): string {
-  return `${siteUrl.replace(/\/$/, "")}/images/logo.png`;
+/** Optimized email logo on Supabase Storage CDN (200×200, ~20KB). */
+export const EMAIL_LOGO_CDN_URL =
+  "https://dsbfudkacjrpnilqmiuy.supabase.co/storage/v1/object/public/brand-assets/email/logo.png";
+
+export function brandLogoUrl(_siteUrl?: string): string {
+  return EMAIL_LOGO_CDN_URL;
 }
