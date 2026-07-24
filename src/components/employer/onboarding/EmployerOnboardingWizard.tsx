@@ -285,10 +285,10 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
     <OnboardingWizardShell
       {...shellProps}
       stepLabel="Personal details"
-      title="Personal & KYC Verification"
-      description="Tell us about yourself to complete your profile verification."
+      title="Personal Details"
+      description="Tell us about yourself to complete your employer profile."
       onBack={() => setPhase("details")}
-      nextLabel="Complete Onboarding"
+      nextLabel="Finish"
       isNextDisabled={isPersonalNextDisabled}
       onNext={() => {
         startTransition(async () => {
