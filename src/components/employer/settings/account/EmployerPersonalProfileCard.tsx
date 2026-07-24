@@ -31,7 +31,7 @@ export function EmployerPersonalProfileCard({
         <div>
           <h2 className="text-lg font-bold text-slate-800">Profile Information</h2>
           <p className="mt-1 text-xs text-slate-400">
-            Your personal login identity — separate from your company brand.
+            Your personal login identity separate from your company brand.
           </p>
         </div>
         <button
@@ -40,7 +40,7 @@ export function EmployerPersonalProfileCard({
           className="text-xs font-bold text-[#006e2f] hover:text-[#005321] flex items-center gap-1 transition-colors"
         >
           <Edit size={14} />
-          Edit Profile
+          Edit
         </button>
       </div>
 

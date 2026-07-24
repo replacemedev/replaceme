@@ -893,7 +893,12 @@ export async function updatePassword(formData: {
 
 /**
  * In-app password change for an authenticated user.
- * Verifies the current password, then updates via Supabase Auth.
+ *
+ * Uses Supabase Auth's native current_password validation on updateUser
+ * (supabase-js v2.102+). Do NOT verify via signInWithPassword here —
+ * Auth CAPTCHA blocks password grants without a Turnstile token, which
+ * previously surfaced every failure as "Current password is incorrect."
+ *
  * Does not sign the user out or send email.
  */
 export async function changePassword(formData: {
@@ -914,37 +919,54 @@ export async function changePassword(formData: {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user?.email) {
+    if (!user) {
       return {
         success: false,
         error: "You must be signed in to change your password.",
       };
     }
 
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: parsed.data.currentPassword,
-    });
-
-    if (verifyError) {
-      return {
-        success: false,
-        error: "Current password is incorrect.",
-      };
-    }
-
     const { error: updateError } = await supabase.auth.updateUser({
       password: parsed.data.password,
+      current_password: parsed.data.currentPassword,
     });
 
     if (updateError) {
       safeError(`[Auth] changePassword updateUser error: ${updateError.message}`);
-      if (updateError.message.toLowerCase().includes("same")) {
+      const message = updateError.message.toLowerCase();
+
+      if (
+        message.includes("incorrect") ||
+        message.includes("invalid login") ||
+        message.includes("invalid credentials") ||
+        message.includes("current password") ||
+        updateError.code === "invalid_credentials"
+      ) {
+        return {
+          success: false,
+          error: "Current password is incorrect.",
+        };
+      }
+
+      if (message.includes("same")) {
         return {
           success: false,
           error: "New password must be different from your current password.",
         };
       }
+
+      if (
+        message.includes("reauthentication") ||
+        message.includes("reauthenticate") ||
+        message.includes("nonce")
+      ) {
+        return {
+          success: false,
+          error:
+            "For security, please sign out and sign back in, then try changing your password again.",
+        };
+      }
+
       return {
         success: false,
         error: "Failed to update password. Please try again.",
