@@ -47,7 +47,7 @@ export function EmailVerificationBanner({
       role="status"
       aria-live="polite"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="flex min-w-0 items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
             <MailWarning className="h-5 w-5" aria-hidden />
@@ -78,7 +78,7 @@ export function EmailVerificationBanner({
           type="button"
           onClick={handleVerify}
           disabled={pending}
-          className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 text-sm font-bold text-white transition-colors hover:bg-[#005c26] disabled:opacity-60 sm:h-10 sm:w-auto"
+          className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#005c26] disabled:opacity-60 sm:w-auto sm:self-center"
         >
           {pending ? (
             <>

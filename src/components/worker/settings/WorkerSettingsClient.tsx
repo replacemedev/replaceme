@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { Bell, ChevronRight, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { updateWorkerSettings } from "@/actions/worker/profile";
 import { reportEmployer } from "@/actions/worker/phase2";
@@ -9,6 +10,21 @@ import {
   COMPENSATION_CURRENCIES,
   type CompensationCurrency,
 } from "@/lib/format/currency";
+
+const SETTINGS_NAV = [
+  {
+    href: "/worker/settings/notifications",
+    label: "Notification preferences",
+    description: "Choose which alerts you receive by email and in-app.",
+    icon: Bell,
+  },
+  {
+    href: "/worker/settings/security",
+    label: "Password & security",
+    description: "Update your password and manage account security.",
+    icon: Shield,
+  },
+] as const;
 
 interface WorkerSettingsClientProps {
   initial: {
@@ -69,14 +85,39 @@ export function WorkerSettingsClient({ initial }: WorkerSettingsClientProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <p className="lg:col-span-2 flex flex-col gap-2 sm:flex-row sm:gap-6 text-sm">
-        <Link href="/worker/settings/notifications" className="font-bold text-[#006e2f] hover:underline">
-          Notification preferences →
-        </Link>
-        <Link href="/worker/settings/security" className="font-bold text-[#006e2f] hover:underline">
-          Password & security →
-        </Link>
-      </p>
+      <nav
+        aria-label="Settings shortcuts"
+        className="lg:col-span-2 flex flex-col gap-4 md:flex-row md:gap-6"
+      >
+        {SETTINGS_NAV.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex flex-1 items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all hover:border-[#006e2f]/40 hover:bg-[#ebfdf2]/40 hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] sm:p-5"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#ebfdf2] text-[#006e2f]">
+                <Icon className="h-5 w-5" aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold text-slate-900">
+                    {item.label}
+                  </span>
+                  <ChevronRight
+                    className="h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#006e2f]"
+                    aria-hidden
+                  />
+                </span>
+                <span className="mt-1 block text-sm leading-relaxed text-slate-500">
+                  {item.description}
+                </span>
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
       <form
         onSubmit={saveSettings}
         className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4"
