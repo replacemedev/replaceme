@@ -3,6 +3,11 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { resolveSafeRedirectOrigin } from "@/lib/auth/safe-redirect-origin";
 import { sanitizeRedirectPath } from "@/lib/auth/safe-callback-url";
+import {
+  clearEmailVerificationPending,
+  emailVerificationSettingsPath,
+} from "@/lib/auth/email-verification";
+import { isAppRole } from "@/lib/auth/role";
 
 function authFailureRedirect(request: NextRequest): NextResponse {
   const url = new URL("/signin", resolveSafeRedirectOrigin(request));
@@ -55,7 +60,7 @@ export async function GET(request: NextRequest) {
   }
 
   const origin = resolveSafeRedirectOrigin(request);
-  const isSignup = type === "signup" || next === "/signin";
+  const isSignup = type === "signup";
   const isRecovery = type === "recovery" || next === "/update-password";
 
   const cookieStore = await cookies();
@@ -67,9 +72,23 @@ export async function GET(request: NextRequest) {
     return authFailureRedirect(request);
   }
 
-  if (isSignup) {
-    await supabase.auth.signOut();
-    return attachRedirect(`${origin}/signin?confirmed=email`);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (isSignup && user) {
+    await clearEmailVerificationPending(user.id);
+    const role =
+      (typeof user.app_metadata?.role === "string" && user.app_metadata.role) ||
+      (typeof user.user_metadata?.role === "string" && user.user_metadata.role) ||
+      undefined;
+    const settingsPath = emailVerificationSettingsPath(
+      isAppRole(role) ? role : "worker"
+    );
+    const safeNext = sanitizeRedirectPath(next, settingsPath);
+    const url = new URL(safeNext, origin);
+    url.searchParams.set("confirmed", "email");
+    return attachRedirect(url);
   }
 
   if (isRecovery) {

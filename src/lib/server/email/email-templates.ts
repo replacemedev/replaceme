@@ -245,11 +245,11 @@ export function renderWorkerNotificationEmail(input: {
  */
 export function getSupabaseConfirmSignupHtml(): string {
   const ctaHref =
-    "{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup";
+    "{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next={{ .RedirectTo }}";
 
   const bodyHtml = `
     <p style="margin:0 0 14px 0;">Welcome to <strong>${BRAND.appName}</strong> — the direct marketplace for Filipino remote talent.</p>
-    <p style="margin:0 0 18px 0;">Confirm your email to activate your account and get started.</p>
+    <p style="margin:0 0 18px 0;">Confirm your email to finish verifying your account. You can keep using Replaceme in the meantime.</p>
     <p style="margin:0 0 18px 0;">
       <a href="${ctaHref}" style="display:inline-block;background:${BRAND.accent};color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;letter-spacing:-0.01em;line-height:1.2;">Confirm email address</a>
     </p>
@@ -261,7 +261,7 @@ export function getSupabaseConfirmSignupHtml(): string {
 
   return renderEmailLayout({
     title: "Confirm your email",
-    preheader: "Activate your Replaceme account in one click.",
+    preheader: "Verify your Replaceme email when you’re ready.",
     bodyHtml,
     footerNote: `This link expires for your security. Need help? ${BRAND.supportEmail}`,
     siteUrl: BRAND.productionSiteUrl,

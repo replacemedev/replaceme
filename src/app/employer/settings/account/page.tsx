@@ -7,11 +7,13 @@ import {
   listEmployerInvoices,
 } from "@/actions/employer/billing";
 import { getEmployerAccountDetails } from "@/actions/employer/account";
+import { getEmailVerificationStatus } from "@/actions/auth";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 import {
   EmployerPageHeader,
   EmployerPageShell,
 } from "@/components/employer/layout";
+import { EmailVerificationBanner } from "@/components/shared/settings/EmailVerificationBanner";
 
 export const metadata = {
   title: "Account Settings | Replaceme",
@@ -29,11 +31,10 @@ export default async function AccountSettingsPage() {
     redirect("/signin");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, verification] = await Promise.all([
+    supabase.from("profiles").select("role").eq("id", user.id).single(),
+    getEmailVerificationStatus(),
+  ]);
 
   if (!profile || profile.role !== "employer") {
     redirect("/dashboard");
@@ -69,13 +70,20 @@ export default async function AccountSettingsPage() {
         subhead="Manage your profile, security, subscription, and invoices."
       />
 
+      <EmailVerificationBanner
+        email={verification.email}
+        needsVerification={verification.needsVerification}
+      />
+
       <Suspense fallback={null}>
         <AccountSettingsClient
           initialSettings={defaultSettings}
           planUsage={planUsage}
           accountDetails={accountDetails}
           invoices={
-            "invoices" in invoiceResult ? [...(invoiceResult.invoices ?? [])] : []
+            "invoices" in invoiceResult
+              ? [...(invoiceResult.invoices ?? [])]
+              : []
           }
           invoicesError={"error" in invoiceResult ? invoiceResult.error : null}
         />

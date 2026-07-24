@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,7 +77,6 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) {
-  const router = useRouter();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [activeDocumentModal, setActiveDocumentModal] = useState<"terms" | "privacy" | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -163,12 +161,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
         return;
       }
 
-      if (result.requiresConfirmation) {
-        toast.success(result.message);
-        router.push("/signin");
-        router.refresh();
-        return;
-      }
+      // Successful signup redirects server-side to the role dashboard.
     } catch (error) {
       if (
         error &&

@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -13,12 +13,21 @@ import {
   loginCredentialsSchema,
   type LoginCredentials,
 } from "@/lib/validations/auth";
-import { ROLE_HOME_PATH } from "@/config/navigation";
 import { safeLog, safeError } from "@/utils/logger";
-import { authCallbackUrl } from "@/lib/auth/site-url";
+import { authCallbackUrl, getSiteUrl } from "@/lib/auth/site-url";
 import { syncResendContactForUser } from "@/lib/server/resend/contact-sync";
 import { isAppRole, profileIdFilter } from "@/lib/auth/role";
 import { resolvePostAuthRedirect } from "@/lib/auth/safe-callback-url";
+import {
+  emailVerificationSettingsPath,
+  isEmailVerificationPending,
+  markEmailVerificationPending,
+} from "@/lib/auth/email-verification";
+import { sendTransactionalEmail } from "@/lib/server/email/mailer";
+import {
+  escapeHtml,
+  renderEmailLayout,
+} from "@/lib/server/email/email-templates";
 import {
   forgotPasswordSchema,
   updatePasswordSchema,
@@ -53,6 +62,81 @@ function captchaAuthOptions(
   return { captchaToken: token };
 }
 
+/**
+ * When Supabase "Confirm email" is enabled, signUp returns no session.
+ * Soft-confirm via Admin API, then create a cookie session with password sign-in.
+ * Falls back to admin magic-link OTP exchange if password sign-in still fails.
+ */
+async function establishSessionAfterSignup(input: {
+  userId: string;
+  email: string;
+  password: string;
+  captchaToken: string;
+  existingAppMetadata?: Record<string, unknown>;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const admin = await createAdminClient();
+
+  const { error: confirmError } = await admin.auth.admin.updateUserById(
+    input.userId,
+    {
+      email_confirm: true,
+      app_metadata: {
+        ...input.existingAppMetadata,
+        email_verification_pending: true,
+      },
+    }
+  );
+  if (confirmError) {
+    safeError("[Auth] soft-confirm after signup failed:", confirmError);
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: input.email,
+    password: input.password,
+    options: captchaAuthOptions(input.captchaToken),
+  });
+
+  if (!signInError) {
+    return { ok: true };
+  }
+
+  safeError("[Auth] post-signup signInWithPassword failed:", signInError.message);
+
+  const { data: linkData, error: linkError } =
+    await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: input.email,
+    });
+
+  const tokenHash = linkData?.properties?.hashed_token;
+  if (linkError || !tokenHash) {
+    safeError("[Auth] post-signup generateLink failed:", linkError);
+    return {
+      ok: false,
+      error:
+        "Account created, but we could not sign you in automatically. Please sign in.",
+    };
+  }
+
+  const { error: otpError } = await supabase.auth.verifyOtp({
+    type: "magiclink",
+    token_hash: tokenHash,
+  });
+
+  if (otpError) {
+    safeError("[Auth] post-signup verifyOtp failed:", otpError);
+    return {
+      ok: false,
+      error:
+        "Account created, but we could not sign you in automatically. Please sign in.",
+    };
+  }
+
+  await markEmailVerificationPending(input.userId, input.existingAppMetadata);
+  return { ok: true };
+}
+
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-06-20" as any,
@@ -71,7 +155,7 @@ function handleAuthError(error: unknown): string {
   }
 
   if (message.includes("Email not confirmed")) {
-    return "Please confirm your email address before logging in. A confirmation link was sent to your email.";
+    return "Invalid email, username, or password. Please try again.";
   }
 
   if (message.includes("Invalid login credentials")) {
@@ -316,12 +400,14 @@ export async function signUp(formData: SignUpFormValues) {
 
     // 3. Sign up with Supabase Auth
     // We pass metadata that the Postgres trigger will use to populate the profile
+    const appRole = role === "employer" ? "employer" : "worker";
+    const settingsPath = emailVerificationSettingsPath(appRole);
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: normalizedEmail,
       password: data.password,
       options: {
         ...captchaAuthOptions(turnstile.token),
-        emailRedirectTo: authCallbackUrl("signup", "/signin"),
+        emailRedirectTo: authCallbackUrl("signup", settingsPath),
         data: {
           role: data.role,
           username: normalizedUsername,
@@ -391,19 +477,25 @@ export async function signUp(formData: SignUpFormValues) {
 
     // Stripe customer is created on first checkout via ensureStripeCustomer()
     // (employer_subscriptions.stripe_customer_id — single billing source of truth).
-    revalidatePath("/", "layout");
-    
+
+    // Confirm-email projects return no session — soft-confirm + sign in immediately.
     if (!authData.session) {
-      return {
-        success: true,
-        message:
-          "Registration successful! Check your email and click the confirmation link to activate your account.",
-        requiresConfirmation: true,
-      };
+      const sessionResult = await establishSessionAfterSignup({
+        userId: authData.user.id,
+        email: normalizedEmail,
+        password: data.password,
+        captchaToken: turnstile.token,
+        existingAppMetadata: authData.user.app_metadata as
+          | Record<string, unknown>
+          | undefined,
+      });
+      if (!sessionResult.ok) {
+        return { success: false, error: sessionResult.error };
+      }
     }
 
     const destination = resolvePostAuthRedirect(
-      role === "employer" ? "employer" : "worker",
+      appRole,
       (formData as SignUpFormValues & { callbackUrl?: string }).callbackUrl
     );
     const welcomeQuery = new URLSearchParams({
@@ -490,20 +582,16 @@ export async function signIn(formData: LoginCredentials) {
       return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    let {
+      data: { user: signedInUser },
+      error,
+    } = await supabase.auth.signInWithPassword({
       email: emailToAuth,
       password,
       options: captchaAuthOptions(turnstile.token),
     });
 
     if (error) {
-      if (error.message.includes("Email not confirmed")) {
-        return {
-          success: false,
-          error:
-            "Please confirm your email address before logging in. A confirmation link was sent to your email.",
-        };
-      }
       if (
         error.message.toLowerCase().includes("captcha") ||
         error.message.toLowerCase().includes("turnstile")
@@ -529,40 +617,91 @@ export async function signIn(formData: LoginCredentials) {
           error: "Security check failed. Please complete it again and retry.",
         };
       }
-      safeError("[Auth] signInWithPassword failed:", error.message);
-      await recordLoginFailure(emailKey);
-      return { success: false, error: GENERIC_LOGIN_ERROR };
+
+      // Legacy accounts blocked by Confirm email — soft-confirm then retry once.
+      if (
+        error.message.includes("Email not confirmed") ||
+        error.code === "email_not_confirmed"
+      ) {
+        try {
+          const admin = await createAdminClient();
+          const { data: byEmail } = await admin
+            .from("profiles")
+            .select("id")
+            .ilike("email", escapeIlikeExact(emailToAuth))
+            .limit(1)
+            .maybeSingle();
+
+          if (!byEmail?.id) {
+            await recordLoginFailure(emailKey);
+            return { success: false, error: GENERIC_LOGIN_ERROR };
+          }
+
+          const { data: authUser } = await admin.auth.admin.getUserById(
+            byEmail.id
+          );
+          await admin.auth.admin.updateUserById(byEmail.id, {
+            email_confirm: true,
+            app_metadata: {
+              ...authUser?.user?.app_metadata,
+              email_verification_pending: true,
+            },
+          });
+
+          const retry = await supabase.auth.signInWithPassword({
+            email: emailToAuth,
+            password,
+            options: captchaAuthOptions(turnstile.token),
+          });
+
+          if (retry.error || !retry.data.user) {
+            safeError(
+              "[Auth] signIn retry after soft-confirm failed:",
+              retry.error?.message
+            );
+            await recordLoginFailure(emailKey);
+            return { success: false, error: GENERIC_LOGIN_ERROR };
+          }
+
+          signedInUser = retry.data.user;
+          error = null;
+        } catch (softConfirmError) {
+          safeError("[Auth] soft-confirm on signIn failed:", softConfirmError);
+          await recordLoginFailure(emailKey);
+          return { success: false, error: GENERIC_LOGIN_ERROR };
+        }
+      } else {
+        safeError("[Auth] signInWithPassword failed:", error.message);
+        await recordLoginFailure(emailKey);
+        return { success: false, error: GENERIC_LOGIN_ERROR };
+      }
     }
 
-    if (data.user && !data.user.email_confirmed_at) {
-      await supabase.auth.signOut({ scope: "local" });
-      return {
-        success: false,
-        error:
-          "Please confirm your email address before logging in. A confirmation link was sent to your email.",
-      };
+    if (!signedInUser) {
+      await recordLoginFailure(emailKey);
+      return { success: false, error: GENERIC_LOGIN_ERROR };
     }
 
     await clearLoginFailures(emailKey);
 
     // Blueprint: app_metadata → profiles.role → signup user_metadata
-    let role = data.user.app_metadata?.role as string | undefined;
+    let role = signedInUser.app_metadata?.role as string | undefined;
     let displayName =
-      data.user.user_metadata?.first_name ??
-      data.user.user_metadata?.full_name?.trim().split(/\s+/)[0];
+      signedInUser.user_metadata?.first_name ??
+      signedInUser.user_metadata?.full_name?.trim().split(/\s+/)[0];
 
     if (!isAppRole(role) || !displayName) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, first_name, full_name")
-        .or(profileIdFilter(data.user.id))
+        .or(profileIdFilter(signedInUser.id))
         .maybeSingle();
 
       if (!isAppRole(role)) {
         role = isAppRole(profile?.role)
           ? profile.role
-          : isAppRole(data.user.user_metadata?.role)
-            ? data.user.user_metadata.role
+          : isAppRole(signedInUser.user_metadata?.role)
+            ? signedInUser.user_metadata.role
             : undefined;
       }
 
@@ -748,6 +887,144 @@ export async function updatePassword(formData: {
     }
     safeError("[Auth] updatePassword unexpected error:", error);
     return { success: false, error: "An unexpected error occurred. Please try again." };
+  }
+}
+
+export async function getEmailVerificationStatus(): Promise<{
+  email: string | null;
+  needsVerification: boolean;
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { email: null, needsVerification: false };
+  }
+
+  return {
+    email: user.email ?? null,
+    needsVerification: isEmailVerificationPending(user),
+  };
+}
+
+/**
+ * Sends (or re-sends) an email verification link from Account Settings.
+ * Uses auth.resend for unconfirmed users; for soft-confirmed users with a
+ * pending flag, emails a magic link via Resend so they can complete verification.
+ */
+export async function resendEmailVerification(): Promise<{
+  success: boolean;
+  error?: string;
+  message?: string;
+}> {
+  try {
+    const rateLimit = await assertRateLimit("email-verification", {
+      maxAttempts: 3,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!rateLimit.ok) {
+      return { success: false, error: rateLimit.error };
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) {
+      return { success: false, error: "You must be signed in to verify your email." };
+    }
+
+    if (!isEmailVerificationPending(user)) {
+      return { success: true, message: "Your email is already verified." };
+    }
+
+    const role =
+      (typeof user.app_metadata?.role === "string" && user.app_metadata.role) ||
+      (typeof user.user_metadata?.role === "string" && user.user_metadata.role) ||
+      "worker";
+    const settingsPath = emailVerificationSettingsPath(String(role));
+    const redirectTo = authCallbackUrl("signup", settingsPath);
+
+    if (!user.email_confirmed_at) {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: user.email,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) {
+        safeError("[Auth] resend signup confirmation failed:", error);
+        return {
+          success: false,
+          error: "Could not send verification email. Please try again.",
+        };
+      }
+      return {
+        success: true,
+        message: "Verification email sent. Check your inbox.",
+      };
+    }
+
+    // Soft-confirmed at signup — send a magic link so clicking it clears pending.
+    const admin = await createAdminClient();
+    const { data: linkData, error: linkError } =
+      await admin.auth.admin.generateLink({
+        type: "magiclink",
+        email: user.email,
+        options: { redirectTo },
+      });
+
+    const tokenHash = linkData?.properties?.hashed_token;
+    if (linkError || !tokenHash) {
+      safeError("[Auth] generateLink for verification failed:", linkError);
+      return {
+        success: false,
+        error: "Could not send verification email. Please try again.",
+      };
+    }
+
+    const verifyHref = `${getSiteUrl()}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=email&next=${encodeURIComponent(settingsPath)}`;
+
+    const bodyHtml = `
+      <p style="margin:0 0 14px 0;">Confirm <strong>${escapeHtml(user.email)}</strong> for your Replaceme account.</p>
+      <p style="margin:0 0 18px 0;">You can keep using the app — this just verifies ownership of your email.</p>
+      <p style="margin:0 0 18px 0;">
+        <a href="${escapeHtml(verifyHref)}" style="display:inline-block;background:#006e2f;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;">Verify email</a>
+      </p>
+    `;
+    const rendered = renderEmailLayout({
+      title: "Verify your email",
+      preheader: "Confirm your email address for Replaceme.",
+      bodyHtml,
+    });
+
+    const sent = await sendTransactionalEmail({
+      templateKey: "auth.email_verification",
+      to: user.email,
+      subject: "Verify your email — Replaceme",
+      html: rendered.html,
+      text: rendered.text,
+      userId: user.id,
+      role: isAppRole(role) ? role : null,
+      idempotencyKey: `email-verify:${user.id}:${Math.floor(Date.now() / 60_000)}`,
+    });
+
+    if (!sent.success) {
+      return { success: false, error: sent.error };
+    }
+
+    return {
+      success: true,
+      message: "Verification email sent. Check your inbox.",
+    };
+  } catch (error) {
+    safeError("[Auth] resendEmailVerification unexpected error:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
   }
 }
 

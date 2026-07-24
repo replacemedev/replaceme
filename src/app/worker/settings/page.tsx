@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSettingsClient";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
+import { EmailVerificationBanner } from "@/components/shared/settings/EmailVerificationBanner";
+import { getEmailVerificationStatus } from "@/actions/auth";
 
 export const metadata = {
   title: "Account Settings | Replaceme",
@@ -16,11 +18,14 @@ export default async function WorkerSettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/signin");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("availability, hourly_rate, is_remote, salary_currency, role")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, verification] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("availability, hourly_rate, is_remote, salary_currency, role")
+      .eq("id", user.id)
+      .single(),
+    getEmailVerificationStatus(),
+  ]);
 
   if (!profile || profile.role !== "worker") redirect("/signin");
 
@@ -30,6 +35,12 @@ export default async function WorkerSettingsPage() {
         title="Account settings"
         subhead="Manage availability, hourly rate, and trust & safety reports."
       />
+      <div className="mb-6">
+        <EmailVerificationBanner
+          email={verification.email}
+          needsVerification={verification.needsVerification}
+        />
+      </div>
       <WorkerSettingsClient
         initial={{
           availability: profile.availability ?? "Full-time",
