@@ -196,7 +196,7 @@ export function ManagePlanGrid({
                             Redirecting to Stripe...
                           </>
                         ) : (
-                          "Change plan on Stripe"
+                          "Change"
                         )}
                       </button>
                     ) : (
