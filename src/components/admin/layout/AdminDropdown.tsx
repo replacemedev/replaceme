@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, LayoutDashboard, LogOut, Shield } from "lucide-react";
 import { logOut } from "@/actions/auth";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import type { NavProfile } from "@/types/nav";
 
 interface AdminDropdownProps {
@@ -51,6 +51,24 @@ export function AdminDropdown({
     });
   };
 
+  const avatar = (
+    <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-900">
+      {profile?.avatar_url ? (
+        <AvatarImage
+          src={profile.avatar_url}
+          alt={`${displayName}'s Avatar`}
+          initials={initials}
+          size="xs"
+          priority
+        />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center">
+          <Shield size={16} className="text-white" aria-hidden />
+        </span>
+      )}
+    </div>
+  );
+
   if (layout === "mobile") {
     return (
       <div className="w-full" ref={dropdownRef}>
@@ -63,19 +81,7 @@ export function AdminDropdown({
           aria-label="Admin menu"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-8 h-8 shrink-0 rounded-full border border-slate-200 bg-slate-900 overflow-hidden flex items-center justify-center">
-              {profile?.avatar_url ? (
-                <Image
-                  src={profile.avatar_url}
-                  alt={`${displayName}'s Avatar`}
-                  fill
-                  className="rounded-full object-cover"
-                  sizes="32px"
-                />
-              ) : (
-                <Shield size={16} className="text-white" aria-hidden />
-              )}
-            </div>
+            {avatar}
             <span className="text-sm font-bold text-slate-800 select-none truncate">
               {displayName}
             </span>
@@ -132,19 +138,7 @@ export function AdminDropdown({
         aria-expanded={dropdownOpen}
         aria-label="Admin menu"
       >
-        <div className="relative w-8 h-8 rounded-full shrink-0 border border-slate-100 bg-slate-900 overflow-hidden flex items-center justify-center">
-          {profile?.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={`${displayName}'s Avatar`}
-              fill
-              className="rounded-full object-cover"
-              sizes="32px"
-            />
-          ) : (
-            <Shield size={16} className="text-white" aria-hidden />
-          )}
-        </div>
+        {avatar}
         <span className="hidden sm:inline-block text-xs font-semibold text-slate-700 max-w-[120px] truncate">
           {displayName}
         </span>
@@ -159,25 +153,28 @@ export function AdminDropdown({
         <div
           className="absolute right-0 mt-2 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50"
           role="menu"
+          aria-label="Admin actions"
         >
           <Link
             href="/admin/dashboard"
             onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+            className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
             role="menuitem"
           >
-            <LayoutDashboard size={14} className="text-slate-400" />
+            <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
             Admin Dashboard
           </Link>
+
           <div className="h-px bg-slate-100 my-1" />
+
           <button
             type="button"
             disabled={isPending}
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 w-full text-left font-bold cursor-pointer"
+            className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
             role="menuitem"
           >
-            <LogOut size={14} className="text-red-500" />
+            <LogOut size={14} className="text-red-500 shrink-0" />
             {isPending ? "Signing out..." : "Sign Out"}
           </button>
         </div>

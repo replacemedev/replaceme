@@ -549,12 +549,13 @@ export function AdminReportsClient({
                   ) : null}
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                  {selected.evidenceSignedUrl ? (
+      {selected.evidenceSignedUrl ? (
                     <OptimizedImage
                       src={selected.evidenceSignedUrl}
                       alt="Report screenshot evidence"
                       fill
                       sizes="(max-width: 768px) 100vw, 640px"
+                      loading="lazy"
                       className="object-contain p-2"
                       containerClassName="relative aspect-video w-full max-h-80"
                     />

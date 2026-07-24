@@ -286,16 +286,26 @@ async function signReportEvidenceUrl(
   adminSupabase: Awaited<ReturnType<typeof createAdminClient>>,
   storagePath: string
 ): Promise<string | null> {
-  const { data: signed, error: signedError } = await adminSupabase.storage
-    .from(REPORT_EVIDENCE_BUCKET)
-    .createSignedUrl(storagePath, 60 * 60);
+  // Reuse the same signed URL across admin deep-dives so Smart CDN can HIT
+  // (each unique ?token= is a separate CDN cache key).
+  const cached = await getOrSet<string | null>(
+    CacheKeys.storageSignedUrl(REPORT_EVIDENCE_BUCKET, storagePath),
+    Math.min(CACHE_TTL_SECONDS.storageSignedUrl * 10, 50 * 60),
+    async () => {
+      const { data: signed, error: signedError } = await adminSupabase.storage
+        .from(REPORT_EVIDENCE_BUCKET)
+        .createSignedUrl(storagePath, 60 * 60);
 
-  if (signedError) {
-    safeError("signReportEvidenceUrl:", signedError);
-    return null;
-  }
+      if (signedError) {
+        safeError("signReportEvidenceUrl:", signedError);
+        return null;
+      }
 
-  return signed?.signedUrl ?? null;
+      return signed?.signedUrl ?? null;
+    }
+  );
+
+  return cached;
 }
 
 export async function getAdminReports(input: unknown): Promise<{

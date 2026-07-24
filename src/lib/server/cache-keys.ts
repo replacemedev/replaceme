@@ -48,6 +48,9 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:admin:reports:${filterKey}`,
   messagingMessages: (userId: string, threadId: string) =>
     `rm:${CACHE_VERSION}:user:${userId}:messages:${threadId}`,
+  /** Reuse signed Storage URLs so Smart CDN stays warm (unique tokens = cache miss). */
+  storageSignedUrl: (bucket: string, path: string) =>
+    `rm:${CACHE_VERSION}:storage:signed:${bucket}:${path}`,
 } as const;
 
 export const CACHE_TTL_SECONDS = {
@@ -68,6 +71,8 @@ export const CACHE_TTL_SECONDS = {
   adminMetrics: 30,
   adminAuditLogs: 30,
   adminReports: 20,
+  /** Keep under signed URL expiry (typically 300–3600s). */
+  storageSignedUrl: 240,
 } as const;
 
 export function employerCacheKeys(employerId: string): string[] {

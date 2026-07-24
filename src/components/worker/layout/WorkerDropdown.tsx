@@ -98,6 +98,7 @@ export function WorkerDropdown({
                 alt={`${displayName}'s Avatar`}
                 initials={initials}
                 size="xs"
+                priority
               />
             </div>
             <span className="flex items-center gap-1 text-sm font-bold text-slate-800 select-none truncate">
@@ -260,6 +261,7 @@ export function WorkerDropdown({
             alt={`${displayName}'s Avatar`}
             initials={initials}
             size="xs"
+            priority
           />
         </div>
 

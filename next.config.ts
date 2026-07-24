@@ -64,6 +64,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // Keep Next/Image optimizer warm for non-transformed remotes (e.g. Google).
+    // Supabase render URLs bypass the optimizer and hit Smart CDN directly.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: "https",
@@ -84,6 +87,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.supabase.co",
         pathname: "/storage/v1/render/image/public/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/render/image/sign/**",
       },
     ],
   },

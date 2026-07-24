@@ -1,6 +1,6 @@
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import Link from "next/link";
-import Image from "next/image";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import type { PublicCompanyListing } from "@/types/public-growth";
 
 interface PublicCompanyDirectoryProps {
@@ -42,18 +42,15 @@ export function PublicCompanyDirectory({
                 className="block h-full bg-white border border-slate-200 rounded-2xl p-5 hover:border-emerald-200 hover:shadow-md transition-all"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="relative w-10 h-10 rounded-lg bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center font-bold text-slate-600">
-                    {company.logoUrl ? (
-                      <Image
-                        src={company.logoUrl}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="40px"
-                      />
-                    ) : (
-                      company.companyName.charAt(0)
-                    )}
+                  <div className="relative w-10 h-10 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                    <LogoImage
+                      src={company.logoUrl}
+                      alt=""
+                      label={company.companyName}
+                      sizePx={40}
+                      rounded="lg"
+                      colorClass="bg-slate-100 text-slate-600"
+                    />
                   </div>
                   <h2 className="text-sm font-bold text-slate-900 line-clamp-2">
                     {company.companyName}

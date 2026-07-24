@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import { RecentMessage } from "@/types/worker";
 
 interface RecentMessageRowProps {
@@ -11,7 +12,6 @@ interface RecentMessageRowProps {
 }
 
 export function RecentMessageRow({ message }: RecentMessageRowProps) {
-  // Format the date/time to a user-friendly format
   const formattedTime = message.latest_message_time
     ? new Date(message.latest_message_time).toLocaleDateString("en-US", {
         month: "short",
@@ -30,32 +30,25 @@ export function RecentMessageRow({ message }: RecentMessageRowProps) {
       className="group flex items-center justify-between p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-200 gap-4"
     >
       <div className="flex items-center gap-4 min-w-0 flex-1">
-        {/* Avatar/Company Logo */}
-        <div className="relative w-12 h-12 rounded-full shrink-0 border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden">
+        <div className="relative w-12 h-12 rounded-full shrink-0 border border-slate-100 bg-slate-50 overflow-hidden">
           {message.other_company_logo ? (
-            <Image
+            <LogoImage
               src={message.other_company_logo}
               alt={`${companyName} Logo`}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
-          ) : message.other_avatar_url ? (
-            <Image
-              src={message.other_avatar_url}
-              alt="Employer Avatar"
-              fill
-              className="object-cover"
-              sizes="48px"
+              label={companyName}
+              sizePx={48}
+              rounded="full"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-[#ebfdf2] text-[#006e2f] font-bold text-sm">
-              {initials}
-            </div>
+            <AvatarImage
+              src={message.other_avatar_url}
+              alt="Employer Avatar"
+              initials={initials}
+              size="sm"
+            />
           )}
         </div>
 
-        {/* Message Content */}
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-baseline justify-between gap-2">
             <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-[#006e2f] transition-colors">
@@ -71,7 +64,6 @@ export function RecentMessageRow({ message }: RecentMessageRowProps) {
         </div>
       </div>
 
-      {/* Message Icon indicator */}
       <div className="p-2 bg-slate-50 group-hover:bg-[#ebfdf2] rounded-xl text-slate-400 group-hover:text-[#006e2f] transition-colors duration-200">
         <MessageSquare size={16} />
       </div>

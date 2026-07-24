@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,9 +78,11 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) {
+  const router = useRouter();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [activeDocumentModal, setActiveDocumentModal] = useState<"terms" | "privacy" | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
+  const submitLockRef = useRef(false);
   const turnstileRequired = isTurnstileClientEnabled();
 
   const schema = role === "employer" ? employerSignUpSchema : workerSignUpSchema;
@@ -109,24 +112,33 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
   const onSubmit = async (
     data: WorkerSignUpFormValues | EmployerSignUpFormValues
   ) => {
-    if (turnstileRequired && !turnstileToken) {
+    if (submitLockRef.current || isSubmitting) return;
+
+    const captchaToken = turnstileToken;
+    if (turnstileRequired && !captchaToken) {
       toast.error("Complete security check.");
       return;
     }
+    setTurnstileToken(null);
+
+    submitLockRef.current = true;
+    toast.dismiss();
 
     try {
       const result = await signUp({
         ...data,
-        turnstileToken: turnstileToken ?? undefined,
+        turnstileToken: captchaToken ?? undefined,
         callbackUrl,
       } as (WorkerSignUpFormValues | EmployerSignUpFormValues) & {
         callbackUrl?: string;
       });
 
-      if (!result.success) {
-        const errCode = result.error;
+      if (!result.success || !result.redirectTo) {
+        const errCode = !result.success ? result.error : undefined;
         const errMessage =
-          ("message" in result && typeof result.message === "string"
+          (!result.success &&
+            "message" in result &&
+            typeof result.message === "string"
             ? result.message
             : null) ?? formatSignUpError(errCode);
 
@@ -141,6 +153,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           });
           setFocus("username");
           resetCaptcha();
+          submitLockRef.current = false;
           return;
         }
         if (
@@ -154,25 +167,21 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           });
           setFocus("email");
           resetCaptcha();
+          submitLockRef.current = false;
           return;
         }
         toast.error(errMessage);
         resetCaptcha();
+        submitLockRef.current = false;
         return;
       }
 
-      // Successful signup redirects server-side to the role dashboard.
-    } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "digest" in error &&
-        String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-      ) {
-        throw error;
-      }
+      router.replace(result.redirectTo);
+      router.refresh();
+    } catch {
       toast.error("Error occurred. Please retry.");
       resetCaptcha();
+      submitLockRef.current = false;
     }
   };
 

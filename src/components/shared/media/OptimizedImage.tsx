@@ -16,11 +16,17 @@ export interface OptimizedImageProps {
   fill?: boolean;
   sizes?: string;
   priority?: boolean;
+  /** Defaults to lazy unless priority is set. */
+  loading?: "lazy" | "eager";
   className?: string;
   containerClassName?: string;
   transform?: OptimizedImageOptions;
   fallback?: ReactNode;
   onLoadComplete?: () => void;
+}
+
+function isSupabaseEdgeTransformed(url: string): boolean {
+  return url.includes("/storage/v1/render/image/");
 }
 
 export function OptimizedImage({
@@ -31,6 +37,7 @@ export function OptimizedImage({
   fill = false,
   sizes,
   priority = false,
+  loading,
   className = "object-cover",
   containerClassName = "",
   transform,
@@ -75,12 +82,32 @@ export function OptimizedImage({
     );
   }
 
-  const imageProps: Pick<ImageProps, "src" | "alt" | "className" | "sizes" | "priority" | "onLoad" | "onError"> = {
+  // Serve transformed assets straight from Supabase Smart CDN — skip Next.js
+  // optimizer double-fetch (faster cold loads, higher CDN cache hit rate).
+  const serveFromCdn = isSupabaseEdgeTransformed(resolvedSrc);
+  const resolvedLoading: ImageProps["loading"] = priority
+    ? undefined
+    : (loading ?? "lazy");
+
+  const imageProps: Pick<
+    ImageProps,
+    | "src"
+    | "alt"
+    | "className"
+    | "sizes"
+    | "priority"
+    | "loading"
+    | "unoptimized"
+    | "onLoad"
+    | "onError"
+  > = {
     src: resolvedSrc,
     alt,
-    className: `${className} transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`,
+    className: `${className} transition-opacity duration-200 ${loaded ? "opacity-100" : "opacity-0"}`,
     sizes,
     priority,
+    loading: resolvedLoading,
+    unoptimized: serveFromCdn,
     onLoad: handleLoad,
     onError: handleError,
   };
@@ -89,7 +116,7 @@ export function OptimizedImage({
     <span className={`relative block overflow-hidden ${containerClassName}`}>
       {!loaded ? (
         <span
-          className="absolute inset-0 animate-pulse bg-slate-200/80"
+          className="absolute inset-0 animate-pulse bg-gray-200"
           aria-hidden
         />
       ) : null}

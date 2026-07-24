@@ -1,8 +1,8 @@
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
+import { LogoImage } from "@/components/shared/media/LogoImage";
 import { getPublicCompanyById } from "@/actions/public/growth";
 
 export const dynamic = "force-dynamic";
@@ -29,12 +29,16 @@ export default async function PublicCompanyDetailPage({ params }: PageProps) {
       </Link>
 
       <header className="flex items-start gap-4 mb-8">
-        <div className="relative w-14 h-14 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center font-bold text-lg text-slate-600 shrink-0">
-          {company.logoUrl ? (
-            <Image src={company.logoUrl} alt="" fill className="object-cover" sizes="56px" />
-          ) : (
-            company.companyName.charAt(0)
-          )}
+        <div className="relative w-14 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0">
+          <LogoImage
+            src={company.logoUrl}
+            alt=""
+            label={company.companyName}
+            sizePx={56}
+            rounded="xl"
+            colorClass="bg-slate-100 text-slate-600 text-lg"
+            priority
+          />
         </div>
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">

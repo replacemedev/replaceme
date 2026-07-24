@@ -24,7 +24,13 @@ export function ResponsiveToaster() {
       offset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16, left: 16 }}
       mobileOffset={{ top: "calc(16px + env(safe-area-inset-top))", right: 16, left: 16, bottom: 16 }}
       toastOptions={{
-        className: "w-[calc(100vw-2rem)] mx-auto max-w-sm md:max-w-md md:w-full md:mx-0",
+        className:
+          "w-full max-w-[min(24rem,calc(100vw-2rem))] md:max-w-md box-border",
+        classNames: {
+          toast: "items-center gap-3",
+          content: "flex-1 min-w-0",
+          closeButton: "ml-auto shrink-0",
+        },
       }}
     />
   );

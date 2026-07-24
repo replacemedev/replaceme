@@ -93,6 +93,7 @@ export function EmployerDropdown({
                 alt={`${displayName}'s Avatar`}
                 initials={initials}
                 size="xs"
+                priority
               />
             </div>
             <span className="text-sm font-bold text-slate-800 select-none truncate">
@@ -280,6 +281,7 @@ export function EmployerDropdown({
             alt={`${displayName}'s Avatar`}
             initials={initials}
             size="xs"
+            priority
           />
         </div>
 

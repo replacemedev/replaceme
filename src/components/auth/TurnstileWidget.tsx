@@ -45,6 +45,7 @@ export const TurnstileWidget = forwardRef<
       theme: "light" as const,
       size: "normal" as const,
       refreshExpired: "auto" as const,
+      retry: "auto" as const,
     }),
     []
   );
@@ -62,8 +63,16 @@ export const TurnstileWidget = forwardRef<
           ref={ref}
           siteKey={SITE_KEY}
           onSuccess={(token) => callbacksRef.current.onToken(token)}
-          onExpire={() => callbacksRef.current.onExpire?.()}
-          onError={() => callbacksRef.current.onError?.()}
+          onExpire={() => {
+            callbacksRef.current.onExpire?.();
+          }}
+          onError={() => {
+            callbacksRef.current.onError?.();
+          }}
+          onTimeout={() => {
+            callbacksRef.current.onError?.();
+            ref.current?.reset();
+          }}
           options={options}
         />
       </div>

@@ -167,12 +167,18 @@ export function LandingPageClient({
             <div className="w-full lg:w-[42%] relative hidden lg:block reveal-item" style={{ transitionDelay: "200ms" }}>
               <div className="relative w-full aspect-square max-w-[500px] mx-auto">
                 {/* Main Image */}
-                <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-xl border-[8px] border-white bg-slate-50">
+                <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-xl border-[8px] border-white bg-gray-200">
+                  {!imageLoaded ? (
+                    <span
+                      className="absolute inset-0 animate-pulse bg-gray-200"
+                      aria-hidden
+                    />
+                  ) : null}
                   <Image
                     src="/images/hero-worker.png"
                     alt="Professional Filipino Remote Worker"
                     fill
-                    className={`object-cover transition-opacity duration-500 ease-in ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+                    className={`object-cover transition-opacity duration-200 ease-out ${imageLoaded ? "opacity-100" : "opacity-0"}`}
                     priority
                     sizes="500px"
                     onLoad={() => setImageLoaded(true)}

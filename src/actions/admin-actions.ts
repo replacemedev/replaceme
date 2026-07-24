@@ -705,16 +705,42 @@ export async function fetchWorkerVerificationDocuments(
 
   const results: AdminVerificationDocument[] = [];
   for (const doc of data ?? []) {
-    const { data: signed } = await supabase.storage
-      .from("verification-documents")
-      .createSignedUrl(doc.storage_path, 300);
+    const isImage = doc.mime_type?.startsWith("image/");
+    // Reuse signed URLs so Smart CDN can serve HITs (unique tokens = miss).
+    // Image docs: embed transform in the token for edge-resized thumbnails.
+    const signedUrl = await getOrSet<string | null>(
+      CacheKeys.storageSignedUrl(
+        "verification-documents",
+        isImage ? `${doc.storage_path}:thumb-560` : doc.storage_path
+      ),
+      CACHE_TTL_SECONDS.storageSignedUrl,
+      async () => {
+        const { data: signed } = await supabase.storage
+          .from("verification-documents")
+          .createSignedUrl(
+            doc.storage_path,
+            300,
+            isImage
+              ? {
+                  transform: {
+                    width: 560,
+                    height: 420,
+                    resize: "cover",
+                    quality: 70,
+                  },
+                }
+              : undefined
+          );
+        return signed?.signedUrl ?? null;
+      }
+    );
 
     results.push({
       id: doc.id,
       document_type: doc.document_type,
       file_name: doc.file_name,
       mime_type: doc.mime_type,
-      signed_url: signed?.signedUrl ?? null,
+      signed_url: signedUrl,
       created_at: doc.created_at,
     });
   }

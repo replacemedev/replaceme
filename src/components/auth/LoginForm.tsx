@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -14,7 +15,6 @@ import {
   type LoginCredentials,
 } from "@/lib/validations/auth";
 import Link from "next/link";
-import { unstable_rethrow } from "next/navigation";
 import { toast } from "sonner";
 import {
   TurnstileWidget,
@@ -28,6 +28,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -38,6 +39,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
     setTurnstileToken(null);
     turnstileRef.current?.reset();
   };
+
   const {
     register,
     handleSubmit,
@@ -63,10 +65,13 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
   const onSubmit = async (data: LoginCredentials) => {
     if (submitLockRef.current || isLoading) return;
 
-    if (turnstileRequired && !turnstileToken) {
+    // Snapshot + clear immediately — Turnstile tokens are single-use.
+    const captchaToken = turnstileToken;
+    if (turnstileRequired && !captchaToken) {
       toast.error("Complete security check.");
       return;
     }
+    setTurnstileToken(null);
 
     submitLockRef.current = true;
     setIsLoading(true);
@@ -75,12 +80,16 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
     try {
       const result = await signIn({
         ...data,
-        turnstileToken: turnstileToken ?? undefined,
+        turnstileToken: captchaToken ?? undefined,
         callbackUrl,
       });
 
-      if (result && !result.success) {
-        toast.error(result.error ?? "Invalid credentials.");
+      if (!result?.success || !result.redirectTo) {
+        toast.error(
+          result && "error" in result && result.error
+            ? result.error
+            : "Invalid credentials."
+        );
         resetCaptcha();
         submitLockRef.current = false;
         setIsLoading(false);
@@ -92,11 +101,12 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
       } else {
         localStorage.removeItem("remember_email");
       }
-      // Keep loading/locked until Next.js redirect navigates away.
-    } catch (error) {
-      // Re-throw Next.js redirect / router errors so navigation is not swallowed.
-      unstable_rethrow(error);
 
+      // Session cookies are already on the action response — navigate client-side
+      // so we never treat a server redirect rejection as a login failure.
+      router.replace(result.redirectTo);
+      router.refresh();
+    } catch {
       toast.error("Error occurred. Please retry.");
       resetCaptcha();
       submitLockRef.current = false;

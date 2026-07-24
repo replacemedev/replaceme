@@ -28,10 +28,61 @@ import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { formatFullName } from "@/lib/format/name";
+import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
 } from "@/types/admin.types";
+
+function isImageMime(mime: string | null | undefined) {
+  return Boolean(mime?.startsWith("image/"));
+}
+
+function VerificationDocCard({ doc }: { doc: AdminVerificationDocument }) {
+  const showPreview = Boolean(doc.signed_url && isImageMime(doc.mime_type));
+
+  return (
+    <li className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+      {showPreview ? (
+        <a
+          href={doc.signed_url!}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-2 block overflow-hidden rounded-lg border border-slate-200 bg-white"
+        >
+          <OptimizedImage
+            src={doc.signed_url!}
+            alt={doc.file_name}
+            fill
+            sizes="(max-width: 640px) 100vw, 280px"
+            loading="lazy"
+            className="object-cover"
+            containerClassName="relative aspect-[4/3] w-full"
+          />
+        </a>
+      ) : null}
+      <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+        <FileImage className="h-4 w-4 text-slate-400" />
+        {doc.document_type.replace(/_/g, " ")}
+      </div>
+      <p className="mt-1 truncate text-[11px] text-slate-400">{doc.file_name}</p>
+      {doc.signed_url ? (
+        <a
+          href={doc.signed_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
+        >
+          View / download
+        </a>
+      ) : (
+        <p className="mt-2 text-xs font-semibold text-red-500">
+          Unable to generate preview URL
+        </p>
+      )}
+    </li>
+  );
+}
 
 interface IdentityReviewClientProps {
   queue: AdminVerificationQueueRow[];
@@ -546,32 +597,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                         ) : (
                           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             {docs.map((doc) => (
-                              <li
-                                key={doc.id}
-                                className="rounded-xl border border-slate-100 bg-slate-50 p-3"
-                              >
-                                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                                  <FileImage className="h-4 w-4 text-slate-400" />
-                                  {doc.document_type.replace(/_/g, " ")}
-                                </div>
-                                <p className="mt-1 truncate text-[11px] text-slate-400">
-                                  {doc.file_name}
-                                </p>
-                                {doc.signed_url ? (
-                                  <a
-                                    href={doc.signed_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
-                                  >
-                                    View / download
-                                  </a>
-                                ) : (
-                                  <p className="mt-2 text-xs font-semibold text-red-500">
-                                    Unable to generate preview URL
-                                  </p>
-                                )}
-                              </li>
+                              <VerificationDocCard key={doc.id} doc={doc} />
                             ))}
                           </ul>
                         )}
@@ -853,32 +879,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
               ) : (
                 <ul className="mt-3 grid gap-3 sm:grid-cols-2">
                   {(documents[viewData.id] ?? []).map((doc) => (
-                    <li
-                      key={doc.id}
-                      className="rounded-xl border border-slate-100 bg-slate-50 p-3"
-                    >
-                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                        <FileImage className="h-4 w-4 text-slate-400" />
-                        {doc.document_type.replace(/_/g, " ")}
-                      </div>
-                      <p className="mt-1 truncate text-[11px] text-slate-400">
-                        {doc.file_name}
-                      </p>
-                      {doc.signed_url ? (
-                        <a
-                          href={doc.signed_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
-                        >
-                          View / download
-                        </a>
-                      ) : (
-                        <p className="mt-2 text-xs font-semibold text-red-500">
-                          Unable to generate preview URL
-                        </p>
-                      )}
-                    </li>
+                    <VerificationDocCard key={doc.id} doc={doc} />
                   ))}
                 </ul>
               )}

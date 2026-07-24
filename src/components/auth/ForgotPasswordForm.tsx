@@ -51,15 +51,17 @@ export function ForgotPasswordForm() {
   const emailRegister = register("email");
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {
-    if (turnstileRequired && !turnstileToken) {
+    const captchaToken = turnstileToken;
+    if (turnstileRequired && !captchaToken) {
       toast.error("Complete security check.");
       return;
     }
+    setTurnstileToken(null);
 
     try {
       const result = await sendPasswordResetLink({
         ...data,
-        turnstileToken: turnstileToken ?? undefined,
+        turnstileToken: captchaToken ?? undefined,
       });
 
       if (!result.success) {

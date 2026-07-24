@@ -71,7 +71,9 @@ export async function replaceStorageImage(
     .upload(storagePath, new Uint8Array(fileBuffer), {
       contentType: mimeType,
       upsert: false,
-      cacheControl: "3600",
+      // Versioned paths (`kind-${Date.now()}`) — long browser TTL is safe and
+      // cuts repeat egress. Supabase Smart CDN still invalidates on delete.
+      cacheControl: "31536000",
     });
 
   if (uploadError) {

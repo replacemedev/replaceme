@@ -65,55 +65,26 @@ function captchaAuthOptions(
 }
 
 /**
- * After Admin createUser (no session cookie), soft-confirm metadata if needed,
- * then create a cookie session with password sign-in.
- * Falls back to admin magic-link OTP exchange if password sign-in still fails.
+ * After Admin createUser (no session cookie), soft-confirm metadata and
+ * establish a cookie session via admin magic-link OTP.
+ *
+ * Do NOT call signInWithPassword here: Turnstile tokens are single-use and
+ * Supabase Auth CAPTCHA already consumes them on any password grant that
+ * forwards captchaToken. Reusing the signup widget token causes
+ * `timeout-or-duplicate` (seen in production Vercel logs).
  */
 async function establishSessionAfterSignup(input: {
   userId: string;
   email: string;
-  password: string;
-  captchaToken: string;
   existingAppMetadata?: Record<string, unknown>;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
-  const supabase = await createClient();
-  const admin = await createAdminClient();
-
-  const { error: confirmError } = await admin.auth.admin.updateUserById(
-    input.userId,
-    {
-      email_confirm: true,
-      app_metadata: {
-        ...input.existingAppMetadata,
-        email_verification_pending: true,
-      },
-    }
-  );
-  if (confirmError) {
-    safeError("[Auth] soft-confirm after signup failed:", confirmError);
-  }
-
-  const { error: signInError } = await supabase.auth.signInWithPassword({
+  const established = await softConfirmAndEstablishSession({
     email: input.email,
-    password: input.password,
-    options: captchaAuthOptions(input.captchaToken),
+    userId: input.userId,
+    existingAppMetadata: input.existingAppMetadata,
   });
 
-  if (!signInError) {
-    return { ok: true };
-  }
-
-  safeError("[Auth] post-signup signInWithPassword failed:", signInError.message);
-
-  const { data: linkData, error: linkError } =
-    await admin.auth.admin.generateLink({
-      type: "magiclink",
-      email: input.email,
-    });
-
-  const tokenHash = linkData?.properties?.hashed_token;
-  if (linkError || !tokenHash) {
-    safeError("[Auth] post-signup generateLink failed:", linkError);
+  if (!established.ok) {
     return {
       ok: false,
       error:
@@ -121,21 +92,6 @@ async function establishSessionAfterSignup(input: {
     };
   }
 
-  const { error: otpError } = await supabase.auth.verifyOtp({
-    type: "magiclink",
-    token_hash: tokenHash,
-  });
-
-  if (otpError) {
-    safeError("[Auth] post-signup verifyOtp failed:", otpError);
-    return {
-      ok: false,
-      error:
-        "Account created, but we could not sign you in automatically. Please sign in.",
-    };
-  }
-
-  await markEmailVerificationPending(input.userId, input.existingAppMetadata);
   return { ok: true };
 }
 
@@ -375,7 +331,11 @@ export async function signUp(formData: SignUpFormValues) {
 
     const data = parsed.data;
 
-    const turnstile = await requireTurnstileToken(data.turnstileToken, ip);
+    const turnstile = await requireTurnstileToken(data.turnstileToken, ip, {
+      // Signup establishes the session via OTP (no captchaToken). Verify here
+      // so the widget challenge is actually consumed once.
+      verifyLocally: true,
+    });
     if (!turnstile.success) {
       return { success: false, error: turnstile.error };
     }
@@ -479,12 +439,11 @@ export async function signUp(formData: SignUpFormValues) {
     // Stripe customer is created on first checkout via ensureStripeCustomer()
     // (employer_subscriptions.stripe_customer_id — single billing source of truth).
 
-    // Admin createUser never returns a browser session — soft-confirm flag + sign in.
+    // Admin createUser never returns a browser session — soft-confirm + OTP session
+    // (avoids Turnstile single-use token reuse on password grant).
     const sessionResult = await establishSessionAfterSignup({
       userId: authData.user.id,
       email: normalizedEmail,
-      password: data.password,
-      captchaToken: turnstile.token,
       existingAppMetadata: authData.user.app_metadata as
         | Record<string, unknown>
         | undefined,
@@ -505,7 +464,9 @@ export async function signUp(formData: SignUpFormValues) {
 
     const destinationWithWelcome = `${destination}${separator}${welcomeQuery.toString()}`;
     revalidatePath("/", "layout");
-    redirect(destinationWithWelcome);
+    // Return URL for client navigation — awaiting redirect() rejects the client
+    // promise and was intermittently surfaced as "Error occurred. Please retry."
+    return { success: true as const, redirectTo: destinationWithWelcome };
   } catch (error) {
     unstable_rethrow(error);
     safeError("signUp error:", error);
@@ -576,10 +537,6 @@ async function softConfirmAndEstablishSession(input: {
 }
 
 export async function signIn(formData: LoginCredentials) {
-  // Build the post-auth URL inside try; call redirect() outside so Next.js
-  // does not treat a caught NEXT_REDIRECT as an application error.
-  let postAuthRedirect: string | null = null;
-
   try {
     safeLog("[Auth] Sign-in initiated");
     const supabase = await createClient();
@@ -648,7 +605,7 @@ export async function signIn(formData: LoginCredentials) {
           captchaTokenForwarded: Boolean(turnstile.token?.trim()),
           hint:
             error.message.includes("timeout-or-duplicate")
-              ? "Turnstile token was reused — deploy latest code (single verifier) or complete a fresh widget challenge"
+              ? "Turnstile token was reused — client must reset widget and send a fresh token"
               : error.message.includes("invalid")
                 ? "Verify Supabase Auth → CAPTCHA secret matches TURNSTILE_SECRET_KEY and Cloudflare widget hostnames include this domain"
                 : undefined,
@@ -746,7 +703,12 @@ export async function signIn(formData: LoginCredentials) {
     }
 
     const separator = redirectUrl.includes("?") ? "&" : "?";
-    postAuthRedirect = `${redirectUrl}${separator}${welcomeQuery.toString()}`;
+    const postAuthRedirect = `${redirectUrl}${separator}${welcomeQuery.toString()}`;
+
+    revalidatePath("/", "layout");
+    // Client navigates with router.replace — avoids redirect()-rejection being
+    // mis-handled as "Error occurred. Please retry." on the login form.
+    return { success: true as const, redirectTo: postAuthRedirect };
   } catch (error) {
     unstable_rethrow(error);
     const infrastructureError = mapSignInInfrastructureError(error);
@@ -756,13 +718,6 @@ export async function signIn(formData: LoginCredentials) {
       error: infrastructureError ?? GENERIC_LOGIN_ERROR,
     };
   }
-
-  if (!postAuthRedirect) {
-    return { success: false, error: GENERIC_LOGIN_ERROR };
-  }
-
-  revalidatePath("/", "layout");
-  redirect(postAuthRedirect);
 }
 
 /** @deprecated Use signIn */

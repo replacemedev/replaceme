@@ -43,12 +43,14 @@ type TurnstileResult =
 /**
  * Validate Turnstile token before auth mutations.
  * - No site key → skip (dev / Turnstile off)
+ * - `verifyLocally: true` → always Cloudflare Siteverify (signup OTP session path)
  * - Supabase CAPTCHA on → require token presence only; Supabase verifies once
  * - Supabase CAPTCHA off → Cloudflare Siteverify via TURNSTILE_SECRET_KEY
  */
 export async function requireTurnstileToken(
   token: string | undefined | null,
-  remoteip?: string
+  remoteip?: string,
+  options?: { verifyLocally?: boolean }
 ): Promise<TurnstileResult> {
   if (!isTurnstileEnabled()) {
     return { success: true, token: "" };
@@ -62,7 +64,10 @@ export async function requireTurnstileToken(
     };
   }
 
-  if (shouldDeferTurnstileToSupabase()) {
+  const verifyLocally =
+    options?.verifyLocally === true || !shouldDeferTurnstileToSupabase();
+
+  if (!verifyLocally) {
     return { success: true, token: trimmed };
   }
 
@@ -114,7 +119,7 @@ export async function requireTurnstileToken(
           errorCodes.includes("missing-input-secret")
             ? "Check TURNSTILE_SECRET_KEY matches the Cloudflare widget secret"
             : errorCodes.includes("timeout-or-duplicate")
-              ? "Token was already consumed — enable SUPABASE_AUTH_CAPTCHA_ENABLED (default) so only Supabase verifies once"
+              ? "Token expired or already consumed — reset the widget and retry with a fresh challenge"
               : errorCodes.includes("invalid-input-response")
                 ? "Token expired or hostname mismatch — verify replaceme.ph is in the Turnstile widget hostnames"
                 : undefined,
