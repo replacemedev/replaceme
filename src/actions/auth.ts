@@ -3,7 +3,8 @@
 import { headers } from "next/headers";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import {
   employerSignUpSchema,
   workerSignUpSchema,
@@ -505,17 +506,11 @@ export async function signUp(formData: SignUpFormValues) {
     });
     const separator = destination.includes("?") ? "&" : "?";
 
+    const destinationWithWelcome = `${destination}${separator}${welcomeQuery.toString()}`;
     revalidatePath("/", "layout");
-    redirect(`${destination}${separator}${welcomeQuery.toString()}`);
+    redirect(destinationWithWelcome);
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "digest" in error &&
-      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-    ) {
-      throw error;
-    }
+    unstable_rethrow(error);
     safeError("signUp error:", error);
     return { success: false, error: handleAuthError(error) };
   }
@@ -524,14 +519,6 @@ export async function signUp(formData: SignUpFormValues) {
 const GENERIC_LOGIN_ERROR =
   "Invalid email, username, or password. Please try again.";
 
-function isNextRedirectError(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  return (
-    "digest" in error &&
-    String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-  );
-}
-
 function mapSignInInfrastructureError(error: unknown): string | null {
   if (isRedisInfrastructureError(error)) {
     return REDIS_UNAVAILABLE_ERROR;
@@ -539,7 +526,63 @@ function mapSignInInfrastructureError(error: unknown): string | null {
   return null;
 }
 
+/**
+ * Soft-confirm unconfirmed users, then establish a cookie session via admin
+ * magic-link OTP (avoids reusing a single-use Turnstile token on password retry).
+ */
+async function softConfirmAndEstablishSession(input: {
+  email: string;
+  userId: string;
+  existingAppMetadata?: Record<string, unknown>;
+}): Promise<{ ok: true; user: User } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const admin = await createAdminClient();
+
+  const { error: confirmError } = await admin.auth.admin.updateUserById(
+    input.userId,
+    {
+      email_confirm: true,
+      app_metadata: {
+        ...input.existingAppMetadata,
+        email_verification_pending: true,
+      },
+    }
+  );
+  if (confirmError) {
+    safeError("[Auth] soft-confirm on signIn failed:", confirmError);
+  }
+
+  const { data: linkData, error: linkError } =
+    await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: input.email,
+    });
+
+  const tokenHash = linkData?.properties?.hashed_token;
+  if (linkError || !tokenHash) {
+    safeError("[Auth] soft-confirm generateLink failed:", linkError);
+    return { ok: false, error: GENERIC_LOGIN_ERROR };
+  }
+
+  const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+    type: "magiclink",
+    token_hash: tokenHash,
+  });
+
+  if (otpError || !otpData.user) {
+    safeError("[Auth] soft-confirm verifyOtp failed:", otpError);
+    return { ok: false, error: GENERIC_LOGIN_ERROR };
+  }
+
+  await markEmailVerificationPending(input.userId, input.existingAppMetadata);
+  return { ok: true, user: otpData.user };
+}
+
 export async function signIn(formData: LoginCredentials) {
+  // Build the post-auth URL inside try; call redirect() outside so Next.js
+  // does not treat a caught NEXT_REDIRECT as an application error.
+  let postAuthRedirect: string | null = null;
+
   try {
     safeLog("[Auth] Sign-in initiated");
     const supabase = await createClient();
@@ -619,58 +662,40 @@ export async function signIn(formData: LoginCredentials) {
         };
       }
 
-      // Legacy accounts blocked by Confirm email — soft-confirm then retry once.
+      // Legacy accounts blocked by Confirm email — soft-confirm then session via OTP.
       if (
         error.message.includes("Email not confirmed") ||
         error.code === "email_not_confirmed"
       ) {
-        try {
-          const admin = await createAdminClient();
-          const { data: byEmail } = await admin
-            .from("profiles")
-            .select("id")
-            .ilike("email", escapeIlikeExact(emailToAuth))
-            .limit(1)
-            .maybeSingle();
+        const admin = await createAdminClient();
+        const { data: byEmail } = await admin
+          .from("profiles")
+          .select("id")
+          .ilike("email", escapeIlikeExact(emailToAuth))
+          .limit(1)
+          .maybeSingle();
 
-          if (!byEmail?.id) {
-            await recordLoginFailure(emailKey);
-            return { success: false, error: GENERIC_LOGIN_ERROR };
-          }
-
-          const { data: authUser } = await admin.auth.admin.getUserById(
-            byEmail.id
-          );
-          await admin.auth.admin.updateUserById(byEmail.id, {
-            email_confirm: true,
-            app_metadata: {
-              ...authUser?.user?.app_metadata,
-              email_verification_pending: true,
-            },
-          });
-
-          const retry = await supabase.auth.signInWithPassword({
-            email: emailToAuth,
-            password,
-            options: captchaAuthOptions(turnstile.token),
-          });
-
-          if (retry.error || !retry.data.user) {
-            safeError(
-              "[Auth] signIn retry after soft-confirm failed:",
-              retry.error?.message
-            );
-            await recordLoginFailure(emailKey);
-            return { success: false, error: GENERIC_LOGIN_ERROR };
-          }
-
-          signedInUser = retry.data.user;
-          error = null;
-        } catch (softConfirmError) {
-          safeError("[Auth] soft-confirm on signIn failed:", softConfirmError);
+        if (!byEmail?.id) {
           await recordLoginFailure(emailKey);
           return { success: false, error: GENERIC_LOGIN_ERROR };
         }
+
+        const { data: authUser } = await admin.auth.admin.getUserById(
+          byEmail.id
+        );
+        const established = await softConfirmAndEstablishSession({
+          email: emailToAuth,
+          userId: byEmail.id,
+          existingAppMetadata: authUser?.user?.app_metadata,
+        });
+
+        if (!established.ok) {
+          await recordLoginFailure(emailKey);
+          return { success: false, error: established.error };
+        }
+
+        signedInUser = established.user;
+        error = null;
       } else {
         safeError("[Auth] signInWithPassword failed:", error.message);
         await recordLoginFailure(emailKey);
@@ -724,13 +749,9 @@ export async function signIn(formData: LoginCredentials) {
     }
 
     const separator = redirectUrl.includes("?") ? "&" : "?";
-
-    revalidatePath("/", "layout");
-    redirect(`${redirectUrl}${separator}${welcomeQuery.toString()}`);
+    postAuthRedirect = `${redirectUrl}${separator}${welcomeQuery.toString()}`;
   } catch (error) {
-    if (isNextRedirectError(error)) {
-      throw error;
-    }
+    unstable_rethrow(error);
     const infrastructureError = mapSignInInfrastructureError(error);
     safeError("signIn error:", error);
     return {
@@ -738,6 +759,13 @@ export async function signIn(formData: LoginCredentials) {
       error: infrastructureError ?? GENERIC_LOGIN_ERROR,
     };
   }
+
+  if (!postAuthRedirect) {
+    return { success: false, error: GENERIC_LOGIN_ERROR };
+  }
+
+  revalidatePath("/", "layout");
+  redirect(postAuthRedirect);
 }
 
 /** @deprecated Use signIn */
@@ -878,14 +906,7 @@ export async function updatePassword(formData: {
     revalidatePath("/", "layout");
     redirect("/signin?reset=success");
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "digest" in error &&
-      String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-    ) {
-      throw error;
-    }
+    unstable_rethrow(error);
     safeError("[Auth] updatePassword unexpected error:", error);
     return { success: false, error: "An unexpected error occurred. Please try again." };
   }

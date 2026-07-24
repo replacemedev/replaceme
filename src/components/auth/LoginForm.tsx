@@ -14,6 +14,7 @@ import {
   type LoginCredentials,
 } from "@/lib/validations/auth";
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { toast } from "sonner";
 import {
   TurnstileWidget,
@@ -30,6 +31,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
+  const submitLockRef = useRef(false);
   const turnstileRequired = isTurnstileClientEnabled();
 
   const resetCaptcha = () => {
@@ -59,12 +61,16 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
   }, [setValue]);
 
   const onSubmit = async (data: LoginCredentials) => {
+    if (submitLockRef.current || isLoading) return;
+
     if (turnstileRequired && !turnstileToken) {
       toast.error("Complete security check.");
       return;
     }
 
+    submitLockRef.current = true;
     setIsLoading(true);
+    toast.dismiss();
 
     try {
       const result = await signIn({
@@ -76,23 +82,24 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
       if (result && !result.success) {
         toast.error(result.error ?? "Invalid credentials.");
         resetCaptcha();
-      } else if (data.rememberMe) {
+        submitLockRef.current = false;
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.rememberMe) {
         localStorage.setItem("remember_email", data.email);
       } else {
         localStorage.removeItem("remember_email");
       }
+      // Keep loading/locked until Next.js redirect navigates away.
     } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "digest" in error &&
-        String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
-      ) {
-        throw error;
-      }
+      // Re-throw Next.js redirect / router errors so navigation is not swallowed.
+      unstable_rethrow(error);
+
       toast.error("Error occurred. Please retry.");
       resetCaptcha();
-    } finally {
+      submitLockRef.current = false;
       setIsLoading(false);
     }
   };
@@ -119,6 +126,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
           placeholder="Enter your email or username"
           icon={<Mail size={18} />}
           autoComplete="username"
+          disabled={isLoading}
         />
       </div>
 
@@ -131,12 +139,13 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
           placeholder="Min. 8 characters"
           icon={<Lock size={18} />}
           autoComplete="current-password"
+          disabled={isLoading}
         />
       </div>
 
       <div className="flex items-center justify-between pt-2">
         <label className="flex items-center gap-2 cursor-pointer group">
-          <Checkbox {...register("rememberMe")} />
+          <Checkbox {...register("rememberMe")} disabled={isLoading} />
           <span className="text-sm font-body-base text-slate-600 group-hover:text-slate-900 transition-colors">
             Remember me
           </span>
@@ -159,6 +168,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
         <Button
           type="submit"
           disabled={isLoading || (turnstileRequired && !turnstileToken)}
+          aria-busy={isLoading}
           className="w-full text-base h-12"
         >
           {isLoading ? "Signing in..." : "Sign In"}
