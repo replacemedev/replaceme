@@ -614,7 +614,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           router.refresh();
         });
       }}
-      nextLabel="Finish & go to dashboard"
+      nextLabel="Finish"
       isNextDisabled={Boolean(
         hasProjectDraft &&
           (!projectTitle.trim() ||

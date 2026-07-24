@@ -65,8 +65,8 @@ function captchaAuthOptions(
 }
 
 /**
- * When Supabase "Confirm email" is enabled, signUp returns no session.
- * Soft-confirm via Admin API, then create a cookie session with password sign-in.
+ * After Admin createUser (no session cookie), soft-confirm metadata if needed,
+ * then create a cookie session with password sign-in.
  * Falls back to admin magic-link OTP exchange if password sign-in still fails.
  */
 async function establishSessionAfterSignup(input: {
@@ -365,8 +365,6 @@ export async function signUp(formData: SignUpFormValues) {
       return { success: false, error: rateLimit.error };
     }
 
-    const supabase = await createClient();
-
     // 1. Validate Form Data using strict schemas
     const schema = role === "employer" ? employerSignUpSchema : workerSignUpSchema;
     const parsed = schema.safeParse(formData);
@@ -400,26 +398,26 @@ export async function signUp(formData: SignUpFormValues) {
       return identityConflictResponse(identity.conflict);
     }
 
-    // 3. Sign up with Supabase Auth
-    // We pass metadata that the Postgres trigger will use to populate the profile
+    // 3. Create the Auth user via Admin API (does not send a confirmation email).
+    // Metadata feeds the handle_new_user trigger; deferred verification stays in settings.
     const appRole = role === "employer" ? "employer" : "worker";
-    const settingsPath = emailVerificationSettingsPath(appRole);
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const admin = await createAdminClient();
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
       email: normalizedEmail,
       password: data.password,
-      options: {
-        ...captchaAuthOptions(turnstile.token),
-        emailRedirectTo: authCallbackUrl("signup", settingsPath),
-        data: {
-          role: data.role,
-          username: normalizedUsername,
-          full_name: fullName,
-          first_name: firstName,
-          middle_name: middleName || null,
-          last_name: lastName,
-          suffix: suffix || null,
-          phone_number: phoneNumber || null,
-        },
+      email_confirm: true,
+      app_metadata: {
+        email_verification_pending: true,
+      },
+      user_metadata: {
+        role: data.role,
+        username: normalizedUsername,
+        full_name: fullName,
+        first_name: firstName,
+        middle_name: middleName || null,
+        last_name: lastName,
+        suffix: suffix || null,
+        phone_number: phoneNumber || null,
       },
     });
 
@@ -444,6 +442,7 @@ export async function signUp(formData: SignUpFormValues) {
       }
       if (
         lower.includes("already registered") ||
+        lower.includes("already exists") ||
         lower.includes("email already") ||
         msg.includes("unique_email") ||
         msg.includes("profiles_email_unique_lower_idx") ||
@@ -480,20 +479,18 @@ export async function signUp(formData: SignUpFormValues) {
     // Stripe customer is created on first checkout via ensureStripeCustomer()
     // (employer_subscriptions.stripe_customer_id — single billing source of truth).
 
-    // Confirm-email projects return no session — soft-confirm + sign in immediately.
-    if (!authData.session) {
-      const sessionResult = await establishSessionAfterSignup({
-        userId: authData.user.id,
-        email: normalizedEmail,
-        password: data.password,
-        captchaToken: turnstile.token,
-        existingAppMetadata: authData.user.app_metadata as
-          | Record<string, unknown>
-          | undefined,
-      });
-      if (!sessionResult.ok) {
-        return { success: false, error: sessionResult.error };
-      }
+    // Admin createUser never returns a browser session — soft-confirm flag + sign in.
+    const sessionResult = await establishSessionAfterSignup({
+      userId: authData.user.id,
+      email: normalizedEmail,
+      password: data.password,
+      captchaToken: turnstile.token,
+      existingAppMetadata: authData.user.app_metadata as
+        | Record<string, unknown>
+        | undefined,
+    });
+    if (!sessionResult.ok) {
+      return { success: false, error: sessionResult.error };
     }
 
     const destination = resolvePostAuthRedirect(
@@ -1024,7 +1021,7 @@ export async function getEmailVerificationStatus(): Promise<{
 }
 
 /**
- * Sends (or re-sends) an email verification link from Account Settings.
+ * Sends an email verification link from Account Settings (on demand only).
  * Uses auth.resend for unconfirmed users; for soft-confirmed users with a
  * pending flag, emails a magic link via Resend so they can complete verification.
  */

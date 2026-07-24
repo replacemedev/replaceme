@@ -59,15 +59,16 @@ export function EmailVerificationBanner({
             <p className="text-sm leading-relaxed text-amber-900/90">
               {email ? (
                 <>
-                  We sent a link to{" "}
-                  <span className="font-semibold break-all">{email}</span>.
-                  Confirm it when you can. You can keep using your account in
-                  the meantime.
+                  Confirm{" "}
+                  <span className="font-semibold break-all">{email}</span>{" "}
+                  when you can. Use Verify email to send a confirmation link.
+                  You can keep using your account in the meantime.
                 </>
               ) : (
                 <>
-                  Confirm your email when you can — you can keep using your
-                  account in the meantime.
+                  Confirm your email when you can — use Verify email to send a
+                  confirmation link. You can keep using your account in the
+                  meantime.
                 </>
               )}
             </p>
