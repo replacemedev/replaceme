@@ -44,6 +44,13 @@ function applyCspHeaders(response: NextResponse, nonce: string) {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Inbound provider webhooks (Resend/Stripe): never run auth redirects or
+  // session refresh. Webhook POSTs also will not follow 308s (e.g. apex→www),
+  // so endpoints must be registered on the canonical host that serves 200.
+  if (pathname.startsWith("/api/webhooks/")) {
+    return NextResponse.next();
+  }
+
   if (isMaintenanceMode() && !isMaintenanceBypassPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/maintenance";
@@ -68,11 +75,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
+     * - api/webhooks (Resend/Stripe — must not redirect; providers ignore 308 on POST)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api/webhooks/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

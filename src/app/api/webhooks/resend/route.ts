@@ -10,6 +10,15 @@ import type { Json } from "@/types/database";
 
 export const runtime = "nodejs";
 
+/**
+ * Resend webhook (Svix). Verify with raw body + RESEND_WEBHOOK_SECRET.
+ *
+ * Ops: Production must register the canonical host that returns 200 without a
+ * redirect — currently `https://www.replaceme.ph/api/webhooks/resend` (apex
+ * `replaceme.ph` issues a Vercel 308 to www; Resend will not follow POST
+ * redirects and auto-disables the endpoint). After fixing/deploying, re-enable
+ * the webhook in the Resend dashboard and replay failed events.
+ */
 type ResendWebhookEvent = {
   type: string;
   created_at?: string;
@@ -48,10 +57,23 @@ function parseIso(value: unknown): string {
   return new Date().toISOString();
 }
 
+function ok(extra?: Record<string, unknown>) {
+  return NextResponse.json({ received: true, ...extra }, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
+  const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    safeError("Resend webhook: RESEND_WEBHOOK_SECRET is not configured");
+    return NextResponse.json(
+      { error: "Webhook not configured" },
+      { status: 500 }
+    );
+  }
+
   const resend = createResendClient();
 
-  // IMPORTANT: raw body is required for Svix signature verification.
+  // Raw body required for Svix signature verification (Resend docs).
   const payload = await request.text();
 
   const id = request.headers.get("svix-id");
@@ -67,7 +89,7 @@ export async function POST(request: NextRequest) {
     event = resend.webhooks.verify({
       payload,
       headers: { id, timestamp, signature },
-      webhookSecret: process.env.RESEND_WEBHOOK_SECRET!,
+      webhookSecret,
     }) as unknown as ResendWebhookEvent;
   } catch (err) {
     safeError("Resend webhook verification failed:", err);
@@ -76,7 +98,7 @@ export async function POST(request: NextRequest) {
 
   const claim = await claimResendWebhookEvent(id, event.type);
   if (claim === "duplicate") {
-    return NextResponse.json({ received: true, duplicate: true });
+    return ok({ duplicate: true });
   }
 
   // Store everything we can; don’t assume presence of fields for every event type.
@@ -127,12 +149,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ received: true });
+    // Acknowledge promptly after verify + claim so Resend does not time out.
+    return ok();
   } catch (err) {
     safeError("Resend webhook handler error:", err);
     // Release claim so a later retry can reprocess after a transient failure.
     await releaseResendWebhookEvent(id);
     // Return 200 to prevent retries storm; we’ll see errors in logs.
-    return NextResponse.json({ received: true });
+    return ok();
   }
 }
