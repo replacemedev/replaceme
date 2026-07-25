@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { safeWarn } from "@/utils/logger";
+import type { Json } from "@/types/database";
 import {
   CacheKeys,
   CACHE_TTL_SECONDS,
@@ -73,11 +74,21 @@ async function getClientIp(): Promise<string | null> {
   );
 }
 
-function revalidateAdminSurfaces() {
+async function revalidateAdminSurfaces() {
   for (const path of ADMIN_PATHS) {
     revalidatePath(path);
   }
-  void invalidateAdminCache();
+  // Prefer the users list path explicitly so status badges refresh immediately.
+  revalidatePath("/admin/users");
+  await invalidateAdminCache();
+}
+
+function actionErrorMessage(err: unknown, fallback: string): string {
+  if (err instanceof z.ZodError) {
+    return err.issues.map((i) => i.message).join("; ") || fallback;
+  }
+  if (err instanceof Error) return err.message;
+  return fallback;
 }
 
 export async function logAdminAction(
@@ -86,15 +97,17 @@ export async function logAdminAction(
   targetId?: string,
   metadata?: Record<string, unknown>
 ) {
-  const { supabase, user } = await requireAdmin();
+  const { user } = await requireAdmin();
   const ip = await getClientIp();
+  // Service-role insert so audit logging cannot fail the mutation due to RLS edge cases.
+  const admin = await createAdminClient();
 
-  const { error } = await supabase.from("audit_logs").insert({
+  const { error } = await admin.from("audit_logs").insert({
     admin_id: user.id,
     action_type: actionType,
     target_type: targetType ?? null,
     target_id: targetId ?? null,
-    metadata: metadata ?? {},
+    metadata: (metadata ?? {}) as Json,
     ip_address: ip,
   });
 
@@ -177,20 +190,27 @@ export async function suspendUser(input: {
       return { success: false, error: result.error };
     }
 
-    await logAdminAction("suspend_user", "profile", parsed.userId, {
-      reason: parsed.reason,
-      reasonCategory: parsed.reasonCategory ?? null,
-      durationDays: parsed.durationDays,
-      suspensionEndsAt: result.suspensionEndsAt,
-      jobsClosed: result.jobsClosed,
-      emailSent: result.emailSent,
-    });
-    revalidateAdminSurfaces();
+    try {
+      await logAdminAction("suspend_user", "profile", parsed.userId, {
+        reason: parsed.reason,
+        reasonCategory: parsed.reasonCategory ?? null,
+        durationDays: parsed.durationDays,
+        suspensionEndsAt: result.suspensionEndsAt,
+        jobsClosed: result.jobsClosed,
+        emailSent: result.emailSent,
+      });
+    } catch (auditErr) {
+      safeWarn("suspendUser: audit log failed after successful suspend", {
+        userId: parsed.userId,
+        error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+      });
+    }
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to suspend user",
+      error: actionErrorMessage(err, "Failed to suspend user"),
     };
   }
 }
@@ -208,13 +228,20 @@ export async function unsuspendUser(
       return { success: false, error: result.error };
     }
 
-    await logAdminAction("unsuspend_user", "profile", id, { notifyUser });
-    revalidateAdminSurfaces();
+    try {
+      await logAdminAction("unsuspend_user", "profile", id, { notifyUser });
+    } catch (auditErr) {
+      safeWarn("unsuspendUser: audit log failed after successful unsuspend", {
+        userId: id,
+        error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+      });
+    }
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to unsuspend user",
+      error: actionErrorMessage(err, "Failed to unsuspend user"),
     };
   }
 }
@@ -262,22 +289,26 @@ export async function scheduleUserAccountDeletion(input: {
       return { success: false, error: result.error };
     }
 
-    await logAdminAction("schedule_account_deletion", "profile", parsed.userId, {
-      reason: parsed.reason,
-      reasonCategory: parsed.reasonCategory ?? null,
-      forceCloseEngagements: parsed.forceCloseEngagements,
-      deletionScheduledFor: result.deletionScheduledFor,
-      notifyUser: parsed.notifyUser,
-    });
-    revalidateAdminSurfaces();
+    try {
+      await logAdminAction("schedule_account_deletion", "profile", parsed.userId, {
+        reason: parsed.reason,
+        reasonCategory: parsed.reasonCategory ?? null,
+        forceCloseEngagements: parsed.forceCloseEngagements,
+        deletionScheduledFor: result.deletionScheduledFor,
+        notifyUser: parsed.notifyUser,
+      });
+    } catch (auditErr) {
+      safeWarn("scheduleUserAccountDeletion: audit log failed after success", {
+        userId: parsed.userId,
+        error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+      });
+    }
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error:
-        err instanceof Error
-          ? err.message
-          : "Failed to schedule account deletion",
+      error: actionErrorMessage(err, "Failed to schedule account deletion"),
     };
   }
 }
@@ -319,19 +350,26 @@ export async function deleteUserAccount(input: {
       return { success: false, error: result.error };
     }
 
-    await logAdminAction("delete_user_account", "profile", parsed.userId, {
-      reason: parsed.reason,
-      reasonCategory: parsed.reasonCategory ?? null,
-      forceCloseEngagements: parsed.forceCloseEngagements,
-      notifyUser: parsed.notifyUser,
-      certificate: result.certificate,
-    });
-    revalidateAdminSurfaces();
+    try {
+      await logAdminAction("delete_user_account", "profile", parsed.userId, {
+        reason: parsed.reason,
+        reasonCategory: parsed.reasonCategory ?? null,
+        forceCloseEngagements: parsed.forceCloseEngagements,
+        notifyUser: parsed.notifyUser,
+        certificate: result.certificate,
+      });
+    } catch (auditErr) {
+      safeWarn("deleteUserAccount: audit log failed after successful erase", {
+        userId: parsed.userId,
+        error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+      });
+    }
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to delete user account",
+      error: actionErrorMessage(err, "Failed to delete user account"),
     };
   }
 }
@@ -366,7 +404,7 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
     }
 
     await logAdminAction("approve_job", "job", id);
-    revalidateAdminSurfaces();
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
@@ -394,7 +432,7 @@ export async function rejectJobPost(
     await logAdminAction("reject_job", "job", parsed.jobId, {
       reason: parsed.reason,
     });
-    revalidateAdminSurfaces();
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
@@ -419,7 +457,7 @@ export async function deleteJobPost(
     await logAdminAction("delete_job_post", "job", parsed.jobId, {
       reason: parsed.reason,
     });
-    revalidateAdminSurfaces();
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
@@ -467,7 +505,7 @@ export async function reviewWorkerVerification(
       parsed.workerId,
       trimmedReason ? { reason: trimmedReason, decision: parsed.decision } : { decision: parsed.decision }
     );
-    revalidateAdminSurfaces();
+    await revalidateAdminSurfaces();
     revalidatePath("/worker/verification");
     revalidatePath("/worker/dashboard");
     return { success: true };
@@ -1130,7 +1168,10 @@ export async function fetchAdminDisputes(
     .order("created_at", { ascending: false });
 
   if (status) {
-    query = query.eq("status", status);
+    const parsedStatus = disputeStatusSchema.safeParse(status);
+    if (parsedStatus.success) {
+      query = query.eq("status", parsedStatus.data);
+    }
   }
 
   const { data, error } = await query;
@@ -1212,7 +1253,7 @@ export async function updateDisputeStatus(
       status: parsed.status,
       adminNotes: parsed.adminNotes,
     });
-    revalidateAdminSurfaces();
+    await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {

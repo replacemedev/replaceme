@@ -79,19 +79,37 @@ export async function suspendAccount(
         : addCalendarDays(new Date(), input.durationDays);
     const suspensionEndsAt = endsAt?.toISOString() ?? null;
 
-    const { error: updateError } = await admin
+    const { data: updated, error: updateError } = await admin
       .from("profiles")
       .update({
         account_status: "suspended",
         suspension_ends_at: suspensionEndsAt,
       })
-      .eq("id", input.userId);
+      .eq("id", input.userId)
+      .select("id")
+      .maybeSingle();
 
     if (updateError) throw new Error(updateError.message);
+    if (!updated) {
+      throw new Error("Profile status update did not apply (0 rows)");
+    }
 
-    await admin.auth.admin.updateUserById(input.userId, {
-      ban_duration: banDurationHours(input.durationDays),
-    });
+    // Auth Admin API — requires service role. Official ban pattern: ban_duration.
+    const { error: banError } = await admin.auth.admin.updateUserById(
+      input.userId,
+      { ban_duration: banDurationHours(input.durationDays) }
+    );
+    if (banError) {
+      // Roll back profile standing if Auth ban fails so UI/auth stay consistent.
+      await admin
+        .from("profiles")
+        .update({
+          account_status: profile.account_status ?? "active",
+          suspension_ends_at: null,
+        })
+        .eq("id", input.userId);
+      throw new Error(`Auth ban failed: ${banError.message}`);
+    }
 
     let jobsClosed = 0;
     if (profile.role === "employer") {
@@ -144,19 +162,28 @@ export async function unsuspendAccount(input: {
       return { success: false, error: "Cannot unsuspend a deleted account" };
     }
 
-    const { error: updateError } = await admin
+    const { data: updated, error: updateError } = await admin
       .from("profiles")
       .update({
         account_status: "active",
         suspension_ends_at: null,
       })
-      .eq("id", input.userId);
+      .eq("id", input.userId)
+      .select("id")
+      .maybeSingle();
 
     if (updateError) throw new Error(updateError.message);
+    if (!updated) {
+      throw new Error("Profile status update did not apply (0 rows)");
+    }
 
-    await admin.auth.admin.updateUserById(input.userId, {
-      ban_duration: "none",
-    });
+    const { error: unbanError } = await admin.auth.admin.updateUserById(
+      input.userId,
+      { ban_duration: "none" }
+    );
+    if (unbanError) {
+      throw new Error(`Auth unban failed: ${unbanError.message}`);
+    }
 
     if (profile.email && profile.role !== "admin") {
       await sendAccountUnsuspendedEmail({

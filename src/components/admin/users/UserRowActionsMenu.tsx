@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Eye,
+  Loader2,
   MoreHorizontal,
   Trash2,
   UserCheck,
@@ -44,6 +45,8 @@ export interface UserRowActionsMenuProps {
 
 type DialogMode = "suspend" | "unsuspend" | "delete" | null;
 
+type MenuCoords = { top: number; left: number };
+
 export function UserRowActionsMenu({
   userId,
   label,
@@ -57,7 +60,10 @@ export function UserRowActionsMenu({
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<DialogMode>(null);
+  const [coords, setCoords] = useState<MenuCoords | null>(null);
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const [reason, setReason] = useState("");
   const [reasonCategory, setReasonCategory] = useState<
@@ -78,6 +84,7 @@ export function UserRowActionsMenu({
   const closeMenu = () => {
     if (detailsRef.current) detailsRef.current.open = false;
     setOpen(false);
+    setCoords(null);
   };
 
   const resetForm = () => {
@@ -91,6 +98,46 @@ export function UserRowActionsMenu({
     setConfirmText("");
     setBlockers(null);
   };
+
+  const placeMenu = () => {
+    const el = summaryRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const menuWidth = 208;
+    const left = Math.min(
+      Math.max(8, rect.right - menuWidth),
+      window.innerWidth - menuWidth - 8
+    );
+    setCoords({ top: rect.bottom + 4, left });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    placeMenu();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        detailsRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
+      ) {
+        return;
+      }
+      closeMenu();
+    };
+    const onReposition = () => placeMenu();
+    document.addEventListener("mousedown", onPointer);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (mode !== "delete") return;
@@ -125,7 +172,7 @@ export function UserRowActionsMenu({
       if (mode === "unsuspend") {
         const result = await unsuspendUser(userId, notifyUser);
         if (result.success) {
-          toast.success("User reactivated");
+          toast.success("User account successfully reactivated");
           resetForm();
           closeMenu();
           router.refresh();
@@ -148,7 +195,7 @@ export function UserRowActionsMenu({
           reasonCategory,
         });
         if (result.success) {
-          toast.success("User suspended");
+          toast.success("User account successfully suspended");
           resetForm();
           closeMenu();
           router.refresh();
@@ -192,8 +239,8 @@ export function UserRowActionsMenu({
         if (result.success) {
           toast.success(
             deleteMode === "schedule"
-              ? "Deletion scheduled"
-              : "Account erased"
+              ? "Account deletion successfully scheduled"
+              : "User account successfully erased"
           );
           resetForm();
           closeMenu();
@@ -209,58 +256,85 @@ export function UserRowActionsMenu({
     addCalendarDays(new Date(), ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays)
   );
 
+  const menuItems = (
+    <>
+      <Link
+        href={profileHref}
+        role="menuitem"
+        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+        onClick={closeMenu}
+      >
+        <Eye className="h-4 w-4 text-slate-400" aria-hidden />
+        View profile
+      </Link>
+      {accountStatus === "active" ? (
+        <MenuButton
+          icon={UserX}
+          label="Suspend"
+          onClick={() => {
+            closeMenu();
+            setMode("suspend");
+          }}
+        />
+      ) : (
+        <MenuButton
+          icon={UserCheck}
+          label="Unsuspend"
+          onClick={() => {
+            closeMenu();
+            setMode("unsuspend");
+          }}
+        />
+      )}
+      <MenuButton
+        icon={Trash2}
+        label="Delete account"
+        danger
+        onClick={() => {
+          closeMenu();
+          setMode("delete");
+        }}
+      />
+    </>
+  );
+
   return (
     <>
       <details
         ref={detailsRef}
         className="relative inline-block text-left"
-        onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
+        onToggle={(event) => {
+          const nextOpen = (event.target as HTMLDetailsElement).open;
+          setOpen(nextOpen);
+          if (!nextOpen) setCoords(null);
+        }}
       >
-        <summary className="flex cursor-pointer list-none items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
-          <MoreHorizontal className="h-4 w-4" aria-hidden />
+        <summary
+          ref={summaryRef}
+          className="flex cursor-pointer list-none items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
+          aria-label={`Actions for ${label}`}
+          aria-haspopup="menu"
+          aria-expanded={open}
+        >
+          {pending ? (
+            <Loader2 className="h-4 w-4 animate-spin text-slate-400" aria-hidden />
+          ) : (
+            <MoreHorizontal className="h-4 w-4" aria-hidden />
+          )}
           <span className="sr-only">Actions for {label}</span>
         </summary>
-        {open ? (
-          <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-            <Link
-              href={profileHref}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
-              onClick={closeMenu}
-            >
-              <Eye className="h-4 w-4 text-slate-400" aria-hidden />
-              View profile
-            </Link>
-            {accountStatus === "active" ? (
-              <MenuButton
-                icon={UserX}
-                label="Suspend"
-                onClick={() => {
-                  closeMenu();
-                  setMode("suspend");
-                }}
-              />
-            ) : (
-              <MenuButton
-                icon={UserCheck}
-                label="Unsuspend"
-                onClick={() => {
-                  closeMenu();
-                  setMode("unsuspend");
-                }}
-              />
-            )}
-            <MenuButton
-              icon={Trash2}
-              label="Delete account"
-              danger
-              onClick={() => {
-                closeMenu();
-                setMode("delete");
-              }}
-            />
-          </div>
-        ) : null}
       </details>
+
+      {open && coords ? (
+        <div
+          ref={menuRef}
+          role="menu"
+          style={{ top: coords.top, left: coords.left }}
+          className="fixed z-[80] w-52 max-w-[min(13rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg"
+        >
+          {menuItems}
+        </div>
+      ) : null}
 
       <ConfirmDialog
         open={mode !== null}
@@ -538,6 +612,7 @@ function MenuButton({
   return (
     <button
       type="button"
+      role="menuitem"
       onClick={onClick}
       className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors ${
         danger

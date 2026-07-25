@@ -1,17 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import type { Database } from "@/types/database";
 
 /**
  * Vercel Serverless & Supabase Connection Pooling Optimization:
- * 
+ *
  * 1. SERVERLESS INSTANTIATION:
  *    Next.js App Router calls this function for every server-side operation (Server Components, Actions, Routes).
  *    To prevent cookie read/write overhead and redundant fetches, cookie Store is accessed on-demand.
- * 
+ *
  * 2. DATABASE CONNECTION POOLING (Supavisor):
  *    When deploying on Vercel, serverless scaling can spin up hundreds of concurrent functions.
  *    If direct PostgreSQL connections (port 5432) are used, the database will quickly throw "too many connections" errors.
- *    
+ *
  *    To configure connection pooling in the Vercel Dashboard:
  *    - Go to Vercel Project Settings -> Environment Variables.
  *    - Configure your database connection string using Supabase's built-in connection pooler (Supavisor).
@@ -65,16 +67,24 @@ export function createPublicClient() {
   );
 }
 
+/**
+ * Service-role client for Auth Admin API + RLS-bypassing server mutations.
+ * Uses `@supabase/supabase-js` (not SSR cookie client) per Supabase Admin docs.
+ */
 export async function createAdminClient() {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() { return [] },
-        setAll() {}
-      }
-    }
-  )
-}
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  if (!url || !serviceRoleKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY for admin operations"
+    );
+  }
+
+  return createSupabaseJsClient<Database>(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}

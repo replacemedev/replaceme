@@ -20,7 +20,7 @@ export function AdminDataTable({
         {mobileCards}
       </div>
       <div
-        className={`hidden md:block overflow-x-auto overflow-y-visible w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
+        className={`hidden md:block overflow-x-auto overflow-y-visible w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white isolate ${className}`}
       >
         {children}
       </div>

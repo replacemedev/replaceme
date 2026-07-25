@@ -52,13 +52,14 @@ export function ConfirmDialog({
 
   if (!open) return null;
 
-  const maxWidth = size === "lg" ? "max-w-lg" : "max-w-md";
+  const maxWidth =
+    size === "lg" ? "sm:max-w-lg" : "sm:max-w-md";
 
   return (
     <dialog
       ref={dialogRef}
       dir="ltr"
-      className={`fixed inset-0 z-[100] m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 text-left shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none overscroll-contain`}
+      className={`fixed inset-0 z-[100] m-0 sm:m-auto h-full max-h-full w-full max-w-none rounded-none border-0 sm:border sm:border-slate-200 bg-white p-0 text-left shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:rounded-2xl ${maxWidth} overflow-hidden outline-none overscroll-contain`}
       onClose={onCancel}
       onClick={(e) => {
         if (e.target === dialogRef.current) {
@@ -66,7 +67,7 @@ export function ConfirmDialog({
         }
       }}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5 shrink-0 bg-white rounded-t-2xl text-left">
+      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5 shrink-0 bg-white sm:rounded-t-2xl text-left">
         <div className="flex items-start gap-3 min-w-0 text-left">
           <span
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
@@ -100,7 +101,7 @@ export function ConfirmDialog({
           {children}
         </div>
       ) : null}
-      <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4 shrink-0 bg-slate-50/50 rounded-b-2xl">
+      <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4 shrink-0 bg-slate-50/50 sm:rounded-b-2xl pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-4">
         <Button
           type="button"
           variant="outline"

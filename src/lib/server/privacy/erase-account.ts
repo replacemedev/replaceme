@@ -413,17 +413,24 @@ export async function executeAccountErasure(
 
     if (anonError) throw new Error(anonError.message);
 
-    await admin.auth.admin.updateUserById(input.userId, {
-      ban_duration: "876000h",
-      email: anonEmail,
-      user_metadata: {
-        anonymized: true,
-        deleted_at: now,
-      },
-      app_metadata: {
-        anonymized: true,
-      },
-    });
+    const { error: authError } = await admin.auth.admin.updateUserById(
+      input.userId,
+      {
+        ban_duration: "876000h",
+        email: anonEmail,
+        email_confirm: true,
+        user_metadata: {
+          anonymized: true,
+          deleted_at: now,
+        },
+        app_metadata: {
+          anonymized: true,
+        },
+      }
+    );
+    if (authError) {
+      throw new Error(`Auth anonymization failed: ${authError.message}`);
+    }
 
     const resendMeta = await suppressResendContact(
       originalEmail,

@@ -246,7 +246,8 @@ export async function fetchAdminTeamActivity(
       target_type: row.target_type,
       target_id: row.target_id,
       metadata: row.metadata as Record<string, unknown> | null,
-      ip_address: row.ip_address,
+      ip_address:
+        typeof row.ip_address === "string" ? row.ip_address : null,
       created_at: row.created_at,
       admin_email: row.admin_id ? emailById.get(row.admin_id) ?? null : null,
     }));
@@ -362,9 +363,15 @@ export async function updateAdminStatus(
 
     if (error) throw new Error(error.message);
 
-    await db.auth.admin.updateUserById(parsed.userId, {
-      ban_duration: parsed.status === "suspended" ? "876000h" : "none",
-    });
+    const { error: banError } = await db.auth.admin.updateUserById(
+      parsed.userId,
+      {
+        ban_duration: parsed.status === "suspended" ? "876000h" : "none",
+      }
+    );
+    if (banError) {
+      throw new Error(`Auth ban update failed: ${banError.message}`);
+    }
 
     await logAdminAction("update_admin_status", "admin_profile", parsed.userId, {
       status: parsed.status,
