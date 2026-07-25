@@ -7,7 +7,6 @@ interface AuditEntry {
   target_type: string | null;
   target_id: string | null;
   created_at: string;
-  metadata: Record<string, unknown> | null;
 }
 
 interface RecentActionsProps {

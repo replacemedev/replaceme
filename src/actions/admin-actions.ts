@@ -115,7 +115,9 @@ export async function logAdminAction(
   await invalidateAdminCache();
 }
 
-type ActionResult = { success: true } | { success: false; error: string };
+type ActionResult =
+  | { success: true; emailSent?: boolean; emailError?: string | null }
+  | { success: false; error: string };
 
 const LAST_SIGN_IN_CONCURRENCY = 50;
 
@@ -198,6 +200,7 @@ export async function suspendUser(input: {
         suspensionEndsAt: result.suspensionEndsAt,
         jobsClosed: result.jobsClosed,
         emailSent: result.emailSent,
+        emailError: result.emailError,
       });
     } catch (auditErr) {
       safeWarn("suspendUser: audit log failed after successful suspend", {
@@ -206,7 +209,11 @@ export async function suspendUser(input: {
       });
     }
     await revalidateAdminSurfaces();
-    return { success: true };
+    return {
+      success: true,
+      emailSent: result.emailSent,
+      emailError: result.emailError,
+    };
   } catch (err) {
     return {
       success: false,
@@ -229,7 +236,11 @@ export async function unsuspendUser(
     }
 
     try {
-      await logAdminAction("unsuspend_user", "profile", id, { notifyUser });
+      await logAdminAction("unsuspend_user", "profile", id, {
+        notifyUser,
+        emailSent: result.emailSent,
+        emailError: result.emailError,
+      });
     } catch (auditErr) {
       safeWarn("unsuspendUser: audit log failed after successful unsuspend", {
         userId: id,
@@ -237,7 +248,11 @@ export async function unsuspendUser(
       });
     }
     await revalidateAdminSurfaces();
-    return { success: true };
+    return {
+      success: true,
+      emailSent: result.emailSent,
+      emailError: result.emailError,
+    };
   } catch (err) {
     return {
       success: false,
@@ -296,6 +311,8 @@ export async function scheduleUserAccountDeletion(input: {
         forceCloseEngagements: parsed.forceCloseEngagements,
         deletionScheduledFor: result.deletionScheduledFor,
         notifyUser: parsed.notifyUser,
+        emailSent: result.emailSent,
+        emailError: result.emailError,
       });
     } catch (auditErr) {
       safeWarn("scheduleUserAccountDeletion: audit log failed after success", {
@@ -304,7 +321,11 @@ export async function scheduleUserAccountDeletion(input: {
       });
     }
     await revalidateAdminSurfaces();
-    return { success: true };
+    return {
+      success: true,
+      emailSent: result.emailSent,
+      emailError: result.emailError,
+    };
   } catch (err) {
     return {
       success: false,
@@ -356,6 +377,8 @@ export async function deleteUserAccount(input: {
         reasonCategory: parsed.reasonCategory ?? null,
         forceCloseEngagements: parsed.forceCloseEngagements,
         notifyUser: parsed.notifyUser,
+        emailSent: result.emailSent,
+        emailError: result.emailError,
         certificate: result.certificate,
       });
     } catch (auditErr) {
@@ -365,7 +388,11 @@ export async function deleteUserAccount(input: {
       });
     }
     await revalidateAdminSurfaces();
-    return { success: true };
+    return {
+      success: true,
+      emailSent: result.emailSent,
+      emailError: result.emailError,
+    };
   } catch (err) {
     return {
       success: false,

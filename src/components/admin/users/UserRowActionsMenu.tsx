@@ -169,10 +169,31 @@ export function UserRowActionsMenu({
   const runAction = () => {
     if (!mode) return;
     startTransition(async () => {
+      const toastLifecycleSuccess = (
+        message: string,
+        result: { emailSent?: boolean; emailError?: string | null },
+        wantedEmail: boolean
+      ) => {
+        if (wantedEmail && result.emailSent === false) {
+          toast.success(message);
+          toast.warning(
+            result.emailError
+              ? `Notification email failed: ${result.emailError}`
+              : "Account updated, but the notification email did not send."
+          );
+          return;
+        }
+        toast.success(message);
+      };
+
       if (mode === "unsuspend") {
         const result = await unsuspendUser(userId, notifyUser);
         if (result.success) {
-          toast.success("User account successfully reactivated");
+          toastLifecycleSuccess(
+            "User account successfully reactivated",
+            result,
+            notifyUser
+          );
           resetForm();
           closeMenu();
           router.refresh();
@@ -195,7 +216,11 @@ export function UserRowActionsMenu({
           reasonCategory,
         });
         if (result.success) {
-          toast.success("User account successfully suspended");
+          toastLifecycleSuccess(
+            "User account successfully suspended",
+            result,
+            notifyUser
+          );
           resetForm();
           closeMenu();
           router.refresh();
@@ -237,10 +262,12 @@ export function UserRowActionsMenu({
             : await deleteUserAccount(payload);
 
         if (result.success) {
-          toast.success(
+          toastLifecycleSuccess(
             deleteMode === "schedule"
               ? "Account deletion successfully scheduled"
-              : "User account successfully erased"
+              : "User account successfully erased",
+            result,
+            notifyUser
           );
           resetForm();
           closeMenu();

@@ -352,10 +352,11 @@ export async function getAdminReports(input: unknown): Promise<{
         items: (data ?? []).map((r) => ({
           id: r.id,
           createdAt: r.created_at,
-          status: r.status,
-          category: r.category,
+          // DB column is TEXT + CHECK; generated types are `string`.
+          status: r.status as (typeof REPORT_STATUSES)[number],
+          category: r.category as (typeof REPORT_CATEGORIES)[number],
           reporterId: r.reporter_id,
-          reporterRole: r.reporter_role,
+          reporterRole: r.reporter_role as AdminReportRow["reporterRole"],
           title: r.title,
           reportedUrl: r.reported_url,
           hasEvidence: Boolean(r.evidence_storage_path),
@@ -442,8 +443,9 @@ export async function getAdminReportById(
       id: data.id,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      status: data.status,
-      category: data.category,
+      // DB column is TEXT + CHECK; generated types are `string`.
+      status: data.status as (typeof REPORT_STATUSES)[number],
+      category: data.category as (typeof REPORT_CATEGORIES)[number],
       reporterId: data.reporter_id,
       reporterRole: data.reporter_role,
       title: data.title,

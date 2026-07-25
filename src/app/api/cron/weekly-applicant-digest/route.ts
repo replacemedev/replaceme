@@ -66,7 +66,8 @@ export async function GET(request: NextRequest) {
               .select("id")
               .eq("employer_id", employer.employerId)
               .eq("status", "Active")
-          ).data?.map((j) => j.id) ?? []
+          ).data?.map((j) => j.id).filter((id): id is string => Boolean(id)) ??
+            []
         )
         .gte("created_at", sevenDaysAgo);
 

@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
     admin.rpc("get_platform_metrics"),
     admin
       .from("audit_logs")
-      .select("id, action_type, target_type, target_id, metadata, created_at")
+      .select("id, action_type, target_type, target_id, created_at")
       .order("created_at", { ascending: false })
       .limit(8),
   ]);

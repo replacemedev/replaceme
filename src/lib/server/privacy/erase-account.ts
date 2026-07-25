@@ -192,7 +192,12 @@ async function cancelEmployerStripe(employerId: string): Promise<{
 export async function scheduleAccountDeletion(
   input: ScheduleDeletionInput
 ): Promise<
-  | { success: true; deletionScheduledFor: string }
+  | {
+      success: true;
+      deletionScheduledFor: string;
+      emailSent: boolean;
+      emailError: string | null;
+    }
   | { success: false; error: string }
 > {
   try {
@@ -260,17 +265,25 @@ export async function scheduleAccountDeletion(
       }
     }
 
-    if (profile.email) {
-      await sendDeletionScheduledEmail({
-        to: profile.email,
-        userId: input.userId,
-        role: profile.role as UserRole,
-        scheduledFor: scheduled,
-        notify: input.notifyUser !== false,
-      });
+    let emailSent = false;
+    let emailError: string | null = null;
+    if (input.notifyUser !== false) {
+      if (!profile.email) {
+        emailError = "User has no email on file";
+      } else {
+        const mailed = await sendDeletionScheduledEmail({
+          to: profile.email,
+          userId: input.userId,
+          role: profile.role as UserRole,
+          scheduledFor: scheduled,
+          notify: true,
+        });
+        emailSent = mailed.sent;
+        if (!mailed.sent) emailError = mailed.skipped;
+      }
     }
 
-    return { success: true, deletionScheduledFor };
+    return { success: true, deletionScheduledFor, emailSent, emailError };
   } catch (err) {
     safeError("scheduleAccountDeletion:", err);
     return {
@@ -283,7 +296,12 @@ export async function scheduleAccountDeletion(
 export async function executeAccountErasure(
   input: ExecuteErasureInput
 ): Promise<
-  | { success: true; certificate: Record<string, unknown> }
+  | {
+      success: true;
+      certificate: Record<string, unknown>;
+      emailSent: boolean;
+      emailError: string | null;
+    }
   | { success: false; error: string }
 > {
   try {
@@ -325,13 +343,21 @@ export async function executeAccountErasure(
 
     const originalEmail = profile.email;
 
-    if (originalEmail) {
-      await sendDeletionCompleteEmail({
-        to: originalEmail,
-        userId: input.userId,
-        role: profile.role as UserRole,
-        notify: input.notifyUser !== false,
-      });
+    let emailSent = false;
+    let emailError: string | null = null;
+    if (input.notifyUser !== false) {
+      if (!originalEmail) {
+        emailError = "User has no email on file";
+      } else {
+        const mailed = await sendDeletionCompleteEmail({
+          to: originalEmail,
+          userId: input.userId,
+          role: profile.role as UserRole,
+          notify: true,
+        });
+        emailSent = mailed.sent;
+        if (!mailed.sent) emailError = mailed.skipped;
+      }
     }
 
     if (profile.role === "worker") {
@@ -463,7 +489,7 @@ export async function executeAccountErasure(
       erasedAt: now,
     };
 
-    return { success: true, certificate };
+    return { success: true, certificate, emailSent, emailError };
   } catch (err) {
     safeError("executeAccountErasure:", err);
     return {

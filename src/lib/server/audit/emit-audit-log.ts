@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import type { Json } from "@/types/database";
 import { headers } from "next/headers";
 import { safeError } from "@/utils/logger";
 
@@ -28,7 +29,7 @@ export async function emitAuditLog(params: {
       action_type: params.actionType,
       target_type: params.targetType ?? null,
       target_id: params.targetId ?? null,
-      metadata: params.metadata ?? {},
+      metadata: (params.metadata ?? {}) as Json,
       ip_address: ip,
     });
 

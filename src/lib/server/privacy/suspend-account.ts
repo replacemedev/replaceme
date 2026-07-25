@@ -25,6 +25,7 @@ export type SuspendAccountResult =
       suspensionEndsAt: string | null;
       jobsClosed: number;
       emailSent: boolean;
+      emailError: string | null;
     }
   | { success: false; error: string };
 
@@ -117,16 +118,22 @@ export async function suspendAccount(
     }
 
     let emailSent = false;
-    if (profile.email) {
-      const mailed = await sendAccountSuspendedEmail({
-        to: profile.email,
-        userId: input.userId,
-        role: profile.role as UserRole,
-        reasonCategory: input.reasonCategory,
-        endsAt,
-        notify: input.notifyUser !== false,
-      });
-      emailSent = mailed.sent;
+    let emailError: string | null = null;
+    if (input.notifyUser !== false) {
+      if (!profile.email) {
+        emailError = "User has no email on file";
+      } else {
+        const mailed = await sendAccountSuspendedEmail({
+          to: profile.email,
+          userId: input.userId,
+          role: profile.role as UserRole,
+          reasonCategory: input.reasonCategory,
+          endsAt,
+          notify: true,
+        });
+        emailSent = mailed.sent;
+        if (!mailed.sent) emailError = mailed.skipped;
+      }
     }
 
     return {
@@ -134,6 +141,7 @@ export async function suspendAccount(
       suspensionEndsAt,
       jobsClosed,
       emailSent,
+      emailError,
     };
   } catch (err) {
     safeError("suspendAccount:", err);
@@ -147,7 +155,10 @@ export async function suspendAccount(
 export async function unsuspendAccount(input: {
   userId: string;
   notifyUser?: boolean;
-}): Promise<{ success: true } | { success: false; error: string }> {
+}): Promise<
+  | { success: true; emailSent: boolean; emailError: string | null }
+  | { success: false; error: string }
+> {
   try {
     const admin = await createAdminClient();
     const { data: profile, error: profileError } = await admin
@@ -185,16 +196,24 @@ export async function unsuspendAccount(input: {
       throw new Error(`Auth unban failed: ${unbanError.message}`);
     }
 
-    if (profile.email && profile.role !== "admin") {
-      await sendAccountUnsuspendedEmail({
-        to: profile.email,
-        userId: input.userId,
-        role: profile.role as UserRole,
-        notify: input.notifyUser !== false,
-      });
+    let emailSent = false;
+    let emailError: string | null = null;
+    if (input.notifyUser !== false && profile.role !== "admin") {
+      if (!profile.email) {
+        emailError = "User has no email on file";
+      } else {
+        const mailed = await sendAccountUnsuspendedEmail({
+          to: profile.email,
+          userId: input.userId,
+          role: profile.role as UserRole,
+          notify: true,
+        });
+        emailSent = mailed.sent;
+        if (!mailed.sent) emailError = mailed.skipped;
+      }
     }
 
-    return { success: true };
+    return { success: true, emailSent, emailError };
   } catch (err) {
     safeError("unsuspendAccount:", err);
     return {
