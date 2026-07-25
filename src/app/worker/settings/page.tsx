@@ -21,7 +21,9 @@ export default async function WorkerSettingsPage() {
   const [{ data: profile }, verification] = await Promise.all([
     supabase
       .from("profiles")
-      .select("availability, hourly_rate, is_remote, salary_currency, role")
+      .select(
+        "availability, hourly_rate, is_remote, salary_currency, role, email, username"
+      )
       .eq("id", user.id)
       .single(),
     getEmailVerificationStatus(),
@@ -33,7 +35,7 @@ export default async function WorkerSettingsPage() {
     <WorkerPageShell width="content">
       <WorkerPageHeader
         title="Account settings"
-        subhead="Manage availability, hourly rate, and trust & safety reports."
+        subhead="View your login identity, manage availability, and submit trust & safety reports."
       />
       <div className="mb-6">
         <EmailVerificationBanner
@@ -42,6 +44,10 @@ export default async function WorkerSettingsPage() {
         />
       </div>
       <WorkerSettingsClient
+        identity={{
+          email: profile.email ?? user.email ?? null,
+          username: profile.username ?? null,
+        }}
         initial={{
           availability: profile.availability ?? "Full-time",
           hourlyRate: Number(profile.hourly_rate ?? 0),
