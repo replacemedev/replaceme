@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const timeSeriesPointSchema = z.object({
   date: z.string(),
-  count: z.number(),
+  count: z.coerce.number(),
 });
 
 export const urgentAlertSchema = z.object({
