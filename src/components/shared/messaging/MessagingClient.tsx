@@ -18,6 +18,7 @@ import {
   MessagingRole,
   MessagingThread,
   MESSAGING_THREADS_PAGE_SIZE,
+  sortThreadsByRecentActivity,
 } from "@/types/messaging";
 import { InboxSidebar } from "./InboxSidebar";
 import { ChatArea } from "./ChatArea";
@@ -74,7 +75,9 @@ export function MessagingClient({
   const [, startRefresh] = useTransition();
   const [isNavigating, startNavigation] = useTransition();
 
-  const [threads, setThreads] = useState(initialThreads);
+  const [threads, setThreads] = useState(() =>
+    sortThreadsByRecentActivity(initialThreads)
+  );
   const [hasMoreThreads, setHasMoreThreads] = useState(initialHasMoreThreads);
   const [isLoadingMoreThreads, setIsLoadingMoreThreads] = useState(false);
   const [messages, setMessages] = useState(initialMessagesPage.messages);
@@ -92,7 +95,7 @@ export function MessagingClient({
   const messagesCacheRef = useRef<Map<string, ThreadMessagesCache>>(new Map());
 
   useEffect(() => {
-    setThreads(initialThreads);
+    setThreads(sortThreadsByRecentActivity(initialThreads));
     setHasMoreThreads(initialHasMoreThreads);
   }, [initialThreads, initialHasMoreThreads]);
 
@@ -113,6 +116,16 @@ export function MessagingClient({
 
   useEffect(() => {
     if (!selectedThreadId) return;
+
+    // Clear unread locally without touching activity timestamps / list order.
+    setThreads((prev) =>
+      prev.map((t) =>
+        t.id === selectedThreadId
+          ? { ...t, unread_count: 0, marked_unread: false }
+          : t
+      )
+    );
+
     markMessagingThreadRead(selectedThreadId, basePath).then(() => {
       startRefresh(() => router.refresh());
     });
@@ -133,9 +146,34 @@ export function MessagingClient({
         }
         return next;
       });
+
+      // New message activity — promote this thread to the top of the inbox.
+      setThreads((prev) =>
+        sortThreadsByRecentActivity(
+          prev.map((t) =>
+            t.id === message.thread_id
+              ? {
+                  ...t,
+                  last_message: {
+                    content: message.content,
+                    created_at: message.created_at,
+                    sender_id: message.sender_id,
+                    read_at: message.read_at,
+                  },
+                  unread_count:
+                    message.sender_id === currentUserId ||
+                    t.id === selectedThreadId
+                      ? t.unread_count
+                      : t.unread_count + 1,
+                }
+              : t
+          )
+        )
+      );
+
       startRefresh(() => router.refresh());
     },
-    [selectedThreadId, hasMoreMessages, nextCursor, router]
+    [selectedThreadId, hasMoreMessages, nextCursor, router, currentUserId]
   );
 
   useMessagingThreadRealtime(
@@ -220,7 +258,10 @@ export function MessagingClient({
       );
       setThreads((prev) => {
         const existing = new Set(prev.map((t) => t.id));
-        return [...prev, ...page.threads.filter((t) => !existing.has(t.id))];
+        return sortThreadsByRecentActivity([
+          ...prev,
+          ...page.threads.filter((t) => !existing.has(t.id)),
+        ]);
       });
       setHasMoreThreads(page.hasMore);
     } finally {
@@ -248,6 +289,25 @@ export function MessagingClient({
     };
 
     setMessages((prev) => [...prev, optimistic]);
+
+    // Sending is real activity — move this conversation to the top.
+    setThreads((prev) =>
+      sortThreadsByRecentActivity(
+        prev.map((t) =>
+          t.id === selectedThreadId
+            ? {
+                ...t,
+                last_message: {
+                  content,
+                  created_at: optimistic.created_at,
+                  sender_id: currentUserId,
+                  read_at: null,
+                },
+              }
+            : t
+        )
+      )
+    );
 
     const result = await sendMessagingMessage(
       selectedThreadId,

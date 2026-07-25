@@ -108,7 +108,7 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   return (
     <EmployerPageShell
       width="wide"
-      className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4"
+      className="h-[calc(100dvh-4rem)] min-h-0 flex flex-col justify-center overflow-hidden py-4"
     >
       <Suspense fallback={null}>
         <MessagingClient

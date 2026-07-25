@@ -8,6 +8,7 @@ import {
   MessagingJobRole,
   MessagingRole,
   MessagingThread,
+  sortThreadsByRecentActivity,
 } from "@/types/messaging";
 import { InboxThreadItem } from "./InboxThreadItem";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -50,27 +51,29 @@ export function InboxSidebar({
 }: InboxSidebarProps) {
   const filtered = useMemo(
     () =>
-      threads.filter((t) => {
-        if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
-          return false;
-        }
+      sortThreadsByRecentActivity(
+        threads.filter((t) => {
+          if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
+            return false;
+          }
 
-        const q = searchQuery.toLowerCase();
-        const matches =
-          t.oppositeParty.name.toLowerCase().includes(q) ||
-          (t.jobTitle?.toLowerCase().includes(q) ?? false) ||
-          (t.last_message?.content.toLowerCase().includes(q) ?? false);
-        if (!matches) return false;
-        if (activeTab === "unread") return t.unread_count > 0 || t.marked_unread;
-        if (activeTab === "pinned") return t.is_pinned;
-        return true;
-      }),
+          const q = searchQuery.toLowerCase();
+          const matches =
+            t.oppositeParty.name.toLowerCase().includes(q) ||
+            (t.jobTitle?.toLowerCase().includes(q) ?? false) ||
+            (t.last_message?.content.toLowerCase().includes(q) ?? false);
+          if (!matches) return false;
+          if (activeTab === "unread") return t.unread_count > 0 || t.marked_unread;
+          if (activeTab === "pinned") return t.is_pinned;
+          return true;
+        })
+      ),
     [threads, selectedJobRole, searchQuery, activeTab]
   );
 
   return (
     <aside
-      className={`w-full lg:w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full ${
+      className={`w-full lg:w-[320px] shrink-0 border-r border-slate-200 bg-white flex flex-col h-full min-h-0 ${
         mobileHidden ? "hidden lg:flex" : ""
       }`}
     >
@@ -128,7 +131,9 @@ export function InboxSidebar({
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent]"
+      >
         {threads.length === 0 ? (
           <div className="flex items-center justify-center h-full p-4">
             <EmptyState
@@ -153,6 +158,7 @@ export function InboxSidebar({
           </p>
         ) : (
           <Virtuoso
+            style={{ height: "100%" }}
             className="h-full"
             data={filtered}
             endReached={() => {

@@ -71,9 +71,6 @@ export function AccountLoginIdentity({
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
           Login identity
         </h3>
-        <p className="text-xs leading-relaxed text-slate-400">
-          Email and username cannot be changed.
-        </p>
       </div>
       <dl className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
         <LockedField

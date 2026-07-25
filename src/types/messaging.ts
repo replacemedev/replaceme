@@ -73,6 +73,21 @@ export interface MessagingThreadsPage {
   hasMore: boolean;
 }
 
+/** Activity clock for inbox ordering — last message only, never selection/read state. */
+export function threadActivityTimestamp(thread: MessagingThread): number {
+  const iso = thread.last_message?.created_at ?? thread.created_at;
+  return new Date(iso).getTime();
+}
+
+/** Newest activity first. Selecting/opening a thread must not change this order. */
+export function sortThreadsByRecentActivity(
+  threads: MessagingThread[]
+): MessagingThread[] {
+  return [...threads].sort(
+    (a, b) => threadActivityTimestamp(b) - threadActivityTimestamp(a)
+  );
+}
+
 /** Derive unique job roles from real thread data — no mock hydration. */
 export function extractJobRolesFromThreads(
   threads: MessagingThread[]

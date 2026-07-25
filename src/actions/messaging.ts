@@ -24,6 +24,7 @@ import {
   MessagingRole,
   MessagingThread,
   MessagingThreadsPage,
+  sortThreadsByRecentActivity,
 } from "@/types/messaging";
 import { revalidatePath } from "next/cache";
 import { assertEmployerMessaging, fetchEmployerEntitlements } from "@/lib/server/entitlements";
@@ -109,7 +110,7 @@ async function enrichThreads(
   const lastByThread = new Map(lastMessagePairs);
   const unreadByThread = new Map(unreadPairs);
 
-  return threads.map((t) => {
+  const mapped = threads.map((t) => {
     const jobs = t.jobs as { id: string; title: string } | null;
     const jobTitle = jobs?.title ?? null;
     let oppositeParty: MessagingThread["oppositeParty"];
@@ -164,6 +165,10 @@ async function enrichThreads(
       marked_unread: markedUnread,
     };
   });
+
+  // Inbox order follows last message activity — not thread.updated_at (bumped by
+  // read/pin/metadata writes and would jump a conversation on mere selection).
+  return sortThreadsByRecentActivity(mapped);
 }
 
 /** One query: which threads already have a non-worker (employer) message. */
@@ -599,25 +604,27 @@ export async function markMessagingThreadRead(
       return fail("Failed to mark messages as read");
     }
 
-    // Reset marked unread for the current user based on role
+    // Reset marked unread for the current user based on role — only write when
+    // the flag is set so we avoid no-op chat_threads updates (and any
+    // updated_at / realtime churn that would reshuffle the inbox).
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
-    if (profile) {
-      if (profile.role === "worker") {
-        await supabase
-          .from("chat_threads")
-          .update({ worker_marked_unread: false })
-          .eq("id", parsed.threadId);
-      } else if (profile.role === "employer") {
-        await supabase
-          .from("chat_threads")
-          .update({ employer_marked_unread: false })
-          .eq("id", parsed.threadId);
-      }
+    if (profile?.role === "worker") {
+      await supabase
+        .from("chat_threads")
+        .update({ worker_marked_unread: false })
+        .eq("id", parsed.threadId)
+        .eq("worker_marked_unread", true);
+    } else if (profile?.role === "employer") {
+      await supabase
+        .from("chat_threads")
+        .update({ employer_marked_unread: false })
+        .eq("id", parsed.threadId)
+        .eq("employer_marked_unread", true);
     }
 
     const { data: thread } = await supabase
