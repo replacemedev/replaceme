@@ -294,13 +294,13 @@ export function UserRowActionsMenu({
         onConfirm={runAction}
       >
         {mode === "suspend" ? (
-          <div className="space-y-4 text-sm">
-            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <div className="space-y-4 text-left text-sm">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950">
               <AlertTriangle
                 className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
                 aria-hidden
               />
-              <p className="leading-relaxed">
+              <p className="min-w-0 flex-1 text-left leading-relaxed">
                 Suspended accounts cannot sign in until reactivated
                 {durationDays
                   ? ` or after the ${durationDays}-day period`
@@ -354,19 +354,19 @@ export function UserRowActionsMenu({
         ) : null}
 
         {mode === "unsuspend" ? (
-          <div className="space-y-4 text-sm">
+          <div className="space-y-4 text-left text-sm">
             <NotifyCheckbox checked={notifyUser} onChange={setNotifyUser} />
           </div>
         ) : null}
 
         {mode === "delete" ? (
-          <div className="space-y-5 text-sm">
-            <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-950">
+          <div className="space-y-5 text-left text-sm">
+            <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-left text-sm text-red-950">
               <AlertTriangle
                 className="mt-0.5 h-4 w-4 shrink-0 text-red-600"
                 aria-hidden
               />
-              <p className="leading-relaxed">
+              <p className="min-w-0 flex-1 text-left leading-relaxed">
                 Schedule uses a{" "}
                 {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace
                 (closes ~{graceEnd}). Immediate erase skips recovery and cannot
@@ -386,15 +386,17 @@ export function UserRowActionsMenu({
               </select>
             </Field>
             {loadingBlockers ? (
-              <p className="text-sm text-slate-500">Checking engagements…</p>
+              <p className="text-left text-sm text-slate-500">
+                Checking engagements…
+              </p>
             ) : blockers ? (
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-slate-700">
                 {blockers.canProceedWithoutForce ? (
-                  <p>No open engagement blockers.</p>
+                  <p className="text-left">No open engagement blockers.</p>
                 ) : (
-                  <ul className="list-disc list-outside ml-4 space-y-1.5">
+                  <ul className="ml-4 list-outside list-disc space-y-1.5 text-left">
                     {blockers.messages.map((m) => (
-                      <li key={m} className="pl-1">
+                      <li key={m} className="pl-1 text-left">
                         {m}
                       </li>
                     ))}
@@ -403,7 +405,7 @@ export function UserRowActionsMenu({
               </div>
             ) : null}
             {!blockers?.canProceedWithoutForce ? (
-              <label className="flex items-start gap-2.5 text-sm text-slate-700">
+              <label className="flex items-start gap-2.5 text-left text-sm text-slate-700">
                 <input
                   type="checkbox"
                   checked={forceClose}
@@ -413,26 +415,28 @@ export function UserRowActionsMenu({
                 Force close engagements (audited)
               </label>
             ) : null}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 text-left">
+                <p className="text-left text-xs font-bold uppercase tracking-wide text-slate-500">
                   Wiped
                 </p>
-                <ul className="mt-2 list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
-                  <li className="pl-0.5">Profile PII / email → sentinel</li>
-                  <li className="pl-0.5">KYC / resume / avatar</li>
+                <ul className="mt-2 ml-4 list-outside list-disc space-y-1.5 text-left text-sm text-slate-700">
+                  <li className="pl-0.5 text-left">
+                    Profile PII / email → sentinel
+                  </li>
+                  <li className="pl-0.5 text-left">KYC / resume / avatar</li>
                   {kind === "employer" ? (
-                    <li className="pl-0.5">Public company fields</li>
+                    <li className="pl-0.5 text-left">Public company fields</li>
                   ) : null}
                 </ul>
               </div>
-              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 text-left">
+                <p className="text-left text-xs font-bold uppercase tracking-wide text-slate-500">
                   Retained
                 </p>
-                <ul className="mt-2 list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
+                <ul className="mt-2 ml-4 list-outside list-disc space-y-1.5 text-left text-sm text-slate-700">
                   {DATA_RETENTION_PERIODS.slice(2, 5).map((r) => (
-                    <li key={r.category} className="pl-0.5">
+                    <li key={r.category} className="pl-0.5 text-left">
                       {r.category}
                     </li>
                   ))}
@@ -481,7 +485,7 @@ export function UserRowActionsMenu({
 }
 
 const FIELD_CONTROL =
-  "mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 md:text-sm";
+  "mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-left text-base text-slate-800 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 md:text-sm";
 
 function Field({
   label,
@@ -491,8 +495,10 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+    <label className="block w-full text-left">
+      <span className="block text-left text-sm font-medium text-slate-700">
+        {label}
+      </span>
       {children}
     </label>
   );
@@ -506,7 +512,7 @@ function NotifyCheckbox({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-2.5 text-sm text-slate-700">
+    <label className="flex items-start gap-2.5 text-left text-sm text-slate-700">
       <input
         type="checkbox"
         checked={checked}

@@ -49,15 +49,52 @@ const TAB_LABELS: Record<AdminUserTab, string> = {
 
 function MailtoEmail({ email }: { email: string | null }) {
   if (!email) {
-    return <p className="text-xs text-slate-400">—</p>;
+    return <p className="text-sm text-slate-500">—</p>;
   }
   return (
     <a
       href={`mailto:${email}`}
-      className="text-xs text-slate-400 hover:text-emerald-700 hover:underline"
+      title={email}
+      className="block truncate text-sm text-slate-500 hover:text-emerald-700 hover:underline"
     >
       {email}
     </a>
+  );
+}
+
+function UserIdentityCell({
+  href,
+  name,
+  email,
+  verified,
+}: {
+  href?: string;
+  name: string;
+  email: string | null;
+  verified?: boolean;
+}) {
+  return (
+    <div className="flex min-w-0 max-w-xs flex-col overflow-hidden">
+      <div className="flex min-w-0 items-center gap-1.5">
+        {href ? (
+          <Link
+            href={href}
+            title={name}
+            className="min-w-0 truncate text-sm font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+          >
+            {name}
+          </Link>
+        ) : (
+          <span title={name} className="min-w-0 truncate text-sm font-medium text-slate-900">
+            {name}
+          </span>
+        )}
+        {verified !== undefined ? (
+          <VerifiedBadge show={verified} size="sm" />
+        ) : null}
+      </div>
+      <MailtoEmail email={email} />
+    </div>
   );
 }
 
@@ -386,18 +423,12 @@ export function UsersClient({
                       />
                     }
                   >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-                        <Link
-                          href={`/admin/users/workers/${worker.id}`}
-                          className="hover:text-emerald-700 hover:underline truncate min-w-0"
-                        >
-                          {name}
-                        </Link>
-                        <VerifiedBadge show={worker.is_verified} size="sm" />
-                      </p>
-                      <MailtoEmail email={worker.email} />
-                    </div>
+                    <UserIdentityCell
+                      href={`/admin/users/workers/${worker.id}`}
+                      name={name}
+                      email={worker.email}
+                      verified={worker.is_verified}
+                    />
                     {worker.professional_title ? (
                       <p className="text-sm text-slate-600 truncate">
                         {worker.professional_title}
@@ -438,17 +469,11 @@ export function UsersClient({
                       />
                     }
                   >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 truncate">
-                        <Link
-                          href={`/admin/users/employers/${employer.employer_id}`}
-                          className="hover:text-emerald-700 hover:underline"
-                        >
-                          {employer.company_name}
-                        </Link>
-                      </p>
-                      <MailtoEmail email={employer.email} />
-                    </div>
+                    <UserIdentityCell
+                      href={`/admin/users/employers/${employer.employer_id}`}
+                      name={employer.company_name}
+                      email={employer.email}
+                    />
                     {employer.industry ? (
                       <p className="text-sm text-slate-600 truncate">
                         {employer.industry}
@@ -481,10 +506,7 @@ export function UsersClient({
                   actionsPlacement="header"
                   actions={adminTeamHint}
                 >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-slate-900 truncate">{name}</p>
-                    <p className="text-xs text-slate-500 truncate">{admin.email}</p>
-                  </div>
+                  <UserIdentityCell name={name} email={admin.email} />
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2 py-0.5 text-[11px] font-semibold text-[#006e2f]">
                       <ShieldCheck className="h-3 w-3" aria-hidden />
@@ -534,17 +556,13 @@ export function UsersClient({
                         );
                         return (
                           <tr key={worker.id} className={ADMIN_TABLE_ROW}>
-                            <td className={ADMIN_TABLE_TD}>
-                              <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-                                <Link
-                                  href={`/admin/users/workers/${worker.id}`}
-                                  className="hover:text-emerald-700 hover:underline truncate min-w-0"
-                                >
-                                  {name}
-                                </Link>
-                                <VerifiedBadge show={worker.is_verified} size="sm" />
-                              </p>
-                              <MailtoEmail email={worker.email} />
+                            <td className={`${ADMIN_TABLE_TD} max-w-xs overflow-hidden`}>
+                              <UserIdentityCell
+                                href={`/admin/users/workers/${worker.id}`}
+                                name={name}
+                                email={worker.email}
+                                verified={worker.is_verified}
+                              />
                             </td>
                             <td className={ADMIN_TABLE_TD}>
                               {worker.professional_title ?? "—"}
@@ -603,16 +621,12 @@ export function UsersClient({
                     : tab === "employers"
                       ? (paginatedFiltered as AdminEmployerRow[]).map((employer) => (
                           <tr key={employer.id} className={ADMIN_TABLE_ROW}>
-                            <td className={ADMIN_TABLE_TD}>
-                              <p className="font-semibold text-slate-900">
-                                <Link
-                                  href={`/admin/users/employers/${employer.employer_id}`}
-                                  className="hover:text-emerald-700 hover:underline"
-                                >
-                                  {employer.company_name}
-                                </Link>
-                              </p>
-                              <MailtoEmail email={employer.email} />
+                            <td className={`${ADMIN_TABLE_TD} max-w-xs overflow-hidden`}>
+                              <UserIdentityCell
+                                href={`/admin/users/employers/${employer.employer_id}`}
+                                name={employer.company_name}
+                                email={employer.email}
+                              />
                             </td>
                             <td className={ADMIN_TABLE_TD}>
                               {employer.industry ?? "—"}
@@ -650,18 +664,16 @@ export function UsersClient({
                       : tab === "admins"
                         ? (paginatedFiltered as AdminAdminRow[]).map((admin) => (
                             <tr key={admin.id} className={ADMIN_TABLE_ROW}>
-                              <td className={ADMIN_TABLE_TD}>
-                                <p className="font-semibold text-slate-900">
-                                  {displayName(
+                              <td className={`${ADMIN_TABLE_TD} max-w-xs overflow-hidden`}>
+                                <UserIdentityCell
+                                  name={displayName(
                                     admin.first_name,
                                     admin.middle_name,
                                     admin.last_name,
                                     "Unnamed"
                                   )}
-                                </p>
-                                <p className="text-xs text-slate-400">
-                                  {admin.email}
-                                </p>
+                                  email={admin.email}
+                                />
                               </td>
                               <td className={ADMIN_TABLE_TD}>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-semibold text-[#006e2f]">

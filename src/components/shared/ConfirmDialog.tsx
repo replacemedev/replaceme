@@ -48,7 +48,8 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
-      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none`}
+      dir="ltr"
+      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 text-left shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none`}
       onClose={onCancel}
       onClick={(e) => {
         if (e.target === dialogRef.current) {
@@ -56,8 +57,8 @@ export function ConfirmDialog({
         }
       }}
     >
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5 shrink-0 bg-white rounded-t-2xl">
-        <div className="flex items-start gap-3 min-w-0">
+      <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5 shrink-0 bg-white rounded-t-2xl text-left">
+        <div className="flex items-start gap-3 min-w-0 text-left">
           <span
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
               variant === "danger"
@@ -67,11 +68,11 @@ export function ConfirmDialog({
           >
             <AlertTriangle className="h-4 w-4" aria-hidden />
           </span>
-          <div className="min-w-0">
-            <h2 className="text-base font-bold text-slate-900 leading-snug">
+          <div className="min-w-0 text-left">
+            <h2 className="text-base font-bold text-slate-900 leading-snug text-left">
               {title}
             </h2>
-            <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
+            <p className="mt-1.5 text-sm text-slate-500 leading-relaxed text-left">
               {description}
             </p>
           </div>
@@ -86,7 +87,7 @@ export function ConfirmDialog({
         </button>
       </div>
       {children ? (
-        <div className="overflow-y-auto overflow-x-hidden px-6 py-5 flex-1 min-h-0 text-slate-700">
+        <div className="overflow-y-auto overflow-x-hidden px-6 py-5 flex-1 min-h-0 text-left text-slate-700">
           {children}
         </div>
       ) : null}
