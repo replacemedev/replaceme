@@ -52,6 +52,7 @@ export interface EmployerInterviewRow {
   status?: string;
   notes?: string | null;
   isPreview: boolean;
+  isVerified: boolean;
 }
 
 export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
@@ -81,7 +82,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           job_id,
           candidate_id,
           created_at,
-          profiles ( first_name, middle_name, last_name ),
+          profiles ( first_name, middle_name, last_name, is_verified ),
           interviews (
             id,
             scheduled_at,
@@ -104,6 +105,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           first_name?: string;
           middle_name?: string;
           last_name?: string;
+          is_verified?: boolean | null;
         } | null;
         const name = candidate
           ? formatFullName(candidate.first_name, candidate.middle_name, candidate.last_name)
@@ -127,6 +129,7 @@ export async function getEmployerInterviews(): Promise<EmployerInterviewRow[]> {
           status: interview?.status || "scheduled",
           notes: interview?.notes || null,
           isPreview,
+          isVerified: isPreview ? false : Boolean(candidate?.is_verified),
         };
       });
     }

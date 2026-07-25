@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pin, MoreVertical, AlertTriangle, Trash2, MailOpen } from "lucide-react";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
 import { ChatInputArea } from "./ChatInputArea";
 import { MessagingEmptyState } from "./MessagingEmptyState";
@@ -113,9 +114,15 @@ export function ChatArea({
               <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
                 {contextTitle}
               </h3>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
-                <span className="text-xs text-slate-500 font-semibold truncate">
-                  {oppositeParty.name}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1 min-w-0">
+                <span className="inline-flex items-center gap-1.5 min-w-0 max-w-full">
+                  <span className="text-xs text-slate-500 font-semibold truncate min-w-0">
+                    {oppositeParty.name}
+                  </span>
+                  <VerifiedBadge
+                    show={Boolean(oppositeParty.isVerified)}
+                    size="sm"
+                  />
                 </span>
               </div>
             </div>

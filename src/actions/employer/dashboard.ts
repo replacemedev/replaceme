@@ -167,7 +167,8 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
           middle_name,
           last_name,
           avatar_url,
-          professional_title
+          professional_title,
+          is_verified
         )
       `)
           .in("job_id", jobIds)
@@ -214,6 +215,9 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
             avatar_url: avatarUrl,
             is_unlocked: hasFullIdentity,
             job_id: app.job_id,
+            isVerified: hasFullIdentity
+              ? Boolean(candidate?.is_verified)
+              : false,
           };
         });
       }

@@ -9,6 +9,7 @@ import { AdminFilterPills, AdminSectionLabel } from "@/components/admin/shared/A
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import type { AdminDisputeRow, DisputeStatus } from "@/types/admin.types";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 const STATUS_FILTERS = [
   "All",
@@ -101,9 +102,17 @@ export function DisputesClient({ disputes }: DisputesClientProps) {
                   {dispute.description ? (
                     <p className="mt-1 text-sm text-slate-600">{dispute.description}</p>
                   ) : null}
-                  <p className="mt-2 text-xs text-slate-500">
-                    {dispute.worker_name ?? "Unknown worker"}
-                    {dispute.worker_email ? ` · ${dispute.worker_email}` : ""}
+                  <p className="mt-2 text-xs text-slate-500 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                    <span className="truncate min-w-0">
+                      {dispute.worker_name ?? "Unknown worker"}
+                    </span>
+                    <VerifiedBadge
+                      show={dispute.worker_is_verified}
+                      size="sm"
+                    />
+                    {dispute.worker_email ? (
+                      <span className="truncate">· {dispute.worker_email}</span>
+                    ) : null}
                   </p>
                   <p className="text-xs text-slate-400">
                     Filed {new Date(dispute.created_at).toLocaleString()}

@@ -24,6 +24,7 @@ import type {
   AdminWorkerRow,
 } from "@/types/admin.types";
 import { formatFullName } from "@/lib/format/name";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface UsersClientProps {
   tab: AdminUserTab;
@@ -361,13 +362,14 @@ export function UsersClient({
                       />
                     }
                   >
-                    <p className="font-semibold text-slate-900">
+                    <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
                       <Link
                         href={`/admin/users/workers/${worker.id}`}
-                        className="hover:text-emerald-700 hover:underline"
+                        className="hover:text-emerald-700 hover:underline truncate min-w-0"
                       >
                         {name}
                       </Link>
+                      <VerifiedBadge show={worker.is_verified} size="sm" />
                     </p>
                     <p className="text-xs text-slate-500">{worker.email}</p>
                     <p className="text-sm text-slate-600">
@@ -503,13 +505,14 @@ export function UsersClient({
                       return (
                         <tr key={worker.id} className={ADMIN_TABLE_ROW}>
                           <td className={ADMIN_TABLE_TD}>
-                            <p className="font-semibold text-slate-900">
+                            <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
                               <Link
                                 href={`/admin/users/workers/${worker.id}`}
-                                className="hover:text-emerald-700 hover:underline"
+                                className="hover:text-emerald-700 hover:underline truncate min-w-0"
                               >
                                 {name}
                               </Link>
+                              <VerifiedBadge show={worker.is_verified} size="sm" />
                             </p>
                             <p className="text-xs text-slate-400">
                               {worker.email}

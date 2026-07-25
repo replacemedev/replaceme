@@ -263,6 +263,7 @@ export type AdminWorkerProfileDeepDive = {
   salaryCurrency: string;
   accountStatus: string;
   verificationStatus: string | null;
+  isVerified: boolean;
   suffix?: string | null;
   phoneNumber?: string | null;
   gender?: string | null;
@@ -301,7 +302,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
+            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status, is_verified"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -342,6 +343,7 @@ export async function getAdminWorkerProfileDeepDive(
       salaryCurrency: profile.salary_currency ?? "PHP",
       accountStatus: profile.account_status,
       verificationStatus: profile.verification_status ?? null,
+      isVerified: Boolean(profile.is_verified),
       suffix: profile.suffix,
       phoneNumber: profile.phone_number,
       gender: profile.gender,

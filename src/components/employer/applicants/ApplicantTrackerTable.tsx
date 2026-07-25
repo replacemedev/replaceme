@@ -7,6 +7,7 @@ import { APPLICATION_STATUS_LABELS } from "@/types/applications";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
 import { EmployerInlineActions } from "@/components/employer/layout/EmployerInlineActions";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 
 export type ApplicantTrackerRow = {
@@ -19,6 +20,7 @@ export type ApplicantTrackerRow = {
   appliedAt: string;
   isPreview: boolean;
   jobId: string;
+  isVerified: boolean;
 };
 
 type ApplicantTrackerTableProps = {
@@ -91,9 +93,12 @@ export function ApplicantTrackerTable({
                     <div className="min-w-0">
                       <Link
                         href={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
-                        className="font-semibold text-slate-900 hover:text-[#006e2f] hover:underline truncate block"
+                        className="font-semibold text-slate-900 hover:text-[#006e2f] hover:underline inline-flex items-center gap-1.5 min-w-0 max-w-full"
                       >
-                        {row.name}
+                        <span className="truncate min-w-0">{row.name}</span>
+                        {!row.isPreview ? (
+                          <VerifiedBadge show={row.isVerified} size="sm" />
+                        ) : null}
                       </Link>
                       {row.isPreview ? (
                         <UnlockOverlay

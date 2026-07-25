@@ -8,6 +8,7 @@ import {
   type ReviewableWorker,
 } from "@/actions/employer/reviews";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { StarRatingInput } from "./StarRatingInput";
 import { Star, CheckCircle2 } from "lucide-react";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
@@ -39,8 +40,11 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
   if (worker.hasReview) {
     return (
       <li className={`${EMPLOYER_CARD} flex items-center justify-between gap-4 p-5`}>
-        <div>
-          <p className="text-sm font-extrabold text-slate-900">{worker.workerName}</p>
+        <div className="min-w-0">
+          <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+            <span className="truncate min-w-0">{worker.workerName}</span>
+            <VerifiedBadge show={worker.isVerified} size="sm" />
+          </p>
           <p className="text-xs text-slate-500 font-medium mt-1">
             Hired team member
           </p>
@@ -55,8 +59,11 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
 
   return (
     <li className={`${EMPLOYER_CARD} p-5 space-y-4`}>
-      <div>
-        <p className="text-sm font-extrabold text-slate-900">{worker.workerName}</p>
+      <div className="min-w-0">
+        <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+          <span className="truncate min-w-0">{worker.workerName}</span>
+          <VerifiedBadge show={worker.isVerified} size="sm" />
+        </p>
         <p className="text-xs text-slate-500 font-medium mt-1">
           Share your experience working together
         </p>

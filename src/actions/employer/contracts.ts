@@ -35,6 +35,7 @@ export interface EmployerContractDetail {
   startDate: string;
   employmentStatus: string | null;
   showHiredBadge: boolean;
+  isVerified: boolean;
 }
 
 export async function getEmployerContract(
@@ -59,7 +60,7 @@ export async function getEmployerContract(
       start_date,
       show_hired_badge,
       employment_status,
-      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, professional_title ),
+      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, professional_title, is_verified ),
       jobs ( title )
     `
     )
@@ -74,6 +75,7 @@ export async function getEmployerContract(
     middle_name?: string;
     last_name?: string;
     professional_title?: string;
+    is_verified?: boolean | null;
   } | null;
   const job = contract.jobs as { title?: string } | null;
 
@@ -92,6 +94,7 @@ export async function getEmployerContract(
     startDate: contract.start_date,
     employmentStatus: contract.employment_status || null,
     showHiredBadge: Boolean(contract.show_hired_badge),
+    isVerified: Boolean(worker?.is_verified),
   };
 }
 

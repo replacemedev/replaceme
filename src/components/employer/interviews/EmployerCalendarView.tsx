@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Video } from "lucide-react";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { InterviewDetailModal } from "./InterviewDetailModal";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -172,10 +173,13 @@ export function EmployerCalendarView({ interviews }: EmployerCalendarViewProps) 
                       key={int.applicationId}
                       type="button"
                       onClick={() => setSelectedInterview(int)}
-                      className="w-full text-left truncate text-[10px] font-bold text-slate-700 bg-slate-50 hover:bg-slate-100/80 hover:text-slate-900 border border-slate-100 rounded-lg p-1 transition-colors flex items-center gap-1 cursor-pointer"
+                      className="w-full text-left truncate text-[10px] font-bold text-slate-700 bg-slate-50 hover:bg-slate-100/80 hover:text-slate-900 border border-slate-100 rounded-lg p-1 transition-colors flex items-center gap-1 cursor-pointer min-w-0"
                     >
                       {int.meetingUrl && <Video size={10} className="text-blue-500 shrink-0" />}
-                      <span className="truncate">{int.candidateName}</span>
+                      <span className="truncate min-w-0">{int.candidateName}</span>
+                      {!int.isPreview ? (
+                        <VerifiedBadge show={int.isVerified} size="sm" />
+                      ) : null}
                     </button>
                   ))}
                   {dateInterviews.length > 2 && (

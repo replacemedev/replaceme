@@ -2,6 +2,7 @@
 
 import { MessagingThread } from "@/types/messaging";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface InboxThreadItemProps {
   thread: MessagingThread;
@@ -65,15 +66,19 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-baseline gap-2 mb-0.5">
+        <div className="flex justify-between items-baseline gap-2 mb-0.5 min-w-0">
           <h4
-            className={`text-sm truncate ${
+            className={`inline-flex items-center gap-1.5 min-w-0 text-sm ${
               isActive || isUnread
                 ? "font-bold text-slate-900"
                 : "font-semibold text-slate-800"
             }`}
           >
-            {oppositeParty.name}
+            <span className="truncate min-w-0">{oppositeParty.name}</span>
+            <VerifiedBadge
+              show={Boolean(oppositeParty.isVerified)}
+              size="sm"
+            />
           </h4>
           <span
             className={`text-[11px] font-semibold shrink-0 ${

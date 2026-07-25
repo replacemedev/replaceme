@@ -189,6 +189,7 @@ export function ApplicantsClient({
         appliedAt: app.createdAt,
         isPreview: isDiscoveryPreview,
         jobId,
+        isVerified: app.isVerified,
       })),
     [filteredApplicants, isDiscoveryPreview, jobId]
   );

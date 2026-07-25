@@ -103,9 +103,9 @@ export function EmployerCandidateProfile({
               />
             </div>
             <div className="space-y-2 flex-1">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                {candidate.name}
-                <VerifiedBadge show={candidate.isVerified} />
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 inline-flex flex-wrap items-center justify-center sm:justify-start gap-1.5 min-w-0">
+                <span className="truncate min-w-0 max-w-full">{candidate.name}</span>
+                <VerifiedBadge show={candidate.isVerified} size="md" />
               </h1>
               <p className={`text-sm sm:text-base ${isPreview ? "text-slate-500 font-medium" : "text-slate-600 font-semibold"}`}>
                 {isPreview ? "Candidate Profile" : candidate.title}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Calendar, Users } from "lucide-react";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
 import { EmployerSectionCard } from "@/components/employer/layout";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface DashboardHiringSummaryProps {
   interviewCount: number;
@@ -78,8 +79,16 @@ export function DashboardHiringSummary({
                 <li key={interview.applicationId} className="px-4 py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-slate-900 truncate">
-                        {interview.candidateName}
+                      <p className="text-sm font-bold text-slate-900 inline-flex items-center gap-1.5 min-w-0 max-w-full">
+                        <span className="truncate min-w-0">
+                          {interview.candidateName}
+                        </span>
+                        {!interview.isPreview ? (
+                          <VerifiedBadge
+                            show={interview.isVerified}
+                            size="sm"
+                          />
+                        ) : null}
                       </p>
                       <p className="text-[11px] font-medium text-slate-500 mt-0.5 truncate">
                         {interview.jobTitle}

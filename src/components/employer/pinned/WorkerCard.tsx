@@ -71,14 +71,14 @@ export function WorkerCard({
               )}
             </div>
 
-            <div>
-              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1.5 inline-flex items-center gap-1">
-                {worker.name}
+            <div className="min-w-0">
+              <h3 className="text-xs font-extrabold text-slate-800 leading-none mb-1.5 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                <span className="truncate min-w-0">{worker.name}</span>
                 {!isPreview ? (
                   <VerifiedBadge show={worker.isVerified} size="sm" />
                 ) : null}
               </h3>
-              <p className="text-[10px] text-slate-400 font-bold leading-none">
+              <p className="text-[10px] text-slate-400 font-bold leading-none truncate">
                 {worker.role}
               </p>
             </div>

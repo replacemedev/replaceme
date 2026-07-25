@@ -9,6 +9,7 @@ import {
   type EmployerContractDetail,
 } from "@/actions/employer/contracts";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 import { ContractStickyActions } from "./ContractStickyActions";
 
@@ -63,9 +64,21 @@ export function ContractDetailClient({
   return (
     <>
       <div className={`${EMPLOYER_CARD} space-y-6 p-6`}>
-        <p className="text-sm text-slate-500 font-medium">
-          {contract.workerName} · {contract.workerRole}
-          {contract.jobTitle ? ` · ${contract.jobTitle}` : ""}
+        <p className="text-sm text-slate-500 font-medium inline-flex items-center gap-1.5 flex-wrap min-w-0">
+          <span className="inline-flex items-center gap-1.5 min-w-0">
+            <span className="truncate min-w-0 text-slate-800 font-extrabold">
+              {contract.workerName}
+            </span>
+            <VerifiedBadge show={contract.isVerified} size="sm" />
+          </span>
+          <span className="text-slate-400">·</span>
+          <span className="truncate">{contract.workerRole}</span>
+          {contract.jobTitle ? (
+            <>
+              <span className="text-slate-400">·</span>
+              <span className="truncate">{contract.jobTitle}</span>
+            </>
+          ) : null}
         </p>
 
         <label className="block text-sm font-semibold text-slate-700">

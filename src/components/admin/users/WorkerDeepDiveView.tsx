@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { formatFullName } from "@/lib/format/name";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import type { AdminWorkerProfileDeepDive } from "@/actions/admin/deep-dive";
 
 interface WorkerDeepDiveViewProps {
@@ -26,7 +27,10 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-          <h2 className="text-xl font-bold text-slate-900">{name}</h2>
+          <h2 className="text-xl font-bold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+            <span className="truncate min-w-0">{name}</span>
+            <VerifiedBadge show={data.isVerified} size="md" />
+          </h2>
           <p className="mt-1 text-sm text-slate-500">{data.email}</p>
           {data.username ? (
             <p className="mt-0.5 text-xs text-slate-400">@{data.username}</p>

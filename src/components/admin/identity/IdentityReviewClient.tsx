@@ -29,6 +29,7 @@ import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { formatFullName } from "@/lib/format/name";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
 import { COMMON_KYC_REJECTION_REASONS } from "@/types/verification";
 import type {
@@ -524,8 +525,11 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     className="rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
                   >
                     <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="font-semibold text-slate-900">{name}</p>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                          <span className="truncate min-w-0">{name}</span>
+                          <VerifiedBadge show={worker.is_verified} size="sm" />
+                        </p>
                         <p className="text-xs text-slate-400">{worker.email}</p>
                         <div className="mt-2 flex flex-wrap gap-2">
                           <StatusBadge status={worker.verification_status} />
@@ -677,7 +681,10 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                         className="hover:bg-slate-50/50 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <p className="font-semibold text-slate-900">{name}</p>
+                          <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                            <span className="truncate min-w-0">{name}</span>
+                            <VerifiedBadge show={worker.is_verified} size="sm" />
+                          </p>
                           <p className="text-xs text-slate-400">
                             {worker.email}
                           </p>
@@ -720,9 +727,12 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     key={worker.id}
                     className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] space-y-3"
                   >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-semibold text-slate-900">{name}</p>
+                    <div className="flex items-start justify-between gap-3 min-w-0">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                          <span className="truncate min-w-0">{name}</span>
+                          <VerifiedBadge show={worker.is_verified} size="sm" />
+                        </p>
                         <p className="text-xs text-slate-400">{worker.email}</p>
                       </div>
                       <StatusBadge status={worker.verification_status} />
@@ -911,13 +921,16 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   Core profile
                 </p>
-                <p className="mt-1 text-sm font-bold text-slate-900">
-                  {formatFullName(
-                    viewData.firstName,
-                    viewData.middleName,
-                    viewData.lastName,
-                    viewData.suffix
-                  ) || "—"}
+                <p className="mt-1 text-sm font-bold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                  <span className="truncate min-w-0">
+                    {formatFullName(
+                      viewData.firstName,
+                      viewData.middleName,
+                      viewData.lastName,
+                      viewData.suffix
+                    ) || "—"}
+                  </span>
+                  <VerifiedBadge show={viewData.isVerified} size="sm" />
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
                   {viewData.email ?? "—"}

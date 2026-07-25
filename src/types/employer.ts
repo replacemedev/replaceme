@@ -18,4 +18,5 @@ export interface RecentApplicant {
   avatar_url: string | null;
   is_unlocked: boolean;
   job_id: string;
+  isVerified: boolean;
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { RecentApplicant } from "@/types/employer";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface RecentApplicantRowProps {
   applicant: RecentApplicant;
@@ -52,15 +53,17 @@ export function RecentApplicantRow({
         </div>
 
         <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-bold text-slate-900 truncate">
+          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+            <span className="text-sm font-bold text-slate-900 truncate min-w-0">
               {applicant.name}
             </span>
             {isPreviewOnly ? (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 uppercase tracking-wider">
                 Preview only
               </span>
-            ) : null}
+            ) : (
+              <VerifiedBadge show={applicant.isVerified} size="sm" />
+            )}
           </div>
           <p className="text-xs text-slate-500 font-medium truncate">
             Applied for{" "}

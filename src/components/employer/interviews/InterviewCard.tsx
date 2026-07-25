@@ -5,6 +5,7 @@ import { Calendar, Lock } from "lucide-react";
 import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import type { EmployerInterviewRow } from "@/actions/employer/hiring";
 import { EmployerInlineActions } from "@/components/employer/layout/EmployerInlineActions";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { InterviewDetailModal } from "./InterviewDetailModal";
 
 interface InterviewCardProps {
@@ -37,8 +38,11 @@ export function InterviewCard({
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-extrabold text-slate-900 truncate">
-              {interview.candidateName}
+            <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+              <span className="truncate min-w-0">{interview.candidateName}</span>
+              {!interview.isPreview ? (
+                <VerifiedBadge show={interview.isVerified} size="sm" />
+              ) : null}
             </p>
             <p className="text-xs font-semibold text-[#006e2f] mt-0.5 truncate">
               {interview.jobTitle}

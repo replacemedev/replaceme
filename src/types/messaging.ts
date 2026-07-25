@@ -25,6 +25,8 @@ export interface MessagingParty {
   id: string;
   name: string;
   avatarUrl: string | null;
+  /** Present when the opposite party is a KYC-verified worker (employer inbox). */
+  isVerified?: boolean;
 }
 
 /** Role-agnostic thread for shared inbox UI. */

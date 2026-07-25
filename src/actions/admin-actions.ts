@@ -653,7 +653,7 @@ export async function fetchVerificationQueue(): Promise<
   const { data: workers, error } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, created_at"
+      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at"
     )
     .eq("role", "worker")
     .in("verification_status", [
@@ -694,6 +694,7 @@ export async function fetchVerificationQueue(): Promise<
     id_expiration_date: w.id_expiration_date ?? null,
     id_issuing_country: w.id_issuing_country ?? null,
     verification_status: w.verification_status,
+    is_verified: Boolean(w.is_verified),
     document_count: counts.get(w.id) ?? 0,
     created_at: w.created_at,
   }));
@@ -915,16 +916,23 @@ export async function fetchAdminDisputes(
     ...new Set((data ?? []).map((d) => d.worker_id).filter(Boolean)),
   ] as string[];
 
-  const workerById = new Map<string, { name: string; email: string | null }>();
+  const workerById = new Map<
+    string,
+    { name: string; email: string | null; isVerified: boolean }
+  >();
   if (workerIds.length > 0) {
     const { data: workers } = await adminClient
       .from("profiles")
-      .select("id, first_name, middle_name, last_name, email")
+      .select("id, first_name, middle_name, last_name, email, is_verified")
       .in("id", workerIds);
 
     for (const w of workers ?? []) {
       const name = formatFullName(w.first_name, w.middle_name, w.last_name) || "Worker";
-      workerById.set(w.id, { name, email: w.email });
+      workerById.set(w.id, {
+        name,
+        email: w.email,
+        isVerified: Boolean(w.is_verified),
+      });
     }
   }
 
@@ -940,6 +948,7 @@ export async function fetchAdminDisputes(
       job_id: row.job_id,
       worker_name: worker?.name ?? null,
       worker_email: worker?.email ?? null,
+      worker_is_verified: worker?.isVerified ?? false,
       admin_notes: row.admin_notes,
       created_at: row.created_at,
       updated_at: row.updated_at,
@@ -1012,7 +1021,8 @@ export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
         first_name,
         middle_name,
         last_name,
-        email
+        email,
+        is_verified
       )
     `
     )
@@ -1043,6 +1053,7 @@ export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
         formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
         null,
       worker_email: worker?.email ?? null,
+      worker_is_verified: Boolean(worker?.is_verified),
       status: row.status,
       match_score: row.match_score,
       created_at: row.created_at,
@@ -1063,7 +1074,7 @@ export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
       updated_at,
       jobs ( title ),
       company_profiles ( company_name ),
-      profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name )
+      profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, is_verified )
     `
     )
     .order("updated_at", { ascending: false })
@@ -1103,6 +1114,7 @@ export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
       worker_name:
         formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
         null,
+      worker_is_verified: Boolean(worker?.is_verified),
       company_name: company?.company_name ?? null,
       job_title: job?.title ?? null,
       message_count: meta?.count ?? 0,

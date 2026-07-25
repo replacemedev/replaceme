@@ -14,6 +14,7 @@ export interface HiredWorker {
   online: boolean; // Dynamic status indicator
   showHiredBadge: boolean;
   employmentStatus: string | null;
+  isVerified: boolean;
 }
 
 export interface HiredStats {

@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X, Loader2, Video, Clock, AlignLeft, Edit, Trash } from "lucide-react";
 import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
 import { createOrUpdateInterview, cancelInterview, updateInterviewSchedule, type EmployerInterviewRow } from "@/actions/employer/hiring";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -218,7 +219,12 @@ export function InterviewDetailModal({
           <div className="space-y-5 pt-4">
             <div>
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Candidate</p>
-              <p className="text-base font-extrabold text-slate-900 mt-0.5">{interview.candidateName}</p>
+              <p className="text-base font-extrabold text-slate-900 mt-0.5 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                <span className="truncate min-w-0">{interview.candidateName}</span>
+                {!interview.isPreview ? (
+                  <VerifiedBadge show={interview.isVerified} size="sm" />
+                ) : null}
+              </p>
               <p className="text-xs font-semibold text-slate-400">{interview.jobTitle}</p>
             </div>
 

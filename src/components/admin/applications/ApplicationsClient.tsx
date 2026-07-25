@@ -15,6 +15,7 @@ import {
 } from "@/components/admin/shared/AdminDataTable";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminApplicationRow } from "@/types/admin.types";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface ApplicationsClientProps {
   applications: AdminApplicationRow[];
@@ -54,8 +55,9 @@ export function ApplicationsClient({ applications }: ApplicationsClientProps) {
         <AdminDataTable
           mobileCards={paginatedApps.map((app) => (
             <AdminMobileCard key={app.id}>
-              <p className="font-semibold text-slate-900">
-                {app.worker_name ?? "—"}
+              <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                <span className="truncate min-w-0">{app.worker_name ?? "—"}</span>
+                <VerifiedBadge show={app.worker_is_verified} size="sm" />
               </p>
               <p className="text-xs text-slate-500">{app.worker_email}</p>
               <p className="text-sm text-slate-700">{app.job_title ?? "—"}</p>
@@ -87,8 +89,9 @@ export function ApplicationsClient({ applications }: ApplicationsClientProps) {
               {paginatedApps.map((app) => (
                 <tr key={app.id} className={ADMIN_TABLE_ROW}>
                   <td className={ADMIN_TABLE_TD}>
-                    <p className="font-medium text-slate-900">
-                      {app.worker_name ?? "—"}
+                    <p className="font-medium text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                      <span className="truncate min-w-0">{app.worker_name ?? "—"}</span>
+                      <VerifiedBadge show={app.worker_is_verified} size="sm" />
                     </p>
                     <p className="text-xs text-slate-400">{app.worker_email}</p>
                   </td>

@@ -101,8 +101,8 @@ export function ApplicantCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="text-xs font-extrabold text-slate-800 leading-snug mb-1 inline-flex items-center gap-1 flex-wrap">
-              {applicant.name}
+            <h3 className="text-xs font-extrabold text-slate-800 leading-snug mb-1 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+              <span className="truncate min-w-0">{applicant.name}</span>
               {isPreview ? (
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 uppercase tracking-wider">
                   Preview
@@ -258,6 +258,7 @@ export function ApplicantCard({
                 status: applicant.interview.status,
                 notes: applicant.interview.notes,
                 isPreview,
+                isVerified: isPreview ? false : applicant.isVerified,
               }
               : {
                 applicationId: applicant.id,
@@ -270,6 +271,7 @@ export function ApplicantCard({
                 status: "scheduled",
                 notes: null,
                 isPreview,
+                isVerified: isPreview ? false : applicant.isVerified,
               }
           }
         />

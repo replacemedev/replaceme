@@ -7,6 +7,7 @@ import { Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
 import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
 import { updateHiredBadgeVisibility } from "@/actions/employer/contracts";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { toast } from "sonner";
 
 interface HiredWorkerCardProps {
@@ -121,8 +122,9 @@ export function HiredWorkerCard({
         </div>
 
         <div className="min-w-0">
-          <h3 className="text-sm font-extrabold text-slate-800 truncate mb-1">
-            {worker.name}
+          <h3 className="text-sm font-extrabold text-slate-800 mb-1 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+            <span className="truncate min-w-0">{worker.name}</span>
+            <VerifiedBadge show={worker.isVerified} size="sm" />
           </h3>
           <p className="text-xs font-bold text-[#006e2f] truncate mb-2">
             {worker.role}

@@ -131,6 +131,7 @@ async function enrichThreads(
         id: string;
         full_name: string | null;
         avatar_url: string | null;
+        is_verified?: boolean | null;
       };
       const maskIdentity = employerIdentityMode !== "full";
       oppositeParty = {
@@ -139,6 +140,7 @@ async function enrichThreads(
           ? previewDisplayName(worker.id)
           : worker.full_name?.trim() || "Worker",
         avatarUrl: maskIdentity ? null : worker.avatar_url,
+        isVerified: maskIdentity ? false : Boolean(worker.is_verified),
       };
     }
 
@@ -250,7 +252,7 @@ async function loadMessagingThreadsPage(
   const { data: threads, error } = await supabase
     .from("chat_threads")
     .select(
-      `*, worker:profiles!chat_threads_worker_id_fkey (id, full_name, avatar_url), jobs (id, title)`
+      `*, worker:profiles!chat_threads_worker_id_fkey (id, full_name, avatar_url, is_verified), jobs (id, title)`
     )
     .eq("company_profile_id", company.id)
     .is("employer_deleted_at", null)

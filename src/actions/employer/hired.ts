@@ -44,7 +44,8 @@ async function loadHiredDataForEmployer(
           middle_name,
           last_name,
           avatar_url,
-          professional_title
+          professional_title,
+          is_verified
         )
       `
     )
@@ -69,6 +70,7 @@ async function loadHiredDataForEmployer(
       last_name?: string | null;
       avatar_url?: string | null;
       professional_title?: string | null;
+      is_verified?: boolean | null;
     } | null;
     if (!worker) continue;
 
@@ -93,6 +95,7 @@ async function loadHiredDataForEmployer(
       online,
       showHiredBadge: Boolean(contract.show_hired_badge),
       employmentStatus: contract.employment_status || null,
+      isVerified: Boolean(worker.is_verified),
     });
 
     if (contract.status === "active") {

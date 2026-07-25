@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminChatThreadRow } from "@/types/admin.types";
+import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 
 interface ModerationClientProps {
   threads: AdminChatThreadRow[];
@@ -55,7 +56,15 @@ export function ModerationClient({ threads }: ModerationClientProps) {
               {paginatedThreads.map((thread) => (
                 <tr key={thread.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-4 py-3 font-medium text-slate-900">
-                    {thread.worker_name ?? "—"}
+                    <span className="inline-flex items-center gap-1.5 min-w-0 max-w-full">
+                      <span className="truncate min-w-0">
+                        {thread.worker_name ?? "—"}
+                      </span>
+                      <VerifiedBadge
+                        show={thread.worker_is_verified}
+                        size="sm"
+                      />
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {thread.company_name ?? "—"}

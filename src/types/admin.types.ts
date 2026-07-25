@@ -220,6 +220,7 @@ export interface AdminVerificationQueueRow {
   id_expiration_date: string | null;
   id_issuing_country: string | null;
   verification_status: VerificationStatus;
+  is_verified: boolean;
   document_count: number;
   created_at: string;
 }
@@ -354,6 +355,7 @@ export const adminDisputeRowSchema = z.object({
   job_id: z.string().uuid().nullable(),
   worker_name: z.string().nullable(),
   worker_email: z.string().nullable(),
+  worker_is_verified: z.boolean().catch(false),
   admin_notes: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -373,6 +375,7 @@ export const adminApplicationRowSchema = z.object({
   worker_id: z.string().uuid(),
   worker_name: z.string().nullable(),
   worker_email: z.string().nullable(),
+  worker_is_verified: z.boolean().catch(false),
   status: z.string(),
   match_score: z.number(),
   created_at: z.string(),
@@ -382,6 +385,7 @@ export const adminChatThreadRowSchema = z.object({
   id: z.string().uuid(),
   worker_id: z.string().uuid(),
   worker_name: z.string().nullable(),
+  worker_is_verified: z.boolean().catch(false),
   company_name: z.string().nullable(),
   job_title: z.string().nullable(),
   message_count: z.number(),

@@ -23,8 +23,8 @@ export function VerifiedBadge({
   return (
     <span
       className={`inline-flex items-center text-[#006e2f] shrink-0 ${className}`}
-      title={showTooltip ? "Verified worker" : undefined}
-      aria-label="Verified worker"
+      title={showTooltip ? "Verified Worker" : undefined}
+      aria-label="Verified Worker"
     >
       <BadgeCheck className={sizeClasses[size]} aria-hidden />
     </span>
