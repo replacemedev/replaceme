@@ -7,10 +7,7 @@ import { formatFullName } from "@/lib/format/name";
 import { computeKeywordMatchScore } from "@/lib/matching/keyword-match-score";
 import { logAdminAction } from "@/actions/admin-actions";
 import { safeError } from "@/utils/logger";
-import {
-  APPLICATION_STATUSES,
-  isApplicationStatus,
-} from "@/types/applications";
+import { isApplicationStatus } from "@/types/applications";
 import type {
   AdminApplicationDeepDive,
   AdminApplicationRow,
@@ -20,7 +17,7 @@ import type {
 
 const PAGE_SIZE = 20;
 
-export type AdminApplicationsQuery = {
+type AdminApplicationsQuery = {
   search?: string;
   status?: string;
   from?: string;
@@ -490,5 +487,3 @@ export async function clearAdminApplicationFlag(
     };
   }
 }
-
-export { APPLICATION_STATUSES, PAGE_SIZE as ADMIN_APPLICATIONS_PAGE_SIZE };
