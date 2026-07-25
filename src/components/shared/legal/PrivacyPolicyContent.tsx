@@ -183,10 +183,12 @@ export function PrivacyPolicyContent({
             plan-usage metrics.
           </CheckItem>
           <CheckItem label="Job post moderation:">
-            Trust &amp; Safety review outcomes for your listings (for example approve or reject),
-            reason category, optional moderator explanation, related timestamps, and the admin
-            actor recorded for audit—used to enforce marketplace and labor-compliance rules and to
-            notify you of decisions.
+            Trust &amp; Safety review outcomes for your listings (approve, reject, or soft-delete),
+            reason category, optional moderator explanation, related timestamps (including
+            rejection and soft-delete times), deletion reason where recorded, and the admin actor
+            for audit—used to enforce marketplace and labor-compliance rules, keep rejected or
+            soft-deleted posts off Worker boards, notify you of rejection decisions, and retain a
+            limited audit trail as described in Section 9.
           </CheckItem>
         </ul>
       </RolePanel>
@@ -436,8 +438,11 @@ export function PrivacyPolicyContent({
           administrators may access application contents and job post moderation records only for
           Trust &amp; Safety, fraud prevention, abuse investigation, legal compliance, and
           support—under least-privilege access controls with audit logging. Job post moderation
-          decisions (including reason category and optional explanation) are retained as listed in
-          the retention table above. You may exercise privacy rights as described in Section 11.
+          decisions (including reason category, optional explanation, and soft-delete metadata) are
+          retained as listed in the retention table above. Soft-deleted job posts are excluded from
+          public Worker boards and Employer live listings but may remain visible to Platform
+          administrators for audit and restore during that retention window. You may exercise privacy
+          rights as described in Section 11.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">

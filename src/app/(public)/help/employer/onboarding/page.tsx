@@ -72,8 +72,9 @@ const STEPS = [
       "Publish your job post with required skills, expected working hours, and salary range.",
     details: [
       "Paid subscribers (Starter, Growth, Scale) receive instant automated job post approvals.",
-      "Free Discovery plan posts are reviewed and approved within 2 business days.",
-      "You can edit or pause your job listing at any time from your Employer Dashboard.",
+      "Free Discovery plan posts are reviewed and approved within 2 business days (they stay pending until an admin decides — no auto-publish).",
+      "If we reject a listing, you receive a reason category so you can revise and resubmit. Soft-deleted listings leave Worker boards but may be retained for Trust & Safety audit.",
+      "You can edit or pause your job listing at any time from your Employer Dashboard (except when rejected or soft-deleted by moderation).",
     ],
   },
   {

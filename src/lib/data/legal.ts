@@ -81,7 +81,7 @@ export const DATA_RETENTION_PERIODS = [
   {
     category: "Job post moderation records",
     period:
-      "Up to 24 months after a moderation decision (approve / reject / remove), including reason category and optional explanation, for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer",
+      "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by Platform administrators during that audit window",
   },
   {
     category: "Cookie consent records",

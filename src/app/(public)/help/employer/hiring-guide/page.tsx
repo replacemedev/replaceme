@@ -47,6 +47,7 @@ const STEPS = [
       "Paid plans (Starter, Growth, Scale) feature instant job post approval when the listing meets our posting rules.",
       "Free Discovery plan posts are reviewed within 2 business days.",
       "If a post is not approved, we email you a reason category (for example discriminatory language, below minimum wage, spam/scam, or Terms issues) so you can fix and resubmit. Discovery posts are not auto-published if review runs long — they stay pending until an admin decides.",
+      "Rejected posts are marked Rejected (separate from you closing your own listing) and leave Worker boards. Soft-deleted posts are removed from public surfaces but may be retained for Trust & Safety audit as described in our Privacy Policy.",
       "Approved active posts appear on the public Replaceme job board.",
     ],
   },

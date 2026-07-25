@@ -406,12 +406,16 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
               plans publish job posts immediately subject to later removal for policy violations.
               Discovery posts enter a human review queue (target: within{" "}
               {DISCOVERY_JOB_APPROVAL_SLA.targetBusinessDays} business days) and remain hidden from
-              Workers until approved. We may refuse, close, hide, or require edits for reasons
-              including discriminatory language, below-minimum-wage offers, spam or scam indicators,
-              Terms violations, misleading or incomplete listings, or prohibited content. When we
-              reject or remove a post, we will notify you (email and/or in-product) with a reason
-              category and any optional moderator explanation, and we may retain an audit record as
-              described in our Privacy Policy. You may contact{" "}
+              Workers until approved. We may refuse, reject, hide, soft-delete, or require edits for
+              reasons including discriminatory language, below-minimum-wage offers, spam or scam
+              indicators, Terms violations, misleading or incomplete listings, or prohibited content.
+              A <strong className="font-semibold text-slate-800">rejection</strong> marks the listing
+              as rejected (distinct from an Employer closing their own post), removes it from Worker
+              boards, and triggers notice to you (email and/or in-product) with a reason category and
+              any optional moderator explanation. A Platform{" "}
+              <strong className="font-semibold text-slate-800">soft-delete</strong> removes the listing
+              from public and Employer live surfaces while retaining an audit record that Platform
+              administrators may restore or review as described in our Privacy Policy. You may contact{" "}
               <a
                 href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
                 className="font-semibold text-[#006e2f] hover:underline"

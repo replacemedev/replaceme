@@ -15,7 +15,7 @@ Short record of processing activities (ROPA-style) for Phase 1 account lifecycle
 | Applications & messaging | Application materials, in-product messages | While relevant to open roles / activity | Up to **24 months** after relevance ends; closed with account subject to grace | Employer-held unlocked copies are Employer PIC |
 | Billing & tax (subscriptions) | Stripe metadata, invoices, ledger | While subscribed + dispute window | Retain up to **7 years** where tax/accounting law requires | Not erased solely by account closure |
 | Security / fraud / audit | Security logs, abuse signals | Continuous for ops | Up to **24 months** | May outlive account for incident defense |
-| Job post moderation (Trust & Safety) | Rejection/approve metadata, reason category, optional explanation, admin actor | While job exists + post-decision audit | Up to **24 months** after decision unless legal hold | Employer notified on reject; Discovery queued (`queued_2d`), paid instant; daily admin SLA reminder cron (no auto-publish) |
+| Job post moderation (Trust & Safety) | Rejection/approve/soft-delete metadata, reason category, optional explanation, deletion reason, admin actor | While job exists + post-decision audit | Up to **24 months** after decision unless legal hold; soft-deleted rows leave public boards but may be restored by admins within the audit window | Employer notified on **reject**; Discovery queued (`queued_2d`), paid instant; soft-delete ≠ hard erase; daily admin SLA reminder cron (no auto-publish) |
 | Cookie consent records | Consent choice + policy version | Until withdraw or policy bump | Aligned with Cookie Policy version | Account deletion does not clear browser cookies |
 
 ## Operational clocks (source of truth)
@@ -32,9 +32,10 @@ Short record of processing activities (ROPA-style) for Phase 1 account lifecycle
 ## Soft-delete behavior
 
 1. **Suspend** — login/features restricted; row remains identifiable; no anonymization.
-2. **Close / soft-delete** — schedule grace end; user notified; blockers (active jobs, billing) resolved first where required.
-3. **Post-grace anonymize** — replace or null personal fields on Platform-held records; keep non-identifying aggregates and legally required billing rows.
-4. **Backup restore** — re-apply erasure so closed accounts do not reappear with PII.
+2. **Close / soft-delete (account)** — schedule grace end; user notified; blockers (active jobs, billing) resolved first where required.
+3. **Job post soft-delete (moderation)** — listing status marked deleted with `deleted_at` audit fields; excluded from public/job board views; recoverable by admins; distinct from Employer-closed posts and from **Rejected** (policy refusal with employer notice).
+4. **Post-grace anonymize (account)** — replace or null personal fields on Platform-held records; keep non-identifying aggregates and legally required billing rows.
+5. **Backup restore** — re-apply erasure so closed accounts do not reappear with PII.
 
 ## Controllers
 
