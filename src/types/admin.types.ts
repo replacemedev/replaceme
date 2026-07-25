@@ -76,6 +76,14 @@ export const adminWorkerContractSchema = z.object({
   status: z.string().catch("unknown"),
 });
 
+export const accountReasonCategorySchema = z.enum([
+  "policy",
+  "fraud",
+  "user_request",
+  "legal_hold",
+  "other",
+]);
+
 export const adminWorkerRowSchema = z.object({
   id: z.string().uuid(),
   first_name: nullableOptionalString,
@@ -87,6 +95,11 @@ export const adminWorkerRowSchema = z.object({
   verification_status: verificationStatusSchema.catch("unverified"),
   is_verified: z.boolean().nullable().optional().transform((v) => v ?? false),
   created_at: z.string(),
+  deleted_at: nullableOptionalString.catch(null),
+  deletion_scheduled_for: nullableOptionalString.catch(null),
+  legal_hold: z.boolean().catch(false),
+  suspension_ends_at: nullableOptionalString.catch(null),
+  last_sign_in_at: nullableOptionalString.catch(null),
   contracts: z
     .array(adminWorkerContractSchema)
     .optional()
@@ -103,6 +116,11 @@ export const adminEmployerRowSchema = z.object({
   account_status: accountStatusSchema.catch("active"),
   subscription_status: z.string().nullable(),
   created_at: z.string(),
+  deleted_at: nullableOptionalString.catch(null),
+  deletion_scheduled_for: nullableOptionalString.catch(null),
+  legal_hold: z.boolean().catch(false),
+  suspension_ends_at: nullableOptionalString.catch(null),
+  last_sign_in_at: nullableOptionalString.catch(null),
 });
 
 export const adminAdminRowSchema = z.object({
@@ -154,6 +172,11 @@ export interface AdminWorkerRow {
   verification_status: VerificationStatus;
   is_verified: boolean;
   created_at: string;
+  deleted_at: string | null;
+  deletion_scheduled_for: string | null;
+  legal_hold: boolean;
+  suspension_ends_at: string | null;
+  last_sign_in_at: string | null;
   contracts?: {
     id: string;
     employment_status: string | null;
@@ -171,6 +194,11 @@ export interface AdminEmployerRow {
   account_status: AccountStatus;
   subscription_status: string | null;
   created_at: string;
+  deleted_at: string | null;
+  deletion_scheduled_for: string | null;
+  legal_hold: boolean;
+  suspension_ends_at: string | null;
+  last_sign_in_at: string | null;
 }
 
 export interface AdminAdminRow {
@@ -323,6 +351,27 @@ export interface AdminAuditLogRow {
 export const suspendUserSchema = z.object({
   userId: z.string().uuid(),
   reason: z.string().min(3).max(500),
+  /** Null = indefinite suspension. */
+  durationDays: z.union([
+    z.literal(7),
+    z.literal(14),
+    z.literal(30),
+    z.literal(90),
+    z.null(),
+  ]),
+  notifyUser: z.boolean().default(true),
+  reasonCategory: accountReasonCategorySchema.optional(),
+});
+
+export const deleteAccountSchema = z.object({
+  userId: z.string().uuid(),
+  mode: z.enum(["schedule", "immediate"]),
+  reason: z.string().min(3).max(500),
+  reasonCategory: accountReasonCategorySchema.optional(),
+  forceCloseEngagements: z.boolean().default(false),
+  notifyUser: z.boolean().default(true),
+  /** Must equal "DELETE" or the user email — validated in the server action. */
+  confirmText: z.string(),
 });
 
 export const moderateJobSchema = z.object({

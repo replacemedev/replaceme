@@ -1908,6 +1908,8 @@ export type Database = {
           country: string | null
           created_at: string
           cv_url: string | null
+          deleted_at: string | null
+          deletion_scheduled_for: string | null
           email: string | null
           expected_salary_max: number | null
           expected_salary_min: number | null
@@ -1926,6 +1928,7 @@ export type Database = {
           is_verified: boolean
           kyc_rejection_reason: string | null
           last_name: string | null
+          legal_hold: boolean
           location: string | null
           middle_name: string | null
           onboarding_completed_at: string | null
@@ -1944,6 +1947,7 @@ export type Database = {
           skills: string[] | null
           stripe_customer_id: string | null
           suffix: string | null
+          suspension_ends_at: string | null
           timezone: string | null
           tin_number: string | null
           updated_at: string
@@ -1964,6 +1968,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           cv_url?: string | null
+          deleted_at?: string | null
+          deletion_scheduled_for?: string | null
           email?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
@@ -1982,6 +1988,7 @@ export type Database = {
           is_verified?: boolean
           kyc_rejection_reason?: string | null
           last_name?: string | null
+          legal_hold?: boolean
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
@@ -2000,6 +2007,7 @@ export type Database = {
           skills?: string[] | null
           stripe_customer_id?: string | null
           suffix?: string | null
+          suspension_ends_at?: string | null
           timezone?: string | null
           tin_number?: string | null
           updated_at?: string
@@ -2020,6 +2028,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           cv_url?: string | null
+          deleted_at?: string | null
+          deletion_scheduled_for?: string | null
           email?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
@@ -2038,6 +2048,7 @@ export type Database = {
           is_verified?: boolean
           kyc_rejection_reason?: string | null
           last_name?: string | null
+          legal_hold?: boolean
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
@@ -2056,6 +2067,7 @@ export type Database = {
           skills?: string[] | null
           stripe_customer_id?: string | null
           suffix?: string | null
+          suspension_ends_at?: string | null
           timezone?: string | null
           tin_number?: string | null
           updated_at?: string

@@ -8,6 +8,10 @@ import { SignInWelcomePanel } from "@/components/auth/marketing/SignInWelcomePan
 import { AUTH_LINK, AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { SIGNIN_PAGE } from "@/lib/auth/static-copy";
 import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
+import {
+  parseSignInAccountReason,
+  SignInAccountStatusBanner,
+} from "@/components/auth/SignInAccountStatusBanner";
 
 export const metadata = {
   title: "Sign In | Replaceme",
@@ -23,11 +27,16 @@ function resolveView(raw?: string): SignInView {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; callbackUrl?: string }>;
+  searchParams: Promise<{
+    view?: string;
+    callbackUrl?: string;
+    reason?: string;
+  }>;
 }) {
   const params = await searchParams;
   const view = resolveView(params.view);
   const callbackUrl = parseGuestCallbackUrl(params.callbackUrl) ?? undefined;
+  const accountReason = parseSignInAccountReason(params.reason);
   const copy =
     view === "login" ? SIGNIN_PAGE.login : SIGNIN_PAGE.forgotPassword;
 
@@ -44,6 +53,10 @@ export default async function SignInPage({
         <h1 className={AUTH_TITLE}>{copy.headline}</h1>
         <p className={AUTH_SUBTITLE}>{copy.description}</p>
       </header>
+
+      {view === "login" ? (
+        <SignInAccountStatusBanner reason={accountReason} />
+      ) : null}
 
       <AuthFormCard>
         {view === "login" ? (

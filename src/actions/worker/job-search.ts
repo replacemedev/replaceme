@@ -252,14 +252,27 @@ export async function getJobSearchData(
         string,
         { company_name: string | null; logo_url: string | null }
       >();
+      const blockedEmployers = new Set<string>();
 
       if (employerIds.length > 0) {
+        const { data: employerProfiles } = await supabase
+          .from("profiles")
+          .select("id, account_status, deleted_at")
+          .in("id", employerIds);
+
+        for (const p of employerProfiles ?? []) {
+          if (p.deleted_at || p.account_status === "suspended") {
+            blockedEmployers.add(p.id);
+          }
+        }
+
         const { data: companies } = await supabase
           .from("company_profiles")
           .select("employer_id, company_name, logo_url")
           .in("employer_id", employerIds);
 
         for (const company of companies ?? []) {
+          if (blockedEmployers.has(company.employer_id)) continue;
           companyByEmployer.set(company.employer_id, {
             company_name: company.company_name,
             logo_url: company.logo_url,
@@ -268,6 +281,7 @@ export async function getJobSearchData(
       }
 
       let mappedJobs = (data ?? [])
+        .filter((row) => !row.employer_id || !blockedEmployers.has(row.employer_id))
         .map((row) => mapJobRow(row, savedJobIds, companyByEmployer))
         .filter((j): j is JobSearchResult => j !== null);
 

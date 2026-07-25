@@ -19,6 +19,7 @@ import {
   platformMetricsSchema,
   reviewVerificationSchema,
   suspendUserSchema,
+  deleteAccountSchema,
   adminEmployerListSchema,
   adminAdminRowSchema,
   adminWorkerRowSchema,
@@ -41,6 +42,15 @@ import {
   updateDisputeStatusSchema,
   adminSubscriptionOverrideSchema,
 } from "@/types/admin.types";
+import { getAccountClosureBlockers } from "@/lib/server/privacy/account-blockers";
+import {
+  suspendAccount,
+  unsuspendAccount,
+} from "@/lib/server/privacy/suspend-account";
+import {
+  executeAccountErasure,
+  scheduleAccountDeletion,
+} from "@/lib/server/privacy/erase-account";
 
 const ADMIN_PATHS = [
   "/admin/dashboard",
@@ -95,28 +105,86 @@ export async function logAdminAction(
 
 type ActionResult = { success: true } | { success: false; error: string };
 
-export async function suspendUser(
-  userId: string,
-  reason: string
-): Promise<ActionResult> {
+const LAST_SIGN_IN_CONCURRENCY = 50;
+
+async function enrichWithLastSignInAt<T>(
+  rows: T[],
+  getUserId: (row: T) => string
+): Promise<(T & { last_sign_in_at: string | null })[]> {
+  if (rows.length === 0) return [];
+
+  const adminClient = await createAdminClient();
+  const out: (T & { last_sign_in_at: string | null })[] = [];
+
+  for (let i = 0; i < rows.length; i += LAST_SIGN_IN_CONCURRENCY) {
+    const chunk = rows.slice(i, i + LAST_SIGN_IN_CONCURRENCY);
+    const enriched = await Promise.all(
+      chunk.map(async (row) => {
+        try {
+          const { data, error } = await adminClient.auth.admin.getUserById(
+            getUserId(row)
+          );
+          if (error) {
+            return { ...row, last_sign_in_at: null as string | null };
+          }
+          return {
+            ...row,
+            last_sign_in_at: data.user.last_sign_in_at ?? null,
+          };
+        } catch {
+          return { ...row, last_sign_in_at: null as string | null };
+        }
+      })
+    );
+    out.push(...enriched);
+  }
+
+  return out;
+}
+
+function assertDeleteConfirmText(
+  confirmText: string,
+  email: string | null
+): void {
+  const trimmed = confirmText.trim();
+  const emailOk =
+    Boolean(email) && trimmed.toLowerCase() === email!.toLowerCase();
+  if (trimmed !== "DELETE" && !emailOk) {
+    throw new Error('Confirmation must be "DELETE" or the account email');
+  }
+}
+
+export async function suspendUser(input: {
+  userId: string;
+  reason: string;
+  durationDays: 7 | 14 | 30 | 90 | null;
+  notifyUser?: boolean;
+  reasonCategory?: string;
+}): Promise<ActionResult> {
   try {
-    const parsed = suspendUserSchema.parse({ userId, reason });
-    const { supabase } = await requireAdmin();
+    const parsed = suspendUserSchema.parse(input);
+    const { user } = await requireAdmin();
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ account_status: "suspended" })
-      .eq("id", parsed.userId);
-
-    if (error) throw new Error(error.message);
-
-    const adminClient = await createAdminClient();
-    await adminClient.auth.admin.updateUserById(parsed.userId, {
-      ban_duration: "876000h",
+    const result = await suspendAccount({
+      userId: parsed.userId,
+      reason: parsed.reason,
+      durationDays: parsed.durationDays,
+      notifyUser: parsed.notifyUser,
+      reasonCategory: parsed.reasonCategory,
+      actorAdminId: user.id,
     });
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
 
     await logAdminAction("suspend_user", "profile", parsed.userId, {
       reason: parsed.reason,
+      reasonCategory: parsed.reasonCategory ?? null,
+      durationDays: parsed.durationDays,
+      suspensionEndsAt: result.suspensionEndsAt,
+      jobsClosed: result.jobsClosed,
+      emailSent: result.emailSent,
     });
     revalidateAdminSurfaces();
     return { success: true };
@@ -128,28 +196,143 @@ export async function suspendUser(
   }
 }
 
-export async function unsuspendUser(userId: string): Promise<ActionResult> {
+export async function unsuspendUser(
+  userId: string,
+  notifyUser = true
+): Promise<ActionResult> {
   try {
     const id = z.string().uuid().parse(userId);
-    const { supabase } = await requireAdmin();
+    await requireAdmin();
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({ account_status: "active" })
-      .eq("id", id);
+    const result = await unsuspendAccount({ userId: id, notifyUser });
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
 
-    if (error) throw new Error(error.message);
-
-    const adminClient = await createAdminClient();
-    await adminClient.auth.admin.updateUserById(id, { ban_duration: "none" });
-
-    await logAdminAction("unsuspend_user", "profile", id);
+    await logAdminAction("unsuspend_user", "profile", id, { notifyUser });
     revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to unsuspend user",
+    };
+  }
+}
+
+export async function getUserClosureBlockers(userId: string) {
+  const id = z.string().uuid().parse(userId);
+  await requireAdmin();
+  const admin = await createAdminClient();
+  return getAccountClosureBlockers(admin, id);
+}
+
+export async function scheduleUserAccountDeletion(input: {
+  userId: string;
+  reason: string;
+  reasonCategory?: string;
+  forceCloseEngagements?: boolean;
+  notifyUser?: boolean;
+  confirmText: string;
+}): Promise<ActionResult> {
+  try {
+    const parsed = deleteAccountSchema.parse({ ...input, mode: "schedule" });
+    await requireAdmin();
+
+    const admin = await createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("id", parsed.userId)
+      .maybeSingle();
+
+    if (profileError) throw new Error(profileError.message);
+    if (!profile) return { success: false, error: "User not found" };
+
+    assertDeleteConfirmText(parsed.confirmText, profile.email);
+
+    const result = await scheduleAccountDeletion({
+      userId: parsed.userId,
+      reason: parsed.reason,
+      reasonCategory: parsed.reasonCategory,
+      forceCloseEngagements: parsed.forceCloseEngagements,
+      notifyUser: parsed.notifyUser,
+    });
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    await logAdminAction("schedule_account_deletion", "profile", parsed.userId, {
+      reason: parsed.reason,
+      reasonCategory: parsed.reasonCategory ?? null,
+      forceCloseEngagements: parsed.forceCloseEngagements,
+      deletionScheduledFor: result.deletionScheduledFor,
+      notifyUser: parsed.notifyUser,
+    });
+    revalidateAdminSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to schedule account deletion",
+    };
+  }
+}
+
+export async function deleteUserAccount(input: {
+  userId: string;
+  reason: string;
+  reasonCategory?: string;
+  forceCloseEngagements?: boolean;
+  notifyUser?: boolean;
+  confirmText: string;
+}): Promise<ActionResult> {
+  try {
+    const parsed = deleteAccountSchema.parse({ ...input, mode: "immediate" });
+    await requireAdmin();
+
+    const admin = await createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("id", parsed.userId)
+      .maybeSingle();
+
+    if (profileError) throw new Error(profileError.message);
+    if (!profile) return { success: false, error: "User not found" };
+
+    assertDeleteConfirmText(parsed.confirmText, profile.email);
+
+    const result = await executeAccountErasure({
+      userId: parsed.userId,
+      reason: parsed.reason,
+      reasonCategory: parsed.reasonCategory,
+      forceCloseEngagements: parsed.forceCloseEngagements,
+      notifyUser: parsed.notifyUser,
+      immediate: true,
+    });
+
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    await logAdminAction("delete_user_account", "profile", parsed.userId, {
+      reason: parsed.reason,
+      reasonCategory: parsed.reasonCategory ?? null,
+      forceCloseEngagements: parsed.forceCloseEngagements,
+      notifyUser: parsed.notifyUser,
+      certificate: result.certificate,
+    });
+    revalidateAdminSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to delete user account",
     };
   }
 }
@@ -364,6 +547,10 @@ export async function fetchAdminWorkersSafe(): Promise<
         verification_status,
         is_verified,
         created_at,
+        deleted_at,
+        suspension_ends_at,
+        deletion_scheduled_for,
+        legal_hold,
         contracts!contracts_worker_id_fkey (
           id,
           employment_status,
@@ -409,7 +596,8 @@ export async function fetchAdminWorkersSafe(): Promise<
       };
     }
 
-    return { success: true, data: valid };
+    const enriched = await enrichWithLastSignInAt(valid, (row) => row.id);
+    return { success: true, data: enriched };
   } catch (err) {
     return {
       success: false,
@@ -442,6 +630,10 @@ export async function fetchAdminEmployersSafe(): Promise<
         profiles!company_profiles_employer_id_fkey (
           email,
           account_status,
+          deleted_at,
+          suspension_ends_at,
+          deletion_scheduled_for,
+          legal_hold,
           employer_subscriptions (
             status
           )
@@ -470,6 +662,11 @@ export async function fetchAdminEmployersSafe(): Promise<
         account_status: profile?.account_status ?? "active",
         subscription_status: subscription?.status ?? null,
         created_at: row.created_at,
+        deleted_at: profile?.deleted_at ?? null,
+        suspension_ends_at: profile?.suspension_ends_at ?? null,
+        deletion_scheduled_for: profile?.deletion_scheduled_for ?? null,
+        legal_hold: profile?.legal_hold ?? false,
+        last_sign_in_at: null,
       };
     });
 
@@ -482,7 +679,11 @@ export async function fetchAdminEmployersSafe(): Promise<
       };
     }
 
-    return { success: true, data: parsed.data };
+    const enriched = await enrichWithLastSignInAt(
+      parsed.data,
+      (row) => row.employer_id
+    );
+    return { success: true, data: enriched };
   } catch (err) {
     return {
       success: false,

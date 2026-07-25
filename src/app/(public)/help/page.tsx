@@ -17,6 +17,7 @@ import {
   LifeBuoy,
   FileText,
   Shield,
+  Trash2,
   ArrowUpRight,
   Zap,
   BookOpen,
@@ -58,6 +59,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   LifeBuoy,
   FileText,
   Shield,
+  Trash2,
 };
 
 function getArticleIcon(article: HelpArticleConfig) {
@@ -89,6 +91,8 @@ function getCategoryIcon(categoryId: string) {
       return Building2;
     case "workers":
       return UserCheck;
+    case "account":
+      return Lock;
     case "general":
     default:
       return HelpCircle;

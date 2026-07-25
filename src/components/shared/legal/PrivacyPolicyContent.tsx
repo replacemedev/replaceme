@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { Briefcase, Check, Shield, User } from "lucide-react";
+import {
+  ACCOUNT_LIFECYCLE_TIMELINES,
+  APPEAL_SLA_COPY,
+  DATA_RETENTION_PERIODS,
+  DELETION_REQUEST_SLA,
+  DELETION_REQUEST_SUPPORT_EMAIL,
+} from "@/lib/data/legal";
 import { LegalSectionHeading } from "./LegalSectionHeading";
 
 const tocItems = [
@@ -213,7 +220,11 @@ export function PrivacyPolicyContent({
           <li>
             <strong className="font-semibold text-slate-800">Processors:</strong> hosting (e.g.,
             cloud infrastructure), email delivery, customer support tools, analytics (only with
-            consent), and Stripe for payments;
+            consent), and Stripe for payments. A current list of subprocessors is published at{" "}
+            <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
+              /subprocessors
+            </Link>
+            ;
           </li>
           <li>
             <strong className="font-semibold text-slate-800">Authorities:</strong> when required by
@@ -384,34 +395,49 @@ export function PrivacyPolicyContent({
           and to meet legal, tax, dispute, and security obligations. Documented periods include:
         </p>
         <ul className="list-disc space-y-2 pl-5">
-          <li>
-            <strong className="font-semibold text-slate-800">Account profile:</strong> while active,
-            then up to 30 days after closure for recovery;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Government ID images &amp; verification metadata:</strong>{" "}
-            until the verification purpose is fulfilled, then deleted or anonymized within 90 days
-            unless a legal hold applies;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Applications &amp; messaging:</strong> while
-            relevant to open roles or account activity, then up to 24 months;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Billing ledger &amp; invoices:</strong> up to
-            7 years where tax or accounting law requires;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Security / audit logs:</strong> up to 24
-            months for fraud prevention and incident response.
-          </li>
+          {DATA_RETENTION_PERIODS.map((item) => (
+            <li key={item.category}>
+              <strong className="font-semibold text-slate-800">{item.category}:</strong>{" "}
+              {item.period}
+            </li>
+          ))}
         </ul>
+        <p>
+          <strong className="font-semibold text-slate-800">Account closure lifecycle.</strong>{" "}
+          Suspension restricts login and marketplace activity but does{" "}
+          <strong className="font-semibold text-slate-800">not</strong> erase your data. When an
+          account is closed (self-service deletion request or admin soft-delete), we keep a recovery
+          window of {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays} calendar days, then
+          anonymize or erase Platform-held personal data that is no longer needed. Billing ledger and
+          invoice records may be retained for up to{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.billingRetainYears} years where tax or accounting law
+          requires. When backups are restored, we re-apply erasure so closed accounts do not reappear
+          with identifiable data.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">
+            NPC Advisory No. 2026-01 (public directories).
+          </strong>{" "}
+          Public profile and company-directory fields may be collected by third parties through
+          scraping or similar means once published. You may object to certain public displays via
+          account settings or by contacting{" "}
+          <a
+            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            {DELETION_REQUEST_SUPPORT_EMAIL}
+          </a>
+          .
+        </p>
         <p>
           We use encryption in transit, access controls, logging, and vendor diligence. No method of
           transmission or storage is 100% secure. Workers and Employers may submit a deletion request
           from account settings or by emailing{" "}
-          <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-            support@replaceme.ph
+          <a
+            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            {DELETION_REQUEST_SUPPORT_EMAIL}
           </a>
           .
         </p>
@@ -473,13 +499,22 @@ export function PrivacyPolicyContent({
           To exercise rights against Replaceme as PIC, use the{" "}
           <strong className="font-semibold text-slate-800">Request data deletion</strong> form in
           your account settings, or email{" "}
-          <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-            support@replaceme.ph
+          <a
+            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            {DELETION_REQUEST_SUPPORT_EMAIL}
           </a>
-          . We aim to acknowledge requests within 5 business days and complete eligible erasure within
-          30 days, subject to legal retention exceptions. We may need to verify your identity.
-          Requests relating to data controlled solely by an Employer after unlock should be directed
-          primarily to that Employer; we will assist where feasible. See also our{" "}
+          . {DELETION_REQUEST_SLA} We may need to verify your identity. For{" "}
+          <strong className="font-semibold text-slate-800">data portability</strong> in this version
+          of the Platform, email support to request a structured export of account data we hold as
+          PIC. Account suspension or moderation appeals: {APPEAL_SLA_COPY} Processors we use are
+          listed at{" "}
+          <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
+            /subprocessors
+          </Link>
+          . Requests relating to data controlled solely by an Employer after unlock should be
+          directed primarily to that Employer; we will assist where feasible. See also our{" "}
           <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
             Employer Data Processing Agreement
           </Link>

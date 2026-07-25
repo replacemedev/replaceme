@@ -42,7 +42,7 @@ interface WorkerSettingsClientProps {
     isRemote: boolean;
     salaryCurrency: string;
   };
-  deletionStatus?: { status: string; createdAt: string } | null;
+  deletionStatus?: { status: string; createdAt: string; scheduledFor?: string | null } | null;
 }
 
 const AVAILABILITY = [
@@ -253,7 +253,10 @@ export function WorkerSettingsClient({
         </form>
       </div>
 
-      <DataDeletionRequestCard latestStatus={deletionStatus} />
+      <DataDeletionRequestCard
+        latestStatus={deletionStatus}
+        scheduledFor={deletionStatus?.scheduledFor}
+      />
     </div>
   );
 }

@@ -78,6 +78,9 @@ export function Footer() {
               <Link className={linkClassName} href="/privacy-policy">
                 Privacy Policy
               </Link>
+              <Link className={linkClassName} href="/subprocessors">
+                Subprocessors
+              </Link>
               <Link className={linkClassName} href="/employer-dpa">
                 Employer DPA
               </Link>

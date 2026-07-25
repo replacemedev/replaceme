@@ -148,13 +148,20 @@ export function CookiePolicyContent({ hideSidebar = false }: { hideSidebar?: boo
       </div>
 
       <LegalSectionHeading id="6-duration" number={6} title="Duration & Third Parties" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        Session cookies expire when you close the browser; persistent cookies remain until they
-        expire or you delete them. Consent records are retained long enough to demonstrate
-        compliance and until you withdraw or a new policy version requires fresh consent.
-        Third-party processors (for example, analytics or ads vendors you enable) set their own
-        cookies subject to their policies; we only load those vendors after opt-in.
-      </p>
+      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+        <p>
+          Session cookies expire when you close the browser; persistent cookies remain until they
+          expire or you delete them. Consent records are retained long enough to demonstrate
+          compliance and until you withdraw or a new policy version requires fresh consent.
+          Third-party processors (for example, analytics or ads vendors you enable) set their own
+          cookies subject to their policies; we only load those vendors after opt-in.
+        </p>
+        <p>
+          Closing or deleting your account does not automatically clear strictly necessary cookies
+          on your next visit to the site. Marketing and analytics cookies require fresh consent if
+          prior optional consent is no longer valid or you clear browser storage.
+        </p>
+      </div>
 
       <LegalSectionHeading id="7-updates" number={7} title="Updates to This Policy" />
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">

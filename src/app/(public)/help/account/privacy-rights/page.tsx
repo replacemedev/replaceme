@@ -1,0 +1,111 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft, Shield } from "lucide-react";
+import {
+  APPEAL_SLA_COPY,
+  DELETION_REQUEST_SLA,
+  DELETION_REQUEST_SUPPORT_EMAIL,
+} from "@/lib/data/legal";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
+export const metadata: Metadata = {
+  title: "Your Privacy Rights | Replaceme Help",
+  description:
+    "How to exercise access, erasure, portability, and other privacy rights on Replaceme.",
+  alternates: { canonical: `${BASE_URL}/help/account/privacy-rights` },
+  openGraph: {
+    title: "Your Privacy Rights | Replaceme Help",
+    description:
+      "RA 10173 and international privacy rights: deletion, portability, and where to ask for help.",
+    url: `${BASE_URL}/help/account/privacy-rights`,
+    type: "article",
+  },
+};
+
+export default function PrivacyRightsHelpPage() {
+  return (
+    <main className="min-h-[calc(100vh-4rem)] bg-slate-50/50 py-8 md:py-12 lg:py-16">
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+        <Link
+          href="/help"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#006e2f] hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Back to Help Center
+        </Link>
+
+        <header className="mb-8 max-w-2xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-100/80 px-3.5 py-1.5 text-xs font-semibold text-emerald-800">
+            <Shield size={13} className="shrink-0 text-[#006e2f]" aria-hidden />
+            Trust &amp; Safety
+          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
+            Your privacy rights
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">
+            Under the Philippine Data Privacy Act (RA 10173)—and GDPR/CCPA where they apply—you can
+            ask about, correct, or erase personal data Replaceme holds as controller.
+          </p>
+        </header>
+
+        <article className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8">
+          <section className="space-y-3 text-base leading-relaxed text-slate-600">
+            <h2 className="text-lg font-bold text-slate-900">Erasure / account closure</h2>
+            <p>
+              Use <strong className="text-slate-800">Request data deletion</strong> in account
+              settings, or email support. {DELETION_REQUEST_SLA} See{" "}
+              <Link
+                href="/help/account/close-delete"
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                Close or delete your account
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy-policy#9-retention"
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                Privacy Policy §9
+              </Link>
+              .
+            </p>
+          </section>
+
+          <section className="space-y-3 text-base leading-relaxed text-slate-600">
+            <h2 className="text-lg font-bold text-slate-900">Portability (structured export)</h2>
+            <p>
+              In this version of the Platform, email{" "}
+              <a
+                href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                {DELETION_REQUEST_SUPPORT_EMAIL}
+              </a>{" "}
+              to request a structured export of account data we hold as Personal Information
+              Controller. We may need to verify your identity first.
+            </p>
+          </section>
+
+          <section className="space-y-3 text-base leading-relaxed text-slate-600">
+            <h2 className="text-lg font-bold text-slate-900">Appeals &amp; processors</h2>
+            <p>
+              {APPEAL_SLA_COPY} Our current subprocessors are listed at{" "}
+              <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
+                /subprocessors
+              </Link>
+              . Full rights language:{" "}
+              <Link
+                href="/privacy-policy#11-rights"
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                Privacy Policy §11
+              </Link>
+              .
+            </p>
+          </section>
+        </article>
+      </div>
+    </main>
+  );
+}

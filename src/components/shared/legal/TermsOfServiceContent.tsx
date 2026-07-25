@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { Briefcase, Scale, User } from "lucide-react";
+import {
+  ACCOUNT_LIFECYCLE_TIMELINES,
+  APPEAL_SLA_COPY,
+  DELETION_REQUEST_SUPPORT_EMAIL,
+} from "@/lib/data/legal";
 import { LegalSectionHeading } from "./LegalSectionHeading";
 
 const tocItems = [
@@ -1070,6 +1075,48 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           in abuse. You may close your account through in-product settings or by contacting support.
           Provisions that by their nature should survive (including IP, liability limits,
           indemnity, class-action waiver, and dispute clauses) survive termination.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">Suspension duration.</strong> Where we
+          impose a timed suspension, available duration tiers are{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.suspendOptionsDays.join(", ")}, or indefinite for serious or
+          unresolved violations. The default timed suspension is{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.suspendDefaultDays} days unless we specify otherwise. We will
+          email the account contact with the suspension end date when a timed suspension applies.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">
+            Suspension is not deletion.
+          </strong>{" "}
+          A suspended account remains on file; login and marketplace features may be blocked, but
+          personal data is not erased solely because of suspension. Account closure (self-service or
+          admin) starts a{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace period for recovery,
+          after which we anonymize or erase Platform-held personal data that is no longer needed,
+          subject to legal retention (for example billing records).
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">Before closing an account.</strong> You
+          should end or settle open engagements, withdraw pending applications, close or archive
+          active job posts, and resolve outstanding billing. Creating new accounts to evade
+          suspension, investigation, or unpaid obligations is prohibited and may result in permanent
+          removal.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">Appeals.</strong> You may appeal a
+          suspension or closure decision by emailing{" "}
+          <a
+            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            {DELETION_REQUEST_SUPPORT_EMAIL}
+          </a>
+          . {APPEAL_SLA_COPY} For Platform transaction disputes more generally, use the internal
+          redress process in{" "}
+          <a href="#10-dispute-resolution" className="font-semibold text-[#006e2f] hover:underline">
+            Section 10
+          </a>{" "}
+          (RA 11967).
         </p>
       </div>
 

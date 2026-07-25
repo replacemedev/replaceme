@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/account-lifecycle",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/worker-profile-nudge",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-applicant-digest",
+      "schedule": "0 9 * * 1"
+    }
+  ]
+}

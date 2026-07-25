@@ -651,6 +651,46 @@ export async function signIn(formData: LoginCredentials) {
         signedInUser = established.user;
         error = null;
       } else {
+        const banned =
+          error.message.toLowerCase().includes("banned") ||
+          error.message.toLowerCase().includes("user is banned") ||
+          error.code === "user_banned";
+
+        if (banned) {
+          try {
+            const admin = await createAdminClient();
+            const { data: bannedProfile } = await admin
+              .from("profiles")
+              .select("deleted_at, account_status, suspension_ends_at")
+              .ilike("email", escapeIlikeExact(emailToAuth))
+              .limit(1)
+              .maybeSingle();
+
+            if (bannedProfile?.deleted_at) {
+              return {
+                success: false,
+                error:
+                  "This account has been closed. Contact support if you need help.",
+                reason: "account_closed" as const,
+              };
+            }
+
+            return {
+              success: false,
+              error: bannedProfile?.suspension_ends_at
+                ? `This account is suspended until ${new Date(bannedProfile.suspension_ends_at).toLocaleDateString()}. Contact support to appeal.`
+                : "This account is suspended. Contact support to appeal.",
+              reason: "suspended" as const,
+            };
+          } catch {
+            return {
+              success: false,
+              error: "This account is suspended. Contact support to appeal.",
+              reason: "suspended" as const,
+            };
+          }
+        }
+
         safeError("[Auth] signInWithPassword failed:", error.message);
         await recordLoginFailure(emailKey);
         return { success: false, error: GENERIC_LOGIN_ERROR };

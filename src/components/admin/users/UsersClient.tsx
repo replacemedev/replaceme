@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState, useEffect, useTransition } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { UserX, UserCheck, ShieldCheck, Search, AlertCircle, LayoutGrid, Table2, KanbanSquare, AlertTriangle, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+import { ShieldCheck, Search, EyeOff } from "lucide-react";
 import {
   AdminDataTable,
   AdminMobileCard,
@@ -12,11 +11,10 @@ import {
   ADMIN_TABLE_TD,
   ADMIN_TABLE_TH,
 } from "@/components/admin/shared/AdminDataTable";
-import { suspendUser, unsuspendUser } from "@/actions/admin-actions";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { UserRowActionsMenu } from "@/components/admin/users/UserRowActionsMenu";
 import type {
   AdminAdminRow,
   AdminEmployerRow,
@@ -49,6 +47,33 @@ const TAB_LABELS: Record<AdminUserTab, string> = {
   admins: "admins",
 };
 
+function MailtoEmail({ email }: { email: string | null }) {
+  if (!email) {
+    return <p className="text-xs text-slate-400">—</p>;
+  }
+  return (
+    <a
+      href={`mailto:${email}`}
+      className="text-xs text-slate-400 hover:text-emerald-700 hover:underline"
+    >
+      {email}
+    </a>
+  );
+}
+
+function AccountStatusBadge({
+  deletedAt,
+  accountStatus,
+}: {
+  deletedAt: string | null | undefined;
+  accountStatus: string;
+}) {
+  if (deletedAt) {
+    return <StatusBadge status="deleted" />;
+  }
+  return <StatusBadge status={accountStatus} />;
+}
+
 export function UsersClient({
   tab,
   workers,
@@ -71,14 +96,6 @@ export function UsersClient({
     setSearchTerm(activeSearch);
     setPrevActiveSearch(activeSearch);
   }
-
-  const [pending, startTransition] = useTransition();
-  const [confirm, setConfirm] = useState<{
-    userId: string;
-    action: "suspend" | "unsuspend";
-    label: string;
-  } | null>(null);
-  const [reason, setReason] = useState("");
 
   // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
@@ -177,7 +194,30 @@ export function UsersClient({
 
     // 2. Status filtering
     if (activeStatus !== "all") {
-      list = list.filter((row) => row.account_status === activeStatus);
+      if (tab === "admins") {
+        // Admins have no deleted_at; ignore deleted filter
+        if (activeStatus !== "deleted") {
+          list = list.filter((row) => row.account_status === activeStatus);
+        }
+      } else {
+        list = list.filter((row) => {
+          const marketplace = row as AdminWorkerRow | AdminEmployerRow;
+          if (activeStatus === "deleted") {
+            return marketplace.deleted_at != null;
+          }
+          if (activeStatus === "suspended") {
+            return (
+              !marketplace.deleted_at && marketplace.account_status === "suspended"
+            );
+          }
+          if (activeStatus === "active") {
+            return (
+              !marketplace.deleted_at && marketplace.account_status === "active"
+            );
+          }
+          return marketplace.account_status === activeStatus;
+        });
+      }
     }
 
     // 3. Verification filtering (only for Workers)
@@ -207,27 +247,6 @@ export function UsersClient({
     return filtered.slice(startIndex, startIndex + itemsPerPage);
   }, [filtered, startIndex, itemsPerPage]);
 
-  const handleConfirm = () => {
-    if (!confirm) return;
-    startTransition(async () => {
-      const result =
-        confirm.action === "suspend"
-          ? await suspendUser(confirm.userId, reason || "Policy violation")
-          : await unsuspendUser(confirm.userId);
-
-      if (result.success) {
-        toast.success(
-          confirm.action === "suspend" ? "User suspended" : "User reactivated"
-        );
-        setConfirm(null);
-        setReason("");
-        router.refresh();
-      } else {
-        toast.error(result.error);
-      }
-    });
-  };
-
   const isFilterActive =
     activeSearch !== "" ||
     activeStatus !== "all" ||
@@ -242,6 +261,15 @@ export function UsersClient({
     params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  const adminTeamHint = (
+    <Link
+      href="/admin/settings/team"
+      className="text-xs font-medium text-slate-400 hover:text-emerald-700 hover:underline"
+    >
+      Manage in Admin Team settings
+    </Link>
+  );
 
   return (
     <div className="space-y-4">
@@ -275,6 +303,9 @@ export function UsersClient({
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
               <option value="suspended">Suspended</option>
+              {tab !== "admins" ? (
+                <option value="deleted">Deleted</option>
+              ) : null}
             </select>
           </div>
 
@@ -343,22 +374,14 @@ export function UsersClient({
                   <AdminMobileCard
                     key={worker.id}
                     actions={
-                      <UserActionButton
-                        status={worker.account_status}
-                        onSuspend={() =>
-                          setConfirm({
-                            userId: worker.id,
-                            action: "suspend",
-                            label: name,
-                          })
-                        }
-                        onUnsuspend={() =>
-                          setConfirm({
-                            userId: worker.id,
-                            action: "unsuspend",
-                            label: name,
-                          })
-                        }
+                      <UserRowActionsMenu
+                        userId={worker.id}
+                        label={name}
+                        email={worker.email}
+                        kind="worker"
+                        accountStatus={worker.account_status}
+                        deletedAt={worker.deleted_at}
+                        profileHref={`/admin/users/workers/${worker.id}`}
                       />
                     }
                   >
@@ -371,16 +394,22 @@ export function UsersClient({
                       </Link>
                       <VerifiedBadge show={worker.is_verified} size="sm" />
                     </p>
-                    <p className="text-xs text-slate-500">{worker.email}</p>
+                    <MailtoEmail email={worker.email} />
                     <p className="text-sm text-slate-600">
                       {worker.professional_title ?? "—"}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <StatusBadge status={worker.verification_status} />
-                      <StatusBadge status={worker.account_status} />
+                      <AccountStatusBadge
+                        deletedAt={worker.deleted_at}
+                        accountStatus={worker.account_status}
+                      />
                     </div>
                     <p className="text-xs text-slate-400">
                       Joined {formatDate(worker.created_at)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Last active {formatRelativeOrDate(worker.last_sign_in_at)}
                     </p>
                   </AdminMobileCard>
                 );
@@ -391,22 +420,14 @@ export function UsersClient({
                   <AdminMobileCard
                     key={employer.id}
                     actions={
-                      <UserActionButton
-                        status={employer.account_status}
-                        onSuspend={() =>
-                          setConfirm({
-                            userId: employer.employer_id,
-                            action: "suspend",
-                            label: employer.company_name,
-                          })
-                        }
-                        onUnsuspend={() =>
-                          setConfirm({
-                            userId: employer.employer_id,
-                            action: "unsuspend",
-                            label: employer.company_name,
-                          })
-                        }
+                      <UserRowActionsMenu
+                        userId={employer.employer_id}
+                        label={employer.company_name}
+                        email={employer.email}
+                        kind="employer"
+                        accountStatus={employer.account_status}
+                        deletedAt={employer.deleted_at}
+                        profileHref={`/admin/users/employers/${employer.employer_id}`}
                       />
                     }
                   >
@@ -418,7 +439,7 @@ export function UsersClient({
                         {employer.company_name}
                       </Link>
                     </p>
-                    <p className="text-xs text-slate-500">{employer.email}</p>
+                    <MailtoEmail email={employer.email} />
                     <p className="text-sm text-slate-600">
                       {employer.industry ?? "—"}
                     </p>
@@ -426,36 +447,24 @@ export function UsersClient({
                       <StatusBadge
                         status={employer.subscription_status ?? "inactive"}
                       />
-                      <StatusBadge status={employer.account_status} />
+                      <AccountStatusBadge
+                        deletedAt={employer.deleted_at}
+                        accountStatus={employer.account_status}
+                      />
                     </div>
+                    <p className="text-xs text-slate-400">
+                      Joined {formatDate(employer.created_at)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Last active {formatRelativeOrDate(employer.last_sign_in_at)}
+                    </p>
                   </AdminMobileCard>
                 );
               }
               const admin = row as AdminAdminRow;
               const name = displayName(admin.first_name, admin.middle_name, admin.last_name, "Unnamed");
               return (
-                <AdminMobileCard
-                  key={admin.id}
-                  actions={
-                    <UserActionButton
-                      status={admin.account_status}
-                      onSuspend={() =>
-                        setConfirm({
-                          userId: admin.id,
-                          action: "suspend",
-                          label: name,
-                        })
-                      }
-                      onUnsuspend={() =>
-                        setConfirm({
-                          userId: admin.id,
-                          action: "unsuspend",
-                          label: name,
-                        })
-                      }
-                    />
-                  }
-                >
+                <AdminMobileCard key={admin.id} actions={adminTeamHint}>
                   <p className="font-semibold text-slate-900">{name}</p>
                   <p className="text-xs text-slate-500">{admin.email}</p>
                   <div className="flex flex-wrap gap-2">
@@ -469,224 +478,195 @@ export function UsersClient({
               );
             })}
           >
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <th className={ADMIN_TABLE_TH}>User</th>
-                  {tab === "workers" ? (
-                    <th className={ADMIN_TABLE_TH}>Title</th>
-                  ) : tab === "employers" ? (
-                    <th className={ADMIN_TABLE_TH}>Industry</th>
-                  ) : (
-                    <th className={ADMIN_TABLE_TH}>Role</th>
-                  )}
-                  {tab === "workers" ? (
-                    <th className={ADMIN_TABLE_TH}>Verification</th>
-                  ) : tab === "employers" ? (
-                    <th className={ADMIN_TABLE_TH}>Plan</th>
-                  ) : null}
-                  {tab === "workers" && (
-                    <th className={`${ADMIN_TABLE_TH} whitespace-nowrap`}>Hire Badge</th>
-                  )}
-                  <th className={ADMIN_TABLE_TH}>Status</th>
-                  <th className={ADMIN_TABLE_TH}>Joined</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {tab === "workers"
-                  ? (paginatedFiltered as AdminWorkerRow[]).map((worker) => {
-                      const name = displayName(
-                        worker.first_name,
-                        worker.middle_name,
-                        worker.last_name,
-                        "Unnamed"
-                      );
-                      return (
-                        <tr key={worker.id} className={ADMIN_TABLE_ROW}>
-                          <td className={ADMIN_TABLE_TD}>
-                            <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-                              <Link
-                                href={`/admin/users/workers/${worker.id}`}
-                                className="hover:text-emerald-700 hover:underline truncate min-w-0"
-                              >
-                                {name}
-                              </Link>
-                              <VerifiedBadge show={worker.is_verified} size="sm" />
-                            </p>
-                            <p className="text-xs text-slate-400">
-                              {worker.email}
-                            </p>
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            {worker.professional_title ?? "—"}
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <StatusBadge status={worker.verification_status} />
-                          </td>
-                          <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
-                            {(() => {
-                              const activeContract = worker.contracts?.find(c => c.status === "active");
-                              if (!activeContract) {
-                                return <span className="text-slate-400 font-semibold text-xs">—</span>;
-                              }
-                              const employmentStatus = activeContract.employment_status || "Full-time";
-                              const isVisible = activeContract.show_hired_badge;
-                              return (
-                                <div className="flex items-center gap-1.5">
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#006e2f] border border-emerald-100">
-                                    Hired • {employmentStatus}
-                                  </span>
-                                  {!isVisible && (
-                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200">
-                                      <EyeOff size={10} /> Hidden
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                    <th className={ADMIN_TABLE_TH}>User</th>
+                    {tab === "workers" ? (
+                      <th className={ADMIN_TABLE_TH}>Title</th>
+                    ) : tab === "employers" ? (
+                      <th className={ADMIN_TABLE_TH}>Industry</th>
+                    ) : (
+                      <th className={ADMIN_TABLE_TH}>Role</th>
+                    )}
+                    {tab === "workers" ? (
+                      <th className={ADMIN_TABLE_TH}>Verification</th>
+                    ) : tab === "employers" ? (
+                      <th className={ADMIN_TABLE_TH}>Plan</th>
+                    ) : null}
+                    {tab === "workers" && (
+                      <th className={`${ADMIN_TABLE_TH} whitespace-nowrap`}>Hire Badge</th>
+                    )}
+                    <th className={ADMIN_TABLE_TH}>Status</th>
+                    <th className={ADMIN_TABLE_TH}>Joined</th>
+                    {tab !== "admins" ? (
+                      <th className={ADMIN_TABLE_TH}>Last Active</th>
+                    ) : null}
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {tab === "workers"
+                    ? (paginatedFiltered as AdminWorkerRow[]).map((worker) => {
+                        const name = displayName(
+                          worker.first_name,
+                          worker.middle_name,
+                          worker.last_name,
+                          "Unnamed"
+                        );
+                        return (
+                          <tr key={worker.id} className={ADMIN_TABLE_ROW}>
+                            <td className={ADMIN_TABLE_TD}>
+                              <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                                <Link
+                                  href={`/admin/users/workers/${worker.id}`}
+                                  className="hover:text-emerald-700 hover:underline truncate min-w-0"
+                                >
+                                  {name}
+                                </Link>
+                                <VerifiedBadge show={worker.is_verified} size="sm" />
+                              </p>
+                              <MailtoEmail email={worker.email} />
+                            </td>
+                            <td className={ADMIN_TABLE_TD}>
+                              {worker.professional_title ?? "—"}
+                            </td>
+                            <td className={ADMIN_TABLE_TD}>
+                              <StatusBadge status={worker.verification_status} />
+                            </td>
+                            <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                              {(() => {
+                                const activeContract = worker.contracts?.find(c => c.status === "active");
+                                if (!activeContract) {
+                                  return <span className="text-slate-400 font-semibold text-xs">—</span>;
+                                }
+                                const employmentStatus = activeContract.employment_status || "Full-time";
+                                const isVisible = activeContract.show_hired_badge;
+                                return (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#006e2f] border border-emerald-100">
+                                      Hired • {employmentStatus}
                                     </span>
-                                  )}
-                                </div>
-                              );
-                            })()}
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <StatusBadge status={worker.account_status} />
-                          </td>
-                          <td className="px-4 py-3 text-slate-500 text-xs">
-                            {formatDate(worker.created_at)}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <UserActionButton
-                              status={worker.account_status}
-                              onSuspend={() =>
-                                setConfirm({
-                                  userId: worker.id,
-                                  action: "suspend",
-                                  label: name,
-                                })
-                              }
-                              onUnsuspend={() =>
-                                setConfirm({
-                                  userId: worker.id,
-                                  action: "unsuspend",
-                                  label: name,
-                                })
-                              }
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })
-                  : tab === "employers"
-                    ? (paginatedFiltered as AdminEmployerRow[]).map((employer) => (
-                        <tr key={employer.id} className={ADMIN_TABLE_ROW}>
-                          <td className={ADMIN_TABLE_TD}>
-                            <p className="font-semibold text-slate-900">
-                              <Link
-                                href={`/admin/users/employers/${employer.employer_id}`}
-                                className="hover:text-emerald-700 hover:underline"
-                              >
-                                {employer.company_name}
-                              </Link>
-                            </p>
-                            <p className="text-xs text-slate-400">
-                              {employer.email}
-                            </p>
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            {employer.industry ?? "—"}
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <StatusBadge
-                              status={employer.subscription_status ?? "inactive"}
-                            />
-                          </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <StatusBadge status={employer.account_status} />
-                          </td>
-                          <td className="px-4 py-3 text-slate-500 text-xs">
-                            {formatDate(employer.created_at)}
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            <UserActionButton
-                              status={employer.account_status}
-                              onSuspend={() =>
-                                setConfirm({
-                                  userId: employer.employer_id,
-                                  action: "suspend",
-                                  label: employer.company_name,
-                                })
-                              }
-                              onUnsuspend={() =>
-                                setConfirm({
-                                  userId: employer.employer_id,
-                                  action: "unsuspend",
-                                  label: employer.company_name,
-                                })
-                              }
-                            />
-                          </td>
-                        </tr>
-                      ))
-                    : tab === "admins"
-                      ? (paginatedFiltered as AdminAdminRow[]).map((admin) => (
-                          <tr key={admin.id} className={ADMIN_TABLE_ROW}>
-                            <td className={ADMIN_TABLE_TD}>
-                              <p className="font-semibold text-slate-900">
-                                {displayName(
-                                  admin.first_name,
-                                  admin.middle_name,
-                                  admin.last_name,
-                                  "Unnamed"
-                                )}
-                              </p>
-                              <p className="text-xs text-slate-400">
-                                {admin.email}
-                              </p>
+                                    {!isVisible && (
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-black bg-slate-100 text-slate-500 border border-slate-200">
+                                        <EyeOff size={10} /> Hidden
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </td>
                             <td className={ADMIN_TABLE_TD}>
-                              <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-semibold text-[#006e2f]">
-                                <ShieldCheck className="h-3 w-3" aria-hidden />
-                                Platform Admin
-                              </span>
-                            </td>
-                            <td className={ADMIN_TABLE_TD}>
-                              <StatusBadge status={admin.account_status} />
+                              <AccountStatusBadge
+                                deletedAt={worker.deleted_at}
+                                accountStatus={worker.account_status}
+                              />
                             </td>
                             <td className="px-4 py-3 text-slate-500 text-xs">
-                              {formatDate(admin.created_at)}
+                              {formatDate(worker.created_at)}
+                            </td>
+                            <td className="px-4 py-3 text-slate-500 text-xs">
+                              {formatRelativeOrDate(worker.last_sign_in_at)}
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <UserActionButton
-                                status={admin.account_status}
-                                onSuspend={() =>
-                                  setConfirm({
-                                    userId: admin.id,
-                                    action: "suspend",
-                                    label: displayName(
-                                      admin.first_name,
-                                      admin.middle_name,
-                                      admin.last_name,
-                                      admin.email ?? "admin"
-                                    ),
-                                  })
-                                }
-                                onUnsuspend={() =>
-                                  setConfirm({
-                                    userId: admin.id,
-                                    action: "unsuspend",
-                                    label: displayName(
-                                      admin.first_name,
-                                      admin.middle_name,
-                                      admin.last_name,
-                                      admin.email ?? "admin"
-                                    ),
-                                  })
-                                }
+                              <UserRowActionsMenu
+                                userId={worker.id}
+                                label={name}
+                                email={worker.email}
+                                kind="worker"
+                                accountStatus={worker.account_status}
+                                deletedAt={worker.deleted_at}
+                                profileHref={`/admin/users/workers/${worker.id}`}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })
+                    : tab === "employers"
+                      ? (paginatedFiltered as AdminEmployerRow[]).map((employer) => (
+                          <tr key={employer.id} className={ADMIN_TABLE_ROW}>
+                            <td className={ADMIN_TABLE_TD}>
+                              <p className="font-semibold text-slate-900">
+                                <Link
+                                  href={`/admin/users/employers/${employer.employer_id}`}
+                                  className="hover:text-emerald-700 hover:underline"
+                                >
+                                  {employer.company_name}
+                                </Link>
+                              </p>
+                              <MailtoEmail email={employer.email} />
+                            </td>
+                            <td className={ADMIN_TABLE_TD}>
+                              {employer.industry ?? "—"}
+                            </td>
+                            <td className={ADMIN_TABLE_TD}>
+                              <StatusBadge
+                                status={employer.subscription_status ?? "inactive"}
+                              />
+                            </td>
+                            <td className={ADMIN_TABLE_TD}>
+                              <AccountStatusBadge
+                                deletedAt={employer.deleted_at}
+                                accountStatus={employer.account_status}
+                              />
+                            </td>
+                            <td className="px-4 py-3 text-slate-500 text-xs">
+                              {formatDate(employer.created_at)}
+                            </td>
+                            <td className="px-4 py-3 text-slate-500 text-xs">
+                              {formatRelativeOrDate(employer.last_sign_in_at)}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <UserRowActionsMenu
+                                userId={employer.employer_id}
+                                label={employer.company_name}
+                                email={employer.email}
+                                kind="employer"
+                                accountStatus={employer.account_status}
+                                deletedAt={employer.deleted_at}
+                                profileHref={`/admin/users/employers/${employer.employer_id}`}
                               />
                             </td>
                           </tr>
                         ))
-                      : null}
-              </tbody>
-            </table>
+                      : tab === "admins"
+                        ? (paginatedFiltered as AdminAdminRow[]).map((admin) => (
+                            <tr key={admin.id} className={ADMIN_TABLE_ROW}>
+                              <td className={ADMIN_TABLE_TD}>
+                                <p className="font-semibold text-slate-900">
+                                  {displayName(
+                                    admin.first_name,
+                                    admin.middle_name,
+                                    admin.last_name,
+                                    "Unnamed"
+                                  )}
+                                </p>
+                                <p className="text-xs text-slate-400">
+                                  {admin.email}
+                                </p>
+                              </td>
+                              <td className={ADMIN_TABLE_TD}>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-semibold text-[#006e2f]">
+                                  <ShieldCheck className="h-3 w-3" aria-hidden />
+                                  Platform Admin
+                                </span>
+                              </td>
+                              <td className={ADMIN_TABLE_TD}>
+                                <StatusBadge status={admin.account_status} />
+                              </td>
+                              <td className="px-4 py-3 text-slate-500 text-xs">
+                                {formatDate(admin.created_at)}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                {adminTeamHint}
+                              </td>
+                            </tr>
+                          ))
+                        : null}
+                </tbody>
+              </table>
+            </div>
           </AdminDataTable>
 
           <TablePagination
@@ -697,76 +677,7 @@ export function UsersClient({
           />
         </>
       )}
-
-      <ConfirmDialog
-        open={confirm !== null}
-        title={
-          confirm?.action === "suspend" ? "Suspend user?" : "Reactivate user?"
-        }
-        description={
-          confirm?.action === "suspend"
-            ? `This will ban ${confirm?.label ?? "this user"} from signing in.`
-            : `Restore access for ${confirm?.label ?? "this user"}.`
-        }
-        confirmLabel={confirm?.action === "suspend" ? "Suspend" : "Reactivate"}
-        variant={confirm?.action === "suspend" ? "danger" : "default"}
-        loading={pending}
-        onCancel={() => {
-          setConfirm(null);
-          setReason("");
-        }}
-        onConfirm={handleConfirm}
-      />
-
-      {confirm?.action === "suspend" ? (
-        <label className="block max-w-md">
-          <span className="text-xs font-medium text-slate-600">
-            Reason (logged to audit trail)
-          </span>
-          <input
-            type="text"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Policy violation, fraud report, etc."
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          />
-        </label>
-      ) : null}
     </div>
-  );
-}
-
-function UserActionButton({
-  status,
-  onSuspend,
-  onUnsuspend,
-}: {
-  status: string;
-  onSuspend: () => void;
-  onUnsuspend: () => void;
-}) {
-  if (status === "suspended") {
-    return (
-      <button
-        type="button"
-        onClick={onUnsuspend}
-        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#006e2f] hover:bg-[#ebfdf2]"
-      >
-        <UserCheck className="h-3.5 w-3.5" aria-hidden />
-        Reactivate
-      </button>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={onSuspend}
-      className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
-    >
-      <UserX className="h-3.5 w-3.5" aria-hidden />
-      Suspend
-    </button>
   );
 }
 
@@ -776,4 +687,9 @@ function formatDate(iso: string): string {
     day: "numeric",
     year: "numeric",
   });
+}
+
+function formatRelativeOrDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  return formatDate(iso);
 }

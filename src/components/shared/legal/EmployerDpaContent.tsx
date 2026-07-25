@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Briefcase, Check, Shield } from "lucide-react";
+import { ACCOUNT_LIFECYCLE_TIMELINES } from "@/lib/data/legal";
 import { LegalSectionHeading } from "./LegalSectionHeading";
 
 const tocItems = [
@@ -120,20 +121,23 @@ export function EmployerDpaContent({
       <LegalSectionHeading id="6-subprocessors" number={6} title="Subprocessors" />
       <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         Replaceme uses infrastructure and payment processors (including hosting providers and Stripe)
-        under contracts that require confidentiality and security. A current list is available on
-        request at{" "}
-        <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-          support@replaceme.ph
-        </a>
+        under contracts that require confidentiality and security. The current public list is at{" "}
+        <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
+          /subprocessors
+        </Link>
         .
       </p>
 
       <LegalSectionHeading id="7-retention" number={7} title="Retention & Deletion" />
       <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        Employers should retain unlocked Worker data only as long as needed for the hiring process
-        or legal obligations, then securely delete or anonymize it. Workers may request erasure from
-        Replaceme via account settings or email; requests about data held solely by an Employer after
-        unlock should be directed primarily to that Employer.
+        On the Platform, when a Worker or Employer account is closed, Replaceme observes a{" "}
+        {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace period and then anonymizes
+        or erases Platform-held personal data that is no longer needed, subject to legal retention.
+        Employers should retain unlocked Worker data only as long as needed for the hiring process or
+        legal obligations, then securely delete or anonymize it. The Employer remains the Personal
+        Information Controller for any unlocked copies they have downloaded or exported. Workers may
+        request erasure from Replaceme via account settings or email; requests about data held solely
+        by an Employer after unlock should be directed primarily to that Employer.
       </p>
 
       <LegalSectionHeading id="8-assistance" number={8} title="Assistance & Rights" />

@@ -86,6 +86,35 @@ export const HELP_INDEX_CATEGORIES = [
     ],
   },
   {
+    id: "account",
+    title: "Trust & Safety / Account",
+    description:
+      "Suspension, account closure, deletion timelines, and how to exercise privacy rights.",
+    articles: [
+      {
+        href: "/help/account/suspension",
+        title: "Account Suspension",
+        description:
+          "What suspension means, duration tiers, and how to appeal a restricted account.",
+        icon: "Lock",
+      },
+      {
+        href: "/help/account/close-delete",
+        title: "Close or Delete Your Account",
+        description:
+          "Grace periods, anonymization, what to resolve first, and what we retain by law.",
+        icon: "Trash2",
+      },
+      {
+        href: "/help/account/privacy-rights",
+        title: "Your Privacy Rights",
+        description:
+          "Access, erasure, portability, and how to contact support about your data.",
+        icon: "Shield",
+      },
+    ],
+  },
+  {
     id: "general",
     title: "General & Support",
     description:

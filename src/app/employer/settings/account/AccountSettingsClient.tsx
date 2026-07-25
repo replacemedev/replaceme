@@ -33,7 +33,7 @@ interface AccountSettingsClientProps {
   accountDetails: EmployerAccountDetails | null;
   invoices: EmployerInvoiceRow[];
   invoicesError?: string | null;
-  deletionStatus?: { status: string; createdAt: string } | null;
+  deletionStatus?: { status: string; createdAt: string; scheduledFor?: string | null } | null;
 }
 
 function formatDate(iso: string): string {
@@ -306,7 +306,10 @@ export function AccountSettingsClient({
           {accountDetails ? (
             <EmployerPersonalProfileCard account={accountDetails} />
           ) : null}
-          <DataDeletionRequestCard latestStatus={deletionStatus} />
+          <DataDeletionRequestCard
+            latestStatus={deletionStatus}
+            scheduledFor={deletionStatus?.scheduledFor}
+          />
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}

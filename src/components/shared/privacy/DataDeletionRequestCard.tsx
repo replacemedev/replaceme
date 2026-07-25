@@ -7,17 +7,23 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { submitDataDeletionRequest } from "@/actions/privacy/deletion-request";
 import {
+  ACCOUNT_LIFECYCLE_TIMELINES,
   DATA_RETENTION_PERIODS,
   DELETION_REQUEST_SLA,
   DELETION_REQUEST_SUPPORT_EMAIL,
+  addCalendarDays,
+  formatClosureDate,
 } from "@/lib/data/legal";
 
 interface DataDeletionRequestCardProps {
   latestStatus?: { status: string; createdAt: string } | null;
+  /** Optional explicit scheduled closure date; otherwise derived from createdAt + grace days. */
+  scheduledFor?: string | Date | null;
 }
 
 export function DataDeletionRequestCard({
   latestStatus = null,
+  scheduledFor = null,
 }: DataDeletionRequestCardProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -25,6 +31,18 @@ export function DataDeletionRequestCard({
   const [confirmed, setConfirmed] = useState(false);
 
   const hasPending = latestStatus?.status === "pending" || latestStatus?.status === "in_progress";
+
+  const closureDate =
+    scheduledFor != null
+      ? typeof scheduledFor === "string"
+        ? new Date(scheduledFor)
+        : scheduledFor
+      : latestStatus?.createdAt
+        ? addCalendarDays(
+            latestStatus.createdAt,
+            ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays
+          )
+        : null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -62,7 +80,8 @@ export function DataDeletionRequestCard({
             </h2>
             <p className="mt-1 text-xs leading-relaxed text-slate-500 sm:text-sm">
               Exercise your right to erasure under RA 10173 and, where applicable, GDPR/CCPA.
-              {` ${DELETION_REQUEST_SLA}`}
+              {` ${DELETION_REQUEST_SLA}`} Resolve active contracts, applications, job posts, and
+              billing before closing.
             </p>
           </div>
         </div>
@@ -92,6 +111,13 @@ export function DataDeletionRequestCard({
             >
               Privacy Policy §9
             </Link>
+            . How closure works:{" "}
+            <Link
+              href="/help/account/close-delete"
+              className="font-semibold text-[#006e2f] hover:underline"
+            >
+              Close or delete your account
+            </Link>
             .
           </p>
         </div>
@@ -102,7 +128,18 @@ export function DataDeletionRequestCard({
             {latestStatus?.createdAt
               ? ` (submitted ${new Date(latestStatus.createdAt).toLocaleDateString()})`
               : ""}
-            . We will follow up at your account email. Questions:{" "}
+            .
+            {closureDate && !Number.isNaN(closureDate.getTime()) ? (
+              <>
+                {" "}
+                Scheduled closure / anonymization window ends on{" "}
+                <strong className="font-semibold">{formatClosureDate(closureDate)}</strong> (
+                {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace from submission,
+                unless we confirm a different date).
+              </>
+            ) : null}{" "}
+            Please resolve any active work before that date. We will follow up at your account email.
+            Questions:{" "}
             <a
               href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
               className="font-semibold underline"
@@ -135,7 +172,7 @@ export function DataDeletionRequestCard({
               <span className="min-w-0 text-sm leading-relaxed text-slate-600">
                 I understand that some records (for example billing invoices or security logs) may be
                 retained where the law requires, and that data already unlocked by an Employer is
-                controlled by that Employer.
+                controlled by that Employer. I will resolve active work before closure.
               </span>
             </label>
             <button

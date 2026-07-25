@@ -201,6 +201,20 @@ export async function getPublicCompanyDirectory(): Promise<
     const listings: PublicCompanyListing[] = [];
 
     for (const row of companies ?? []) {
+      const { data: employer } = await supabase
+        .from("profiles")
+        .select("account_status, deleted_at")
+        .eq("id", row.employer_id)
+        .maybeSingle();
+
+      if (
+        !employer ||
+        employer.deleted_at ||
+        employer.account_status === "suspended"
+      ) {
+        continue;
+      }
+
       const { count } = await supabase
         .from("job_posts")
         .select("*", { count: "exact", head: true })
