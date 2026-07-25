@@ -133,11 +133,14 @@ export function EmployerDpaContent({
         On the Platform, when a Worker or Employer account is closed, Replaceme observes a{" "}
         {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace period and then anonymizes
         or erases Platform-held personal data that is no longer needed, subject to legal retention.
-        Employers should retain unlocked Worker data only as long as needed for the hiring process or
-        legal obligations, then securely delete or anonymize it. The Employer remains the Personal
-        Information Controller for any unlocked copies they have downloaded or exported. Workers may
-        request erasure from Replaceme via account settings or email; requests about data held solely
-        by an Employer after unlock should be directed primarily to that Employer.
+        Platform-held unsuccessful or withdrawn job applications are generally deleted or anonymized
+        six months after the related job closes (or after a terminal hiring decision), unless a legal
+        hold or investigation applies. Employers should retain unlocked Worker data only as long as
+        needed for the hiring process or legal obligations, then securely delete or anonymize it. The
+        Employer remains the Personal Information Controller for any unlocked copies they have
+        downloaded or exported. Workers may request erasure from Replaceme via account settings or
+        email; requests about data held solely by an Employer after unlock should be directed
+        primarily to that Employer.
       </p>
 
       <LegalSectionHeading id="8-assistance" number={8} title="Assistance & Rights" />

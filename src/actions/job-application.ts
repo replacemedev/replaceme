@@ -140,7 +140,7 @@ export async function submitJobApplication(
 
     const { data: job } = await supabase
       .from("job_posts")
-      .select("id, employer_id, is_premium_path")
+      .select("id, employer_id, is_premium_path, title, description, skills")
       .eq("id", jobId)
       .eq("status", "Active")
       .maybeSingle();
@@ -178,6 +178,26 @@ export async function submitJobApplication(
     const cap = await resolveApplicantCapForJob(job.employer_id, jobId, admin);
     const withinPlanCap = cap.withinCap;
 
+    const { data: workerProfile } = await admin
+      .from("profiles")
+      .select("skills, professional_title, bio")
+      .eq("id", profile.id)
+      .maybeSingle();
+
+    const { computeKeywordMatchScore } = await import(
+      "@/lib/matching/keyword-match-score"
+    );
+    const matchScore = computeKeywordMatchScore({
+      jobTitle: job.title,
+      jobDescription: job.description,
+      jobSkills: job.skills,
+      workerSkills: workerProfile?.skills,
+      workerTitle: workerProfile?.professional_title,
+      workerBio: workerProfile?.bio,
+      coverLetter,
+      applicationSubject,
+    });
+
     const { data: inserted, error: insertError } = await admin
       .from("applications")
       .insert({
@@ -189,6 +209,7 @@ export async function submitJobApplication(
         contact_methods: contactMethods,
         is_within_plan_cap: withinPlanCap,
         received_at: new Date().toISOString(),
+        match_score: matchScore,
       })
       .select("id")
       .single();

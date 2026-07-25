@@ -435,7 +435,7 @@ export function UserRowActionsMenu({
                   Retained
                 </p>
                 <ul className="mt-2 ml-4 list-outside list-disc space-y-1.5 text-left text-sm text-slate-700">
-                  {DATA_RETENTION_PERIODS.slice(2, 5).map((r) => (
+                  {DATA_RETENTION_PERIODS.slice(2, 6).map((r) => (
                     <li key={r.category} className="pl-0.5 text-left">
                       {r.category}
                     </li>

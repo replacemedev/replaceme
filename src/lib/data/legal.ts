@@ -37,6 +37,9 @@ export const EMPLOYER_DPA_PAGE_META: PageContentMeta = {
 /** Bump when cookie purposes/categories change so the consent banner reappears. */
 export const COOKIE_POLICY_VERSION = "cookie-policy-v2";
 
+/** Unsuccessful application packets: months after job close / terminal status (RA 10173 + GDPR-aligned). */
+export const APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE = 6;
+
 /** Documented retention periods surfaced in Privacy Policy §9 and deletion UX. */
 export const DATA_RETENTION_PERIODS = [
   {
@@ -49,8 +52,13 @@ export const DATA_RETENTION_PERIODS = [
       "Until verification purpose is fulfilled, then deleted or anonymized within 90 days unless a legal hold applies",
   },
   {
-    category: "Applications & messaging",
-    period: "While relevant to open roles or account activity, then up to 24 months",
+    category: "Job applications (unsuccessful / withdrawn)",
+    period: `Deleted or anonymized ${APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE} months after the related job closes or a terminal decision (rejected / withdrawn), unless a legal hold, dispute, or fraud investigation applies`,
+  },
+  {
+    category: "Messaging threads",
+    period:
+      "While relevant to open roles or account activity, then up to 24 months for support and dispute handling",
   },
   {
     category: "Billing ledger & invoices (Stripe metadata)",

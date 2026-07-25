@@ -41,6 +41,15 @@ export function ConfirmDialog({
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   const maxWidth = size === "lg" ? "max-w-lg" : "max-w-md";
@@ -49,7 +58,7 @@ export function ConfirmDialog({
     <dialog
       ref={dialogRef}
       dir="ltr"
-      className={`fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 text-left shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none`}
+      className={`fixed inset-0 z-[100] m-auto w-[calc(100%-2rem)] ${maxWidth} rounded-2xl border border-slate-200 bg-white p-0 text-left shadow-2xl backdrop:bg-slate-900/50 open:flex open:flex-col my-auto max-h-[85dvh] sm:max-h-[90vh] overflow-hidden outline-none overscroll-contain`}
       onClose={onCancel}
       onClick={(e) => {
         if (e.target === dialogRef.current) {
@@ -87,7 +96,7 @@ export function ConfirmDialog({
         </button>
       </div>
       {children ? (
-        <div className="overflow-y-auto overflow-x-hidden px-6 py-5 flex-1 min-h-0 text-left text-slate-700">
+        <div className="overflow-y-auto overflow-x-hidden overscroll-contain px-6 py-5 flex-1 min-h-0 text-left text-slate-700">
           {children}
         </div>
       ) : null}

@@ -34,7 +34,6 @@ import {
   type AdminVerificationQueueRow,
   type AdminWorkerRow,
   type AdminDisputeRow,
-  type AdminApplicationRow,
   type AdminChatThreadRow,
   type PlatformMetrics,
   disputeStatusSchema,
@@ -1221,69 +1220,6 @@ export async function updateDisputeStatus(
       error: err instanceof Error ? err.message : "Failed to update dispute",
     };
   }
-}
-
-export async function fetchAdminApplications(): Promise<AdminApplicationRow[]> {
-  const { supabase } = await requireAdmin();
-
-  const { data, error } = await supabase
-    .from("applications")
-    .select(
-      `
-      id,
-      job_id,
-      candidate_id,
-      status,
-      match_score,
-      created_at,
-      jobs!applications_job_id_fkey (
-        title,
-        profiles!jobs_employer_id_fkey (
-          company_profiles ( company_name )
-        )
-      ),
-      profiles!applications_candidate_id_fkey (
-        first_name,
-        middle_name,
-        last_name,
-        email,
-        is_verified
-      )
-    `
-    )
-    .order("created_at", { ascending: false })
-    .limit(200);
-
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).map((row) => {
-    const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
-    const worker = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-    const employerProfile = job?.profiles;
-    const employer = Array.isArray(employerProfile)
-      ? employerProfile[0]
-      : employerProfile;
-    const companyProfiles = employer?.company_profiles;
-    const company = Array.isArray(companyProfiles)
-      ? companyProfiles[0]
-      : companyProfiles;
-
-    return {
-      id: row.id,
-      job_id: row.job_id,
-      job_title: job?.title ?? null,
-      company_name: company?.company_name ?? null,
-      worker_id: row.candidate_id,
-      worker_name:
-        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
-        null,
-      worker_email: worker?.email ?? null,
-      worker_is_verified: Boolean(worker?.is_verified),
-      status: row.status,
-      match_score: row.match_score,
-      created_at: row.created_at,
-    };
-  });
 }
 
 export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {

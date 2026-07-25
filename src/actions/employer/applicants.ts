@@ -161,6 +161,7 @@ async function loadApplicantsForJob(
     `)
     .eq("job_id", jobId)
     .eq("is_within_plan_cap", true)
+    .neq("moderation_status", "suspended")
     .order("created_at", { ascending: false });
 
   if (appsError) {

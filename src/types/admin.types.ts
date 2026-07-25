@@ -436,8 +436,55 @@ export const adminApplicationRowSchema = z.object({
   worker_is_verified: z.boolean().catch(false),
   status: z.string(),
   match_score: z.number(),
+  moderation_status: z.enum(["clear", "flagged", "suspended"]).catch("clear"),
   created_at: z.string(),
 });
+
+export const adminApplicationsListResultSchema = z.object({
+  rows: z.array(adminApplicationRowSchema),
+  total: z.number(),
+  page: z.number(),
+  pageSize: z.number(),
+});
+
+export type AdminApplicationsListResult = z.infer<
+  typeof adminApplicationsListResultSchema
+>;
+
+export type ApplicationModerationStatus = "clear" | "flagged" | "suspended";
+
+export type AdminApplicationDeepDive = {
+  id: string;
+  jobId: string;
+  jobTitle: string | null;
+  employerId: string | null;
+  companyName: string | null;
+  workerId: string;
+  workerName: string | null;
+  workerEmail: string | null;
+  workerIsVerified: boolean;
+  workerResumeUrl: string | null;
+  status: string;
+  matchScore: number;
+  moderationStatus: ApplicationModerationStatus;
+  flagReason: string | null;
+  flaggedAt: string | null;
+  applicationSubject: string | null;
+  coverLetter: string | null;
+  contactMethods: unknown;
+  createdAt: string;
+  stageHistory: Array<{
+    status: string;
+    createdAt: string;
+    actorRole: string | null;
+  }>;
+  auditEvents: Array<{
+    id: string;
+    actionType: string;
+    createdAt: string;
+    metadata: Record<string, unknown>;
+  }>;
+};
 
 export const adminChatThreadRowSchema = z.object({
   id: z.string().uuid(),

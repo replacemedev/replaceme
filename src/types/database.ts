@@ -118,11 +118,15 @@ export type Database = {
           cover_letter: string | null
           created_at: string
           employment_status: string | null
+          flag_reason: string | null
+          flagged_at: string | null
+          flagged_by: string | null
           id: string
           is_within_plan_cap: boolean
           job_id: string
           masked_preview_snapshot: Json | null
           match_score: number
+          moderation_status: string
           received_at: string | null
           show_hired_badge: boolean
           status: Database["public"]["Enums"]["application_status"]
@@ -134,11 +138,15 @@ export type Database = {
           cover_letter?: string | null
           created_at?: string
           employment_status?: string | null
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           id?: string
           is_within_plan_cap?: boolean
           job_id: string
           masked_preview_snapshot?: Json | null
           match_score?: number
+          moderation_status?: string
           received_at?: string | null
           show_hired_badge?: boolean
           status?: Database["public"]["Enums"]["application_status"]
@@ -150,11 +158,15 @@ export type Database = {
           cover_letter?: string | null
           created_at?: string
           employment_status?: string | null
+          flag_reason?: string | null
+          flagged_at?: string | null
+          flagged_by?: string | null
           id?: string
           is_within_plan_cap?: boolean
           job_id?: string
           masked_preview_snapshot?: Json | null
           match_score?: number
+          moderation_status?: string
           received_at?: string | null
           show_hired_badge?: boolean
           status?: Database["public"]["Enums"]["application_status"]

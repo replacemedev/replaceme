@@ -3,6 +3,7 @@ import { Briefcase, Check, Shield, User } from "lucide-react";
 import {
   ACCOUNT_LIFECYCLE_TIMELINES,
   APPEAL_SLA_COPY,
+  APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE,
   DATA_RETENTION_PERIODS,
   DELETION_REQUEST_SLA,
   DELETION_REQUEST_SUPPORT_EMAIL,
@@ -413,6 +414,22 @@ export function PrivacyPolicyContent({
           {ACCOUNT_LIFECYCLE_TIMELINES.billingRetainYears} years where tax or accounting law
           requires. When backups are restored, we re-apply erasure so closed accounts do not reappear
           with identifiable data.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">
+            Job applications &amp; Trust &amp; Safety access.
+          </strong>{" "}
+          Cover letters, resumes, and application stage history are processed to run the hiring
+          marketplace. Unsuccessful or withdrawn applications are deleted or anonymized{" "}
+          {APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE} months after the related job closes (or after
+          a terminal decision if the job remains open), aligned with RA 10173 storage-limitation
+          principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
+          investigation requires longer retention. Hired application packets may be retained with
+          employment or contract records under applicable employment and tax rules. Platform
+          administrators may access application contents only for Trust &amp; Safety, fraud
+          prevention, abuse investigation, legal compliance, and support—under least-privilege
+          access controls with audit logging. You may exercise privacy rights as described in
+          Section 11.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">

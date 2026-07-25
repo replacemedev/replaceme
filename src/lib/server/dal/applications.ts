@@ -17,7 +17,8 @@ export async function getApplicationsForJob(
   return supabase
     .from("applications")
     .select(APPLICATION_WITH_CANDIDATE_SELECT)
-    .eq("job_id", jobId);
+    .eq("job_id", jobId)
+    .neq("moderation_status", "suspended");
 }
 
 export async function getUnlockedCandidateIds(
