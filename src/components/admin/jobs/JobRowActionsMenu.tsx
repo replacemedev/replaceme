@@ -13,7 +13,9 @@ import { useRouter } from "next/navigation";
 import {
   Check,
   Eye,
+  FileWarning,
   MoreHorizontal,
+  RotateCcw,
   Trash2,
   X,
 } from "lucide-react";
@@ -22,6 +24,7 @@ import {
   approveJobPost,
   deleteJobPost,
   rejectJobPost,
+  restoreJobPost,
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import {
@@ -35,17 +38,29 @@ export interface JobRowActionsMenuProps {
   jobId: string;
   title: string;
   status: string;
+  rejectionCategory?: string | null;
+  rejectionReason?: string | null;
   /** Called when parent should clear row selection after mutate. */
   onMutated?: () => void;
 }
 
-type DialogMode = "reject" | "delete" | null;
+type DialogMode = "reject" | "delete" | "view_rejection" | null;
 type MenuCoords = { top: number; left: number };
+
+function categoryLabel(category: string | null | undefined): string {
+  if (!category) return "Not recorded";
+  if (category in JOB_REJECTION_CATEGORY_LABELS) {
+    return JOB_REJECTION_CATEGORY_LABELS[category as JobRejectionCategory];
+  }
+  return category.replace(/_/g, " ");
+}
 
 export function JobRowActionsMenu({
   jobId,
   title,
   status,
+  rejectionCategory = null,
+  rejectionReason = null,
   onMutated,
 }: JobRowActionsMenuProps) {
   const router = useRouter();
@@ -87,7 +102,7 @@ export function JobRowActionsMenu({
       Math.max(8, rect.right - menuWidth),
       window.innerWidth - menuWidth - 8
     );
-    const estimatedHeight = 220;
+    const estimatedHeight = 260;
     const spaceBelow = window.innerHeight - rect.bottom;
     const top =
       spaceBelow < estimatedHeight && rect.top > estimatedHeight
@@ -124,7 +139,13 @@ export function JobRowActionsMenu({
     };
   }, [open]);
 
-  const canModerate = status === "Pending Review";
+  const isDeleted = status === "Deleted";
+  const isRejected = status === "Rejected";
+  const canApprove = status === "Pending Review";
+  const canReject = status === "Pending Review" || status === "Active";
+  const canDelete = !isDeleted;
+  const canRestore = isDeleted;
+  const canViewRejection = isRejected || Boolean(rejectionCategory);
   const detailHref = `/admin/jobs/${jobId}`;
 
   const runApprove = () => {
@@ -170,8 +191,22 @@ export function JobRowActionsMenu({
         toast.error(result.error);
         return;
       }
-      toast.success("Job deleted");
+      toast.success("Job soft-deleted");
       resetDialog();
+      closeMenu();
+      onMutated?.();
+      router.refresh();
+    });
+  };
+
+  const runRestore = () => {
+    startTransition(async () => {
+      const result = await restoreJobPost(jobId);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Job restored as Draft");
       closeMenu();
       onMutated?.();
       router.refresh();
@@ -189,47 +224,78 @@ export function JobRowActionsMenu({
         <Eye className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
         View details
       </Link>
-      {canModerate ? (
-        <>
-          <button
-            type="button"
-            role="menuitem"
-            disabled={pending}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
-            onClick={() => {
-              closeMenu();
-              runApprove();
-            }}
-          >
-            <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Approve
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-amber-800 hover:bg-amber-50"
-            onClick={() => {
-              closeMenu();
-              setMode("reject");
-            }}
-          >
-            <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            Reject…
-          </button>
-        </>
+      {canViewRejection ? (
+        <button
+          type="button"
+          role="menuitem"
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-amber-800 hover:bg-amber-50"
+          onClick={() => {
+            closeMenu();
+            setMode("view_rejection");
+          }}
+        >
+          <FileWarning className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          View rejection reason
+        </button>
       ) : null}
-      <button
-        type="button"
-        role="menuitem"
-        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"
-        onClick={() => {
-          closeMenu();
-          setMode("delete");
-        }}
-      >
-        <Trash2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        Delete…
-      </button>
+      {canApprove ? (
+        <button
+          type="button"
+          role="menuitem"
+          disabled={pending}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+          onClick={() => {
+            closeMenu();
+            runApprove();
+          }}
+        >
+          <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          Approve
+        </button>
+      ) : null}
+      {canReject ? (
+        <button
+          type="button"
+          role="menuitem"
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-amber-800 hover:bg-amber-50"
+          onClick={() => {
+            closeMenu();
+            setMode("reject");
+          }}
+        >
+          <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          Reject…
+        </button>
+      ) : null}
+      {canRestore ? (
+        <button
+          type="button"
+          role="menuitem"
+          disabled={pending}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+          onClick={() => {
+            closeMenu();
+            runRestore();
+          }}
+        >
+          <RotateCcw className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          Restore…
+        </button>
+      ) : null}
+      {canDelete ? (
+        <button
+          type="button"
+          role="menuitem"
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"
+          onClick={() => {
+            closeMenu();
+            setMode("delete");
+          }}
+        >
+          <Trash2 className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          Delete…
+        </button>
+      ) : null}
     </>
   );
 
@@ -275,7 +341,7 @@ export function JobRowActionsMenu({
       <ConfirmDialog
         open={mode === "reject"}
         title="Reject job post?"
-        description={`"${title}" will be closed and hidden from workers. The employer will receive the reason by email and in-app notification.`}
+        description={`"${title}" will be rejected and hidden from workers. The employer will receive the reason by email and in-app notification.`}
         confirmLabel="Reject & notify"
         variant="danger"
         loading={pending}
@@ -326,8 +392,8 @@ export function JobRowActionsMenu({
       <ConfirmDialog
         open={mode === "delete"}
         title="Delete job post?"
-        description={`Permanently remove "${title}". This cannot be undone.`}
-        confirmLabel="Delete"
+        description={`Soft-delete "${title}" so it leaves all public boards. You can restore it later from the Deleted filter.`}
+        confirmLabel="Soft-delete"
         variant="danger"
         loading={pending}
         onCancel={resetDialog}
@@ -345,6 +411,36 @@ export function JobRowActionsMenu({
             className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </label>
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={mode === "view_rejection"}
+        title="Rejection reason"
+        description={`Recorded moderation decision for "${title}".`}
+        confirmLabel="Close"
+        variant="default"
+        loading={false}
+        onCancel={resetDialog}
+        onConfirm={resetDialog}
+      >
+        <div className="space-y-3 text-left text-sm text-slate-700">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Category
+            </p>
+            <p className="mt-1 font-medium text-slate-900">
+              {categoryLabel(rejectionCategory)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Explanation
+            </p>
+            <p className="mt-1 whitespace-pre-wrap text-slate-800">
+              {rejectionReason?.trim() || "No additional explanation recorded."}
+            </p>
+          </div>
+        </div>
       </ConfirmDialog>
     </>
   );

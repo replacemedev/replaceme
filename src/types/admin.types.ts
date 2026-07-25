@@ -232,6 +232,11 @@ export interface AdminJobRow {
   plan_slug: string | null;
   submitted_for_review_at: string | null;
   requires_manual_approval: boolean;
+  rejection_category: string | null;
+  rejection_reason: string | null;
+  rejected_at: string | null;
+  deleted_at: string | null;
+  deletion_reason: string | null;
 }
 
 export interface AdminVerificationQueueRow {

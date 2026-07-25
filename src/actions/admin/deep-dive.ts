@@ -21,6 +21,11 @@ export type AdminJobDeepDive = {
   parsedSections: ReturnType<typeof parseJobDescription>;
   createdAt: string;
   updatedAt: string;
+  rejectionCategory: string | null;
+  rejectionReason: string | null;
+  rejectedAt: string | null;
+  deletedAt: string | null;
+  deletionReason: string | null;
 };
 
 export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDive | null> {
@@ -45,6 +50,11 @@ export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDi
         location,
         created_at,
         updated_at,
+        rejection_category,
+        rejection_reason,
+        rejected_at,
+        deleted_at,
+        deletion_reason,
         profiles!jobs_employer_id_fkey (
           company_profiles (
             company_name
@@ -65,7 +75,7 @@ export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDi
     return {
       id: data.id,
       title: data.title,
-      status: data.status,
+      status: data.deleted_at ? "Deleted" : data.status,
       employerId: data.employer_id,
       companyName: company?.company_name ?? null,
       employmentType: data.employment_type,
@@ -78,6 +88,11 @@ export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDi
       parsedSections: parseJobDescription(description),
       createdAt: data.created_at,
       updatedAt: data.updated_at ?? data.created_at,
+      rejectionCategory: data.rejection_category ?? null,
+      rejectionReason: data.rejection_reason ?? null,
+      rejectedAt: data.rejected_at ?? null,
+      deletedAt: data.deleted_at ?? null,
+      deletionReason: data.deletion_reason ?? null,
     };
   } catch (err) {
     safeError("getAdminJobDeepDive:", err);

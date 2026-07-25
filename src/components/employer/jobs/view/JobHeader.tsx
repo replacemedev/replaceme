@@ -11,7 +11,7 @@ import { formatMoney } from "@/lib/format/currency";
 interface JobHeaderProps {
   jobId: string;
   title: string;
-  status: "Active" | "Closed" | "Pending Review";
+  status: "Active" | "Closed" | "Pending Review" | "Rejected" | "Deleted" | "Draft";
   location: string;
   employmentType: string;
   hourlyRate: number;
@@ -71,10 +71,19 @@ export function JobHeader({
       statusBadgeClasses = "bg-emerald-50 text-emerald-700 border-emerald-200";
       break;
     case "Closed":
-      statusBadgeClasses = "bg-red-50 text-red-700 border-red-200";
+      statusBadgeClasses = "bg-slate-100 text-slate-600 border-slate-200";
+      break;
+    case "Rejected":
+      statusBadgeClasses = "bg-amber-50 text-amber-900 border-amber-300";
+      break;
+    case "Deleted":
+      statusBadgeClasses = "bg-red-50 text-red-800 border-red-200";
       break;
     case "Pending Review":
       statusBadgeClasses = "bg-amber-50 text-amber-700 border-amber-200";
+      break;
+    default:
+      statusBadgeClasses = "bg-slate-100 text-slate-600 border-slate-200";
       break;
   }
 
@@ -126,6 +135,8 @@ export function JobHeader({
             View Pipeline
           </Link>
 
+          {/* Actions */}
+          {status !== "Rejected" && status !== "Deleted" ? (
           <Link
             href={`/employer/jobs/create?edit=${jobId}`}
             className="h-10 px-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all duration-200 flex items-center justify-center gap-2"
@@ -133,6 +144,7 @@ export function JobHeader({
             <Edit3 size={14} aria-hidden />
             Edit Job
           </Link>
+          ) : null}
 
           <button
             type="button"
@@ -143,7 +155,9 @@ export function JobHeader({
             Share
           </button>
 
-          {status !== "Closed" && (
+          {status !== "Closed" &&
+            status !== "Rejected" &&
+            status !== "Deleted" && (
             <button
               type="button"
               disabled={isPending}

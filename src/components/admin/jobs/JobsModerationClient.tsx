@@ -360,6 +360,8 @@ export function JobsModerationClient({
               <option value="all">All Statuses</option>
               <option value="Pending Review">Pending Review</option>
               <option value="Active">Active</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Deleted">Deleted</option>
               <option value="Closed">Closed</option>
               <option value="Draft">Draft</option>
             </select>
@@ -499,6 +501,8 @@ export function JobsModerationClient({
                     jobId={job.id}
                     title={job.title}
                     status={job.status}
+                    rejectionCategory={job.rejection_category}
+                    rejectionReason={job.rejection_reason}
                     onMutated={clearSelection}
                   />
                 }
@@ -629,6 +633,8 @@ export function JobsModerationClient({
                         jobId={job.id}
                         title={job.title}
                         status={job.status}
+                        rejectionCategory={job.rejection_category}
+                        rejectionReason={job.rejection_reason}
                         onMutated={clearSelection}
                       />
                     </td>

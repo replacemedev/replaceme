@@ -10,7 +10,13 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
-type StatusFilter = "all" | "Active" | "Pending Review" | "Closed" | "Draft";
+type StatusFilter =
+  | "all"
+  | "Active"
+  | "Pending Review"
+  | "Rejected"
+  | "Closed"
+  | "Draft";
 type SortKey = "newest" | "oldest" | "applicants" | "views";
 
 interface JobsListClientProps {
@@ -23,6 +29,7 @@ const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "Active", label: "Active" },
   { value: "Pending Review", label: "Pending" },
+  { value: "Rejected", label: "Rejected" },
   { value: "Closed", label: "Closed" },
   { value: "Draft", label: "Draft" },
 ];

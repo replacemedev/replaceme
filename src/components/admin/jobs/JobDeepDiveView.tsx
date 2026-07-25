@@ -24,6 +24,8 @@ export function JobDeepDiveView({ data }: JobDeepDiveViewProps) {
           jobId={data.id}
           title={data.title}
           status={data.status}
+          rejectionCategory={data.rejectionCategory}
+          rejectionReason={data.rejectionReason}
         />
       </div>
 
@@ -37,6 +39,39 @@ export function JobDeepDiveView({ data }: JobDeepDiveViewProps) {
           </span>
         </div>
       </header>
+
+      {data.status === "Rejected" || data.rejectionCategory ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-800">
+            Rejection record
+          </p>
+          <p className="mt-2 text-sm font-medium text-amber-950">
+            {data.rejectionCategory?.replace(/_/g, " ") ?? "Category not recorded"}
+          </p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-amber-900/90">
+            {data.rejectionReason?.trim() || "No additional explanation recorded."}
+          </p>
+          {data.rejectedAt ? (
+            <p className="mt-2 text-xs text-amber-800/80">
+              Rejected {new Date(data.rejectedAt).toLocaleString()}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {data.deletedAt ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-red-800">
+            Soft-deleted
+          </p>
+          <p className="mt-2 text-sm text-red-900">
+            {data.deletionReason?.trim() || "No deletion reason recorded."}
+          </p>
+          <p className="mt-2 text-xs text-red-800/80">
+            Deleted {new Date(data.deletedAt).toLocaleString()}
+          </p>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">

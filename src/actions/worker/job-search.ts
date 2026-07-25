@@ -206,6 +206,7 @@ export async function getJobSearchData(
         `
         )
         .eq("status", "Active")
+        .is("deleted_at", null)
         .order("priority_score", { ascending: false })
         .order("created_at", { ascending: false });
 

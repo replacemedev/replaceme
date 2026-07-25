@@ -1608,6 +1608,9 @@ export type Database = {
           approved_by: string | null
           clicks_count: number
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
           description: string
           employer_id: string
           employment_type: string
@@ -1641,6 +1644,9 @@ export type Database = {
           approved_by?: string | null
           clicks_count?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description: string
           employer_id: string
           employment_type: string
@@ -1674,6 +1680,9 @@ export type Database = {
           approved_by?: string | null
           clicks_count?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
           description?: string
           employer_id?: string
           employment_type?: string

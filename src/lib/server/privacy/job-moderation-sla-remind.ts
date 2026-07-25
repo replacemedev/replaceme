@@ -27,6 +27,7 @@ export async function remindAdminsDiscoveryJobSla(): Promise<JobModerationSlaRem
     .from("jobs")
     .select("id, title, submitted_for_review_at")
     .eq("status", "Pending Review")
+    .is("deleted_at", null)
     .not("submitted_for_review_at", "is", null);
 
   if (error) throw new Error(error.message);

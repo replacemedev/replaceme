@@ -415,12 +415,15 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
 
     const { data: existing, error: loadError } = await supabase
       .from("jobs")
-      .select("id, title, employer_id, status")
+      .select("id, title, employer_id, status, deleted_at")
       .eq("id", id)
       .maybeSingle();
 
     if (loadError) throw new Error(loadError.message);
     if (!existing) throw new Error("Job not found");
+    if (existing.deleted_at || existing.status === "Deleted") {
+      throw new Error("Restore this job before approving it");
+    }
 
     const { error } = await supabase
       .from("jobs")
@@ -473,17 +476,23 @@ export async function rejectJobPost(input: {
 
     const { data: existing, error: loadError } = await supabase
       .from("jobs")
-      .select("id, title, employer_id, status")
+      .select("id, title, employer_id, status, deleted_at")
       .eq("id", parsed.jobId)
       .maybeSingle();
 
     if (loadError) throw new Error(loadError.message);
     if (!existing) throw new Error("Job not found");
+    if (existing.deleted_at || existing.status === "Deleted") {
+      throw new Error("Cannot reject a deleted job");
+    }
+    if (existing.status === "Rejected") {
+      throw new Error("Job is already rejected");
+    }
 
     const { error } = await supabase
       .from("jobs")
       .update({
-        status: "Closed",
+        status: "Rejected",
         rejection_category: parsed.category,
         rejection_reason: trimmedReason,
         rejected_at: now,
@@ -584,7 +593,8 @@ export async function countJobsPendingReview(): Promise<number> {
   const { count, error } = await supabase
     .from("jobs")
     .select("id", { count: "exact", head: true })
-    .eq("status", "Pending Review");
+    .eq("status", "Pending Review")
+    .is("deleted_at", null);
 
   if (error) throw new Error(error.message);
   return count ?? 0;
@@ -596,14 +606,43 @@ export async function deleteJobPost(
 ): Promise<ActionResult> {
   try {
     const parsed = moderateJobSchema.parse({ jobId, reason });
-    const { supabase } = await requireAdmin();
+    const { supabase, user } = await requireAdmin();
+    const now = new Date().toISOString();
 
-    const { error } = await supabase.from("jobs").delete().eq("id", parsed.jobId);
+    const { data: existing, error: loadError } = await supabase
+      .from("jobs")
+      .select("id, employer_id, status, deleted_at")
+      .eq("id", parsed.jobId)
+      .maybeSingle();
+
+    if (loadError) throw new Error(loadError.message);
+    if (!existing) throw new Error("Job not found");
+    if (existing.deleted_at || existing.status === "Deleted") {
+      throw new Error("Job is already deleted");
+    }
+
+    const { error } = await supabase
+      .from("jobs")
+      .update({
+        status: "Deleted",
+        deleted_at: now,
+        deleted_by: user.id,
+        deletion_reason: parsed.reason,
+      })
+      .eq("id", parsed.jobId);
 
     if (error) throw new Error(error.message);
 
+    if (existing.employer_id) {
+      const { invalidateEmployerCache } = await import(
+        "@/lib/server/entitlements"
+      );
+      await invalidateEmployerCache(existing.employer_id);
+    }
+
     await logAdminAction("delete_job_post", "job", parsed.jobId, {
       reason: parsed.reason,
+      soft: true,
     });
     await revalidateAdminSurfaces();
     return { success: true };
@@ -611,6 +650,53 @@ export async function deleteJobPost(
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to delete job",
+    };
+  }
+}
+
+export async function restoreJobPost(jobId: string): Promise<ActionResult> {
+  try {
+    const id = moderateJobSchema.shape.jobId.parse(jobId);
+    const { supabase } = await requireAdmin();
+
+    const { data: existing, error: loadError } = await supabase
+      .from("jobs")
+      .select("id, employer_id, status, deleted_at")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (loadError) throw new Error(loadError.message);
+    if (!existing) throw new Error("Job not found");
+    if (!existing.deleted_at && existing.status !== "Deleted") {
+      throw new Error("Job is not deleted");
+    }
+
+    const { error } = await supabase
+      .from("jobs")
+      .update({
+        status: "Draft",
+        deleted_at: null,
+        deleted_by: null,
+        deletion_reason: null,
+      })
+      .eq("id", id);
+
+    if (error) throw new Error(error.message);
+
+    if (existing.employer_id) {
+      const { invalidateEmployerCache } = await import(
+        "@/lib/server/entitlements"
+      );
+      await invalidateEmployerCache(existing.employer_id);
+    }
+
+    await logAdminAction("restore_job_post", "job", id);
+    await revalidateAdminSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: actionErrorMessage(err, "Failed to restore job"),
     };
   }
 }
@@ -986,6 +1072,11 @@ export async function fetchAdminJobs(
       employer_id,
       created_at,
       submitted_for_review_at,
+      rejection_category,
+      rejection_reason,
+      rejected_at,
+      deleted_at,
+      deletion_reason,
       profiles!jobs_employer_id_fkey (
         company_profiles (
           company_name
@@ -999,8 +1090,12 @@ export async function fetchAdminJobs(
     .order("created_at", { ascending: false });
 
   const statusFilter = filters?.status;
-  if (statusFilter && statusFilter !== "all") {
-    query = query.eq("status", statusFilter);
+  if (statusFilter === "Deleted") {
+    query = query.or("deleted_at.not.is.null,status.eq.Deleted");
+  } else if (statusFilter && statusFilter !== "all") {
+    query = query.eq("status", statusFilter).is("deleted_at", null);
+  } else {
+    query = query.is("deleted_at", null);
   }
 
   const search = filters?.search?.trim();
@@ -1032,7 +1127,7 @@ export async function fetchAdminJobs(
     return {
       id: row.id,
       title: row.title,
-      status: row.status,
+      status: row.deleted_at ? "Deleted" : row.status,
       employment_type: row.employment_type,
       monthly_salary: row.monthly_salary,
       salary_currency: row.salary_currency ?? null,
@@ -1042,6 +1137,11 @@ export async function fetchAdminJobs(
       plan_slug: planSlug,
       submitted_for_review_at: row.submitted_for_review_at,
       requires_manual_approval: planSlug === "discovery",
+      rejection_category: row.rejection_category ?? null,
+      rejection_reason: row.rejection_reason ?? null,
+      rejected_at: row.rejected_at ?? null,
+      deleted_at: row.deleted_at ?? null,
+      deletion_reason: row.deletion_reason ?? null,
     };
   });
 }

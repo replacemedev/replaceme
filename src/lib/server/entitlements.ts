@@ -182,7 +182,8 @@ export async function countActiveJobsForEmployer(
     .from("jobs")
     .select("id", { count: "exact", head: true })
     .eq("employer_id", employerId)
-    .in("status", ["Active", "Pending Review"]);
+    .in("status", ["Active", "Pending Review"])
+    .is("deleted_at", null);
 
   if (error) {
     safeError("countActiveJobsForEmployer:", error);

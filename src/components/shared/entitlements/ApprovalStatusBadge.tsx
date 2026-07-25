@@ -5,6 +5,8 @@ interface ApprovalStatusBadgeProps {
 
 function normalizeStatus(status: string): string {
   const value = status.trim();
+  if (/rejected/i.test(value)) return "rejected";
+  if (/deleted/i.test(value)) return "deleted";
   if (/pending/i.test(value)) return "pending";
   if (/closed|inactive|deactivated/i.test(value)) return "closed";
   if (/active|live|open/i.test(value)) return "active";
@@ -14,12 +16,16 @@ function normalizeStatus(status: string): string {
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-emerald-50 text-emerald-700 border-emerald-200",
   pending: "bg-amber-50 text-amber-800 border-amber-200",
+  rejected: "bg-amber-50 text-amber-900 border-amber-300",
+  deleted: "bg-red-50 text-red-800 border-red-200",
   closed: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Live",
   pending: "In review",
+  rejected: "Rejected",
+  deleted: "Deleted",
   closed: "Closed",
 };
 

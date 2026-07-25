@@ -335,7 +335,7 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
     return {
       id: job.id,
       title: job.title,
-      status: job.status as "Active" | "Closed" | "Pending Review",
+      status: job.status as JobDetails["status"],
       location: "Remote",
       employmentType: job.employment_type,
       hourlyRate,

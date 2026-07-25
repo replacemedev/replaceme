@@ -79,6 +79,7 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
         )
       `)
           .eq("employer_id", employerProfileId)
+          .is("deleted_at", null)
           .order("priority_score", { ascending: false })
           .order("created_at", { ascending: false });
 

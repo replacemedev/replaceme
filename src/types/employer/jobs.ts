@@ -18,7 +18,7 @@ export interface HiringTeamMember {
 export interface JobDetails {
   id: string;
   title: string;
-  status: "Active" | "Closed" | "Pending Review";
+  status: "Active" | "Closed" | "Pending Review" | "Rejected" | "Deleted" | "Draft";
   location: string;
   employmentType: string;
   hourlyRate: number;
