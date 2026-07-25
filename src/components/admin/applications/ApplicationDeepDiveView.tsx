@@ -1,17 +1,25 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, FileText } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ApplicationRowActionsMenu } from "@/components/admin/applications/ApplicationRowActionsMenu";
+import { ApplicationAuditScroll } from "@/components/admin/applications/ApplicationAuditScroll";
+import { OpenResumeButton } from "@/components/admin/applications/OpenResumeButton";
 import type { AdminApplicationDeepDive } from "@/types/admin.types";
 
 interface ApplicationDeepDiveViewProps {
   data: AdminApplicationDeepDive;
+  section?: string | null;
 }
 
-export function ApplicationDeepDiveView({ data }: ApplicationDeepDiveViewProps) {
+export function ApplicationDeepDiveView({
+  data,
+  section,
+}: ApplicationDeepDiveViewProps) {
   return (
     <div className="space-y-6 min-w-0">
+      <ApplicationAuditScroll section={section} />
+
       <div className="flex flex-wrap items-start justify-between gap-3">
         <Link
           href="/admin/applications"
@@ -130,17 +138,11 @@ export function ApplicationDeepDiveView({ data }: ApplicationDeepDiveViewProps) 
         <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
           Resume
         </p>
-        {data.workerResumeUrl ? (
-          <a
-            href={data.workerResumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
-          >
-            <FileText className="h-4 w-4" aria-hidden />
-            Open resume
-            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-          </a>
+        {data.hasWorkerResume || data.workerResumeUrl ? (
+          <OpenResumeButton
+            applicationId={data.id}
+            initialUrl={data.workerResumeUrl}
+          />
         ) : (
           <p className="mt-2 text-sm text-slate-500">No resume on file.</p>
         )}

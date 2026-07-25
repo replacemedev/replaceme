@@ -464,6 +464,7 @@ export type AdminApplicationDeepDive = {
   workerEmail: string | null;
   workerIsVerified: boolean;
   workerResumeUrl: string | null;
+  hasWorkerResume: boolean;
   status: string;
   matchScore: number;
   moderationStatus: ApplicationModerationStatus;

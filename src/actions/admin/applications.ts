@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { computeKeywordMatchScore } from "@/lib/matching/keyword-match-score";
 import { logAdminAction } from "@/actions/admin-actions";
@@ -14,6 +15,27 @@ import type {
   AdminApplicationsListResult,
   ApplicationModerationStatus,
 } from "@/types/admin.types";
+
+const RESUME_SIGNED_URL_TTL_SECONDS = 60 * 60;
+
+async function resolveResumeSignedUrl(
+  storagePath: string | null | undefined
+): Promise<string | null> {
+  if (!storagePath?.trim()) return null;
+  const path = storagePath.trim();
+  if (/^https?:\/\//i.test(path)) return path;
+
+  const admin = await createAdminClient();
+  const { data, error } = await admin.storage
+    .from("resumes")
+    .createSignedUrl(path, RESUME_SIGNED_URL_TTL_SECONDS);
+
+  if (error || !data?.signedUrl) {
+    safeError("resolveResumeSignedUrl:", error);
+    return null;
+  }
+  return data.signedUrl;
+}
 
 const PAGE_SIZE = 20;
 
@@ -340,20 +362,25 @@ export async function fetchAdminApplicationDeepDive(
       | null
       | undefined;
 
-    const [{ data: history }, { data: audits }] = await Promise.all([
-      supabase
-        .from("application_stage_history")
-        .select("status, created_at, actor_role")
-        .eq("application_id", id)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("audit_logs")
-        .select("id, action_type, created_at, metadata")
-        .eq("target_type", "application")
-        .eq("target_id", id)
-        .order("created_at", { ascending: false })
-        .limit(50),
-    ]);
+    const resumeStoragePath =
+      workerRecord?.resume_url ?? workerRecord?.cv_url ?? null;
+
+    const [{ data: history }, { data: audits }, workerResumeUrl] =
+      await Promise.all([
+        supabase
+          .from("application_stage_history")
+          .select("status, created_at, actor_role")
+          .eq("application_id", id)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("audit_logs")
+          .select("id, action_type, created_at, metadata")
+          .eq("target_type", "application")
+          .eq("target_id", id)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        resolveResumeSignedUrl(resumeStoragePath),
+      ]);
 
     return {
       id: mapped.id,
@@ -365,7 +392,8 @@ export async function fetchAdminApplicationDeepDive(
       workerName: mapped.worker_name,
       workerEmail: mapped.worker_email,
       workerIsVerified: mapped.worker_is_verified,
-      workerResumeUrl: workerRecord?.resume_url ?? workerRecord?.cv_url ?? null,
+      workerResumeUrl,
+      hasWorkerResume: Boolean(resumeStoragePath),
       status: mapped.status,
       matchScore: mapped.match_score,
       moderationStatus: mapped.moderation_status,
@@ -401,6 +429,63 @@ const moderateSchema = z.object({
 
 type ActionResult = { success: true } | { success: false; error: string };
 
+function revalidateApplicationSurfaces(applicationId: string) {
+  revalidatePath("/admin/applications");
+  revalidatePath(`/admin/applications/${applicationId}`);
+  revalidatePath("/admin/audit-log");
+}
+
+/** Time-limited signed URL for a worker resume in private storage. */
+export async function getAdminApplicationResumeSignedUrl(
+  applicationId: string
+): Promise<{ success: true; url: string } | { success: false; error: string }> {
+  try {
+    const id = z.string().uuid().parse(applicationId);
+    await requireAdmin();
+    const admin = await createAdminClient();
+
+    const { data, error } = await admin
+      .from("applications")
+      .select(
+        `
+        profiles!applications_candidate_id_fkey (
+          resume_url,
+          cv_url
+        )
+      `
+      )
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      safeError("getAdminApplicationResumeSignedUrl:", error);
+      return { success: false, error: error.message };
+    }
+
+    const worker = Array.isArray(data?.profiles)
+      ? data.profiles[0]
+      : data?.profiles;
+    const workerRecord = worker as
+      | { resume_url?: string | null; cv_url?: string | null }
+      | null
+      | undefined;
+    const storagePath =
+      workerRecord?.resume_url ?? workerRecord?.cv_url ?? null;
+    const url = await resolveResumeSignedUrl(storagePath);
+    if (!url) {
+      return { success: false, error: "Resume not found in storage." };
+    }
+    return { success: true, url };
+  } catch (err) {
+    safeError("getAdminApplicationResumeSignedUrl:", err);
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to open resume",
+    };
+  }
+}
+
 export async function moderateAdminApplication(input: {
   applicationId: string;
   mode: "flagged" | "suspended";
@@ -415,10 +500,11 @@ export async function moderateAdminApplication(input: {
       };
     }
 
-    const { supabase, user } = await requireAdmin();
+    const { user } = await requireAdmin();
+    const admin = await createAdminClient();
     const { applicationId, mode, reason } = parsed.data;
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("applications")
       .update({
         moderation_status: mode,
@@ -426,11 +512,19 @@ export async function moderateAdminApplication(input: {
         flag_reason: reason,
         flagged_by: user.id,
       })
-      .eq("id", applicationId);
+      .eq("id", applicationId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       safeError("moderateAdminApplication:", error);
       return { success: false, error: error.message };
+    }
+    if (!updated?.id) {
+      return {
+        success: false,
+        error: "Application not found or could not be updated.",
+      };
     }
 
     await logAdminAction(
@@ -442,8 +536,7 @@ export async function moderateAdminApplication(input: {
       { reason, moderation_status: mode }
     );
 
-    revalidatePath("/admin/applications");
-    revalidatePath(`/admin/applications/${applicationId}`);
+    revalidateApplicationSurfaces(applicationId);
     return { success: true };
   } catch (err) {
     safeError("moderateAdminApplication:", err);
@@ -459,9 +552,10 @@ export async function clearAdminApplicationFlag(
 ): Promise<ActionResult> {
   try {
     const id = z.string().uuid().parse(applicationId);
-    const { supabase } = await requireAdmin();
+    await requireAdmin();
+    const admin = await createAdminClient();
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("applications")
       .update({
         moderation_status: "clear",
@@ -469,15 +563,22 @@ export async function clearAdminApplicationFlag(
         flag_reason: null,
         flagged_by: null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       return { success: false, error: error.message };
     }
+    if (!updated?.id) {
+      return {
+        success: false,
+        error: "Application not found or could not be updated.",
+      };
+    }
 
     await logAdminAction("application.clear_flag", "application", id, {});
-    revalidatePath("/admin/applications");
-    revalidatePath(`/admin/applications/${id}`);
+    revalidateApplicationSurfaces(id);
     return { success: true };
   } catch (err) {
     safeError("clearAdminApplicationFlag:", err);

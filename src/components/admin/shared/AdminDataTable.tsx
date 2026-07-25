@@ -20,7 +20,7 @@ export function AdminDataTable({
         {mobileCards}
       </div>
       <div
-        className={`hidden md:block overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
+        className={`hidden md:block overflow-x-auto overflow-y-visible w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
       >
         {children}
       </div>
@@ -35,7 +35,7 @@ export const ADMIN_TABLE_TH = "px-4 py-3 whitespace-nowrap";
 
 export const ADMIN_TABLE_ROW = "hover:bg-slate-50/50";
 
-export const ADMIN_TABLE_TD = "px-4 py-3 align-middle";
+export const ADMIN_TABLE_TD = "px-4 py-3 align-middle relative";
 
 type ActionsPlacement = "header" | "footer";
 
@@ -52,7 +52,7 @@ export function AdminMobileCard({
   if (actions && actionsPlacement === "header") {
     return (
       <article
-        className={`${ADMIN_CARD} relative z-0 p-4 min-w-0 w-full max-w-full overflow-visible has-[details[open]]:z-40`}
+        className={`${ADMIN_CARD} relative z-0 p-4 min-w-0 w-full max-w-full overflow-visible has-[details[open]]:z-50`}
       >
         <div className="flex items-start justify-between gap-3 min-w-0">
           <div className="min-w-0 flex-1 space-y-2.5">{children}</div>
@@ -64,7 +64,7 @@ export function AdminMobileCard({
 
   return (
     <article
-      className={`${ADMIN_CARD} relative z-0 p-4 space-y-3 min-w-0 w-full max-w-full overflow-visible has-[details[open]]:z-40`}
+        className={`${ADMIN_CARD} relative z-0 p-4 space-y-3 min-w-0 w-full max-w-full overflow-visible has-[details[open]]:z-50`}
     >
       <div className="min-w-0 space-y-2">{children}</div>
       {actions ? (
