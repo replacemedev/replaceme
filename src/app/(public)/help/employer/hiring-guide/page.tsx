@@ -44,9 +44,10 @@ const STEPS = [
       "Write a simple job post outlining your role, required skills, schedule, and proposed pay rate.",
     details: [
       "Include a clear job title and a bulleted list of daily responsibilities.",
-      "Paid plans (Starter, Growth, Scale) feature instant job post approval.",
-      "Free Discovery plan posts are reviewed and approved within 2 business days.",
-      "Your active post appears immediately on the public Replaceme job board.",
+      "Paid plans (Starter, Growth, Scale) feature instant job post approval when the listing meets our posting rules.",
+      "Free Discovery plan posts are reviewed within 2 business days.",
+      "If a post is not approved, we email you a reason category (for example discriminatory language, below minimum wage, spam/scam, or Terms issues) so you can fix and resubmit. Discovery posts are not auto-published if review runs long — they stay pending until an admin decides.",
+      "Approved active posts appear on the public Replaceme job board.",
     ],
   },
   {

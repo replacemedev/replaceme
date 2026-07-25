@@ -1,7 +1,11 @@
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminPageShell } from "@/components/admin/layout";
 import { JobsModerationClient } from "@/components/admin/jobs/JobsModerationClient";
-import { fetchAdminJobs } from "@/actions/admin-actions";
+import {
+  countJobsPendingReview,
+  fetchAdminJobs,
+} from "@/actions/admin-actions";
+import { DISCOVERY_JOB_APPROVAL_SLA } from "@/lib/data/legal";
 
 export const metadata = {
   title: "Job Posts | Admin",
@@ -9,20 +13,42 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminJobsPage() {
-  const jobs = await fetchAdminJobs();
+function firstParam(
+  value: string | string[] | undefined
+): string | undefined {
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
 
-  const pendingCount = jobs.filter(
-    (j) => j.status === "Pending Review"
-  ).length;
+export default async function AdminJobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const statusParam = firstParam(params.status);
+
+  const [jobs, pendingCount] = await Promise.all([
+    fetchAdminJobs({
+      status:
+        statusParam === undefined
+          ? "Pending Review"
+          : statusParam === "all"
+            ? null
+            : statusParam,
+    }),
+    countJobsPendingReview(),
+  ]);
 
   return (
     <AdminPageShell>
       <AdminPageHeader
         title="Job Moderation"
-        description={`Review and approve employer job posts before they go live.${pendingCount > 0 ? ` ${pendingCount} awaiting review.` : ""}`}
+        description={`Discovery posts need human review within ${DISCOVERY_JOB_APPROVAL_SLA.targetBusinessDays} business days (never auto-publish). Paid plans publish instantly.${
+          pendingCount > 0 ? ` ${pendingCount} awaiting review.` : ""
+        }`}
       />
-      <JobsModerationClient jobs={jobs} />
+      <JobsModerationClient jobs={jobs} pendingCount={pendingCount} />
     </AdminPageShell>
   );
 }

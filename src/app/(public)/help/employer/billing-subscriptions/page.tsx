@@ -42,7 +42,7 @@ const BILLING_RULES = [
   {
     title: "Instant vs. Manual Job Post Approvals",
     icon: Clock,
-    copy: "Subscribers on paid plans (Starter, Growth, Scale) enjoy instant job post approvals. Jobs posted under the free Discovery plan are reviewed and approved within 2 business days.",
+    copy: "Subscribers on paid plans (Starter, Growth, Scale) enjoy instant job post approvals when listings meet posting rules. Discovery plan posts are reviewed within 2 business days. If we do not approve a post, we notify you with a reason category so you can revise and resubmit.",
   },
   {
     title: "Changing or Canceling Your Subscription",

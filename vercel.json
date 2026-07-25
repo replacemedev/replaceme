@@ -6,6 +6,10 @@
       "schedule": "0 3 * * *"
     },
     {
+      "path": "/api/cron/job-moderation-sla",
+      "schedule": "0 2 * * *"
+    },
+    {
       "path": "/api/cron/worker-profile-nudge",
       "schedule": "0 */6 * * *"
     },

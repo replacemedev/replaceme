@@ -273,6 +273,89 @@ function retentionListHtml(
   </div>`;
 }
 
+/** Job post rejected by Trust & Safety — reason category + optional detail for employer. */
+export function renderJobRejectedEmail(input: {
+  companyName?: string | null;
+  jobTitle: string;
+  categoryLabel: string;
+  reason?: string | null;
+  ctaUrl: string;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Job post not approved: ${input.jobTitle}`;
+  const greeting = input.companyName
+    ? `Hi ${escapeHtml(input.companyName)},`
+    : "Hi there,";
+  const reasonBlock = input.reason?.trim()
+    ? `${sectionLabel("Moderator notes")}
+    <div style="margin:0 0 18px 0;padding:14px 16px;border:1px solid ${BRAND.border};border-radius:14px;background:#fff;color:${BRAND.body};font-size:14px;line-height:1.55;">${escapeHtml(input.reason).replaceAll("\n", "<br />")}</div>`
+    : "";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">${greeting}</p>
+    <p style="margin:0 0 16px 0;">
+      Your job post <strong>${escapeHtml(input.jobTitle)}</strong> was reviewed and is not approved for publication. It has been closed and is hidden from workers.
+    </p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:#b91c1c;">Not approved</span>`)}
+      ${detailRow("Reason", escapeHtml(input.categoryLabel))}
+    `)}
+    ${reasonBlock}
+    <p style="margin:0 0 18px 0;">
+      You may edit the listing to address the issue and submit a new post for review. For appeals or questions, contact support.
+    </p>
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(input.ctaUrl, "View job posts")}
+    </p>
+    <p style="margin:0;font-size:13px;color:${BRAND.muted};line-height:1.55;">
+      Prefer email?
+      <a href="mailto:${escapeHtml(input.supportEmail)}" style="color:${BRAND.accent};font-weight:600;text-decoration:none;">${escapeHtml(input.supportEmail)}</a>
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Job post not approved",
+    preheader: `${input.jobTitle} was not approved for publication`,
+    bodyHtml,
+    footerNote: `Questions: ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}
+
+/** Job post approved and published. */
+export function renderJobApprovedEmail(input: {
+  companyName?: string | null;
+  jobTitle: string;
+  ctaUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Job post live: ${input.jobTitle}`;
+  const greeting = input.companyName
+    ? `Hi ${escapeHtml(input.companyName)},`
+    : "Hi there,";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">${greeting}</p>
+    <p style="margin:0 0 16px 0;">
+      Good news — <strong>${escapeHtml(input.jobTitle)}</strong> is approved and now visible to workers on Replaceme.
+    </p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${BRAND.accent};">Active</span>`)}
+    `)}
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(input.ctaUrl, "View job post")}
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Job post published",
+    preheader: `${input.jobTitle} is now live`,
+    bodyHtml,
+  });
+
+  return { subject, html, text };
+}
+
 /** Account suspended — matches employer support email visual system. */
 export function renderAccountSuspendedEmail(input: {
   endsAtLabel: string | null;

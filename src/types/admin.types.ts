@@ -374,9 +374,71 @@ export const deleteAccountSchema = z.object({
   confirmText: z.string(),
 });
 
+/** Trust & Safety rejection categories — DOLE fair recruitment + marketplace TOS. */
+export const JOB_REJECTION_CATEGORY_VALUES = [
+  "discriminatory_language",
+  "below_minimum_wage",
+  "spam_scam",
+  "tos_violation",
+  "misleading_incomplete",
+  "prohibited_content",
+  "other",
+] as const;
+
+export type JobRejectionCategory =
+  (typeof JOB_REJECTION_CATEGORY_VALUES)[number];
+
+export const jobRejectionCategorySchema = z.enum(JOB_REJECTION_CATEGORY_VALUES);
+
+export const JOB_REJECTION_CATEGORY_LABELS: Record<
+  JobRejectionCategory,
+  string
+> = {
+  discriminatory_language: "Discriminatory Language",
+  below_minimum_wage: "Below Minimum Wage",
+  spam_scam: "Spam / Scam",
+  tos_violation: "Terms of Service Violation",
+  misleading_incomplete: "Misleading or Incomplete",
+  prohibited_content: "Prohibited Content",
+  other: "Other Policy Violation",
+};
+
+export const JOB_REJECTION_CATEGORY_HINTS: Record<
+  JobRejectionCategory,
+  string
+> = {
+  discriminatory_language:
+    "Age, gender, disability, or other protected-characteristic bias (e.g. RA 10911).",
+  below_minimum_wage:
+    "Offered pay below applicable regional minimum wage standards.",
+  spam_scam: "Duplicate spam, phishing, or fraudulent hiring intent.",
+  tos_violation: "Off-platform payment, unpaid trial work, or other TOS breach.",
+  misleading_incomplete:
+    "False role details, missing material terms, or ghost-job indicators.",
+  prohibited_content:
+    "Illegal, harmful, or otherwise disallowed work under marketplace rules.",
+  other: "Policy issue not covered by the categories above.",
+};
+
 export const moderateJobSchema = z.object({
   jobId: z.string().uuid(),
   reason: z.string().min(3).max(500).optional(),
+});
+
+export const rejectJobSchema = z.object({
+  jobId: z.string().uuid(),
+  category: jobRejectionCategorySchema,
+  reason: z.string().max(1000).optional(),
+});
+
+export const bulkApproveJobsSchema = z.object({
+  jobIds: z.array(z.string().uuid()).min(1).max(50),
+});
+
+export const bulkRejectJobsSchema = z.object({
+  jobIds: z.array(z.string().uuid()).min(1).max(50),
+  category: jobRejectionCategorySchema,
+  reason: z.string().max(1000).optional(),
 });
 
 export const reviewVerificationSchema = z.object({

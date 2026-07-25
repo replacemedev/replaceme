@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { JobRowActionsMenu } from "@/components/admin/jobs/JobRowActionsMenu";
 import { formatMoney } from "@/lib/format/currency";
 import type { AdminJobDeepDive } from "@/actions/admin/deep-dive";
 
@@ -11,13 +12,20 @@ interface JobDeepDiveViewProps {
 export function JobDeepDiveView({ data }: JobDeepDiveViewProps) {
   return (
     <div className="space-y-6">
-      <Link
-        href="/admin/jobs"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
-      >
-        <ArrowLeft className="h-4 w-4" aria-hidden />
-        Back to job moderation
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href="/admin/jobs"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Back to job moderation
+        </Link>
+        <JobRowActionsMenu
+          jobId={data.id}
+          title={data.title}
+          status={data.status}
+        />
+      </div>
 
       <header className="space-y-2">
         <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{data.title}</h2>

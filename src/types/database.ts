@@ -1622,6 +1622,10 @@ export type Database = {
           monthly_salary: number
           paused_reason: string | null
           priority_score: number
+          rejection_category: string | null
+          rejection_reason: string | null
+          rejected_at: string | null
+          rejected_by: string | null
           salary_currency: string
           skills: string[]
           status: string
@@ -1651,6 +1655,10 @@ export type Database = {
           monthly_salary: number
           paused_reason?: string | null
           priority_score?: number
+          rejection_category?: string | null
+          rejection_reason?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
           salary_currency?: string
           skills?: string[]
           status?: string
@@ -1680,6 +1688,10 @@ export type Database = {
           monthly_salary?: number
           paused_reason?: string | null
           priority_score?: number
+          rejection_category?: string | null
+          rejection_reason?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
           salary_currency?: string
           skills?: string[]
           status?: string

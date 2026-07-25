@@ -4,6 +4,7 @@ import {
   ACCOUNT_LIFECYCLE_TIMELINES,
   APPEAL_SLA_COPY,
   DELETION_REQUEST_SUPPORT_EMAIL,
+  DISCOVERY_JOB_APPROVAL_SLA,
 } from "@/lib/data/legal";
 import { LegalSectionHeading } from "./LegalSectionHeading";
 
@@ -320,19 +321,26 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             <ul className="list-disc space-y-2 pl-5">
               <li>
                 <strong className="font-semibold text-slate-800">Discovery</strong> — Free ($0):
-                limited job posting and anonymous candidate previews;
+                limited job posting with human review before publication (target: within{" "}
+                {DISCOVERY_JOB_APPROVAL_SLA.targetBusinessDays} business days; listings stay
+                unpublished until approved — we do not auto-publish overdue Discovery posts), and
+                anonymous candidate previews;
               </li>
               <li>
                 <strong className="font-semibold text-slate-800">Starter</strong> — approximately
-                USD&nbsp;19 / month: unlocks full profiles, messaging, and core hiring tools;
+                USD&nbsp;19 / month: unlocks full profiles, messaging, core hiring tools, and{" "}
+                <strong className="font-semibold text-slate-800">instant job-post publication</strong>
+                ;
               </li>
               <li>
                 <strong className="font-semibold text-slate-800">Growth</strong> — approximately
-                USD&nbsp;39 / month: expanded capacity and features; and
+                USD&nbsp;39 / month: expanded capacity, features, and instant job-post publication;
+                and
               </li>
               <li>
                 <strong className="font-semibold text-slate-800">Scale</strong> — approximately
-                USD&nbsp;79 / month: highest-capacity hiring tools for growing teams.
+                USD&nbsp;79 / month: highest-capacity hiring tools with instant job-post publication
+                for growing teams.
               </li>
             </ul>
             <p>
@@ -376,7 +384,10 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         >
           <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
             <li>
-              Post accurate, non-discriminatory job opportunities and company information;
+              Post accurate, non-discriminatory job opportunities and company information—including
+              compliance with Philippine equal-opportunity rules such as the Anti-Age Discrimination
+              in Employment Act (RA 10911), gender and disability protections, and applicable
+              regional minimum-wage standards for roles performed in or targeting the Philippines;
             </li>
             <li>
               Comply with applicable labor, immigration, occupational safety, and anti-discrimination
@@ -389,6 +400,25 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             <li>
               Use Worker contact details, resumes, and profile data solely for legitimate hiring
               purposes related to the role posted or applied for;
+            </li>
+            <li>
+              <strong className="font-semibold text-slate-800">Job post moderation.</strong> Paid
+              plans publish job posts immediately subject to later removal for policy violations.
+              Discovery posts enter a human review queue (target: within{" "}
+              {DISCOVERY_JOB_APPROVAL_SLA.targetBusinessDays} business days) and remain hidden from
+              Workers until approved. We may refuse, close, hide, or require edits for reasons
+              including discriminatory language, below-minimum-wage offers, spam or scam indicators,
+              Terms violations, misleading or incomplete listings, or prohibited content. When we
+              reject or remove a post, we will notify you (email and/or in-product) with a reason
+              category and any optional moderator explanation, and we may retain an audit record as
+              described in our Privacy Policy. You may contact{" "}
+              <a
+                href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                {DELETION_REQUEST_SUPPORT_EMAIL}
+              </a>{" "}
+              to ask questions or request a review of a moderation decision;
             </li>
             <li>
               <strong className="font-semibold text-slate-800">Strictly prohibited:</strong> selling,
@@ -693,11 +723,16 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         <p>You must not:</p>
         <ul className="list-disc space-y-2 pl-5">
           <li>Violate any law, including labor, privacy, IP, export, or anti-corruption rules;</li>
-          <li>Post fraudulent jobs, fake credentials, or malware;</li>
+          <li>
+            Post fraudulent, spam, scam, ghost, or otherwise non-genuine jobs; discriminatory job
+            ads (including unlawful age, sex, disability, or similar preferences); listings that
+            offer pay below applicable minimum wage; unpaid trial/sample work without clear paid
+            terms; or work that is illegal, harmful, or otherwise prohibited on the Platform;
+          </li>
           <li>Harass, discriminate against, or exploit other users;</li>
           <li>Reverse engineer, scrape at scale, or overload Platform infrastructure;</li>
           <li>Impersonate another person or misrepresent your affiliation; or</li>
-          <li>Interfere with verification, tax, or redress processes required by law.</li>
+          <li>Interfere with verification, tax, moderation, or redress processes required by law.</li>
         </ul>
       </div>
 

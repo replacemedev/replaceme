@@ -5,6 +5,7 @@ export const notificationTypeSchema = z.enum([
   "application_status",
   "new_message",
   "job_invite",
+  "job_moderation",
   "verification_update",
   "identity_verification_request",
   "moderation_queue",
@@ -49,6 +50,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   application_status: "Application",
   new_message: "Message",
   job_invite: "Job invite",
+  job_moderation: "Job moderation",
   verification_update: "Verification",
   identity_verification_request: "Identity review",
   moderation_queue: "Moderation",
@@ -85,6 +87,11 @@ export function getNotificationHref(notification: Notification): string | null {
     }
     case "new_message":
       return notification.action_url ?? "/worker/messages";
+    case "job_moderation": {
+      const jobId = metaId(meta, "job_id");
+      if (jobId) return `/employer/jobs/${jobId}`;
+      return notification.action_url ?? "/employer/jobs";
+    }
     case "worker_acceptance":
       return notification.action_url ?? "/worker/dashboard";
     case "verification_update":

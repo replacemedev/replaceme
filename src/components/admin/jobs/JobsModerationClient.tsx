@@ -3,25 +3,34 @@
 import { useMemo, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Briefcase, Check, Trash2, X, Eye, Search } from "lucide-react";
+import { Briefcase, Check, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import {
-  approveJobPost,
-  deleteJobPost,
-  rejectJobPost,
+  bulkApproveJobPosts,
+  bulkRejectJobPosts,
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
-import type { AdminJobRow } from "@/types/admin.types";
-import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
-import { getAdminJobDeepDive, type AdminJobDeepDive } from "@/actions/admin/deep-dive";
+import type { AdminJobRow, JobRejectionCategory } from "@/types/admin.types";
+import {
+  JOB_REJECTION_CATEGORY_HINTS,
+  JOB_REJECTION_CATEGORY_LABELS,
+  JOB_REJECTION_CATEGORY_VALUES,
+} from "@/types/admin.types";
 import { formatMoney } from "@/lib/format/currency";
 import {
   AdminDataTable,
   AdminMobileCard,
 } from "@/components/admin/shared/AdminDataTable";
+import { JobRowActionsMenu } from "@/components/admin/jobs/JobRowActionsMenu";
+import {
+  discoverySlaSortWeight,
+  getDiscoverySlaState,
+  type DiscoverySlaTone,
+} from "@/lib/jobs/moderation-sla";
+import { DISCOVERY_JOB_APPROVAL_SLA } from "@/lib/data/legal";
 
 const PLAN_LABELS: Record<string, string> = {
   discovery: "Discovery",
@@ -30,38 +39,63 @@ const PLAN_LABELS: Record<string, string> = {
   scale: "Scale",
 };
 
-function PlanTierBadge({ planSlug, requiresManualApproval }: {
+const PAGE_SIZE = 20;
+
+const SLA_BADGE_CLASS: Record<DiscoverySlaTone, string> = {
+  overdue: "bg-red-50 text-red-800 ring-red-600/20",
+  due_soon: "bg-amber-50 text-amber-900 ring-amber-600/20",
+  ok: "bg-slate-50 text-slate-600 ring-slate-500/15",
+};
+
+function SlaBadge({ tone, label }: { tone: DiscoverySlaTone; label: string }) {
+  return (
+    <span
+      className={`inline-flex max-w-full items-center truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${SLA_BADGE_CLASS[tone]}`}
+      title={label}
+    >
+      {tone === "overdue" ? "Overdue" : tone === "due_soon" ? "Due soon" : "In queue"}
+    </span>
+  );
+}
+
+function PlanStack({
+  planSlug,
+  requiresManualApproval,
+  submittedAt,
+  sla,
+}: {
   planSlug: string | null;
   requiresManualApproval: boolean;
+  submittedAt: string | null;
+  sla: ReturnType<typeof getDiscoverySlaState>;
 }) {
   const slug = planSlug ?? "discovery";
   const label = PLAN_LABELS[slug] ?? slug;
 
   return (
-    <div className="flex flex-col items-start gap-1">
-      <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide text-slate-600 whitespace-nowrap">
-        {label}
+    <div className="flex flex-col gap-0.5 min-w-0">
+      <span className="text-sm font-medium text-slate-800">{label}</span>
+      <span className="text-xs text-slate-500">
+        {requiresManualApproval ? "2-day approval queue" : "Instant publish"}
       </span>
-      {requiresManualApproval ? (
-        <span className="text-xs font-medium text-amber-700 whitespace-nowrap">
-          2-day approval queue
+      {submittedAt ? (
+        <span className="text-xs text-slate-400">
+          Submitted {new Date(submittedAt).toLocaleDateString()}
         </span>
-      ) : (
-        <span className="text-xs font-medium text-emerald-700 whitespace-nowrap">
-          Instant publish
-        </span>
-      )}
+      ) : null}
+      {sla ? <SlaBadge tone={sla.tone} label={sla.label} /> : null}
     </div>
   );
 }
 
 interface JobsModerationClientProps {
   jobs: AdminJobRow[];
-  initialFilter?: string;
+  pendingCount: number;
 }
 
 export function JobsModerationClient({
   jobs,
+  pendingCount,
 }: JobsModerationClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -75,161 +109,204 @@ export function JobsModerationClient({
 
   const [searchTerm, setSearchTerm] = useState(activeSearch);
   const [prevActiveSearch, setPrevActiveSearch] = useState(activeSearch);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkRejectOpen, setBulkRejectOpen] = useState(false);
+  const [bulkCategory, setBulkCategory] =
+    useState<JobRejectionCategory>("tos_violation");
+  const [bulkReason, setBulkReason] = useState("");
+  const [pending, startTransition] = useTransition();
 
   if (activeSearch !== prevActiveSearch) {
     setSearchTerm(activeSearch);
     setPrevActiveSearch(activeSearch);
   }
 
-  const [pending, startTransition] = useTransition();
-  const [rejectTarget, setRejectTarget] = useState<AdminJobRow | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<AdminJobRow | null>(null);
-  const [viewTarget, setViewTarget] = useState<AdminJobRow | null>(null);
-  const [viewData, setViewData] = useState<AdminJobDeepDive | null>(null);
-  const [reason, setReason] = useState("");
-
-  // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
     const handler = setTimeout(() => {
-      const currentSearch = new URLSearchParams(window.location.search).get("search") ?? "";
+      const currentSearch =
+        new URLSearchParams(window.location.search).get("search") ?? "";
       if (currentSearch === searchTerm) return;
 
       const params = new URLSearchParams(window.location.search);
-      if (searchTerm) {
-        params.set("search", searchTerm);
-      } else {
-        params.delete("search");
-      }
-      params.delete("page"); // Reset page when search query changes
+      if (searchTerm) params.set("search", searchTerm);
+      else params.delete("search");
+      params.delete("page");
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }, 400);
 
     return () => clearTimeout(handler);
   }, [searchTerm, pathname, router]);
 
-  const handleStatusChange = (val: string) => {
+  const pushFilter = (key: string, val: string, clearWhen = "all") => {
     const params = new URLSearchParams(window.location.search);
-    if (val && val !== "all") {
-      params.set("status", val);
-    } else {
-      params.delete("status");
-    }
-    params.delete("page"); // Reset page on filter change
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  const handlePlanChange = (val: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (val && val !== "all") {
-      params.set("plan", val);
-    } else {
-      params.delete("plan");
-    }
-    params.delete("page"); // Reset page on filter change
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  const handleEmploymentTypeChange = (val: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (val && val !== "all") {
-      params.set("employment_type", val);
-    } else {
-      params.delete("employment_type");
-    }
-    params.delete("page"); // Reset page on filter change
+    if (val && val !== clearWhen) params.set(key, val);
+    else params.delete(key);
+    params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(window.location.search);
-    if (page > 1) {
-      params.set("page", String(page));
-    } else {
-      params.delete("page");
-    }
+    if (page > 1) params.set("page", String(page));
+    else params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const filtered = useMemo(() => {
     let list = jobs;
 
-    // 1. Search Query filtering (multi-field)
     if (activeSearch) {
       const q = activeSearch.toLowerCase().trim();
-      list = list.filter((j) => {
-        return (
+      list = list.filter(
+        (j) =>
           j.title.toLowerCase().includes(q) ||
           (j.company_name?.toLowerCase().includes(q) ?? false) ||
           j.id.toLowerCase().includes(q) ||
           j.employer_id.toLowerCase().includes(q)
-        );
-      });
+      );
     }
 
-    // 2. Status filtering
     if (activeStatus !== "all") {
       list = list.filter((j) => j.status === activeStatus);
     }
 
-    // 3. Plan Tier filtering
     if (activePlan !== "all") {
       list = list.filter((j) => j.plan_slug === activePlan);
     }
 
-    // 4. Employment Type filtering
     if (activeEmploymentType !== "all") {
       list = list.filter((j) => j.employment_type === activeEmploymentType);
     }
 
-    return list;
+    // Discovery queue: overdue first, then due soon, then oldest submission.
+    if (activeStatus !== "Pending Review") {
+      return list;
+    }
+
+    return [...list].sort((a, b) => {
+      const slaA = getDiscoverySlaState({
+        status: a.status,
+        requiresManualApproval: a.requires_manual_approval,
+        submittedForReviewAt: a.submitted_for_review_at,
+      });
+      const slaB = getDiscoverySlaState({
+        status: b.status,
+        requiresManualApproval: b.requires_manual_approval,
+        submittedForReviewAt: b.submitted_for_review_at,
+      });
+      const weight =
+        discoverySlaSortWeight(slaA?.tone ?? null) -
+        discoverySlaSortWeight(slaB?.tone ?? null);
+      if (weight !== 0) return weight;
+      const ta = a.submitted_for_review_at ?? a.created_at;
+      const tb = b.submitted_for_review_at ?? b.created_at;
+      return new Date(ta).getTime() - new Date(tb).getTime();
+    });
   }, [jobs, activeSearch, activeStatus, activePlan, activeEmploymentType]);
 
-  const handleApprove = (jobId: string) => {
-    startTransition(async () => {
-      const result = await approveJobPost(jobId);
-      if (result.success) toast.success("Job approved and published");
-      else toast.error(result.error);
-      if (result.success) router.refresh();
-    });
-  };
+  const slaSummary = useMemo(() => {
+    let overdue = 0;
+    let dueSoon = 0;
+    for (const job of jobs) {
+      const sla = getDiscoverySlaState({
+        status: job.status,
+        requiresManualApproval: job.requires_manual_approval,
+        submittedForReviewAt: job.submitted_for_review_at,
+      });
+      if (sla?.tone === "overdue") overdue += 1;
+      else if (sla?.tone === "due_soon") dueSoon += 1;
+    }
+    return { overdue, dueSoon };
+  }, [jobs]);
 
-  const handleReject = () => {
-    if (!rejectTarget) return;
-    startTransition(async () => {
-      const result = await rejectJobPost(
-        rejectTarget.id,
-        reason || "Did not meet posting guidelines"
-      );
-      if (result.success) {
-        toast.success("Job rejected");
-        setRejectTarget(null);
-        setReason("");
-        router.refresh();
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * PAGE_SIZE;
+  const paginatedJobs = useMemo(
+    () => filtered.slice(startIndex, startIndex + PAGE_SIZE),
+    [filtered, startIndex]
+  );
+
+  const pageIds = paginatedJobs.map((j) => j.id);
+  const allPageSelected =
+    pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleAllPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        for (const id of pageIds) next.delete(id);
       } else {
-        toast.error(result.error);
+        for (const id of pageIds) next.add(id);
       }
+      return next;
     });
   };
 
-  const handleDelete = () => {
-    if (!deleteTarget) return;
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const selectedPendingIds = useMemo(() => {
+    const byId = new Map(jobs.map((j) => [j.id, j]));
+    return [...selectedIds].filter(
+      (id) => byId.get(id)?.status === "Pending Review"
+    );
+  }, [selectedIds, jobs]);
+
+  const handleBulkApprove = () => {
+    if (selectedPendingIds.length === 0) {
+      toast.error("Select at least one pending job to approve.");
+      return;
+    }
     startTransition(async () => {
-      const result = await deleteJobPost(
-        deleteTarget.id,
-        reason || "Removed by admin"
-      );
-      if (result.success) {
-        toast.success("Job deleted");
-        setDeleteTarget(null);
-        setReason("");
-        router.refresh();
-      } else {
+      const result = await bulkApproveJobPosts(selectedPendingIds);
+      if (!result.success) {
         toast.error(result.error);
+        return;
       }
+      toast.success(
+        `Approved ${result.approved ?? selectedPendingIds.length} job(s)`
+      );
+      clearSelection();
+      router.refresh();
     });
   };
 
-
+  const handleBulkReject = () => {
+    if (selectedPendingIds.length === 0) {
+      toast.error("Select at least one pending job to reject.");
+      return;
+    }
+    startTransition(async () => {
+      const result = await bulkRejectJobPosts({
+        jobIds: selectedPendingIds,
+        category: bulkCategory,
+        reason: bulkReason.trim() || undefined,
+      });
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(
+        `Rejected ${result.rejected ?? selectedPendingIds.length} job(s) — employers notified`
+      );
+      setBulkRejectOpen(false);
+      setBulkReason("");
+      setBulkCategory("tos_violation");
+      clearSelection();
+      router.refresh();
+    });
+  };
 
   const isFilterActive =
     activeSearch !== "" ||
@@ -248,18 +325,11 @@ export function JobsModerationClient({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const itemsPerPage = 20;
-  const totalItems = filtered.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const activePage = Math.min(currentPage, totalPages || 1);
-  const startIndex = (activePage - 1) * itemsPerPage;
-  const paginatedJobs = useMemo(() => {
-    return filtered.slice(startIndex, startIndex + itemsPerPage);
-  }, [filtered, startIndex, itemsPerPage]);
+  const selectClassName =
+    "w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer";
 
   return (
     <div className="space-y-4">
-      {/* Search & Multi-faceted Filter Bar */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between bg-white p-4 rounded-xl border border-slate-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -273,12 +343,19 @@ export function JobsModerationClient({
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          {/* Status Filter */}
           <div className="flex-1 md:flex-initial min-w-[140px]">
             <select
               value={activeStatus}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+              onChange={(e) => {
+                const params = new URLSearchParams(window.location.search);
+                params.set("status", e.target.value);
+                params.delete("page");
+                router.push(`${pathname}?${params.toString()}`, {
+                  scroll: false,
+                });
+              }}
+              className={selectClassName}
+              aria-label="Filter by status"
             >
               <option value="all">All Statuses</option>
               <option value="Pending Review">Pending Review</option>
@@ -288,12 +365,12 @@ export function JobsModerationClient({
             </select>
           </div>
 
-          {/* Plan Tier Filter */}
           <div className="flex-1 md:flex-initial min-w-[140px]">
             <select
               value={activePlan}
-              onChange={(e) => handlePlanChange(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+              onChange={(e) => pushFilter("plan", e.target.value)}
+              className={selectClassName}
+              aria-label="Filter by plan"
             >
               <option value="all">All Plans</option>
               <option value="discovery">Discovery</option>
@@ -303,12 +380,12 @@ export function JobsModerationClient({
             </select>
           </div>
 
-          {/* Employment Type Filter */}
           <div className="flex-1 md:flex-initial min-w-[150px]">
             <select
               value={activeEmploymentType}
-              onChange={(e) => handleEmploymentTypeChange(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+              onChange={(e) => pushFilter("employment_type", e.target.value)}
+              className={selectClassName}
+              aria-label="Filter by employment type"
             >
               <option value="all">All Types</option>
               <option value="Full-time">Full-time</option>
@@ -319,8 +396,7 @@ export function JobsModerationClient({
             </select>
           </div>
 
-          {/* Clear Filters Button */}
-          {isFilterActive && (
+          {isFilterActive ? (
             <button
               type="button"
               onClick={handleClearFilters}
@@ -328,9 +404,78 @@ export function JobsModerationClient({
             >
               Clear
             </button>
-          )}
+          ) : null}
         </div>
       </div>
+
+      {someSelected ? (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3">
+          <p className="text-sm font-medium text-slate-800">
+            {selectedIds.size} selected
+            {selectedPendingIds.length !== selectedIds.size
+              ? ` · ${selectedPendingIds.length} pending`
+              : null}
+            {pendingCount > 0 ? (
+              <span className="text-slate-500 font-normal">
+                {" "}
+                · {pendingCount} awaiting review overall
+              </span>
+            ) : null}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              disabled={pending || selectedPendingIds.length === 0}
+              onClick={handleBulkApprove}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
+            >
+              <Check className="h-3.5 w-3.5" aria-hidden />
+              Bulk Approve
+            </button>
+            <button
+              type="button"
+              disabled={pending || selectedPendingIds.length === 0}
+              onClick={() => setBulkRejectOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-50 disabled:opacity-50"
+            >
+              <X className="h-3.5 w-3.5" aria-hidden />
+              Bulk Reject
+            </button>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-white/80"
+            >
+              Clear selection
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {(slaSummary.overdue > 0 || slaSummary.dueSoon > 0) &&
+      activeStatus === "Pending Review" ? (
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            slaSummary.overdue > 0
+              ? "border-red-200 bg-red-50/70 text-red-950"
+              : "border-amber-200 bg-amber-50/70 text-amber-950"
+          }`}
+          role="status"
+        >
+          <p className="font-semibold">
+            Discovery SLA · {DISCOVERY_JOB_APPROVAL_SLA.targetBusinessDays} business-day review
+          </p>
+          <p className="mt-1 text-xs sm:text-sm opacity-90 leading-relaxed">
+            {slaSummary.overdue > 0
+              ? `${slaSummary.overdue} overdue (past ${DISCOVERY_JOB_APPROVAL_SLA.overdueAfterHours}h). `
+              : null}
+            {slaSummary.dueSoon > 0
+              ? `${slaSummary.dueSoon} due soon (past ${DISCOVERY_JOB_APPROVAL_SLA.remindAfterHours}h). `
+              : null}
+            Paid plans stay instant. Discovery never auto-publishes — clear the queue manually.
+          </p>
+        </div>
+      ) : null}
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -348,74 +493,59 @@ export function JobsModerationClient({
             mobileCards={paginatedJobs.map((job) => (
               <AdminMobileCard
                 key={job.id}
+                actionsPlacement="header"
                 actions={
-                  <>
-                    <ActionBtn
-                      label="View"
-                      icon={Eye}
-                      className="text-slate-700 hover:bg-slate-100"
-                      disabled={pending}
-                      onClick={() => {
-                        setViewTarget(job);
-                        setViewData(null);
-                        startTransition(async () => {
-                          const full = await getAdminJobDeepDive(job.id);
-                          if (!full) {
-                            toast.error("Failed to load job details");
-                            return;
-                          }
-                          setViewData(full);
-                        });
-                      }}
-                    />
-                    {job.status === "Pending Review" ? (
-                      <>
-                        <ActionBtn
-                          label="Approve"
-                          icon={Check}
-                          className="text-[#006e2f] hover:bg-[#ebfdf2]"
-                          disabled={pending}
-                          onClick={() => handleApprove(job.id)}
-                        />
-                        <ActionBtn
-                          label="Reject"
-                          icon={X}
-                          className="text-amber-700 hover:bg-amber-50"
-                          disabled={pending}
-                          onClick={() => setRejectTarget(job)}
-                        />
-                      </>
-                    ) : null}
-                    <ActionBtn
-                      label="Delete"
-                      icon={Trash2}
-                      className="text-red-600 hover:bg-red-50"
-                      disabled={pending}
-                      onClick={() => setDeleteTarget(job)}
-                    />
-                  </>
+                  <JobRowActionsMenu
+                    jobId={job.id}
+                    title={job.title}
+                    status={job.status}
+                    onMutated={clearSelection}
+                  />
                 }
               >
-                <div className="flex items-start justify-between gap-2">
-                  <Link
-                    href={`/admin/jobs/${job.id}`}
-                    className="font-bold text-slate-900 hover:text-[#006e2f] hover:underline block"
-                  >
-                    {job.title}
-                  </Link>
-                  <StatusBadge status={job.status} />
-                </div>
-                <p className="text-xs text-slate-500">{job.company_name ?? "—"}</p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
-                  <span>{job.employment_type}</span>
-                  <span>{formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo</span>
-                </div>
-                <div className="flex items-center justify-between border-t border-slate-50 pt-2 text-[10px] text-slate-400">
-                  <PlanTierBadge
-                    planSlug={job.plan_slug}
-                    requiresManualApproval={job.requires_manual_approval}
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(job.id)}
+                    onChange={() => toggleOne(job.id)}
+                    className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                    aria-label={`Select ${job.title}`}
                   />
-                  <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        href={`/admin/jobs/${job.id}`}
+                        className="font-bold text-slate-900 hover:text-emerald-700 hover:underline block"
+                      >
+                        {job.title}
+                      </Link>
+                      <StatusBadge status={job.status} />
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Posted {new Date(job.created_at).toLocaleDateString()}
+                      {job.company_name ? ` · ${job.company_name}` : null}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+                      <span>{job.employment_type}</span>
+                      <span>
+                        {formatMoney(
+                          job.monthly_salary,
+                          job.salary_currency ?? "PHP"
+                        )}
+                        /mo
+                      </span>
+                    </div>
+                    <PlanStack
+                      planSlug={job.plan_slug}
+                      requiresManualApproval={job.requires_manual_approval}
+                      submittedAt={job.submitted_for_review_at}
+                      sla={getDiscoverySlaState({
+                        status: job.status,
+                        requiresManualApproval: job.requires_manual_approval,
+                        submittedForReviewAt: job.submitted_for_review_at,
+                      })}
+                    />
+                  </div>
                 </div>
               </AdminMobileCard>
             ))}
@@ -423,103 +553,84 @@ export function JobsModerationClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={allPageSelected}
+                      onChange={toggleAllPage}
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                      aria-label="Select all on this page"
+                    />
+                  </th>
                   <th className="px-4 py-3">Job</th>
                   <th className="px-4 py-3">Employer</th>
-                  <th className="px-4 py-3 text-left">Plan</th>
+                  <th className="px-4 py-3">Plan</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Salary</th>
-                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {paginatedJobs.map((job) => (
                   <tr key={job.id} className="hover:bg-slate-50/50">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/jobs/${job.id}`}
-                        className="block font-medium text-slate-900 hover:text-emerald-700 hover:underline"
-                      >
-                        {job.title}
-                      </Link>
-                      <p className="text-xs text-slate-400">
-                        {new Date(job.created_at).toLocaleDateString()}
-                      </p>
+                    <td className="px-4 py-3 align-middle">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(job.id)}
+                        onChange={() => toggleOne(job.id)}
+                        className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                        aria-label={`Select ${job.title}`}
+                      />
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 align-middle">
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <Link
+                          href={`/admin/jobs/${job.id}`}
+                          className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
+                        >
+                          {job.title}
+                        </Link>
+                        <span className="text-xs text-slate-500">
+                          Posted {new Date(job.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 align-middle text-slate-600">
                       {job.company_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col items-start gap-1">
-                        <PlanTierBadge
-                          planSlug={job.plan_slug}
-                          requiresManualApproval={job.requires_manual_approval}
-                        />
-                        {job.submitted_for_review_at ? (
-                          <p className="mt-1 text-[10px] text-slate-400 whitespace-nowrap">
-                            Submitted{" "}
-                            {new Date(job.submitted_for_review_at).toLocaleDateString()}
-                          </p>
-                        ) : null}
-                      </div>
+                    <td className="px-4 py-3 align-middle">
+                      <PlanStack
+                        planSlug={job.plan_slug}
+                        requiresManualApproval={job.requires_manual_approval}
+                        submittedAt={job.submitted_for_review_at}
+                        sla={getDiscoverySlaState({
+                          status: job.status,
+                          requiresManualApproval: job.requires_manual_approval,
+                          submittedForReviewAt: job.submitted_for_review_at,
+                        })}
+                      />
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 align-middle text-slate-600">
                       {job.employment_type}
                     </td>
-                    <td className="px-4 py-3 text-slate-600 font-mono text-xs">
-                      {formatMoney(job.monthly_salary, job.salary_currency ?? "PHP")}/mo
+                    <td className="px-4 py-3 align-middle text-slate-600 font-mono text-xs">
+                      {formatMoney(
+                        job.monthly_salary,
+                        job.salary_currency ?? "PHP"
+                      )}
+                      /mo
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-start">
-                        <StatusBadge status={job.status} />
-                      </div>
+                    <td className="px-4 py-3 align-middle">
+                      <StatusBadge status={job.status} />
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-1">
-                        <ActionBtn
-                          label="View"
-                          icon={Eye}
-                          className="text-slate-700 hover:bg-slate-100"
-                          disabled={pending}
-                          onClick={() => {
-                            setViewTarget(job);
-                            setViewData(null);
-                            startTransition(async () => {
-                              const full = await getAdminJobDeepDive(job.id);
-                              if (!full) {
-                                toast.error("Failed to load job details");
-                                return;
-                              }
-                              setViewData(full);
-                            });
-                          }}
-                        />
-                        {job.status === "Pending Review" ? (
-                          <>
-                            <ActionBtn
-                              label="Approve"
-                              icon={Check}
-                              className="text-[#006e2f] hover:bg-[#ebfdf2]"
-                              disabled={pending}
-                              onClick={() => handleApprove(job.id)}
-                            />
-                            <ActionBtn
-                              label="Reject"
-                              icon={X}
-                              className="text-amber-700 hover:bg-amber-50"
-                              disabled={pending}
-                              onClick={() => setRejectTarget(job)}
-                            />
-                          </>
-                        ) : null}
-                        <ActionBtn
-                          label="Delete"
-                          icon={Trash2}
-                          className="text-red-600 hover:bg-red-50"
-                          disabled={pending}
-                          onClick={() => setDeleteTarget(job)}
-                        />
-                      </div>
+                    <td className="px-4 py-3 align-middle text-right">
+                      <JobRowActionsMenu
+                        jobId={job.id}
+                        title={job.title}
+                        status={job.status}
+                        onMutated={clearSelection}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -529,165 +640,66 @@ export function JobsModerationClient({
           <TablePagination
             currentPage={activePage}
             totalItems={totalItems}
-            pageSize={itemsPerPage}
+            pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
           />
         </div>
       )}
 
       <ConfirmDialog
-        open={rejectTarget !== null}
-        title="Reject job post?"
-        description={`"${rejectTarget?.title}" will be closed and hidden from workers.`}
-        confirmLabel="Reject"
+        open={bulkRejectOpen}
+        title="Bulk reject job posts?"
+        description={`${selectedPendingIds.length} pending job(s) will be closed. Each employer receives the same reason category by email and in-app notification.`}
+        confirmLabel="Reject all & notify"
         variant="danger"
         loading={pending}
+        size="lg"
         onCancel={() => {
-          setRejectTarget(null);
-          setReason("");
+          setBulkRejectOpen(false);
+          setBulkReason("");
+          setBulkCategory("tos_violation");
         }}
-        onConfirm={handleReject}
-      />
-
-      <ConfirmDialog
-        open={deleteTarget !== null}
-        title="Delete job post?"
-        description={`Permanently remove "${deleteTarget?.title}". This cannot be undone.`}
-        confirmLabel="Delete"
-        variant="danger"
-        loading={pending}
-        onCancel={() => {
-          setDeleteTarget(null);
-          setReason("");
-        }}
-        onConfirm={handleDelete}
-      />
-
-      {(rejectTarget || deleteTarget) && (
-        <label className="block max-w-md">
-          <span className="text-xs font-medium text-slate-600">
-            Reason (audit log)
-          </span>
-          <input
-            type="text"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          />
-        </label>
-      )}
-
-      <AdminSlideover
-        open={viewTarget !== null}
-        onClose={() => {
-          setViewTarget(null);
-          setViewData(null);
-        }}
-        title={viewTarget?.title ?? "Job post"}
-        description={viewData ? `${viewData.employmentType} • ${formatMoney(viewData.monthlySalary, viewData.salaryCurrency)}/mo` : "Loading…"}
+        onConfirm={handleBulkReject}
       >
-        {!viewData ? (
-          <p className="text-sm font-medium text-slate-500">Loading details…</p>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Employer
-                </p>
-                <p className="mt-1 text-sm font-bold text-slate-900">
-                  {viewData.companyName ?? "—"}
-                </p>
-                <p className="mt-1 text-xs font-mono text-slate-500">
-                  {viewData.employerId}
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Status
-                </p>
-                <div className="mt-1">
-                  <StatusBadge status={viewData.status} />
-                </div>
-                <p className="mt-2 text-xs text-slate-500">
-                  Posted {new Date(viewData.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Description
-              </p>
-              <pre className="mt-2 whitespace-pre-wrap text-sm text-slate-800">
-                {viewData.description}
-              </pre>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Responsibilities
-                </p>
-                <ul className="mt-2 space-y-2 text-sm text-slate-700">
-                  {viewData.parsedSections.responsibilities.length > 0 ? (
-                    viewData.parsedSections.responsibilities.map((i) => (
-                      <li key={i} className="leading-relaxed">
-                        - {i}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-slate-500">—</li>
-                  )}
-                </ul>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Requirements
-                </p>
-                <ul className="mt-2 space-y-2 text-sm text-slate-700">
-                  {viewData.parsedSections.requirements.length > 0 ? (
-                    viewData.parsedSections.requirements.map((i) => (
-                      <li key={i} className="leading-relaxed">
-                        - {i}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-slate-500">—</li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
-      </AdminSlideover>
+        <div className="space-y-4 text-left">
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Reason category <span className="text-red-500">*</span>
+            </span>
+            <select
+              value={bulkCategory}
+              onChange={(e) =>
+                setBulkCategory(e.target.value as JobRejectionCategory)
+              }
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
+            >
+              {JOB_REJECTION_CATEGORY_VALUES.map((value) => (
+                <option key={value} value={value}>
+                  {JOB_REJECTION_CATEGORY_LABELS[value]}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              {JOB_REJECTION_CATEGORY_HINTS[bulkCategory]}
+            </p>
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Additional explanation{" "}
+              <span className="font-normal normal-case text-slate-400">
+                (optional)
+              </span>
+            </span>
+            <textarea
+              value={bulkReason}
+              onChange={(e) => setBulkReason(e.target.value)}
+              rows={3}
+              placeholder="Optional shared note for employers…"
+              className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
+            />
+          </label>
+        </div>
+      </ConfirmDialog>
     </div>
-  );
-}
-
-function ActionBtn({
-  label,
-  icon: Icon,
-  className,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  className: string;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      title={label}
-      disabled={disabled}
-      onClick={onClick}
-      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold disabled:opacity-50 ${className}`}
-    >
-      <Icon className="h-3.5 w-3.5" aria-hidden />
-      <span className="sr-only sm:not-sr-only">{label}</span>
-    </button>
   );
 }

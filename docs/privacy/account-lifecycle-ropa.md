@@ -1,8 +1,8 @@
 # Account lifecycle — ROPA note (internal)
 
 **Audience:** Privacy / Legal / Ops  
-**Last updated:** 2026-07-25  
-**Related:** `src/lib/data/legal.ts` (`ACCOUNT_LIFECYCLE_TIMELINES`, `DATA_RETENTION_PERIODS`), Privacy Policy §9, Terms §11
+**Last updated:** 2026-07-26  
+**Related:** `src/lib/data/legal.ts` (`ACCOUNT_LIFECYCLE_TIMELINES`, `DATA_RETENTION_PERIODS`), Privacy Policy §9, Terms §5.3 / §7 / §11
 
 Short record of processing activities (ROPA-style) for Phase 1 account lifecycle: suspend, soft-delete / anonymize, and legal retention.
 
@@ -15,6 +15,7 @@ Short record of processing activities (ROPA-style) for Phase 1 account lifecycle
 | Applications & messaging | Application materials, in-product messages | While relevant to open roles / activity | Up to **24 months** after relevance ends; closed with account subject to grace | Employer-held unlocked copies are Employer PIC |
 | Billing & tax (subscriptions) | Stripe metadata, invoices, ledger | While subscribed + dispute window | Retain up to **7 years** where tax/accounting law requires | Not erased solely by account closure |
 | Security / fraud / audit | Security logs, abuse signals | Continuous for ops | Up to **24 months** | May outlive account for incident defense |
+| Job post moderation (Trust & Safety) | Rejection/approve metadata, reason category, optional explanation, admin actor | While job exists + post-decision audit | Up to **24 months** after decision unless legal hold | Employer notified on reject; Discovery queued (`queued_2d`), paid instant; daily admin SLA reminder cron (no auto-publish) |
 | Cookie consent records | Consent choice + policy version | Until withdraw or policy bump | Aligned with Cookie Policy version | Account deletion does not clear browser cookies |
 
 ## Operational clocks (source of truth)

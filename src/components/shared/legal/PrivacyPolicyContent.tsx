@@ -182,6 +182,12 @@ export function PrivacyPolicyContent({
             jobs posted, candidates viewed/unlocked, messages, interview notes you enter, and
             plan-usage metrics.
           </CheckItem>
+          <CheckItem label="Job post moderation:">
+            Trust &amp; Safety review outcomes for your listings (for example approve or reject),
+            reason category, optional moderator explanation, related timestamps, and the admin
+            actor recorded for audit—used to enforce marketplace and labor-compliance rules and to
+            notify you of decisions.
+          </CheckItem>
         </ul>
       </RolePanel>
 
@@ -201,7 +207,8 @@ export function PrivacyPolicyContent({
         </CheckItem>
         <CheckItem label="Legitimate interests (balanced):">
           security, fraud prevention, product improvement using aggregated metrics, and enforcing
-          Terms—where consent is not required and rights are not overridden.
+          Terms—including job post moderation and employer notices—where consent is not required and
+          rights are not overridden.
         </CheckItem>
       </ul>
 
@@ -426,10 +433,11 @@ export function PrivacyPolicyContent({
           principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
           investigation requires longer retention. Hired application packets may be retained with
           employment or contract records under applicable employment and tax rules. Platform
-          administrators may access application contents only for Trust &amp; Safety, fraud
-          prevention, abuse investigation, legal compliance, and support—under least-privilege
-          access controls with audit logging. You may exercise privacy rights as described in
-          Section 11.
+          administrators may access application contents and job post moderation records only for
+          Trust &amp; Safety, fraud prevention, abuse investigation, legal compliance, and
+          support—under least-privilege access controls with audit logging. Job post moderation
+          decisions (including reason category and optional explanation) are retained as listed in
+          the retention table above. You may exercise privacy rights as described in Section 11.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">

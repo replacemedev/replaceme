@@ -4,7 +4,17 @@
 
 import type { PageContentMeta } from "@/types/page-content";
 
-export const LEGAL_LAST_UPDATED = "July 25, 2026";
+/** Discovery plan: human review SLA before publish (not auto-approve). */
+export const DISCOVERY_JOB_APPROVAL_SLA = {
+  /** Marketing / Terms: review within this many business days. */
+  targetBusinessDays: 2,
+  /** Ops badge: warn admins after this many hours pending. */
+  remindAfterHours: 24,
+  /** Ops badge: mark overdue after this many hours (≈ 2 calendar days). */
+  overdueAfterHours: 48,
+} as const;
+
+export const LEGAL_LAST_UPDATED = "July 26, 2026";
 
 export const PRIVACY_PAGE_META: PageContentMeta = {
   lastUpdated: LEGAL_LAST_UPDATED,
@@ -67,6 +77,11 @@ export const DATA_RETENTION_PERIODS = [
   {
     category: "Security / audit logs",
     period: "Up to 24 months for fraud prevention and incident response",
+  },
+  {
+    category: "Job post moderation records",
+    period:
+      "Up to 24 months after a moderation decision (approve / reject / remove), including reason category and optional explanation, for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer",
   },
   {
     category: "Cookie consent records",

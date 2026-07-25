@@ -17,6 +17,9 @@ import {
 import {
   EMPTY_PLATFORM_METRICS,
   moderateJobSchema,
+  rejectJobSchema,
+  bulkApproveJobsSchema,
+  bulkRejectJobsSchema,
   platformMetricsSchema,
   reviewVerificationSchema,
   suspendUserSchema,
@@ -51,6 +54,10 @@ import {
   executeAccountErasure,
   scheduleAccountDeletion,
 } from "@/lib/server/privacy/erase-account";
+import {
+  notifyEmployerJobApproved,
+  notifyEmployerJobRejected,
+} from "@/lib/server/privacy/job-moderation-notify";
 
 const ADMIN_PATHS = [
   "/admin/dashboard",
@@ -406,28 +413,40 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
     const { supabase, user } = await requireAdmin();
 
+    const { data: existing, error: loadError } = await supabase
+      .from("jobs")
+      .select("id, title, employer_id, status")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (loadError) throw new Error(loadError.message);
+    if (!existing) throw new Error("Job not found");
+
     const { error } = await supabase
       .from("jobs")
       .update({
         status: "Active",
         approved_at: new Date().toISOString(),
         approved_by: user.id,
+        rejection_category: null,
+        rejection_reason: null,
+        rejected_at: null,
+        rejected_by: null,
       })
       .eq("id", id);
 
     if (error) throw new Error(error.message);
 
-    const { data: job } = await supabase
-      .from("jobs")
-      .select("employer_id")
-      .eq("id", id)
-      .maybeSingle();
-
-    if (job?.employer_id) {
+    if (existing.employer_id) {
       const { invalidateEmployerCache } = await import(
         "@/lib/server/entitlements"
       );
-      await invalidateEmployerCache(job.employer_id);
+      await invalidateEmployerCache(existing.employer_id);
+      await notifyEmployerJobApproved({
+        employerId: existing.employer_id,
+        jobId: id,
+        jobTitle: existing.title,
+      });
     }
 
     await logAdminAction("approve_job", "job", id);
@@ -436,37 +455,139 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to approve job",
+      error: actionErrorMessage(err, "Failed to approve job"),
     };
   }
 }
 
-export async function rejectJobPost(
-  jobId: string,
-  reason: string
-): Promise<ActionResult> {
+export async function rejectJobPost(input: {
+  jobId: string;
+  category: string;
+  reason?: string;
+}): Promise<ActionResult> {
   try {
-    const parsed = moderateJobSchema.parse({ jobId, reason });
-    const { supabase } = await requireAdmin();
+    const parsed = rejectJobSchema.parse(input);
+    const { supabase, user } = await requireAdmin();
+    const trimmedReason = parsed.reason?.trim() || null;
+    const now = new Date().toISOString();
+
+    const { data: existing, error: loadError } = await supabase
+      .from("jobs")
+      .select("id, title, employer_id, status")
+      .eq("id", parsed.jobId)
+      .maybeSingle();
+
+    if (loadError) throw new Error(loadError.message);
+    if (!existing) throw new Error("Job not found");
 
     const { error } = await supabase
       .from("jobs")
-      .update({ status: "Closed" })
+      .update({
+        status: "Closed",
+        rejection_category: parsed.category,
+        rejection_reason: trimmedReason,
+        rejected_at: now,
+        rejected_by: user.id,
+      })
       .eq("id", parsed.jobId);
 
     if (error) throw new Error(error.message);
 
+    if (existing.employer_id) {
+      const { invalidateEmployerCache } = await import(
+        "@/lib/server/entitlements"
+      );
+      await invalidateEmployerCache(existing.employer_id);
+      await notifyEmployerJobRejected({
+        employerId: existing.employer_id,
+        jobId: parsed.jobId,
+        jobTitle: existing.title,
+        category: parsed.category,
+        reason: trimmedReason,
+      });
+    }
+
     await logAdminAction("reject_job", "job", parsed.jobId, {
-      reason: parsed.reason,
+      category: parsed.category,
+      reason: trimmedReason,
     });
     await revalidateAdminSurfaces();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to reject job",
+      error: actionErrorMessage(err, "Failed to reject job"),
     };
   }
+}
+
+export async function bulkApproveJobPosts(
+  jobIds: string[]
+): Promise<ActionResult & { approved?: number }> {
+  try {
+    const parsed = bulkApproveJobsSchema.parse({ jobIds });
+    let approved = 0;
+    for (const jobId of parsed.jobIds) {
+      const result = await approveJobPost(jobId);
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+          approved,
+        };
+      }
+      approved += 1;
+    }
+    return { success: true, approved };
+  } catch (err) {
+    return {
+      success: false,
+      error: actionErrorMessage(err, "Failed to bulk approve jobs"),
+    };
+  }
+}
+
+export async function bulkRejectJobPosts(input: {
+  jobIds: string[];
+  category: string;
+  reason?: string;
+}): Promise<ActionResult & { rejected?: number }> {
+  try {
+    const parsed = bulkRejectJobsSchema.parse(input);
+    let rejected = 0;
+    for (const jobId of parsed.jobIds) {
+      const result = await rejectJobPost({
+        jobId,
+        category: parsed.category,
+        reason: parsed.reason,
+      });
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+          rejected,
+        };
+      }
+      rejected += 1;
+    }
+    return { success: true, rejected };
+  } catch (err) {
+    return {
+      success: false,
+      error: actionErrorMessage(err, "Failed to bulk reject jobs"),
+    };
+  }
+}
+
+export async function countJobsPendingReview(): Promise<number> {
+  const { supabase } = await requireAdmin();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "Pending Review");
+
+  if (error) throw new Error(error.message);
+  return count ?? 0;
 }
 
 export async function deleteJobPost(
@@ -845,7 +966,10 @@ export async function fetchAdminUsersPageData(): Promise<
 }
 
 export async function fetchAdminJobs(
-  status?: string
+  filters?: {
+    status?: string | null;
+    search?: string;
+  }
 ): Promise<AdminJobRow[]> {
   const { supabase } = await requireAdmin();
 
@@ -874,8 +998,20 @@ export async function fetchAdminJobs(
     )
     .order("created_at", { ascending: false });
 
-  if (status) {
-    query = query.eq("status", status);
+  const statusFilter = filters?.status;
+  if (statusFilter && statusFilter !== "all") {
+    query = query.eq("status", statusFilter);
+  }
+
+  const search = filters?.search?.trim();
+  if (search) {
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        search
+      );
+    query = isUuid
+      ? query.or(`title.ilike.%${search}%,id.eq.${search}`)
+      : query.ilike("title", `%${search}%`);
   }
 
   const { data, error } = await query;
