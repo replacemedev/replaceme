@@ -150,7 +150,9 @@ export function PrivacyPolicyContent({
           </CheckItem>
           <CheckItem label="Representatives:">
             name, work email, phone, role/title, and authentication data for hiring managers and
-            billing contacts.
+            billing contacts. We do{" "}
+            <strong className="font-semibold text-slate-800">not</strong> collect employer TIN, EIN,
+            or other statutory tax identification numbers as part of employer account profiles.
           </CheckItem>
           <CheckItem label="Financial / billing:">
             subscription tier, invoices, payment status, and billing contact details. Full payment

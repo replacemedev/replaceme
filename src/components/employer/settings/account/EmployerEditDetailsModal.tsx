@@ -17,7 +17,6 @@ interface EmployerEditDetailsModalProps {
     gender: string;
     civilStatus: string;
     phoneNumber: string;
-    tinNumber: string;
     personalAddress: string;
     personalCity: string;
     personalStateProvince: string;
@@ -41,7 +40,6 @@ export function EmployerEditDetailsModal({
   const [gender, setGender] = useState(initial.gender);
   const [civilStatus, setCivilStatus] = useState(initial.civilStatus);
   const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
-  const [tinNumber, setTinNumber] = useState(initial.tinNumber);
   const [personalAddress, setPersonalAddress] = useState(initial.personalAddress);
   const [personalCity, setPersonalCity] = useState(initial.personalCity);
   const [personalStateProvince, setPersonalStateProvince] = useState(initial.personalStateProvince);
@@ -57,7 +55,6 @@ export function EmployerEditDetailsModal({
         gender: gender || null,
         civilStatus: civilStatus || null,
         phoneNumber: phoneNumber || null,
-        tinNumber: tinNumber || null,
         personalAddress: personalAddress || null,
         personalCity: personalCity || null,
         personalStateProvince: personalStateProvince || null,
@@ -239,20 +236,6 @@ export function EmployerEditDetailsModal({
               />
             </label>
           </div>
-        </div>
-
-        {/* Statutory Details */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Statutory Details</h3>
-          <label className="block space-y-1 text-xs font-bold text-slate-500">
-            TIN / EIN Number
-            <input
-              value={tinNumber}
-              onChange={(e) => setTinNumber(e.target.value)}
-              placeholder="Tax ID Number"
-              className={inputClass}
-            />
-          </label>
         </div>
       </div>
     </ProfileModal>

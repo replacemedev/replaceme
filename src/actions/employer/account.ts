@@ -15,7 +15,6 @@ export type EmployerAccountDetails = {
   gender: string | null;
   civilStatus: string | null;
   phoneNumber: string | null;
-  tinNumber: string | null;
   personalAddress: string | null;
   personalCity: string | null;
   personalStateProvince: string | null;
@@ -34,7 +33,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name, username, email, avatar_url, role, birth_date, gender, civil_status, phone_number, tin_number, personal_address, personal_city, personal_state_province, country")
+      .select("first_name, middle_name, last_name, username, email, avatar_url, role, birth_date, gender, civil_status, phone_number, personal_address, personal_city, personal_state_province, country")
       .eq("id", user.id)
       .single();
 
@@ -52,7 +51,6 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
       gender: profile.gender,
       civilStatus: profile.civil_status,
       phoneNumber: profile.phone_number,
-      tinNumber: profile.tin_number,
       personalAddress: profile.personal_address,
       personalCity: profile.personal_city,
       personalStateProvince: profile.personal_state_province,
@@ -72,7 +70,6 @@ export async function updateEmployerAccountDetails(data: {
   gender?: string | null;
   civilStatus?: string | null;
   phoneNumber?: string | null;
-  tinNumber?: string | null;
   personalAddress?: string | null;
   personalCity?: string | null;
   personalStateProvince?: string | null;
@@ -97,7 +94,7 @@ export async function updateEmployerAccountDetails(data: {
         gender: data.gender || null,
         civil_status: data.civilStatus || null,
         phone_number: data.phoneNumber || null,
-        tin_number: data.tinNumber || null,
+        tin_number: null,
         personal_address: data.personalAddress || null,
         personal_city: data.personalCity || null,
         personal_state_province: data.personalStateProvince || null,

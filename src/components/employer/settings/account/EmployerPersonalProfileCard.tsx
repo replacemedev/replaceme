@@ -104,16 +104,6 @@ export function EmployerPersonalProfileCard({
             </div>
           </dl>
         </div>
-
-        <div className="border-t border-slate-50 pt-6">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Statutory Details</h3>
-          <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">TIN / EIN Number</dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">{account.tinNumber ?? "—"}</dd>
-            </div>
-          </dl>
-        </div>
       </div>
 
       <EmployerEditDetailsModal
@@ -127,7 +117,6 @@ export function EmployerPersonalProfileCard({
           gender: account.gender || "",
           civilStatus: account.civilStatus || "",
           phoneNumber: account.phoneNumber || "",
-          tinNumber: account.tinNumber || "",
           personalAddress: account.personalAddress || "",
           personalCity: account.personalCity || "",
           personalStateProvince: account.personalStateProvince || "",

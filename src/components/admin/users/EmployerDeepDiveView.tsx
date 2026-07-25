@@ -136,11 +136,7 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-4 text-sm">
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">TIN</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.tinNumber ?? "—"}</p>
-            </div>
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 text-sm">
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">ID Verification</p>
               <p className="font-semibold text-slate-700 mt-1">

@@ -495,9 +495,10 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             arrangement applies.
           </li>
           <li>
-            <strong className="font-semibold text-slate-800">Invoices &amp; tax IDs:</strong> You
-            agree to provide accurate billing contact, company, and tax-identification details when
-            requested so that invoices and tax documentation can be issued correctly.
+            <strong className="font-semibold text-slate-800">Invoices:</strong> You
+            agree to provide accurate billing contact and company details when
+            requested so that invoices can be issued correctly. Replaceme does not collect
+            employer TIN, EIN, or other statutory tax IDs as part of employer account profiles.
           </li>
         </ul>
       </div>

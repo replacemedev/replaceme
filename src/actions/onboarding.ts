@@ -69,7 +69,6 @@ export type EmployerOnboardingDraft = {
   gender: string;
   civilStatus: string;
   phoneNumber: string;
-  tinNumber: string;
   personalAddress: string;
   personalCity: string;
   personalStateProvince: string;
@@ -209,7 +208,7 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
     const [{ data: profile }, { data: company }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("skills, birth_date, gender, civil_status, phone_number, tin_number, personal_address, personal_city, personal_state_province, country")
+        .select("skills, birth_date, gender, civil_status, phone_number, personal_address, personal_city, personal_state_province, country")
         .eq("id", user.id)
         .single(),
       supabase
@@ -231,7 +230,6 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       gender: profile?.gender ?? "",
       civilStatus: profile?.civil_status ?? "",
       phoneNumber: profile?.phone_number ?? "",
-      tinNumber: profile?.tin_number ?? "",
       personalAddress: profile?.personal_address ?? "",
       personalCity: profile?.personal_city ?? "",
       personalStateProvince: profile?.personal_state_province ?? "",
@@ -424,7 +422,7 @@ export async function saveEmployerOnboardingStep(
             gender: parsed.gender || null,
             civil_status: parsed.civilStatus || null,
             phone_number: parsed.phoneNumber,
-            tin_number: parsed.tinNumber || null,
+            tin_number: null,
             personal_address: parsed.personalAddress || null,
             personal_city: parsed.personalCity || null,
             personal_state_province: parsed.personalStateProvince || null,

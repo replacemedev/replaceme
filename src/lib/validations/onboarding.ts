@@ -131,7 +131,6 @@ export const employerPersonalStepSchema = z.object({
   gender: z.string().min(1, "Gender is required."),
   civilStatus: z.string().min(1, "Civil status is required."),
   phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25),
-  tinNumber: z.string().min(1, "TIN/EIN is required."),
   personalAddress: z.string().min(1, "Address is required."),
   personalCity: z.string().min(1, "City is required."),
   personalStateProvince: z.string().min(1, "State/Province is required."),

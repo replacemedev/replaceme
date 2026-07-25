@@ -48,12 +48,11 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
   const [companyBio, setCompanyBio] = useState(draft.companyBio);
   const [logoUrl, setLogoUrl] = useState<string | null>(draft.logoUrl);
 
-  // Employer Personal KYC State
+  // Employer Personal Details State
   const [birthDate, setBirthDate] = useState(draft.birthDate || "");
   const [gender, setGender] = useState(draft.gender || "");
   const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
   const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
-  const [tinNumber, setTinNumber] = useState(draft.tinNumber || "");
   const [personalAddress, setPersonalAddress] = useState(draft.personalAddress || "");
   const [personalCity, setPersonalCity] = useState(draft.personalCity || "");
   const [personalStateProvince, setPersonalStateProvince] = useState(draft.personalStateProvince || "");
@@ -275,7 +274,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
     !gender ||
     !civilStatus ||
     !phoneNumber.trim() ||
-    !tinNumber.trim() ||
     !personalAddress.trim() ||
     !personalCity.trim() ||
     !personalStateProvince.trim() ||
@@ -297,7 +295,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
             gender,
             civilStatus,
             phoneNumber: phoneNumber.trim(),
-            tinNumber: tinNumber.trim(),
             personalAddress: personalAddress.trim(),
             personalCity: personalCity.trim(),
             personalStateProvince: personalStateProvince.trim(),
@@ -417,21 +414,6 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
               />
             </label>
           </div>
-        </div>
-
-        <div className="border-t border-slate-100 pt-4 space-y-4">
-          <h3 className="text-sm font-bold text-slate-900">Statutory Details</h3>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            TIN / EIN Number
-            <input
-              type="text"
-              required
-              value={tinNumber}
-              onChange={(e) => setTinNumber(e.target.value)}
-              placeholder="Tax ID Number"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-            />
-          </label>
         </div>
       </div>
     </OnboardingWizardShell>

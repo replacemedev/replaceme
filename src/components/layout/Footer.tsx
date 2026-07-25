@@ -89,6 +89,17 @@ export function Footer() {
           <p className="text-sm text-gray-500">
             © {new Date().getFullYear()} Replaceme. All rights reserved.
           </p>
+          <p className="text-xs text-gray-400 text-center sm:text-right max-w-md">
+            We do not collect employer TIN/EIN numbers. See our{" "}
+            <Link href="/privacy-policy" className="underline hover:text-emerald-600 transition-colors">
+              Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link href="/terms-of-service" className="underline hover:text-emerald-600 transition-colors">
+              Terms
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </footer>
