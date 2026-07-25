@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { HELP_INDEX_FALLBACK } from "@/lib/content/page-fallbacks";
-import type { HelpArticleConfig, HelpCategoryConfig, HelpIndexConfig } from "@/types/page-content";
+import { HELP_INDEX } from "@/lib/data/publicPages";
+import type { HelpArticleConfig, HelpCategoryConfig } from "@/types/page-content";
 import type { Metadata } from "next";
 import {
   Briefcase,
@@ -44,8 +43,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-export const dynamic = "force-dynamic";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Briefcase,
@@ -98,19 +95,9 @@ function getCategoryIcon(categoryId: string) {
   }
 }
 
-export default async function HelpCenterPage() {
-  const cms = await getPublishedPageContent("help-index");
-  const config: HelpIndexConfig = {
-    ...HELP_INDEX_FALLBACK,
-    ...(cms?.contentJson as Partial<HelpIndexConfig>),
-    title: cms?.title ?? HELP_INDEX_FALLBACK.title,
-    description: (cms?.meta?.description as string | undefined) ?? HELP_INDEX_FALLBACK.description,
-  };
-
-  const categories: HelpCategoryConfig[] =
-    config.categories && config.categories.length > 0
-      ? config.categories
-      : HELP_INDEX_FALLBACK.categories ?? [];
+export default function HelpCenterPage() {
+  const config = HELP_INDEX;
+  const categories: HelpCategoryConfig[] = config.categories ?? [];
 
   return (
     <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] ${PUBLIC_PAGE_TOP}`}>

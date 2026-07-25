@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { COOKIE_POLICY_VERSION } from "@/lib/data/publicPages";
 
 export const cookieConsentActionSchema = z.enum([
   "accept_all",

@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -35,7 +33,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -172,9 +169,7 @@ function EmployerHiringGuideFallback() {
   );
 }
 
-export default async function EmployerHiringGuidePage() {
-  const cms = await getPublishedPageContent("help-employer-hiring-guide");
-
+export default function EmployerHiringGuidePage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,19 +179,14 @@ export default async function EmployerHiringGuidePage() {
             <span>Employer Playbook</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Employer Hiring Guide"}
+            Employer Hiring Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "A simple step-by-step playbook to find, message, and hire top remote talent on Replaceme."}
+            A simple step-by-step playbook to find, message, and hire top remote talent on Replaceme.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<EmployerHiringGuideFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <EmployerHiringGuideFallback />
       </div>
     </main>
   );

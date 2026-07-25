@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -34,7 +32,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const BILLING_RULES = [
   {
@@ -55,7 +52,7 @@ const BILLING_RULES = [
   {
     title: "Direct Worker Payments (0% Commission)",
     icon: ShieldCheck,
-    copy: "Replaceme does not process employee payroll. You pay your workers 100% of their agreed wage directly using Wise, PayPal, bank transfer, or crypto. 0% is deducted from worker pay.",
+    copy: "Replaceme does not process employee payroll. You and your hire agree on payment terms off-platform. Common options employers use include Wise, PayPal, or bank transfer. Replaceme does not provide or endorse any payment rail. 0% is deducted from worker pay by Replaceme.",
   },
 ];
 
@@ -122,9 +119,7 @@ function EmployerBillingFallback() {
   );
 }
 
-export default async function EmployerBillingPage() {
-  const cms = await getPublishedPageContent("help-employer-billing-subscriptions");
-
+export default function EmployerBillingPage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,19 +129,14 @@ export default async function EmployerBillingPage() {
             <span>Employer Billing</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Billing & Subscriptions Guide"}
+            Billing & Subscriptions Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "Understand Replaceme's flat-rate employer subscription plans, Stripe USD billing, instant job approvals, and 0% salary commission rules."}
+            Understand Replaceme's flat-rate employer subscription plans, Stripe USD billing, instant job approvals, and 0% salary commission rules.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<EmployerBillingFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <EmployerBillingFallback />
       </div>
     </main>
   );

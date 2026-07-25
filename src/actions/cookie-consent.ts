@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { COOKIE_POLICY_VERSION } from "@/lib/data/publicPages";
 import { fail, ok, runAction, type ActionResult } from "@/lib/server/action-result";
 import { saveCookieConsentSchema } from "@/lib/validations/cookie-consent";
 import type { CookieConsentPreferences } from "@/lib/cookie-consent/types";

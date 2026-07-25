@@ -1,17 +1,3 @@
-export type PageContentType = "html" | "json";
-
-export interface PageContentRow {
-  id: string;
-  slug: string;
-  title: string;
-  contentType: PageContentType;
-  body: string | null;
-  contentJson: Record<string, unknown>;
-  meta: PageContentMeta;
-  isPublished: boolean;
-  updatedAt: string;
-}
-
 export interface PageContentMeta {
   lastUpdated?: string;
   badge?: string;
@@ -53,22 +39,6 @@ export interface ContactPageConfig {
   email: string;
 }
 
-export interface AuthScreenConfig {
-  headline: string;
-  description: string;
-  signupPrompt?: string;
-  signupLinkLabel?: string;
-  testimonialQuote?: string;
-  testimonialName?: string;
-  testimonialRole?: string;
-}
-
-export type AuthScreenSlug =
-  | "auth-login"
-  | "auth-signup"
-  | "auth-forgot-password"
-  | "auth-update-password";
-
 export interface FaqEntry {
   id: string;
   question: string;
@@ -77,12 +47,4 @@ export interface FaqEntry {
 
 export interface FaqPageConfig {
   items: FaqEntry[];
-}
-
-export interface PageContentDefinition {
-  slug: string;
-  label: string;
-  publicPath: string;
-  contentType: PageContentType;
-  description: string;
 }

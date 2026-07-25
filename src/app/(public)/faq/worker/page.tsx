@@ -1,8 +1,5 @@
 import { PublicFaqPage } from "@/components/shared/faq/PublicFaqPage";
-import {
-  WORKER_FAQ_FALLBACK,
-  WORKER_FAQ_FALLBACK_META,
-} from "@/lib/content/faq-fallbacks";
+import { WORKER_FAQ, WORKER_FAQ_META } from "@/lib/data/publicPages";
 import { FAQSchema } from "@/components/seo";
 import type { Metadata } from "next";
 
@@ -30,19 +27,13 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 export default function WorkerFaqPage() {
   return (
     <>
-      <FAQSchema items={WORKER_FAQ_FALLBACK.items.map(({ question, answer }) => ({ question, answer }))} />
-      <PublicFaqPage
-        slug="worker-faq"
-        defaultTitle="Worker FAQs"
-        fallback={WORKER_FAQ_FALLBACK}
-        fallbackMeta={WORKER_FAQ_FALLBACK_META}
+      <FAQSchema
+        items={WORKER_FAQ.items.map(({ question, answer }) => ({ question, answer }))}
       />
+      <PublicFaqPage title="Worker FAQs" config={WORKER_FAQ} meta={WORKER_FAQ_META} />
     </>
   );
 }
-

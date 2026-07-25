@@ -1,8 +1,6 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
 import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import { PrivacyPolicyContent } from "@/components/shared/legal/PrivacyPolicyContent";
-import { PRIVACY_FALLBACK_META } from "@/lib/content/page-fallbacks";
+import { PRIVACY_PAGE_META } from "@/lib/data/publicPages";
 import type { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -20,21 +18,16 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function PrivacyPolicyPage() {
-  const cms = await getPublishedPageContent("privacy-policy");
-  const meta = { ...PRIVACY_FALLBACK_META, ...cms?.meta };
-
+export default function PrivacyPolicyPage() {
   return (
     <LegalPageLayout
-      badge={meta.badge ?? PRIVACY_FALLBACK_META.badge!}
-      badgeVariant={meta.badgeVariant ?? "pill"}
-      title={cms?.title ?? "Privacy Policy"}
-      lastUpdated={meta.lastUpdated ?? PRIVACY_FALLBACK_META.lastUpdated!}
-      wide={meta.wide ?? true}
+      badge={PRIVACY_PAGE_META.badge!}
+      badgeVariant={PRIVACY_PAGE_META.badgeVariant ?? "pill"}
+      title="Privacy Policy"
+      lastUpdated={PRIVACY_PAGE_META.lastUpdated!}
+      wide={PRIVACY_PAGE_META.wide ?? true}
     >
-      <CmsHtmlContent html={cms?.body} fallback={<PrivacyPolicyContent />} />
+      <PrivacyPolicyContent />
     </LegalPageLayout>
   );
 }

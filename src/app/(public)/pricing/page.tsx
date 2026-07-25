@@ -1,9 +1,7 @@
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
-import { getPublishedPageContent } from "@/actions/public/page-content";
 import { getPricingData } from "@/actions/employer/pricing";
 import { PublicPricingClient } from "@/components/public/PublicPricingClient";
-import { PRICING_FALLBACK } from "@/lib/content/page-fallbacks";
-import type { PricingPageConfig } from "@/types/page-content";
+import { PRICING_PAGE } from "@/lib/data/publicPages";
 import { FAQSchema } from "@/components/seo";
 import type { Metadata } from "next";
 
@@ -31,8 +29,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
 const PRICING_FAQ_FALLBACK = [
   {
     question: "How much does it cost to hire Filipino remote workers on Replaceme?",
@@ -57,16 +53,7 @@ const PRICING_FAQ_FALLBACK = [
 ];
 
 export default async function PublicPricingPage() {
-  const [cms, pricing] = await Promise.all([
-    getPublishedPageContent("pricing"),
-    getPricingData(),
-  ]);
-
-  const config = {
-    ...PRICING_FALLBACK,
-    ...(cms?.contentJson as Partial<PricingPageConfig>),
-  };
-
+  const pricing = await getPricingData();
   const schemaFaqs = pricing.faqs.length > 0 ? pricing.faqs : PRICING_FAQ_FALLBACK;
 
   return (
@@ -75,9 +62,11 @@ export default async function PublicPricingPage() {
       <div className={`bg-[#f8fafe] min-h-screen ${PUBLIC_PAGE_TOP}`}>
         <header className="text-center max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
-            {config.headline}
+            {PRICING_PAGE.headline}
           </h1>
-          <p className="text-slate-500 font-medium text-base sm:text-lg mt-3 sm:mt-4">{config.description}</p>
+          <p className="text-slate-500 font-medium text-base sm:text-lg mt-3 sm:mt-4">
+            {PRICING_PAGE.description}
+          </p>
         </header>
 
         <PublicPricingClient

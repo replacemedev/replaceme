@@ -8,7 +8,6 @@ import {
   DollarSign,
   Fingerprint,
   Scale,
-  FileText,
   Bell,
   ClipboardList,
   MessageSquare,
@@ -46,7 +45,6 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: UserCog,
     superAdminOnly: true,
   },
-  { href: "/admin/settings/pages", label: "Public Pages", icon: FileText },
 ];
 
 export const ADMIN_NOTIFICATIONS_HREF = "/admin/notifications";
@@ -95,7 +93,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         "/admin/security",
         "/admin/settings",
         "/admin/settings/team",
-        "/admin/settings/pages",
       ].includes(item.href)
     ),
   },

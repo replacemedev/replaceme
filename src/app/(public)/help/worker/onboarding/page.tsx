@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -35,7 +33,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -57,7 +54,7 @@ const STEPS = [
     icon: DollarSign,
     badgeText: "100% Direct Pay",
     summary:
-      "Choose your preferred payment method directly with your employer (Wise, PayPal, bank transfer, or crypto).",
+      "Agree payment terms directly with your employer off-platform. Common options include Wise, PayPal, or bank transfer—Replaceme does not process or endorse any payment method.",
     details: [
       "Replaceme does NOT process payroll or take deductions from your salary.",
       "You receive 100% of the compensation agreed upon with your client.",
@@ -171,9 +168,7 @@ function WorkerOnboardingFallback() {
   );
 }
 
-export default async function WorkerOnboardingPage() {
-  const cms = await getPublishedPageContent("help-worker-onboarding");
-
+export default function WorkerOnboardingPage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -183,19 +178,14 @@ export default async function WorkerOnboardingPage() {
             <span>Worker Onboarding</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Worker Onboarding Guide"}
+            Worker Onboarding Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "Understand direct payment arrangements, working expectations, keeping 100% of your salary, and long-term remote client success on Replaceme."}
+            Understand direct payment arrangements, working expectations, keeping 100% of your salary, and long-term remote client success on Replaceme.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<WorkerOnboardingFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <WorkerOnboardingFallback />
       </div>
     </main>
   );

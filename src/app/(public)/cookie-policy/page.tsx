@@ -1,8 +1,6 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
 import { LegalPageLayout } from "@/components/shared/LegalPageLayout";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import { CookiePolicyContent } from "@/components/shared/legal/CookiePolicyContent";
-import { COOKIE_FALLBACK_META } from "@/lib/content/page-fallbacks";
+import { COOKIE_PAGE_META } from "@/lib/data/publicPages";
 import type { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -20,21 +18,16 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function CookiePolicyPage() {
-  const cms = await getPublishedPageContent("cookie-policy");
-  const meta = { ...COOKIE_FALLBACK_META, ...cms?.meta };
-
+export default function CookiePolicyPage() {
   return (
     <LegalPageLayout
-      badge={meta.badge ?? COOKIE_FALLBACK_META.badge!}
-      badgeVariant={meta.badgeVariant ?? "pill"}
-      title={cms?.title ?? "Cookie Policy"}
-      lastUpdated={meta.lastUpdated ?? COOKIE_FALLBACK_META.lastUpdated!}
-      wide={meta.wide ?? true}
+      badge={COOKIE_PAGE_META.badge!}
+      badgeVariant={COOKIE_PAGE_META.badgeVariant ?? "pill"}
+      title="Cookie Policy"
+      lastUpdated={COOKIE_PAGE_META.lastUpdated!}
+      wide={COOKIE_PAGE_META.wide ?? true}
     >
-      <CmsHtmlContent html={cms?.body} fallback={<CookiePolicyContent />} />
+      <CookiePolicyContent />
     </LegalPageLayout>
   );
 }

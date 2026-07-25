@@ -5,7 +5,7 @@ import {
   getCookieConsentForUser,
   saveCookieConsent,
 } from "@/actions/cookie-consent";
-import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { COOKIE_POLICY_VERSION } from "@/lib/data/publicPages";
 import {
   buildConsent,
   consentNeedsBanner,

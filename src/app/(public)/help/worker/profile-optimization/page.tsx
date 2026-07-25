@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -37,7 +35,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const OPTIMIZATION_TIPS = [
   {
@@ -129,7 +126,7 @@ const VERIFICATION_STEPS = [
       "Front photo of your Philippine Government ID (JPEG or PNG format, up to 5 MB).",
       "Back photo of your Philippine Government ID (JPEG or PNG format, up to 5 MB).",
       "Selfie verification photo holding your ID next to your face so reviewers can verify your identity.",
-      "🔒 Strict Privacy Guaranteed: Your ID documents are encrypted and seen only by verification reviewers. Employers never see your raw ID photos.",
+      "Your ID documents are stored securely and reviewed only by verification staff. Employers never see your raw ID photos.",
     ],
   },
   {
@@ -280,9 +277,7 @@ function ProfileOptimizationFallback() {
   );
 }
 
-export default async function ProfileOptimizationPage() {
-  const cms = await getPublishedPageContent("help-worker-profile-optimization");
-
+export default function ProfileOptimizationPage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -292,19 +287,14 @@ export default async function ProfileOptimizationPage() {
             <span>Profile Optimization</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Profile Optimization Guide"}
+            Profile Optimization Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "Learn expert tips to optimize your Replaceme worker profile, write compelling summaries, highlight key skills, and get hired faster."}
+            Learn expert tips to optimize your Replaceme worker profile, write compelling summaries, highlight key skills, and get hired faster.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<ProfileOptimizationFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <ProfileOptimizationFallback />
       </div>
     </main>
   );

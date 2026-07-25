@@ -1,9 +1,7 @@
 import { PUBLIC_PAGE_TOP } from "@/lib/layout/public-shell";
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CONTACT_FALLBACK } from "@/lib/content/page-fallbacks";
-import type { ContactPageConfig } from "@/types/page-content";
+import { CONTACT_PAGE } from "@/lib/data/publicPages";
 import type { Metadata } from "next";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
@@ -30,15 +28,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function ContactPage() {
-  const cms = await getPublishedPageContent("contact");
-  const config: ContactPageConfig = {
-    ...CONTACT_FALLBACK,
-    ...(cms?.contentJson as Partial<ContactPageConfig>),
-    title: cms?.title ?? CONTACT_FALLBACK.title,
-  };
+export default function ContactPage() {
+  const config = CONTACT_PAGE;
 
   return (
     <main className={`${PUBLIC_PAGE_TOP} min-h-[calc(100vh-4rem)] bg-[#f8fafe] flex-1`}>

@@ -117,15 +117,15 @@ export type Database = {
           contact_methods: Json
           cover_letter: string | null
           created_at: string
+          employment_status: string | null
           id: string
           is_within_plan_cap: boolean
           job_id: string
           masked_preview_snapshot: Json | null
           match_score: number
           received_at: string | null
-          status: Database["public"]["Enums"]["application_status"]
-          employment_status: string | null
           show_hired_badge: boolean
+          status: Database["public"]["Enums"]["application_status"]
         }
         Insert: {
           application_subject?: string | null
@@ -133,15 +133,15 @@ export type Database = {
           contact_methods?: Json
           cover_letter?: string | null
           created_at?: string
+          employment_status?: string | null
           id?: string
           is_within_plan_cap?: boolean
           job_id: string
           masked_preview_snapshot?: Json | null
           match_score?: number
           received_at?: string | null
-          status?: Database["public"]["Enums"]["application_status"]
-          employment_status?: string | null
           show_hired_badge?: boolean
+          status?: Database["public"]["Enums"]["application_status"]
         }
         Update: {
           application_subject?: string | null
@@ -149,15 +149,15 @@ export type Database = {
           contact_methods?: Json
           cover_letter?: string | null
           created_at?: string
+          employment_status?: string | null
           id?: string
           is_within_plan_cap?: boolean
           job_id?: string
           masked_preview_snapshot?: Json | null
           match_score?: number
           received_at?: string | null
-          status?: Database["public"]["Enums"]["application_status"]
-          employment_status?: string | null
           show_hired_badge?: boolean
+          status?: Database["public"]["Enums"]["application_status"]
         }
         Relationships: [
           {
@@ -280,6 +280,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_ledger_events_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "billing_ledger_events_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
           },
         ]
       }
@@ -410,31 +424,43 @@ export type Database = {
           blocked_reason: string | null
           company_profile_id: string
           created_at: string
+          employer_deleted_at: string | null
+          employer_marked_unread: boolean
           id: string
           is_pinned: boolean
           job_id: string | null
           updated_at: string
+          worker_deleted_at: string | null
           worker_id: string
+          worker_marked_unread: boolean
         }
         Insert: {
           blocked_reason?: string | null
           company_profile_id: string
           created_at?: string
+          employer_deleted_at?: string | null
+          employer_marked_unread?: boolean
           id?: string
           is_pinned?: boolean
           job_id?: string | null
           updated_at?: string
+          worker_deleted_at?: string | null
           worker_id: string
+          worker_marked_unread?: boolean
         }
         Update: {
           blocked_reason?: string | null
           company_profile_id?: string
           created_at?: string
+          employer_deleted_at?: string | null
+          employer_marked_unread?: boolean
           id?: string
           is_pinned?: boolean
           job_id?: string | null
           updated_at?: string
+          worker_deleted_at?: string | null
           worker_id?: string
+          worker_marked_unread?: boolean
         }
         Relationships: [
           {
@@ -474,6 +500,190 @@ export type Database = {
           },
           {
             foreignKeyName: "chat_threads_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      company_profiles: {
+        Row: {
+          company_bio: string | null
+          company_name: string
+          company_size: string | null
+          company_verification_status: string
+          created_at: string
+          employer_id: string
+          hiring_regions: string[] | null
+          id: string
+          industry: string | null
+          logo_url: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          timezone: string | null
+          updated_at: string
+          username: string | null
+          verified_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          company_bio?: string | null
+          company_name: string
+          company_size?: string | null
+          company_verification_status?: string
+          created_at?: string
+          employer_id: string
+          hiring_regions?: string[] | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          timezone?: string | null
+          updated_at?: string
+          username?: string | null
+          verified_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          company_bio?: string | null
+          company_name?: string
+          company_size?: string | null
+          company_verification_status?: string
+          created_at?: string
+          employer_id?: string
+          hiring_regions?: string[] | null
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          timezone?: string | null
+          updated_at?: string
+          username?: string | null
+          verified_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_profiles_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_profiles_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: true
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "company_profiles_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: true
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          created_at: string
+          employer_id: string
+          employment_status: string | null
+          employment_type: string
+          hourly_rate: number
+          id: string
+          job_id: string | null
+          show_hired_badge: boolean
+          start_date: string
+          status: string
+          updated_at: string
+          weekly_hours: number
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          employment_status?: string | null
+          employment_type: string
+          hourly_rate: number
+          id?: string
+          job_id?: string | null
+          show_hired_badge?: boolean
+          start_date?: string
+          status?: string
+          updated_at?: string
+          weekly_hours: number
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          employment_status?: string | null
+          employment_type?: string
+          hourly_rate?: number
+          id?: string
+          job_id?: string | null
+          show_hired_badge?: boolean
+          start_date?: string
+          status?: string
+          updated_at?: string
+          weekly_hours?: number
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "contracts_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "contracts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "contracts_worker_id_fkey"
             columns: ["worker_id"]
             isOneToOne: false
             referencedRelation: "worker_profiles"
@@ -586,299 +796,6 @@ export type Database = {
             foreignKeyName: "cookie_consent_preferences_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: true
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
-      company_profiles: {
-        Row: {
-          company_bio: string | null
-          company_name: string
-          company_size: string | null
-          company_verification_status: string
-          created_at: string
-          employer_id: string
-          hiring_regions: string[] | null
-          id: string
-          industry: string | null
-          logo_url: string | null
-          role: Database["public"]["Enums"]["user_role"] | null
-          timezone: string | null
-          updated_at: string
-          username: string | null
-          verified_at: string | null
-          website_url: string | null
-        }
-        Insert: {
-          company_bio?: string | null
-          company_name: string
-          company_size?: string | null
-          company_verification_status?: string
-          created_at?: string
-          employer_id: string
-          hiring_regions?: string[] | null
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          timezone?: string | null
-          updated_at?: string
-          username?: string | null
-          verified_at?: string | null
-          website_url?: string | null
-        }
-        Update: {
-          company_bio?: string | null
-          company_name?: string
-          company_size?: string | null
-          company_verification_status?: string
-          created_at?: string
-          employer_id?: string
-          hiring_regions?: string[] | null
-          id?: string
-          industry?: string | null
-          logo_url?: string | null
-          role?: Database["public"]["Enums"]["user_role"] | null
-          timezone?: string | null
-          updated_at?: string
-          username?: string | null
-          verified_at?: string | null
-          website_url?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "company_profiles_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "company_profiles_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: true
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "company_profiles_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: true
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
-      reports: {
-        Row: {
-          admin_notes: string | null
-          app_area: string | null
-          category: string
-          context: Json
-          created_at: string
-          description_markdown: string
-          evidence_file_size_bytes: number | null
-          evidence_mime_type: string | null
-          evidence_storage_path: string | null
-          id: string
-          reported_url: string | null
-          reporter_id: string
-          reporter_role: string
-          resolved_at: string | null
-          resolved_by: string | null
-          status: string
-          title: string | null
-          updated_at: string
-          user_agent: string | null
-        }
-        Insert: {
-          admin_notes?: string | null
-          app_area?: string | null
-          category: string
-          context?: Json
-          created_at?: string
-          description_markdown: string
-          evidence_file_size_bytes?: number | null
-          evidence_mime_type?: string | null
-          evidence_storage_path?: string | null
-          id?: string
-          reported_url?: string | null
-          reporter_id: string
-          reporter_role: string
-          resolved_at?: string | null
-          resolved_by?: string | null
-          status?: string
-          title?: string | null
-          updated_at?: string
-          user_agent?: string | null
-        }
-        Update: {
-          admin_notes?: string | null
-          app_area?: string | null
-          category?: string
-          context?: Json
-          created_at?: string
-          description_markdown?: string
-          evidence_file_size_bytes?: number | null
-          evidence_mime_type?: string | null
-          evidence_storage_path?: string | null
-          id?: string
-          reported_url?: string | null
-          reporter_id?: string
-          reporter_role?: string
-          resolved_at?: string | null
-          resolved_by?: string | null
-          status?: string
-          title?: string | null
-          updated_at?: string
-          user_agent?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reports_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reports_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "reports_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-          {
-            foreignKeyName: "reports_resolved_by_fkey"
-            columns: ["resolved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reports_resolved_by_fkey"
-            columns: ["resolved_by"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "reports_resolved_by_fkey"
-            columns: ["resolved_by"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
-      contracts: {
-        Row: {
-          created_at: string
-          employer_id: string
-          employment_type: string
-          hourly_rate: number
-          id: string
-          job_id: string | null
-          start_date: string
-          status: string
-          updated_at: string
-          weekly_hours: number
-          worker_id: string
-          employment_status: string | null
-          show_hired_badge: boolean
-        }
-        Insert: {
-          created_at?: string
-          employer_id: string
-          employment_type: string
-          hourly_rate: number
-          id?: string
-          job_id?: string | null
-          start_date?: string
-          status?: string
-          updated_at?: string
-          weekly_hours: number
-          worker_id: string
-          employment_status?: string | null
-          show_hired_badge?: boolean
-        }
-        Update: {
-          created_at?: string
-          employer_id?: string
-          employment_type?: string
-          hourly_rate?: number
-          id?: string
-          job_id?: string | null
-          start_date?: string
-          status?: string
-          updated_at?: string
-          weekly_hours?: number
-          worker_id?: string
-          employment_status?: string | null
-          show_hired_badge?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "contracts_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contracts_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "contracts_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-          {
-            foreignKeyName: "contracts_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "job_posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contracts_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contracts_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contracts_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "contracts_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
           },
@@ -1023,6 +940,132 @@ export type Database = {
           {
             foreignKeyName: "earnings_overview_worker_id_fkey"
             columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      email_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          message_id: string
+          occurred_at: string
+          payload: Json
+          provider: string
+          provider_broadcast_id: string | null
+          provider_message_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          message_id: string
+          occurred_at?: string
+          payload?: Json
+          provider?: string
+          provider_broadcast_id?: string | null
+          provider_message_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          message_id?: string
+          occurred_at?: string
+          payload?: Json
+          provider?: string
+          provider_broadcast_id?: string | null
+          provider_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_events_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "email_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_messages: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          last_event_at: string | null
+          provider: string
+          provider_broadcast_id: string | null
+          provider_message_id: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          status: string
+          subject: string | null
+          tags: Json
+          template_key: string | null
+          tier_label: string | null
+          tier_slug: string | null
+          to_email: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          last_event_at?: string | null
+          provider?: string
+          provider_broadcast_id?: string | null
+          provider_message_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          status?: string
+          subject?: string | null
+          tags?: Json
+          template_key?: string | null
+          tier_label?: string | null
+          tier_slug?: string | null
+          to_email?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          last_event_at?: string | null
+          provider?: string
+          provider_broadcast_id?: string | null
+          provider_message_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          status?: string
+          subject?: string | null
+          tags?: Json
+          template_key?: string | null
+          tier_label?: string | null
+          tier_slug?: string | null
+          to_email?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "email_messages_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
@@ -1219,14 +1262,14 @@ export type Database = {
           override_expires_at?: string | null
           override_plan_id?: string | null
           override_reason?: string | null
-          stripe_dispute_id?: string | null
-          stripe_dispute_status?: string | null
           plan_id?: string | null
           plan_slug?: string | null
           scheduled_effective_at?: string | null
           scheduled_plan_slug?: string | null
           status?: string
           stripe_customer_id?: string | null
+          stripe_dispute_id?: string | null
+          stripe_dispute_status?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
           unit_amount_cents?: number | null
@@ -1410,7 +1453,7 @@ export type Database = {
           employer_id: string
           id: string
           job_id: string
-          meeting_url: string | null
+          meeting_link: string | null
           notes: string | null
           scheduled_at: string
           status: Database["public"]["Enums"]["interview_status"]
@@ -1423,7 +1466,7 @@ export type Database = {
           employer_id: string
           id?: string
           job_id: string
-          meeting_url?: string | null
+          meeting_link?: string | null
           notes?: string | null
           scheduled_at: string
           status?: Database["public"]["Enums"]["interview_status"]
@@ -1436,7 +1479,7 @@ export type Database = {
           employer_id?: string
           id?: string
           job_id?: string
-          meeting_url?: string | null
+          meeting_link?: string | null
           notes?: string | null
           scheduled_at?: string
           status?: Database["public"]["Enums"]["interview_status"]
@@ -1529,14 +1572,15 @@ export type Database = {
           hiring_manager_email: string | null
           hiring_manager_name: string | null
           hiring_manager_role: string | null
+          hourly_rate: number | null
           hours_per_week: number
           id: string
           is_premium_path: boolean
           location: string | null
           monthly_salary: number
-          salary_currency: string
           paused_reason: string | null
           priority_score: number
+          salary_currency: string
           skills: string[]
           status: string
           submitted_for_review_at: string | null
@@ -1557,14 +1601,15 @@ export type Database = {
           hiring_manager_email?: string | null
           hiring_manager_name?: string | null
           hiring_manager_role?: string | null
+          hourly_rate?: number | null
           hours_per_week: number
           id?: string
           is_premium_path?: boolean
           location?: string | null
           monthly_salary: number
-          salary_currency?: string
           paused_reason?: string | null
           priority_score?: number
+          salary_currency?: string
           skills?: string[]
           status?: string
           submitted_for_review_at?: string | null
@@ -1585,14 +1630,15 @@ export type Database = {
           hiring_manager_email?: string | null
           hiring_manager_name?: string | null
           hiring_manager_role?: string | null
+          hourly_rate?: number | null
           hours_per_week?: number
           id?: string
           is_premium_path?: boolean
           location?: string | null
           monthly_salary?: number
-          salary_currency?: string
           paused_reason?: string | null
           priority_score?: number
+          salary_currency?: string
           skills?: string[]
           status?: string
           submitted_for_review_at?: string | null
@@ -1753,45 +1799,6 @@ export type Database = {
           },
         ]
       }
-      page_content: {
-        Row: {
-          body: string | null
-          content_json: Json
-          content_type: string
-          id: string
-          is_published: boolean
-          meta: Json
-          slug: string
-          title: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          body?: string | null
-          content_json?: Json
-          content_type: string
-          id?: string
-          is_published?: boolean
-          meta?: Json
-          slug: string
-          title: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          body?: string | null
-          content_json?: Json
-          content_type?: string
-          id?: string
-          is_published?: boolean
-          meta?: Json
-          slug?: string
-          title?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
       pinned_workers: {
         Row: {
           employer_id: string
@@ -1859,192 +1866,415 @@ export type Database = {
       profiles: {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"]
+          address_line_1: string | null
           auth_user_id: string | null
           availability: string | null
           availability_status: string | null
           avatar_url: string | null
           bio: string | null
           birth_date: string | null
+          city: string | null
+          civil_status: string | null
+          country: string | null
           created_at: string
           cv_url: string | null
           email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
           expected_salary_max: number | null
           expected_salary_min: number | null
           experience_years: number | null
           first_name: string | null
-          middle_name: string | null
           full_name: string | null
+          gender: string | null
           hourly_rate: number | null
           id: string
+          id_expiration_date: string | null
+          id_issuing_country: string | null
+          id_number: string | null
+          id_type: string | null
           is_remote: boolean | null
           is_top_rated: boolean | null
           is_verified: boolean
           last_name: string | null
           location: string | null
-          region: string | null
-          province: string | null
-          city: string | null
-          address_line_1: string | null
+          middle_name: string | null
           onboarding_completed_at: string | null
+          pagibig_number: string | null
+          personal_address: string | null
+          personal_city: string | null
+          personal_state_province: string | null
+          philhealth_number: string | null
           phone_number: string | null
           portfolio_url: string | null
+          preferred_language: string | null
           professional_title: string | null
           profile_visibility: string
+          province: string | null
+          region: string | null
+          resend_contact_id: string | null
           resume_storage_path: string | null
           resume_url: string | null
           role: Database["public"]["Enums"]["user_role"]
           salary_currency: string
           skills: string[] | null
+          sss_number: string | null
           stripe_customer_id: string | null
+          suffix: string | null
+          timezone: string | null
+          tin_number: string | null
           updated_at: string
           username: string | null
-          suffix: string | null
-          gender: string | null
-          civil_status: string | null
-          id_type: string | null
-          id_number: string | null
-          id_expiration_date: string | null
-          id_issuing_country: string | null
-          tin_number: string | null
-          sss_number: string | null
-          philhealth_number: string | null
-          pagibig_number: string | null
-          emergency_contact_name: string | null
-          emergency_contact_relationship: string | null
-          emergency_contact_phone: string | null
-          preferred_language: string | null
-          timezone: string | null
-          country: string | null
-          personal_address: string | null
-          personal_city: string | null
-          personal_state_province: string | null
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
           account_status?: Database["public"]["Enums"]["account_status"]
+          address_line_1?: string | null
           auth_user_id?: string | null
           availability?: string | null
           availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
           birth_date?: string | null
+          city?: string | null
+          civil_status?: string | null
+          country?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           experience_years?: number | null
           first_name?: string | null
-          middle_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
           id: string
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
           last_name?: string | null
           location?: string | null
-          region?: string | null
-          province?: string | null
-          city?: string | null
-          address_line_1?: string | null
+          middle_name?: string | null
           onboarding_completed_at?: string | null
+          pagibig_number?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
+          philhealth_number?: string | null
           phone_number?: string | null
           portfolio_url?: string | null
+          preferred_language?: string | null
           professional_title?: string | null
           profile_visibility?: string
+          province?: string | null
+          region?: string | null
+          resend_contact_id?: string | null
           resume_storage_path?: string | null
           resume_url?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
+          sss_number?: string | null
           stripe_customer_id?: string | null
+          suffix?: string | null
+          timezone?: string | null
+          tin_number?: string | null
           updated_at?: string
           username?: string | null
-          suffix?: string | null
-          gender?: string | null
-          civil_status?: string | null
-          id_type?: string | null
-          id_number?: string | null
-          id_expiration_date?: string | null
-          id_issuing_country?: string | null
-          tin_number?: string | null
-          sss_number?: string | null
-          philhealth_number?: string | null
-          pagibig_number?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_relationship?: string | null
-          emergency_contact_phone?: string | null
-          preferred_language?: string | null
-          timezone?: string | null
-          country?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Update: {
           account_status?: Database["public"]["Enums"]["account_status"]
+          address_line_1?: string | null
           auth_user_id?: string | null
           availability?: string | null
           availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
           birth_date?: string | null
+          city?: string | null
+          civil_status?: string | null
+          country?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           experience_years?: number | null
           first_name?: string | null
-          middle_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
           id?: string
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
           last_name?: string | null
           location?: string | null
-          region?: string | null
-          province?: string | null
-          city?: string | null
-          address_line_1?: string | null
+          middle_name?: string | null
           onboarding_completed_at?: string | null
+          pagibig_number?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
+          philhealth_number?: string | null
           phone_number?: string | null
           portfolio_url?: string | null
+          preferred_language?: string | null
           professional_title?: string | null
           profile_visibility?: string
+          province?: string | null
+          region?: string | null
+          resend_contact_id?: string | null
           resume_storage_path?: string | null
           resume_url?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
+          sss_number?: string | null
           stripe_customer_id?: string | null
+          suffix?: string | null
+          timezone?: string | null
+          tin_number?: string | null
           updated_at?: string
           username?: string | null
-          suffix?: string | null
-          gender?: string | null
-          civil_status?: string | null
-          id_type?: string | null
-          id_number?: string | null
-          id_expiration_date?: string | null
-          id_issuing_country?: string | null
-          tin_number?: string | null
-          sss_number?: string | null
-          philhealth_number?: string | null
-          pagibig_number?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_relationship?: string | null
-          emergency_contact_phone?: string | null
-          preferred_language?: string | null
-          timezone?: string | null
-          country?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
+        }
+        Relationships: []
+      }
+      reported_jobs: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          job_id: string
+          reason: string
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          job_id: string
+          reason: string
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          job_id?: string
+          reason?: string
+          reporter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_reported_jobs_job"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reported_jobs_job"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reported_jobs_reporter"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reported_jobs_reporter"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "fk_reported_jobs_reporter"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          app_area: string | null
+          category: string
+          context: Json
+          created_at: string
+          description_markdown: string
+          evidence_file_size_bytes: number | null
+          evidence_mime_type: string | null
+          evidence_storage_path: string | null
+          id: string
+          reported_url: string | null
+          reporter_id: string
+          reporter_role: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          app_area?: string | null
+          category: string
+          context?: Json
+          created_at?: string
+          description_markdown: string
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
+          id?: string
+          reported_url?: string | null
+          reporter_id: string
+          reporter_role: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          app_area?: string | null
+          category?: string
+          context?: Json
+          created_at?: string
+          description_markdown?: string
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
+          id?: string
+          reported_url?: string | null
+          reporter_id?: string
+          reporter_role?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "reports_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      resend_segments: {
+        Row: {
+          created_at: string
+          key: string
+          segment_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          segment_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          segment_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resend_webhook_events: {
+        Row: {
+          event_type: string
+          processed_at: string
+          svix_id: string
+        }
+        Insert: {
+          event_type: string
+          processed_at?: string
+          svix_id: string
+        }
+        Update: {
+          event_type?: string
+          processed_at?: string
+          svix_id?: string
         }
         Relationships: []
       }
@@ -2066,24 +2296,6 @@ export type Database = {
           payload_hash?: string | null
           processed_at?: string
           type?: string
-        }
-        Relationships: []
-      }
-      resend_webhook_events: {
-        Row: {
-          svix_id: string
-          event_type: string
-          processed_at: string
-        }
-        Insert: {
-          svix_id: string
-          event_type: string
-          processed_at?: string
-        }
-        Update: {
-          svix_id?: string
-          event_type?: string
-          processed_at?: string
         }
         Relationships: []
       }
@@ -2199,6 +2411,52 @@ export type Database = {
             foreignKeyName: "unlocked_profiles_employer_id_fkey"
             columns: ["employer_id"]
             isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      user_ux_preferences: {
+        Row: {
+          locale: string | null
+          profile_id: string
+          sidebar_collapsed: boolean
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          locale?: string | null
+          profile_id: string
+          sidebar_collapsed?: boolean
+          theme?: string
+          updated_at?: string
+        }
+        Update: {
+          locale?: string | null
+          profile_id?: string
+          sidebar_collapsed?: boolean
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_ux_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_ux_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "user_ux_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
           },
@@ -2496,6 +2754,77 @@ export type Database = {
           },
         ]
       }
+      worker_transactions: {
+        Row: {
+          amount: number
+          client_name: string
+          contract_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          job_title: string
+          receipt_url: string | null
+          reference_number: string | null
+          status: string
+          worker_id: string
+        }
+        Insert: {
+          amount: number
+          client_name: string
+          contract_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          job_title: string
+          receipt_url?: string | null
+          reference_number?: string | null
+          status?: string
+          worker_id: string
+        }
+        Update: {
+          amount?: number
+          client_name?: string
+          contract_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          job_title?: string
+          receipt_url?: string | null
+          reference_number?: string | null
+          status?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_transactions_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "worker_transactions_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "worker_transactions_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "worker_transactions_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
     }
     Views: {
       job_applications: {
@@ -2673,18 +3002,40 @@ export type Database = {
       worker_profiles: {
         Row: {
           avatar_url: string | null
+          birth_date: string | null
+          civil_status: string | null
+          country: string | null
           created_at: string | null
           email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
           experience_years: number | null
           first_name: string | null
-          middle_name: string | null
           full_name: string | null
+          gender: string | null
           hourly_rate: number | null
+          id_expiration_date: string | null
+          id_issuing_country: string | null
+          id_number: string | null
+          id_type: string | null
           is_verified: boolean | null
           last_name: string | null
+          middle_name: string | null
+          pagibig_number: string | null
+          personal_address: string | null
+          personal_city: string | null
+          personal_state_province: string | null
+          philhealth_number: string | null
+          phone_number: string | null
+          preferred_language: string | null
           professional_title: string | null
           profile_id: string | null
           skills: string[] | null
+          sss_number: string | null
+          suffix: string | null
+          timezone: string | null
+          tin_number: string | null
           updated_at: string | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
@@ -2693,18 +3044,40 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          birth_date?: string | null
+          civil_status?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           experience_years?: number | null
           first_name?: string | null
-          middle_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_verified?: boolean | null
           last_name?: string | null
+          middle_name?: string | null
+          pagibig_number?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
+          philhealth_number?: string | null
+          phone_number?: string | null
+          preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
+          sss_number?: string | null
+          suffix?: string | null
+          timezone?: string | null
+          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -2713,18 +3086,40 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          birth_date?: string | null
+          civil_status?: string | null
+          country?: string | null
           created_at?: string | null
           email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           experience_years?: number | null
           first_name?: string | null
-          middle_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_verified?: boolean | null
           last_name?: string | null
+          middle_name?: string | null
+          pagibig_number?: string | null
+          personal_address?: string | null
+          personal_city?: string | null
+          personal_state_province?: string | null
+          philhealth_number?: string | null
+          phone_number?: string | null
+          preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
+          sss_number?: string | null
+          suffix?: string | null
+          timezone?: string | null
+          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -2735,6 +3130,8 @@ export type Database = {
       }
     }
     Functions: {
+      auth_user_is_employer: { Args: never; Returns: boolean }
+      auth_user_is_worker: { Args: never; Returns: boolean }
       create_notification: {
         Args: {
           p_action_url?: string
@@ -2777,6 +3174,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
+      is_superadmin: { Args: never; Returns: boolean }
       notify_admins: {
         Args: {
           p_action_url?: string

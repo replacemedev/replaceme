@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, FileText, Settings, Shield, UserCog } from "lucide-react";
+import { ChevronRight, Settings, Shield, UserCog } from "lucide-react";
 import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminSelfPasswordActions } from "@/components/admin/settings/AdminSelfPasswordActions";
@@ -19,13 +19,6 @@ const SETTINGS_SECTIONS = [
     icon: UserCog,
     superAdminOnly: true,
   },
-  {
-    href: "/admin/settings/pages",
-    label: "Public Pages",
-    description: "Edit marketing copy, legal pages, and FAQ content.",
-    icon: FileText,
-    superAdminOnly: false,
-  },
 ] as const;
 
 export default async function AdminSettingsPage() {
@@ -42,7 +35,7 @@ export default async function AdminSettingsPage() {
     <AdminPageShell>
       <AdminPageHeader
         title="Platform Settings"
-        description="Configuration, admin team management, and editable public content."
+        description="Configuration and admin team management."
       />
 
       <section className="grid gap-3 sm:grid-cols-2">

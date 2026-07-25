@@ -1,4 +1,4 @@
-import { COOKIE_POLICY_VERSION } from "@/lib/content/page-fallbacks";
+import { COOKIE_POLICY_VERSION } from "@/lib/data/publicPages";
 import {
   COOKIE_CONSENT_STORAGE_KEY,
   type CookieConsentPreferences,

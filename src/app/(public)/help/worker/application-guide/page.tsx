@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -36,7 +34,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -172,9 +169,7 @@ function WorkerApplicationFallback() {
   );
 }
 
-export default async function WorkerApplicationPage() {
-  const cms = await getPublishedPageContent("help-worker-application-guide");
-
+export default function WorkerApplicationPage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,19 +179,14 @@ export default async function WorkerApplicationPage() {
             <span>Worker Playbook</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Job Seeker Application Guide"}
+            Job Seeker Application Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "Learn how to build a standout worker profile, search active remote roles, and apply directly to hiring employers with 0% platform salary cuts."}
+            Learn how to build a standout worker profile, search active remote roles, and apply directly to hiring employers with 0% platform salary cuts.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<WorkerApplicationFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <WorkerApplicationFallback />
       </div>
     </main>
   );

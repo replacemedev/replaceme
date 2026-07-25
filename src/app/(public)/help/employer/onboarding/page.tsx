@@ -1,5 +1,3 @@
-import { getPublishedPageContent } from "@/actions/public/page-content";
-import { CmsHtmlContent } from "@/components/shared/cms/CmsHtmlContent";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -36,7 +34,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -49,7 +46,7 @@ const STEPS = [
     details: [
       "Upload a high-resolution logo and write a brief description of your business.",
       "Add your official website URL and social links so applicants can learn about your culture.",
-      "A complete profile increases job application rates by up to 3x.",
+      "A complete company profile helps candidates evaluate your opportunity and decide whether to apply.",
     ],
   },
   {
@@ -172,9 +169,7 @@ function EmployerOnboardingFallback() {
   );
 }
 
-export default async function EmployerOnboardingPage() {
-  const cms = await getPublishedPageContent("help-employer-onboarding");
-
+export default function EmployerOnboardingPage() {
   return (
     <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,19 +179,14 @@ export default async function EmployerOnboardingPage() {
             <span>Employer Onboarding</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
-            {cms?.title ?? "Employer Onboarding Guide"}
+            Employer Onboarding Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-            {(cms?.meta?.description as string) ??
-              "Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline on Replaceme."}
+            Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline on Replaceme.
           </p>
         </div>
 
-        <CmsHtmlContent
-          html={cms?.body}
-          fallback={<EmployerOnboardingFallback />}
-          className="prose prose-slate max-w-none"
-        />
+        <EmployerOnboardingFallback />
       </div>
     </main>
   );
