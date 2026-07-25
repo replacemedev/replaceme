@@ -46,8 +46,9 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:admin:audit-logs:${limit}`,
   adminReportsList: (filterKey: string) =>
     `rm:${CACHE_VERSION}:admin:reports:${filterKey}`,
+  /** Initial (most-recent) message page only — older pages are fetched uncached. */
   messagingMessages: (userId: string, threadId: string) =>
-    `rm:${CACHE_VERSION}:user:${userId}:messages:${threadId}`,
+    `rm:${CACHE_VERSION}:user:${userId}:messages:${threadId}:recent`,
   /** Reuse signed Storage URLs so Smart CDN stays warm (unique tokens = cache miss). */
   storageSignedUrl: (bucket: string, path: string) =>
     `rm:${CACHE_VERSION}:storage:signed:${bucket}:${path}`,

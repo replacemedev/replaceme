@@ -1,13 +1,15 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getMessagingThreads,
-  getMessagingMessages,
-  getMessagingJobRoles,
-} from "@/actions/messaging";
+import { getMessagingThreads, getMessagingMessages } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
-import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
-import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
+import {
+  extractJobRolesFromThreads,
+  MESSAGING_THREADS_PAGE_SIZE,
+  type MessagingMessagesPage,
+  type MessagingThread,
+} from "@/types/messaging";
+import { WorkerPageShell } from "@/components/worker/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
@@ -41,20 +43,28 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   const { threadId } = await searchParams;
 
   let threads: MessagingThread[] = [];
-  let availableJobRoles: MessagingJobRole[] = [];
   let loadError: string | null = null;
 
   try {
-    [threads, availableJobRoles] = await Promise.all([
-      getMessagingThreads("worker"),
-      getMessagingJobRoles("worker"),
-    ]);
+    threads = await getMessagingThreads("worker");
   } catch {
-    loadError = "We couldn't load your messaging inbox. Please refresh and try again.";
+    loadError =
+      "We couldn't load your messaging inbox. Please refresh and try again.";
   }
 
-  const initialMessages =
-    threadId && !loadError ? await getMessagingMessages(threadId) : [];
+  const availableJobRoles = extractJobRolesFromThreads(threads);
+  const hasMoreThreads = threads.length >= MESSAGING_THREADS_PAGE_SIZE;
+
+  const emptyMessages: MessagingMessagesPage = {
+    messages: [],
+    hasMore: false,
+    nextCursor: null,
+  };
+
+  const initialMessagesPage =
+    threadId && !loadError
+      ? await getMessagingMessages(threadId)
+      : emptyMessages;
 
   if (loadError) {
     return (
@@ -65,16 +75,22 @@ export default async function WorkerMessagesPage({ searchParams }: PageProps) {
   }
 
   return (
-    <WorkerPageShell width="wide" className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4">
-      <MessagingClient
-        role="worker"
-        basePath="/worker/messages"
-        threads={threads}
-        availableJobRoles={availableJobRoles}
-        initialMessages={initialMessages}
-        selectedThreadId={threadId ?? null}
-        currentUserId={profile.id}
-      />
+    <WorkerPageShell
+      width="wide"
+      className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4"
+    >
+      <Suspense fallback={null}>
+        <MessagingClient
+          role="worker"
+          basePath="/worker/messages"
+          threads={threads}
+          availableJobRoles={availableJobRoles}
+          initialMessagesPage={initialMessagesPage}
+          selectedThreadId={threadId ?? null}
+          currentUserId={profile.id}
+          initialHasMoreThreads={hasMoreThreads}
+        />
+      </Suspense>
     </WorkerPageShell>
   );
 }

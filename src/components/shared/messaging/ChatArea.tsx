@@ -1,15 +1,15 @@
 "use client";
 
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useState } from "react";
 import { Pin, MoreVertical, AlertTriangle, Trash2, MailOpen } from "lucide-react";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
-import { MessageBubble } from "./MessageBubble";
 import { ChatInputArea } from "./ChatInputArea";
 import { MessagingEmptyState } from "./MessagingEmptyState";
 import { MessagingThreadStatus } from "./MessagingThreadStatus";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { MobileChatBackButton } from "./MobileChatBackButton";
+import { VirtualizedMessageList } from "./VirtualizedMessageList";
 
 interface ChatAreaProps {
   thread: MessagingThread | null;
@@ -18,61 +18,15 @@ interface ChatAreaProps {
   role: "worker" | "employer";
   messagingEnabled?: boolean;
   planSlug?: string;
+  hasMoreMessages?: boolean;
+  isLoadingOlder?: boolean;
+  onLoadOlderMessages?: () => void;
   onSendMessage: (content: string) => Promise<void>;
   onTogglePin: () => Promise<void>;
   onMarkUnread: () => Promise<void>;
   onDeleteConversation: () => Promise<void>;
   onBack?: () => void;
   mobileHidden?: boolean;
-}
-
-function formatDateSeparator(isoString: string) {
-  const date = new Date(isoString);
-  const now = new Date();
-  const time = date.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  if (date.toDateString() === now.toDateString()) {
-    return `TODAY, ${time}`;
-  }
-
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (date.toDateString() === yesterday.toDateString()) {
-    return `YESTERDAY, ${time}`;
-  }
-
-  const day = date
-    .toLocaleDateString([], { weekday: "long" })
-    .toUpperCase();
-  const datePart = date.toLocaleDateString([], {
-    month: "short",
-    day: "numeric",
-  });
-  return `${day}, ${datePart}`;
-}
-
-function groupMessagesByDay(messages: MessagingMessage[]) {
-  const groups: { dateKey: string; label: string; items: MessagingMessage[] }[] =
-    [];
-
-  for (const message of messages) {
-    const dateKey = new Date(message.created_at).toDateString();
-    const last = groups[groups.length - 1];
-    if (last?.dateKey === dateKey) {
-      last.items.push(message);
-    } else {
-      groups.push({
-        dateKey,
-        label: formatDateSeparator(message.created_at),
-        items: [message],
-      });
-    }
-  }
-
-  return groups;
 }
 
 function partyInitials(name: string) {
@@ -91,6 +45,9 @@ export function ChatArea({
   role,
   messagingEnabled = true,
   planSlug = "discovery",
+  hasMoreMessages = false,
+  isLoadingOlder = false,
+  onLoadOlderMessages,
   onSendMessage,
   onTogglePin,
   onMarkUnread,
@@ -98,23 +55,17 @@ export function ChatArea({
   onBack,
   mobileHidden = false,
 }: ChatAreaProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [isPinning, setIsPinning] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const messageGroups = useMemo(() => groupMessagesByDay(messages), [messages]);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
 
   if (!thread) {
     return (
       <section
-        className={`flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8 ${mobileHidden ? "hidden lg:flex" : ""
-          }`}
+        className={`flex-1 flex items-center justify-center bg-slate-50/50 min-w-0 p-8 ${
+          mobileHidden ? "hidden lg:flex" : ""
+        }`}
       >
         <MessagingEmptyState
           role={role}
@@ -130,17 +81,20 @@ export function ChatArea({
   const isBlocked =
     Boolean(thread.blocked_reason) ||
     (role === "employer" && !messagingEnabled);
-  const employerHasMessaged = messages.some(
-    (message) => message.sender_id !== currentUserId
-  );
+  // Worker inbox only surfaces employer-opened threads. Empty recent page with
+  // no older history means the opening message has not arrived yet.
   const waitingForEmployer =
-    role === "worker" && !isBlocked && !employerHasMessaged;
+    role === "worker" &&
+    !isBlocked &&
+    messages.length === 0 &&
+    !hasMoreMessages;
   const canCompose = !isBlocked && !waitingForEmployer;
 
   return (
     <section
-      className={`flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0 ${mobileHidden ? "hidden lg:flex" : ""
-        }`}
+      className={`flex-1 flex flex-col h-full bg-[#f8fafd]/40 min-w-0 ${
+        mobileHidden ? "hidden lg:flex" : ""
+      }`}
     >
       <header className="relative shrink-0 h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -152,6 +106,7 @@ export function ChatArea({
                 alt={oppositeParty.name}
                 initials={initials}
                 size="xs"
+                priority
               />
             </div>
             <div className="flex-1 min-w-0">
@@ -176,13 +131,16 @@ export function ChatArea({
               setIsPinning(false);
             }}
             disabled={isPinning}
-            className={`hidden sm:inline-flex p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${thread.is_pinned
+            className={`hidden sm:inline-flex p-2 rounded-lg cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 ${
+              thread.is_pinned
                 ? "text-[#006e2f]"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-              }`}
+            }`}
             aria-label="Pin conversation"
           >
-            <Pin className={`h-4.5 w-4.5 ${thread.is_pinned ? "fill-current" : ""}`} />
+            <Pin
+              className={`h-4.5 w-4.5 ${thread.is_pinned ? "fill-current" : ""}`}
+            />
           </button>
           <button
             type="button"
@@ -195,7 +153,10 @@ export function ChatArea({
 
           {showMenu && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowMenu(false)}
+              />
               <div className="absolute right-0 top-10 w-48 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-50">
                 <button
                   type="button"
@@ -208,7 +169,11 @@ export function ChatArea({
                   disabled={isPinning}
                   className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 sm:hidden cursor-pointer disabled:opacity-50"
                 >
-                  <Pin className={`h-3.5 w-3.5 ${thread.is_pinned ? "fill-current text-[#006e2f]" : ""}`} />
+                  <Pin
+                    className={`h-3.5 w-3.5 ${
+                      thread.is_pinned ? "fill-current text-[#006e2f]" : ""
+                    }`}
+                  />
                   {thread.is_pinned ? "Unpin conversation" : "Pin conversation"}
                 </button>
                 <button
@@ -255,35 +220,26 @@ export function ChatArea({
         >
           <p className="text-sm font-bold text-slate-900">Waiting for employer</p>
           <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">
-            The employer will message you first about this application. You can reply
-            here once they send the opening message.
+            The employer will message you first about this application. You can
+            reply here once they send the opening message.
           </p>
         </div>
       ) : null}
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
-        {messages.length === 0 ? (
-          <p className="text-center text-sm text-slate-400 py-12">
-            {role === "employer"
+      <div className="flex-1 min-h-0 px-4 sm:px-6 py-2">
+        <VirtualizedMessageList
+          threadKey={thread.id}
+          messages={messages}
+          currentUserId={currentUserId}
+          hasMore={hasMoreMessages}
+          isLoadingOlder={isLoadingOlder}
+          emptyLabel={
+            role === "employer"
               ? "Send the first message below to start the conversation."
-              : "No messages yet."}
-          </p>
-        ) : (
-          messageGroups.map((group) => (
-            <div key={group.dateKey} className="mb-6 last:mb-0">
-              <p className="text-center text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-6">
-                {group.label}
-              </p>
-              {group.items.map((msg) => (
-                <MessageBubble
-                  key={msg.id}
-                  message={msg}
-                  currentUserId={currentUserId}
-                />
-              ))}
-            </div>
-          ))
-        )}
+              : "No messages yet."
+          }
+          onLoadOlder={() => onLoadOlderMessages?.()}
+        />
       </div>
 
       {canCompose ? (
@@ -312,7 +268,9 @@ export function ChatArea({
               <span className="p-2 rounded-xl bg-red-50 text-red-600">
                 <AlertTriangle className="h-6 w-6" />
               </span>
-              <h4 className="text-base font-bold text-slate-900">Delete Conversation?</h4>
+              <h4 className="text-base font-bold text-slate-900">
+                Delete Conversation?
+              </h4>
             </div>
             <p className="text-xs font-semibold leading-relaxed text-slate-500">
               Are you sure? This will remove the chat from your inbox.

@@ -9,15 +9,21 @@ import {
   threadIdSchema,
   togglePinSchema,
   ensureMessagingThreadSchema,
+  loadOlderMessagesSchema,
+  loadMoreThreadsSchema,
 } from "@/lib/validations/messaging";
 import { safeError } from "@/utils/logger";
 import {
   buildContextTitle,
   extractJobRolesFromThreads,
+  MESSAGING_MESSAGES_PAGE_SIZE,
+  MESSAGING_THREADS_PAGE_SIZE,
   MessagingJobRole,
   MessagingMessage,
+  MessagingMessagesPage,
   MessagingRole,
   MessagingThread,
+  MessagingThreadsPage,
 } from "@/types/messaging";
 import { revalidatePath } from "next/cache";
 import { assertEmployerMessaging, fetchEmployerEntitlements } from "@/lib/server/entitlements";
@@ -55,6 +61,14 @@ async function getAuthenticatedProfile() {
   return { supabase, user, profile };
 }
 
+type LastMessageRow = {
+  content: string;
+  created_at: string;
+  sender_id: string;
+  read_at: string | null;
+};
+
+/** Parallel per-thread meta fetches — avoids sequential N+1 waterfalls. */
 async function enrichThreads(
   supabase: Awaited<ReturnType<typeof createClient>>,
   threads: Array<Record<string, unknown>>,
@@ -62,23 +76,40 @@ async function enrichThreads(
   currentUserId: string,
   employerIdentityMode: BillingIdentityMode | null = null
 ): Promise<MessagingThread[]> {
-  const result: MessagingThread[] = [];
+  if (threads.length === 0) return [];
 
-  for (const t of threads) {
-    const { data: lastMessages } = await supabase
-      .from("chat_messages")
-      .select("content, created_at, sender_id, read_at")
-      .eq("thread_id", t.id as string)
-      .order("created_at", { ascending: false })
-      .limit(1);
+  const threadIds = threads.map((t) => t.id as string);
 
-    const { count: unreadCount } = await supabase
-      .from("chat_messages")
-      .select("*", { count: "exact", head: true })
-      .eq("thread_id", t.id as string)
-      .neq("sender_id", currentUserId)
-      .is("read_at", null);
+  const [lastMessagePairs, unreadPairs] = await Promise.all([
+    Promise.all(
+      threadIds.map(async (id) => {
+        const { data } = await supabase
+          .from("chat_messages")
+          .select("content, created_at, sender_id, read_at")
+          .eq("thread_id", id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        return [id, (data as LastMessageRow | null) ?? null] as const;
+      })
+    ),
+    Promise.all(
+      threadIds.map(async (id) => {
+        const { count } = await supabase
+          .from("chat_messages")
+          .select("*", { count: "exact", head: true })
+          .eq("thread_id", id)
+          .neq("sender_id", currentUserId)
+          .is("read_at", null);
+        return [id, count ?? 0] as const;
+      })
+    ),
+  ]);
 
+  const lastByThread = new Map(lastMessagePairs);
+  const unreadByThread = new Map(unreadPairs);
+
+  return threads.map((t) => {
     const jobs = t.jobs as { id: string; title: string } | null;
     const jobTitle = jobs?.title ?? null;
     let oppositeParty: MessagingThread["oppositeParty"];
@@ -112,11 +143,12 @@ async function enrichThreads(
 
     const markedUnread =
       role === "worker"
-        ? (t.worker_marked_unread as boolean)
-        : (t.employer_marked_unread as boolean);
+        ? Boolean(t.worker_marked_unread)
+        : Boolean(t.employer_marked_unread);
 
-    result.push({
-      id: t.id as string,
+    const id = t.id as string;
+    return {
+      id,
       worker_id: t.worker_id as string,
       company_profile_id: t.company_profile_id as string,
       job_id: (t.job_id as string) ?? null,
@@ -127,20 +159,49 @@ async function enrichThreads(
       jobTitle,
       contextTitle: buildContextTitle(jobTitle),
       blocked_reason: (t.blocked_reason as string | null) ?? null,
-      last_message: lastMessages?.[0] ?? null,
-      unread_count: unreadCount ?? 0,
+      last_message: lastByThread.get(id) ?? null,
+      unread_count: unreadByThread.get(id) ?? 0,
       marked_unread: markedUnread,
-    });
-  }
-
-  return result;
+    };
+  });
 }
 
-async function loadMessagingThreads(
+/** One query: which threads already have a non-worker (employer) message. */
+async function filterThreadsWithEmployerMessages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  threads: Array<Record<string, unknown>>,
+  workerId: string
+): Promise<Array<Record<string, unknown>>> {
+  if (threads.length === 0) return [];
+
+  const withEmployer = threads.filter((thread) => {
+    const company = thread.company_profiles as { employer_id: string } | null;
+    return Boolean(company?.employer_id);
+  });
+
+  if (withEmployer.length === 0) return [];
+
+  const threadIds = withEmployer.map((t) => t.id as string);
+  const { data: rows } = await supabase
+    .from("chat_messages")
+    .select("thread_id")
+    .in("thread_id", threadIds)
+    .neq("sender_id", workerId);
+
+  const activeIds = new Set((rows ?? []).map((r) => r.thread_id));
+  return withEmployer.filter((t) => activeIds.has(t.id as string));
+}
+
+async function loadMessagingThreadsPage(
   supabase: Awaited<ReturnType<typeof createClient>>,
   profile: { id: string; role: string },
-  role: MessagingRole
-): Promise<MessagingThread[]> {
+  role: MessagingRole,
+  offset: number,
+  limit: number
+): Promise<MessagingThreadsPage> {
+  // Fetch a wider window so soft-filters (worker: employer-messaged) still fill a page.
+  const fetchLimit = Math.min(offset + limit + limit, 200);
+
   if (role === "worker") {
     const { data: threads, error } = await supabase
       .from("chat_threads")
@@ -149,31 +210,25 @@ async function loadMessagingThreads(
       )
       .eq("worker_id", profile.id)
       .is("worker_deleted_at", null)
-      .order("updated_at", { ascending: false });
+      .order("updated_at", { ascending: false })
+      .limit(fetchLimit);
 
     if (error) {
       safeError("getMessagingThreads worker:", error);
-      return [];
+      return { threads: [], hasMore: false };
     }
 
-    const activeThreads: Array<Record<string, unknown>> = [];
-    for (const thread of threads ?? []) {
-      const company = thread.company_profiles as {
-        employer_id: string;
-      } | null;
-      if (!company?.employer_id) continue;
-
-      const hasEmployerMessage = await employerHasMessagedThread(
-        supabase,
-        thread.id as string,
-        company.employer_id
-      );
-      if (hasEmployerMessage) {
-        activeThreads.push(thread);
-      }
-    }
-
-    return enrichThreads(supabase, activeThreads, role, profile.id);
+    const activeThreads = await filterThreadsWithEmployerMessages(
+      supabase,
+      threads ?? [],
+      profile.id
+    );
+    const pageSlice = activeThreads.slice(offset, offset + limit);
+    const enriched = await enrichThreads(supabase, pageSlice, role, profile.id);
+    return {
+      threads: enriched,
+      hasMore: activeThreads.length > offset + limit,
+    };
   }
 
   const { data: company } = await supabase
@@ -182,7 +237,7 @@ async function loadMessagingThreads(
     .eq("employer_id", profile.id)
     .single();
 
-  if (!company) return [];
+  if (!company) return { threads: [], hasMore: false };
 
   const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
   const identityMode = entitlements?.identityMode ?? "anonymous_preview";
@@ -194,19 +249,94 @@ async function loadMessagingThreads(
     )
     .eq("company_profile_id", company.id)
     .is("employer_deleted_at", null)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .range(offset, offset + limit);
 
   if (error) {
     safeError("getMessagingThreads employer:", error);
-    return [];
+    return { threads: [], hasMore: false };
   }
-  return enrichThreads(
+
+  const rows = threads ?? [];
+  const hasMore = rows.length > limit;
+  const pageRows = hasMore ? rows.slice(0, limit) : rows;
+  const enriched = await enrichThreads(
     supabase,
-    threads ?? [],
+    pageRows,
     role,
     profile.id,
     identityMode
   );
+  return { threads: enriched, hasMore };
+}
+
+async function loadMessagingThreads(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  profile: { id: string; role: string },
+  role: MessagingRole
+): Promise<MessagingThread[]> {
+  const page = await loadMessagingThreadsPage(
+    supabase,
+    profile,
+    role,
+    0,
+    MESSAGING_THREADS_PAGE_SIZE
+  );
+  return page.threads;
+}
+
+async function assertThreadAccess(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  threadId: string
+): Promise<boolean> {
+  const { data: thread, error } = await supabase
+    .from("chat_threads")
+    .select(`id, worker_id, company_profiles (employer_id)`)
+    .eq("id", threadId)
+    .single();
+
+  if (error || !thread) return false;
+
+  const cp = thread.company_profiles as
+    | { employer_id: string }
+    | { employer_id: string }[]
+    | null;
+  const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
+  return thread.worker_id === userId || employerId === userId;
+}
+
+async function fetchMessagesPage(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  threadId: string,
+  limit: number,
+  before?: string
+): Promise<MessagingMessagesPage> {
+  let query = supabase
+    .from("chat_messages")
+    .select(`*, sender:profiles (id, full_name, avatar_url, role)`)
+    .eq("thread_id", threadId)
+    .order("created_at", { ascending: false })
+    .limit(limit + 1);
+
+  if (before) {
+    query = query.lt("created_at", before);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    safeError("fetchMessagesPage:", error);
+    return { messages: [], hasMore: false, nextCursor: null };
+  }
+
+  const rows = (data ?? []) as MessagingMessage[];
+  const hasMore = rows.length > limit;
+  const page = hasMore ? rows.slice(0, limit) : rows;
+  // Newest-first from DB → chronological for UI
+  const messages = page.reverse();
+  const nextCursor = messages[0]?.created_at ?? null;
+
+  return { messages, hasMore, nextCursor };
 }
 
 /** Fetch threads for worker (joins company_profiles) or employer (joins profiles). */
@@ -232,57 +362,108 @@ export async function getMessagingThreads(
   }
 }
 
+/** Paginated inbox page — used for infinite scroll beyond the cached first page. */
+export async function getMessagingThreadsPage(
+  role: MessagingRole,
+  offset = 0,
+  limit = MESSAGING_THREADS_PAGE_SIZE
+): Promise<MessagingThreadsPage> {
+  try {
+    const parsed = loadMoreThreadsSchema.safeParse({ role, offset, limit });
+    if (!parsed.success) return { threads: [], hasMore: false };
+
+    const ctx = await getAuthenticatedProfile();
+    if (!ctx || ctx.profile.role !== parsed.data.role) {
+      return { threads: [], hasMore: false };
+    }
+
+    return loadMessagingThreadsPage(
+      ctx.supabase,
+      ctx.profile,
+      parsed.data.role,
+      parsed.data.offset,
+      parsed.data.limit ?? MESSAGING_THREADS_PAGE_SIZE
+    );
+  } catch (err) {
+    safeError("getMessagingThreadsPage:", err);
+    return { threads: [], hasMore: false };
+  }
+}
+
+/** Most recent messages for a thread (paginated). Older history via loadOlderMessagingMessages. */
 export async function getMessagingMessages(
   threadId: string
-): Promise<MessagingMessage[]> {
+): Promise<MessagingMessagesPage> {
+  const empty: MessagingMessagesPage = {
+    messages: [],
+    hasMore: false,
+    nextCursor: null,
+  };
   try {
     const ctx = await getAuthenticatedProfile();
-    if (!ctx) return [];
+    if (!ctx) return empty;
 
     const parsed = threadIdSchema.safeParse({ threadId });
-    if (!parsed.success) return [];
+    if (!parsed.success) return empty;
 
     const { supabase, user } = ctx;
-
-    const { data: thread, error: threadError } = await supabase
-      .from("chat_threads")
-      .select(
-        `id, worker_id, company_profiles (employer_id)`
-      )
-      .eq("id", parsed.data.threadId)
-      .single();
-
-    if (threadError || !thread) return [];
-
-    const cp = thread.company_profiles as
-      | { employer_id: string }
-      | { employer_id: string }[]
-      | null;
-    const employerId = Array.isArray(cp) ? cp[0]?.employer_id : cp?.employer_id;
-    if (thread.worker_id !== user.id && employerId !== user.id) return [];
+    const allowed = await assertThreadAccess(
+      supabase,
+      user.id,
+      parsed.data.threadId
+    );
+    if (!allowed) return empty;
 
     return getOrSet(
       CacheKeys.messagingMessages(user.id, parsed.data.threadId),
       CACHE_TTL_SECONDS.messagingMessages,
-      async () => {
-        const { data: messages, error } = await supabase
-          .from("chat_messages")
-          .select(
-            `*, sender:profiles (id, full_name, avatar_url, role)`
-          )
-          .eq("thread_id", parsed.data.threadId)
-          .order("created_at", { ascending: true });
-
-        if (error) {
-          safeError("getMessagingMessages:", error);
-          return [];
-        }
-        return (messages ?? []) as MessagingMessage[];
-      }
+      () =>
+        fetchMessagesPage(
+          supabase,
+          parsed.data.threadId,
+          MESSAGING_MESSAGES_PAGE_SIZE
+        )
     );
   } catch (err) {
     safeError("getMessagingMessages:", err);
-    return [];
+    return empty;
+  }
+}
+
+/** Cursor-paginated older messages (not Redis-cached — ephemeral scroll history). */
+export async function loadOlderMessagingMessages(
+  threadId: string,
+  before: string,
+  limit = MESSAGING_MESSAGES_PAGE_SIZE
+): Promise<MessagingMessagesPage> {
+  const empty: MessagingMessagesPage = {
+    messages: [],
+    hasMore: false,
+    nextCursor: null,
+  };
+  try {
+    const parsed = loadOlderMessagesSchema.safeParse({ threadId, before, limit });
+    if (!parsed.success) return empty;
+
+    const ctx = await getAuthenticatedProfile();
+    if (!ctx) return empty;
+
+    const allowed = await assertThreadAccess(
+      ctx.supabase,
+      ctx.user.id,
+      parsed.data.threadId
+    );
+    if (!allowed) return empty;
+
+    return fetchMessagesPage(
+      ctx.supabase,
+      parsed.data.threadId,
+      parsed.data.limit ?? MESSAGING_MESSAGES_PAGE_SIZE,
+      parsed.data.before
+    );
+  } catch (err) {
+    safeError("loadOlderMessagingMessages:", err);
+    return empty;
   }
 }
 
@@ -643,8 +824,42 @@ export async function getUnreadMessagingCount(
     const ctx = await getAuthenticatedProfile();
     if (!ctx || ctx.profile.role !== role) return 0;
 
-    const threads = await getMessagingThreads(role);
-    return threads.reduce((sum, t) => sum + t.unread_count, 0);
+    const { supabase, profile } = ctx;
+
+    let threadIds: string[] = [];
+
+    if (role === "worker") {
+      const { data: threads } = await supabase
+        .from("chat_threads")
+        .select("id")
+        .eq("worker_id", profile.id)
+        .is("worker_deleted_at", null);
+      threadIds = (threads ?? []).map((t) => t.id);
+    } else {
+      const { data: company } = await supabase
+        .from("company_profiles")
+        .select("id")
+        .eq("employer_id", profile.id)
+        .maybeSingle();
+      if (!company) return 0;
+      const { data: threads } = await supabase
+        .from("chat_threads")
+        .select("id")
+        .eq("company_profile_id", company.id)
+        .is("employer_deleted_at", null);
+      threadIds = (threads ?? []).map((t) => t.id);
+    }
+
+    if (threadIds.length === 0) return 0;
+
+    const { count } = await supabase
+      .from("chat_messages")
+      .select("*", { count: "exact", head: true })
+      .in("thread_id", threadIds)
+      .neq("sender_id", profile.id)
+      .is("read_at", null);
+
+    return count ?? 0;
   } catch {
     return 0;
   }

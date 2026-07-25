@@ -5,6 +5,11 @@ export type DbChatMessage = Database["public"]["Tables"]["chat_messages"]["Row"]
 
 export type MessagingRole = "worker" | "employer";
 
+/** Initial / page size for message history (cursor pagination). */
+export const MESSAGING_MESSAGES_PAGE_SIZE = 30;
+/** Initial / page size for inbox thread list. */
+export const MESSAGING_THREADS_PAGE_SIZE = 40;
+
 /** Sentinel value for the "All Roles" dropdown option. */
 export const ALL_JOB_ROLES = "all" as const;
 export type JobRoleFilterValue = typeof ALL_JOB_ROLES | string;
@@ -54,6 +59,18 @@ export interface MessagingMessage extends DbChatMessage {
     avatar_url: string | null;
     role: "employer" | "worker" | "admin";
   } | null;
+}
+
+export interface MessagingMessagesPage {
+  messages: MessagingMessage[];
+  hasMore: boolean;
+  /** ISO created_at of the oldest loaded message — pass as `before` to load older. */
+  nextCursor: string | null;
+}
+
+export interface MessagingThreadsPage {
+  threads: MessagingThread[];
+  hasMore: boolean;
 }
 
 /** Derive unique job roles from real thread data — no mock hydration. */

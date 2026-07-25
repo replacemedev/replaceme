@@ -1,6 +1,7 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { useMemo } from "react";
+import { Virtuoso } from "react-virtuoso";
 import {
   ALL_JOB_ROLES,
   JobRoleFilterValue,
@@ -10,7 +11,7 @@ import {
 } from "@/types/messaging";
 import { InboxThreadItem } from "./InboxThreadItem";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Inbox } from "lucide-react";
+import { Inbox, Search } from "lucide-react";
 
 interface InboxSidebarProps {
   threads: MessagingThread[];
@@ -24,8 +25,10 @@ interface InboxSidebarProps {
   onJobRoleChange: (jobRoleId: JobRoleFilterValue) => void;
   onSelectThread: (threadId: string) => void;
   role?: MessagingRole;
-  /** Hide inbox on mobile when a thread is open (master-detail). */
   mobileHidden?: boolean;
+  hasMoreThreads?: boolean;
+  isLoadingMoreThreads?: boolean;
+  onLoadMoreThreads?: () => void;
 }
 
 export function InboxSidebar({
@@ -41,22 +44,29 @@ export function InboxSidebar({
   onSelectThread,
   role = "worker",
   mobileHidden = false,
+  hasMoreThreads = false,
+  isLoadingMoreThreads = false,
+  onLoadMoreThreads,
 }: InboxSidebarProps) {
-  const filtered = threads.filter((t) => {
-    if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
-      return false;
-    }
+  const filtered = useMemo(
+    () =>
+      threads.filter((t) => {
+        if (selectedJobRole !== ALL_JOB_ROLES && t.job_id !== selectedJobRole) {
+          return false;
+        }
 
-    const q = searchQuery.toLowerCase();
-    const matches =
-      t.oppositeParty.name.toLowerCase().includes(q) ||
-      (t.jobTitle?.toLowerCase().includes(q) ?? false) ||
-      (t.last_message?.content.toLowerCase().includes(q) ?? false);
-    if (!matches) return false;
-    if (activeTab === "unread") return t.unread_count > 0 || t.marked_unread;
-    if (activeTab === "pinned") return t.is_pinned;
-    return true;
-  });
+        const q = searchQuery.toLowerCase();
+        const matches =
+          t.oppositeParty.name.toLowerCase().includes(q) ||
+          (t.jobTitle?.toLowerCase().includes(q) ?? false) ||
+          (t.last_message?.content.toLowerCase().includes(q) ?? false);
+        if (!matches) return false;
+        if (activeTab === "unread") return t.unread_count > 0 || t.marked_unread;
+        if (activeTab === "pinned") return t.is_pinned;
+        return true;
+      }),
+    [threads, selectedJobRole, searchQuery, activeTab]
+  );
 
   return (
     <aside
@@ -93,9 +103,9 @@ export function InboxSidebar({
           className="w-full mb-3 px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-[#006e2f] focus:border-[#006e2f] cursor-pointer"
         >
           <option value={ALL_JOB_ROLES}>All Roles</option>
-          {availableJobRoles.map((role) => (
-            <option key={role.id} value={role.id}>
-              {role.title}
+          {availableJobRoles.map((jobRole) => (
+            <option key={jobRole.id} value={jobRole.id}>
+              {jobRole.title}
             </option>
           ))}
         </select>
@@ -118,7 +128,7 @@ export function InboxSidebar({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 min-h-0">
         {threads.length === 0 ? (
           <div className="flex items-center justify-center h-full p-4">
             <EmptyState
@@ -142,14 +152,41 @@ export function InboxSidebar({
             No threads match your filters
           </p>
         ) : (
-          filtered.map((thread) => (
-            <InboxThreadItem
-              key={thread.id}
-              thread={thread}
-              isActive={selectedThreadId === thread.id}
-              onClick={() => onSelectThread(thread.id)}
-            />
-          ))
+          <Virtuoso
+            className="h-full"
+            data={filtered}
+            endReached={() => {
+              if (
+                hasMoreThreads &&
+                !isLoadingMoreThreads &&
+                onLoadMoreThreads &&
+                activeTab === "all" &&
+                !searchQuery &&
+                selectedJobRole === ALL_JOB_ROLES
+              ) {
+                onLoadMoreThreads();
+              }
+            }}
+            increaseViewportBy={120}
+            computeItemKey={(_, thread) => thread.id}
+            itemContent={(_, thread) => (
+              <InboxThreadItem
+                thread={thread}
+                isActive={selectedThreadId === thread.id}
+                onClick={() => onSelectThread(thread.id)}
+              />
+            )}
+            components={{
+              Footer: () =>
+                isLoadingMoreThreads ? (
+                  <p className="py-3 text-center text-[11px] font-semibold text-slate-400">
+                    Loading more…
+                  </p>
+                ) : (
+                  <div className="h-2" />
+                ),
+            }}
+          />
         )}
       </div>
     </aside>

@@ -1,16 +1,21 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   getMessagingThreads,
   getMessagingMessages,
-  getMessagingJobRoles,
   ensureMessagingThread,
 } from "@/actions/messaging";
 import { MessagingClient } from "@/components/shared/messaging/MessagingClient";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { EmployerPageShell, EmployerPageHeader } from "@/components/employer/layout";
+import { EmployerPageShell } from "@/components/employer/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
-import type { MessagingJobRole, MessagingThread } from "@/types/messaging";
+import {
+  extractJobRolesFromThreads,
+  MESSAGING_THREADS_PAGE_SIZE,
+  type MessagingMessagesPage,
+  type MessagingThread,
+} from "@/types/messaging";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 
 export const metadata = {
@@ -21,7 +26,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ threadId?: string; jobId?: string; candidateId?: string }>;
+  searchParams: Promise<{
+    threadId?: string;
+    jobId?: string;
+    candidateId?: string;
+  }>;
 }
 
 export default async function EmployerMessagesPage({ searchParams }: PageProps) {
@@ -50,26 +59,43 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
     }
   }
 
-  let resolvedThreadId = threadId;
+  const resolvedThreadId = threadId;
 
   let threads: MessagingThread[] = [];
-  let availableJobRoles: MessagingJobRole[] = [];
   let planUsage: EmployerPlanUsage | null = null;
+  let companyProfileId: string | null = null;
   let loadError: string | null = null;
 
   try {
-    [threads, availableJobRoles, planUsage] = await Promise.all([
+    const [threadList, usage, company] = await Promise.all([
       getMessagingThreads("employer"),
-      getMessagingJobRoles("employer"),
       getEmployerPlanUsage(),
+      supabase
+        .from("company_profiles")
+        .select("id")
+        .eq("employer_id", profile.id)
+        .maybeSingle(),
     ]);
+    threads = threadList;
+    planUsage = usage;
+    companyProfileId = company.data?.id ?? null;
   } catch {
-    loadError = "We couldn't load your messaging inbox. Please refresh and try again.";
+    loadError =
+      "We couldn't load your messaging inbox. Please refresh and try again.";
   }
 
-  const initialMessages = resolvedThreadId
+  const availableJobRoles = extractJobRolesFromThreads(threads);
+  const hasMoreThreads = threads.length >= MESSAGING_THREADS_PAGE_SIZE;
+
+  const emptyMessages: MessagingMessagesPage = {
+    messages: [],
+    hasMore: false,
+    nextCursor: null,
+  };
+
+  const initialMessagesPage = resolvedThreadId
     ? await getMessagingMessages(resolvedThreadId)
-    : [];
+    : emptyMessages;
 
   if (loadError) {
     return (
@@ -80,18 +106,25 @@ export default async function EmployerMessagesPage({ searchParams }: PageProps) 
   }
 
   return (
-    <EmployerPageShell width="wide" className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4">
-      <MessagingClient
-        role="employer"
-        basePath="/employer/messages"
-        threads={threads}
-        availableJobRoles={availableJobRoles}
-        initialMessages={initialMessages}
-        selectedThreadId={resolvedThreadId ?? null}
-        currentUserId={profile.id}
-        messagingEnabled={planUsage?.messagingEnabled ?? false}
-        planSlug={planUsage?.planSlug ?? "discovery"}
-      />
+    <EmployerPageShell
+      width="wide"
+      className="h-[calc(100dvh-4rem)] flex flex-col justify-center py-4"
+    >
+      <Suspense fallback={null}>
+        <MessagingClient
+          role="employer"
+          basePath="/employer/messages"
+          threads={threads}
+          availableJobRoles={availableJobRoles}
+          initialMessagesPage={initialMessagesPage}
+          selectedThreadId={resolvedThreadId ?? null}
+          currentUserId={profile.id}
+          companyProfileId={companyProfileId}
+          initialHasMoreThreads={hasMoreThreads}
+          messagingEnabled={planUsage?.messagingEnabled ?? false}
+          planSlug={planUsage?.planSlug ?? "discovery"}
+        />
+      </Suspense>
     </EmployerPageShell>
   );
 }
