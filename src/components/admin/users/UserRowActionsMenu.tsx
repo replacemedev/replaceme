@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   Eye,
   MoreHorizontal,
   Trash2,
@@ -220,7 +221,7 @@ export function UserRowActionsMenu({
           <span className="sr-only">Actions for {label}</span>
         </summary>
         {open ? (
-          <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+          <div className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
             <Link
               href={profileHref}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
@@ -263,6 +264,7 @@ export function UserRowActionsMenu({
 
       <ConfirmDialog
         open={mode !== null}
+        size={mode === "delete" ? "lg" : "md"}
         title={
           mode === "suspend"
             ? `Suspend ${kind}?`
@@ -292,7 +294,20 @@ export function UserRowActionsMenu({
         onConfirm={runAction}
       >
         {mode === "suspend" ? (
-          <div className="space-y-3 text-sm">
+          <div className="space-y-4 text-sm">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <AlertTriangle
+                className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
+                aria-hidden
+              />
+              <p className="leading-relaxed">
+                Suspended accounts cannot sign in until reactivated
+                {durationDays
+                  ? ` or after the ${durationDays}-day period`
+                  : " (or until further review)"}
+                .
+              </p>
+            </div>
             <Field label="Duration">
               <select
                 value={durationDays === null ? "indefinite" : String(durationDays)}
@@ -300,7 +315,7 @@ export function UserRowActionsMenu({
                   const v = e.target.value;
                   setDurationDays(v === "indefinite" ? null : (Number(v) as DurationDays));
                 }}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               >
                 {ACCOUNT_LIFECYCLE_TIMELINES.suspendOptionsDays.map((d) => (
                   <option key={d} value={d}>
@@ -316,7 +331,7 @@ export function UserRowActionsMenu({
                 onChange={(e) =>
                   setReasonCategory(e.target.value as typeof reasonCategory)
                 }
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               >
                 <option value="policy">Policy</option>
                 <option value="fraud">Fraud</option>
@@ -331,7 +346,7 @@ export function UserRowActionsMenu({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Policy violation, fraud report, etc."
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               />
             </Field>
             <NotifyCheckbox checked={notifyUser} onChange={setNotifyUser} />
@@ -339,14 +354,24 @@ export function UserRowActionsMenu({
         ) : null}
 
         {mode === "unsuspend" ? (
-          <NotifyCheckbox checked={notifyUser} onChange={setNotifyUser} />
+          <div className="space-y-4 text-sm">
+            <NotifyCheckbox checked={notifyUser} onChange={setNotifyUser} />
+          </div>
         ) : null}
 
         {mode === "delete" ? (
-          <div className="space-y-3 text-sm">
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-              Schedule uses a {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day
-              grace (closes ~{graceEnd}). Immediate erase skips recovery.
+          <div className="space-y-5 text-sm">
+            <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-950">
+              <AlertTriangle
+                className="mt-0.5 h-4 w-4 shrink-0 text-red-600"
+                aria-hidden
+              />
+              <p className="leading-relaxed">
+                Schedule uses a{" "}
+                {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace
+                (closes ~{graceEnd}). Immediate erase skips recovery and cannot
+                be undone from the admin panel.
+              </p>
             </div>
             <Field label="Mode">
               <select
@@ -354,52 +379,62 @@ export function UserRowActionsMenu({
                 onChange={(e) =>
                   setDeleteMode(e.target.value as "schedule" | "immediate")
                 }
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               >
                 <option value="schedule">Schedule (default, 30-day grace)</option>
                 <option value="immediate">Immediate erase (override)</option>
               </select>
             </Field>
             {loadingBlockers ? (
-              <p className="text-xs text-slate-500">Checking engagements…</p>
+              <p className="text-sm text-slate-500">Checking engagements…</p>
             ) : blockers ? (
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 {blockers.canProceedWithoutForce ? (
                   <p>No open engagement blockers.</p>
                 ) : (
-                  <ul className="list-disc space-y-1 pl-4">
+                  <ul className="list-disc list-outside ml-4 space-y-1.5">
                     {blockers.messages.map((m) => (
-                      <li key={m}>{m}</li>
+                      <li key={m} className="pl-1">
+                        {m}
+                      </li>
                     ))}
                   </ul>
                 )}
               </div>
             ) : null}
             {!blockers?.canProceedWithoutForce ? (
-              <label className="flex items-start gap-2 text-xs text-slate-700">
+              <label className="flex items-start gap-2.5 text-sm text-slate-700">
                 <input
                   type="checkbox"
                   checked={forceClose}
                   onChange={(e) => setForceClose(e.target.checked)}
-                  className="mt-0.5"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300"
                 />
                 Force close engagements (audited)
               </label>
             ) : null}
-            <div className="grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
-              <div>
-                <p className="font-semibold text-slate-800">Wiped</p>
-                <ul className="mt-1 list-disc pl-4">
-                  <li>Profile PII / email → sentinel</li>
-                  <li>KYC / resume / avatar</li>
-                  {kind === "employer" ? <li>Public company fields</li> : null}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Wiped
+                </p>
+                <ul className="mt-2 list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
+                  <li className="pl-0.5">Profile PII / email → sentinel</li>
+                  <li className="pl-0.5">KYC / resume / avatar</li>
+                  {kind === "employer" ? (
+                    <li className="pl-0.5">Public company fields</li>
+                  ) : null}
                 </ul>
               </div>
-              <div>
-                <p className="font-semibold text-slate-800">Retained</p>
-                <ul className="mt-1 list-disc pl-4">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Retained
+                </p>
+                <ul className="mt-2 list-disc list-outside ml-4 space-y-1.5 text-sm text-slate-700">
                   {DATA_RETENTION_PERIODS.slice(2, 5).map((r) => (
-                    <li key={r.category}>{r.category}</li>
+                    <li key={r.category} className="pl-0.5">
+                      {r.category}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -410,7 +445,7 @@ export function UserRowActionsMenu({
                 onChange={(e) =>
                   setReasonCategory(e.target.value as typeof reasonCategory)
                 }
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               >
                 <option value="policy">Policy</option>
                 <option value="fraud">Fraud</option>
@@ -424,16 +459,17 @@ export function UserRowActionsMenu({
                 type="text"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
               />
             </Field>
-            <Field label='Type DELETE or the account email'>
+            <Field label="Type DELETE or the account email">
               <input
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder={email ?? "DELETE"}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={FIELD_CONTROL}
+                autoComplete="off"
               />
             </Field>
             <NotifyCheckbox checked={notifyUser} onChange={setNotifyUser} />
@@ -444,6 +480,9 @@ export function UserRowActionsMenu({
   );
 }
 
+const FIELD_CONTROL =
+  "mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 md:text-sm";
+
 function Field({
   label,
   children,
@@ -453,7 +492,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium text-slate-600">{label}</span>
+      <span className="text-sm font-medium text-slate-700">{label}</span>
       {children}
     </label>
   );
@@ -467,12 +506,12 @@ function NotifyCheckbox({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-2 text-xs text-slate-700">
+    <label className="flex items-start gap-2.5 text-sm text-slate-700">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5"
+        className="mt-0.5 h-4 w-4 rounded border-slate-300"
       />
       Notify user by email
     </label>

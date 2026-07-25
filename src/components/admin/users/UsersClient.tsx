@@ -373,6 +373,7 @@ export function UsersClient({
                 return (
                   <AdminMobileCard
                     key={worker.id}
+                    actionsPlacement="header"
                     actions={
                       <UserRowActionsMenu
                         userId={worker.id}
@@ -385,32 +386,37 @@ export function UsersClient({
                       />
                     }
                   >
-                    <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-                      <Link
-                        href={`/admin/users/workers/${worker.id}`}
-                        className="hover:text-emerald-700 hover:underline truncate min-w-0"
-                      >
-                        {name}
-                      </Link>
-                      <VerifiedBadge show={worker.is_verified} size="sm" />
-                    </p>
-                    <MailtoEmail email={worker.email} />
-                    <p className="text-sm text-slate-600">
-                      {worker.professional_title ?? "—"}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+                        <Link
+                          href={`/admin/users/workers/${worker.id}`}
+                          className="hover:text-emerald-700 hover:underline truncate min-w-0"
+                        >
+                          {name}
+                        </Link>
+                        <VerifiedBadge show={worker.is_verified} size="sm" />
+                      </p>
+                      <MailtoEmail email={worker.email} />
+                    </div>
+                    {worker.professional_title ? (
+                      <p className="text-sm text-slate-600 truncate">
+                        {worker.professional_title}
+                      </p>
+                    ) : null}
+                    <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge status={worker.verification_status} />
                       <AccountStatusBadge
                         deletedAt={worker.deleted_at}
                         accountStatus={worker.account_status}
                       />
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Joined {formatDate(worker.created_at)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Last active {formatRelativeOrDate(worker.last_sign_in_at)}
-                    </p>
+                    <div className="space-y-0.5 text-sm text-slate-500">
+                      <p>Joined {formatDate(worker.created_at)}</p>
+                      <p>
+                        Last active{" "}
+                        {formatRelativeOrDate(worker.last_sign_in_at)}
+                      </p>
+                    </div>
                   </AdminMobileCard>
                 );
               }
@@ -419,6 +425,7 @@ export function UsersClient({
                 return (
                   <AdminMobileCard
                     key={employer.id}
+                    actionsPlacement="header"
                     actions={
                       <UserRowActionsMenu
                         userId={employer.employer_id}
@@ -431,19 +438,23 @@ export function UsersClient({
                       />
                     }
                   >
-                    <p className="font-semibold text-slate-900">
-                      <Link
-                        href={`/admin/users/employers/${employer.employer_id}`}
-                        className="hover:text-emerald-700 hover:underline"
-                      >
-                        {employer.company_name}
-                      </Link>
-                    </p>
-                    <MailtoEmail email={employer.email} />
-                    <p className="text-sm text-slate-600">
-                      {employer.industry ?? "—"}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 truncate">
+                        <Link
+                          href={`/admin/users/employers/${employer.employer_id}`}
+                          className="hover:text-emerald-700 hover:underline"
+                        >
+                          {employer.company_name}
+                        </Link>
+                      </p>
+                      <MailtoEmail email={employer.email} />
+                    </div>
+                    {employer.industry ? (
+                      <p className="text-sm text-slate-600 truncate">
+                        {employer.industry}
+                      </p>
+                    ) : null}
+                    <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge
                         status={employer.subscription_status ?? "inactive"}
                       />
@@ -452,22 +463,29 @@ export function UsersClient({
                         accountStatus={employer.account_status}
                       />
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Joined {formatDate(employer.created_at)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Last active {formatRelativeOrDate(employer.last_sign_in_at)}
-                    </p>
+                    <div className="space-y-0.5 text-sm text-slate-500">
+                      <p>Joined {formatDate(employer.created_at)}</p>
+                      <p>
+                        Last active{" "}
+                        {formatRelativeOrDate(employer.last_sign_in_at)}
+                      </p>
+                    </div>
                   </AdminMobileCard>
                 );
               }
               const admin = row as AdminAdminRow;
               const name = displayName(admin.first_name, admin.middle_name, admin.last_name, "Unnamed");
               return (
-                <AdminMobileCard key={admin.id} actions={adminTeamHint}>
-                  <p className="font-semibold text-slate-900">{name}</p>
-                  <p className="text-xs text-slate-500">{admin.email}</p>
-                  <div className="flex flex-wrap gap-2">
+                <AdminMobileCard
+                  key={admin.id}
+                  actionsPlacement="header"
+                  actions={adminTeamHint}
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-900 truncate">{name}</p>
+                    <p className="text-xs text-slate-500 truncate">{admin.email}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2 py-0.5 text-[11px] font-semibold text-[#006e2f]">
                       <ShieldCheck className="h-3 w-3" aria-hidden />
                       Platform Admin
@@ -478,8 +496,7 @@ export function UsersClient({
               );
             })}
           >
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     <th className={ADMIN_TABLE_TH}>User</th>
@@ -666,7 +683,6 @@ export function UsersClient({
                         : null}
                 </tbody>
               </table>
-            </div>
           </AdminDataTable>
 
           <TablePagination

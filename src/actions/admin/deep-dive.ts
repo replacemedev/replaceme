@@ -95,10 +95,6 @@ export type AdminEmployerDeepDive = {
   accountStatus: string;
   createdAt: string;
   phoneNumber?: string | null;
-  idType?: string | null;
-  idNumber?: string | null;
-  idExpirationDate?: string | null;
-  idIssuingCountry?: string | null;
   country?: string | null;
   subscription: {
     status: string;
@@ -141,7 +137,7 @@ export async function getAdminEmployerDeepDive(
       await Promise.all([
         supabase
           .from("profiles")
-          .select("id, email, account_status, created_at, role, phone_number, id_type, id_number, id_expiration_date, id_issuing_country, country")
+          .select("id, email, account_status, created_at, role, phone_number, country")
           .eq("id", id)
           .maybeSingle(),
         supabase
@@ -200,10 +196,6 @@ export async function getAdminEmployerDeepDive(
       accountStatus: profile.account_status,
       createdAt: company?.created_at ?? profile.created_at,
       phoneNumber: profile.phone_number,
-      idType: profile.id_type,
-      idNumber: profile.id_number,
-      idExpirationDate: profile.id_expiration_date,
-      idIssuingCountry: profile.id_issuing_country,
       country: profile.country,
       subscription: subscription
         ? {

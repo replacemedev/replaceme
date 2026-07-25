@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Briefcase, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
@@ -62,15 +62,15 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 border-b border-slate-100 pb-5 text-sm">
-            <div>
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div className="min-w-0">
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Primary contact
               </p>
-              <p className="font-semibold text-slate-700 mt-1">{data.companyName}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{data.email}</p>
+              <p className="font-semibold text-slate-700 mt-1 break-words">{data.companyName}</p>
+              <p className="text-xs text-slate-500 mt-0.5 break-all">{data.email}</p>
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                 Industry
               </p>
@@ -78,8 +78,16 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
                 {data.industry ?? "—"}
               </p>
             </div>
+            <div className="min-w-0">
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Phone Number</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.phoneNumber ?? "—"}</p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Country</p>
+              <p className="font-semibold text-slate-700 mt-1">{data.country ?? "—"}</p>
+            </div>
             {data.websiteUrl ? (
-              <div className="sm:col-span-2">
+              <div className="min-w-0 md:col-span-2">
                 <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                   Website
                 </p>
@@ -91,41 +99,13 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-[#006e2f] hover:underline mt-1"
+                  className="inline-flex max-w-full items-center gap-1 font-semibold text-[#006e2f] hover:underline mt-1 break-all"
                 >
-                  {data.websiteUrl}
-                  <ExternalLink className="h-3 w-3" />
+                  <span className="min-w-0">{data.websiteUrl}</span>
+                  <ExternalLink className="h-3 w-3 shrink-0" />
                 </a>
               </div>
             ) : null}
-          </div>
-
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Phone Number</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.phoneNumber ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Country</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.country ?? "—"}</p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 text-sm">
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">ID Verification</p>
-              <p className="font-semibold text-slate-700 mt-1">
-                {data.idType ? `${data.idType} (${data.idNumber})` : "—"}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">ID Expiration & Issuing Country</p>
-              <p className="font-semibold text-slate-700 mt-1">
-                {data.idExpirationDate
-                  ? `${data.idExpirationDate} (${data.idIssuingCountry || "—"})`
-                  : "—"}
-              </p>
-            </div>
           </div>
         </div>
 
