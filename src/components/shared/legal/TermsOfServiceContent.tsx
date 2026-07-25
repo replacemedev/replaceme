@@ -6,7 +6,7 @@ const tocItems = [
   { href: "#1-acceptance-of-terms", label: "1. Acceptance of Terms" },
   { href: "#2-platform-role", label: "2. Platform Role (Digital Conduit)" },
   { href: "#3-eligibility-accounts", label: "3. Eligibility & Accounts" },
-  { href: "#4-workers", label: "4. Workers (Philippines)" },
+  { href: "#4-workers", label: "4. Workers (Filipino Citizens)" },
   { href: "#41-id-verification", label: "4.1 ID Verification (RA 11967)", indent: true },
   { href: "#42-bir-tax", label: "4.2 BIR & Tax (RR 15-2024)", indent: true },
   { href: "#5-employers", label: "5. Employers (Global & Local)" },
@@ -157,7 +157,19 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         title="Eligibility & Accounts"
       />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>You must:</p>
+        <p>
+          <strong className="font-semibold text-slate-800">
+            Platform work and identity verification are strictly restricted to citizens of the
+            Philippines.
+          </strong>{" "}
+          Only natural persons who are Filipino citizens may register as Workers, complete identity
+          verification, list a Worker profile, apply to roles, or otherwise offer services through
+          the Platform. Dual citizens who hold Philippine citizenship may qualify if they can
+          complete verification with accepted Philippine government-issued identification.
+          Non-citizens—including foreign nationals residing in the Philippines, temporary visitors,
+          and undocumented persons—are not eligible for Worker accounts or verification.
+        </p>
+        <p>All users must:</p>
         <ul className="list-disc space-y-2 pl-5">
           <li>Be at least eighteen (18) years of age;</li>
           <li>Provide accurate, complete, and current registration information;</li>
@@ -169,19 +181,22 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         </ul>
         <p>
           You are responsible for all activity under your account. We may require identity,
-          business, or tax documentation before unlocking listing, messaging, payout, or hiring
-          features.
+          citizenship, business, or tax documentation before unlocking listing, messaging, payout,
+          or hiring features. We may refuse, suspend, or permanently remove any account that cannot
+          demonstrate Filipino citizenship for Worker eligibility or that attempts to circumvent
+          these restrictions.
         </p>
       </div>
 
       <LegalSectionHeading
         id="4-workers"
         number={4}
-        title="Workers Residing or Operating in the Philippines"
+        title="Workers (Filipino Citizens)"
       />
       <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        This Section applies to Workers who reside in, operate from, or offer services through the
-        Philippines via Replaceme.
+        This Section applies exclusively to Workers who are citizens of the Philippines and who
+        offer services through Replaceme. Platform work and identity verification are strictly
+        restricted to Filipino citizens; residency alone does not confer eligibility.
       </p>
 
       <div className="mb-4 space-y-4">
@@ -196,6 +211,11 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             <ul className="list-disc space-y-2 pl-5">
               <li>Full legal name matching government records;</li>
               <li>
+                Proof of Philippine citizenship (for example, a Philippine Passport, PhilID /
+                National ID reflecting Filipino citizenship, or other government evidence we accept
+                from time to time);
+              </li>
+              <li>
                 At least one (1) valid Philippine government-issued identification document (for
                 example: PhilID / National ID, Philippine Passport, Driver&apos;s License, UMID,
                 PRC ID, or other IDs we accept from time to time);
@@ -206,9 +226,9 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             <p>
               We maintain and periodically update a register of listed Workers for compliance,
               transparency, and lawful requests by competent authorities. Failure or refusal to
-              complete ID verification, or submission of forged / mismatched documents, will result
-              in delayed listing, account restriction, suspension, or permanent removal from the
-              Platform.
+              complete ID verification, inability to prove Filipino citizenship, or submission of
+              forged / mismatched documents, will result in delayed listing, account restriction,
+              suspension, or permanent removal from the Platform.
             </p>
           </div>
         </RoleCard>

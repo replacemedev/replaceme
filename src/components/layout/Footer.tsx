@@ -76,6 +76,30 @@ export function Footer() {
               <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/terms-of-service">
                 Terms of Service
               </Link>
+              <Link
+                className="text-base text-gray-600 hover:text-emerald-600 transition-colors block"
+                href="/terms-of-service#51-subscriptions"
+              >
+                Subscription Terms
+              </Link>
+              <Link
+                className="text-base text-gray-600 hover:text-emerald-600 transition-colors block"
+                href="/terms-of-service#6-payments"
+              >
+                Billing &amp; Payment Policy
+              </Link>
+              <Link
+                className="text-base text-gray-600 hover:text-emerald-600 transition-colors block"
+                href="/terms-of-service#65-refunds-chargebacks"
+              >
+                Refund Policy
+              </Link>
+              <Link
+                className="text-base text-gray-600 hover:text-emerald-600 transition-colors block"
+                href="/terms-of-service#3-eligibility-accounts"
+              >
+                Eligibility &amp; Verification Policy
+              </Link>
               <Link className="text-base text-gray-600 hover:text-emerald-600 transition-colors block" href="/cookie-policy">
                 Cookie Policy
               </Link>
@@ -85,21 +109,58 @@ export function Footer() {
         </div>
 
         {/* Bottom Copyright */}
-        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">
+        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <p className="text-sm text-gray-500 shrink-0">
             © {new Date().getFullYear()} Replaceme. All rights reserved.
           </p>
-          <p className="text-xs text-gray-400 text-center sm:text-right max-w-md">
-            We do not collect employer TIN/EIN numbers. See our{" "}
-            <Link href="/privacy-policy" className="underline hover:text-emerald-600 transition-colors">
-              Privacy Policy
-            </Link>{" "}
-            and{" "}
-            <Link href="/terms-of-service" className="underline hover:text-emerald-600 transition-colors">
-              Terms
-            </Link>
-            .
-          </p>
+          <div className="text-xs text-gray-400 text-center sm:text-right max-w-2xl space-y-2 leading-relaxed">
+            <p>
+              Employer subscription payments are processed securely by{" "}
+              <a
+                href="https://stripe.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-emerald-600 transition-colors"
+              >
+                Stripe
+              </a>
+              . Replaceme is the merchant of record for standard Stripe Billing subscriptions.
+              Recurring charges, cancellations, and refunds are governed by our{" "}
+              <Link
+                href="/terms-of-service#6-payments"
+                className="underline hover:text-emerald-600 transition-colors"
+              >
+                Billing &amp; Payment Policy
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/terms-of-service#65-refunds-chargebacks"
+                className="underline hover:text-emerald-600 transition-colors"
+              >
+                Refund Policy
+              </Link>
+              .
+            </p>
+            <p>
+              Platform work and identity verification are strictly restricted to citizens of the
+              Philippines. See our{" "}
+              <Link
+                href="/terms-of-service#3-eligibility-accounts"
+                className="underline hover:text-emerald-600 transition-colors"
+              >
+                Eligibility &amp; Verification Policy
+              </Link>
+              . We do not collect employer TIN/EIN numbers. See our{" "}
+              <Link href="/privacy-policy" className="underline hover:text-emerald-600 transition-colors">
+                Privacy Policy
+              </Link>{" "}
+              and{" "}
+              <Link href="/terms-of-service" className="underline hover:text-emerald-600 transition-colors">
+                Terms
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </div>
     </footer>

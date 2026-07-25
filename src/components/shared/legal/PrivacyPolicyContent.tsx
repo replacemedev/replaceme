@@ -104,7 +104,8 @@ export function PrivacyPolicyContent({
 
       <LegalSectionHeading id="2-scope" number={2} title="Scope & Dual-Sided Marketplace" />
       <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        This Policy covers Workers (typically Filipino residents offering services) and Employers
+        This Policy covers Workers (Filipino citizens offering services through the Platform; platform
+        work and identity verification are strictly restricted to citizens of the Philippines) and Employers
         (local or global companies hiring through Replaceme). It applies to website visitors,
         applicants, and account holders. Separately negotiated contracts (for example, enterprise
         DPAs) may supplement this Policy.
