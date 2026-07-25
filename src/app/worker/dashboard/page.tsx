@@ -22,7 +22,9 @@ import {
   WorkerSectionCard,
 } from "@/components/worker/layout";
 import { WorkerDashboardOnboardedBanner } from "@/components/worker/dashboard/WorkerDashboardOnboardedBanner";
+import { WorkerKycResubmitBanner } from "@/components/worker/verification/WorkerKycResubmitBanner";
 import { computeWorkerProfileStrength } from "@/lib/worker/profile-strength";
+import type { VerificationStatus } from "@/types/verification";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +40,7 @@ export default async function WorkerDashboard() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url, salary_currency"
+      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url, salary_currency, verification_status, kyc_rejection_reason"
     )
     .eq("id", user.id)
     .single();
@@ -133,6 +135,13 @@ export default async function WorkerDashboard() {
       <Suspense fallback={null}>
         <WorkerDashboardOnboardedBanner />
       </Suspense>
+
+      <WorkerKycResubmitBanner
+        verificationStatus={
+          (profile.verification_status as VerificationStatus | null) ?? null
+        }
+        kycRejectionReason={profile.kyc_rejection_reason}
+      />
 
       <WorkerPageHeader
         title={`Hello, ${workerName}`}

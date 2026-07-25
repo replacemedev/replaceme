@@ -50,6 +50,7 @@ export default async function WorkerVerificationPage() {
           <VerificationUploadPanel
             documents={state.documents}
             verificationStatus={state.verificationStatus}
+            kycRejectionReason={state.kycRejectionReason}
             personalInfoComplete={state.personalInfoComplete}
             canSubmitForReview={state.canSubmitForReview}
             idType={state.idType}

@@ -59,6 +59,7 @@ export const verificationStatusSchema = z.enum([
   "under_review",
   "approved",
   "rejected",
+  "resubmission_required",
 ]);
 
 /** Nullable string that also accepts missing keys (legacy / partial selects). */
@@ -321,8 +322,19 @@ export const moderateJobSchema = z.object({
 
 export const reviewVerificationSchema = z.object({
   workerId: z.string().uuid(),
-  decision: z.enum(["approved", "rejected"]),
+  decision: z.enum(["approved", "rejected", "resubmission_required"]),
   reason: z.string().min(3).max(500).optional(),
+}).superRefine((data, ctx) => {
+  if (
+    (data.decision === "rejected" || data.decision === "resubmission_required") &&
+    !data.reason?.trim()
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "A feedback reason is required when rejecting or requesting an update.",
+      path: ["reason"],
+    });
+  }
 });
 
 export const disputeStatusSchema = z.enum([

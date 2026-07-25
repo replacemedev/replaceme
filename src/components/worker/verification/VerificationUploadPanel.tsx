@@ -3,13 +3,14 @@
 import { useTransition, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Send } from "lucide-react";
+import { AlertTriangle, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { submitVerificationForReview } from "@/actions/verification";
 import { patchWorkerProfile } from "@/actions/worker/profile";
 import { DocumentDropzone } from "./DocumentDropzone";
 import {
   VERIFICATION_DOCUMENT_TYPES,
+  isKycResubmitStatus,
   type VerificationDocumentRecord,
   type VerificationStatus,
 } from "@/types/verification";
@@ -17,6 +18,7 @@ import {
 interface VerificationUploadPanelProps {
   documents: VerificationDocumentRecord[];
   verificationStatus: VerificationStatus;
+  kycRejectionReason?: string | null;
   personalInfoComplete: boolean;
   canSubmitForReview: boolean;
   idType?: string | null;
@@ -32,7 +34,9 @@ function statusMessage(status: VerificationStatus): string | null {
     case "approved":
       return "You're verified! Your badge is now visible across the platform.";
     case "rejected":
-      return "Your previous submission needs updates. Please re-upload your documents.";
+      return "Your verification was rejected. Please review the feedback below and re-upload your documents.";
+    case "resubmission_required":
+      return "Resubmission required. Please review the feedback below and re-upload clearer documents.";
     default:
       return null;
   }
@@ -41,6 +45,7 @@ function statusMessage(status: VerificationStatus): string | null {
 export function VerificationUploadPanel({
   documents,
   verificationStatus,
+  kycRejectionReason,
   personalInfoComplete,
   canSubmitForReview,
   idType,
@@ -58,6 +63,7 @@ export function VerificationUploadPanel({
   const [localIdExpirationDate, setLocalIdExpirationDate] = useState(idExpirationDate || "");
   const [localIdIssuingCountry, setLocalIdIssuingCountry] = useState(idIssuingCountry || "");
   const [kycConsent, setKycConsent] = useState(false);
+
   async function handleSaveDetails() {
     startSaveTransition(async () => {
       const result = await patchWorkerProfile({
@@ -78,6 +84,7 @@ export function VerificationUploadPanel({
     });
   }
 
+  const needsResubmit = isKycResubmitStatus(verificationStatus);
   const uploadsDisabled =
     verificationStatus === "under_review" || verificationStatus === "approved";
 
@@ -89,6 +96,39 @@ export function VerificationUploadPanel({
 
   return (
     <section className="space-y-5">
+      {needsResubmit ? (
+        <div
+          role="alert"
+          className={`flex gap-3 rounded-xl border px-4 py-3.5 sm:px-5 ${
+            verificationStatus === "rejected"
+              ? "border-red-200 bg-red-50 text-red-900"
+              : "border-amber-200 bg-amber-50 text-amber-950"
+          }`}
+        >
+          <AlertTriangle
+            className={`mt-0.5 h-5 w-5 shrink-0 ${
+              verificationStatus === "rejected" ? "text-red-600" : "text-amber-600"
+            }`}
+            aria-hidden
+          />
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-sm font-bold">
+              {verificationStatus === "rejected"
+                ? "Verification rejected"
+                : "Resubmission required"}
+            </p>
+            <p className="text-sm leading-relaxed">
+              {kycRejectionReason?.trim()
+                ? kycRejectionReason
+                : "Please re-upload clear, valid government ID photos and try again."}
+            </p>
+            <p className="text-xs font-medium opacity-80">
+              Upload corrected documents below, then submit for review again.
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       {!personalInfoComplete && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Complete your{" "}
@@ -100,18 +140,17 @@ export function VerificationUploadPanel({
         </div>
       )}
 
-      {banner && (
+      {banner && !needsResubmit ? (
         <div
-          className={`rounded-xl border px-4 py-3 text-sm ${verificationStatus === "approved"
-            ? "border-[#006e2f]/30 bg-[#ebfdf2] text-[#0a4a29]"
-            : verificationStatus === "rejected"
-              ? "border-red-200 bg-red-50 text-red-800"
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            verificationStatus === "approved"
+              ? "border-[#006e2f]/30 bg-[#ebfdf2] text-[#0a4a29]"
               : "border-blue-200 bg-blue-50 text-blue-900"
-            }`}
+          }`}
         >
           {banner}
         </div>
-      )}
+      ) : null}
 
       <div className="rounded-xl border border-emerald-100 bg-[#ebfdf2]/50 p-4 text-xs sm:text-sm text-emerald-950 flex items-start gap-2.5 shadow-sm">
         <span className="text-base shrink-0" aria-hidden="true">💡</span>
@@ -150,7 +189,7 @@ export function VerificationUploadPanel({
                 >
                   <option value="">Select ID Type...</option>
                   <option value="Passport">Passport</option>
-                  <option value="Driver's License">Driver's License</option>
+                  <option value="Driver's License">Driver&apos;s License</option>
                   <option value="National ID">National ID</option>
                   <option value="UMID">UMID</option>
                   <option value="Other">Other</option>
@@ -283,7 +322,11 @@ export function VerificationUploadPanel({
                     toast.error(result.error ?? "Could not submit.");
                     return;
                   }
-                  toast.success("Verification submitted for review.");
+                  toast.success(
+                    needsResubmit
+                      ? "Updated documents submitted for review."
+                      : "Verification submitted for review."
+                  );
                   router.refresh();
                 });
               }}
@@ -294,7 +337,7 @@ export function VerificationUploadPanel({
               ) : (
                 <Send className="h-4 w-4" aria-hidden />
               )}
-              Submit for Review
+              {needsResubmit ? "Resubmit for Review" : "Submit for Review"}
             </button>
           </div>
         </div>

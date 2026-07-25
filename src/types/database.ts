@@ -1924,6 +1924,7 @@ export type Database = {
           is_remote: boolean | null
           is_top_rated: boolean | null
           is_verified: boolean
+          kyc_rejection_reason: string | null
           last_name: string | null
           location: string | null
           middle_name: string | null
@@ -1979,6 +1980,7 @@ export type Database = {
           is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
+          kyc_rejection_reason?: string | null
           last_name?: string | null
           location?: string | null
           middle_name?: string | null
@@ -2034,6 +2036,7 @@ export type Database = {
           is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
+          kyc_rejection_reason?: string | null
           last_name?: string | null
           location?: string | null
           middle_name?: string | null
@@ -3020,6 +3023,7 @@ export type Database = {
           id_number: string | null
           id_type: string | null
           is_verified: boolean | null
+          kyc_rejection_reason: string | null
           last_name: string | null
           middle_name: string | null
           phone_number: string | null
@@ -3053,6 +3057,7 @@ export type Database = {
           id_number?: string | null
           id_type?: string | null
           is_verified?: boolean | null
+          kyc_rejection_reason?: string | null
           last_name?: string | null
           middle_name?: string | null
           phone_number?: string | null
@@ -3086,6 +3091,7 @@ export type Database = {
           id_number?: string | null
           id_type?: string | null
           is_verified?: boolean | null
+          kyc_rejection_reason?: string | null
           last_name?: string | null
           middle_name?: string | null
           phone_number?: string | null
@@ -3203,6 +3209,7 @@ export type Database = {
         | "under_review"
         | "approved"
         | "rejected"
+        | "resubmission_required"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3360,6 +3367,7 @@ export const Constants = {
         "under_review",
         "approved",
         "rejected",
+        "resubmission_required",
       ],
     },
   },

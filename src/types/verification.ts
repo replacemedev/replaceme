@@ -15,6 +15,27 @@ export const VERIFICATION_STATUSES = [
   "under_review",
   "approved",
   "rejected",
+  "resubmission_required",
+] as const;
+
+/** Statuses where the worker must re-upload after admin feedback. */
+export const KYC_RESUBMIT_STATUSES = ["rejected", "resubmission_required"] as const;
+
+export type KycResubmitStatus = (typeof KYC_RESUBMIT_STATUSES)[number];
+
+export function isKycResubmitStatus(
+  status: VerificationStatus
+): status is KycResubmitStatus {
+  return (KYC_RESUBMIT_STATUSES as readonly string[]).includes(status);
+}
+
+export const COMMON_KYC_REJECTION_REASONS = [
+  "ID image is too blurry or unreadable",
+  "ID is expired",
+  "ID details do not match your profile",
+  "Selfie does not match the ID photo",
+  "Document type is not accepted",
+  "Submission is incomplete (missing back of ID or selfie)",
 ] as const;
 
 export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
@@ -59,6 +80,7 @@ export interface WorkerVerificationState {
   workerId: string;
   verificationStatus: VerificationStatus;
   isVerified: boolean;
+  kycRejectionReason: string | null;
   personalInfoComplete: boolean;
   documents: VerificationDocumentRecord[];
   requiredDocumentTypes: VerificationDocumentType[];
@@ -116,7 +138,7 @@ export function deriveVerificationSteps(
   const approved = status === "approved";
   const inReview =
     status === "under_review" || status === "documents_submitted";
-  const rejected = status === "rejected";
+  const needsResubmit = isKycResubmitStatus(status);
 
   const step1: VerificationStep["state"] = personalInfoComplete || approved
     ? "completed"
@@ -125,14 +147,14 @@ export function deriveVerificationSteps(
   let step2: VerificationStep["state"] = "pending";
   if (approved || documentsComplete || inReview) {
     step2 = "completed";
-  } else if (personalInfoComplete || rejected) {
+  } else if (personalInfoComplete || needsResubmit) {
     step2 = "active";
   }
 
   let step3: VerificationStep["state"] = "pending";
   if (approved) {
     step3 = "completed";
-  } else if (inReview || rejected) {
+  } else if (inReview || needsResubmit) {
     step3 = "active";
   }
 

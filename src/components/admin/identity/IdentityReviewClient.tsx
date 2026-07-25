@@ -13,6 +13,7 @@ import {
   Files,
   Eye,
   Search,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -29,10 +30,13 @@ import { AdminSlideover } from "@/components/admin/shared/AdminSlideover";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { formatFullName } from "@/lib/format/name";
 import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
+import { COMMON_KYC_REJECTION_REASONS } from "@/types/verification";
 import type {
   AdminVerificationDocument,
   AdminVerificationQueueRow,
 } from "@/types/admin.types";
+
+type ReviewDecision = "approved" | "rejected" | "resubmission_required";
 
 function isImageMime(mime: string | null | undefined) {
   return Boolean(mime?.startsWith("image/"));
@@ -114,7 +118,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   const [decision, setDecision] = useState<{
     workerId: string;
     name: string;
-    type: "approved" | "rejected";
+    type: ReviewDecision;
   } | null>(null);
   const [viewTarget, setViewTarget] = useState<{
     workerId: string;
@@ -124,6 +128,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
     null
   );
   const [reason, setReason] = useState("");
+  const [presetReason, setPresetReason] = useState("");
 
   // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
@@ -186,20 +191,32 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
 
   const handleDecision = () => {
     if (!decision) return;
+
+    const needsReason =
+      decision.type === "rejected" || decision.type === "resubmission_required";
+    const finalReason = reason.trim();
+    if (needsReason && finalReason.length < 3) {
+      toast.error("Please provide feedback for the worker (at least 3 characters).");
+      return;
+    }
+
     startTransition(async () => {
       const result = await reviewWorkerVerification(
         decision.workerId,
         decision.type,
-        reason || undefined
+        finalReason || undefined
       );
       if (result.success) {
         toast.success(
           decision.type === "approved"
             ? "Worker verified"
-            : "Verification rejected"
+            : decision.type === "resubmission_required"
+              ? "Resubmission requested"
+              : "Verification rejected"
         );
         setDecision(null);
         setReason("");
+        setPresetReason("");
         setExpandedId(null);
         setViewTarget(null);
         setViewData(null);
@@ -208,6 +225,16 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
         toast.error(result.error);
       }
     });
+  };
+
+  const openDecision = (
+    workerId: string,
+    name: string,
+    type: ReviewDecision
+  ) => {
+    setDecision({ workerId, name, type });
+    setReason("");
+    setPresetReason("");
   };
 
   const openDeepDive = (workerId: string, name: string) => {
@@ -255,7 +282,10 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
         return false;
       }
     } else if (activeTab === "rejected") {
-      if (worker.verification_status !== "rejected") {
+      if (
+        worker.verification_status !== "rejected" &&
+        worker.verification_status !== "resubmission_required"
+      ) {
         return false;
       }
     }
@@ -318,7 +348,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   const tabs = [
     { id: "pending", label: "Pending Review" },
     { id: "approved", label: "Approved" },
-    { id: "rejected", label: "Rejected" },
+    { id: "rejected", label: "Rejected / Resubmission required" },
     { id: "all", label: "All History" },
   ];
 
@@ -343,7 +373,10 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 return worker.verification_status === "approved";
               }
               if (tab.id === "rejected") {
-                return worker.verification_status === "rejected";
+                return (
+                  worker.verification_status === "rejected" ||
+                  worker.verification_status === "resubmission_required"
+                );
               }
               return true; // all
             }).length;
@@ -527,11 +560,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                           type="button"
                           disabled={pending}
                           onClick={() =>
-                            setDecision({
-                              workerId: worker.id,
-                              name,
-                              type: "approved",
-                            })
+                            openDecision(worker.id, name, "approved")
                           }
                           className="inline-flex items-center gap-1 rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
                         >
@@ -542,11 +571,18 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                           type="button"
                           disabled={pending}
                           onClick={() =>
-                            setDecision({
-                              workerId: worker.id,
-                              name,
-                              type: "rejected",
-                            })
+                            openDecision(worker.id, name, "resubmission_required")
+                          }
+                          className="inline-flex items-center gap-1 rounded-lg border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                          Require resubmission
+                        </button>
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() =>
+                            openDecision(worker.id, name, "rejected")
                           }
                           className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
                         >
@@ -738,36 +774,117 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
         title={
           decision?.type === "approved"
             ? "Approve verification?"
-            : "Reject verification?"
+            : decision?.type === "resubmission_required"
+              ? "Require resubmission?"
+              : "Reject verification?"
         }
         description={
           decision?.type === "approved"
             ? `Mark ${decision?.name} as identity-verified.`
-            : `Reject identity documents for ${decision?.name}.`
+            : decision?.type === "resubmission_required"
+              ? `Set ${decision?.name} to resubmission required and ask for corrected identity documents.`
+              : `Reject identity documents for ${decision?.name}. They will need to re-submit.`
         }
-        confirmLabel={decision?.type === "approved" ? "Approve" : "Reject"}
+        confirmLabel={
+          decision?.type === "approved"
+            ? "Approve"
+            : decision?.type === "resubmission_required"
+              ? "Require resubmission"
+              : "Reject"
+        }
         variant={decision?.type === "rejected" ? "danger" : "default"}
         loading={pending}
         onCancel={() => {
           setDecision(null);
           setReason("");
+          setPresetReason("");
         }}
         onConfirm={handleDecision}
       >
-        <label className="block">
-          <span className="text-xs font-medium text-slate-600">
-            {decision?.type === "approved"
-              ? "Approval note (optional, sent to worker)"
-              : "Rejection feedback (recommended, sent to worker)"}
-          </span>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={3}
-            placeholder="Add custom feedback for the worker…"
-            className="mt-1.5 w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </label>
+        {decision?.type !== "approved" ? (
+          <div className="space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() =>
+                  setDecision((prev) =>
+                    prev ? { ...prev, type: "resubmission_required" } : prev
+                  )
+                }
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
+                  decision?.type === "resubmission_required"
+                    ? "border-amber-300 bg-amber-50 text-amber-800"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Resubmission required
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setDecision((prev) =>
+                    prev ? { ...prev, type: "rejected" } : prev
+                  )
+                }
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
+                  decision?.type === "rejected"
+                    ? "border-red-300 bg-red-50 text-red-700"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Rejected
+              </button>
+            </div>
+            <label className="block">
+              <span className="text-xs font-medium text-slate-600">
+                Common reason
+              </span>
+              <select
+                value={presetReason}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPresetReason(value);
+                  if (value) setReason(value);
+                }}
+                className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="">Select a common reason…</option>
+                {COMMON_KYC_REJECTION_REASONS.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+                <option value="__custom">Other (write custom feedback)</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-slate-600">
+                Feedback for worker (required)
+              </span>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={3}
+                required
+                placeholder="Explain what the worker must fix…"
+                className="mt-1.5 w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </label>
+          </div>
+        ) : (
+          <label className="block">
+            <span className="text-xs font-medium text-slate-600">
+              Approval note (optional)
+            </span>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={3}
+              placeholder="Add an optional note…"
+              className="mt-1.5 w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            />
+          </label>
+        )}
       </ConfirmDialog>
 
       <AdminSlideover
@@ -889,45 +1006,64 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   type="button"
                   disabled={pending}
                   onClick={() =>
-                    setDecision({
-                      workerId: viewData.id,
-                      name:
-                        formatFullName(
-                          viewData.firstName,
-                          viewData.middleName,
-                          viewData.lastName
-                        ) ||
+                    openDecision(
+                      viewData.id,
+                      formatFullName(
+                        viewData.firstName,
+                        viewData.middleName,
+                        viewData.lastName
+                      ) ||
                         viewData.email ||
                         "Worker",
-                      type: "approved",
-                    })
+                      "approved"
+                    )
                   }
                   className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl bg-[#006e2f] px-3 py-2.5 text-xs font-semibold text-white hover:bg-[#005c26] disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" aria-hidden />
-                  Approve verification
+                  Approve
                 </button>
                 <button
                   type="button"
                   disabled={pending}
                   onClick={() =>
-                    setDecision({
-                      workerId: viewData.id,
-                      name:
-                        formatFullName(
-                          viewData.firstName,
-                          viewData.middleName,
-                          viewData.lastName
-                        ) ||
+                    openDecision(
+                      viewData.id,
+                      formatFullName(
+                        viewData.firstName,
+                        viewData.middleName,
+                        viewData.lastName
+                      ) ||
                         viewData.email ||
                         "Worker",
-                      type: "rejected",
-                    })
+                      "resubmission_required"
+                    )
+                  }
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-amber-200 px-3 py-2.5 text-xs font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                  Require resubmission
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    openDecision(
+                      viewData.id,
+                      formatFullName(
+                        viewData.firstName,
+                        viewData.middleName,
+                        viewData.lastName
+                      ) ||
+                        viewData.email ||
+                        "Worker",
+                      "rejected"
+                    )
                   }
                   className="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-red-200 px-3 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden />
-                  Reject / suspend
+                  Reject
                 </button>
               </div>
             )}

@@ -113,7 +113,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             Build a profile employers trust
           </h1>
           <p className="text-xs font-medium text-slate-600 sm:text-sm whitespace-normal break-words">
-            A short guided setup — about 3 minutes. You can skip optional steps
+            A short guided setup about 3 minutes. You can skip optional steps
             and finish later from your profile.
           </p>
         </header>

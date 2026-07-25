@@ -11,6 +11,7 @@ import {
   WorkerVerificationState,
   deriveVerificationSteps,
   hasAllRequiredDocuments,
+  isKycResubmitStatus,
   isPersonalInfoComplete,
   verificationUploadSchema,
   type VerificationDocumentRecord,
@@ -72,7 +73,7 @@ export async function getWorkerVerificationState(): Promise<WorkerVerificationSt
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "id, role, first_name, last_name, email, professional_title, verification_status, is_verified, phone_number, gender, civil_status, id_type, id_number, id_expiration_date, id_issuing_country"
+        "id, role, first_name, last_name, email, professional_title, verification_status, is_verified, kyc_rejection_reason, phone_number, gender, civil_status, id_type, id_number, id_expiration_date, id_issuing_country"
       )
       .eq("id", user.id)
       .single();
@@ -110,12 +111,13 @@ export async function getWorkerVerificationState(): Promise<WorkerVerificationSt
       documentsComplete &&
       (status === "personal_complete" ||
         status === "documents_submitted" ||
-        status === "rejected");
+        isKycResubmitStatus(status));
 
     return {
       workerId: profile.id,
       verificationStatus: status,
       isVerified: Boolean(profile.is_verified),
+      kycRejectionReason: profile.kyc_rejection_reason ?? null,
       personalInfoComplete,
       documents: documents,
       requiredDocumentTypes: [...VERIFICATION_DOCUMENT_TYPES],
@@ -245,7 +247,10 @@ export async function uploadVerificationDocument(
 
     await supabase
       .from("profiles")
-      .update({ verification_status: nextStatus })
+      .update({
+        verification_status: nextStatus,
+        kyc_rejection_reason: null,
+      })
       .eq("id", profile.id);
 
     const previewUrl = await getSignedPreviewUrl(supabase, storagePath);
@@ -292,7 +297,10 @@ export async function submitVerificationForReview(input: {
 
     const { error } = await supabase
       .from("profiles")
-      .update({ verification_status: "under_review" })
+      .update({
+        verification_status: "under_review",
+        kyc_rejection_reason: null,
+      })
       .eq("id", profile.id);
 
     if (error) {

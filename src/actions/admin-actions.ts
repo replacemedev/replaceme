@@ -249,36 +249,45 @@ export async function deleteJobPost(
 
 export async function reviewWorkerVerification(
   workerId: string,
-  decision: "approved" | "rejected",
+  decision: "approved" | "rejected" | "resubmission_required",
   reason?: string
 ): Promise<ActionResult> {
   try {
     const parsed = reviewVerificationSchema.parse({ workerId, decision, reason });
     const { supabase } = await requireAdmin();
 
-    const nextStatus =
-      parsed.decision === "approved" ? "approved" : "rejected";
+    const nextStatus = parsed.decision;
+    const trimmedReason = parsed.reason?.trim() || null;
 
     const { error } = await supabase
       .from("profiles")
       .update({
         verification_status: nextStatus,
         is_verified: parsed.decision === "approved",
+        kyc_rejection_reason:
+          parsed.decision === "approved" ? null : trimmedReason,
       })
       .eq("id", parsed.workerId)
       .eq("role", "worker");
 
     if (error) throw new Error(error.message);
 
-    await logAdminAction(
+    const actionType =
       parsed.decision === "approved"
         ? "approve_verification"
-        : "reject_verification",
+        : parsed.decision === "resubmission_required"
+          ? "require_verification_resubmission"
+          : "reject_verification";
+
+    await logAdminAction(
+      actionType,
       "profile",
       parsed.workerId,
-      parsed.reason ? { reason: parsed.reason } : {}
+      trimmedReason ? { reason: trimmedReason, decision: parsed.decision } : { decision: parsed.decision }
     );
     revalidateAdminSurfaces();
+    revalidatePath("/worker/verification");
+    revalidatePath("/worker/dashboard");
     return { success: true };
   } catch (err) {
     return {
@@ -652,6 +661,7 @@ export async function fetchVerificationQueue(): Promise<
       "under_review",
       "approved",
       "rejected",
+      "resubmission_required",
     ])
     .order("created_at", { ascending: false });
 
