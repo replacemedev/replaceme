@@ -20,12 +20,6 @@ interface WorkerEditDetailsModalProps {
     preferredLanguage: string;
     phoneNumber: string;
     tinNumber: string;
-    sssNumber: string;
-    philhealthNumber: string;
-    pagibigNumber: string;
-    emergencyContactName: string;
-    emergencyContactRelationship: string;
-    emergencyContactPhone: string;
     idType: string;
     idNumber: string;
     idExpirationDate: string;
@@ -52,12 +46,6 @@ export function WorkerEditDetailsModal({
   const [preferredLanguage, setPreferredLanguage] = useState(initial.preferredLanguage);
   const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
   const [tinNumber, setTinNumber] = useState(initial.tinNumber);
-  const [sssNumber, setSssNumber] = useState(initial.sssNumber);
-  const [philhealthNumber, setPhilhealthNumber] = useState(initial.philhealthNumber);
-  const [pagibigNumber, setPagibigNumber] = useState(initial.pagibigNumber);
-  const [emergencyContactName, setEmergencyContactName] = useState(initial.emergencyContactName);
-  const [emergencyContactRelationship, setEmergencyContactRelationship] = useState(initial.emergencyContactRelationship);
-  const [emergencyContactPhone, setEmergencyContactPhone] = useState(initial.emergencyContactPhone);
   const [idType, setIdType] = useState(initial.idType);
   const [idNumber, setIdNumber] = useState(initial.idNumber);
   const [idExpirationDate, setIdExpirationDate] = useState(initial.idExpirationDate);
@@ -80,12 +68,6 @@ export function WorkerEditDetailsModal({
         preferredLanguage: preferredLanguage || null,
         phoneNumber: phoneNumber || null,
         tinNumber: tinNumber || null,
-        sssNumber: sssNumber || null,
-        philhealthNumber: philhealthNumber || null,
-        pagibigNumber: pagibigNumber || null,
-        emergencyContactName: emergencyContactName || null,
-        emergencyContactRelationship: emergencyContactRelationship || null,
-        emergencyContactPhone: emergencyContactPhone || null,
         idType: idType || null,
         idNumber: idNumber || null,
         idExpirationDate: idExpirationDate || null,
@@ -115,7 +97,7 @@ export function WorkerEditDetailsModal({
   return (
     <ProfileModal
       open={open}
-      title="Edit Personal, Statutory & Emergency details"
+      title="Edit Personal & Statutory details"
       onClose={onClose}
       maxWidth="max-w-xl"
       footer={
@@ -270,84 +252,18 @@ export function WorkerEditDetailsModal({
           </div>
         </div>
 
-        {/* Emergency Contacts */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Emergency Contacts</h3>
-          <label className="block space-y-1 text-xs font-bold text-slate-500">
-            Contact Name
-            <input
-              value={emergencyContactName}
-              onChange={(e) => setEmergencyContactName(e.target.value)}
-              placeholder="Full Name"
-              className={inputClass}
-            />
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Relationship
-              <input
-                value={emergencyContactRelationship}
-                onChange={(e) => setEmergencyContactRelationship(e.target.value)}
-                placeholder="e.g. Spouse / Parent"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Phone Number
-              <input
-                type="tel"
-                value={emergencyContactPhone}
-                onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                placeholder="Emergency Contact Phone"
-                className={inputClass}
-              />
-            </label>
-          </div>
-        </div>
-
         {/* Statutory Numbers */}
         <div className="space-y-3 pt-4 border-t border-slate-100">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Statutory Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              TIN
-              <input
-                value={tinNumber}
-                onChange={(e) => setTinNumber(e.target.value)}
-                placeholder="000-000-000-000"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              SSS Number
-              <input
-                value={sssNumber}
-                onChange={(e) => setSssNumber(e.target.value)}
-                placeholder="00-0000000-0"
-                className={inputClass}
-              />
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              PhilHealth
-              <input
-                value={philhealthNumber}
-                onChange={(e) => setPhilhealthNumber(e.target.value)}
-                placeholder="00-000000000-0"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Pag-IBIG
-              <input
-                value={pagibigNumber}
-                onChange={(e) => setPagibigNumber(e.target.value)}
-                placeholder="0000-0000-0000"
-                className={inputClass}
-              />
-            </label>
-          </div>
+          <label className="block space-y-1 text-xs font-bold text-slate-500 w-full">
+            TIN
+            <input
+              value={tinNumber}
+              onChange={(e) => setTinNumber(e.target.value)}
+              placeholder="000-000-000-000"
+              className={inputClass}
+            />
+          </label>
         </div>
 
         {/* ID Verification Details */}

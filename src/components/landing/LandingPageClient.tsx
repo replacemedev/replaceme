@@ -241,7 +241,7 @@ export function LandingPageClient({
                 <Users className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
               <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">Direct Hire Advantage</h3>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Connect with experienced Filipino developers, designers, and admins and negotiate pay directly—without agency salary markups.</p>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Connect with experienced Filipino developers, designers, and admins and negotiate pay directly without agency salary markups.</p>
             </div>
           </div>
 

@@ -858,9 +858,6 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   value={viewData.idIssuingCountry}
                 />
                 <KycField label="TIN" value={viewData.tinNumber} />
-                <KycField label="SSS" value={viewData.sssNumber} />
-                <KycField label="PhilHealth" value={viewData.philhealthNumber} />
-                <KycField label="Pag-IBIG" value={viewData.pagibigNumber} />
               </dl>
             </div>
 

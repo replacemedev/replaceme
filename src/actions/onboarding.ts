@@ -65,13 +65,7 @@ export type EmployerOnboardingDraft = {
   websiteUrl: string;
   companyBio: string;
   logoUrl: string | null;
-  birthDate: string | null;
-  gender: string;
-  civilStatus: string;
   phoneNumber: string;
-  personalAddress: string;
-  personalCity: string;
-  personalStateProvince: string;
   country: string;
 };
 
@@ -208,7 +202,7 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
     const [{ data: profile }, { data: company }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("skills, birth_date, gender, civil_status, phone_number, personal_address, personal_city, personal_state_province, country")
+        .select("skills, phone_number, country")
         .eq("id", user.id)
         .single(),
       supabase
@@ -226,13 +220,7 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       websiteUrl: company?.website_url ?? "",
       companyBio: company?.company_bio ?? "",
       logoUrl: company?.logo_url ?? null,
-      birthDate: profile?.birth_date ?? null,
-      gender: profile?.gender ?? "",
-      civilStatus: profile?.civil_status ?? "",
       phoneNumber: profile?.phone_number ?? "",
-      personalAddress: profile?.personal_address ?? "",
-      personalCity: profile?.personal_city ?? "",
-      personalStateProvince: profile?.personal_state_province ?? "",
       country: profile?.country ?? "",
     };
   } catch {
@@ -418,19 +406,16 @@ export async function saveEmployerOnboardingStep(
         const { error } = await supabase
           .from("profiles")
           .update({
-            birth_date: parsed.birthDate,
-            gender: parsed.gender || null,
-            civil_status: parsed.civilStatus || null,
             phone_number: parsed.phoneNumber,
-            tin_number: null,
-            personal_address: parsed.personalAddress || null,
-            personal_city: parsed.personalCity || null,
-            personal_state_province: parsed.personalStateProvince || null,
             country: parsed.country || null,
+            tin_number: null,
+            birth_date: null,
+            gender: null,
+            civil_status: null,
             updated_at: now,
           })
           .eq("id", user.id);
-        if (error) return fail("Failed to save personal identity details.");
+        if (error) return fail("Failed to save contact details.");
         break;
       }
       default:

@@ -143,12 +143,6 @@ export function WorkerProfileEditor({
       ...(patch.civilStatus !== undefined ? { civil_status: patch.civilStatus } : {}),
       ...(patch.preferredLanguage !== undefined ? { preferred_language: patch.preferredLanguage } : {}),
       ...(patch.tinNumber !== undefined ? { tin_number: patch.tinNumber } : {}),
-      ...(patch.sssNumber !== undefined ? { sss_number: patch.sssNumber } : {}),
-      ...(patch.philhealthNumber !== undefined ? { philhealth_number: patch.philhealthNumber } : {}),
-      ...(patch.pagibigNumber !== undefined ? { pagibig_number: patch.pagibigNumber } : {}),
-      ...(patch.emergencyContactName !== undefined ? { emergency_contact_name: patch.emergencyContactName } : {}),
-      ...(patch.emergencyContactRelationship !== undefined ? { emergency_contact_relationship: patch.emergencyContactRelationship } : {}),
-      ...(patch.emergencyContactPhone !== undefined ? { emergency_contact_phone: patch.emergencyContactPhone } : {}),
       ...(patch.idType !== undefined ? { id_type: patch.idType } : {}),
       ...(patch.idNumber !== undefined ? { id_number: patch.idNumber } : {}),
       ...(patch.idExpirationDate !== undefined ? { id_expiration_date: patch.idExpirationDate } : {}),
@@ -368,29 +362,17 @@ export function WorkerProfileEditor({
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 w-full">
                 <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Statutory Information</h4>
                 {canViewFullIdentity ? (
-                  <div className="space-y-2.5">
+                  <div className="space-y-2.5 w-full">
                     <div className="flex justify-between py-1 border-b border-slate-50">
                       <span className="text-slate-500 font-medium">TIN</span>
                       <span className="text-slate-800 font-semibold">{profile.tin_number || "Not specified"}</span>
                     </div>
-                    <div className="flex justify-between py-1 border-b border-slate-50">
-                      <span className="text-slate-500 font-medium">SSS Number</span>
-                      <span className="text-slate-800 font-semibold">{profile.sss_number || "Not specified"}</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-slate-50">
-                      <span className="text-slate-500 font-medium">PhilHealth</span>
-                      <span className="text-slate-800 font-semibold">{profile.philhealth_number || "Not specified"}</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-slate-50">
-                      <span className="text-slate-500 font-medium">Pag-IBIG</span>
-                      <span className="text-slate-800 font-semibold">{profile.pagibig_number || "Not specified"}</span>
-                    </div>
                   </div>
                 ) : (
-                  <div className="relative rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+                  <div className="relative rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center w-full">
                     <p className="text-xs font-bold text-slate-500">🔒 Statutory info locked</p>
                     <p className="text-[10px] text-slate-400 font-medium mt-1">
                       Upgrade to Growth or Scale plan to see government numbers.
@@ -404,7 +386,7 @@ export function WorkerProfileEditor({
             <div className="border-t border-slate-100 pt-4 text-sm space-y-3">
               <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Identity Verification Details</h4>
               {canViewFullIdentity ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID Type</span>
                     <span className="text-slate-800 font-semibold mt-0.5 block">{profile.id_type || "Not specified"}</span>
@@ -428,44 +410,6 @@ export function WorkerProfileEditor({
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Emergency Contacts Card */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-[#ebfdf2] text-[#006e2f] rounded-lg">
-                  <User size={18} className="stroke-[2.5]" />
-                </div>
-                <h3 className="text-base font-extrabold text-slate-900 tracking-tight uppercase">
-                  Emergency Contacts
-                </h3>
-              </div>
-            </div>
-
-            {canViewFullIdentity ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-xs font-semibold text-slate-400 block">Contact Name</span>
-                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_name || "Not specified"}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-semibold text-slate-400 block">Relationship</span>
-                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_relationship || "Not specified"}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-semibold text-slate-400 block">Phone Number</span>
-                  <span className="text-slate-800 font-bold mt-0.5 block">{profile.emergency_contact_phone || "Not specified"}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center">
-                <p className="text-xs font-bold text-slate-500">🔒 Emergency contacts locked</p>
-                <p className="text-[10px] text-slate-400 font-medium mt-1">
-                  Upgrade to Growth or Scale plan to see emergency contact information.
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Top Skills */}
@@ -911,12 +855,6 @@ export function WorkerProfileEditor({
               preferredLanguage: profile.preferred_language || "",
               phoneNumber: profile.phone_number || "",
               tinNumber: profile.tin_number || "",
-              sssNumber: profile.sss_number || "",
-              philhealthNumber: profile.philhealth_number || "",
-              pagibigNumber: profile.pagibig_number || "",
-              emergencyContactName: profile.emergency_contact_name || "",
-              emergencyContactRelationship: profile.emergency_contact_relationship || "",
-              emergencyContactPhone: profile.emergency_contact_phone || "",
               idType: profile.id_type || "",
               idNumber: profile.id_number || "",
               idExpirationDate: profile.id_expiration_date || "",

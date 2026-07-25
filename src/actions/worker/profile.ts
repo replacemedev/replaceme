@@ -96,12 +96,6 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   if (data.civilStatus !== undefined) update.civil_status = emptyToNull(data.civilStatus);
   if (data.preferredLanguage !== undefined) update.preferred_language = emptyToNull(data.preferredLanguage);
   if (data.tinNumber !== undefined) update.tin_number = emptyToNull(data.tinNumber);
-  if (data.sssNumber !== undefined) update.sss_number = emptyToNull(data.sssNumber);
-  if (data.philhealthNumber !== undefined) update.philhealth_number = emptyToNull(data.philhealthNumber);
-  if (data.pagibigNumber !== undefined) update.pagibig_number = emptyToNull(data.pagibigNumber);
-  if (data.emergencyContactName !== undefined) update.emergency_contact_name = emptyToNull(data.emergencyContactName);
-  if (data.emergencyContactRelationship !== undefined) update.emergency_contact_relationship = emptyToNull(data.emergencyContactRelationship);
-  if (data.emergencyContactPhone !== undefined) update.emergency_contact_phone = emptyToNull(data.emergencyContactPhone);
   if (data.idType !== undefined) update.id_type = emptyToNull(data.idType);
   if (data.idNumber !== undefined) update.id_number = emptyToNull(data.idNumber);
   if (data.idExpirationDate !== undefined) update.id_expiration_date = data.idExpirationDate || null;

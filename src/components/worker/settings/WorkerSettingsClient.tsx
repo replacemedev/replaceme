@@ -11,6 +11,7 @@ import {
   type CompensationCurrency,
 } from "@/lib/format/currency";
 import { WorkerAccountIdentityCard } from "@/components/worker/settings/WorkerAccountIdentityCard";
+import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
 
 const SETTINGS_NAV = [
   {
@@ -41,6 +42,7 @@ interface WorkerSettingsClientProps {
     isRemote: boolean;
     salaryCurrency: string;
   };
+  deletionStatus?: { status: string; createdAt: string } | null;
 }
 
 const AVAILABILITY = [
@@ -53,6 +55,7 @@ const AVAILABILITY = [
 export function WorkerSettingsClient({
   identity,
   initial,
+  deletionStatus = null,
 }: WorkerSettingsClientProps) {
   const [pending, startTransition] = useTransition();
   const [availability, setAvailability] = useState(initial.availability);
@@ -249,6 +252,8 @@ export function WorkerSettingsClient({
           </button>
         </form>
       </div>
+
+      <DataDeletionRequestCard latestStatus={deletionStatus} />
     </div>
   );
 }

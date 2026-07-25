@@ -11,13 +11,7 @@ export type EmployerAccountDetails = {
   email: string | null;
   role: string;
   avatarUrl: string | null;
-  birthDate: string | null;
-  gender: string | null;
-  civilStatus: string | null;
   phoneNumber: string | null;
-  personalAddress: string | null;
-  personalCity: string | null;
-  personalStateProvince: string | null;
   country: string | null;
 };
 
@@ -33,7 +27,9 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name, username, email, avatar_url, role, birth_date, gender, civil_status, phone_number, personal_address, personal_city, personal_state_province, country")
+      .select(
+        "first_name, middle_name, last_name, username, email, avatar_url, role, phone_number, country"
+      )
       .eq("id", user.id)
       .single();
 
@@ -47,13 +43,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
       email: profile.email ?? user.email ?? null,
       role: profile.role,
       avatarUrl: profile.avatar_url,
-      birthDate: profile.birth_date,
-      gender: profile.gender,
-      civilStatus: profile.civil_status,
       phoneNumber: profile.phone_number,
-      personalAddress: profile.personal_address,
-      personalCity: profile.personal_city,
-      personalStateProvince: profile.personal_state_province,
       country: profile.country,
     };
   } catch (err) {
@@ -66,13 +56,7 @@ export async function updateEmployerAccountDetails(data: {
   firstName: string;
   middleName?: string | null;
   lastName: string;
-  birthDate?: string | null;
-  gender?: string | null;
-  civilStatus?: string | null;
   phoneNumber?: string | null;
-  personalAddress?: string | null;
-  personalCity?: string | null;
-  personalStateProvince?: string | null;
   country?: string | null;
 }) {
   try {
@@ -90,14 +74,11 @@ export async function updateEmployerAccountDetails(data: {
         first_name: data.firstName,
         middle_name: data.middleName || null,
         last_name: data.lastName,
-        birth_date: data.birthDate || null,
-        gender: data.gender || null,
-        civil_status: data.civilStatus || null,
         phone_number: data.phoneNumber || null,
         tin_number: null,
-        personal_address: data.personalAddress || null,
-        personal_city: data.personalCity || null,
-        personal_state_province: data.personalStateProvince || null,
+        birth_date: null,
+        gender: null,
+        civil_status: null,
         country: data.country || null,
       })
       .eq("id", user.id);

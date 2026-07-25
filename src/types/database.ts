@@ -801,6 +801,36 @@ export type Database = {
           },
         ]
       }
+      data_deletion_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           admin_notes: string | null
@@ -1879,9 +1909,6 @@ export type Database = {
           created_at: string
           cv_url: string | null
           email: string | null
-          emergency_contact_name: string | null
-          emergency_contact_phone: string | null
-          emergency_contact_relationship: string | null
           expected_salary_max: number | null
           expected_salary_min: number | null
           experience_years: number | null
@@ -1901,11 +1928,6 @@ export type Database = {
           location: string | null
           middle_name: string | null
           onboarding_completed_at: string | null
-          pagibig_number: string | null
-          personal_address: string | null
-          personal_city: string | null
-          personal_state_province: string | null
-          philhealth_number: string | null
           phone_number: string | null
           portfolio_url: string | null
           preferred_language: string | null
@@ -1919,7 +1941,6 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           salary_currency: string
           skills: string[] | null
-          sss_number: string | null
           stripe_customer_id: string | null
           suffix: string | null
           timezone: string | null
@@ -1943,9 +1964,6 @@ export type Database = {
           created_at?: string
           cv_url?: string | null
           email?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          emergency_contact_relationship?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           experience_years?: number | null
@@ -1965,11 +1983,6 @@ export type Database = {
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
-          pagibig_number?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
-          philhealth_number?: string | null
           phone_number?: string | null
           portfolio_url?: string | null
           preferred_language?: string | null
@@ -1983,7 +1996,6 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
-          sss_number?: string | null
           stripe_customer_id?: string | null
           suffix?: string | null
           timezone?: string | null
@@ -2007,9 +2019,6 @@ export type Database = {
           created_at?: string
           cv_url?: string | null
           email?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          emergency_contact_relationship?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           experience_years?: number | null
@@ -2029,11 +2038,6 @@ export type Database = {
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
-          pagibig_number?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
-          philhealth_number?: string | null
           phone_number?: string | null
           portfolio_url?: string | null
           preferred_language?: string | null
@@ -2047,7 +2051,6 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
-          sss_number?: string | null
           stripe_customer_id?: string | null
           suffix?: string | null
           timezone?: string | null
@@ -3007,9 +3010,6 @@ export type Database = {
           country: string | null
           created_at: string | null
           email: string | null
-          emergency_contact_name: string | null
-          emergency_contact_phone: string | null
-          emergency_contact_relationship: string | null
           experience_years: number | null
           first_name: string | null
           full_name: string | null
@@ -3022,17 +3022,11 @@ export type Database = {
           is_verified: boolean | null
           last_name: string | null
           middle_name: string | null
-          pagibig_number: string | null
-          personal_address: string | null
-          personal_city: string | null
-          personal_state_province: string | null
-          philhealth_number: string | null
           phone_number: string | null
           preferred_language: string | null
           professional_title: string | null
           profile_id: string | null
           skills: string[] | null
-          sss_number: string | null
           suffix: string | null
           timezone: string | null
           tin_number: string | null
@@ -3049,9 +3043,6 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          emergency_contact_relationship?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
@@ -3064,17 +3055,11 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           middle_name?: string | null
-          pagibig_number?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
-          philhealth_number?: string | null
           phone_number?: string | null
           preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
-          sss_number?: string | null
           suffix?: string | null
           timezone?: string | null
           tin_number?: string | null
@@ -3091,9 +3076,6 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          emergency_contact_relationship?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
@@ -3106,17 +3088,11 @@ export type Database = {
           is_verified?: boolean | null
           last_name?: string | null
           middle_name?: string | null
-          pagibig_number?: string | null
-          personal_address?: string | null
-          personal_city?: string | null
-          personal_state_province?: string | null
-          philhealth_number?: string | null
           phone_number?: string | null
           preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
-          sss_number?: string | null
           suffix?: string | null
           timezone?: string | null
           tin_number?: string | null

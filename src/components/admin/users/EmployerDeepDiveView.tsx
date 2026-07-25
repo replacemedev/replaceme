@@ -100,35 +100,10 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
             ) : null}
           </div>
 
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Birthdate</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.birthDate ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gender</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.gender ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Civil Status</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.civilStatus ?? "—"}</p>
-            </div>
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Phone Number</p>
               <p className="font-semibold text-slate-700 mt-1">{data.phoneNumber ?? "—"}</p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 border-b border-slate-100 pb-5 text-sm">
-            <div className="sm:col-span-2">
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Personal Address</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.personalAddress ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">City & Province/State</p>
-              <p className="font-semibold text-slate-700 mt-1">
-                {[data.personalCity, data.personalStateProvince].filter(Boolean).join(", ") || "—"}
-              </p>
             </div>
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Country</p>

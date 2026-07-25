@@ -272,9 +272,11 @@ export async function uploadVerificationDocument(
   }
 }
 
-export async function submitVerificationForReview(): Promise<VerificationActionResult> {
+export async function submitVerificationForReview(input: {
+  kycConsent: true;
+}): Promise<VerificationActionResult> {
   const result = await runAction("submitVerificationForReview", async () => {
-    submitVerificationForReviewSchema.parse({});
+    submitVerificationForReviewSchema.parse(input);
     const { supabase, profile } = await requireRole("worker");
 
     const state = await getWorkerVerificationState();

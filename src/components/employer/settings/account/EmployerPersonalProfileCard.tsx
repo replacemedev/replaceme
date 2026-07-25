@@ -58,7 +58,7 @@ export function EmployerPersonalProfileCard({
 
         <div className="border-t border-slate-50 pt-6">
           <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-            Personal details
+            Contact details
           </h3>
           <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="min-w-0">
@@ -77,65 +77,7 @@ export function EmployerPersonalProfileCard({
                 {account.phoneNumber ?? "—"}
               </dd>
             </div>
-          </dl>
-        </div>
-
-        <div className="border-t border-slate-50 pt-6">
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-            Demographics
-          </h3>
-          <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="min-w-0">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Birthdate
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.birthDate ?? "—"}
-              </dd>
-            </div>
-            <div className="min-w-0">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Gender
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.gender ?? "—"}
-              </dd>
-            </div>
-            <div className="min-w-0">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Civil Status
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.civilStatus ?? "—"}
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="border-t border-slate-50 pt-6">
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
-            Personal Address
-          </h3>
-          <dl className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="min-w-0 sm:col-span-2">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Address Line
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.personalAddress ?? "—"}
-              </dd>
-            </div>
-            <div className="min-w-0">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                City & Province/State
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {[account.personalCity, account.personalStateProvince]
-                  .filter(Boolean)
-                  .join(", ") || "—"}
-              </dd>
-            </div>
-            <div className="min-w-0">
               <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
                 Country
               </dt>
@@ -154,13 +96,7 @@ export function EmployerPersonalProfileCard({
           firstName: account.firstName || "",
           middleName: account.middleName || "",
           lastName: account.lastName || "",
-          birthDate: account.birthDate || "",
-          gender: account.gender || "",
-          civilStatus: account.civilStatus || "",
           phoneNumber: account.phoneNumber || "",
-          personalAddress: account.personalAddress || "",
-          personalCity: account.personalCity || "",
-          personalStateProvince: account.personalStateProvince || "",
           country: account.country || "",
         }}
         onSaved={() => {

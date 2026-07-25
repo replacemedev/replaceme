@@ -123,10 +123,17 @@ export function PrivacyPolicyContent({
             for RA 11967 listing verification (e.g., PhilID, Passport, Driver&apos;s License).
           </CheckItem>
           <CheckItem label="Sensitive Personal Information (SPI):">
-            where provided or required for verification or compliance—government-issued ID numbers
-            and document images, birth date, and (if you choose to provide it) civil status or other
-            SPI as defined under RA 10173. We process SPI only with appropriate legal basis,
+            government-issued ID numbers and document images submitted for
+            verification, birth date (for age eligibility), and optional gender or civil
+            status if you choose to provide them. We do{" "}
+            <strong className="font-semibold text-slate-800">not</strong> collect SSS,
+            PhilHealth, Pag-IBIG numbers, or emergency contacts. We process SPI only with
+            appropriate legal basis (including explicit consent at ID verification),
             heightened safeguards, and limited access.
+          </CheckItem>
+          <CheckItem label="Location:">
+            region, province, and city for matching. Street-level address is optional and
+            not required to use the Platform.
           </CheckItem>
           <CheckItem label="Professional profile:">
             resume/CV, skills, work history, education, portfolio links, preferred rates,
@@ -150,10 +157,11 @@ export function PrivacyPolicyContent({
             legal/trade name, industry, company size, website, logo, and job post content.
           </CheckItem>
           <CheckItem label="Representatives:">
-            name, work email, phone, role/title, and authentication data for hiring managers and
-            billing contacts. We do{" "}
-            <strong className="font-semibold text-slate-800">not</strong> collect employer TIN, EIN,
-            or other statutory tax identification numbers as part of employer account profiles.
+            name, work email, phone, role/title, country, and authentication data for hiring
+            managers and billing contacts. We do{" "}
+            <strong className="font-semibold text-slate-800">not</strong> collect employer date of
+            birth, gender, civil status, personal home address, TIN, EIN, or other statutory tax
+            identification numbers as part of employer account profiles.
           </CheckItem>
           <CheckItem label="Financial / billing:">
             subscription tier, invoices, payment status, and billing contact details. Full payment
@@ -372,13 +380,40 @@ export function PrivacyPolicyContent({
       <LegalSectionHeading id="9-retention" number={9} title="Retention & Security" />
       <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
         <p>
-          We retain account and verification data for as long as your account is active and for a
-          reasonable period thereafter to meet legal, tax, dispute, and security obligations
-          (typically up to the longer of applicable statutory periods or our documented retention
-          schedules). Billing metadata and invoices may be retained for longer where tax or
-          accounting law requires. Resume and application data may be retained while relevant to open
-          roles or your profile settings. We use encryption in transit, access controls, logging, and
-          vendor diligence. No method of transmission or storage is 100% secure.
+          We retain personal data only as long as needed for the purposes described in this Policy
+          and to meet legal, tax, dispute, and security obligations. Documented periods include:
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong className="font-semibold text-slate-800">Account profile:</strong> while active,
+            then up to 30 days after closure for recovery;
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Government ID images &amp; verification metadata:</strong>{" "}
+            until the verification purpose is fulfilled, then deleted or anonymized within 90 days
+            unless a legal hold applies;
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Applications &amp; messaging:</strong> while
+            relevant to open roles or account activity, then up to 24 months;
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Billing ledger &amp; invoices:</strong> up to
+            7 years where tax or accounting law requires;
+          </li>
+          <li>
+            <strong className="font-semibold text-slate-800">Security / audit logs:</strong> up to 24
+            months for fraud prevention and incident response.
+          </li>
+        </ul>
+        <p>
+          We use encryption in transit, access controls, logging, and vendor diligence. No method of
+          transmission or storage is 100% secure. Workers and Employers may submit a deletion request
+          from account settings or by emailing{" "}
+          <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
+            support@replaceme.ph
+          </a>
+          .
         </p>
       </div>
 
@@ -435,13 +470,20 @@ export function PrivacyPolicyContent({
           correct, opt-out of sale/share, non-discrimination) apply to eligible individuals.
         </p>
         <p>
-          To exercise rights against Replaceme as PIC, email{" "}
+          To exercise rights against Replaceme as PIC, use the{" "}
+          <strong className="font-semibold text-slate-800">Request data deletion</strong> form in
+          your account settings, or email{" "}
           <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
             support@replaceme.ph
           </a>
-          . We may need to verify your identity. Requests relating to data controlled solely by an
-          Employer after unlock should be directed primarily to that Employer; we will assist where
-          feasible.
+          . We aim to acknowledge requests within 5 business days and complete eligible erasure within
+          30 days, subject to legal retention exceptions. We may need to verify your identity.
+          Requests relating to data controlled solely by an Employer after unlock should be directed
+          primarily to that Employer; we will assist where feasible. See also our{" "}
+          <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
+            Employer Data Processing Agreement
+          </Link>
+          .
         </p>
       </div>
 

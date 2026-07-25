@@ -127,13 +127,7 @@ export const employerOnboardingSchema = z.object({
 });
 
 export const employerPersonalStepSchema = z.object({
-  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid birthdate (YYYY-MM-DD)."),
-  gender: z.string().min(1, "Gender is required."),
-  civilStatus: z.string().min(1, "Civil status is required."),
   phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25),
-  personalAddress: z.string().min(1, "Address is required."),
-  personalCity: z.string().min(1, "City is required."),
-  personalStateProvince: z.string().min(1, "State/Province is required."),
   country: z.string().min(1, "Country is required."),
 });
 

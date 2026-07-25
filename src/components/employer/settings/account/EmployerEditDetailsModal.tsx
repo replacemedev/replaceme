@@ -13,13 +13,7 @@ interface EmployerEditDetailsModalProps {
     firstName: string;
     middleName: string;
     lastName: string;
-    birthDate: string;
-    gender: string;
-    civilStatus: string;
     phoneNumber: string;
-    personalAddress: string;
-    personalCity: string;
-    personalStateProvince: string;
     country: string;
   };
   onSaved: () => void;
@@ -36,13 +30,7 @@ export function EmployerEditDetailsModal({
   const [firstName, setFirstName] = useState(initial.firstName);
   const [middleName, setMiddleName] = useState(initial.middleName);
   const [lastName, setLastName] = useState(initial.lastName);
-  const [birthDate, setBirthDate] = useState(initial.birthDate);
-  const [gender, setGender] = useState(initial.gender);
-  const [civilStatus, setCivilStatus] = useState(initial.civilStatus);
   const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
-  const [personalAddress, setPersonalAddress] = useState(initial.personalAddress);
-  const [personalCity, setPersonalCity] = useState(initial.personalCity);
-  const [personalStateProvince, setPersonalStateProvince] = useState(initial.personalStateProvince);
   const [country, setCountry] = useState(initial.country);
 
   function handleSave() {
@@ -51,13 +39,7 @@ export function EmployerEditDetailsModal({
         firstName,
         middleName: middleName || null,
         lastName,
-        birthDate: birthDate || null,
-        gender: gender || null,
-        civilStatus: civilStatus || null,
         phoneNumber: phoneNumber || null,
-        personalAddress: personalAddress || null,
-        personalCity: personalCity || null,
-        personalStateProvince: personalStateProvince || null,
         country: country || null,
       });
 
@@ -105,10 +87,9 @@ export function EmployerEditDetailsModal({
       }
     >
       <div className="space-y-6">
-        {/* Name Fields */}
         <div className="space-y-3">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Legal Name</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <label className="block space-y-1 text-xs font-bold text-slate-500">
               First Name
               <input
@@ -139,19 +120,9 @@ export function EmployerEditDetailsModal({
           </div>
         </div>
 
-        {/* Demographics & Contact */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Demographics & Contact</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Birthdate
-              <input
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className={inputClass}
-              />
-            </label>
+        <div className="space-y-3 border-t border-slate-100 pt-4">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Contact</h3>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <label className="block space-y-1 text-xs font-bold text-slate-500">
               Phone Number
               <input
@@ -159,70 +130,6 @@ export function EmployerEditDetailsModal({
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="+1 234 567 8900"
-                className={inputClass}
-              />
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Gender
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">Select...</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
-              </select>
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Civil Status
-              <select
-                value={civilStatus}
-                onChange={(e) => setCivilStatus(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">Select...</option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Divorced">Divorced</option>
-                <option value="Widowed">Widowed</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        {/* Address */}
-        <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Personal Address</h3>
-          <label className="block space-y-1 text-xs font-bold text-slate-500">
-            Address Line
-            <input
-              value={personalAddress}
-              onChange={(e) => setPersonalAddress(e.target.value)}
-              placeholder="e.g. 123 Main St, Apt 4B"
-              className={inputClass}
-            />
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              City
-              <input
-                value={personalCity}
-                onChange={(e) => setPersonalCity(e.target.value)}
-                placeholder="City"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              State/Province
-              <input
-                value={personalStateProvince}
-                onChange={(e) => setPersonalStateProvince(e.target.value)}
-                placeholder="State/Province"
                 className={inputClass}
               />
             </label>

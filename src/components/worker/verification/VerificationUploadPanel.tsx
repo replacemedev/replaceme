@@ -57,6 +57,7 @@ export function VerificationUploadPanel({
   const [localIdNumber, setLocalIdNumber] = useState(idNumber || "");
   const [localIdExpirationDate, setLocalIdExpirationDate] = useState(idExpirationDate || "");
   const [localIdIssuingCountry, setLocalIdIssuingCountry] = useState(idIssuingCountry || "");
+  const [kycConsent, setKycConsent] = useState(false);
   async function handleSaveDetails() {
     startSaveTransition(async () => {
       const result = await patchWorkerProfile({
@@ -94,7 +95,8 @@ export function VerificationUploadPanel({
           <Link href="/worker/profile" className="font-bold underline">
             profile
           </Link>{" "}
-          (name, email, professional title, phone number, demographics, emergency contact, ID metadata) before submitting verification.
+          (name, email, professional title, phone number, and ID details) before submitting
+          verification.
         </div>
       )}
 
@@ -244,30 +246,57 @@ export function VerificationUploadPanel({
       </div>
 
       {canSubmitForReview && verificationStatus !== "under_review" && (
-        <div className="flex justify-center pt-2">
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => {
-              startTransition(async () => {
-                const result = await submitVerificationForReview();
-                if (!result.success) {
-                  toast.error(result.error ?? "Could not submit.");
+        <div className="space-y-4 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+          <label className="flex w-full cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={kycConsent}
+              onChange={(e) => setKycConsent(e.target.checked)}
+              className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-[#006e2f] focus:ring-2 focus:ring-[#006e2f]/40"
+              required
+              aria-required="true"
+            />
+            <span className="min-w-0 text-sm leading-relaxed text-slate-600">
+              I consent to Replaceme collecting and processing my government-issued ID images and
+              identity details solely for verification under RA 11967 and our{" "}
+              <Link
+                href="/privacy-policy#3-worker-data"
+                className="font-semibold text-[#006e2f] underline-offset-2 hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              . I understand I may request deletion subject to legal retention requirements.
+            </span>
+          </label>
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              disabled={isPending || !kycConsent}
+              onClick={() => {
+                if (!kycConsent) {
+                  toast.error("Please confirm consent before submitting.");
                   return;
                 }
-                toast.success("Verification submitted for review.");
-                router.refresh();
-              });
-            }}
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#006e2f] hover:bg-[#005c26] text-white text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 cursor-pointer w-full md:w-auto"
-          >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : (
-              <Send className="h-4 w-4" aria-hidden />
-            )}
-            Submit for Review
-          </button>
+                startTransition(async () => {
+                  const result = await submitVerificationForReview({ kycConsent: true });
+                  if (!result.success) {
+                    toast.error(result.error ?? "Could not submit.");
+                    return;
+                  }
+                  toast.success("Verification submitted for review.");
+                  router.refresh();
+                });
+              }}
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#006e2f] px-8 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white hover:bg-[#005c26] disabled:cursor-not-allowed disabled:opacity-60 md:w-auto"
+            >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <Send className="h-4 w-4" aria-hidden />
+              )}
+              Submit for Review
+            </button>
+          </div>
         </div>
       )}
     </section>

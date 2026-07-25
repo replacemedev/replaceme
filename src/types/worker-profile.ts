@@ -9,12 +9,6 @@ export interface WorkerProfile {
   civil_status?: string | null;
   preferred_language?: string | null;
   tin_number?: string | null;
-  sss_number?: string | null;
-  philhealth_number?: string | null;
-  pagibig_number?: string | null;
-  emergency_contact_name?: string | null;
-  emergency_contact_relationship?: string | null;
-  emergency_contact_phone?: string | null;
   id_type?: string | null;
   id_number?: string | null;
   id_expiration_date?: string | null;

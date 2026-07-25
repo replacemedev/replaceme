@@ -94,17 +94,11 @@ export type AdminEmployerDeepDive = {
   companyBio: string | null;
   accountStatus: string;
   createdAt: string;
-  birthDate?: string | null;
-  gender?: string | null;
-  civilStatus?: string | null;
   phoneNumber?: string | null;
   idType?: string | null;
   idNumber?: string | null;
   idExpirationDate?: string | null;
   idIssuingCountry?: string | null;
-  personalAddress?: string | null;
-  personalCity?: string | null;
-  personalStateProvince?: string | null;
   country?: string | null;
   subscription: {
     status: string;
@@ -147,7 +141,7 @@ export async function getAdminEmployerDeepDive(
       await Promise.all([
         supabase
           .from("profiles")
-          .select("id, email, account_status, created_at, role, birth_date, gender, civil_status, phone_number, id_type, id_number, id_expiration_date, id_issuing_country, personal_address, personal_city, personal_state_province, country")
+          .select("id, email, account_status, created_at, role, phone_number, id_type, id_number, id_expiration_date, id_issuing_country, country")
           .eq("id", id)
           .maybeSingle(),
         supabase
@@ -205,17 +199,11 @@ export async function getAdminEmployerDeepDive(
       companyBio: company?.company_bio ?? null,
       accountStatus: profile.account_status,
       createdAt: company?.created_at ?? profile.created_at,
-      birthDate: profile.birth_date,
-      gender: profile.gender,
-      civilStatus: profile.civil_status,
       phoneNumber: profile.phone_number,
       idType: profile.id_type,
       idNumber: profile.id_number,
       idExpirationDate: profile.id_expiration_date,
       idIssuingCountry: profile.id_issuing_country,
-      personalAddress: profile.personal_address,
-      personalCity: profile.personal_city,
-      personalStateProvince: profile.personal_state_province,
       country: profile.country,
       subscription: subscription
         ? {
@@ -281,12 +269,6 @@ export type AdminWorkerProfileDeepDive = {
   civilStatus?: string | null;
   preferredLanguage?: string | null;
   tinNumber?: string | null;
-  sssNumber?: string | null;
-  philhealthNumber?: string | null;
-  pagibigNumber?: string | null;
-  emergencyContactName?: string | null;
-  emergencyContactRelationship?: string | null;
-  emergencyContactPhone?: string | null;
   idType?: string | null;
   idNumber?: string | null;
   idExpirationDate?: string | null;
@@ -319,7 +301,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, sss_number, philhealth_number, pagibig_number, emergency_contact_name, emergency_contact_relationship, emergency_contact_phone, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
+            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -366,12 +348,6 @@ export async function getAdminWorkerProfileDeepDive(
       civilStatus: profile.civil_status,
       preferredLanguage: profile.preferred_language,
       tinNumber: profile.tin_number,
-      sssNumber: profile.sss_number,
-      philhealthNumber: profile.philhealth_number,
-      pagibigNumber: profile.pagibig_number,
-      emergencyContactName: profile.emergency_contact_name,
-      emergencyContactRelationship: profile.emergency_contact_relationship,
-      emergencyContactPhone: profile.emergency_contact_phone,
       idType: profile.id_type,
       idNumber: profile.id_number,
       idExpirationDate: profile.id_expiration_date,

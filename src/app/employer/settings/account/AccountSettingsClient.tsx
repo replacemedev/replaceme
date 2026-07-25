@@ -24,6 +24,7 @@ import { EmployerInvoicesPanel } from "@/components/employer/settings/account/Em
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
 import { EmployerEmailSupportCard } from "@/components/employer/settings/account/EmployerEmailSupportCard";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
+import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
 import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
 interface AccountSettingsClientProps {
@@ -32,6 +33,7 @@ interface AccountSettingsClientProps {
   accountDetails: EmployerAccountDetails | null;
   invoices: EmployerInvoiceRow[];
   invoicesError?: string | null;
+  deletionStatus?: { status: string; createdAt: string } | null;
 }
 
 function formatDate(iso: string): string {
@@ -48,6 +50,7 @@ export function AccountSettingsClient({
   accountDetails,
   invoices,
   invoicesError,
+  deletionStatus = null,
 }: AccountSettingsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -303,6 +306,7 @@ export function AccountSettingsClient({
           {accountDetails ? (
             <EmployerPersonalProfileCard account={accountDetails} />
           ) : null}
+          <DataDeletionRequestCard latestStatus={deletionStatus} />
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}

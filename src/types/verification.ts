@@ -82,8 +82,6 @@ export function isPersonalInfoComplete(profile: {
   email: string | null;
   professional_title: string | null;
   phone_number?: string | null;
-  gender?: string | null;
-  civil_status?: string | null;
   id_type?: string | null;
   id_number?: string | null;
   id_expiration_date?: string | null;
@@ -95,8 +93,6 @@ export function isPersonalInfoComplete(profile: {
       profile.email?.trim() &&
       profile.professional_title?.trim() &&
       profile.phone_number?.trim() &&
-      profile.gender?.trim() &&
-      profile.civil_status?.trim() &&
       profile.id_type?.trim() &&
       profile.id_number?.trim() &&
       profile.id_expiration_date?.trim() &&

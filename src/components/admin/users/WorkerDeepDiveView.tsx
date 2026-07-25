@@ -97,18 +97,6 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
                 <dt className="text-xs font-semibold uppercase text-slate-400">TIN</dt>
                 <dd className="text-slate-800 font-semibold">{data.tinNumber ?? "—"}</dd>
               </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">SSS Number</dt>
-                <dd className="text-slate-800 font-semibold">{data.sssNumber ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">PhilHealth</dt>
-                <dd className="text-slate-800 font-semibold">{data.philhealthNumber ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">Pag-IBIG</dt>
-                <dd className="text-slate-800 font-semibold">{data.pagibigNumber ?? "—"}</dd>
-              </div>
             </dl>
           </div>
 
@@ -130,24 +118,6 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
               <div>
                 <dt className="text-xs font-semibold uppercase text-slate-400">ID Issuing Country</dt>
                 <dd className="text-slate-800 font-semibold">{data.idIssuingCountry ?? "—"}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="mt-6 border-t border-slate-100 pt-5 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Emergency Contact</h3>
-            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3 text-sm">
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">Contact Name</dt>
-                <dd className="text-slate-800 font-semibold">{data.emergencyContactName ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">Relationship</dt>
-                <dd className="text-slate-800 font-semibold">{data.emergencyContactRelationship ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold uppercase text-slate-400">Phone Number</dt>
-                <dd className="text-slate-800 font-semibold">{data.emergencyContactPhone ?? "—"}</dd>
               </div>
             </dl>
           </div>

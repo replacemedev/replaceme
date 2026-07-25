@@ -10,29 +10,14 @@ import type {
   PricingPageConfig,
 } from "@/types/page-content";
 
-export const PRIVACY_PAGE_META: PageContentMeta = {
-  lastUpdated: "July 14, 2026",
-  badge: "Legal",
-  badgeVariant: "pill",
-  wide: true,
-};
+export {
+  PRIVACY_PAGE_META,
+  COOKIE_PAGE_META,
+  TERMS_PAGE_META,
+  EMPLOYER_DPA_PAGE_META,
+  COOKIE_POLICY_VERSION,
+} from "@/lib/data/legal";
 
-export const COOKIE_PAGE_META: PageContentMeta = {
-  lastUpdated: "July 14, 2026",
-  badge: "Legal",
-  badgeVariant: "pill",
-  wide: true,
-};
-
-/** Bump when cookie purposes/categories change so the consent banner reappears. */
-export const COOKIE_POLICY_VERSION = "cookie-policy-v2";
-
-export const TERMS_PAGE_META: PageContentMeta = {
-  lastUpdated: "July 14, 2026",
-  badge: "Legal Document",
-  badgeVariant: "text",
-  wide: true,
-};
 
 /** Migrated from live CMS + product pricing copy. */
 export const PRICING_PAGE: PricingPageConfig = {

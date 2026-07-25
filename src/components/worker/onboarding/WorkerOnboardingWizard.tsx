@@ -140,8 +140,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
       !firstName.trim() ||
       !lastName.trim() ||
       !phoneNumber.trim() ||
-      !gender ||
-      !civilStatus ||
       !preferredLanguage.trim();
 
     return (
@@ -161,8 +159,8 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               lastName: lastName.trim(),
               suffix: suffix.trim() || null,
               phoneNumber: phoneNumber.trim(),
-              gender,
-              civilStatus,
+              gender: gender || null,
+              civilStatus: civilStatus || null,
               preferredLanguage: preferredLanguage.trim(),
             });
             if (!result.success) {
@@ -258,29 +256,26 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Gender
+            Gender (optional)
             <select
-              required
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
-              <option value="">Select Gender</option>
+              <option value="">Prefer not to say</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
-              <option value="Prefer not to say">Prefer not to say</option>
             </select>
           </label>
           <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Civil Status
+            Civil Status (optional)
             <select
-              required
               value={civilStatus}
               onChange={(e) => setCivilStatus(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
-              <option value="">Select Status</option>
+              <option value="">Prefer not to say</option>
               <option value="Single">Single</option>
               <option value="Married">Married</option>
               <option value="Divorced">Divorced</option>

@@ -100,7 +100,6 @@ const VERIFICATION_STEPS = [
       "Fill out your contact details, demographic information, and professional title in your worker profile.",
     details: [
       "Ensure your full name, email, phone number, and professional title are filled in.",
-      "Complete demographic details (gender, civil status) and emergency contact info.",
       "Completing your personal profile is required before submitting identity documents.",
     ],
   },
