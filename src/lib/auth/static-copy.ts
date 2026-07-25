@@ -1,6 +1,6 @@
 /**
  * Hardcoded marketing copy for auth screens.
- * Decoupled from Admin CMS — illustrative mockup content only (no photos).
+ * Decoupled from Admin CMS — factual product copy only (no fabricated testimonials).
  */
 
 export const SIGNUP_PAGE = {
@@ -57,14 +57,7 @@ export const SIGNUP_MARKETING = {
       description: "Connect and negotiate without agency markups.",
     },
   ],
-  testimonial: {
-    quote:
-      "Replaceme cut our time-to-hire in half. We found skilled operators without wading through recruiter noise.",
-    name: "Sarah J.",
-    role: "Operations Manager · Logistics",
-    initials: "SJ",
-  },
-  trustBadges: ["Secure messaging", "Profile verification", "Enterprise-ready"],
+  trustBadges: ["Secure messaging", "Profile verification", "Direct hiring"],
 } as const;
 
 export const SIGNIN_MARKETING = {
@@ -85,11 +78,4 @@ export const SIGNIN_MARKETING = {
       description: "Update your credentials once and apply across the platform.",
     },
   ],
-  testimonial: {
-    quote:
-      "The dashboard is calm and focused. I always know what's pending and what needs my attention.",
-    name: "Marcus T.",
-    role: "Senior Technician",
-    initials: "MT",
-  },
 } as const;

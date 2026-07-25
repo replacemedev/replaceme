@@ -62,7 +62,7 @@ export function LandingSkillsShowcase() {
             id="landing-skills-heading"
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 font-bold tracking-tight text-balance"
           >
-            Top Remote Roles Posted <span className="text-[#22c55e]">Every Day</span>
+            Top Remote Roles Across <span className="text-[#22c55e]">Key Skills</span>
           </h2>
           <p className="text-slate-600 font-body-base text-base sm:text-lg leading-relaxed text-pretty">
             Find experienced professionals across software engineering, UI/UX design, digital marketing, and administrative operations.

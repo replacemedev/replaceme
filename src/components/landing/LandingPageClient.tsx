@@ -15,9 +15,8 @@ import {
   CreditCard,
   Handshake,
   Plus,
-  Quote,
   Search,
-  TrendingDown,
+  Users,
   User,
   UserPlus,
   Wallet,
@@ -220,7 +219,7 @@ export function LandingPageClient({
           {/* AEO: Question-format H2 targets "why use Replaceme" voice & featured-snippet queries */}
           <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">Why Do Employers Choose Replaceme Over Traditional Agencies?</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto font-body-base text-base sm:text-lg leading-relaxed">Hire directly and save thousands. Pay one low monthly subscription instead of heavy agency markups or placement fees.</p>
+            <p className="text-slate-600 max-w-2xl mx-auto font-body-base text-base sm:text-lg leading-relaxed">Hire directly with a flat monthly subscription instead of agency markups or placement fees.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 animate-fade-in relative z-10">
             <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "100ms" }}>
@@ -239,10 +238,10 @@ export function LandingPageClient({
             </div>
             <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
               <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 sm:mb-8 border border-slate-100">
-                <TrendingDown className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
+                <Users className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
-              <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">70% Cost Savings</h3>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Hire experienced developers, designers, and admins at a fraction of local costs with fluent English skills.</p>
+              <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">Direct Hire Advantage</h3>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Connect with experienced Filipino developers, designers, and admins and negotiate pay directly—without agency salary markups.</p>
             </div>
           </div>
 
@@ -320,7 +319,7 @@ export function LandingPageClient({
                   <p className="text-slate-500 text-sm leading-relaxed mb-6">Discover full-time jobs and long-term roles in engineering, design, marketing, and admin operations.</p>
                   <div className="pt-4 border-t border-slate-100 flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase font-label-mono">
                     <BadgeCheck className="h-4 w-4 shrink-0" aria-hidden />
-                    Vetted Global Employers
+                    Employers on Replaceme
                   </div>
                 </div>
               </div>
@@ -427,62 +426,6 @@ export function LandingPageClient({
       </section>
 
       <LandingSkillsShowcase />
-
-
-      {/* Voices of Success */}
-      <section className={`${LANDING_SECTION} bg-white`}>
-        <div className={LANDING_SECTION_GRID} aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[10%] bg-emerald-50/50`} aria-hidden />
-
-        <div className={`${LANDING_INNER} relative z-10`}>
-          <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight">Voices of <span className="text-[#22c55e]">Success</span></h2>
-            <p className="text-slate-600 max-w-2xl mx-auto font-body-base text-base sm:text-lg leading-relaxed">See how growing companies build great remote teams on Replaceme.</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-            {/* Large Featured Testimonial */}
-            <div className="lg:col-span-7 reveal-item">
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 md:p-12 lg:p-14 shadow-md relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                <Quote className="absolute -top-4 -right-4 h-40 w-40 text-emerald-100/30 rotate-12 select-none pointer-events-none" aria-hidden />
-                <div className="relative z-10">
-                  <p className="text-slate-700 font-display-md text-lg sm:text-xl md:text-2xl lg:text-3xl italic leading-snug mb-6 sm:mb-10 lg:mb-12">
-                    &quot;Finding reliable React developers used to take us months. With Replaceme, we hired two incredible senior engineers in a week. The quality of talent is unmatched.&quot;
-                  </p>
-                  <div>
-                    <h4 className="text-lg sm:text-xl font-bold text-slate-800">Sarah Jenkins</h4>
-                    <p className="text-[#22c55e] font-body-bold uppercase tracking-widest text-xs mt-1">CTO, TechFlow Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Side Column Testimonials */}
-            <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-              {/* Card 2 */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "150ms" }}>
-                <p className="text-slate-600 font-body-base text-sm sm:text-base italic mb-6 sm:mb-8 leading-relaxed">
-                  &quot;Our customer support and operational tasks are now handled by an amazing team in the Philippines. The value and dedication they bring is incredible.&quot;
-                </p>
-                <div>
-                  <h4 className="font-body-bold text-slate-800 font-bold text-sm">Michael Chen</h4>
-                  <p className="text-xs text-[#22c55e] font-medium uppercase tracking-wider">Founder, Elevate Commerce</p>
-                </div>
-              </div>
-              {/* Card 3 */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 group reveal-item" style={{ transitionDelay: "300ms" }}>
-                <p className="text-slate-600 font-body-base text-sm sm:text-base italic mb-6 sm:mb-8 leading-relaxed">
-                  &quot;We completely streamlined our design operations by hiring a full-time UI/UX designer. High-fidelity output at a fraction of local agency costs.&quot;
-                </p>
-                <div>
-                  <h4 className="font-body-bold text-slate-800 font-bold text-sm">David Miller</h4>
-                  <p className="text-xs text-[#22c55e] font-medium uppercase tracking-wider">Creative Director, ScaleUp</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Pricing Section */}
       <section className={`${LANDING_SECTION} bg-[#0a0f1d] text-white`}>
