@@ -135,7 +135,7 @@ function VerificationDocCard({
   const showPreview = Boolean(previewUrl && isImageMime(doc.mime_type));
 
   return (
-    <li className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+    <li className="min-w-0 w-full overflow-hidden rounded-xl border border-slate-100 bg-slate-50 p-3">
       {showPreview ? (
         <button
           type="button"
@@ -146,10 +146,10 @@ function VerificationDocCard({
             src={previewUrl!}
             alt={doc.file_name}
             fill
-            sizes="(max-width: 640px) 100vw, 280px"
+            sizes="(max-width: 1024px) 100vw, 420px"
             loading="lazy"
             className="object-contain"
-            containerClassName="relative aspect-[4/3] w-full"
+            containerClassName="relative aspect-[3/2] w-full overflow-hidden"
           />
           <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-md bg-slate-900/70 px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
             <ZoomIn className="h-3 w-3" aria-hidden />
@@ -157,9 +157,9 @@ function VerificationDocCard({
           </span>
         </button>
       ) : null}
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-        <FileImage className="h-4 w-4 text-slate-400" />
-        {doc.document_type.replace(/_/g, " ")}
+      <div className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-700">
+        <FileImage className="h-4 w-4 shrink-0 text-slate-400" />
+        <span className="truncate">{doc.document_type.replace(/_/g, " ")}</span>
       </div>
       <p className="mt-1 truncate text-[11px] text-slate-400">{doc.file_name}</p>
       {fullUrl ? (
@@ -180,20 +180,28 @@ function VerificationDocCard({
   );
 }
 
-/** KYC matching fields: legal name, DOB, region/city, optional address line. */
+/** KYC matching fields: legal name, DOB, region/city, address, and typed ID metadata. */
 function ProfileDetailsCard({
   fullName,
   birthDate,
   regionCity,
   addressLine1,
+  idType,
+  idNumber,
+  idExpirationDate,
+  idIssuingCountry,
 }: {
   fullName: string;
   birthDate: string | null;
   regionCity: string | null;
   addressLine1: string | null;
+  idType?: string | null;
+  idNumber?: string | null;
+  idExpirationDate?: string | null;
+  idIssuingCountry?: string | null;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 h-fit">
+    <div className="h-fit min-w-0 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 md:p-5">
       <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
         Profile details
       </p>
@@ -201,13 +209,15 @@ function ProfileDetailsCard({
         Cross-reference against the ID images
       </p>
       <dl className="mt-4 space-y-4">
-        <div>
+        <div className="min-w-0">
           <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Full legal name
           </dt>
-          <dd className="mt-1 text-base font-bold text-slate-900">{fullName}</dd>
+          <dd className="mt-1 break-words text-base font-bold text-slate-900">
+            {fullName}
+          </dd>
         </div>
-        <div>
+        <div className="min-w-0">
           <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Date of birth
           </dt>
@@ -215,23 +225,66 @@ function ProfileDetailsCard({
             {birthDate ?? "—"}
           </dd>
         </div>
-        <div>
+        <div className="min-w-0">
           <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Region / city
           </dt>
-          <dd className="mt-1 text-base font-semibold text-slate-900">
+          <dd className="mt-1 break-words text-base font-semibold text-slate-900">
             {regionCity ?? "—"}
           </dd>
         </div>
-        <div>
+        <div className="min-w-0">
           <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Address line
           </dt>
-          <dd className="mt-1 text-base font-semibold text-slate-900">
+          <dd className="mt-1 break-words text-base font-semibold text-slate-900">
             {addressLine1?.trim() ? addressLine1 : "—"}
           </dd>
         </div>
       </dl>
+
+      <div className="mt-5 border-t border-slate-100 pt-4">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          Submitted ID details
+        </p>
+        <p className="mt-1 text-[11px] font-medium text-slate-400">
+          Typed by the worker during onboarding
+        </p>
+        <dl className="mt-3 space-y-3">
+          <div className="min-w-0">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              ID type
+            </dt>
+            <dd className="mt-1 break-words text-base font-semibold text-slate-900">
+              {idType?.trim() ? idType : "—"}
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              ID number
+            </dt>
+            <dd className="mt-1 break-all font-mono text-base font-semibold tracking-wide text-slate-900">
+              {idNumber?.trim() ? idNumber : "—"}
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Expiration date
+            </dt>
+            <dd className="mt-1 text-base font-semibold text-slate-900">
+              {formatBirthDate(idExpirationDate) ?? "—"}
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Issuing country
+            </dt>
+            <dd className="mt-1 break-words text-base font-semibold text-slate-900">
+              {idIssuingCountry?.trim() ? idIssuingCountry : "—"}
+            </dd>
+          </div>
+        </dl>
+      </div>
     </div>
   );
 }
@@ -748,9 +801,8 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
 
                     {isExpanded ? (
                       <div className="border-t border-slate-100 px-4 py-4">
-                        {/* Mobile: stack (IDs first). Desktop: side-by-side compare */}
-                        <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-6">
-                          <div className="space-y-3 min-w-0">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+                          <div className="min-w-0 space-y-3">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                               Uploaded ID &amp; selfie
                             </p>
@@ -763,7 +815,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                                 No documents on file.
                               </p>
                             ) : (
-                              <ul className="grid gap-3 sm:grid-cols-2">
+                              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {docs.map((doc) => (
                                   <VerificationDocCard
                                     key={doc.id}
@@ -777,16 +829,22 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                             )}
                           </div>
 
-                          <ProfileDetailsCard
-                            fullName={name}
-                            birthDate={formatBirthDate(worker.birth_date)}
-                            regionCity={formatRegionCity(
-                              worker.city,
-                              worker.region,
-                              worker.location
-                            )}
-                            addressLine1={worker.address_line_1}
-                          />
+                          <div className="min-w-0">
+                            <ProfileDetailsCard
+                              fullName={name}
+                              birthDate={formatBirthDate(worker.birth_date)}
+                              regionCity={formatRegionCity(
+                                worker.city,
+                                worker.region,
+                                worker.location
+                              )}
+                              addressLine1={worker.address_line_1}
+                              idType={worker.id_type}
+                              idNumber={worker.id_number}
+                              idExpirationDate={worker.id_expiration_date}
+                              idIssuingCountry={worker.id_issuing_country}
+                            />
+                          </div>
                         </div>
                       </div>
                     ) : null}
@@ -1058,13 +1116,14 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
               }`
             : "Loading…"
         }
+        size="wide"
       >
         {!viewData ? (
           <p className="text-sm font-medium text-slate-500">Loading profile…</p>
         ) : (
           <div className="space-y-6">
-            <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-5">
-              <div className="space-y-3 min-w-0 order-1">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+              <div className="min-w-0 space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Uploaded ID &amp; selfie
                 </p>
@@ -1077,7 +1136,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     No documents on file.
                   </p>
                 ) : (
-                  <ul className="grid gap-3">
+                  <ul className="grid grid-cols-1 gap-3">
                     {(documents[viewData.id] ?? []).map((doc) => (
                       <VerificationDocCard
                         key={doc.id}
@@ -1089,7 +1148,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 )}
               </div>
 
-              <div className="space-y-4 order-2 min-w-0">
+              <div className="min-w-0 space-y-4">
                 <ProfileDetailsCard
                   fullName={
                     formatFullName(
@@ -1106,9 +1165,13 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     viewData.location
                   )}
                   addressLine1={viewData.addressLine1}
+                  idType={viewData.idType}
+                  idNumber={viewData.idNumber}
+                  idExpirationDate={viewData.idExpirationDate}
+                  idIssuingCountry={viewData.idIssuingCountry}
                 />
 
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <div className="min-w-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                     Verification status
                   </p>
@@ -1118,7 +1181,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     />
                     <VerifiedBadge show={viewData.isVerified} size="sm" />
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 break-all text-xs text-slate-500">
                     {viewData.email ?? "—"}
                   </p>
                   <p className="mt-1 text-xs text-slate-500">

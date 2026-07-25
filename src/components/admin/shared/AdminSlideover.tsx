@@ -8,12 +8,14 @@ export function AdminSlideover({
   title,
   description,
   children,
+  size = "default",
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   description?: string;
   children: React.ReactNode;
+  size?: "default" | "wide";
 }) {
   return (
     <AdminDrawer
@@ -21,6 +23,7 @@ export function AdminSlideover({
       onClose={onClose}
       title={title}
       description={description}
+      size={size}
     >
       {children}
     </AdminDrawer>

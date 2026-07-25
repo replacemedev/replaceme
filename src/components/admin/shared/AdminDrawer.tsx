@@ -10,7 +10,14 @@ interface AdminDrawerProps {
   description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  /** Wider panel for side-by-side layouts (e.g. KYC image compare). */
+  size?: "default" | "wide";
 }
+
+const DRAWER_WIDTH: Record<NonNullable<AdminDrawerProps["size"]>, string> = {
+  default: "w-full max-w-full md:max-w-xl",
+  wide: "w-full max-w-full md:max-w-3xl lg:max-w-5xl",
+};
 
 export function AdminDrawer({
   open,
@@ -19,6 +26,7 @@ export function AdminDrawer({
   description,
   children,
   footer,
+  size = "default",
 }: AdminDrawerProps) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -61,7 +69,7 @@ export function AdminDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex h-full w-full max-w-full md:max-w-xl flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+        className={`relative flex h-full ${DRAWER_WIDTH[size]} flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
