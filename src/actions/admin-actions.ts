@@ -653,7 +653,7 @@ export async function fetchVerificationQueue(): Promise<
   const { data: workers, error } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at"
+      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at"
     )
     .eq("role", "worker")
     .in("verification_status", [
@@ -689,6 +689,11 @@ export async function fetchVerificationQueue(): Promise<
     username: w.username ?? null,
     phone_number: w.phone_number ?? null,
     tin_number: w.tin_number ?? null,
+    birth_date: w.birth_date ?? null,
+    region: w.region ?? null,
+    city: w.city ?? null,
+    location: w.location ?? null,
+    address_line_1: w.address_line_1 ?? null,
     id_type: w.id_type ?? null,
     id_number: w.id_number ?? null,
     id_expiration_date: w.id_expiration_date ?? null,
@@ -718,33 +723,51 @@ export async function fetchWorkerVerificationDocuments(
   for (const doc of data ?? []) {
     const isImage = doc.mime_type?.startsWith("image/");
     // Reuse signed URLs so Smart CDN can serve HITs (unique tokens = miss).
-    // Image docs: embed transform in the token for edge-resized thumbnails.
-    const signedUrl = await getOrSet<string | null>(
-      CacheKeys.storageSignedUrl(
-        "verification-documents",
-        isImage ? `${doc.storage_path}:thumb-560` : doc.storage_path
+    // Preview: edge-resized with contain (Safari-safe, readable ID edges).
+    // Full: untransformed for lightbox / download KYC text checks.
+    const [signedUrl, fullSignedUrl] = await Promise.all([
+      getOrSet<string | null>(
+        CacheKeys.storageSignedUrl(
+          "verification-documents",
+          isImage ? `${doc.storage_path}:preview-contain-720` : doc.storage_path
+        ),
+        CACHE_TTL_SECONDS.storageSignedUrl,
+        async () => {
+          const { data: signed } = await supabase.storage
+            .from("verification-documents")
+            .createSignedUrl(
+              doc.storage_path,
+              300,
+              isImage
+                ? {
+                    transform: {
+                      width: 720,
+                      height: 540,
+                      resize: "contain",
+                      quality: 80,
+                    },
+                  }
+                : undefined
+            );
+          return signed?.signedUrl ?? null;
+        }
       ),
-      CACHE_TTL_SECONDS.storageSignedUrl,
-      async () => {
-        const { data: signed } = await supabase.storage
-          .from("verification-documents")
-          .createSignedUrl(
-            doc.storage_path,
-            300,
-            isImage
-              ? {
-                  transform: {
-                    width: 560,
-                    height: 420,
-                    resize: "cover",
-                    quality: 70,
-                  },
-                }
-              : undefined
-          );
-        return signed?.signedUrl ?? null;
-      }
-    );
+      isImage
+        ? getOrSet<string | null>(
+            CacheKeys.storageSignedUrl(
+              "verification-documents",
+              `${doc.storage_path}:full`
+            ),
+            CACHE_TTL_SECONDS.storageSignedUrl,
+            async () => {
+              const { data: signed } = await supabase.storage
+                .from("verification-documents")
+                .createSignedUrl(doc.storage_path, 300);
+              return signed?.signedUrl ?? null;
+            }
+          )
+        : Promise.resolve(null),
+    ]);
 
     results.push({
       id: doc.id,
@@ -752,6 +775,7 @@ export async function fetchWorkerVerificationDocuments(
       file_name: doc.file_name,
       mime_type: doc.mime_type,
       signed_url: signedUrl,
+      full_signed_url: fullSignedUrl ?? signedUrl,
       created_at: doc.created_at,
     });
   }

@@ -215,6 +215,12 @@ export interface AdminVerificationQueueRow {
   username: string | null;
   phone_number: string | null;
   tin_number: string | null;
+  birth_date: string | null;
+  region: string | null;
+  city: string | null;
+  location: string | null;
+  /** Optional street address when the worker provided one. */
+  address_line_1: string | null;
   id_type: string | null;
   id_number: string | null;
   id_expiration_date: string | null;
@@ -230,7 +236,10 @@ export interface AdminVerificationDocument {
   document_type: string;
   file_name: string;
   mime_type: string;
+  /** Grid preview (edge-resized, contain — avoids Safari stretch). */
   signed_url: string | null;
+  /** Full-resolution URL for lightbox / download (KYC text legibility). */
+  full_signed_url: string | null;
   created_at: string;
 }
 

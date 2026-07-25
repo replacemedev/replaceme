@@ -14,6 +14,7 @@ import {
   Eye,
   Search,
   RefreshCw,
+  ZoomIn,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -43,37 +44,127 @@ function isImageMime(mime: string | null | undefined) {
   return Boolean(mime?.startsWith("image/"));
 }
 
-function VerificationDocCard({ doc }: { doc: AdminVerificationDocument }) {
-  const showPreview = Boolean(doc.signed_url && isImageMime(doc.mime_type));
+/** Region / city for KYC location matching (falls back to legacy location). */
+function formatRegionCity(
+  city: string | null | undefined,
+  region: string | null | undefined,
+  locationFallback?: string | null
+) {
+  const parts = [city?.trim(), region?.trim()].filter(Boolean);
+  if (parts.length > 0) return parts.join(", ");
+  const fallback = locationFallback?.trim();
+  return fallback || null;
+}
+
+function formatBirthDate(value: string | null | undefined) {
+  if (!value?.trim()) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function DocumentLightbox({
+  src,
+  alt,
+  onClose,
+}: {
+  src: string;
+  alt: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={alt}
+    >
+      <button
+        type="button"
+        className="absolute inset-0 cursor-zoom-out"
+        aria-label="Close image preview"
+        onClick={onClose}
+      />
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="truncate text-sm font-semibold text-white">{alt}</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        {/* Explicit aspect + object-contain keeps Safari from stretching ID scans */}
+        <div className="relative mx-auto aspect-[4/3] w-full max-h-[80vh] overflow-hidden rounded-xl bg-slate-900">
+          {/* eslint-disable-next-line @next/next/no-img-element -- signed storage URLs */}
+          <img
+            src={src}
+            alt={alt}
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VerificationDocCard({
+  doc,
+  onZoom,
+}: {
+  doc: AdminVerificationDocument;
+  onZoom?: (src: string, alt: string) => void;
+}) {
+  const previewUrl = doc.signed_url;
+  const fullUrl = doc.full_signed_url ?? doc.signed_url;
+  const showPreview = Boolean(previewUrl && isImageMime(doc.mime_type));
 
   return (
     <li className="rounded-xl border border-slate-100 bg-slate-50 p-3">
       {showPreview ? (
-        <a
-          href={doc.signed_url!}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mb-2 block overflow-hidden rounded-lg border border-slate-200 bg-white"
+        <button
+          type="button"
+          onClick={() => fullUrl && onZoom?.(fullUrl, doc.file_name)}
+          className="group relative mb-2 block w-full overflow-hidden rounded-lg border border-slate-200 bg-white text-left"
         >
           <OptimizedImage
-            src={doc.signed_url!}
+            src={previewUrl!}
             alt={doc.file_name}
             fill
             sizes="(max-width: 640px) 100vw, 280px"
             loading="lazy"
-            className="object-cover"
+            className="object-contain"
             containerClassName="relative aspect-[4/3] w-full"
           />
-        </a>
+          <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-md bg-slate-900/70 px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            <ZoomIn className="h-3 w-3" aria-hidden />
+            Zoom
+          </span>
+        </button>
       ) : null}
       <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
         <FileImage className="h-4 w-4 text-slate-400" />
         {doc.document_type.replace(/_/g, " ")}
       </div>
       <p className="mt-1 truncate text-[11px] text-slate-400">{doc.file_name}</p>
-      {doc.signed_url ? (
+      {fullUrl ? (
         <a
-          href={doc.signed_url}
+          href={fullUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-block text-xs font-semibold text-[#006e2f] hover:underline"
@@ -86,6 +177,62 @@ function VerificationDocCard({ doc }: { doc: AdminVerificationDocument }) {
         </p>
       )}
     </li>
+  );
+}
+
+/** KYC matching fields: legal name, DOB, region/city, optional address line. */
+function ProfileDetailsCard({
+  fullName,
+  birthDate,
+  regionCity,
+  addressLine1,
+}: {
+  fullName: string;
+  birthDate: string | null;
+  regionCity: string | null;
+  addressLine1: string | null;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 h-fit">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        Profile details
+      </p>
+      <p className="mt-1 text-[11px] font-medium text-slate-400">
+        Cross-reference against the ID images
+      </p>
+      <dl className="mt-4 space-y-4">
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Full legal name
+          </dt>
+          <dd className="mt-1 text-base font-bold text-slate-900">{fullName}</dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Date of birth
+          </dt>
+          <dd className="mt-1 text-base font-semibold text-slate-900">
+            {birthDate ?? "—"}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Region / city
+          </dt>
+          <dd className="mt-1 text-base font-semibold text-slate-900">
+            {regionCity ?? "—"}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Address line
+          </dt>
+          <dd className="mt-1 text-base font-semibold text-slate-900">
+            {addressLine1?.trim() ? addressLine1 : "—"}
+          </dd>
+        </div>
+      </dl>
+    </div>
   );
 }
 
@@ -130,6 +277,9 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
   );
   const [reason, setReason] = useState("");
   const [presetReason, setPresetReason] = useState("");
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(
+    null
+  );
 
   // Debounced search logic to sync input search query to URL query parameters
   useEffect(() => {
@@ -597,50 +747,47 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                     </div>
 
                     {isExpanded ? (
-                      <div className="space-y-4 border-t border-slate-100 px-4 py-4">
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                          <KycField label="ID type" value={worker.id_type} />
-                          <KycField label="ID number" value={worker.id_number} />
-                          <KycField
-                            label="ID expiration"
-                            value={
-                              worker.id_expiration_date
-                                ? new Date(
-                                    worker.id_expiration_date
-                                  ).toLocaleDateString()
-                                : null
-                            }
-                          />
-                          <KycField
-                            label="Issuing country"
-                            value={worker.id_issuing_country}
-                          />
-                          <KycField label="TIN" value={worker.tin_number} />
-                          <KycField label="Username" value={worker.username} />
-                          <KycField label="Phone" value={worker.phone_number} />
-                          <KycField
-                            label="Registered"
-                            value={new Date(
-                              worker.created_at
-                            ).toLocaleDateString()}
+                      <div className="border-t border-slate-100 px-4 py-4">
+                        {/* Mobile: stack (IDs first). Desktop: side-by-side compare */}
+                        <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-6">
+                          <div className="space-y-3 min-w-0">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                              Uploaded ID &amp; selfie
+                            </p>
+                            {loadingDocs === worker.id ? (
+                              <p className="text-sm font-medium text-slate-400">
+                                Loading documents…
+                              </p>
+                            ) : docs.length === 0 ? (
+                              <p className="text-sm font-medium text-slate-400">
+                                No documents on file.
+                              </p>
+                            ) : (
+                              <ul className="grid gap-3 sm:grid-cols-2">
+                                {docs.map((doc) => (
+                                  <VerificationDocCard
+                                    key={doc.id}
+                                    doc={doc}
+                                    onZoom={(src, alt) =>
+                                      setLightbox({ src, alt })
+                                    }
+                                  />
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+
+                          <ProfileDetailsCard
+                            fullName={name}
+                            birthDate={formatBirthDate(worker.birth_date)}
+                            regionCity={formatRegionCity(
+                              worker.city,
+                              worker.region,
+                              worker.location
+                            )}
+                            addressLine1={worker.address_line_1}
                           />
                         </div>
-
-                        {loadingDocs === worker.id ? (
-                          <p className="text-sm font-medium text-slate-400">
-                            Loading documents…
-                          </p>
-                        ) : docs.length === 0 ? (
-                          <p className="text-sm font-medium text-slate-400">
-                            No documents on file.
-                          </p>
-                        ) : (
-                          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                            {docs.map((doc) => (
-                              <VerificationDocCard key={doc.id} doc={doc} />
-                            ))}
-                          </ul>
-                        )}
                       </div>
                     ) : null}
                   </li>
@@ -916,100 +1063,70 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           <p className="text-sm font-medium text-slate-500">Loading profile…</p>
         ) : (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Core profile
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-5">
+              <div className="space-y-3 min-w-0 order-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Uploaded ID &amp; selfie
                 </p>
-                <p className="mt-1 text-sm font-bold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-                  <span className="truncate min-w-0">
-                    {formatFullName(
+                {loadingDocs === viewData.id ? (
+                  <p className="text-sm font-medium text-slate-500">
+                    Loading documents…
+                  </p>
+                ) : (documents[viewData.id] ?? []).length === 0 ? (
+                  <p className="text-sm font-medium text-slate-500">
+                    No documents on file.
+                  </p>
+                ) : (
+                  <ul className="grid gap-3">
+                    {(documents[viewData.id] ?? []).map((doc) => (
+                      <VerificationDocCard
+                        key={doc.id}
+                        doc={doc}
+                        onZoom={(src, alt) => setLightbox({ src, alt })}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="space-y-4 order-2 min-w-0">
+                <ProfileDetailsCard
+                  fullName={
+                    formatFullName(
                       viewData.firstName,
                       viewData.middleName,
                       viewData.lastName,
                       viewData.suffix
-                    ) || "—"}
-                  </span>
-                  <VerifiedBadge show={viewData.isVerified} size="sm" />
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  {viewData.email ?? "—"}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  @{viewData.username?.trim() || "—"} ·{" "}
-                  {viewData.phoneNumber ?? "No phone"}
-                </p>
-                <p className="mt-2 text-xs text-slate-500">
-                  Registered{" "}
-                  {new Date(viewData.createdAt).toLocaleDateString()}
-                </p>
-                <p className="mt-1 font-mono text-[11px] text-slate-400">
-                  {viewData.id}
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Verification status
-                </p>
-                <div className="mt-2">
-                  <StatusBadge
-                    status={viewData.verificationStatus ?? "unverified"}
-                  />
-                </div>
-                <p className="mt-2 text-xs font-medium text-slate-600">
-                  {viewData.location ?? "—"}
-                  {viewData.isRemote ? " • Remote" : ""}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  {viewData.availability ?? "Availability not set"}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Statutory identification
-              </p>
-              <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <KycField label="ID type" value={viewData.idType} />
-                <KycField label="ID number" value={viewData.idNumber} />
-                <KycField
-                  label="ID expiration"
-                  value={
-                    viewData.idExpirationDate
-                      ? new Date(
-                          viewData.idExpirationDate
-                        ).toLocaleDateString()
-                      : null
+                    ) || "—"
                   }
+                  birthDate={formatBirthDate(viewData.birthDate)}
+                  regionCity={formatRegionCity(
+                    viewData.city,
+                    viewData.region,
+                    viewData.location
+                  )}
+                  addressLine1={viewData.addressLine1}
                 />
-                <KycField
-                  label="Issuing country"
-                  value={viewData.idIssuingCountry}
-                />
-                <KycField label="TIN" value={viewData.tinNumber} />
-              </dl>
-            </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Verification documents
-              </p>
-              {loadingDocs === viewData.id ? (
-                <p className="mt-3 text-sm font-medium text-slate-500">
-                  Loading documents…
-                </p>
-              ) : (documents[viewData.id] ?? []).length === 0 ? (
-                <p className="mt-3 text-sm font-medium text-slate-500">
-                  No documents on file.
-                </p>
-              ) : (
-                <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {(documents[viewData.id] ?? []).map((doc) => (
-                    <VerificationDocCard key={doc.id} doc={doc} />
-                  ))}
-                </ul>
-              )}
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    Verification status
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <StatusBadge
+                      status={viewData.verificationStatus ?? "unverified"}
+                    />
+                    <VerifiedBadge show={viewData.isVerified} size="sm" />
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">
+                    {viewData.email ?? "—"}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Registered{" "}
+                    {new Date(viewData.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {(viewData.verificationStatus === "documents_submitted" ||
@@ -1115,25 +1232,14 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
           </div>
         )}
       </AdminSlideover>
-    </div>
-  );
-}
 
-function KycField({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  return (
-    <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-        {label}
-      </p>
-      <p className="mt-0.5 text-sm font-semibold text-slate-800">
-        {value?.trim() ? value : "—"}
-      </p>
+      {lightbox ? (
+        <DocumentLightbox
+          src={lightbox.src}
+          alt={lightbox.alt}
+          onClose={() => setLightbox(null)}
+        />
+      ) : null}
     </div>
   );
 }
