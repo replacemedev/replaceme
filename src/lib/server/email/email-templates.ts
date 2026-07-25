@@ -242,6 +242,181 @@ export function renderWorkerNotificationEmail(input: {
   return { subject: input.subject, html, text };
 }
 
+function detailRow(label: string, valueHtml: string): string {
+  return `<tr>
+    <td style="padding:8px 0;color:${BRAND.muted};width:132px;vertical-align:top;font-size:14px;">${escapeHtml(label)}</td>
+    <td style="padding:8px 0;color:${BRAND.text};font-weight:600;font-size:14px;vertical-align:top;">${valueHtml}</td>
+  </tr>`;
+}
+
+function detailCard(rowsHtml: string): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.accentSoft};border-radius:14px;padding:4px 16px;margin:0 0 18px 0;">
+    ${rowsHtml}
+  </table>`;
+}
+
+function sectionLabel(label: string): string {
+  return `<p style="margin:0 0 8px 0;font-size:13px;font-weight:700;color:${BRAND.primary};text-transform:uppercase;letter-spacing:0.04em;">${escapeHtml(label)}</p>`;
+}
+
+function retentionListHtml(
+  rows: ReadonlyArray<{ category: string; period: string }>
+): string {
+  const items = rows
+    .map(
+      (row) =>
+        `<li style="margin:0 0 8px 0;"><strong style="color:${BRAND.text};">${escapeHtml(row.category)}:</strong> ${escapeHtml(row.period)}</li>`
+    )
+    .join("");
+  return `<div style="margin:0 0 18px 0;padding:14px 16px;border:1px solid ${BRAND.border};border-radius:14px;background:#fff;">
+    <ul style="margin:0;padding-left:18px;color:${BRAND.body};font-size:14px;line-height:1.55;">${items}</ul>
+  </div>`;
+}
+
+/** Account suspended — matches employer support email visual system. */
+export function renderAccountSuspendedEmail(input: {
+  endsAtLabel: string | null;
+  reasonCategory?: string | null;
+  roleLabel: string;
+  appealCopy: string;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Your Replaceme account has been suspended";
+  const untilValue = input.endsAtLabel
+    ? escapeHtml(input.endsAtLabel)
+    : "Until further review";
+  const reasonRow = input.reasonCategory
+    ? detailRow("Reason", escapeHtml(input.reasonCategory))
+    : "";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Your Replaceme account access has been temporarily restricted. You will not be able to sign in to the dashboard while this suspension is in effect.</p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${BRAND.primary};">Suspended</span>`)}
+      ${detailRow("Until", untilValue)}
+      ${detailRow("Account type", escapeHtml(input.roleLabel))}
+      ${reasonRow}
+    `)}
+    ${sectionLabel("Appeals")}
+    <p style="margin:0 0 18px 0;">${escapeHtml(input.appealCopy)}</p>
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(`mailto:${input.supportEmail}`, "Contact support")}
+    </p>
+    <p style="margin:0;font-size:13px;color:${BRAND.muted};line-height:1.55;">
+      Prefer email? Write to
+      <a href="mailto:${escapeHtml(input.supportEmail)}" style="color:${BRAND.accent};font-weight:600;text-decoration:none;">${escapeHtml(input.supportEmail)}</a>.
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Account suspended",
+    preheader: "Your Replaceme account has been suspended",
+    bodyHtml,
+    footerNote: `Questions or appeals: ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}
+
+/** Account reactivated after suspension. */
+export function renderAccountUnsuspendedEmail(input: {
+  roleLabel: string;
+  signInUrl: string;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Your Replaceme account has been reactivated";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Good news — your Replaceme account is active again. You can sign in and continue as usual.</p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${BRAND.accent};">Active</span>`)}
+      ${detailRow("Account type", escapeHtml(input.roleLabel))}
+    `)}
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(input.signInUrl, "Sign in to Replaceme")}
+    </p>
+    <p style="margin:0;font-size:13px;color:${BRAND.muted};line-height:1.55;">
+      If you did not expect this change, contact
+      <a href="mailto:${escapeHtml(input.supportEmail)}" style="color:${BRAND.accent};font-weight:600;text-decoration:none;">${escapeHtml(input.supportEmail)}</a>.
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Account reactivated",
+    preheader: "Your Replaceme account access is restored",
+    bodyHtml,
+    footerNote: `Need help? ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}
+
+/** Soft-delete grace window scheduled. */
+export function renderDeletionScheduledEmail(input: {
+  scheduledForLabel: string;
+  graceDays: number;
+  retentionRows: ReadonlyArray<{ category: string; period: string }>;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Your Replaceme account closure is scheduled";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Your Replaceme account is scheduled for closure. You keep full access until the date below — contact support before then if you want to cancel.</p>
+    ${detailCard(`
+      ${detailRow("Closure date", escapeHtml(input.scheduledForLabel))}
+      ${detailRow("Recovery window", `${input.graceDays} calendar days`)}
+      ${detailRow("Status", "Scheduled for closure")}
+    `)}
+    ${sectionLabel("What we may retain after closure")}
+    <p style="margin:0 0 10px 0;font-size:14px;color:${BRAND.body};">After closure we anonymize profile PII. Categories that may be retained for legal, tax, fraud, or dispute purposes only:</p>
+    ${retentionListHtml(input.retentionRows)}
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(`mailto:${input.supportEmail}?subject=${encodeURIComponent("Cancel account closure")}`, "Contact support to cancel")}
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Account closure scheduled",
+    preheader: `Account closure scheduled for ${input.scheduledForLabel}`,
+    bodyHtml,
+    footerNote: `Need to cancel? Email ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}
+
+/** Account erasure completed. */
+export function renderDeletionCompleteEmail(input: {
+  retentionRows: ReadonlyArray<{ category: string; period: string }>;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Your Replaceme account has been closed";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Your Replaceme account has been closed and personal profile data has been anonymized. Sign-in is disabled.</p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${BRAND.primary};">Closed</span>`)}
+      ${detailRow("Sign-in", "Disabled")}
+    `)}
+    ${sectionLabel("Data retention")}
+    <p style="margin:0 0 10px 0;font-size:14px;color:${BRAND.body};">Categories that may be retained (for legal, tax, fraud, or dispute purposes only — not marketing):</p>
+    ${retentionListHtml(input.retentionRows)}
+    <p style="margin:0 0 18px 0;font-size:14px;color:${BRAND.body};">You may complain to the National Privacy Commission (NPC) or another supervisory authority where applicable.</p>
+    <p style="margin:0 0 8px 0;">
+      ${ctaButton(`mailto:${input.supportEmail}`, "Contact support")}
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Account closed",
+    preheader: "Your Replaceme account has been closed",
+    bodyHtml,
+    footerNote: `Questions: ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}
+
 /**
  * HTML for Supabase Dashboard → Auth → Email Templates → Confirm signup.
  * Uses TokenHash so clicks go through /auth/confirm (SSR-safe).

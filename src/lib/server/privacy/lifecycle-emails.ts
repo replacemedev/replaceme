@@ -5,9 +5,12 @@ import {
   DELETION_REQUEST_SUPPORT_EMAIL,
   formatClosureDate,
 } from "@/lib/data/legal";
+import { getSiteUrl } from "@/lib/auth/site-url";
 import {
-  escapeHtml,
-  renderEmailLayout,
+  renderAccountSuspendedEmail,
+  renderAccountUnsuspendedEmail,
+  renderDeletionCompleteEmail,
+  renderDeletionScheduledEmail,
 } from "@/lib/server/email/email-templates";
 import { sendTransactionalEmail } from "@/lib/server/email/mailer";
 import { safeError } from "@/utils/logger";
@@ -19,13 +22,19 @@ export type LifecycleEmailResult =
   | { sent: true; messageId: string }
   | { sent: false; skipped: string };
 
-function retentionBulletsHtml(): string {
-  return DATA_RETENTION_PERIODS.slice(0, 4)
-    .map(
-      (row) =>
-        `<li><strong>${escapeHtml(row.category)}:</strong> ${escapeHtml(row.period)}</li>`
-    )
-    .join("");
+const RETENTION_FOR_EMAIL = DATA_RETENTION_PERIODS.slice(0, 4);
+
+function roleLabel(role: UserRole): string {
+  switch (role) {
+    case "employer":
+      return "Employer";
+    case "worker":
+      return "Worker";
+    case "admin":
+      return "Admin";
+    default:
+      return role;
+  }
 }
 
 function uniqueKey(parts: string[]): string {
@@ -44,39 +53,26 @@ export async function sendAccountSuspendedEmail(input: {
   if (!input.to.trim()) return { sent: false, skipped: "missing_email" };
 
   try {
-    const endCopy = input.endsAt
-      ? `Your access is suspended until <strong>${escapeHtml(formatClosureDate(input.endsAt))}</strong>.`
-      : "Your access is suspended until further review.";
-
-    const category = input.reasonCategory
-      ? `<p>Reason category: <strong>${escapeHtml(input.reasonCategory)}</strong>.</p>`
-      : "";
-
-    const { html, text } = renderEmailLayout({
-      preheader: "Your Replaceme account has been suspended",
-      title: "Account suspended",
-      bodyHtml: `
-      <p>${endCopy}</p>
-      ${category}
-      <p>You will not be able to sign in to the dashboard while this suspension is in effect.</p>
-      <p>${escapeHtml(APPEAL_SLA_COPY)}</p>
-      <p>Questions or appeals: <a href="mailto:${DELETION_REQUEST_SUPPORT_EMAIL}">${DELETION_REQUEST_SUPPORT_EMAIL}</a></p>
-    `,
+    const email = renderAccountSuspendedEmail({
+      endsAtLabel: input.endsAt ? formatClosureDate(input.endsAt) : null,
+      reasonCategory: input.reasonCategory ?? null,
+      roleLabel: roleLabel(input.role),
+      appealCopy: APPEAL_SLA_COPY,
+      supportEmail: DELETION_REQUEST_SUPPORT_EMAIL,
     });
 
     const result = await sendTransactionalEmail({
       templateKey: "account.lifecycle.suspended",
       to: input.to,
-      subject: "Your Replaceme account has been suspended",
-      html,
-      text,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
       userId: input.userId,
       role: input.role,
       tags: {
         lifecycle: "suspended",
         role: input.role,
       },
-      // Unique per admin action so re-suspend within 24h still delivers (Resend idempotency).
       idempotencyKey: uniqueKey([
         "account-lifecycle",
         "suspended",
@@ -106,21 +102,19 @@ export async function sendAccountUnsuspendedEmail(input: {
   if (!input.to.trim()) return { sent: false, skipped: "missing_email" };
 
   try {
-    const { html, text } = renderEmailLayout({
-      preheader: "Your Replaceme account access is restored",
-      title: "Account reactivated",
-      bodyHtml: `
-      <p>Your Replaceme account is active again. You can sign in as usual.</p>
-      <p>If you did not expect this change, contact <a href="mailto:${DELETION_REQUEST_SUPPORT_EMAIL}">${DELETION_REQUEST_SUPPORT_EMAIL}</a>.</p>
-    `,
+    const signInUrl = `${getSiteUrl().replace(/\/$/, "")}/signin`;
+    const email = renderAccountUnsuspendedEmail({
+      roleLabel: roleLabel(input.role),
+      signInUrl,
+      supportEmail: DELETION_REQUEST_SUPPORT_EMAIL,
     });
 
     const result = await sendTransactionalEmail({
       templateKey: "account.lifecycle.unsuspended",
       to: input.to,
-      subject: "Your Replaceme account has been reactivated",
-      html,
-      text,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
       userId: input.userId,
       role: input.role,
       tags: {
@@ -157,26 +151,19 @@ export async function sendDeletionScheduledEmail(input: {
   if (!input.to.trim()) return { sent: false, skipped: "missing_email" };
 
   try {
-    const dateLabel = formatClosureDate(input.scheduledFor);
-    const { html, text } = renderEmailLayout({
-      preheader: `Account closure scheduled for ${dateLabel}`,
-      title: "Account closure scheduled",
-      bodyHtml: `
-      <p>Your Replaceme account is scheduled for closure on <strong>${escapeHtml(dateLabel)}</strong>
-      (${ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day recovery window).</p>
-      <p>You keep full access until that date. Contact support before then to cancel.</p>
-      <p>After closure we anonymize profile PII. We may retain the following for legal or tax reasons:</p>
-      <ul>${retentionBulletsHtml()}</ul>
-      <p>Support: <a href="mailto:${DELETION_REQUEST_SUPPORT_EMAIL}">${DELETION_REQUEST_SUPPORT_EMAIL}</a></p>
-    `,
+    const email = renderDeletionScheduledEmail({
+      scheduledForLabel: formatClosureDate(input.scheduledFor),
+      graceDays: ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays,
+      retentionRows: RETENTION_FOR_EMAIL,
+      supportEmail: DELETION_REQUEST_SUPPORT_EMAIL,
     });
 
     const result = await sendTransactionalEmail({
       templateKey: "account.lifecycle.deletion_scheduled",
       to: input.to,
-      subject: "Your Replaceme account closure is scheduled",
-      html,
-      text,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
       userId: input.userId,
       role: input.role,
       tags: {
@@ -212,24 +199,17 @@ export async function sendDeletionCompleteEmail(input: {
   if (!input.to.trim()) return { sent: false, skipped: "missing_email" };
 
   try {
-    const { html, text } = renderEmailLayout({
-      preheader: "Your Replaceme account has been closed",
-      title: "Account closed",
-      bodyHtml: `
-      <p>Your Replaceme account has been closed and personal profile data has been anonymized.</p>
-      <p>Sign-in is disabled. Categories that may be retained (for legal, tax, fraud, or dispute purposes only — not marketing):</p>
-      <ul>${retentionBulletsHtml()}</ul>
-      <p>You may complain to the National Privacy Commission (NPC) or another supervisory authority where applicable.</p>
-      <p>Questions: <a href="mailto:${DELETION_REQUEST_SUPPORT_EMAIL}">${DELETION_REQUEST_SUPPORT_EMAIL}</a></p>
-    `,
+    const email = renderDeletionCompleteEmail({
+      retentionRows: RETENTION_FOR_EMAIL,
+      supportEmail: DELETION_REQUEST_SUPPORT_EMAIL,
     });
 
     const result = await sendTransactionalEmail({
       templateKey: "account.lifecycle.deletion_complete",
       to: input.to,
-      subject: "Your Replaceme account has been closed",
-      html,
-      text,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
       userId: input.userId,
       role: input.role,
       tags: {
