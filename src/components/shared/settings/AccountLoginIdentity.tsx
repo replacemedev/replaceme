@@ -21,12 +21,12 @@ function LockedField({
 }) {
   return (
     <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 w-full flex-1 items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-slate-100">
             {icon}
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
               {label}
             </dt>
