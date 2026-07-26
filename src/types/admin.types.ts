@@ -261,7 +261,37 @@ export interface AdminVerificationQueueRow {
   verification_status: VerificationStatus;
   is_verified: boolean;
   document_count: number;
+  /** Latest verification document upload time (falls back to profile created_at). */
+  submitted_at: string;
   created_at: string;
+  kyc_reviewed_by: string | null;
+  kyc_reviewed_at: string | null;
+  reviewer_name: string | null;
+}
+
+export type IdentityQueueTab = "pending" | "approved" | "rejected" | "all";
+
+export interface IdentityQueueFilters {
+  tab?: IdentityQueueTab;
+  search?: string;
+  sort?: "newest" | "oldest";
+  page?: number;
+  pageSize?: number;
+}
+
+export interface IdentityQueueResult {
+  rows: AdminVerificationQueueRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+  counts: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    all: number;
+  };
+  /** Sum of document counts for workers currently in the pending tab. */
+  pendingDocumentCount: number;
 }
 
 export interface AdminVerificationDocument {

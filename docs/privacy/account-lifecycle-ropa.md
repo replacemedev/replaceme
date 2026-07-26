@@ -11,7 +11,7 @@ Short record of processing activities (ROPA-style) for Phase 1 account lifecycle
 | Purpose | Categories | Retention while active | Soft-delete / anonymize | Notes |
 |---------|------------|------------------------|-------------------------|-------|
 | Account administration & marketplace matching | Profile, contact, auth identifiers | While account is active | After closure: **30-day** grace (`deletionGraceCalendarDays`), then anonymize / erase Platform PIC copy | Suspension does **not** trigger erasure |
-| Identity / KYC (RA 11967 listing) | Government ID images, verification metadata | Until verification purpose fulfilled | Delete or anonymize within **90 days** after purpose unless legal hold | Heightened SPI safeguards |
+| Identity / KYC (RA 11967 listing) | Government ID images, verification metadata | Until verification purpose fulfilled | Delete or anonymize within **90 days** after purpose unless legal hold | Heightened SPI safeguards; private encrypted storage; admin document **views** and approve/reject decisions are audit-logged |
 | Applications & messaging | Application materials, in-product messages | While relevant to open roles / activity | Up to **24 months** after relevance ends; closed with account subject to grace | Employer-held unlocked copies are Employer PIC |
 | Billing & tax (subscriptions) | Stripe metadata, invoices, ledger | While subscribed + dispute window | Retain up to **7 years** where tax/accounting law requires | Not erased solely by account closure |
 | Security / fraud / audit | Security logs, abuse signals | Continuous for ops | Up to **24 months** | May outlive account for incident defense |

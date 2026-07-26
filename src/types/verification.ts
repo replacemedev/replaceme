@@ -29,13 +29,19 @@ export function isKycResubmitStatus(
   return (KYC_RESUBMIT_STATUSES as readonly string[]).includes(status);
 }
 
+/** Worker-facing rejection presets (Jumio/usability-aligned). */
 export const COMMON_KYC_REJECTION_REASONS = [
   "ID image is too blurry or unreadable",
+  "ID is obscured by glare or poor lighting",
   "ID is expired",
-  "ID details do not match your profile",
-  "Selfie does not match the ID photo",
-  "Document type is not accepted",
+  "Name on the ID does not match your profile",
+  "Date of birth on the ID does not match your profile",
+  "Address or location on the ID does not match your profile",
+  "Selfie does not match the photo on the ID",
   "Submission is incomplete (missing back of ID or selfie)",
+  "Document type is not accepted",
+  "Screenshot or photo of a screen is not accepted — upload a photo of the physical ID",
+  "Document appears altered or is not an original government-issued ID",
 ] as const;
 
 export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];

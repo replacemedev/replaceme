@@ -36,6 +36,9 @@ import {
   type AdminUsersPageData,
   type AdminVerificationDocument,
   type AdminVerificationQueueRow,
+  type IdentityQueueFilters,
+  type IdentityQueueResult,
+  type IdentityQueueTab,
   type AdminWorkerRow,
   type AdminDisputeRow,
   type AdminChatThreadRow,
@@ -58,6 +61,7 @@ import {
   notifyEmployerJobApproved,
   notifyEmployerJobRejected,
 } from "@/lib/server/privacy/job-moderation-notify";
+import { notifyWorkerKycDecision } from "@/lib/server/privacy/kyc-notify";
 
 const ADMIN_PATHS = [
   "/admin/dashboard",
@@ -744,10 +748,11 @@ export async function reviewWorkerVerification(
 ): Promise<ActionResult> {
   try {
     const parsed = reviewVerificationSchema.parse({ workerId, decision, reason });
-    const { supabase } = await requireAdmin();
+    const { user, supabase } = await requireAdmin();
 
     const nextStatus = parsed.decision;
     const trimmedReason = parsed.reason?.trim() || null;
+    const now = new Date().toISOString();
 
     const { error } = await supabase
       .from("profiles")
@@ -756,6 +761,8 @@ export async function reviewWorkerVerification(
         is_verified: parsed.decision === "approved",
         kyc_rejection_reason:
           parsed.decision === "approved" ? null : trimmedReason,
+        kyc_reviewed_by: user.id,
+        kyc_reviewed_at: now,
       })
       .eq("id", parsed.workerId)
       .eq("role", "worker");
@@ -773,12 +780,37 @@ export async function reviewWorkerVerification(
       actionType,
       "profile",
       parsed.workerId,
-      trimmedReason ? { reason: trimmedReason, decision: parsed.decision } : { decision: parsed.decision }
+      trimmedReason
+        ? { reason: trimmedReason, decision: parsed.decision }
+        : { decision: parsed.decision }
     );
+
+    let emailSent = false;
+    let emailError: string | null = null;
+    try {
+      const notified = await notifyWorkerKycDecision({
+        workerId: parsed.workerId,
+        decision: parsed.decision,
+        reason: trimmedReason,
+      });
+      emailSent = notified.notified ? notified.emailSent : false;
+      if (!notified.notified) {
+        emailError = notified.skipped;
+      }
+    } catch (notifyErr) {
+      emailError =
+        notifyErr instanceof Error ? notifyErr.message : "notify_failed";
+      safeWarn("reviewWorkerVerification: notify failed", {
+        workerId: parsed.workerId,
+        error: emailError,
+      });
+    }
+
     await revalidateAdminSurfaces();
     revalidatePath("/worker/verification");
     revalidatePath("/worker/dashboard");
-    return { success: true };
+    revalidatePath(`/admin/identity/${parsed.workerId}`);
+    return { success: true, emailSent, emailError };
   } catch (err) {
     return {
       success: false,
@@ -786,6 +818,380 @@ export async function reviewWorkerVerification(
         err instanceof Error ? err.message : "Failed to update verification",
     };
   }
+}
+
+const PENDING_STATUSES = ["documents_submitted", "under_review"] as const;
+const REJECTED_STATUSES = ["rejected", "resubmission_required"] as const;
+const QUEUE_STATUSES = [
+  "documents_submitted",
+  "under_review",
+  "approved",
+  "rejected",
+  "resubmission_required",
+] as const;
+
+function statusesForTab(tab: IdentityQueueTab): readonly string[] {
+  if (tab === "pending") return PENDING_STATUSES;
+  if (tab === "approved") return ["approved"];
+  if (tab === "rejected") return REJECTED_STATUSES;
+  return QUEUE_STATUSES;
+}
+
+export async function fetchVerificationQueue(
+  filters: IdentityQueueFilters = {}
+): Promise<IdentityQueueResult> {
+  const { supabase } = await requireAdmin();
+  const tab: IdentityQueueTab = filters.tab ?? "pending";
+  const sort = filters.sort ?? "newest";
+  const pageSize = Math.min(Math.max(filters.pageSize ?? 20, 1), 100);
+  const page = Math.max(filters.page ?? 1, 1);
+  const search = filters.search?.trim() ?? "";
+
+  const { data: workers, error } = await supabase
+    .from("profiles")
+    .select(
+      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
+    )
+    .eq("role", "worker")
+    .in("verification_status", [...QUEUE_STATUSES]);
+
+  if (error) throw new Error(error.message);
+
+  const allWorkers = workers ?? [];
+  const workerIds = allWorkers.map((w) => w.id);
+
+  const docMeta = new Map<string, { count: number; latestAt: string | null }>();
+  const reviewerIds = [
+    ...new Set(
+      allWorkers
+        .map((w) => w.kyc_reviewed_by)
+        .filter((id): id is string => Boolean(id))
+    ),
+  ];
+
+  const [docsResult, reviewersResult] = await Promise.all([
+    workerIds.length > 0
+      ? supabase
+          .from("verification_documents")
+          .select("worker_id, created_at")
+          .in("worker_id", workerIds)
+      : Promise.resolve({ data: [] as { worker_id: string; created_at: string }[] }),
+    reviewerIds.length > 0
+      ? supabase
+          .from("profiles")
+          .select("id, first_name, middle_name, last_name, email")
+          .in("id", reviewerIds)
+      : Promise.resolve({
+          data: [] as {
+            id: string;
+            first_name: string | null;
+            middle_name: string | null;
+            last_name: string | null;
+            email: string | null;
+          }[],
+        }),
+  ]);
+
+  for (const doc of docsResult.data ?? []) {
+    const prev = docMeta.get(doc.worker_id) ?? { count: 0, latestAt: null };
+    const nextLatest =
+      !prev.latestAt || doc.created_at > prev.latestAt
+        ? doc.created_at
+        : prev.latestAt;
+    docMeta.set(doc.worker_id, {
+      count: prev.count + 1,
+      latestAt: nextLatest,
+    });
+  }
+
+  const reviewerNameById = new Map<string, string>();
+  for (const r of reviewersResult.data ?? []) {
+    reviewerNameById.set(
+      r.id,
+      formatFullName(r.first_name, r.middle_name, r.last_name) ||
+        r.email ||
+        "Admin"
+    );
+  }
+
+  const mapped: AdminVerificationQueueRow[] = allWorkers.map((w) => {
+    const meta = docMeta.get(w.id);
+    return {
+      id: w.id,
+      first_name: w.first_name,
+      middle_name: w.middle_name,
+      last_name: w.last_name,
+      email: w.email,
+      username: w.username ?? null,
+      phone_number: w.phone_number ?? null,
+      tin_number: w.tin_number ?? null,
+      birth_date: w.birth_date ?? null,
+      region: w.region ?? null,
+      city: w.city ?? null,
+      location: w.location ?? null,
+      address_line_1: w.address_line_1 ?? null,
+      id_type: w.id_type ?? null,
+      id_number: w.id_number ?? null,
+      id_expiration_date: w.id_expiration_date ?? null,
+      id_issuing_country: w.id_issuing_country ?? null,
+      verification_status: w.verification_status,
+      is_verified: Boolean(w.is_verified),
+      document_count: meta?.count ?? 0,
+      submitted_at: meta?.latestAt ?? w.created_at,
+      created_at: w.created_at,
+      kyc_reviewed_by: w.kyc_reviewed_by ?? null,
+      kyc_reviewed_at: w.kyc_reviewed_at ?? null,
+      reviewer_name: w.kyc_reviewed_by
+        ? (reviewerNameById.get(w.kyc_reviewed_by) ?? null)
+        : null,
+    };
+  });
+
+  const counts = {
+    pending: mapped.filter((w) =>
+      (PENDING_STATUSES as readonly string[]).includes(w.verification_status)
+    ).length,
+    approved: mapped.filter((w) => w.verification_status === "approved").length,
+    rejected: mapped.filter((w) =>
+      (REJECTED_STATUSES as readonly string[]).includes(w.verification_status)
+    ).length,
+    all: mapped.length,
+  };
+
+  const pendingDocumentCount = mapped
+    .filter((w) =>
+      (PENDING_STATUSES as readonly string[]).includes(w.verification_status)
+    )
+    .reduce((sum, w) => sum + w.document_count, 0);
+
+  const allowed = new Set(statusesForTab(tab));
+  let filtered = mapped.filter((w) => allowed.has(w.verification_status));
+
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter((w) => {
+      const first = w.first_name?.toLowerCase() ?? "";
+      const last = w.last_name?.toLowerCase() ?? "";
+      const email = w.email?.toLowerCase() ?? "";
+      const full = `${first} ${last}`.trim();
+      return (
+        first.includes(q) ||
+        last.includes(q) ||
+        email.includes(q) ||
+        full.includes(q)
+      );
+    });
+  }
+
+  filtered.sort((a, b) => {
+    const timeA = new Date(a.submitted_at).getTime();
+    const timeB = new Date(b.submitted_at).getTime();
+    return sort === "oldest" ? timeA - timeB : timeB - timeA;
+  });
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const start = (safePage - 1) * pageSize;
+  const rows = filtered.slice(start, start + pageSize);
+
+  return {
+    rows,
+    total,
+    page: safePage,
+    pageSize,
+    counts,
+    pendingDocumentCount,
+  };
+}
+
+export async function fetchWorkerVerificationDocuments(
+  workerId: string
+): Promise<AdminVerificationDocument[]> {
+  const id = z.string().uuid().parse(workerId);
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("verification_documents")
+    .select("id, document_type, file_name, mime_type, storage_path, created_at")
+    .eq("worker_id", id)
+    .order("created_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  const results: AdminVerificationDocument[] = [];
+  for (const doc of data ?? []) {
+    const isImage = doc.mime_type?.startsWith("image/");
+    // Reuse signed URLs so Smart CDN can serve HITs (unique tokens = miss).
+    // Preview: edge-resized with contain (Safari-safe, readable ID edges).
+    // Full: untransformed for lightbox / download KYC text checks.
+    const [signedUrl, fullSignedUrl] = await Promise.all([
+      getOrSet<string | null>(
+        CacheKeys.storageSignedUrl(
+          "verification-documents",
+          isImage ? `${doc.storage_path}:preview-contain-720` : doc.storage_path
+        ),
+        CACHE_TTL_SECONDS.storageSignedUrl,
+        async () => {
+          const { data: signed } = await supabase.storage
+            .from("verification-documents")
+            .createSignedUrl(
+              doc.storage_path,
+              300,
+              isImage
+                ? {
+                    transform: {
+                      width: 720,
+                      height: 540,
+                      resize: "contain",
+                      quality: 80,
+                    },
+                  }
+                : undefined
+            );
+          return signed?.signedUrl ?? null;
+        }
+      ),
+      isImage
+        ? getOrSet<string | null>(
+            CacheKeys.storageSignedUrl(
+              "verification-documents",
+              `${doc.storage_path}:full`
+            ),
+            CACHE_TTL_SECONDS.storageSignedUrl,
+            async () => {
+              const { data: signed } = await supabase.storage
+                .from("verification-documents")
+                .createSignedUrl(doc.storage_path, 300);
+              return signed?.signedUrl ?? null;
+            }
+          )
+        : Promise.resolve(null),
+    ]);
+
+    results.push({
+      id: doc.id,
+      document_type: doc.document_type,
+      file_name: doc.file_name,
+      mime_type: doc.mime_type,
+      signed_url: signedUrl,
+      full_signed_url: fullSignedUrl ?? signedUrl,
+      created_at: doc.created_at,
+    });
+  }
+
+  // SPI access log — never include signed URL tokens.
+  try {
+    await logAdminAction("view_verification_documents", "profile", id, {
+      documentIds: results.map((d) => d.id),
+      documentTypes: results.map((d) => d.document_type),
+      documentCount: results.length,
+    });
+  } catch (auditErr) {
+    safeWarn("fetchWorkerVerificationDocuments: view audit failed", {
+      workerId: id,
+      error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+    });
+  }
+
+  return results;
+}
+
+export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
+  worker: AdminVerificationQueueRow;
+  documents: AdminVerificationDocument[];
+} | null> {
+  const id = z.string().uuid().parse(workerId);
+  const { user, supabase } = await requireAdmin();
+
+  const { data: worker, error } = await supabase
+    .from("profiles")
+    .select(
+      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
+    )
+    .eq("id", id)
+    .eq("role", "worker")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!worker) return null;
+
+  // Claim for review when still only submitted.
+  if (worker.verification_status === "documents_submitted") {
+    const { error: claimError } = await supabase
+      .from("profiles")
+      .update({ verification_status: "under_review" })
+      .eq("id", id)
+      .eq("verification_status", "documents_submitted");
+    if (!claimError) {
+      try {
+        await logAdminAction("claim_verification_review", "profile", id, {
+          previousStatus: "documents_submitted",
+          adminId: user.id,
+        });
+      } catch {
+        /* non-blocking */
+      }
+      worker.verification_status = "under_review";
+    }
+  }
+
+  const documents = await fetchWorkerVerificationDocuments(id);
+
+  let reviewerName: string | null = null;
+  if (worker.kyc_reviewed_by) {
+    const { data: reviewer } = await supabase
+      .from("profiles")
+      .select("first_name, middle_name, last_name, email")
+      .eq("id", worker.kyc_reviewed_by)
+      .maybeSingle();
+    if (reviewer) {
+      reviewerName =
+        formatFullName(
+          reviewer.first_name,
+          reviewer.middle_name,
+          reviewer.last_name
+        ) ||
+        reviewer.email ||
+        "Admin";
+    }
+  }
+
+  const latestDoc = documents.reduce<string | null>((latest, doc) => {
+    if (!latest || doc.created_at > latest) return doc.created_at;
+    return latest;
+  }, null);
+
+  return {
+    worker: {
+      id: worker.id,
+      first_name: worker.first_name,
+      middle_name: worker.middle_name,
+      last_name: worker.last_name,
+      email: worker.email,
+      username: worker.username ?? null,
+      phone_number: worker.phone_number ?? null,
+      tin_number: worker.tin_number ?? null,
+      birth_date: worker.birth_date ?? null,
+      region: worker.region ?? null,
+      city: worker.city ?? null,
+      location: worker.location ?? null,
+      address_line_1: worker.address_line_1 ?? null,
+      id_type: worker.id_type ?? null,
+      id_number: worker.id_number ?? null,
+      id_expiration_date: worker.id_expiration_date ?? null,
+      id_issuing_country: worker.id_issuing_country ?? null,
+      verification_status: worker.verification_status,
+      is_verified: Boolean(worker.is_verified),
+      document_count: documents.length,
+      submitted_at: latestDoc ?? worker.created_at,
+      created_at: worker.created_at,
+      kyc_reviewed_by: worker.kyc_reviewed_by ?? null,
+      kyc_reviewed_at: worker.kyc_reviewed_at ?? null,
+      reviewer_name: reviewerName,
+    },
+    documents,
+  };
 }
 
 export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
@@ -1181,144 +1587,6 @@ export async function fetchAdminJobs(
       deletion_reason: row.deletion_reason ?? null,
     };
   });
-}
-
-export async function fetchVerificationQueue(): Promise<
-  AdminVerificationQueueRow[]
-> {
-  const { supabase } = await requireAdmin();
-
-  const { data: workers, error } = await supabase
-    .from("profiles")
-    .select(
-      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at"
-    )
-    .eq("role", "worker")
-    .in("verification_status", [
-      "documents_submitted",
-      "under_review",
-      "approved",
-      "rejected",
-      "resubmission_required",
-    ])
-    .order("created_at", { ascending: false });
-
-  if (error) throw new Error(error.message);
-
-  const workerIds = (workers ?? []).map((w) => w.id);
-  if (workerIds.length === 0) return [];
-
-  const { data: docs } = await supabase
-    .from("verification_documents")
-    .select("worker_id")
-    .in("worker_id", workerIds);
-
-  const counts = new Map<string, number>();
-  for (const doc of docs ?? []) {
-    counts.set(doc.worker_id, (counts.get(doc.worker_id) ?? 0) + 1);
-  }
-
-  return (workers ?? []).map((w) => ({
-    id: w.id,
-    first_name: w.first_name,
-    middle_name: w.middle_name,
-    last_name: w.last_name,
-    email: w.email,
-    username: w.username ?? null,
-    phone_number: w.phone_number ?? null,
-    tin_number: w.tin_number ?? null,
-    birth_date: w.birth_date ?? null,
-    region: w.region ?? null,
-    city: w.city ?? null,
-    location: w.location ?? null,
-    address_line_1: w.address_line_1 ?? null,
-    id_type: w.id_type ?? null,
-    id_number: w.id_number ?? null,
-    id_expiration_date: w.id_expiration_date ?? null,
-    id_issuing_country: w.id_issuing_country ?? null,
-    verification_status: w.verification_status,
-    is_verified: Boolean(w.is_verified),
-    document_count: counts.get(w.id) ?? 0,
-    created_at: w.created_at,
-  }));
-}
-
-export async function fetchWorkerVerificationDocuments(
-  workerId: string
-): Promise<AdminVerificationDocument[]> {
-  const id = z.string().uuid().parse(workerId);
-  const { supabase } = await requireAdmin();
-
-  const { data, error } = await supabase
-    .from("verification_documents")
-    .select("id, document_type, file_name, mime_type, storage_path, created_at")
-    .eq("worker_id", id)
-    .order("created_at", { ascending: true });
-
-  if (error) throw new Error(error.message);
-
-  const results: AdminVerificationDocument[] = [];
-  for (const doc of data ?? []) {
-    const isImage = doc.mime_type?.startsWith("image/");
-    // Reuse signed URLs so Smart CDN can serve HITs (unique tokens = miss).
-    // Preview: edge-resized with contain (Safari-safe, readable ID edges).
-    // Full: untransformed for lightbox / download KYC text checks.
-    const [signedUrl, fullSignedUrl] = await Promise.all([
-      getOrSet<string | null>(
-        CacheKeys.storageSignedUrl(
-          "verification-documents",
-          isImage ? `${doc.storage_path}:preview-contain-720` : doc.storage_path
-        ),
-        CACHE_TTL_SECONDS.storageSignedUrl,
-        async () => {
-          const { data: signed } = await supabase.storage
-            .from("verification-documents")
-            .createSignedUrl(
-              doc.storage_path,
-              300,
-              isImage
-                ? {
-                    transform: {
-                      width: 720,
-                      height: 540,
-                      resize: "contain",
-                      quality: 80,
-                    },
-                  }
-                : undefined
-            );
-          return signed?.signedUrl ?? null;
-        }
-      ),
-      isImage
-        ? getOrSet<string | null>(
-            CacheKeys.storageSignedUrl(
-              "verification-documents",
-              `${doc.storage_path}:full`
-            ),
-            CACHE_TTL_SECONDS.storageSignedUrl,
-            async () => {
-              const { data: signed } = await supabase.storage
-                .from("verification-documents")
-                .createSignedUrl(doc.storage_path, 300);
-              return signed?.signedUrl ?? null;
-            }
-          )
-        : Promise.resolve(null),
-    ]);
-
-    results.push({
-      id: doc.id,
-      document_type: doc.document_type,
-      file_name: doc.file_name,
-      mime_type: doc.mime_type,
-      signed_url: signedUrl,
-      full_signed_url: fullSignedUrl ?? signedUrl,
-      created_at: doc.created_at,
-    });
-  }
-
-  return results;
 }
 
 export async function fetchAdminSubscriptions(): Promise<

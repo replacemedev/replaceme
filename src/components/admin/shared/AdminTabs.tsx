@@ -20,10 +20,11 @@ export function AdminTabs({ tabs, paramKey = "tab" }: AdminTabsProps) {
   const active = searchParams.get(paramKey) ?? tabs[0]?.id;
 
   return (
-    <nav className="flex gap-1 border-b border-slate-200">
+    <nav className="flex gap-1 border-b border-slate-200 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {tabs.map((tab) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set(paramKey, tab.id);
+        params.delete("page");
         const href = `${pathname}?${params.toString()}`;
         const isActive = active === tab.id;
 
@@ -31,7 +32,7 @@ export function AdminTabs({ tabs, paramKey = "tab" }: AdminTabsProps) {
           <Link
             key={tab.id}
             href={href}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+            className={`shrink-0 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
               isActive
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-slate-500 hover:text-slate-700"

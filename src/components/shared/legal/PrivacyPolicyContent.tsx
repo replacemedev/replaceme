@@ -137,7 +137,9 @@ export function PrivacyPolicyContent({
             <strong className="font-semibold text-slate-800">not</strong> collect SSS,
             PhilHealth, Pag-IBIG numbers, or emergency contacts. We process SPI only with
             appropriate legal basis (including explicit consent at ID verification),
-            heightened safeguards, and limited access.
+            heightened safeguards, and limited access. Government ID images and verification
+            selfies are stored in encrypted private storage; administrator access is
+            least-privilege and logged for audit.
           </CheckItem>
           <CheckItem label="Location:">
             region, province, and city for matching. Street-level address is optional and
@@ -426,6 +428,19 @@ export function PrivacyPolicyContent({
         </p>
         <p>
           <strong className="font-semibold text-slate-800">
+            Identity verification (KYC) security.
+          </strong>{" "}
+          Government ID images and verification selfies are stored in a private, encrypted
+          object store and transmitted only over HTTPS. Platform administrators may view these
+          documents solely to complete identity verification under least-privilege access; each
+          view and each approve/reject decision is recorded in an access audit log. After the
+          verification purpose is fulfilled, ID images and related verification metadata are
+          deleted or anonymized within{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.kycImageDaysAfterPurpose} days unless a legal hold,
+          dispute, or fraud investigation requires longer retention.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">
             Job applications &amp; Trust &amp; Safety access.
           </strong>{" "}
           Cover letters, resumes, and application stage history are processed to run the hiring
@@ -460,9 +475,10 @@ export function PrivacyPolicyContent({
           .
         </p>
         <p>
-          We use encryption in transit, access controls, logging, and vendor diligence. No method of
-          transmission or storage is 100% secure. Workers and Employers may submit a deletion request
-          from account settings or by emailing{" "}
+        We use encryption in transit and at rest for identity documents, access controls, logging of
+        administrator views and decisions on government ID images, and vendor diligence. No method of
+        transmission or storage is 100% secure. Workers and Employers may submit a deletion request
+        from account settings or by emailing{" "}
           <a
             href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
             className="font-semibold text-[#006e2f] hover:underline"

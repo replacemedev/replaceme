@@ -287,7 +287,7 @@ export function renderJobRejectedEmail(input: {
     ? `Hi ${escapeHtml(input.companyName)},`
     : "Hi there,";
   const reasonBlock = input.reason?.trim()
-    ? `${sectionLabel("Moderator notes")}
+    ? `${sectionLabel("Notes")}
     <div style="margin:0 0 18px 0;padding:14px 16px;border:1px solid ${BRAND.border};border-radius:14px;background:#fff;color:${BRAND.body};font-size:14px;line-height:1.55;">${escapeHtml(input.reason).replaceAll("\n", "<br />")}</div>`
     : "";
 
@@ -556,4 +556,95 @@ export function getSupabaseResetPasswordHtml(): string {
     footerNote: `This link expires for your security. Need help? ${BRAND.supportEmail}`,
     siteUrl: BRAND.productionSiteUrl,
   }).html;
+}
+
+/** Worker identity verification approved. */
+export function renderKycApprovedEmail(input: {
+  workerName?: string | null;
+  ctaUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Identity verified on Replaceme";
+  const greeting = input.workerName?.trim()
+    ? `Hi ${escapeHtml(input.workerName.trim())},`
+    : "Hi there,";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">${greeting}</p>
+    <p style="margin:0 0 16px 0;">
+      Your government ID and selfie were reviewed and your identity is now <strong>verified</strong> on Replaceme.
+    </p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${BRAND.accent};">Verified</span>`)}
+    `)}
+    <p style="margin:0 0 18px 0;">
+      You can apply to verified-only roles and employers will see your verified badge.
+    </p>
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(input.ctaUrl, "View verification")}
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Identity verified",
+    preheader: "Your Replaceme identity verification was approved",
+    bodyHtml,
+  });
+
+  return { subject, html, text };
+}
+
+/** Worker identity verification rejected or needs resubmission. */
+export function renderKycDecisionEmail(input: {
+  workerName?: string | null;
+  decision: "rejected" | "resubmission_required";
+  reason: string;
+  ctaUrl: string;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const needsUpdate = input.decision === "resubmission_required";
+  const subject = needsUpdate
+    ? "Action needed: resubmit your identity documents"
+    : "Identity verification was not approved";
+  const greeting = input.workerName?.trim()
+    ? `Hi ${escapeHtml(input.workerName.trim())},`
+    : "Hi there,";
+  const statusLabel = needsUpdate ? "Resubmission required" : "Not approved";
+  const statusColor = needsUpdate ? "#b45309" : "#b91c1c";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">${greeting}</p>
+    <p style="margin:0 0 16px 0;">
+      ${
+        needsUpdate
+          ? "Our Trust &amp; Safety team reviewed your identity submission and needs an updated set of documents before we can verify your account."
+          : "Our Trust &amp; Safety team reviewed your identity submission and could not approve it at this time."
+      }
+    </p>
+    ${detailCard(`
+      ${detailRow("Status", `<span style="color:${statusColor};">${statusLabel}</span>`)}
+    `)}
+    ${sectionLabel("Reason")}
+    <div style="margin:0 0 18px 0;padding:14px 16px;border:1px solid ${BRAND.border};border-radius:14px;background:#fff;color:${BRAND.body};font-size:14px;line-height:1.55;">${escapeHtml(input.reason).replaceAll("\n", "<br />")}</div>
+    <p style="margin:0 0 18px 0;">
+      Please upload clear photos of your physical Philippine government-issued ID (front and back) and a selfie holding the ID, then submit again for review.
+    </p>
+    <p style="margin:0 0 18px 0;">
+      ${ctaButton(input.ctaUrl, "Resubmit documents")}
+    </p>
+    <p style="margin:0;font-size:13px;color:${BRAND.muted};line-height:1.55;">
+      Questions?
+      <a href="mailto:${escapeHtml(input.supportEmail)}" style="color:${BRAND.accent};font-weight:600;text-decoration:none;">${escapeHtml(input.supportEmail)}</a>
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: needsUpdate ? "Resubmit identity documents" : "Verification not approved",
+    preheader: needsUpdate
+      ? "Please resubmit your ID documents for verification"
+      : "Your identity verification was not approved",
+    bodyHtml,
+    footerNote: `Support: ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
 }

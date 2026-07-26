@@ -1960,6 +1960,8 @@ export type Database = {
           is_top_rated: boolean | null
           is_verified: boolean
           kyc_rejection_reason: string | null
+          kyc_reviewed_at: string | null
+          kyc_reviewed_by: string | null
           last_name: string | null
           legal_hold: boolean
           location: string | null
@@ -2020,6 +2022,8 @@ export type Database = {
           is_top_rated?: boolean | null
           is_verified?: boolean
           kyc_rejection_reason?: string | null
+          kyc_reviewed_at?: string | null
+          kyc_reviewed_by?: string | null
           last_name?: string | null
           legal_hold?: boolean
           location?: string | null
@@ -2080,6 +2084,8 @@ export type Database = {
           is_top_rated?: boolean | null
           is_verified?: boolean
           kyc_rejection_reason?: string | null
+          kyc_reviewed_at?: string | null
+          kyc_reviewed_by?: string | null
           last_name?: string | null
           legal_hold?: boolean
           location?: string | null

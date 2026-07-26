@@ -196,7 +196,6 @@ Items **not** on the original gate image, but required (or strongly recommended)
   - Security page shows enrollment status  
   - **Gap:** No in-app MFA enrollment UX; workers/employers have no MFA requirement
 
-- [ ] **MFA for high-risk employer accounts** — Not yet *(deferred)*  
 - [x] **Account lockout / progressive delay after failed logins** — Full  
   - Cognito/OWASP-style: after 5 failures, lock `min(2^(n-5), 900)` seconds  
   - Silent (same generic error — no enumeration)  
@@ -249,7 +248,6 @@ Items **not** on the original gate image, but required (or strongly recommended)
 ## D. Infrastructure & platform hardening
 
 - [ ] **Confirm HSTS at CDN/edge** — Not yet (verify live headers)
-- [ ] **WAF / bot protection at edge (Cloudflare / Vercel BotID)** — Not yet in app config
 - [ ] **Rate-limit fail-closed or hard fail in production** — Not yet (currently fail-open without Redis)
 - [ ] **Redis required in production env checklist** — Not yet
 - [ ] **Separate staging vs production projects/keys** — Ops (document)
@@ -267,7 +265,7 @@ Items **not** on the original gate image, but required (or strongly recommended)
 - [x] **DPA with processors (Supabase, Stripe, Resend, Upstash)** — Ops checklist  
   - `docs/security/dpa-and-subprocessors.md` (sign-off table for Legal)  
   - Vendor DPA links inventoried; executed PDFs remain outside git  
-- [x] **Subprocessor list** — Internal DPA checklist (public `/subprocessors` route removed)
+- [x] **Subprocessor list published** — Full (`/subprocessors`, footer link)
 
 ## F. Application resilience & UX safety
 
@@ -376,5 +374,6 @@ Items **not** on the original gate image, but required (or strongly recommended)
 | CSP / maintenance | `src/lib/security/csp.ts`, `src/lib/security/feature-flags.ts`, `src/proxy.ts` |
 | Sentry | `sentry.*.config.ts`, `src/instrumentation.ts` |
 | Incident / abuse / DPA | `docs/security/incident-runbook.md`, `abuse-reporting-slas.md`, `dpa-and-subprocessors.md`, `observability-and-csp.md` |
+| Subprocessors | `src/app/(public)/subprocessors/page.tsx` |
 | RLS migrations | `supabase/migrations/` |
 | Service role | `src/lib/supabase/server.ts` (`createAdminClient`) |
