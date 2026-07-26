@@ -12,6 +12,9 @@ import {
   MFA_ENROLL_PATH,
   resolveAdminMfaRedirect,
 } from "@/lib/server/auth/admin-mfa";
+import { capabilityForPath } from "@/lib/admin/capabilities";
+import { firstAllowedAdminHome } from "@/lib/admin/capability-scopes";
+import { adminCapabilitiesFromJwt } from "@/lib/admin/sync-admin-app-metadata";
 
 const IDLE_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -131,6 +134,27 @@ export async function updateSession(request: NextRequest) {
       const mfaRedirect = resolveAdminMfaRedirect(aalData);
       if (mfaRedirect) {
         return NextResponse.redirect(new URL(mfaRedirect, request.url));
+      }
+
+      // Defense-in-depth: JWT capability gate (skipped until app_metadata synced)
+      const routeCap = capabilityForPath(pathname);
+      if (routeCap) {
+        const jwtCaps = adminCapabilitiesFromJwt(user);
+        if (jwtCaps.hasJwtCaps) {
+          const denied =
+            (routeCap.superAdminOnly &&
+              jwtCaps.adminRole !== "superadmin") ||
+            !jwtCaps.capabilities.includes(routeCap.capability);
+          if (denied) {
+            const home = firstAllowedAdminHome(
+              jwtCaps.capabilities,
+              jwtCaps.adminRole === "superadmin"
+            );
+            if (pathname !== home) {
+              return NextResponse.redirect(new URL(home, request.url));
+            }
+          }
+        }
       }
     }
 

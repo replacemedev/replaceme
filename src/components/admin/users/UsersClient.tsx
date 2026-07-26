@@ -29,6 +29,7 @@ interface UsersClientProps {
   workers: AdminWorkerRow[];
   employers: AdminEmployerRow[];
   admins: AdminAdminRow[];
+  isSuperAdmin?: boolean;
 }
 
 function displayName(
@@ -116,6 +117,7 @@ export function UsersClient({
   workers,
   employers,
   admins,
+  isSuperAdmin = false,
 }: UsersClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -299,14 +301,14 @@ export function UsersClient({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const adminTeamHint = (
+  const adminTeamHint = isSuperAdmin ? (
     <Link
       href="/admin/settings/team"
-      className="text-xs font-medium text-slate-400 hover:text-emerald-700 hover:underline"
+      className="inline-flex items-center min-h-11 text-xs font-medium text-slate-400 hover:text-emerald-700 hover:underline"
     >
       Manage in Admin Team settings
     </Link>
-  );
+  ) : null;
 
   return (
     <div className="space-y-4">

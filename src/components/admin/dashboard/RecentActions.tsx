@@ -11,6 +11,7 @@ interface AuditEntry {
 
 interface RecentActionsProps {
   actions: AuditEntry[];
+  showViewAll?: boolean;
 }
 
 function formatActionLabel(action: string): string {
@@ -19,25 +20,30 @@ function formatActionLabel(action: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function RecentActions({ actions }: RecentActionsProps) {
+export function RecentActions({
+  actions,
+  showViewAll = false,
+}: RecentActionsProps) {
   return (
     <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
       <div className="flex items-center justify-between gap-3 mb-4">
         <h2 className="text-sm font-bold text-slate-900">Recent Admin Actions</h2>
-        <Link
-          href="/admin/audit-log"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-[#006e2f] hover:text-[#005c26]"
-        >
-          View all
-          <ArrowRight className="h-3 w-3" aria-hidden />
-        </Link>
+        {showViewAll ? (
+          <Link
+            href="/admin/audit-log"
+            className="inline-flex items-center gap-1 min-h-11 px-1 text-xs font-semibold text-[#006e2f] hover:text-[#005c26] transition-colors"
+          >
+            View all
+            <ArrowRight className="h-3 w-3" aria-hidden />
+          </Link>
+        ) : null}
       </div>
       {actions.length === 0 ? (
         <p className="text-sm text-slate-400 text-center py-8 rounded-xl bg-slate-50/80 border border-dashed border-slate-200">
-          No recorded actions yet.
+          No recorded actions in your modules yet.
         </p>
       ) : (
-        <ul className="space-y-3 max-h-[320px] overflow-y-auto">
+        <ul className="space-y-3 max-h-[320px] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
           {actions.map((entry) => (
             <li
               key={entry.id}
@@ -57,7 +63,10 @@ export function RecentActions({ actions }: RecentActionsProps) {
                   </p>
                 ) : null}
               </div>
-              <time className="text-[10px] text-slate-400 whitespace-nowrap mt-1">
+              <time
+                className="text-[10px] text-slate-400 whitespace-nowrap mt-1"
+                suppressHydrationWarning
+              >
                 {new Date(entry.created_at).toLocaleDateString(undefined, {
                   month: "short",
                   day: "numeric",

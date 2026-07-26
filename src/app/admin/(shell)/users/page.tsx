@@ -7,14 +7,14 @@ import { UsersClient } from "@/components/admin/users/UsersClient";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { fetchAdminUsersPageData } from "@/actions/admin-actions";
 import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
+import { getCurrentAdminCapabilities } from "@/lib/server/auth/require-capability";
+import type { AdminUserTab } from "@/types/admin.types";
 
 export const metadata = {
   title: "Users | Admin",
 };
 
 export const dynamic = "force-dynamic";
-
-import type { AdminUserTab } from "@/types/admin.types";
 
 function parseUserTab(tab?: string): AdminUserTab {
   if (tab === "employers") return "employers";
@@ -30,6 +30,7 @@ export default async function AdminUsersPage({
   searchParams,
 }: PageProps) {
   await requireAdminPageCapability("users");
+  const { isSuperAdmin } = await getCurrentAdminCapabilities();
 
   const params = await searchParams;
   const tab = parseUserTab(params.tab);
@@ -76,6 +77,7 @@ export default async function AdminUsersPage({
         workers={workers}
         employers={employers}
         admins={admins}
+        isSuperAdmin={isSuperAdmin}
       />
     </AdminPageShell>
   );

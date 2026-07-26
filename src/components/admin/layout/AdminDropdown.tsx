@@ -11,14 +11,28 @@ interface AdminDropdownProps {
   profile: NavProfile | null;
   displayName: string;
   initials: string;
+  layout?: "desktop" | "mobile";
+  showDashboard?: boolean;
+  showProfile?: boolean;
+  dashboardHref?: string;
+  profileHref?: string;
 }
+
+const menuLinkClass =
+  "flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors";
+const menuLinkDesktopClass =
+  "flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors";
 
 export function AdminDropdown({
   profile,
   displayName,
   initials,
   layout = "desktop",
-}: AdminDropdownProps & { layout?: "desktop" | "mobile" }) {
+  showDashboard = true,
+  showProfile = true,
+  dashboardHref = "/admin/dashboard",
+  profileHref = "/admin/settings/profile",
+}: AdminDropdownProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -69,13 +83,45 @@ export function AdminDropdown({
     </div>
   );
 
+  const navLinks = (mobile: boolean) => (
+    <>
+      {showDashboard ? (
+        <Link
+          href={dashboardHref}
+          onClick={() => setDropdownOpen(false)}
+          className={mobile ? menuLinkClass : menuLinkDesktopClass}
+          role="menuitem"
+        >
+          <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
+          Admin Dashboard
+        </Link>
+      ) : null}
+
+      {showProfile ? (
+        <Link
+          href={profileHref}
+          onClick={() => setDropdownOpen(false)}
+          className={mobile ? menuLinkClass : menuLinkDesktopClass}
+          role="menuitem"
+        >
+          <User size={14} className="text-slate-400 shrink-0" />
+          My profile
+        </Link>
+      ) : null}
+
+      {showDashboard || showProfile ? (
+        <div className={`h-px bg-slate-200/60 my-1 ${mobile ? "mx-2" : ""}`} />
+      ) : null}
+    </>
+  );
+
   if (layout === "mobile") {
     return (
       <div className="w-full" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
           type="button"
-          className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer bg-slate-50 border border-slate-100 hover:bg-slate-100/50 focus:outline-none"
+          className="flex items-center justify-between w-full px-3 py-2.5 min-h-11 rounded-xl transition-all duration-200 cursor-pointer bg-slate-50 border border-slate-100 hover:bg-slate-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30"
           aria-haspopup="true"
           aria-expanded={dropdownOpen}
           aria-label="Admin menu"
@@ -100,27 +146,7 @@ export function AdminDropdown({
             role="menu"
             aria-label="Admin actions"
           >
-            <Link
-              href="/admin/dashboard"
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              role="menuitem"
-            >
-              <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
-              Admin Dashboard
-            </Link>
-
-            <Link
-              href="/admin/settings/profile"
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              role="menuitem"
-            >
-              <User size={14} className="text-slate-400 shrink-0" />
-              My profile
-            </Link>
-
-            <div className="h-px bg-slate-200/60 my-1 mx-2" />
+            {navLinks(true)}
 
             <button
               type="button"
@@ -143,7 +169,7 @@ export function AdminDropdown({
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
         type="button"
-        className="flex items-center gap-2 p-1 hover:bg-slate-50 rounded-2xl transition-all duration-200 cursor-pointer"
+        className="flex items-center gap-2 p-1 min-h-11 hover:bg-slate-50 rounded-2xl transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30"
         aria-haspopup="true"
         aria-expanded={dropdownOpen}
         aria-label="Admin menu"
@@ -154,8 +180,9 @@ export function AdminDropdown({
         </span>
         <ChevronDown
           size={14}
-          className={`text-slate-400 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
-            }`}
+          className={`text-slate-400 transition-transform duration-200 ${
+            dropdownOpen ? "rotate-180" : ""
+          }`}
         />
       </button>
 
@@ -165,27 +192,7 @@ export function AdminDropdown({
           role="menu"
           aria-label="Admin actions"
         >
-          <Link
-            href="/admin/dashboard"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-            role="menuitem"
-          >
-            <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
-            Admin Dashboard
-          </Link>
-
-          <Link
-            href="/admin/settings/profile"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-            role="menuitem"
-          >
-            <User size={14} className="text-slate-400 shrink-0" />
-            My profile
-          </Link>
-
-          <div className="h-px bg-slate-100 my-1" />
+          {navLinks(false)}
 
           <button
             type="button"

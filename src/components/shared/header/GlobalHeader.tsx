@@ -8,6 +8,9 @@ interface GlobalHeaderActionsProps {
   session: NavSession;
   children?: React.ReactNode;
   bellSize?: number;
+  /** Override default role-based notifications href. Pass undefined to hide deep-link. */
+  viewAllHref?: string;
+  hideBell?: boolean;
 }
 
 /**
@@ -18,26 +21,33 @@ export async function GlobalHeaderActions({
   session,
   children,
   bellSize,
+  viewAllHref,
+  hideBell = false,
 }: GlobalHeaderActionsProps) {
   if (!session.isAuthenticated || !session.userId) {
     return null;
   }
 
+  const resolvedHref =
+    viewAllHref !== undefined
+      ? viewAllHref
+      : session.role === "worker"
+        ? WORKER_NOTIFICATIONS_HREF
+        : session.role === "admin"
+          ? ADMIN_NOTIFICATIONS_HREF
+          : session.role === "employer"
+            ? EMPLOYER_NOTIFICATIONS_HREF
+            : undefined;
+
   return (
     <div className="flex items-center gap-2 sm:gap-4">
-      <NotificationBellContainer
-        userId={session.userId}
-        size={bellSize}
-        viewAllHref={
-          session.role === "worker"
-            ? WORKER_NOTIFICATIONS_HREF
-            : session.role === "admin"
-              ? ADMIN_NOTIFICATIONS_HREF
-              : session.role === "employer"
-                ? EMPLOYER_NOTIFICATIONS_HREF
-                : undefined
-        }
-      />
+      {!hideBell ? (
+        <NotificationBellContainer
+          userId={session.userId}
+          size={bellSize}
+          viewAllHref={resolvedHref}
+        />
+      ) : null}
       {children}
     </div>
   );

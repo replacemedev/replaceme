@@ -91,6 +91,7 @@ export async function remindAdminsDiscoveryJobSla(): Promise<JobModerationSlaRem
       overdue,
       audience: "admin",
     },
+    p_required_capability: "jobs",
   });
 
   if (notifyError) {

@@ -8,6 +8,7 @@ import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { ADMIN_MAIN_BG } from "@/lib/admin/ui-tokens";
 import { resolveAdminMfaRedirect } from "@/lib/server/auth/admin-mfa";
 import { getCurrentAdminCapabilities } from "@/lib/server/auth/require-capability";
+import { ensureAdminAppMetadataSynced } from "@/lib/admin/sync-admin-app-metadata";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,14 @@ export default async function AdminShellLayout({
   const { isSuperAdmin, capabilities, adminRole } =
     await getCurrentAdminCapabilities();
 
+  const synced = await ensureAdminAppMetadataSynced(user, {
+    adminRole,
+    capabilities,
+  });
+  if (synced) {
+    await supabase.auth.refreshSession();
+  }
+
   const sidebarProfile = {
     displayName: session.displayName,
     roleLabel: isSuperAdmin ? "Super admin" : "Moderator",
@@ -59,7 +68,11 @@ export default async function AdminShellLayout({
             capabilities={capabilities}
           />
           <div className="flex flex-1 flex-col min-w-0 min-h-screen w-full max-w-[100vw] overflow-x-hidden">
-            <AdminHeader session={session} />
+            <AdminHeader
+              session={session}
+              capabilities={capabilities}
+              isSuperAdmin={isSuperAdmin}
+            />
             <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>
           </div>
         </div>

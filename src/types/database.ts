@@ -3567,6 +3567,7 @@ export type Database = {
           p_action_url?: string
           p_message: string
           p_metadata?: Json
+          p_required_capability?: string
           p_title: string
           p_type: string
         }

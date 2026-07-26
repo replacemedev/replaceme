@@ -10,6 +10,7 @@ import {
   randomInvitePassword,
   sendAdminInviteEmail,
 } from "@/lib/admin/team-invite";
+import { syncAdminAppMetadata } from "@/lib/admin/sync-admin-app-metadata";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { requireSuperAdmin } from "@/lib/server/auth/require-super-admin";
 import { createAdminClient } from "@/lib/supabase/server";
@@ -368,7 +369,12 @@ export async function inviteAdminUser(
         email: normalizedEmail,
         password: randomInvitePassword(),
         email_confirm: true,
-        app_metadata: { role: "admin" },
+        app_metadata: {
+          role: "admin",
+          admin_role: parsed.admin_role,
+          capabilities:
+            parsed.admin_role === "superadmin" ? [] : capabilities,
+        },
         user_metadata: {
           role: "admin",
           username: parsed.username,
@@ -560,6 +566,11 @@ export async function updateAdminCapabilities(
 
     if (error) throw new Error(error.message);
 
+    await syncAdminAppMetadata(parsed.userId, {
+      adminRole: parsed.admin_role,
+      capabilities,
+    });
+
     await logAdminAction(
       "update_admin_capabilities",
       "admin_profile",
@@ -682,6 +693,11 @@ export async function updateAdminRole(
     );
 
     if (error) throw new Error(error.message);
+
+    await syncAdminAppMetadata(parsed.userId, {
+      adminRole: parsed.admin_role,
+      capabilities,
+    });
 
     await logAdminAction("update_admin_role", "admin_profile", parsed.userId, {
       admin_role: parsed.admin_role,

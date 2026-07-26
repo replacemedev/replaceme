@@ -5,6 +5,10 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { requireAdminCapability } from "@/lib/server/auth/require-capability";
+import {
+  canViewAuditAction,
+  filterAuditRowsByCapability,
+} from "@/lib/admin/capability-scopes";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { safeWarn } from "@/utils/logger";
@@ -1705,7 +1709,8 @@ export async function fetchAuditLogs(
   limit = 100,
   filters: FetchAuditLogsFilters = {}
 ): Promise<AdminAuditLogRow[]> {
-  await requireAdminCapability("audit_log");
+  const { capabilities, isSuperAdmin } =
+    await requireAdminCapability("audit_log");
   const adminClient = await createAdminClient();
 
   let query = adminClient
@@ -1717,6 +1722,12 @@ export async function fetchAuditLogs(
     .limit(Math.min(Math.max(limit, 1), 1000));
 
   if (filters.actionType && filters.actionType !== "all") {
+    if (
+      !isSuperAdmin &&
+      !canViewAuditAction(filters.actionType, capabilities, false)
+    ) {
+      return [];
+    }
     query = query.eq("action_type", filters.actionType);
   }
   if (filters.from) {
@@ -1729,7 +1740,11 @@ export async function fetchAuditLogs(
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  let rows = data ?? [];
+  let rows = filterAuditRowsByCapability(
+    data ?? [],
+    capabilities,
+    isSuperAdmin
+  );
   const search = filters.search?.trim().toLowerCase();
   if (search) {
     rows = rows.filter((row) => {

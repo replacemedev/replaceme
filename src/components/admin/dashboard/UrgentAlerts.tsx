@@ -38,7 +38,7 @@ export function UrgentAlerts({ alerts }: UrgentAlertsProps) {
           No urgent alerts. All systems nominal.
         </p>
       ) : (
-        <ul className="space-y-2.5 max-h-[280px] overflow-y-auto">
+        <ul className="space-y-2.5 max-h-[280px] overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
           {alerts.map((alert) => {
             const Icon = ALERT_ICONS[alert.type] ?? AlertTriangle;
             const style = ALERT_STYLES[alert.type] ?? ALERT_STYLES.moderation;
@@ -52,7 +52,7 @@ export function UrgentAlerts({ alerts }: UrgentAlertsProps) {
                   <p className="text-xs font-medium leading-relaxed">
                     {alert.message}
                   </p>
-                  <p className="text-[10px] opacity-70 mt-0.5">
+                  <p className="text-[10px] opacity-70 mt-0.5" suppressHydrationWarning>
                     {new Date(alert.created_at).toLocaleString()}
                   </p>
                 </div>

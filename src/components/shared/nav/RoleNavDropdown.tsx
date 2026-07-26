@@ -11,10 +11,18 @@ const ROLE_LABELS: Record<UserRole, { displayName: string; initials: string }> =
     admin: { displayName: "Admin", initials: "A" },
   };
 
+export type AdminDropdownLinks = {
+  showDashboard?: boolean;
+  showProfile?: boolean;
+  dashboardHref?: string;
+  profileHref?: string;
+};
+
 interface RoleNavDropdownProps {
   session: NavSession;
   planUsage?: EmployerPlanUsage | null;
   layout?: "desktop" | "mobile";
+  adminLinks?: AdminDropdownLinks;
 }
 
 /** Role-specific avatar dropdown — always renders when session is authenticated. */
@@ -22,6 +30,7 @@ export function RoleNavDropdown({
   session,
   planUsage = null,
   layout = "desktop",
+  adminLinks,
 }: RoleNavDropdownProps) {
   if (!session.isAuthenticated || !session.role) return null;
 
@@ -59,6 +68,10 @@ export function RoleNavDropdown({
       displayName={displayName}
       initials={initials}
       layout={layout}
+      showDashboard={adminLinks?.showDashboard ?? true}
+      showProfile={adminLinks?.showProfile ?? true}
+      dashboardHref={adminLinks?.dashboardHref ?? "/admin/dashboard"}
+      profileHref={adminLinks?.profileHref ?? "/admin/settings/profile"}
     />
   );
 }

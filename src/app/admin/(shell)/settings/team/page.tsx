@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { AdminPageShell } from "@/components/admin/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { AdminTeamClient } from "@/components/admin/settings/team/AdminTeamClient";
@@ -6,7 +5,8 @@ import {
   fetchAdminTeam,
   fetchAdminTeamActivity,
 } from "@/actions/admin/team";
-import { isCurrentUserSuperAdmin } from "@/lib/server/auth/require-super-admin";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
+import { getCurrentAdminCapabilities } from "@/lib/server/auth/require-capability";
 import { requireAuth } from "@/lib/server/auth/session";
 
 export const metadata = {
@@ -16,10 +16,11 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminTeamSettingsPage() {
-  const isSuperAdmin = await isCurrentUserSuperAdmin();
-  if (!isSuperAdmin) redirect("/admin/settings");
-
-  const { user } = await requireAuth();
+  await requireAdminPageCapability("team");
+  const [{ user }, { isSuperAdmin }] = await Promise.all([
+    requireAuth(),
+    getCurrentAdminCapabilities(),
+  ]);
 
   const [teamResult, activityResult] = await Promise.all([
     fetchAdminTeam(),
