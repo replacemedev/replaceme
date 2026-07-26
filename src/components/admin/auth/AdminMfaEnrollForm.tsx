@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Copy, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -16,8 +15,8 @@ type EnrollState = {
 } | null;
 
 export function AdminMfaEnrollForm() {
-  const router = useRouter();
   const startedRef = useRef(false);
+  const submitLockRef = useRef(false);
   const [enroll, setEnroll] = useState<EnrollState>(null);
   const [code, setCode] = useState("");
   const [bootPending, startBoot] = useTransition();
@@ -55,23 +54,32 @@ export function AdminMfaEnrollForm() {
 
   function handleVerify(event: React.FormEvent) {
     event.preventDefault();
-    if (!enroll) return;
+    if (!enroll || submitLockRef.current) return;
+    const otp = code.trim();
+    if (otp.length !== 6) return;
+
+    submitLockRef.current = true;
     startVerify(async () => {
       try {
         const supabase = createClient();
-        const { error } = await supabase.auth.mfa.challengeAndVerify({
+        const { data: challengeData, error: challengeError } =
+          await supabase.auth.mfa.challenge({ factorId: enroll.factorId });
+        if (challengeError) throw challengeError;
+
+        const { error: verifyError } = await supabase.auth.mfa.verify({
           factorId: enroll.factorId,
-          code: code.trim(),
+          challengeId: challengeData.id,
+          code: otp,
         });
-        if (error) throw error;
+        if (verifyError) throw verifyError;
+
         await auditAdminMfaEvent("auth.mfa_enrolled", {
           factor_id: enroll.factorId,
         });
-        toast.success("Authenticator enrolled");
-        router.push("/admin/dashboard");
-        router.refresh();
+        window.location.assign("/admin/dashboard");
       } catch {
         toast.error("Invalid code. Check your authenticator and try again.");
+        submitLockRef.current = false;
       }
     });
   }
