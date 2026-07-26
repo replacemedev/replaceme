@@ -15,7 +15,7 @@ interface AdminNavContextValue {
   openMobileNav: () => void;
 }
 
-const AdminNavContext = createContext<AdminNavContextValue | null>(null);
+export const AdminNavContext = createContext<AdminNavContextValue | null>(null);
 
 export function useAdminNav() {
   const ctx = use(AdminNavContext);
@@ -23,6 +23,11 @@ export function useAdminNav() {
     throw new Error("useAdminNav must be used within AdminLayoutChrome");
   }
   return ctx;
+}
+
+/** Safe for headers outside the shell (e.g. MFA enroll/challenge). */
+export function useOptionalAdminNav(): AdminNavContextValue | null {
+  return use(AdminNavContext);
 }
 
 interface AdminLayoutChromeProps {
