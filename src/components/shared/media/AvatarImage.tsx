@@ -13,6 +13,14 @@ const SIZE_PX: Record<AvatarSize, number> = {
   xl: 144,
 };
 
+const SIZE_CLASS: Record<AvatarSize, string> = {
+  xs: "h-8 w-8",
+  sm: "h-12 w-12",
+  md: "h-24 w-24",
+  lg: "h-32 w-32",
+  xl: "h-36 w-36",
+};
+
 const TEXT_CLASS: Record<AvatarSize, string> = {
   xs: "text-xs",
   sm: "text-sm",
@@ -53,14 +61,20 @@ export function AvatarImage({
   containerClassName = "",
 }: AvatarImageProps) {
   const px = SIZE_PX[size];
+  const sizeClass = SIZE_CLASS[size];
   const roundClass =
-    rounded === "full" ? "rounded-full" : rounded === "2xl" ? "rounded-2xl" : "rounded-xl";
+    rounded === "full"
+      ? "rounded-full"
+      : rounded === "2xl"
+        ? "rounded-2xl"
+        : "rounded-xl";
+
+  // Safari/WebKit: overflow + rounded on the box; object-cover on the image.
+  const boxClass = `relative block shrink-0 overflow-hidden ${sizeClass} ${roundClass} ${containerClassName}`;
 
   if (!src?.trim()) {
     return (
-      <span
-        className={`relative block h-full w-full overflow-hidden ${roundClass} ${containerClassName}`}
-      >
+      <span className={boxClass}>
         {initialsFallback(initials, size, roundClass)}
       </span>
     );
@@ -70,12 +84,18 @@ export function AvatarImage({
     <OptimizedImage
       src={src}
       alt={alt}
-      fill
+      width={px}
+      height={px}
       sizes={`${px}px`}
       priority={priority}
       className={`${className} ${roundClass}`}
-      containerClassName={`h-full w-full ${roundClass} ${containerClassName}`}
-      transform={{ width: retinaTransformWidth(px), resize: "cover", quality: 80 }}
+      containerClassName={boxClass}
+      transform={{
+        width: retinaTransformWidth(px),
+        height: retinaTransformWidth(px),
+        resize: "cover",
+        quality: 75,
+      }}
       fallback={initialsFallback(initials, size, roundClass)}
     />
   );

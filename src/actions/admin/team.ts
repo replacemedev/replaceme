@@ -41,6 +41,7 @@ const TEAM_AUDIT_ACTIONS = [
   "admin_password_reset",
   "delete_admin",
   "capability_denied",
+  "view_admin_personal_details",
 ] as const;
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -151,7 +152,7 @@ export async function fetchAdminTeam(): Promise<
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "id, first_name, last_name, email, account_status, created_at, avatar_url"
+        "id, first_name, middle_name, last_name, email, account_status, created_at, avatar_url"
       )
       .eq("role", "admin")
       .order("created_at", { ascending: false });
@@ -826,4 +827,136 @@ export async function revokeAdminInvite(
   input: z.infer<typeof adminTeamUserIdSchema>
 ): Promise<ActionResult> {
   return deleteAdminUser(input);
+}
+
+export type AdminTeamMemberDeepDive = {
+  id: string;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+  displayName: string | null;
+  department: string | null;
+  adminRole: AdminRole;
+  capabilities: string[];
+  accountStatus: string;
+  mfaEnrolled: boolean;
+  mfaFactorCount: number;
+  lastSignInAt: string | null;
+  lastSignInIp: string | null;
+  createdAt: string;
+  invitedAt: string | null;
+  inviteAcceptedAt: string | null;
+};
+
+/** Super-admin only: extended PII + security posture for an internal team member. */
+export async function getAdminTeamMemberDeepDive(
+  userId: string
+): Promise<AdminFetchResult<AdminTeamMemberDeepDive>> {
+  try {
+    await requireSuperAdmin();
+    const id = z.string().uuid().parse(userId);
+    const supabase = await createAdminClient();
+
+    const [profileResult, adminProfileResult, authResult, auditResult] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, first_name, middle_name, last_name, email, phone_number, username, avatar_url, account_status, created_at"
+          )
+          .eq("id", id)
+          .eq("role", "admin")
+          .maybeSingle(),
+        supabase
+          .from("admin_profiles")
+          .select(
+            "admin_role, display_name, department, avatar_url, capabilities, invited_at, invite_accepted_at"
+          )
+          .eq("user_id", id)
+          .maybeSingle(),
+        supabase.auth.admin.getUserById(id),
+        supabase
+          .from("audit_logs")
+          .select("ip_address")
+          .eq("admin_id", id)
+          .not("ip_address", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+    if (profileResult.error) {
+      return { success: false, error: profileResult.error.message };
+    }
+    if (!profileResult.data) {
+      return { success: false, error: "Admin account not found." };
+    }
+
+    const profile = profileResult.data;
+    const meta = adminProfileResult.data;
+    let mfaEnrolled = false;
+    let mfaFactorCount = 0;
+
+    try {
+      const { data: factorsData, error: factorsError } =
+        await supabase.auth.admin.mfa.listFactors({ userId: id });
+      if (!factorsError && factorsData?.factors) {
+        const verified = factorsData.factors.filter(
+          (f) => f.factor_type === "totp" && f.status === "verified"
+        );
+        mfaFactorCount = verified.length;
+        mfaEnrolled = verified.length > 0;
+      }
+    } catch {
+      // leave MFA defaults
+    }
+
+    const lastSignInIp =
+      typeof auditResult.data?.ip_address === "string"
+        ? auditResult.data.ip_address
+        : null;
+
+    await logAdminAction("view_admin_personal_details", "admin_profile", id, {
+      email: profile.email,
+    });
+
+    return {
+      success: true,
+      data: {
+        id: profile.id,
+        firstName: profile.first_name ?? null,
+        middleName: profile.middle_name ?? null,
+        lastName: profile.last_name ?? null,
+        email: profile.email ?? null,
+        phoneNumber: profile.phone_number ?? null,
+        username: profile.username ?? null,
+        avatarUrl: profile.avatar_url ?? meta?.avatar_url ?? null,
+        displayName: meta?.display_name ?? null,
+        department: meta?.department ?? null,
+        adminRole:
+          meta?.admin_role === "superadmin" ? "superadmin" : "moderator",
+        capabilities: meta?.capabilities ?? [],
+        accountStatus: profile.account_status ?? "active",
+        mfaEnrolled,
+        mfaFactorCount,
+        lastSignInAt: authResult.data.user?.last_sign_in_at ?? null,
+        lastSignInIp,
+        createdAt: profile.created_at,
+        invitedAt: meta?.invited_at ?? null,
+        inviteAcceptedAt: meta?.invite_accepted_at ?? null,
+      },
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to load admin personal details",
+    };
+  }
 }

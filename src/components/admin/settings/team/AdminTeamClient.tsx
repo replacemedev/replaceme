@@ -18,6 +18,7 @@ import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { Button } from "@/components/ui/button";
 import { AdminTeamActionsMenu } from "@/components/admin/settings/team/AdminTeamActionsMenu";
 import { AdminTeamActivityTab } from "@/components/admin/settings/team/AdminTeamActivityTab";
+import { AdminTeamMemberDetailsDrawer } from "@/components/admin/settings/team/AdminTeamMemberDetailsDrawer";
 import { EditAdminAccessDialog } from "@/components/admin/settings/team/EditAdminAccessDialog";
 import { InviteAdminDialog } from "@/components/admin/settings/team/InviteAdminDialog";
 import { TablePagination } from "@/components/shared/TablePagination";
@@ -39,6 +40,8 @@ interface AdminTeamClientProps {
   members: AdminTeamRow[];
   activity: AdminAuditLogRow[];
   currentUserId: string;
+  /** Session is super admin — gates PII deep-dive. */
+  isSuperAdmin?: boolean;
 }
 
 function displayName(member: AdminTeamRow): string {
@@ -98,7 +101,7 @@ function MemberIdentity({ member }: { member: AdminTeamRow }) {
 
   return (
     <div className="flex min-w-0 items-start gap-3">
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+      <div className="shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
         <AvatarImage
           src={member.avatar_url ?? null}
           alt={name}
@@ -130,6 +133,7 @@ export function AdminTeamClient({
   members,
   activity,
   currentUserId,
+  isSuperAdmin = false,
 }: AdminTeamClientProps) {
   const router = useRouter();
   const [tab, setTab] = useState<TeamTab>("team");
@@ -137,6 +141,7 @@ export function AdminTeamClient({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editMember, setEditMember] = useState<AdminTeamRow | null>(null);
+  const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [prevSearch, setPrevSearch] = useState(search);
@@ -349,7 +354,11 @@ export function AdminTeamClient({
                             <AdminTeamActionsMenu
                               member={member}
                               currentUserId={currentUserId}
+                              canViewPersonalDetails={isSuperAdmin}
                               onEditAccess={() => setEditMember(member)}
+                              onViewPersonalDetails={() =>
+                                setDetailsUserId(member.id)
+                              }
                             />
                           </td>
                         </tr>
@@ -379,7 +388,11 @@ export function AdminTeamClient({
                         <AdminTeamActionsMenu
                           member={member}
                           currentUserId={currentUserId}
+                          canViewPersonalDetails={isSuperAdmin}
                           onEditAccess={() => setEditMember(member)}
+                          onViewPersonalDetails={() =>
+                            setDetailsUserId(member.id)
+                          }
                         />
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -427,6 +440,11 @@ export function AdminTeamClient({
         open={editMember !== null}
         onClose={() => setEditMember(null)}
         onSaved={() => router.refresh()}
+      />
+      <AdminTeamMemberDetailsDrawer
+        userId={detailsUserId}
+        open={detailsUserId !== null}
+        onClose={() => setDetailsUserId(null)}
       />
     </>
   );

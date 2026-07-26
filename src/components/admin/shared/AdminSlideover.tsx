@@ -15,7 +15,7 @@ export function AdminSlideover({
   title: string;
   description?: string;
   children: React.ReactNode;
-  size?: "default" | "wide";
+  size?: "narrow" | "default" | "wide";
 }) {
   return (
     <AdminDrawer

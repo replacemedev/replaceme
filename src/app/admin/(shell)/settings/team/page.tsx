@@ -46,6 +46,7 @@ export default async function AdminTeamSettingsPage() {
         members={teamResult.data}
         activity={activity}
         currentUserId={user.id}
+        isSuperAdmin={isSuperAdmin}
       />
     </AdminPageShell>
   );

@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
+  IdCard,
   KeyRound,
   Mail,
   MoreHorizontal,
@@ -27,7 +28,10 @@ import { formatFullName } from "@/lib/format/name";
 interface AdminTeamActionsMenuProps {
   member: AdminTeamRow;
   currentUserId: string;
+  /** When true, show PII deep-dive (super admin only). */
+  canViewPersonalDetails?: boolean;
   onEditAccess: () => void;
+  onViewPersonalDetails?: () => void;
 }
 
 type PendingAction =
@@ -40,7 +44,9 @@ type PendingAction =
 export function AdminTeamActionsMenu({
   member,
   currentUserId,
+  canViewPersonalDetails = false,
   onEditAccess,
+  onViewPersonalDetails,
 }: AdminTeamActionsMenuProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -125,6 +131,16 @@ export function AdminTeamActionsMenu({
         </summary>
         {open ? (
           <div className="absolute right-0 z-20 mt-2 w-56 max-w-[min(14rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+            {canViewPersonalDetails && onViewPersonalDetails ? (
+              <MenuButton
+                icon={IdCard}
+                label="View personal details"
+                onClick={() => {
+                  closeMenu();
+                  onViewPersonalDetails();
+                }}
+              />
+            ) : null}
             <MenuButton
               icon={Shield}
               label="Edit access"

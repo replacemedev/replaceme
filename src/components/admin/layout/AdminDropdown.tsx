@@ -52,7 +52,7 @@ export function AdminDropdown({
   };
 
   const avatar = (
-    <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-900">
+    <div className="relative shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-900">
       {profile?.avatar_url ? (
         <AvatarImage
           src={profile.avatar_url}
@@ -62,7 +62,7 @@ export function AdminDropdown({
           priority
         />
       ) : (
-        <span className="flex h-full w-full items-center justify-center">
+        <span className="flex h-8 w-8 items-center justify-center">
           <Shield size={16} className="text-white" aria-hidden />
         </span>
       )}
