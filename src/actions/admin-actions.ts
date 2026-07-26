@@ -90,6 +90,27 @@ async function revalidateAdminSurfaces() {
   await invalidateAdminCache();
 }
 
+/** Admin job moderation → employer boards + worker discovery stay in sync. */
+async function revalidateJobModerationSurfaces(
+  jobId: string,
+  employerId?: string | null
+) {
+  await revalidateAdminSurfaces();
+  revalidatePath(`/admin/jobs/${jobId}`);
+  revalidatePath("/employer/jobs");
+  revalidatePath("/employer/dashboard");
+  revalidatePath("/worker/jobs");
+  revalidatePath("/worker/job-search");
+  revalidatePath("/worker/saved-jobs");
+  if (employerId) {
+    revalidatePath(`/employer/jobs/${jobId}`);
+    const { invalidateEmployerCache } = await import(
+      "@/lib/server/entitlements"
+    );
+    await invalidateEmployerCache(employerId);
+  }
+}
+
 function actionErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof z.ZodError) {
     return err.issues.map((i) => i.message).join("; ") || fallback;
@@ -411,9 +432,11 @@ export async function deleteUserAccount(input: {
 export async function approveJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
-    const { supabase, user } = await requireAdmin();
+    // Authz first; mutate with service role so RLS cannot silently no-op the update.
+    const { user } = await requireAdmin();
+    const admin = await createAdminClient();
 
-    const { data: existing, error: loadError } = await supabase
+    const { data: existing, error: loadError } = await admin
       .from("jobs")
       .select("id, title, employer_id, status, deleted_at")
       .eq("id", id)
@@ -424,8 +447,15 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
     if (existing.deleted_at || existing.status === "Deleted") {
       throw new Error("Restore this job before approving it");
     }
+    if (existing.status === "Active") {
+      await revalidateJobModerationSurfaces(id, existing.employer_id);
+      return { success: true };
+    }
+    if (existing.status !== "Pending Review") {
+      throw new Error("Only jobs pending review can be approved");
+    }
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("jobs")
       .update({
         status: "Active",
@@ -436,15 +466,16 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
         rejected_at: null,
         rejected_by: null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
+    if (!updated?.id) {
+      throw new Error("Job could not be approved — no row updated");
+    }
 
     if (existing.employer_id) {
-      const { invalidateEmployerCache } = await import(
-        "@/lib/server/entitlements"
-      );
-      await invalidateEmployerCache(existing.employer_id);
       await notifyEmployerJobApproved({
         employerId: existing.employer_id,
         jobId: id,
@@ -453,7 +484,7 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
     }
 
     await logAdminAction("approve_job", "job", id);
-    await revalidateAdminSurfaces();
+    await revalidateJobModerationSurfaces(id, existing.employer_id);
     return { success: true };
   } catch (err) {
     return {
@@ -470,11 +501,12 @@ export async function rejectJobPost(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = rejectJobSchema.parse(input);
-    const { supabase, user } = await requireAdmin();
+    const { user } = await requireAdmin();
+    const admin = await createAdminClient();
     const trimmedReason = parsed.reason?.trim() || null;
     const now = new Date().toISOString();
 
-    const { data: existing, error: loadError } = await supabase
+    const { data: existing, error: loadError } = await admin
       .from("jobs")
       .select("id, title, employer_id, status, deleted_at")
       .eq("id", parsed.jobId)
@@ -489,7 +521,7 @@ export async function rejectJobPost(input: {
       throw new Error("Job is already rejected");
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("jobs")
       .update({
         status: "Rejected",
@@ -498,15 +530,16 @@ export async function rejectJobPost(input: {
         rejected_at: now,
         rejected_by: user.id,
       })
-      .eq("id", parsed.jobId);
+      .eq("id", parsed.jobId)
+      .select("id")
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
+    if (!updated?.id) {
+      throw new Error("Job could not be rejected — no row updated");
+    }
 
     if (existing.employer_id) {
-      const { invalidateEmployerCache } = await import(
-        "@/lib/server/entitlements"
-      );
-      await invalidateEmployerCache(existing.employer_id);
       await notifyEmployerJobRejected({
         employerId: existing.employer_id,
         jobId: parsed.jobId,
@@ -520,7 +553,7 @@ export async function rejectJobPost(input: {
       category: parsed.category,
       reason: trimmedReason,
     });
-    await revalidateAdminSurfaces();
+    await revalidateJobModerationSurfaces(parsed.jobId, existing.employer_id);
     return { success: true };
   } catch (err) {
     return {
@@ -589,8 +622,9 @@ export async function bulkRejectJobPosts(input: {
 }
 
 export async function countJobsPendingReview(): Promise<number> {
-  const { supabase } = await requireAdmin();
-  const { count, error } = await supabase
+  await requireAdmin();
+  const admin = await createAdminClient();
+  const { count, error } = await admin
     .from("jobs")
     .select("id", { count: "exact", head: true })
     .eq("status", "Pending Review")
@@ -605,11 +639,16 @@ export async function deleteJobPost(
   reason: string
 ): Promise<ActionResult> {
   try {
-    const parsed = moderateJobSchema.parse({ jobId, reason });
-    const { supabase, user } = await requireAdmin();
+    const parsed = moderateJobSchema.parse({
+      jobId,
+      reason: reason.trim() || "Removed by admin",
+    });
+    const { user } = await requireAdmin();
+    const admin = await createAdminClient();
     const now = new Date().toISOString();
+    const deletionReason = parsed.reason ?? "Removed by admin";
 
-    const { data: existing, error: loadError } = await supabase
+    const { data: existing, error: loadError } = await admin
       .from("jobs")
       .select("id, employer_id, status, deleted_at")
       .eq("id", parsed.jobId)
@@ -621,35 +660,33 @@ export async function deleteJobPost(
       throw new Error("Job is already deleted");
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("jobs")
       .update({
         status: "Deleted",
         deleted_at: now,
         deleted_by: user.id,
-        deletion_reason: parsed.reason,
+        deletion_reason: deletionReason,
       })
-      .eq("id", parsed.jobId);
+      .eq("id", parsed.jobId)
+      .select("id")
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
-
-    if (existing.employer_id) {
-      const { invalidateEmployerCache } = await import(
-        "@/lib/server/entitlements"
-      );
-      await invalidateEmployerCache(existing.employer_id);
+    if (!updated?.id) {
+      throw new Error("Job could not be deleted — no row updated");
     }
 
     await logAdminAction("delete_job_post", "job", parsed.jobId, {
-      reason: parsed.reason,
+      reason: deletionReason,
       soft: true,
     });
-    await revalidateAdminSurfaces();
+    await revalidateJobModerationSurfaces(parsed.jobId, existing.employer_id);
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to delete job",
+      error: actionErrorMessage(err, "Failed to delete job"),
     };
   }
 }
@@ -657,9 +694,10 @@ export async function deleteJobPost(
 export async function restoreJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
-    const { supabase } = await requireAdmin();
+    await requireAdmin();
+    const admin = await createAdminClient();
 
-    const { data: existing, error: loadError } = await supabase
+    const { data: existing, error: loadError } = await admin
       .from("jobs")
       .select("id, employer_id, status, deleted_at")
       .eq("id", id)
@@ -671,7 +709,7 @@ export async function restoreJobPost(jobId: string): Promise<ActionResult> {
       throw new Error("Job is not deleted");
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await admin
       .from("jobs")
       .update({
         status: "Draft",
@@ -679,19 +717,17 @@ export async function restoreJobPost(jobId: string): Promise<ActionResult> {
         deleted_by: null,
         deletion_reason: null,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
-
-    if (existing.employer_id) {
-      const { invalidateEmployerCache } = await import(
-        "@/lib/server/entitlements"
-      );
-      await invalidateEmployerCache(existing.employer_id);
+    if (!updated?.id) {
+      throw new Error("Job could not be restored — no row updated");
     }
 
     await logAdminAction("restore_job_post", "job", id);
-    await revalidateAdminSurfaces();
+    await revalidateJobModerationSurfaces(id, existing.employer_id);
     return { success: true };
   } catch (err) {
     return {
@@ -1057,7 +1093,8 @@ export async function fetchAdminJobs(
     search?: string;
   }
 ): Promise<AdminJobRow[]> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
+  const supabase = await createAdminClient();
 
   let query = supabase
     .from("jobs")

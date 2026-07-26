@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Briefcase, Check, Search, X } from "lucide-react";
+import { Briefcase, Check, Loader2, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   bulkApproveJobPosts,
@@ -429,16 +429,20 @@ export function JobsModerationClient({
               type="button"
               disabled={pending || selectedPendingIds.length === 0}
               onClick={handleBulkApprove}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800 disabled:pointer-events-none disabled:opacity-50"
             >
-              <Check className="h-3.5 w-3.5" aria-hidden />
-              Bulk Approve
+              {pending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+              ) : (
+                <Check className="h-3.5 w-3.5" aria-hidden />
+              )}
+              {pending ? "Approving…" : "Bulk Approve"}
             </button>
             <button
               type="button"
               disabled={pending || selectedPendingIds.length === 0}
               onClick={() => setBulkRejectOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-50 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-50 disabled:pointer-events-none disabled:opacity-50"
             >
               <X className="h-3.5 w-3.5" aria-hidden />
               Bulk Reject

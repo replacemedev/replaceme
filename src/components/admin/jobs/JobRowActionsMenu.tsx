@@ -14,6 +14,7 @@ import {
   Check,
   Eye,
   FileWarning,
+  Loader2,
   MoreHorizontal,
   RotateCcw,
   Trash2,
@@ -243,21 +244,26 @@ export function JobRowActionsMenu({
           type="button"
           role="menuitem"
           disabled={pending}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => {
             closeMenu();
             runApprove();
           }}
         >
-          <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          Approve
+          {pending ? (
+            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" aria-hidden />
+          ) : (
+            <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          )}
+          {pending ? "Approving…" : "Approve"}
         </button>
       ) : null}
       {canReject ? (
         <button
           type="button"
           role="menuitem"
-          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-amber-800 hover:bg-amber-50"
+          disabled={pending}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-amber-800 hover:bg-amber-50 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => {
             closeMenu();
             setMode("reject");
@@ -272,21 +278,26 @@ export function JobRowActionsMenu({
           type="button"
           role="menuitem"
           disabled={pending}
-          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:opacity-50"
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-emerald-700 hover:bg-emerald-50 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => {
             closeMenu();
             runRestore();
           }}
         >
-          <RotateCcw className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          Restore…
+          {pending ? (
+            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" aria-hidden />
+          ) : (
+            <RotateCcw className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          )}
+          {pending ? "Restoring…" : "Restore…"}
         </button>
       ) : null}
       {canDelete ? (
         <button
           type="button"
           role="menuitem"
-          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"
+          disabled={pending}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50 disabled:pointer-events-none disabled:opacity-50"
           onClick={() => {
             closeMenu();
             setMode("delete");
@@ -306,7 +317,7 @@ export function JobRowActionsMenu({
             ref={menuRef}
             role="menu"
             style={{ top: coords.top, left: coords.left }}
-            className="fixed z-[200] w-52 max-w-[min(13rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+            className="fixed z-[300] w-52 max-w-[min(13rem,calc(100vw-2rem))] overflow-visible rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
           >
             {menuItems}
           </div>,
@@ -327,12 +338,17 @@ export function JobRowActionsMenu({
       >
         <summary
           ref={summaryRef}
-          className="list-none cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors [&::-webkit-details-marker]:hidden"
+          className="list-none cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors [&::-webkit-details-marker]:hidden disabled:pointer-events-none disabled:opacity-50"
           aria-label={`Actions for ${title}`}
           aria-haspopup="menu"
           aria-expanded={open}
+          aria-busy={pending}
         >
-          <MoreHorizontal className="h-4 w-4" aria-hidden />
+          {pending ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          ) : (
+            <MoreHorizontal className="h-4 w-4" aria-hidden />
+          )}
         </summary>
       </details>
 
