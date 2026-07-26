@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { ImageIcon, Paperclip } from "lucide-react";
 import Link from "next/link";
 import { OptimizedImage } from "@/components/shared/media/OptimizedImage";
@@ -11,22 +12,72 @@ import {
   updateReportStatus,
   getAdminJobReports,
   updateJobReportStatus,
+  getAdminUserReports,
+  getAdminUserReportById,
+  updateUserReportStatus,
   type AdminReportDeepDive,
   type AdminReportRow,
   type AdminJobReportRow,
+  type AdminUserReportRow,
+  type AdminUserReportDeepDive,
 } from "@/actions/reports";
-import { REPORT_STATUSES } from "@/lib/reporting/constants";
+import {
+  REPORT_STATUSES,
+  USER_REPORT_VIOLATION_LABELS,
+  USER_REPORT_STATUS_LABELS,
+  type AdminReportsTab,
+  type UserReportStatus,
+} from "@/lib/reporting/constants";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
 import { AdminDrawer } from "@/components/admin/shared/AdminDrawer";
+import { AdminTabs } from "@/components/admin/shared/AdminTabs";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import {
+  AdminDataTable,
+  AdminMobileCard,
+  ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_TH,
+  ADMIN_TABLE_ROW,
+  ADMIN_TABLE_TD,
+} from "@/components/admin/shared/AdminDataTable";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { ReportRowActionsMenu } from "@/components/admin/reports/ReportRowActionsMenu";
 
-const STATUS_FILTERS = ["open", "in_progress", "resolved"] as const;
-const ROLE_FILTERS = ["all", "worker", "employer"] as const;
-const JOB_STATUS_FILTERS = ["PENDING", "REVIEWED", "DISMISSED", "ALL"] as const;
+const PLATFORM_STATUSES = ["open", "in_progress", "resolved"] as const;
+const JOB_STATUSES = ["PENDING", "REVIEWED", "DISMISSED", "ALL"] as const;
+const USER_STATUSES = ["open", "investigating", "resolved", "dismissed"] as const;
 
-function prettyStatus(s: string) {
-  return s === "in_progress" ? "In progress" : s.charAt(0).toUpperCase() + s.slice(1);
+function prettyPlatformStatus(s: string) {
+  return s === "in_progress"
+    ? "In progress"
+    : s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatWhen(iso: string) {
+  return new Date(iso).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function StackedCell({
+  primary,
+  secondary,
+}: {
+  primary: string;
+  secondary?: string | null;
+}) {
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <p className="truncate text-sm font-semibold text-slate-900">{primary}</p>
+      {secondary ? (
+        <p className="truncate text-xs text-slate-500">{secondary}</p>
+      ) : null}
+    </div>
+  );
 }
 
 export function AdminReportsClient({
@@ -34,72 +85,82 @@ export function AdminReportsClient({
 }: {
   initial: { items: AdminReportRow[]; total: number };
 }) {
-  const [activeTab, setActiveTab] = useState<"general" | "jobs">("general");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") ?? "platform";
+  const activeTab = (
+    ["platform", "jobs", "employers", "workers"].includes(tabParam)
+      ? tabParam
+      : "platform"
+  ) as AdminReportsTab;
+
   const [pending, startTransition] = useTransition();
 
-  // General Platform Reports State
-  const [status, setStatus] = useState<(typeof STATUS_FILTERS)[number]>("open");
-  const [role, setRole] = useState<(typeof ROLE_FILTERS)[number]>("all");
-  const [q, setQ] = useState("");
-  const [data, setData] = useState(initial);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [selected, setSelected] = useState<AdminReportDeepDive | null>(null);
+  const [platformStatus, setPlatformStatus] =
+    useState<(typeof PLATFORM_STATUSES)[number]>("open");
+  const [platformQ, setPlatformQ] = useState("");
+  const [platformData, setPlatformData] = useState(initial);
+  const [platformPage, setPlatformPage] = useState(1);
+  const [selectedPlatformId, setSelectedPlatformId] = useState<string | null>(
+    null
+  );
+  const [selectedPlatform, setSelectedPlatform] =
+    useState<AdminReportDeepDive | null>(null);
 
-  // Job Reports State
-  const [jobReportsData, setJobReportsData] = useState<{ items: AdminJobReportRow[]; total: number }>({ items: [], total: 0 });
+  const [jobStatus, setJobStatus] = useState<
+    "PENDING" | "REVIEWED" | "DISMISSED" | "ALL"
+  >("PENDING");
+  const [jobQ, setJobQ] = useState("");
+  const [jobData, setJobData] = useState<{
+    items: AdminJobReportRow[];
+    total: number;
+  }>({ items: [], total: 0 });
   const [jobPage, setJobPage] = useState(1);
-  const [jobStatus, setJobStatus] = useState<"PENDING" | "REVIEWED" | "DISMISSED" | "ALL">("PENDING");
-  const [jobQuery, setJobQuery] = useState("");
-  const [selectedJobReport, setSelectedJobReport] = useState<AdminJobReportRow | null>(null);
+  const [selectedJob, setSelectedJob] = useState<AdminJobReportRow | null>(
+    null
+  );
 
-  // Shared Admin Notes Draft
+  const [userStatus, setUserStatus] = useState<UserReportStatus | "all">(
+    "open"
+  );
+  const [userQ, setUserQ] = useState("");
+  const [employerData, setEmployerData] = useState<{
+    items: AdminUserReportRow[];
+    total: number;
+  }>({ items: [], total: 0 });
+  const [workerData, setWorkerData] = useState<{
+    items: AdminUserReportRow[];
+    total: number;
+  }>({ items: [], total: 0 });
+  const [userPage, setUserPage] = useState(1);
+  const [selectedUserReport, setSelectedUserReport] =
+    useState<AdminUserReportDeepDive | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
   const [notesDraft, setNotesDraft] = useState("");
-
   const itemsPerPage = 20;
 
-  // Compute counts based on currently loaded list items
-  const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const s of STATUS_FILTERS) counts[s] = 0;
-    for (const r of data.items) {
-      if (counts[r.status] != null) counts[r.status] += 1;
-    }
-    return counts;
-  }, [data.items]);
-
-  const jobStatusCounts = useMemo(() => {
-    const counts: Record<string, number> = { PENDING: 0, REVIEWED: 0, DISMISSED: 0 };
-    for (const r of jobReportsData.items) {
-      if (counts[r.status] != null) counts[r.status] += 1;
-    }
-    return counts;
-  }, [jobReportsData.items]);
-
-  // Fetch functions
-  const fetchPage = (page: number) => {
+  const fetchPlatform = (page: number) => {
     startTransition(async () => {
       const next = await getAdminReports({
-        status,
-        reporterRole: role === "all" ? undefined : role,
-        q: q.trim() || undefined,
+        status: platformStatus,
+        q: platformQ.trim() || undefined,
         limit: itemsPerPage,
         offset: (page - 1) * itemsPerPage,
       });
       if (!next) {
-        toast.error("Failed to load reports");
+        toast.error("Failed to load platform issues");
         return;
       }
-      setData(next);
-      setCurrentPage(page);
+      setPlatformData(next);
+      setPlatformPage(page);
     });
   };
 
-  const fetchJobPage = (page: number) => {
+  const fetchJobs = (page: number) => {
     startTransition(async () => {
       const next = await getAdminJobReports({
         status: jobStatus === "ALL" ? undefined : jobStatus,
-        q: jobQuery.trim() || undefined,
+        q: jobQ.trim() || undefined,
         limit: itemsPerPage,
         offset: (page - 1) * itemsPerPage,
       });
@@ -107,52 +168,87 @@ export function AdminReportsClient({
         toast.error("Failed to load job reports");
         return;
       }
-      setJobReportsData(next);
+      setJobData(next);
       setJobPage(page);
     });
   };
 
-  const refresh = () => fetchPage(1);
-
-  // Trigger loading when general filters change
-  useEffect(() => {
-    if (activeTab === "general") {
-      refresh();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, role]);
-
-  // Trigger loading when job filters change
-  useEffect(() => {
-    fetchJobPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobStatus]);
-
-  // Trigger when general report is selected
-  useEffect(() => {
-    if (!selectedId) return;
+  const fetchUserReports = (
+    reportedRole: "employer" | "worker",
+    page: number
+  ) => {
     startTransition(async () => {
-      const full = await getAdminReportById(selectedId);
+      const next = await getAdminUserReports({
+        reportedRole,
+        status: userStatus === "all" ? undefined : userStatus,
+        q: userQ.trim() || undefined,
+        limit: itemsPerPage,
+        offset: (page - 1) * itemsPerPage,
+      });
+      if (!next) {
+        toast.error("Failed to load user reports");
+        return;
+      }
+      if (reportedRole === "employer") setEmployerData(next);
+      else setWorkerData(next);
+      setUserPage(page);
+    });
+  };
+
+  useEffect(() => {
+    if (activeTab === "platform") fetchPlatform(1);
+    else if (activeTab === "jobs") fetchJobs(1);
+    else if (activeTab === "employers") fetchUserReports("employer", 1);
+    else fetchUserReports("worker", 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, platformStatus, jobStatus, userStatus]);
+
+  useEffect(() => {
+    if (!selectedPlatformId) return;
+    startTransition(async () => {
+      const full = await getAdminReportById(selectedPlatformId);
       if (!full) {
         toast.error("Failed to load report");
         return;
       }
-      setSelected(full);
+      setSelectedPlatform(full);
       setNotesDraft(full.adminNotes ?? "");
     });
-  }, [selectedId]);
+  }, [selectedPlatformId]);
 
-  const openPanel = (id: string) => {
-    setSelectedId(id);
-    setSelected(null);
+  useEffect(() => {
+    if (!selectedUserId) return;
+    startTransition(async () => {
+      const full = await getAdminUserReportById(selectedUserId);
+      if (!full) {
+        toast.error("Failed to load case");
+        return;
+      }
+      setSelectedUserReport(full);
+      setNotesDraft(full.adminNotes ?? "");
+    });
+  }, [selectedUserId]);
+
+  const searchPlaceholder =
+    activeTab === "platform"
+      ? "Search title, URL, description…"
+      : activeTab === "jobs"
+        ? "Search reason, description…"
+        : "Search title or description…";
+
+  const handleSearch = () => {
+    if (activeTab === "platform") fetchPlatform(1);
+    else if (activeTab === "jobs") fetchJobs(1);
+    else if (activeTab === "employers") fetchUserReports("employer", 1);
+    else fetchUserReports("worker", 1);
   };
 
-  const saveStatus = (nextStatus: (typeof REPORT_STATUSES)[number]) => {
-    if (!selected) return;
+  const savePlatformStatus = (next: (typeof REPORT_STATUSES)[number]) => {
+    if (!selectedPlatform) return;
     startTransition(async () => {
       const result = await updateReportStatus({
-        reportId: selected.id,
-        status: nextStatus,
+        reportId: selectedPlatform.id,
+        status: next,
         adminNotes: notesDraft,
       });
       if (!result.success) {
@@ -160,325 +256,553 @@ export function AdminReportsClient({
         return;
       }
       toast.success("Report updated");
-      await refresh();
-      const full = await getAdminReportById(selected.id);
-      setSelected(full);
+      fetchPlatform(platformPage);
+      const full = await getAdminReportById(selectedPlatform.id);
+      setSelectedPlatform(full);
     });
   };
 
-  const saveJobReportStatus = (nextStatus: "PENDING" | "REVIEWED" | "DISMISSED") => {
-    if (!selectedJobReport) return;
+  const saveJobStatus = (next: "PENDING" | "REVIEWED" | "DISMISSED") => {
+    if (!selectedJob) return;
     startTransition(async () => {
       const result = await updateJobReportStatus({
-        reportId: selectedJobReport.id,
-        status: nextStatus,
+        reportId: selectedJob.id,
+        status: next,
         adminNotes: notesDraft,
       });
       if (!result.success) {
         toast.error(result.error);
         return;
       }
-      toast.success("Job report status updated");
-      setSelectedJobReport(null);
-      await fetchJobPage(jobPage);
+      toast.success("Job report updated");
+      setSelectedJob(null);
+      fetchJobs(jobPage);
     });
   };
 
-  const handleSearch = () => {
-    if (activeTab === "general") {
-      refresh();
-    } else {
-      fetchJobPage(1);
-    }
+  const saveUserStatus = (next: UserReportStatus) => {
+    if (!selectedUserReport) return;
+    startTransition(async () => {
+      const result = await updateUserReportStatus({
+        reportId: selectedUserReport.id,
+        status: next,
+        adminNotes: notesDraft,
+      });
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Case updated");
+      const role =
+        selectedUserReport.reportedRole === "employer" ? "employer" : "worker";
+      fetchUserReports(role, userPage);
+      const full = await getAdminUserReportById(selectedUserReport.id);
+      setSelectedUserReport(full);
+    });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
+  const userRows =
+    activeTab === "employers" ? employerData : workerData;
+
+  const tabs = [
+    { id: "platform", label: "Platform Issues", count: platformData.total },
+    { id: "jobs", label: "Job Reports", count: jobData.total },
+    { id: "employers", label: "Employer Reports", count: employerData.total },
+    { id: "workers", label: "Worker Reports", count: workerData.total },
+  ];
+
+  const renderUserCards = (rows: AdminUserReportRow[]) =>
+    rows.length === 0 ? (
+      <p className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-400">
+        No reports in this queue.
+        {activeTab === "employers" ? (
+          <>
+            {" "}
+            Legacy wage disputes may still appear under{" "}
+            <Link href="/admin/disputes" className="font-semibold text-[#006e2f]">
+              Disputes
+            </Link>
+            .
+          </>
+        ) : null}
+      </p>
+    ) : (
+      rows.map((r) => (
+        <AdminMobileCard
+          key={r.id}
+          actionsPlacement="header"
+          actions={
+            <ReportRowActionsMenu
+              reportId={r.id}
+              reportedUserId={r.reportedUserId}
+              reportedLabel={r.reportedName}
+              reportedEmail={r.reportedEmail}
+              onReview={() => setSelectedUserId(r.id)}
+              onChanged={() =>
+                fetchUserReports(
+                  activeTab === "employers" ? "employer" : "worker",
+                  userPage
+                )
+              }
+            />
+          }
+        >
+          <button
+            type="button"
+            className="w-full min-w-0 space-y-2 text-left"
+            onClick={() => setSelectedUserId(r.id)}
+          >
+            <StackedCell
+              primary={r.title}
+              secondary={USER_REPORT_VIOLATION_LABELS[r.violationCategory]}
+            />
+            <StackedCell
+              primary={r.reportedName}
+              secondary={`Reported · ${r.reportedEmail || "No email"}`}
+            />
+            <StackedCell
+              primary={r.reporterName}
+              secondary={`Reporter · confidential`}
+            />
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <StatusBadge status={r.status} />
+              <span className="text-xs text-slate-400">
+                {formatWhen(r.createdAt)}
+              </span>
+            </div>
+          </button>
+        </AdminMobileCard>
+      ))
+    );
+
+  const renderUserTable = (rows: AdminUserReportRow[]) => (
+    <table className="w-full min-w-0 table-fixed text-sm">
+      <thead>
+        <tr className={ADMIN_TABLE_HEAD}>
+          <th className={`${ADMIN_TABLE_TH} w-[28%]`}>Report</th>
+          <th className={`${ADMIN_TABLE_TH} w-[18%]`}>Reporter</th>
+          <th className={`${ADMIN_TABLE_TH} w-[18%]`}>Reported</th>
+          <th className={`${ADMIN_TABLE_TH} w-[16%]`}>Violation</th>
+          <th className={`${ADMIN_TABLE_TH} w-[12%]`}>Status</th>
+          <th className={`${ADMIN_TABLE_TH} w-[8%] text-right`}>Actions</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-slate-50">
+        {rows.map((r) => (
+          <tr key={r.id} className={ADMIN_TABLE_ROW}>
+            <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+              <button
+                type="button"
+                className="w-full min-w-0 text-left"
+                onClick={() => setSelectedUserId(r.id)}
+              >
+                <StackedCell
+                  primary={r.title}
+                  secondary={formatWhen(r.createdAt)}
+                />
+              </button>
+            </td>
+            <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+              <StackedCell
+                primary={r.reporterName}
+                secondary={r.reporterRole}
+              />
+            </td>
+            <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+              <StackedCell
+                primary={r.reportedName}
+                secondary={r.reportedEmail || undefined}
+              />
+            </td>
+            <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+              <span className="text-xs font-semibold text-slate-700">
+                {USER_REPORT_VIOLATION_LABELS[r.violationCategory]}
+              </span>
+            </td>
+            <td className={ADMIN_TABLE_TD}>
+              <StatusBadge status={r.status} />
+            </td>
+            <td className={`${ADMIN_TABLE_TD} text-right`}>
+              <ReportRowActionsMenu
+                reportId={r.id}
+                reportedUserId={r.reportedUserId}
+                reportedLabel={r.reportedName}
+                reportedEmail={r.reportedEmail}
+                onReview={() => setSelectedUserId(r.id)}
+                onChanged={() =>
+                  fetchUserReports(
+                    activeTab === "employers" ? "employer" : "worker",
+                    userPage
+                  )
+                }
+              />
+            </td>
+          </tr>
+        ))}
+        {rows.length === 0 ? (
+          <tr>
+            <td
+              colSpan={6}
+              className="px-4 py-10 text-center text-sm italic text-slate-400"
+            >
+              No reports in this queue.
+            </td>
+          </tr>
+        ) : null}
+      </tbody>
+    </table>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Tab bar header */}
-      <div className="flex border-b border-slate-200">
-        <button
-          type="button"
-          onClick={() => setActiveTab("general")}
-          className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all -mb-px ${
-            activeTab === "general"
-              ? "border-[#006e2f] text-[#006e2f] bg-[#ebfdf2]/20"
-              : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-350"
-          }`}
-        >
-          <span>Platform Issues</span>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
-            {data.total}
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("jobs")}
-          className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all -mb-px ${
-            activeTab === "jobs"
-              ? "border-[#006e2f] text-[#006e2f] bg-[#ebfdf2]/20"
-              : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-350"
-          }`}
-        >
-          <span>Job Reports</span>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
-            {jobReportsData.total}
-          </span>
-        </button>
-      </div>
+    <div className="min-w-0 space-y-6">
+      <AdminTabs tabs={tabs} />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-3">
-          {activeTab === "general" ? (
-            <>
-              <AdminFilterPills
-                options={STATUS_FILTERS.map(prettyStatus)}
-                value={prettyStatus(status)}
-                onChange={(v) => {
-                  setStatus(
-                    v === "In progress" ? "in_progress" : (v.toLowerCase() as typeof status)
-                  );
-                  setCurrentPage(1);
-                }}
-                counts={{
-                  Open: statusCounts.open ?? 0,
-                  "In progress": statusCounts.in_progress ?? 0,
-                  Resolved: statusCounts.resolved ?? 0,
-                }}
-              />
-              <div className="flex flex-wrap items-center gap-2">
-                {ROLE_FILTERS.map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => {
-                      setRole(r);
-                      setCurrentPage(1);
-                    }}
-                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
-                      role === r
-                        ? "border-[#006e2f]/30 bg-[#ebfdf2] text-[#006e2f]"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    {r === "all" ? "All roles" : r}
-                  </button>
-                ))}
-              </div>
-            </>
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0 space-y-3">
+          {activeTab === "platform" ? (
+            <AdminFilterPills
+              options={PLATFORM_STATUSES.map(prettyPlatformStatus)}
+              value={prettyPlatformStatus(platformStatus)}
+              onChange={(v) => {
+                setPlatformStatus(
+                  v === "In progress"
+                    ? "in_progress"
+                    : (v.toLowerCase() as typeof platformStatus)
+                );
+              }}
+            />
+          ) : activeTab === "jobs" ? (
+            <AdminFilterPills
+              options={JOB_STATUSES.map((s) =>
+                s === "ALL"
+                  ? "All"
+                  : s.charAt(0) + s.slice(1).toLowerCase()
+              )}
+              value={
+                jobStatus === "ALL"
+                  ? "All"
+                  : jobStatus.charAt(0) + jobStatus.slice(1).toLowerCase()
+              }
+              onChange={(v) => {
+                setJobStatus(
+                  (v === "All" ? "ALL" : v.toUpperCase()) as typeof jobStatus
+                );
+              }}
+            />
           ) : (
             <AdminFilterPills
-              options={JOB_STATUS_FILTERS.map(s => s === "ALL" ? "All" : s.charAt(0) + s.slice(1).toLowerCase())}
-              value={jobStatus === "ALL" ? "All" : jobStatus.charAt(0) + jobStatus.slice(1).toLowerCase()}
+              options={[
+                ...USER_STATUSES.map((s) => USER_REPORT_STATUS_LABELS[s]),
+                "All",
+              ]}
+              value={
+                userStatus === "all"
+                  ? "All"
+                  : USER_REPORT_STATUS_LABELS[userStatus]
+              }
               onChange={(v) => {
-                const statusKey = (v === "All" ? "ALL" : v.toUpperCase()) as typeof jobStatus;
-                setJobStatus(statusKey);
-                setJobPage(1);
-              }}
-              counts={{
-                Pending: jobStatusCounts.PENDING ?? 0,
-                Reviewed: jobStatusCounts.REVIEWED ?? 0,
-                Dismissed: jobStatusCounts.DISMISSED ?? 0,
-                All: jobReportsData.total,
+                if (v === "All") {
+                  setUserStatus("all");
+                  return;
+                }
+                const entry = (
+                  Object.entries(USER_REPORT_STATUS_LABELS) as [
+                    UserReportStatus,
+                    string,
+                  ][]
+                ).find(([, label]) => label === v);
+                if (entry) setUserStatus(entry[0]);
               }}
             />
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex min-w-0 gap-2">
           <input
-            value={activeTab === "general" ? q : jobQuery}
-            onChange={(e) => activeTab === "general" ? setQ(e.target.value) : setJobQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={activeTab === "general" ? "Search title, URL, description…" : "Search reason, description…"}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 sm:w-[320px]"
+            value={
+              activeTab === "platform"
+                ? platformQ
+                : activeTab === "jobs"
+                  ? jobQ
+                  : userQ
+            }
+            onChange={(e) => {
+              const v = e.target.value;
+              if (activeTab === "platform") setPlatformQ(v);
+              else if (activeTab === "jobs") setJobQ(v);
+              else setUserQ(v);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
+            placeholder={searchPlaceholder}
+            className="min-w-0 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 sm:w-[320px]"
           />
           <button
             type="button"
             onClick={handleSearch}
             disabled={pending}
-            className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
+            className="shrink-0 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50"
           >
             Search
           </button>
         </div>
       </div>
 
-      {activeTab === "general" ? (
-        <div className="space-y-4">
-          <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-            <table className="w-full text-sm">
+      {activeTab === "platform" ? (
+        <div className="min-w-0 space-y-4">
+          <AdminDataTable
+            mobileCards={
+              platformData.items.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-400">
+                  No platform issues found.
+                </p>
+              ) : (
+                platformData.items.map((r) => (
+                  <AdminMobileCard key={r.id}>
+                    <button
+                      type="button"
+                      className="w-full min-w-0 space-y-2 text-left"
+                      onClick={() => setSelectedPlatformId(r.id)}
+                    >
+                      <StackedCell
+                        primary={r.title || r.category.replace(/_/g, " ")}
+                        secondary={r.reportedUrl ?? "No URL"}
+                      />
+                      <div className="flex items-center justify-between gap-2">
+                        <StatusBadge status={prettyPlatformStatus(r.status)} />
+                        <span className="text-xs text-slate-400">
+                          {formatWhen(r.createdAt)}
+                        </span>
+                      </div>
+                      {r.hasEvidence ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#006e2f]">
+                          <Paperclip className="h-3.5 w-3.5" aria-hidden />
+                          Evidence attached
+                        </span>
+                      ) : null}
+                    </button>
+                  </AdminMobileCard>
+                ))
+              )
+            }
+          >
+            <table className="w-full min-w-0 table-fixed text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <th className="px-4 py-3">Report</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Attachment</th>
-                  <th className="px-4 py-3">Created</th>
+                <tr className={ADMIN_TABLE_HEAD}>
+                  <th className={`${ADMIN_TABLE_TH} w-[40%]`}>Report</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[14%]`}>Category</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[14%]`}>Status</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[14%]`}>Attachment</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[18%]`}>Created</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {data.items.map((r) => (
+                {platformData.items.map((r) => (
                   <tr
                     key={r.id}
-                    className="cursor-pointer hover:bg-slate-50/60"
-                    onClick={() => openPanel(r.id)}
+                    className={`${ADMIN_TABLE_ROW} cursor-pointer`}
+                    onClick={() => setSelectedPlatformId(r.id)}
                   >
-                    <td className="px-4 py-3">
-                      <p className="font-semibold text-slate-900">
-                        {r.title || r.category.replace(/_/g, " ")}
-                      </p>
-                      <p className="mt-0.5 text-xs text-slate-400 line-clamp-1">
-                        {r.reportedUrl ?? "—"}
-                      </p>
+                    <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+                      <StackedCell
+                        primary={r.title || r.category.replace(/_/g, " ")}
+                        secondary={r.reportedUrl ?? "—"}
+                      />
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{r.reporterRole}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={prettyStatus(r.status)} />
+                    <td className={`${ADMIN_TABLE_TD} text-slate-600`}>
+                      {r.category.replace(/_/g, " ")}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={ADMIN_TABLE_TD}>
+                      <StatusBadge status={prettyPlatformStatus(r.status)} />
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
                       {r.hasEvidence ? (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openPanel(r.id);
-                          }}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#006e2f]/20 bg-[#ebfdf2] px-2.5 py-1 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#d8f9e6]"
-                        >
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-[#006e2f]">
                           <Paperclip className="h-3.5 w-3.5" aria-hidden />
-                          View image
-                        </button>
+                          View
+                        </span>
                       ) : (
-                        <span className="text-xs font-medium text-slate-400">—</span>
+                        <span className="text-xs text-slate-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
-                      {new Date(r.createdAt).toLocaleString()}
+                    <td className={`${ADMIN_TABLE_TD} text-xs text-slate-500`}>
+                      {formatWhen(r.createdAt)}
                     </td>
                   </tr>
                 ))}
+                {platformData.items.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-10 text-center text-sm italic text-slate-400"
+                    >
+                      No platform issues found.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
-          </div>
+          </AdminDataTable>
           <TablePagination
-            currentPage={currentPage}
-            totalItems={data.total}
+            currentPage={platformPage}
+            totalItems={platformData.total}
             pageSize={itemsPerPage}
-            onPageChange={fetchPage}
+            onPageChange={fetchPlatform}
           />
         </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <th className="px-4 py-3">Report Details</th>
-                  <th className="px-4 py-3">Reporter</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Created</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-55">
-                {jobReportsData.items.map((r) => {
-                  const isSkillsIssue = r.reason.toLowerCase().includes("skills") || r.reason.toLowerCase().includes("ponytail");
-                  return (
-                    <tr
-                      key={r.id}
-                      className={`cursor-pointer transition-colors hover:bg-slate-50/60 ${
-                        isSkillsIssue ? "bg-amber-50/30 hover:bg-amber-50/50" : ""
-                      }`}
+      ) : null}
+
+      {activeTab === "jobs" ? (
+        <div className="min-w-0 space-y-4">
+          <AdminDataTable
+            mobileCards={
+              jobData.items.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center text-sm text-slate-400">
+                  No job reports found.
+                </p>
+              ) : (
+                jobData.items.map((r) => (
+                  <AdminMobileCard key={r.id}>
+                    <button
+                      type="button"
+                      className="w-full min-w-0 space-y-2 text-left"
                       onClick={() => {
-                        setSelectedJobReport(r);
+                        setSelectedJob(r);
                         setNotesDraft(r.adminNotes ?? "");
                       }}
                     >
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {isSkillsIssue && (
-                            <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-800 uppercase tracking-wide shrink-0">
-                              Agent Skills
-                            </span>
-                          )}
-                          <p className="font-semibold text-slate-900 leading-tight">
-                            {r.reason}
-                          </p>
-                        </div>
-                        <p className="mt-1 text-xs font-medium text-slate-500">
-                          Job: <span className="font-bold text-slate-700">{r.jobTitle}</span>
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-800 text-xs">{r.reporterName}</p>
-                        <p className="text-[11px] text-slate-400">{r.reporterEmail}</p>
-                      </td>
-                      <td className="px-4 py-3">
+                      <StackedCell primary={r.reason} secondary={r.jobTitle} />
+                      <StackedCell
+                        primary={r.reporterName ?? "Unknown"}
+                        secondary={r.reporterEmail}
+                      />
+                      <div className="flex items-center justify-between gap-2">
                         <StatusBadge status={r.status.toLowerCase()} />
-                      </td>
-                      <td className="px-4 py-3 text-slate-500 font-mono text-xs whitespace-nowrap">
-                        {new Date(r.createdAt).toLocaleString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-                {jobReportsData.items.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-sm italic text-slate-400">
-                      No job reports found matching your selection.
+                        <span className="text-xs text-slate-400">
+                          {formatWhen(r.createdAt)}
+                        </span>
+                      </div>
+                    </button>
+                  </AdminMobileCard>
+                ))
+              )
+            }
+          >
+            <table className="w-full min-w-0 table-fixed text-sm">
+              <thead>
+                <tr className={ADMIN_TABLE_HEAD}>
+                  <th className={`${ADMIN_TABLE_TH} w-[40%]`}>Report</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[24%]`}>Reporter</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[16%]`}>Status</th>
+                  <th className={`${ADMIN_TABLE_TH} w-[20%]`}>Created</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {jobData.items.map((r) => (
+                  <tr
+                    key={r.id}
+                    className={`${ADMIN_TABLE_ROW} cursor-pointer`}
+                    onClick={() => {
+                      setSelectedJob(r);
+                      setNotesDraft(r.adminNotes ?? "");
+                    }}
+                  >
+                    <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+                      <StackedCell primary={r.reason} secondary={r.jobTitle} />
+                    </td>
+                    <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+                      <StackedCell
+                        primary={r.reporterName ?? "Unknown"}
+                        secondary={r.reporterEmail}
+                      />
+                    </td>
+                    <td className={ADMIN_TABLE_TD}>
+                      <StatusBadge status={r.status.toLowerCase()} />
+                    </td>
+                    <td className={`${ADMIN_TABLE_TD} text-xs text-slate-500`}>
+                      {formatWhen(r.createdAt)}
                     </td>
                   </tr>
-                )}
+                ))}
+                {jobData.items.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-4 py-10 text-center text-sm italic text-slate-400"
+                    >
+                      No job reports found.
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
-          </div>
+          </AdminDataTable>
           <TablePagination
             currentPage={jobPage}
-            totalItems={jobReportsData.total}
+            totalItems={jobData.total}
             pageSize={itemsPerPage}
-            onPageChange={fetchJobPage}
+            onPageChange={fetchJobs}
           />
         </div>
-      )}
+      ) : null}
 
-      {/* Drawer for Platform Issue */}
+      {activeTab === "employers" || activeTab === "workers" ? (
+        <div className="min-w-0 space-y-4">
+          <AdminDataTable mobileCards={renderUserCards(userRows.items)}>
+            {renderUserTable(userRows.items)}
+          </AdminDataTable>
+          <TablePagination
+            currentPage={userPage}
+            totalItems={userRows.total}
+            pageSize={itemsPerPage}
+            onPageChange={(page) =>
+              fetchUserReports(
+                activeTab === "employers" ? "employer" : "worker",
+                page
+              )
+            }
+          />
+        </div>
+      ) : null}
+
+      {/* Platform drawer */}
       <AdminDrawer
-        open={Boolean(selectedId)}
+        open={Boolean(selectedPlatformId)}
         onClose={() => {
-          setSelectedId(null);
-          setSelected(null);
+          setSelectedPlatformId(null);
+          setSelectedPlatform(null);
         }}
-        title={selected?.title || "Report details"}
-        description={selected ? `${selected.category.replace(/_/g, " ")} • ${prettyStatus(selected.status)}` : "Loading…"}
+        title={selectedPlatform?.title || "Report details"}
+        description={
+          selectedPlatform
+            ? `${selectedPlatform.category.replace(/_/g, " ")} • ${prettyPlatformStatus(selectedPlatform.status)}`
+            : "Loading…"
+        }
         footer={
-          selected ? (
+          selectedPlatform ? (
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveStatus("open")}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
+                onClick={() => savePlatformStatus("open")}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
               >
                 Mark open
               </button>
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveStatus("in_progress")}
-                className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-50 cursor-pointer"
+                onClick={() => savePlatformStatus("in_progress")}
+                className="rounded-xl bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-50"
               >
-                Mark in progress
+                Investigating
               </button>
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveStatus("resolved")}
-                className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50 cursor-pointer"
+                onClick={() => savePlatformStatus("resolved")}
+                className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white hover:bg-[#005c26] disabled:opacity-50"
               >
                 Resolve
               </button>
@@ -486,8 +810,8 @@ export function AdminReportsClient({
           ) : null
         }
       >
-        {!selected ? (
-          <p className="text-sm font-medium text-slate-500">Loading report…</p>
+        {!selectedPlatform ? (
+          <p className="text-sm text-slate-500">Loading report…</p>
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -496,215 +820,241 @@ export function AdminReportsClient({
                   Reporter
                 </p>
                 <p className="mt-1 text-sm font-bold text-slate-900">
-                  {selected.reporterRole}
+                  {selectedPlatform.reporterRole}
                 </p>
-                <p className="mt-1 text-xs font-mono text-slate-500">
-                  {selected.reporterId}
+                <p className="mt-1 truncate font-mono text-xs text-slate-500">
+                  {selectedPlatform.reporterId}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   Reported URL
                 </p>
-                {selected.reportedUrl ? (
+                {selectedPlatform.reportedUrl ? (
                   <a
-                    href={selected.reportedUrl}
+                    href={selectedPlatform.reportedUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-1 block break-all text-sm font-semibold text-[#006e2f] hover:underline"
+                    className="mt-1 block truncate text-sm font-semibold text-[#006e2f] hover:underline"
                   >
-                    {selected.reportedUrl}
+                    {selectedPlatform.reportedUrl}
                   </a>
                 ) : (
-                  <p className="mt-1 text-sm font-medium text-slate-600">—</p>
+                  <p className="mt-1 text-sm text-slate-600">—</p>
                 )}
               </div>
             </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Description (Markdown)
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Description
               </p>
-              <pre className="whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-800">
-                {selected.descriptionMarkdown}
-              </pre>
+              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
+                {selectedPlatform.descriptionMarkdown}
+              </p>
             </div>
-
-            {selected.evidenceStoragePath ? (
-              <div className="space-y-3 rounded-2xl border border-[#006e2f]/15 bg-[#fafdfb] p-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Screenshot evidence
-                  </p>
-                  {selected.evidenceSignedUrl ? (
-                    <a
-                      href={selected.evidenceSignedUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#006e2f] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
-                    >
-                      <ImageIcon className="h-4 w-4" aria-hidden />
-                      View attachment
-                    </a>
-                  ) : null}
-                </div>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-      {selected.evidenceSignedUrl ? (
-                    <OptimizedImage
-                      src={selected.evidenceSignedUrl}
-                      alt="Report screenshot evidence"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 640px"
-                      loading="lazy"
-                      className="object-contain p-2"
-                      containerClassName="relative aspect-video w-full max-h-80"
-                    />
-                  ) : (
-                    <p className="px-4 py-6 text-center text-sm font-medium text-amber-700">
-                      Attachment is on file but the preview could not be loaded.
-                      Try reopening this report.
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-white px-4 py-2">
-                    <p className="text-xs font-medium text-slate-500">
-                      {selected.evidenceFileSizeBytes
-                        ? `${(selected.evidenceFileSizeBytes / 1024).toFixed(0)} KB`
-                        : "Attached file"}
-                      {selected.evidenceMimeType
-                        ? ` • ${selected.evidenceMimeType}`
-                        : ""}
-                    </p>
-                    {selected.evidenceSignedUrl ? (
-                      <a
-                        href={selected.evidenceSignedUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs font-bold text-[#006e2f] hover:underline"
-                      >
-                        Open full size
-                      </a>
-                    ) : null}
-                  </div>
-                </div>
+            {selectedPlatform.evidenceSignedUrl ? (
+              <div className="overflow-hidden rounded-xl border border-slate-200">
+                <OptimizedImage
+                  src={selectedPlatform.evidenceSignedUrl}
+                  alt="Report evidence"
+                  width={640}
+                  height={400}
+                  className="h-auto w-full object-contain"
+                />
+              </div>
+            ) : selectedPlatform.evidenceStoragePath ? (
+              <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm text-slate-500">
+                <ImageIcon className="h-4 w-4" aria-hidden />
+                Evidence on file
               </div>
             ) : null}
-
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Admin notes
-              </p>
-              <AdminNotesTextarea
+            <label className="block text-sm font-semibold text-slate-700">
+              Admin notes
+              <textarea
                 value={notesDraft}
-                onChange={setNotesDraft}
-                placeholder="Enter admin notes..."
+                onChange={(e) => setNotesDraft(e.target.value)}
+                rows={4}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
-            </div>
+            </label>
           </div>
         )}
       </AdminDrawer>
 
-      {/* Drawer for Job Report */}
+      {/* Job drawer */}
       <AdminDrawer
-        open={Boolean(selectedJobReport)}
-        onClose={() => {
-          setSelectedJobReport(null);
-        }}
-        title="Job Report Details"
-        description={selectedJobReport ? `${selectedJobReport.reason}` : "Loading…"}
+        open={Boolean(selectedJob)}
+        onClose={() => setSelectedJob(null)}
+        title={selectedJob?.reason ?? "Job report"}
+        description={selectedJob?.jobTitle}
         footer={
-          selectedJobReport ? (
+          selectedJob ? (
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveJobReportStatus("PENDING")}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
+                onClick={() => saveJobStatus("PENDING")}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
               >
-                Mark Pending
+                Pending
               </button>
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveJobReportStatus("REVIEWED")}
-                className="rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] disabled:opacity-50 cursor-pointer"
+                onClick={() => saveJobStatus("REVIEWED")}
+                className="rounded-xl bg-[#006e2f] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
-                Mark Reviewed
+                Reviewed
               </button>
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => saveJobReportStatus("DISMISSED")}
-                className="rounded-xl bg-slate-500 px-4 py-2 text-xs font-bold text-white hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
+                onClick={() => saveJobStatus("DISMISSED")}
+                className="rounded-xl bg-slate-700 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
-                Dismiss Report
+                Dismiss
               </button>
             </div>
           ) : null
         }
       >
-        {!selectedJobReport ? (
-          <p className="text-sm font-medium text-slate-500">Loading report…</p>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Reporter
-                </p>
-                <p className="mt-1 text-sm font-bold text-slate-900">
-                  {selectedJobReport.reporterName}
-                </p>
-                <p className="mt-1 text-xs text-slate-500">
-                  {selectedJobReport.reporterEmail}
-                </p>
-                <p className="mt-1 text-[10px] font-mono text-slate-400">
-                  ID: {selectedJobReport.reporterId}
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Reported Job
-                </p>
-                <Link
-                  href={`/admin/jobs/${selectedJobReport.jobId}`}
-                  target="_blank"
-                  className="mt-1 block text-sm font-bold text-[#006e2f] hover:underline leading-tight"
-                >
-                  {selectedJobReport.jobTitle}
-                </Link>
-                <p className="mt-2 text-[10px] font-mono text-slate-400">
-                  Job ID: {selectedJobReport.jobId}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Reason for Reporting
-              </p>
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800">
-                {selectedJobReport.reason}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Report Description / Context
-              </p>
-              <pre className="whitespace-pre-wrap rounded-2xl border border-slate-200 bg-white p-4 text-xs font-medium text-slate-800 font-sans leading-relaxed">
-                {selectedJobReport.description}
-              </pre>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Admin Notes
-              </p>
-              <AdminNotesTextarea
+        {selectedJob ? (
+          <div className="space-y-4">
+            <StackedCell
+              primary={selectedJob.reporterName ?? "Unknown"}
+              secondary={selectedJob.reporterEmail}
+            />
+            <p className="whitespace-pre-wrap text-sm text-slate-700">
+              {selectedJob.description}
+            </p>
+            <label className="block text-sm font-semibold text-slate-700">
+              Admin notes
+              <textarea
                 value={notesDraft}
-                onChange={setNotesDraft}
-                placeholder="Enter moderation audit notes..."
+                onChange={(e) => setNotesDraft(e.target.value)}
+                rows={4}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
+            </label>
+          </div>
+        ) : null}
+      </AdminDrawer>
+
+      {/* User report drawer */}
+      <AdminDrawer
+        open={Boolean(selectedUserId)}
+        onClose={() => {
+          setSelectedUserId(null);
+          setSelectedUserReport(null);
+        }}
+        title={selectedUserReport?.title ?? "Case details"}
+        description={
+          selectedUserReport
+            ? `${USER_REPORT_VIOLATION_LABELS[selectedUserReport.violationCategory]} · ${USER_REPORT_STATUS_LABELS[selectedUserReport.status]}`
+            : "Loading…"
+        }
+        footer={
+          selectedUserReport ? (
+            <div className="flex flex-wrap gap-2">
+              {(
+                Object.keys(USER_REPORT_STATUS_LABELS) as UserReportStatus[]
+              ).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={pending}
+                  onClick={() => saveUserStatus(s)}
+                  className={`rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-50 ${
+                    s === "dismissed"
+                      ? "bg-slate-700 text-white"
+                      : s === "resolved"
+                        ? "bg-[#006e2f] text-white"
+                        : s === "investigating"
+                          ? "bg-amber-500 text-white"
+                          : "border border-slate-200 bg-white text-slate-700"
+                  }`}
+                >
+                  {USER_REPORT_STATUS_LABELS[s]}
+                </button>
+              ))}
+            </div>
+          ) : null
+        }
+      >
+        {!selectedUserReport ? (
+          <p className="text-sm text-slate-500">Loading case…</p>
+        ) : (
+          <div className="space-y-5">
+            <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+              Reporter identity is confidential. Do not disclose to the reported
+              party (RA 10173 / GDPR).
+            </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Reporter (admin only)
+                </p>
+                <p className="mt-1 truncate text-sm font-bold text-slate-900">
+                  {selectedUserReport.reporterName}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                  {selectedUserReport.reporterEmail || "—"}
+                </p>
+              </div>
+              <div className="min-w-0 rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Reported user
+                </p>
+                <p className="mt-1 truncate text-sm font-bold text-slate-900">
+                  {selectedUserReport.reportedName}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                  {selectedUserReport.reportedEmail || "—"}
+                </p>
+              </div>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                Details
+              </p>
+              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
+                {selectedUserReport.description}
+              </p>
+            </div>
+            <label className="block text-sm font-semibold text-slate-700">
+              Admin notes
+              <textarea
+                value={notesDraft}
+                onChange={(e) => setNotesDraft(e.target.value)}
+                rows={4}
+                className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <ReportRowActionsMenu
+                reportId={selectedUserReport.id}
+                reportedUserId={selectedUserReport.reportedUserId}
+                reportedLabel={selectedUserReport.reportedName}
+                reportedEmail={selectedUserReport.reportedEmail}
+                onReview={() => undefined}
+                onChanged={() => {
+                  fetchUserReports(
+                    selectedUserReport.reportedRole === "employer"
+                      ? "employer"
+                      : "worker",
+                    userPage
+                  );
+                  void getAdminUserReportById(selectedUserReport.id).then(
+                    setSelectedUserReport
+                  );
+                }}
+              />
+              <Link
+                href={`/admin/users?search=${encodeURIComponent(selectedUserReport.reportedEmail || selectedUserReport.reportedUserId)}`}
+                className="inline-flex items-center rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+              >
+                Open user in Users
+              </Link>
             </div>
           </div>
         )}
@@ -712,26 +1062,3 @@ export function AdminReportsClient({
     </div>
   );
 }
-
-// Stable top-level component defined outside the render body to prevent React unmounting/focus loss
-function AdminNotesTextarea({
-  value,
-  onChange,
-  placeholder = "Enter moderation audit notes...",
-}: {
-  value: string;
-  onChange: (val: string) => void;
-  placeholder?: string;
-}) {
-  return (
-    <textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      rows={5}
-      placeholder={placeholder}
-      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
-    />
-  );
-}
-
-

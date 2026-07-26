@@ -648,3 +648,34 @@ export function renderKycDecisionEmail(input: {
 
   return { subject, html, text };
 }
+
+/** Trust & Safety warning — never names the reporter. */
+export function renderAccountWarningEmail(input: {
+  roleLabel: string;
+  reasonSummary: string;
+  supportEmail: string;
+}): { subject: string; html: string; text: string } {
+  const subject = "Important notice about your Replaceme account";
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Our Trust &amp; Safety team reviewed a report related to your account and is issuing a formal warning. This notice does not identify who submitted the report.</p>
+    ${detailCard(`
+      ${detailRow("Account type", escapeHtml(input.roleLabel))}
+      ${detailRow("Notice", escapeHtml(input.reasonSummary))}
+    `)}
+    <p style="margin:0 0 18px 0;">Please review our Terms of Service and Community Guidelines. Further violations may result in suspension or permanent restriction of your account.</p>
+    <p style="margin:0;font-size:13px;color:${BRAND.muted};line-height:1.55;">
+      Questions? Contact
+      <a href="mailto:${escapeHtml(input.supportEmail)}" style="color:${BRAND.accent};font-weight:600;text-decoration:none;">${escapeHtml(input.supportEmail)}</a>.
+    </p>
+  `;
+
+  const { html, text } = renderEmailLayout({
+    title: "Account warning",
+    preheader: "Formal notice from Trust & Safety",
+    bodyHtml,
+    footerNote: `Support: ${input.supportEmail}`,
+  });
+
+  return { subject, html, text };
+}

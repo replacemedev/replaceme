@@ -1016,6 +1016,18 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             process requires and may seek reimbursement of compliance costs from the requesting or
             responsible user(s) under Section 9.5.
           </p>
+          <p>
+            Separately, you may submit{" "}
+            <strong className="font-semibold text-slate-800">confidential Trust &amp; Safety reports</strong>{" "}
+            (fraud, harassment, off-platform payment circumvention, wage-payment concerns, and similar
+            policy violations) through in-product reporting tools. Reports are reviewed by Platform
+            administrators. Reporter identity is kept confidential from the reported user and is not
+            disclosed in warning or enforcement notices, except where disclosure is required by law
+            or you consent. Retaliation against a good-faith reporter may itself result in
+            suspension or termination. Platform enforcement (warnings, suspensions, listing removal)
+            does not make Replaceme a party to, or guarantor of, the underlying user-to-user
+            engagement.
+          </p>
           <p className="font-semibold uppercase text-slate-800">
             CLASS ACTION WAIVER. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AND
             REPLACEME AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN AN INDIVIDUAL

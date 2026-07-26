@@ -63,7 +63,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         "/admin/users",
         "/admin/applications",
         "/admin/jobs",
-        "/admin/reports",
         "/admin/reports/email",
       ].includes(item.href)
     ),
@@ -73,6 +72,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: ADMIN_NAV_ITEMS.filter((item) =>
       [
         "/admin/identity",
+        "/admin/reports",
         "/admin/moderation",
         "/admin/disputes",
         "/admin/notifications",

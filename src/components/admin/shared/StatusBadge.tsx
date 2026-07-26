@@ -31,7 +31,17 @@ const STYLES: Record<string, string> = {
   flagged: "bg-orange-50 text-orange-700 ring-orange-600/20",
   clear: "bg-slate-50 text-slate-600 ring-slate-400/20",
   reviewed: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  dismissed: "bg-slate-150 text-slate-700 ring-slate-500/20",
+  REVIEWED: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  dismissed: "bg-slate-100 text-slate-600 ring-slate-500/20",
+  DISMISSED: "bg-slate-100 text-slate-600 ring-slate-500/20",
+  open: "bg-amber-50 text-amber-700 ring-amber-600/20",
+  Open: "bg-amber-50 text-amber-700 ring-amber-600/20",
+  in_progress: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  "In progress": "bg-blue-50 text-blue-700 ring-blue-600/20",
+  investigating: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  Investigating: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  resolved: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  Resolved: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
 };
 
 function formatLabel(value: string): string {

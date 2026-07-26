@@ -84,6 +84,11 @@ export const DATA_RETENTION_PERIODS = [
       "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by Platform administrators during that audit window",
   },
   {
+    category: "User-to-user abuse & safety reports",
+    period:
+      "Up to 24 months after case closure (resolved or dismissed), including violation category, evidence attachments, admin notes, and actor IDs—for Trust & Safety investigation, anti-retaliation, and legal defense. Reporter identity is restricted to authorized administrators and is not disclosed to the reported party except by court order or explicit reporter consent (RA 10173 / GDPR)",
+  },
+  {
     category: "Cookie consent records",
     period: "Aligned with Cookie Policy version; refreshed on consent change",
   },

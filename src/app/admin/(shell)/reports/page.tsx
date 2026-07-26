@@ -4,7 +4,7 @@ import { AdminReportsClient } from "@/components/admin/reports/AdminReportsClien
 import { getAdminReports } from "@/actions/reports";
 
 export const metadata = {
-  title: "Reports | Admin",
+  title: "Trust & Safety Reports | Admin",
 };
 
 export const dynamic = "force-dynamic";
@@ -18,8 +18,8 @@ export default async function AdminReportsPage() {
   return (
     <AdminPageShell>
       <AdminPageHeader
-        title="Reports"
-        description="Bug reports and feedback submitted from Worker and Employer portals."
+        title="Trust & Safety Reports"
+        description="Confidential moderation queue for platform issues, job flags, and user-to-user reports. Reporter identity is never disclosed to the reported party."
       />
       <AdminReportsClient initial={initial} />
     </AdminPageShell>

@@ -12,6 +12,8 @@ import {
   getOrSet,
   invalidateWorkerCache,
 } from "@/lib/server/redis-cache";
+import { rateLimitReportSubmission } from "@/lib/server/rate-limit";
+import { safeError } from "@/utils/logger";
 
 export async function getWorkerInterviews(): Promise<WorkerInterviewRow[]> {
   const ctx = await requireWorker();
@@ -78,18 +80,41 @@ export async function reportEmployer(payload: unknown) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid report" };
   }
 
-  const { error } = await ctx.supabase.from("disputes").insert({
+  const rate = await rateLimitReportSubmission(ctx.profile.id);
+  if (!rate.success) return { error: rate.error };
+
+  const { data: employer, error: employerError } = await ctx.supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", parsed.data.employerId)
+    .eq("role", "employer")
+    .maybeSingle();
+
+  if (employerError || !employer) {
+    return { error: "Employer account not found" };
+  }
+
+  if (employer.id === ctx.profile.id) {
+    return { error: "You cannot report yourself" };
+  }
+
+  const { error } = await ctx.supabase.from("user_reports").insert({
+    reporter_id: ctx.profile.id,
+    reported_user_id: employer.id,
+    job_id: parsed.data.jobId ?? null,
+    violation_category: parsed.data.violationCategory,
     title: parsed.data.title,
     description: parsed.data.description,
-    worker_id: ctx.profile.id,
-    employer_id: parsed.data.employerId ?? null,
-    job_id: parsed.data.jobId ?? null,
     status: "open",
   });
 
-  if (error) return { error: "Failed to submit report" };
+  if (error) {
+    safeError("reportEmployer insert:", error);
+    return { error: "Failed to submit report" };
+  }
 
   revalidatePath("/worker/settings");
+  revalidatePath("/admin/reports");
   return { success: true };
 }
 

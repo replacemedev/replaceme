@@ -12,6 +12,11 @@ import {
 } from "@/lib/format/currency";
 import { WorkerAccountIdentityCard } from "@/components/worker/settings/WorkerAccountIdentityCard";
 import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
+import {
+  USER_REPORT_VIOLATIONS,
+  USER_REPORT_VIOLATION_LABELS,
+  type UserReportViolation,
+} from "@/lib/reporting/constants";
 
 const SETTINGS_NAV = [
   {
@@ -66,6 +71,9 @@ export function WorkerSettingsClient({
   const [isRemote, setIsRemote] = useState(initial.isRemote);
   const [reportTitle, setReportTitle] = useState("");
   const [reportDescription, setReportDescription] = useState("");
+  const [reportEmployerId, setReportEmployerId] = useState("");
+  const [violationCategory, setViolationCategory] =
+    useState<UserReportViolation>("wage_dispute");
 
   function saveSettings(e: React.FormEvent) {
     e.preventDefault();
@@ -87,12 +95,16 @@ export function WorkerSettingsClient({
       const result = await reportEmployer({
         title: reportTitle,
         description: reportDescription,
+        employerId: reportEmployerId.trim(),
+        violationCategory,
       });
       if (result.error) toast.error(result.error);
       else {
-        toast.success("Report submitted");
+        toast.success("Report submitted confidentially");
         setReportTitle("");
         setReportDescription("");
+        setReportEmployerId("");
+        setViolationCategory("wage_dispute");
       }
     });
   }
@@ -219,9 +231,36 @@ export function WorkerSettingsClient({
               Report Employer
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-slate-500">
-              Submit a dispute or safety report. Our team will review it.
+              Submit a confidential safety or wage report. Your identity is not
+              shared with the employer.
             </p>
           </div>
+          <label className="block text-sm font-semibold text-slate-700">
+            Violation category
+            <select
+              value={violationCategory}
+              onChange={(e) =>
+                setViolationCategory(e.target.value as UserReportViolation)
+              }
+              className={inputClassName}
+            >
+              {USER_REPORT_VIOLATIONS.map((v) => (
+                <option key={v} value={v}>
+                  {USER_REPORT_VIOLATION_LABELS[v]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm font-semibold text-slate-700">
+            Employer account ID
+            <input
+              required
+              value={reportEmployerId}
+              onChange={(e) => setReportEmployerId(e.target.value)}
+              placeholder="UUID from the employer profile or contract"
+              className={inputClassName}
+            />
+          </label>
           <label className="block text-sm font-semibold text-slate-700">
             Subject
             <input

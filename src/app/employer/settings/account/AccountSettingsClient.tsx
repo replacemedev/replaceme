@@ -25,6 +25,7 @@ import { PlanFeatureChecklist } from "@/components/employer/settings/account/Pla
 import { EmployerEmailSupportCard } from "@/components/employer/settings/account/EmployerEmailSupportCard";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
+import { ReportWorkerCard } from "@/components/employer/settings/account/ReportWorkerCard";
 import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
 interface AccountSettingsClientProps {
@@ -310,6 +311,7 @@ export function AccountSettingsClient({
             latestStatus={deletionStatus}
             scheduledFor={deletionStatus?.scheduledFor}
           />
+          <ReportWorkerCard />
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}

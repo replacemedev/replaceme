@@ -192,6 +192,15 @@ export function PrivacyPolicyContent({
             soft-deleted posts off Worker boards, notify you of rejection decisions, and retain a
             limited audit trail as described in Section 9.
           </CheckItem>
+          <CheckItem label="User-to-user safety reports:">
+            When you report another user (or are reported), we process the report title,
+            description, violation category, optional job reference, and evidence. Reporter identity
+            is treated as confidential personal information under RA 10173 and GDPR principles and
+            is accessible only to authorized Trust &amp; Safety administrators—not disclosed to the
+            reported party except by court order or your explicit consent. We may send the reported
+            party a warning, suspension notice, or other enforcement message that does not name the
+            reporter.
+          </CheckItem>
         </ul>
       </RolePanel>
 
@@ -450,9 +459,10 @@ export function PrivacyPolicyContent({
           principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
           investigation requires longer retention. Hired application packets may be retained with
           employment or contract records under applicable employment and tax rules. Platform
-          administrators may access application contents and job post moderation records only for
-          Trust &amp; Safety, fraud prevention, abuse investigation, legal compliance, and
-          support—under least-privilege access controls with audit logging. Job post moderation
+          administrators may access application contents, job post moderation records, and
+          confidential user-to-user abuse reports only for Trust &amp; Safety, fraud prevention,
+          abuse investigation, legal compliance, and support—under least-privilege access controls
+          with audit logging. Job post moderation
           decisions (including reason category, optional explanation, and soft-delete metadata) are
           retained as listed in the retention table above. Soft-deleted job posts are excluded from
           public Worker boards and Employer live listings but may remain visible to Platform

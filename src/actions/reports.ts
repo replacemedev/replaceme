@@ -17,11 +17,21 @@ import {
 import { rateLimitReportSubmission } from "@/lib/server/rate-limit";
 import { safeError } from "@/utils/logger";
 
-import { REPORT_CATEGORIES, REPORT_STATUSES } from "@/lib/reporting/constants";
+import {
+  REPORT_CATEGORIES,
+  REPORT_STATUSES,
+  USER_REPORT_STATUSES,
+  USER_REPORT_VIOLATIONS,
+  type UserReportStatus,
+  type UserReportViolation,
+} from "@/lib/reporting/constants";
 import {
   normalizeReportEvidenceMime,
   validateReportEvidenceFile,
 } from "@/lib/reporting/evidence";
+import { DELETION_REQUEST_SUPPORT_EMAIL } from "@/lib/data/legal";
+import { renderAccountWarningEmail } from "@/lib/server/email/email-templates";
+import { sendTransactionalEmail } from "@/lib/server/email/mailer";
 
 const REPORT_EVIDENCE_BUCKET = "report-evidence";
 
@@ -749,6 +759,364 @@ export async function updateJobReportStatus(input: unknown) {
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");
     return ok();
+  });
+}
+
+// ─── User-to-user T&S reports ───────────────────────────────────────────────
+
+const adminUserReportsQuerySchema = z
+  .object({
+    reportedRole: z.enum(["employer", "worker"]),
+    status: z.enum(USER_REPORT_STATUSES).optional(),
+    violationCategory: z.enum(USER_REPORT_VIOLATIONS).optional(),
+    q: z.string().trim().max(120).optional(),
+    limit: z.number().int().min(10).max(100).default(25),
+    offset: z.number().int().min(0).default(0),
+  })
+  .strict();
+
+export type AdminUserReportsQuery = z.infer<typeof adminUserReportsQuerySchema>;
+
+type ProfileLite = {
+  id: string;
+  email: string | null;
+  first_name: string | null;
+  middle_name: string | null;
+  last_name: string | null;
+  role: string;
+};
+
+export type AdminUserReportRow = {
+  id: string;
+  createdAt: string;
+  status: UserReportStatus;
+  violationCategory: UserReportViolation;
+  title: string;
+  description: string;
+  adminNotes: string | null;
+  jobId: string | null;
+  reporterId: string;
+  reporterName: string;
+  reporterEmail: string;
+  reporterRole: string;
+  reportedUserId: string;
+  reportedName: string;
+  reportedEmail: string;
+  reportedRole: string;
+};
+
+function mapProfileName(p: ProfileLite | null | undefined): string {
+  if (!p) return "Unknown";
+  return formatFullName(p.first_name, p.middle_name, p.last_name) || "Unknown";
+}
+
+function asProfile(value: ProfileLite | ProfileLite[] | null): ProfileLite | null {
+  if (!value) return null;
+  return Array.isArray(value) ? (value[0] ?? null) : value;
+}
+
+export async function getAdminUserReports(input: unknown): Promise<{
+  items: AdminUserReportRow[];
+  total: number;
+} | null> {
+  try {
+    const parsed = adminUserReportsQuerySchema.parse(input);
+    const { supabase } = await requireAdmin();
+
+    let query = supabase
+      .from("user_reports")
+      .select(
+        `
+        id,
+        created_at,
+        status,
+        violation_category,
+        title,
+        description,
+        admin_notes,
+        job_id,
+        reporter_id,
+        reported_user_id,
+        reporter:profiles!user_reports_reporter_id_fkey (
+          id, email, first_name, middle_name, last_name, role
+        ),
+        reported:profiles!user_reports_reported_user_id_fkey!inner (
+          id, email, first_name, middle_name, last_name, role
+        )
+        `,
+        { count: "exact" }
+      )
+      .eq("reported.role", parsed.reportedRole)
+      .order("created_at", { ascending: false })
+      .range(parsed.offset, parsed.offset + parsed.limit - 1);
+
+    if (parsed.status) query = query.eq("status", parsed.status);
+    if (parsed.violationCategory) {
+      query = query.eq("violation_category", parsed.violationCategory);
+    }
+    if (parsed.q) {
+      const { postgrestIlikeClause } = await import(
+        "@/lib/security/postgrest-filter"
+      );
+      query = query.or(
+        [
+          postgrestIlikeClause("title", parsed.q),
+          postgrestIlikeClause("description", parsed.q),
+        ].join(",")
+      );
+    }
+
+    const { data, count, error } = await query;
+    if (error) {
+      safeError("getAdminUserReports:", error);
+      return { items: [], total: 0 };
+    }
+
+    const items: AdminUserReportRow[] = (data ?? []).map((r) => {
+      const reporter = asProfile(
+        r.reporter as ProfileLite | ProfileLite[] | null
+      );
+      const reported = asProfile(
+        r.reported as ProfileLite | ProfileLite[] | null
+      );
+
+      return {
+        id: r.id,
+        createdAt: r.created_at,
+        status: r.status as UserReportStatus,
+        violationCategory: r.violation_category as UserReportViolation,
+        title: r.title,
+        description: r.description,
+        adminNotes: r.admin_notes,
+        jobId: r.job_id,
+        reporterId: r.reporter_id,
+        reporterName: mapProfileName(reporter),
+        reporterEmail: reporter?.email ?? "",
+        reporterRole: reporter?.role ?? "",
+        reportedUserId: r.reported_user_id,
+        reportedName: mapProfileName(reported),
+        reportedEmail: reported?.email ?? "",
+        reportedRole: reported?.role ?? parsed.reportedRole,
+      };
+    });
+
+    return { items, total: count ?? 0 };
+  } catch (err) {
+    safeError("getAdminUserReports:", err);
+    return null;
+  }
+}
+
+export type AdminUserReportDeepDive = AdminUserReportRow & {
+  updatedAt: string;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+};
+
+export async function getAdminUserReportById(
+  reportId: string
+): Promise<AdminUserReportDeepDive | null> {
+  try {
+    const id = z.string().uuid().parse(reportId);
+    const { supabase } = await requireAdmin();
+
+    const { data, error } = await supabase
+      .from("user_reports")
+      .select(
+        `
+        id,
+        created_at,
+        updated_at,
+        status,
+        violation_category,
+        title,
+        description,
+        admin_notes,
+        job_id,
+        reporter_id,
+        reported_user_id,
+        reviewed_by,
+        reviewed_at,
+        reporter:profiles!user_reports_reporter_id_fkey (
+          id, email, first_name, middle_name, last_name, role
+        ),
+        reported:profiles!user_reports_reported_user_id_fkey (
+          id, email, first_name, middle_name, last_name, role
+        )
+        `
+      )
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) safeError("getAdminUserReportById:", error);
+      return null;
+    }
+
+    const reporter = asProfile(
+      data.reporter as ProfileLite | ProfileLite[] | null
+    );
+    const reported = asProfile(
+      data.reported as ProfileLite | ProfileLite[] | null
+    );
+
+    return {
+      id: data.id,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      status: data.status as UserReportStatus,
+      violationCategory: data.violation_category as UserReportViolation,
+      title: data.title,
+      description: data.description,
+      adminNotes: data.admin_notes,
+      jobId: data.job_id,
+      reporterId: data.reporter_id,
+      reporterName: mapProfileName(reporter),
+      reporterEmail: reporter?.email ?? "",
+      reporterRole: reporter?.role ?? "",
+      reportedUserId: data.reported_user_id,
+      reportedName: mapProfileName(reported),
+      reportedEmail: reported?.email ?? "",
+      reportedRole: reported?.role ?? "",
+      reviewedBy: data.reviewed_by,
+      reviewedAt: data.reviewed_at,
+    };
+  } catch (err) {
+    safeError("getAdminUserReportById:", err);
+    return null;
+  }
+}
+
+const updateUserReportSchema = z
+  .object({
+    reportId: z.string().uuid(),
+    status: z.enum(USER_REPORT_STATUSES),
+    adminNotes: z.string().trim().max(5000).optional(),
+  })
+  .strict();
+
+export async function updateUserReportStatus(input: unknown) {
+  return runAction("updateUserReportStatus", async () => {
+    const parsed = updateUserReportSchema.safeParse(input);
+    if (!parsed.success) return fail("Invalid update.");
+
+    const { supabase, user } = await requireAdmin();
+    const now = new Date().toISOString();
+
+    const update: Record<string, unknown> = {
+      status: parsed.data.status,
+      admin_notes: parsed.data.adminNotes?.trim()
+        ? parsed.data.adminNotes.trim()
+        : null,
+      updated_at: now,
+      reviewed_at: now,
+      reviewed_by: user.id,
+    };
+
+    const { error } = await supabase
+      .from("user_reports")
+      .update(update)
+      .eq("id", parsed.data.reportId);
+
+    if (error) {
+      safeError("updateUserReportStatus:", error);
+      return fail("Failed to update report.");
+    }
+
+    const { logAdminAction } = await import("@/actions/admin-actions");
+    await logAdminAction(
+      "update_user_report_status",
+      "user_report",
+      parsed.data.reportId,
+      { status: parsed.data.status }
+    );
+
+    await cacheDel(CacheKeys.adminReportsList("all"));
+    revalidatePath("/admin/reports");
+    return ok();
+  });
+}
+
+const warnUserSchema = z
+  .object({
+    userId: z.string().uuid(),
+    reportId: z.string().uuid().optional(),
+    reason: z.string().trim().min(10).max(2000),
+  })
+  .strict();
+
+/** Formal warning email — never discloses reporter identity. */
+export async function warnReportedUser(input: unknown) {
+  return runAction("warnReportedUser", async () => {
+    const parsed = warnUserSchema.safeParse(input);
+    if (!parsed.success) {
+      return fail(parsed.error.issues[0]?.message ?? "Invalid warning.");
+    }
+
+    const { user } = await requireAdmin();
+    const admin = await createAdminClient();
+
+    const { data: profile, error } = await admin
+      .from("profiles")
+      .select("id, email, role, first_name")
+      .eq("id", parsed.data.userId)
+      .maybeSingle();
+
+    if (error || !profile?.email) {
+      return fail("User not found or missing email.");
+    }
+
+    const roleLabel =
+      profile.role === "employer"
+        ? "Employer"
+        : profile.role === "worker"
+          ? "Worker"
+          : "Account";
+
+    const { subject, html, text } = renderAccountWarningEmail({
+      roleLabel,
+      reasonSummary: parsed.data.reason,
+      supportEmail: DELETION_REQUEST_SUPPORT_EMAIL,
+    });
+
+    const sendResult = await sendTransactionalEmail({
+      templateKey: "account_warning",
+      to: profile.email,
+      subject,
+      html,
+      text,
+      userId: profile.id,
+      role: profile.role as "worker" | "employer" | "admin",
+      idempotencyKey: `warn:${profile.id}:${parsed.data.reportId ?? "manual"}:${Date.now()}`,
+      tags: { kind: "trust_safety_warning" },
+    });
+
+    if (!sendResult.success) {
+      return fail(sendResult.error);
+    }
+
+    if (parsed.data.reportId) {
+      await admin
+        .from("user_reports")
+        .update({
+          admin_notes: parsed.data.reason,
+          status: "investigating",
+          reviewed_by: user.id,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", parsed.data.reportId);
+    }
+
+    const { logAdminAction } = await import("@/actions/admin-actions");
+    await logAdminAction("warn_user", "profile", parsed.data.userId, {
+      reportId: parsed.data.reportId ?? null,
+      reasonLength: parsed.data.reason.length,
+      emailSent: true,
+      messageId: sendResult.messageId,
+    });
+
+    revalidatePath("/admin/reports");
+    return ok({ emailSent: true as const });
   });
 }
 
