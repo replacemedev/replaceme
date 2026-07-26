@@ -160,6 +160,12 @@ export function PrivacyPolicyContent({
             IP address, device/browser data, logs, and approximate location derived from IP for
             security and fraud prevention.
           </CheckItem>
+          <CheckItem label="Messaging safety signals:">
+            Messages you send on the Platform may be automatically scanned for fraud, harassment,
+            and Terms violations. Human administrators review message content only when a system
+            flag, user report, legal process, or active investigation creates justified cause;
+            reviews are audit-logged under least-privilege access (RA 10173 / GDPR).
+          </CheckItem>
         </ul>
       </RolePanel>
 
@@ -197,12 +203,20 @@ export function PrivacyPolicyContent({
           </CheckItem>
           <CheckItem label="User-to-user safety reports:">
             When you report another user (or are reported), we process the report title,
-            description, violation category, optional job reference, and evidence. Reporter identity
+            description, violation category, optional job reference, optional conversation
+            reference, and evidence. Reporter identity
             is treated as confidential personal information under RA 10173 and GDPR principles and
             is accessible only to authorized Trust &amp; Safety administrators—not disclosed to the
             reported party except by court order or your explicit consent. We may send the reported
             party a warning, suspension notice, or other enforcement message that does not name the
             reporter.
+          </CheckItem>
+          <CheckItem label="Messaging safety signals:">
+            Platform messages may be automatically scanned for fraud, harassment, and Terms
+            violations (such as sharing contact details or soliciting off-platform payment). Human
+            administrators review message transcripts only when a system flag, user report, legal
+            process, or active investigation creates justified cause, and each such review is
+            audit-logged.
           </CheckItem>
         </ul>
       </RolePanel>
@@ -223,8 +237,8 @@ export function PrivacyPolicyContent({
         </CheckItem>
         <CheckItem label="Legitimate interests (balanced):">
           security, fraud prevention, product improvement using aggregated metrics, and enforcing
-          Terms—including job post moderation and employer notices—where consent is not required and
-          rights are not overridden.
+          Terms—including job post moderation, automated messaging safety signals, and employer
+          notices—where consent is not required and rights are not overridden.
         </CheckItem>
       </ul>
 
@@ -470,10 +484,18 @@ export function PrivacyPolicyContent({
           principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
           investigation requires longer retention. Hired application packets may be retained with
           employment or contract records under applicable employment and tax rules. Platform
-          administrators may access application contents, job post moderation records, and
-          confidential user-to-user abuse reports only for Trust &amp; Safety, fraud prevention,
-          abuse investigation, legal compliance, and support—under least-privilege access controls
-          with audit logging. Job post moderation
+          administrators may access application contents, job post moderation records,
+          confidential user-to-user abuse reports, and{" "}
+          <strong className="font-semibold text-slate-800">
+            messaging threads only when justified
+          </strong>{" "}
+          (system safety flags, user reports, legal process, or an active investigation)—for Trust
+          &amp; Safety, fraud prevention, abuse investigation, legal compliance, and support—under
+          least-privilege access controls with audit logging. Messages may be{" "}
+          <strong className="font-semibold text-slate-800">automatically analyzed</strong> for
+          safety and fraud signals (for example contact-information sharing or payment-circumvention
+          indicators); human moderators review message content only after such a flag, report, or
+          legal basis arises. Job post moderation
           decisions (including reason category, optional explanation, and soft-delete metadata) are
           retained as listed in the retention table above. Soft-deleted job posts are excluded from
           public Worker boards and Employer live listings but may remain visible to Platform

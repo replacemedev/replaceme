@@ -584,17 +584,34 @@ export type AdminApplicationDeepDive = {
   }>;
 };
 
-export const adminChatThreadRowSchema = z.object({
-  id: z.string().uuid(),
+export const adminChatModerationFlagRowSchema = z.object({
+  flag_id: z.string().uuid(),
+  thread_id: z.string().uuid(),
   worker_id: z.string().uuid(),
   worker_name: z.string().nullable(),
   worker_is_verified: z.boolean().catch(false),
+  employer_user_id: z.string().uuid().nullable(),
   company_name: z.string().nullable(),
   job_title: z.string().nullable(),
+  source: z.enum(["system", "user_report"]),
+  reason_code: z.enum([
+    "contact_info",
+    "payment_circumvention",
+    "harassment",
+    "scam_fraud",
+    "spam_misleading",
+    "other",
+  ]),
+  status: z.enum(["open", "investigating", "dismissed", "resolved"]),
+  flagged_message_id: z.string().uuid().nullable(),
   message_count: z.number(),
   last_message_at: z.string().nullable(),
+  created_at: z.string(),
   updated_at: z.string(),
 });
+
+/** @deprecated Use adminChatModerationFlagRowSchema — kept for transitional imports */
+export const adminChatThreadRowSchema = adminChatModerationFlagRowSchema;
 
 export const adminSubscriptionOverrideSchema = z.object({
   subscriptionId: z.string().uuid(),
@@ -629,4 +646,8 @@ export const adminIssueRefundSchema = z.object({
 export type DisputeStatus = z.infer<typeof disputeStatusSchema>;
 export type AdminDisputeRow = z.infer<typeof adminDisputeRowSchema>;
 export type AdminApplicationRow = z.infer<typeof adminApplicationRowSchema>;
-export type AdminChatThreadRow = z.infer<typeof adminChatThreadRowSchema>;
+export type AdminChatModerationFlagRow = z.infer<
+  typeof adminChatModerationFlagRowSchema
+>;
+/** @deprecated Prefer AdminChatModerationFlagRow */
+export type AdminChatThreadRow = AdminChatModerationFlagRow;

@@ -1831,67 +1831,12 @@ export async function updateDisputeStatus(
   }
 }
 
+/** @deprecated Use fetchAdminModerationFlags from messaging-moderation */
 export async function fetchAdminChatThreads(): Promise<AdminChatThreadRow[]> {
-  await requireAdmin();
-  const adminClient = await createAdminClient();
-
-  const { data: threads, error } = await adminClient
-    .from("chat_threads")
-    .select(
-      `
-      id,
-      worker_id,
-      updated_at,
-      jobs ( title ),
-      company_profiles ( company_name ),
-      profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, is_verified )
-    `
-    )
-    .order("updated_at", { ascending: false })
-    .limit(100);
-
-  if (error) throw new Error(error.message);
-  if (!threads?.length) return [];
-
-  const threadIds = threads.map((t) => t.id);
-  const { data: messages } = await adminClient
-    .from("chat_messages")
-    .select("thread_id, created_at")
-    .in("thread_id", threadIds)
-    .order("created_at", { ascending: false });
-
-  const stats = new Map<string, { count: number; last: string | null }>();
-  for (const msg of messages ?? []) {
-    const current = stats.get(msg.thread_id) ?? { count: 0, last: null };
-    current.count += 1;
-    if (!current.last) current.last = msg.created_at;
-    stats.set(msg.thread_id, current);
-  }
-
-  return threads.map((thread) => {
-    const worker = Array.isArray(thread.profiles)
-      ? thread.profiles[0]
-      : thread.profiles;
-    const company = Array.isArray(thread.company_profiles)
-      ? thread.company_profiles[0]
-      : thread.company_profiles;
-    const job = Array.isArray(thread.jobs) ? thread.jobs[0] : thread.jobs;
-    const meta = stats.get(thread.id);
-
-    return {
-      id: thread.id,
-      worker_id: thread.worker_id,
-      worker_name:
-        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
-        null,
-      worker_is_verified: Boolean(worker?.is_verified),
-      company_name: company?.company_name ?? null,
-      job_title: job?.title ?? null,
-      message_count: meta?.count ?? 0,
-      last_message_at: meta?.last ?? null,
-      updated_at: thread.updated_at,
-    };
-  });
+  const { fetchAdminModerationFlags } = await import(
+    "@/actions/admin/messaging-moderation"
+  );
+  return fetchAdminModerationFlags("active");
 }
 
 export async function adminOverrideSubscriptionUsage(

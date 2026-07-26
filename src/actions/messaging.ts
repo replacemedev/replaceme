@@ -533,15 +533,29 @@ export async function sendMessagingMessage(
       return fail(rateCheck.error);
     }
 
-    const { error: insertError } = await supabase.from("chat_messages").insert({
-      thread_id: parsed.threadId,
-      sender_id: user.id,
-      content: parsed.content,
-    });
+    const { data: inserted, error: insertError } = await supabase
+      .from("chat_messages")
+      .insert({
+        thread_id: parsed.threadId,
+        sender_id: user.id,
+        content: parsed.content,
+      })
+      .select("id")
+      .single();
 
-    if (insertError) {
+    if (insertError || !inserted) {
       return fail("Failed to send message");
     }
+
+    // Best-effort T&S auto-flag (fail-open; never blocks delivery).
+    void import("@/lib/server/messaging/content-safety").then(
+      ({ maybeFlagMessageForSafety }) =>
+        maybeFlagMessageForSafety({
+          threadId: parsed.threadId,
+          messageId: inserted.id,
+          content: parsed.content,
+        })
+    );
 
     await invalidateMessagingThreadMessages(user.id, parsed.threadId);
     if (employerId) {

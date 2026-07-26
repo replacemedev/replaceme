@@ -431,6 +431,90 @@ export type Database = {
           },
         ]
       }
+      chat_moderation_flags: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          flagged_message_id: string | null
+          id: string
+          reason_code: string
+          reporter_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          status: string
+          thread_id: string
+          updated_at: string
+          user_report_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_message_id?: string | null
+          id?: string
+          reason_code: string
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source: string
+          status?: string
+          thread_id: string
+          updated_at?: string
+          user_report_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_message_id?: string | null
+          id?: string
+          reason_code?: string
+          reporter_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          status?: string
+          thread_id?: string
+          updated_at?: string
+          user_report_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_moderation_flags_flagged_message_id_fkey"
+            columns: ["flagged_message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_user_report_id_fkey"
+            columns: ["user_report_id"]
+            isOneToOne: false
+            referencedRelation: "user_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_threads: {
         Row: {
           blocked_reason: string | null
@@ -2330,6 +2414,7 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
+          thread_id: string | null
           title: string
           updated_at: string
           violation_category: string
@@ -2348,6 +2433,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          thread_id?: string | null
           title: string
           updated_at?: string
           violation_category: string
@@ -2366,6 +2452,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          thread_id?: string | null
           title?: string
           updated_at?: string
           violation_category?: string
@@ -2404,6 +2491,13 @@ export type Database = {
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
             referencedColumns: ["id"]
           },
         ]

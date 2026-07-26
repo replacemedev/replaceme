@@ -755,7 +755,10 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         The Platform, branding, software, and content we provide are owned by Replaceme or its
         licensors. You retain ownership of content you upload (profiles, job posts, messages) and
         grant Replaceme a worldwide, non-exclusive license to host, display, and process that
-        content solely to operate and improve the Services. You must not use our marks without prior
+        content solely to operate and improve the Services—including automated safety analysis of
+        messages and, where justified by a system flag, user report, legal process, or active
+        investigation, human Trust &amp; Safety review under least-privilege access with audit
+        logging. You must not use our marks without prior
         written permission.
       </p>
 
@@ -1026,8 +1029,11 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             Separately, you may submit{" "}
             <strong className="font-semibold text-slate-800">confidential Trust &amp; Safety reports</strong>{" "}
             (fraud, harassment, off-platform payment circumvention, wage-payment concerns, and similar
-            policy violations) through in-product reporting tools. Reports are reviewed by Platform
-            administrators. Reporter identity is kept confidential from the reported user and is not
+            policy violations) through in-product reporting tools, including reporting a conversation
+            from messaging. Reports are reviewed by Platform administrators. Messages may also be
+            automatically scanned for safety and fraud signals; human review of message content occurs
+            only with justified cause (flag, report, legal process, or active investigation) and is
+            audit-logged. Reporter identity is kept confidential from the reported user and is not
             disclosed in warning or enforcement notices, except where disclosure is required by law
             or you consent. Retaliation against a good-faith reporter may itself result in
             suspension or termination. Platform enforcement (warnings, suspensions, listing removal)

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pin, MoreVertical, AlertTriangle, Trash2, MailOpen } from "lucide-react";
+import { Pin, MoreVertical, AlertTriangle, Trash2, MailOpen, Flag } from "lucide-react";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { MessagingMessage, MessagingThread } from "@/types/messaging";
@@ -11,6 +11,7 @@ import { MessagingThreadStatus } from "./MessagingThreadStatus";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { MobileChatBackButton } from "./MobileChatBackButton";
 import { VirtualizedMessageList } from "./VirtualizedMessageList";
+import { ReportConversationDialog } from "./ReportConversationDialog";
 
 interface ChatAreaProps {
   thread: MessagingThread | null;
@@ -60,6 +61,7 @@ export function ChatArea({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   if (!thread) {
     return (
@@ -194,6 +196,17 @@ export function ChatArea({
                   <MailOpen className="h-3.5 w-3.5" />
                   Mark as unread
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowReport(true);
+                  }}
+                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <Flag className="h-3.5 w-3.5" />
+                  Report conversation
+                </button>
                 <div className="h-px bg-slate-100 my-1" />
                 <button
                   type="button"
@@ -308,6 +321,11 @@ export function ChatArea({
           </div>
         </div>
       )}
+      <ReportConversationDialog
+        open={showReport}
+        threadId={thread.id}
+        onClose={() => setShowReport(false)}
+      />
     </section>
   );
 }

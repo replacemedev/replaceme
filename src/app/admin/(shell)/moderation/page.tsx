@@ -1,24 +1,36 @@
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminPageShell } from "@/components/admin/layout";
 import { ModerationClient } from "@/components/admin/moderation/ModerationClient";
-import { fetchAdminChatThreads } from "@/actions/admin-actions";
+import { fetchAdminModerationFlags } from "@/actions/admin/messaging-moderation";
 
 export const metadata = {
-  title: "Moderation | Admin",
+  title: "Messaging Trust & Safety | Admin",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminModerationPage() {
-  const threads = await fetchAdminChatThreads();
+  // Load full set so client filters work without refetch; queue is flag-gated.
+  const [active, dismissed, resolved] = await Promise.all([
+    fetchAdminModerationFlags("active"),
+    fetchAdminModerationFlags("dismissed"),
+    fetchAdminModerationFlags("resolved"),
+  ]);
+
+  const seen = new Set<string>();
+  const flags = [...active, ...dismissed, ...resolved].filter((f) => {
+    if (seen.has(f.flag_id)) return false;
+    seen.add(f.flag_id);
+    return true;
+  });
 
   return (
     <AdminPageShell>
       <AdminPageHeader
-        title="Messaging Moderation"
-        description="Oversight of worker–employer chat threads across the platform."
+        title="Messaging Trust & Safety"
+        description="Review only conversations that were auto-flagged for safety signals or reported by a user. Opening a thread is audit-logged."
       />
-      <ModerationClient threads={threads} />
+      <ModerationClient flags={flags} />
     </AdminPageShell>
   );
 }

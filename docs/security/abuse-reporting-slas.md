@@ -16,6 +16,7 @@ Covers product abuse reports (platform issues, job reports, user-to-user reports
 | Job report modal | Job Reports | Worker → job |
 | Worker “Report Employer” | Employer Reports | Confidential; `user_reports` |
 | Employer “Report Worker” | Worker Reports | Confidential; `user_reports` |
+| Messaging auto-flags / “Report conversation” | `/admin/moderation` | Flagged-only queue; human review audit-logged (`chat_moderation_flags`) |
 | Email / contact form | Triage → Reports or legal | Escalate if illegal content / threats |
 | Legacy disputes | `/admin/disputes` | Historical wage/mediation rows |
 | Stripe disputes | Admin billing | Parallel path; not this SLA |
