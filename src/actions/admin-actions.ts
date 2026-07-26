@@ -134,6 +134,10 @@ export async function logAdminAction(
   const ip = await getClientIp();
   // Service-role insert so audit logging cannot fail the mutation due to RLS edge cases.
   const admin = await createAdminClient();
+  const { resolveAuditActorSnapshot } = await import(
+    "@/lib/server/audit/resolve-actor"
+  );
+  const actor = await resolveAuditActorSnapshot(user.id, "admin");
 
   const { error } = await admin.from("audit_logs").insert({
     admin_id: user.id,
@@ -142,6 +146,9 @@ export async function logAdminAction(
     target_id: targetId ?? null,
     metadata: (metadata ?? {}) as Json,
     ip_address: ip,
+    actor_email: actor.actorEmail,
+    actor_display_name: actor.actorDisplayName,
+    actor_type: actor.actorType,
   });
 
   if (error) throw new Error(`Failed to log admin action: ${error.message}`);
@@ -1684,43 +1691,216 @@ export async function fetchAdminSubscriptions(): Promise<
   });
 }
 
-export async function fetchAuditLogs(limit = 100): Promise<AdminAuditLogRow[]> {
-  const { supabase } = await requireAdminCapability("audit_log");
+export type FetchAuditLogsFilters = {
+  search?: string;
+  actionType?: string;
+  from?: string;
+  to?: string;
+};
 
-  const { data, error } = await supabase
+export async function fetchAuditLogs(
+  limit = 100,
+  filters: FetchAuditLogsFilters = {}
+): Promise<AdminAuditLogRow[]> {
+  await requireAdminCapability("audit_log");
+  const adminClient = await createAdminClient();
+
+  let query = adminClient
     .from("audit_logs")
     .select(
-      "id, action_type, target_type, target_id, metadata, ip_address, created_at, admin_id"
+      "id, action_type, target_type, target_id, metadata, ip_address, created_at, admin_id, actor_email, actor_display_name, actor_type"
     )
     .order("created_at", { ascending: false })
-    .limit(limit);
+    .limit(Math.min(Math.max(limit, 1), 1000));
 
+  if (filters.actionType && filters.actionType !== "all") {
+    query = query.eq("action_type", filters.actionType);
+  }
+  if (filters.from) {
+    query = query.gte("created_at", `${filters.from}T00:00:00.000Z`);
+  }
+  if (filters.to) {
+    query = query.lte("created_at", `${filters.to}T23:59:59.999Z`);
+  }
+
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  const adminIds = [...new Set((data ?? []).map((r) => r.admin_id))];
-  const emailById = new Map<string, string>();
+  let rows = data ?? [];
+  const search = filters.search?.trim().toLowerCase();
+  if (search) {
+    rows = rows.filter((row) => {
+      const hay = [
+        row.action_type,
+        row.target_type,
+        row.target_id,
+        row.actor_email,
+        row.actor_display_name,
+        row.ip_address,
+        typeof row.admin_id === "string" ? row.admin_id : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  return enrichAuditLogRows(rows);
+}
+
+type AuditLogDbRow = {
+  id: string;
+  action_type: string;
+  target_type: string | null;
+  target_id: string | null;
+  metadata: Json | null;
+  ip_address: unknown;
+  created_at: string;
+  admin_id: string | null;
+  actor_email?: string | null;
+  actor_display_name?: string | null;
+  actor_type?: string | null;
+};
+
+async function enrichAuditLogRows(
+  rows: AuditLogDbRow[]
+): Promise<AdminAuditLogRow[]> {
+  if (rows.length === 0) return [];
+
+  const adminClient = await createAdminClient();
+  const adminIds = [
+    ...new Set(
+      rows
+        .map((r) => r.admin_id)
+        .filter((id): id is string => typeof id === "string" && id.length > 0)
+    ),
+  ];
+
+  type ActorLive = {
+    email: string | null;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
+  const actorById = new Map<string, ActorLive>();
 
   if (adminIds.length > 0) {
-    const { data: admins } = await supabase
-      .from("profiles")
-      .select("id, email")
-      .in("id", adminIds);
+    const [{ data: profiles }, { data: adminProfiles }] = await Promise.all([
+      adminClient
+        .from("profiles")
+        .select("id, email, first_name, middle_name, last_name, avatar_url")
+        .in("id", adminIds),
+      adminClient
+        .from("admin_profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", adminIds),
+    ]);
 
-    for (const admin of admins ?? []) {
-      if (admin.email) emailById.set(admin.id, admin.email);
+    const metaById = new Map(
+      (adminProfiles ?? []).map((m) => [m.user_id, m] as const)
+    );
+
+    for (const p of profiles ?? []) {
+      const meta = metaById.get(p.id);
+      const fullName = formatFullName(p.first_name, p.middle_name, p.last_name);
+      actorById.set(p.id, {
+        email: p.email ?? null,
+        displayName:
+          meta?.display_name?.trim() ||
+          fullName.trim() ||
+          p.email ||
+          null,
+        avatarUrl: p.avatar_url ?? meta?.avatar_url ?? null,
+      });
     }
   }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    action_type: row.action_type,
-    target_type: row.target_type,
-    target_id: row.target_id,
-    metadata: row.metadata as Record<string, unknown> | null,
-    ip_address: row.ip_address,
-    created_at: row.created_at,
-    admin_email: emailById.get(row.admin_id) ?? null,
-  }));
+  // Batch-resolve profile targets for nicer labels / correct worker vs employer links
+  const profileTargetIds = [
+    ...new Set(
+      rows
+        .filter(
+          (r) =>
+            r.target_id &&
+            (r.target_type === "profile" ||
+              r.target_type === "user" ||
+              r.target_type === "worker")
+        )
+        .map((r) => r.target_id as string)
+    ),
+  ];
+  const targetProfileById = new Map<
+    string,
+    { name: string | null; role: "worker" | "employer" | null }
+  >();
+
+  if (profileTargetIds.length > 0) {
+    const { data: targets } = await adminClient
+      .from("profiles")
+      .select("id, first_name, middle_name, last_name, email, role")
+      .in("id", profileTargetIds);
+    for (const t of targets ?? []) {
+      const name =
+        formatFullName(t.first_name, t.middle_name, t.last_name).trim() ||
+        t.email ||
+        null;
+      const role =
+        t.role === "employer"
+          ? "employer"
+          : t.role === "worker"
+            ? "worker"
+            : null;
+      targetProfileById.set(t.id, { name, role });
+    }
+  }
+
+  const { resolveAuditTarget } = await import("@/lib/admin/audit-target");
+
+  return rows.map((row) => {
+    const live = row.admin_id ? actorById.get(row.admin_id) : undefined;
+    const actorTypeRaw = row.actor_type;
+    const actorType =
+      actorTypeRaw === "admin" ||
+      actorTypeRaw === "worker" ||
+      actorTypeRaw === "system"
+        ? actorTypeRaw
+        : row.admin_id
+          ? "admin"
+          : "system";
+
+    const actorEmail = live?.email ?? row.actor_email ?? null;
+    const actorDisplayName =
+      live?.displayName ??
+      row.actor_display_name ??
+      (actorType === "system" ? "System" : actorType === "worker" ? "Worker" : null);
+
+    const targetMeta =
+      row.target_id && targetProfileById.has(row.target_id)
+        ? targetProfileById.get(row.target_id)!
+        : null;
+    const resolved = resolveAuditTarget(row.target_type, row.target_id, {
+      displayName: targetMeta?.name ?? null,
+      role: targetMeta?.role ?? null,
+    });
+
+    return {
+      id: row.id,
+      action_type: row.action_type,
+      target_type: row.target_type,
+      target_id: row.target_id,
+      metadata: row.metadata as Record<string, unknown> | null,
+      ip_address: typeof row.ip_address === "string" ? row.ip_address : null,
+      created_at: row.created_at,
+      admin_id: row.admin_id,
+      admin_email: actorEmail,
+      actor_email: actorEmail,
+      actor_display_name: actorDisplayName,
+      actor_avatar_url: live?.avatarUrl ?? null,
+      actor_type: actorType,
+      target_label: resolved.label,
+      target_href: resolved.href,
+    };
+  });
 }
 
 export async function fetchAdminDisputes(

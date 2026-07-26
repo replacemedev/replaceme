@@ -390,7 +390,15 @@ export interface AdminAuditLogRow {
   metadata: Record<string, unknown> | null;
   ip_address: string | null;
   created_at: string;
+  admin_id: string | null;
+  /** @deprecated Prefer actor_email — kept for older callers. */
   admin_email: string | null;
+  actor_email: string | null;
+  actor_display_name: string | null;
+  actor_avatar_url: string | null;
+  actor_type: "admin" | "worker" | "system";
+  target_label: string | null;
+  target_href: string | null;
 }
 
 export const suspendUserSchema = z.object({

@@ -485,7 +485,11 @@ export function PrivacyPolicyContent({
           (who receive module capabilities—such as Trust &amp; Safety queues, Users, or Billing—granted
           by a Super administrator). Access is MFA-gated, capability-scoped, and audit-logged,
           consistent with RA 10173 / NPC Circular No. 2023-06 least-privilege and access-control
-          requirements and GDPR accountability principles. Staff work email, optional internal
+          requirements and GDPR accountability principles. Privileged staff actions and sensitive-data
+          access (including identity-document views) are written to an append-only audit log with
+          actor identity, timestamp, target, and source context; authorized administrators with the
+          Audit Log capability may filter and export CSV evidence for compliance reviews. Staff work
+          email, optional internal
           profile photo, department, timezone, short bio, MFA metadata, and action audit logs are
           processed as employment/contractor operational data and retained with security/audit
           logs (see retention table). By default staff photos and bios are for admin-team identity

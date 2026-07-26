@@ -67,6 +67,10 @@ async function logDeniedCapability(
   try {
     const ip = await clientIp();
     const admin = await createAdminClient();
+    const { resolveAuditActorSnapshot } = await import(
+      "@/lib/server/audit/resolve-actor"
+    );
+    const actor = await resolveAuditActorSnapshot(userId, "admin");
     await admin.from("audit_logs").insert({
       admin_id: userId,
       action_type: "capability_denied",
@@ -74,6 +78,9 @@ async function logDeniedCapability(
       target_id: userId,
       metadata: { capability } as Json,
       ip_address: ip,
+      actor_email: actor.actorEmail,
+      actor_display_name: actor.actorDisplayName,
+      actor_type: actor.actorType,
     });
   } catch (err) {
     safeError("[Auth] capability_denied audit failed:", err);

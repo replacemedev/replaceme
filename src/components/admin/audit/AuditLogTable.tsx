@@ -1,20 +1,63 @@
 "use client";
 
 import { useState } from "react";
-import { ScrollText } from "lucide-react";
+import Link from "next/link";
+import { ScrollText, UserRound } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
-import type { AdminAuditLogRow } from "@/types/admin.types";
+import {
+  AdminDataTable,
+  AdminMobileCard,
+  ADMIN_TABLE_HEAD,
+  ADMIN_TABLE_ROW,
+  ADMIN_TABLE_TD,
+  ADMIN_TABLE_TH,
+} from "@/components/admin/shared/AdminDataTable";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { formatAuditAction } from "@/lib/admin/audit-target";
+import type { AdminAuditLogRow } from "@/types/admin.types";
 
 interface AuditLogTableProps {
   logs: AdminAuditLogRow[];
 }
 
-function formatAction(action: string): string {
-  return action
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+function ActorCell({ log }: { log: AdminAuditLogRow }) {
+  const name =
+    log.actor_display_name ??
+    log.admin_email ??
+    (log.actor_type === "system"
+      ? "System"
+      : log.actor_type === "worker"
+        ? "Worker"
+        : "Unknown admin");
+
+  return (
+    <div className="flex items-center gap-2.5 min-w-0 max-w-[220px]">
+      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+        {log.actor_avatar_url ? (
+          <AvatarImage
+            src={log.actor_avatar_url}
+            alt=""
+            initials={name.slice(0, 2)}
+            size="xs"
+          />
+        ) : (
+          <span className="flex h-full w-full items-center justify-center text-slate-400">
+            <UserRound className="h-3.5 w-3.5" aria-hidden />
+          </span>
+        )}
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold text-slate-800">{name}</p>
+        {log.actor_email || log.admin_email ? (
+          <p className="truncate text-[11px] text-slate-400">
+            {log.actor_email ?? log.admin_email}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
 }
 
 export function AuditLogTable({ logs }: AuditLogTableProps) {
@@ -38,58 +81,94 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
   const paginatedLogs = logs.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 min-w-0">
       <div className="flex items-center justify-between gap-3">
         <AdminSectionLabel>Event log</AdminSectionLabel>
         <span className="rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-bold text-[#006e2f]">
           {logs.length} entries
         </span>
       </div>
-      <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+
+      <AdminDataTable
+        mobileCards={paginatedLogs.map((log) => (
+          <AdminMobileCard key={log.id}>
+            <div className="flex items-start justify-between gap-3 min-w-0">
+              <ActorCell log={log} />
+              <time className="shrink-0 text-[10px] text-slate-400 whitespace-nowrap">
+                {new Date(log.created_at).toLocaleString()}
+              </time>
+            </div>
+            <p className="text-sm font-semibold text-slate-900">
+              {formatAuditAction(log.action_type)}
+            </p>
+            {log.target_href ? (
+              <Link
+                href={log.target_href}
+                className="block truncate text-xs font-medium text-[#006e2f] hover:underline min-w-0"
+              >
+                {log.target_label ?? "—"}
+              </Link>
+            ) : (
+              <p className="truncate text-xs text-slate-500 min-w-0">
+                {log.target_label ?? "—"}
+              </p>
+            )}
+          </AdminMobileCard>
+        ))}
+      >
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              <th className="px-4 py-3 text-left whitespace-nowrap">Timestamp</th>
-              <th className="px-4 py-3 text-left whitespace-nowrap">Admin</th>
-              <th className="px-4 py-3 text-left whitespace-nowrap">Action</th>
-              <th className="px-4 py-3 text-left whitespace-nowrap">Target</th>
-              <th className="px-4 py-3 text-left whitespace-nowrap">IP</th>
+            <tr className={ADMIN_TABLE_HEAD}>
+              <th className={ADMIN_TABLE_TH}>Timestamp</th>
+              <th className={ADMIN_TABLE_TH}>Admin</th>
+              <th className={ADMIN_TABLE_TH}>Action</th>
+              <th className={ADMIN_TABLE_TH}>Target</th>
+              <th className={ADMIN_TABLE_TH}>IP</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {paginatedLogs.map((log) => (
-              <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-4 py-3 text-left text-xs text-slate-500 whitespace-nowrap">
+              <tr key={log.id} className={ADMIN_TABLE_ROW}>
+                <td
+                  className={`${ADMIN_TABLE_TD} text-left text-xs text-slate-500 whitespace-nowrap`}
+                >
                   {new Date(log.created_at).toLocaleString()}
                 </td>
-                <td className="px-4 py-3 text-left text-xs text-slate-600">
-                  {log.admin_email ?? "—"}
+                <td className={ADMIN_TABLE_TD}>
+                  <ActorCell log={log} />
                 </td>
-                <td className="px-4 py-3 text-left font-semibold text-slate-800 text-xs">
-                  {formatAction(log.action_type)}
+                <td
+                  className={`${ADMIN_TABLE_TD} text-left font-semibold text-slate-800 text-xs`}
+                >
+                  {formatAuditAction(log.action_type)}
                 </td>
-                <td className="px-4 py-3 text-left text-xs text-slate-500">
-                  {log.target_type ? (
-                    <>
-                      <span className="text-slate-400">{log.target_type}</span>
-                      {log.target_id ? (
-                        <span className="block font-mono truncate max-w-[180px]">
-                          {log.target_id}
-                        </span>
-                      ) : null}
-                    </>
+                <td className={`${ADMIN_TABLE_TD} text-left text-xs min-w-0`}>
+                  {log.target_href ? (
+                    <Link
+                      href={log.target_href}
+                      className="block truncate max-w-[200px] font-medium text-[#006e2f] hover:underline"
+                    >
+                      {log.target_label ?? "—"}
+                    </Link>
                   ) : (
-                    "—"
+                    <span className="block truncate max-w-[200px] text-slate-500">
+                      {log.target_label ?? "—"}
+                    </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-left text-xs font-mono text-slate-400">
-                  {log.ip_address ?? "—"}
+                <td
+                  className={`${ADMIN_TABLE_TD} text-left text-xs font-mono text-slate-400 max-w-[120px]`}
+                >
+                  <span className="block truncate min-w-0">
+                    {log.ip_address ?? "—"}
+                  </span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </AdminDataTable>
+
       <TablePagination
         currentPage={activePage}
         totalItems={totalItems}

@@ -19,7 +19,7 @@ Platform identity remains JWT `app_metadata.role = admin` + MFA (AAL2). Tier and
 | `users`, `applications`, `jobs` | Off | Operations |
 | `identity`, `reports`, `moderation`, `disputes`, `notifications` | On | Trust & Safety need-to-know |
 | `billing` | Off | Revenue |
-| `audit_log`, `security` | Off | Platform |
+| `audit_log`, `security` | Off | Platform — audit_log is read + CSV export only; rows are append-only |
 | `settings` | On | Self profile (photo, contact) + account security |
 | `team`, `email` | Never | Super admin only |
 

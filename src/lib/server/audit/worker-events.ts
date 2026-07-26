@@ -21,6 +21,7 @@ export async function emitWorkerAuditLog(
     actionType,
     targetType: "worker",
     targetId: workerId,
+    actorType: "worker",
     metadata: { actor_id: workerId, ...metadata },
   });
 }

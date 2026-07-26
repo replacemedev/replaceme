@@ -2,6 +2,10 @@ import { createAdminClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 import { headers } from "next/headers";
 import { safeError } from "@/utils/logger";
+import {
+  resolveAuditActorSnapshot,
+  type AuditActorType,
+} from "@/lib/server/audit/resolve-actor";
 
 /**
  * Security / product audit helper using the service role so worker and auth
@@ -15,6 +19,7 @@ export async function emitAuditLog(params: {
   metadata?: Record<string, unknown>;
   /** Admin user id when the actor is an admin; otherwise null. */
   adminId?: string | null;
+  actorType?: AuditActorType;
 }): Promise<void> {
   try {
     const headerStore = await headers();
@@ -22,6 +27,19 @@ export async function emitAuditLog(params: {
       headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       headerStore.get("x-real-ip") ??
       null;
+
+    const fallbackType: AuditActorType =
+      params.actorType ??
+      (params.adminId
+        ? "admin"
+        : params.actionType.startsWith("worker.")
+          ? "worker"
+          : "system");
+
+    const actor = await resolveAuditActorSnapshot(
+      params.adminId,
+      fallbackType
+    );
 
     const admin = await createAdminClient();
     const { error } = await admin.from("audit_logs").insert({
@@ -31,6 +49,9 @@ export async function emitAuditLog(params: {
       target_id: params.targetId ?? null,
       metadata: (params.metadata ?? {}) as Json,
       ip_address: ip,
+      actor_email: actor.actorEmail,
+      actor_display_name: actor.actorDisplayName,
+      actor_type: actor.actorType,
     });
 
     if (error) {

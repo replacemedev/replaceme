@@ -225,6 +225,9 @@ export type Database = {
         Row: {
           action_type: string
           admin_id: string | null
+          actor_display_name: string | null
+          actor_email: string | null
+          actor_type: string
           created_at: string
           id: string
           ip_address: unknown
@@ -235,6 +238,9 @@ export type Database = {
         Insert: {
           action_type: string
           admin_id?: string | null
+          actor_display_name?: string | null
+          actor_email?: string | null
+          actor_type?: string
           created_at?: string
           id?: string
           ip_address?: unknown
@@ -245,6 +251,9 @@ export type Database = {
         Update: {
           action_type?: string
           admin_id?: string | null
+          actor_display_name?: string | null
+          actor_email?: string | null
+          actor_type?: string
           created_at?: string
           id?: string
           ip_address?: unknown

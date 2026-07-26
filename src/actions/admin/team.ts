@@ -242,7 +242,7 @@ export async function fetchAdminTeamActivity(
     const { data, error } = await supabase
       .from("audit_logs")
       .select(
-        "id, action_type, target_type, target_id, metadata, ip_address, created_at, admin_id"
+        "id, action_type, target_type, target_id, metadata, ip_address, created_at, admin_id, actor_email, actor_display_name, actor_type"
       )
       .in("action_type", [...TEAM_AUDIT_ACTIONS])
       .order("created_at", { ascending: false })
@@ -259,30 +259,78 @@ export async function fetchAdminTeamActivity(
           .filter((id): id is string => typeof id === "string" && id.length > 0)
       ),
     ];
-    const emailById = new Map<string, string>();
+
+    type LiveActor = {
+      email: string | null;
+      displayName: string | null;
+      avatarUrl: string | null;
+    };
+    const actorById = new Map<string, LiveActor>();
 
     if (adminIds.length > 0) {
-      const { data: admins } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .in("id", adminIds);
-
-      for (const admin of admins ?? []) {
-        if (admin.email) emailById.set(admin.id, admin.email);
+      const [{ data: profiles }, { data: adminProfiles }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, email, first_name, middle_name, last_name, avatar_url")
+          .in("id", adminIds),
+        supabase
+          .from("admin_profiles")
+          .select("user_id, display_name, avatar_url")
+          .in("user_id", adminIds),
+      ]);
+      const metaById = new Map(
+        (adminProfiles ?? []).map((m) => [m.user_id, m] as const)
+      );
+      for (const p of profiles ?? []) {
+        const meta = metaById.get(p.id);
+        const fullName = [p.first_name, p.middle_name, p.last_name]
+          .filter(Boolean)
+          .join(" ");
+        actorById.set(p.id, {
+          email: p.email ?? null,
+          displayName:
+            meta?.display_name?.trim() || fullName.trim() || p.email || null,
+          avatarUrl: p.avatar_url ?? meta?.avatar_url ?? null,
+        });
       }
     }
 
-    const logs: AdminAuditLogRow[] = (data ?? []).map((row) => ({
-      id: row.id,
-      action_type: row.action_type,
-      target_type: row.target_type,
-      target_id: row.target_id,
-      metadata: row.metadata as Record<string, unknown> | null,
-      ip_address:
-        typeof row.ip_address === "string" ? row.ip_address : null,
-      created_at: row.created_at,
-      admin_email: row.admin_id ? emailById.get(row.admin_id) ?? null : null,
-    }));
+    const { resolveAuditTarget } = await import("@/lib/admin/audit-target");
+
+    const logs: AdminAuditLogRow[] = (data ?? []).map((row) => {
+      const live = row.admin_id ? actorById.get(row.admin_id) : undefined;
+      const actorEmail = live?.email ?? row.actor_email ?? null;
+      const actorDisplayName =
+        live?.displayName ?? row.actor_display_name ?? null;
+      const actorType =
+        row.actor_type === "admin" ||
+        row.actor_type === "worker" ||
+        row.actor_type === "system"
+          ? row.actor_type
+          : row.admin_id
+            ? "admin"
+            : "system";
+      const resolved = resolveAuditTarget(row.target_type, row.target_id);
+
+      return {
+        id: row.id,
+        action_type: row.action_type,
+        target_type: row.target_type,
+        target_id: row.target_id,
+        metadata: row.metadata as Record<string, unknown> | null,
+        ip_address:
+          typeof row.ip_address === "string" ? row.ip_address : null,
+        created_at: row.created_at,
+        admin_id: row.admin_id,
+        admin_email: actorEmail,
+        actor_email: actorEmail,
+        actor_display_name: actorDisplayName,
+        actor_avatar_url: live?.avatarUrl ?? null,
+        actor_type: actorType,
+        target_label: resolved.label,
+        target_href: resolved.href,
+      };
+    });
 
     return { success: true, data: logs };
   } catch (err) {

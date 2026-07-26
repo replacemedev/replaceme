@@ -76,7 +76,8 @@ export const DATA_RETENTION_PERIODS = [
   },
   {
     category: "Security / audit logs",
-    period: "Up to 24 months for fraud prevention and incident response",
+    period:
+      "Up to 24 months for fraud prevention, incident response, and SOC 2 / GDPR accountability evidence. Entries are append-only (staff cannot alter or erase them via the admin portal). Actor identity, action, target, timestamp, and source IP are retained; longer under legal hold",
   },
   {
     category: "Admin in-app notifications (Identity / Moderation / Billing / System)",
