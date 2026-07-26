@@ -33,11 +33,14 @@ export type AdminEmailMessageRow = {
   kind: "transactional" | "broadcast";
   subject: string | null;
   to_email: string | null;
+  user_id: string | null;
   role: "worker" | "employer" | "admin" | null;
   tier_slug: "discovery" | "starter" | "growth" | "scale" | null;
   status: string;
   provider_message_id: string | null;
   provider_broadcast_id: string | null;
+  template_key: string | null;
+  tags: Record<string, unknown> | null;
   created_at: string;
   last_event_at: string | null;
 };
@@ -59,7 +62,7 @@ export async function listEmailMessages(
   let query = admin
     .from("email_messages")
     .select(
-      "id, kind, subject, to_email, role, tier_slug, status, provider_message_id, provider_broadcast_id, created_at, last_event_at"
+      "id, kind, subject, to_email, user_id, role, tier_slug, status, provider_message_id, provider_broadcast_id, template_key, created_at, last_event_at, tags"
     )
     .order("created_at", { ascending: false })
     .limit(parsed.limit);

@@ -1114,6 +1114,134 @@ export type Database = {
           },
         ]
       }
+      email_template_settings: {
+        Row: {
+          enabled: boolean
+          template_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          template_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          template_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_announcements: {
+        Row: {
+          audience: string
+          body: string | null
+          created_at: string
+          created_by: string | null
+          cta_href: string | null
+          cta_label: string | null
+          enabled: boolean
+          ends_at: string | null
+          feature_key: string
+          id: string
+          requires_early_access: boolean
+          starts_at: string | null
+          status: string
+          summary: string
+          teaser_summary: string | null
+          teaser_title: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audience?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_href?: string | null
+          cta_label?: string | null
+          enabled?: boolean
+          ends_at?: string | null
+          feature_key: string
+          id?: string
+          requires_early_access?: boolean
+          starts_at?: string | null
+          status?: string
+          summary: string
+          teaser_summary?: string | null
+          teaser_title?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_href?: string | null
+          cta_label?: string | null
+          enabled?: boolean
+          ends_at?: string | null
+          feature_key?: string
+          id?: string
+          requires_early_access?: boolean
+          starts_at?: string | null
+          status?: string
+          summary?: string
+          teaser_summary?: string | null
+          teaser_title?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      announcement_dismissals: {
+        Row: {
+          announcement_id: string
+          dismissed_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          dismissed_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          dismissed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_dismissals_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "product_announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_dismissals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employer_credits: {
         Row: {
           created_at: string
@@ -3344,6 +3472,7 @@ export type Database = {
         | "messaging"
         | "resume"
         | "identity"
+        | "early_access"
       interview_status: "scheduled" | "completed" | "cancelled" | "no_show"
       user_role: "employer" | "worker" | "admin"
       verification_status:
@@ -3501,6 +3630,7 @@ export const Constants = {
         "messaging",
         "resume",
         "identity",
+        "early_access",
       ],
       interview_status: ["scheduled", "completed", "cancelled", "no_show"],
       user_role: ["employer", "worker", "admin"],

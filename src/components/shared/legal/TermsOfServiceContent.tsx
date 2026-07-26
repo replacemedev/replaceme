@@ -339,8 +339,14 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
               </li>
               <li>
                 <strong className="font-semibold text-slate-800">Scale</strong> — approximately
-                USD&nbsp;79 / month: highest-capacity hiring tools with instant job-post publication
-                for growing teams.
+                USD&nbsp;79 / month: highest-capacity hiring tools with instant job-post publication,
+                priority support, and{" "}
+                <strong className="font-semibold text-slate-800">
+                  Early Access to New Features
+                </strong>{" "}
+                while that benefit is active. Early Access features may be paused, modified, or
+                later rolled out to other plans; other tiers may see in-dashboard teasers but cannot
+                use gated Early Access features until they upgrade (or until a feature graduates).
               </li>
             </ul>
             <p>

@@ -7,7 +7,8 @@ export type EntitlementFeature =
   | "job_limit"
   | "applicant_cap"
   | "priority_listing"
-  | "priority_support";
+  | "priority_support"
+  | "early_access";
 
 export const TIER_PRICES: Record<SubscriptionTier, number> = {
   discovery: 0,
@@ -85,6 +86,9 @@ export function suggestedUpgradeTier(
     feature === "identity"
   ) {
     return slug === "discovery" ? "starter" : UPGRADE_PATH[slug] ?? "starter";
+  }
+  if (feature === "early_access" || feature === "priority_support") {
+    return "scale";
   }
   return UPGRADE_PATH[slug] ?? "starter";
 }
@@ -165,6 +169,15 @@ export function featureGateCopy(
         title: "Upgrade to Scale",
         description:
           "Unlimited jobs and applicants, plus priority support for teams managing active contracts and payroll.",
+        tier: "scale",
+        price: TIER_PRICES.scale,
+        tierLabel: TIER_LABELS.scale,
+      };
+    case "early_access":
+      return {
+        title: "Early Access on Scale",
+        description:
+          "Try new hiring features first with Scale — Early Access to New Features. Upgrade to unlock, or wait until they roll out to all plans.",
         tier: "scale",
         price: TIER_PRICES.scale,
         tierLabel: TIER_LABELS.scale,

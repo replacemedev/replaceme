@@ -17,7 +17,9 @@ import { JobCard } from "@/components/employer/JobCard";
 import { RecentApplicantRow } from "@/components/employer/RecentApplicantRow";
 import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { DashboardOnboardedBanner } from "@/components/employer/dashboard/DashboardOnboardedBanner";
+import { EmployerAnnouncementBanner } from "@/components/employer/dashboard/EmployerAnnouncementBanner";
 import { DashboardPoller } from "@/components/employer/dashboard/DashboardPoller";
+import { getActiveEmployerAnnouncement } from "@/actions/admin/announcements";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
@@ -60,13 +62,14 @@ export default async function EmployerDashboard() {
     formatFullName(profile.first_name, profile.middle_name, profile.last_name) ||
     "Employer";
 
-  const [jobs, recentApplicants, planUsage, interviews, hiredData] =
+  const [jobs, recentApplicants, planUsage, interviews, hiredData, announcement] =
     await Promise.all([
       getRecentJobs(profile.id),
       getRecentApplicants(profile.id),
       getEmployerPlanUsage(),
       getEmployerInterviews(),
       getHiredData(),
+      getActiveEmployerAnnouncement().catch(() => null),
     ]);
 
   const messagingEnabled = planUsage?.messagingEnabled ?? false;
@@ -139,6 +142,10 @@ export default async function EmployerDashboard() {
       <Suspense fallback={null}>
         <DashboardOnboardedBanner planUsage={planUsage} />
       </Suspense>
+
+      {announcement ? (
+        <EmployerAnnouncementBanner announcement={announcement} />
+      ) : null}
 
       <EmployerKpiStrip items={kpiItems} />
 

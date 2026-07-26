@@ -107,7 +107,10 @@ export function PrivacyPolicyContent({
         <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
           support@replaceme.ph
         </a>
-        .
+        . Commercial (marketing) emails include a working unsubscribe link; when a registered
+        physical postal address is configured for the business, that address also appears in the
+        email footer (CAN-SPAM). Product notices inside your signed-in dashboard are service
+        communications and may be dismissed in-product.
       </p>
 
       <LegalSectionHeading id="2-scope" number={2} title="Scope & Dual-Sided Marketplace" />

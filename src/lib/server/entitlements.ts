@@ -44,6 +44,8 @@ export type EmployerPlanUsage = {
   messagingEnabled: boolean;
   resumeDownloadEnabled: boolean;
   identityMode: BillingIdentityMode;
+  prioritySupport: boolean;
+  earlyAccess: boolean;
 };
 
 export type EntitlementCheckResult =
@@ -263,6 +265,8 @@ async function loadEmployerPlanUsageFromDb(
     messagingEnabled: entitlements.messagingEnabled,
     resumeDownloadEnabled: entitlements.resumeDownloadEnabled,
     identityMode: entitlements.identityMode,
+    prioritySupport: entitlements.prioritySupport,
+    earlyAccess: entitlements.earlyAccess,
   };
 }
 
@@ -462,6 +466,65 @@ export async function assertEmployerCanPinWorker(
       error: "Pinning workers is limited on Discovery. Upgrade to Starter to bookmark talent.",
       denialType: "identity",
       suggestedPlan: "starter",
+    };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Scale Early Access gate. Optional featureKey checks product_announcements.enabled
+ * when the feature is registered as requires_early_access.
+ */
+export async function assertEmployerEarlyAccess(
+  employerId: string,
+  featureKey?: string
+): Promise<EntitlementCheckResult> {
+  const entitlements = await fetchEmployerEntitlements(employerId);
+  const planSlug = entitlements?.planSlug ?? "discovery";
+
+  if (featureKey) {
+    const admin = await createAdminClient();
+    const { data: feature } = await admin
+      .from("product_announcements")
+      .select("enabled, requires_early_access, status")
+      .eq("feature_key", featureKey)
+      .neq("status", "archived")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (feature) {
+      if (!feature.enabled) {
+        return {
+          allowed: false,
+          error: "This early-access feature is currently turned off.",
+          denialType: "early_access",
+          suggestedPlan: "scale",
+        };
+      }
+      if (!feature.requires_early_access) {
+        return { allowed: true };
+      }
+    }
+  }
+
+  if (!entitlements?.earlyAccess) {
+    await logEntitlementDenial({
+      employerId,
+      denialType: "early_access",
+      planSlug,
+      metadata: { feature_key: featureKey ?? null },
+    });
+
+    const pausedOnScale = planSlug === "scale";
+    return {
+      allowed: false,
+      error: pausedOnScale
+        ? "Early Access is temporarily paused on Scale. Check back soon or contact support."
+        : "Early Access to new features requires the Scale plan.",
+      denialType: "early_access",
+      suggestedPlan: "scale",
     };
   }
 
