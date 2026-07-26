@@ -496,12 +496,17 @@ export function PrivacyPolicyContent({
           <strong className="font-semibold text-slate-800">automatically analyzed</strong> for
           safety and fraud signals (for example contact-information sharing or payment-circumvention
           indicators); human moderators review message content only after such a flag, report, or
-          legal basis arises. Job post moderation
+          legal basis arises.           Job post moderation
           decisions (including reason category, optional explanation, and soft-delete metadata) are
           retained as listed in the retention table above. Soft-deleted job posts are excluded from
           public Worker boards and Employer live listings but may remain visible to Platform
-          administrators for audit and restore during that retention window. You may exercise privacy
-          rights as described in Section 11.
+          administrators for audit and restore during that retention window. Administrator in-app
+          notifications about Identity reviews, Moderation queues, Billing, and System events are
+          retained for up to{" "}
+          {ACCOUNT_LIFECYCLE_TIMELINES.auditLogMonths} months as a secondary operational alert
+          trail; dismissing or archiving a notification only hides it from that administrator&apos;s
+          inbox and does not delete the underlying record. You may exercise privacy rights as
+          described in Section 11.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">

@@ -210,6 +210,7 @@ export function AdminNotificationsPageSkeleton() {
   return (
     <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading notifications">
       <AdminPageHeaderSkeleton withAction />
+      <AdminTabsSkeleton count={7} />
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, index) => (
           <div

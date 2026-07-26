@@ -2019,6 +2019,7 @@ export type Database = {
       notifications: {
         Row: {
           action_url: string | null
+          archived_at: string | null
           created_at: string
           id: string
           is_read: boolean
@@ -2030,6 +2031,7 @@ export type Database = {
         }
         Insert: {
           action_url?: string | null
+          archived_at?: string | null
           created_at?: string
           id?: string
           is_read?: boolean
@@ -2041,6 +2043,7 @@ export type Database = {
         }
         Update: {
           action_url?: string | null
+          archived_at?: string | null
           created_at?: string
           id?: string
           is_read?: boolean

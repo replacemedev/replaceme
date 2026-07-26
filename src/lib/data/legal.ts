@@ -79,6 +79,11 @@ export const DATA_RETENTION_PERIODS = [
     period: "Up to 24 months for fraud prevention and incident response",
   },
   {
+    category: "Admin in-app notifications (Identity / Moderation / Billing / System)",
+    period:
+      "Up to 24 months as a secondary operational alert trail for Trust & Safety triage. Archiving hides an alert from an administrator's inbox UI but does not erase the database record; hard erasure follows account-lifecycle and legal-hold processes only (RA 10173 / GDPR storage limitation)",
+  },
+  {
     category: "Job post moderation records",
     period:
       "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by Platform administrators during that audit window",

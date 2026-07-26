@@ -36,7 +36,7 @@ export default async function AdminNotificationsPage() {
       <AdminPageShell>
         <AdminPageHeader
           title="Notifications"
-          description="Platform alerts for moderation, billing, and system events."
+          description="Platform alerts for moderation, identity review, billing, and system events."
         />
         <ErrorState
           title="Unable to load notifications"

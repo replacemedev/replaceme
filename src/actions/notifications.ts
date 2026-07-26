@@ -23,6 +23,12 @@ async function verifySessionUser() {
   return { supabase, userId: user.id };
 }
 
+function revalidateNotificationPaths() {
+  revalidatePath("/employer/notifications");
+  revalidatePath("/worker/notifications");
+  revalidatePath("/admin/notifications");
+}
+
 export async function markNotificationRead(
   notificationId: string
 ): Promise<ActionResult> {
@@ -38,14 +44,38 @@ export async function markNotificationRead(
 
     if (error) throw new Error(error.message);
     await invalidateUserCache(userId);
-    revalidatePath("/employer/notifications");
-    revalidatePath("/worker/notifications");
-    revalidatePath("/admin/notifications");
+    revalidateNotificationPaths();
     return { success: true };
   } catch (err) {
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to mark as read",
+    };
+  }
+}
+
+export async function markNotificationUnread(
+  notificationId: string
+): Promise<ActionResult> {
+  try {
+    const parsed = notificationIdSchema.parse({ notificationId });
+    const { supabase, userId } = await verifySessionUser();
+
+    const { error } = await supabase
+      .from("notifications")
+      .update({ is_read: false })
+      .eq("id", parsed.notificationId)
+      .eq("user_id", userId)
+      .is("archived_at", null);
+
+    if (error) throw new Error(error.message);
+    await invalidateUserCache(userId);
+    revalidateNotificationPaths();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to mark as unread",
     };
   }
 }
@@ -58,13 +88,12 @@ export async function markAllNotificationsRead(): Promise<ActionResult> {
       .from("notifications")
       .update({ is_read: true })
       .eq("user_id", userId)
-      .eq("is_read", false);
+      .eq("is_read", false)
+      .is("archived_at", null);
 
     if (error) throw new Error(error.message);
     await invalidateUserCache(userId);
-    revalidatePath("/employer/notifications");
-    revalidatePath("/worker/notifications");
-    revalidatePath("/admin/notifications");
+    revalidateNotificationPaths();
     return { success: true };
   } catch (err) {
     return {
@@ -74,7 +103,7 @@ export async function markAllNotificationsRead(): Promise<ActionResult> {
   }
 }
 
-export async function deleteNotification(
+export async function archiveNotification(
   notificationId: string
 ): Promise<ActionResult> {
   try {
@@ -83,22 +112,55 @@ export async function deleteNotification(
 
     const { error } = await supabase
       .from("notifications")
-      .delete()
+      .update({ archived_at: new Date().toISOString(), is_read: true })
       .eq("id", parsed.notificationId)
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .is("archived_at", null);
 
     if (error) throw new Error(error.message);
     await invalidateUserCache(userId);
-    revalidatePath("/employer/notifications");
-    revalidatePath("/worker/notifications");
-    revalidatePath("/admin/notifications");
+    revalidateNotificationPaths();
     return { success: true };
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to delete notification",
+      error: err instanceof Error ? err.message : "Failed to archive notification",
     };
   }
+}
+
+export async function unarchiveNotification(
+  notificationId: string
+): Promise<ActionResult> {
+  try {
+    const parsed = notificationIdSchema.parse({ notificationId });
+    const { supabase, userId } = await verifySessionUser();
+
+    const { error } = await supabase
+      .from("notifications")
+      .update({ archived_at: null })
+      .eq("id", parsed.notificationId)
+      .eq("user_id", userId)
+      .not("archived_at", "is", null);
+
+    if (error) throw new Error(error.message);
+    await invalidateUserCache(userId);
+    revalidateNotificationPaths();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to unarchive notification",
+    };
+  }
+}
+
+/** @deprecated Use archiveNotification — hard delete breaks audit retention. */
+export async function deleteNotification(
+  notificationId: string
+): Promise<ActionResult> {
+  return archiveNotification(notificationId);
 }
 
 export async function revalidateNotificationSurfaces() {

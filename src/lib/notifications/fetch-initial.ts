@@ -11,6 +11,9 @@ import {
 
 const DEFAULT_LIMIT = 30;
 
+const NOTIFICATION_COLUMNS =
+  "id, user_id, type, title, message, action_url, metadata, is_read, archived_at, created_at";
+
 async function loadNotificationBootstrap(
   userId: string,
   limit: number
@@ -19,10 +22,9 @@ async function loadNotificationBootstrap(
 
   const { data, error } = await supabase
     .from("notifications")
-    .select(
-      "id, user_id, type, title, message, action_url, metadata, is_read, created_at"
-    )
+    .select(NOTIFICATION_COLUMNS)
     .eq("user_id", userId)
+    .is("archived_at", null)
     .order("created_at", { ascending: false })
     .limit(limit);
 

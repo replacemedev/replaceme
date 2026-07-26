@@ -17,6 +17,16 @@ export const notificationTypeSchema = z.enum([
   "interview_rescheduled",
 ]);
 
+export const notificationCategorySchema = z.enum([
+  "identity",
+  "moderation",
+  "billing",
+  "system",
+  "other",
+]);
+
+export type NotificationCategory = z.infer<typeof notificationCategorySchema>;
+
 export const notificationSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
@@ -32,6 +42,7 @@ export const notificationSchema = z.object({
     )
     .optional(),
   is_read: z.boolean(),
+  archived_at: z.string().nullable().optional(),
   created_at: z.string(),
 });
 
@@ -62,6 +73,37 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   worker_acceptance: "Hiring",
   interview_rescheduled: "Scheduling",
 };
+
+const TYPE_TO_CATEGORY: Record<string, NotificationCategory> = {
+  identity_verification_request: "identity",
+  verification_update: "identity",
+  moderation_queue: "moderation",
+  job_moderation: "moderation",
+  flagged_report: "moderation",
+  billing_update: "billing",
+  subscription_update: "billing",
+  system_alert: "system",
+  system: "system",
+};
+
+export function getNotificationCategory(
+  type: string
+): NotificationCategory {
+  return TYPE_TO_CATEGORY[type] ?? "other";
+}
+
+export const ADMIN_NOTIFICATION_TABS = [
+  { id: "all", label: "All" },
+  { id: "unread", label: "Unread" },
+  { id: "identity", label: "Identity" },
+  { id: "moderation", label: "Moderation" },
+  { id: "billing", label: "Billing" },
+  { id: "system", label: "System" },
+  { id: "archived", label: "Archived" },
+] as const;
+
+export type AdminNotificationTabId =
+  (typeof ADMIN_NOTIFICATION_TABS)[number]["id"];
 
 function metaId(
   metadata: Record<string, unknown> | null | undefined,
@@ -97,8 +139,9 @@ export function getNotificationHref(notification: Notification): string | null {
     case "verification_update":
       return notification.action_url ?? "/worker/verification";
     case "identity_verification_request": {
-      const workerId = metaId(meta, "worker_id");
-      if (workerId) return `/admin/users/workers/${workerId}`;
+      const workerId =
+        metaId(meta, "worker_id") ?? metaId(meta, "user_id");
+      if (workerId) return `/admin/identity/${workerId}`;
       return notification.action_url ?? "/admin/identity";
     }
     case "moderation_queue": {
@@ -126,4 +169,8 @@ export function getNotificationHref(notification: Notification): string | null {
     default:
       return notification.action_url ?? null;
   }
+}
+
+export function isNotificationArchived(notification: Notification): boolean {
+  return Boolean(notification.archived_at);
 }
