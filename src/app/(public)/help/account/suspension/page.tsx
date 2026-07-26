@@ -97,8 +97,9 @@ export default function AccountSuspensionHelpPage() {
               >
                 {DELETION_REQUEST_SUPPORT_EMAIL}
               </a>{" "}
-              with the subject &quot;Account Appeal.&quot; {APPEAL_SLA_COPY} For Platform transaction
-              disputes, also see{" "}
+              with the subject &quot;Account Appeal.&quot; {APPEAL_SLA_COPY} While suspended, sign-in
+              takes you to an Account Suspended notice (not the dashboard or onboarding) with the
+              same support contact. For Platform transaction disputes, also see{" "}
               <Link
                 href="/terms-of-service#10-dispute-resolution"
                 className="font-semibold text-[#006e2f] hover:underline"

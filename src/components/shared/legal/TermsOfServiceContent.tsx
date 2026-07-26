@@ -1140,11 +1140,14 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             Suspension is not deletion.
           </strong>{" "}
           A suspended account remains on file; login and marketplace features may be blocked, but
-          personal data is not erased solely because of suspension. Account closure (self-service or
-          admin) starts a{" "}
-          {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace period for recovery,
+          personal data is not erased solely because of suspension. Restricted users who still have
+          an active session are directed to a dedicated account status page (not onboarding or the
+          dashboard) with support and appeal options. Account closure (self-service or admin) starts
+          a {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays}-day grace period for recovery,
           after which we anonymize or erase Platform-held personal data that is no longer needed,
-          subject to legal retention (for example billing records).
+          subject to legal retention (for example billing records). Closed accounts that attempt
+          sign-in are shown an Account Closed notice and may contact support to appeal or request
+          access to retained ledgers they are entitled to receive under applicable privacy law.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">Before closing an account.</strong> You

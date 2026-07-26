@@ -90,10 +90,7 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
             ? result.reason
             : null;
         if (reason === "suspended" || reason === "account_closed") {
-          const params = new URLSearchParams();
-          params.set("reason", reason);
-          if (callbackUrl) params.set("callbackUrl", callbackUrl);
-          router.replace(`/signin?${params.toString()}`);
+          router.replace(reason === "account_closed" ? "/closed" : "/suspended");
           toast.error(
             result && "error" in result && result.error
               ? result.error

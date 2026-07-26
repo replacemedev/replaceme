@@ -432,8 +432,16 @@ export function PrivacyPolicyContent({
           anonymize or erase Platform-held personal data that is no longer needed. Billing ledger and
           invoice records may be retained for up to{" "}
           {ACCOUNT_LIFECYCLE_TIMELINES.billingRetainYears} years where tax or accounting law
-          requires. When backups are restored, we re-apply erasure so closed accounts do not reappear
-          with identifiable data.
+          requires. After closure, you may email{" "}
+          <a
+            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            {DELETION_REQUEST_SUPPORT_EMAIL}
+          </a>{" "}
+          to appeal the decision or exercise access rights to retained records under RA 10173 and
+          applicable privacy laws (including GDPR where it applies). When backups are restored, we
+          re-apply erasure so closed accounts do not reappear with identifiable data.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">

@@ -704,6 +704,22 @@ export async function signIn(formData: LoginCredentials) {
 
     await clearLoginFailures(emailKey);
 
+    // Standing check before any dashboard/onboarding redirect (ban may lag Auth).
+    const { data: standing } = await supabase
+      .from("profiles")
+      .select(
+        "role, first_name, full_name, deleted_at, account_status, suspension_ends_at"
+      )
+      .or(profileIdFilter(signedInUser.id))
+      .maybeSingle();
+
+    if (standing?.deleted_at) {
+      return { success: true as const, redirectTo: "/closed" };
+    }
+    if (standing?.account_status === "suspended") {
+      return { success: true as const, redirectTo: "/suspended" };
+    }
+
     // Blueprint: app_metadata → profiles.role → signup user_metadata
     let role = signedInUser.app_metadata?.role as string | undefined;
     let displayName =
@@ -711,23 +727,17 @@ export async function signIn(formData: LoginCredentials) {
       signedInUser.user_metadata?.full_name?.trim().split(/\s+/)[0];
 
     if (!isAppRole(role) || !displayName) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, first_name, full_name")
-        .or(profileIdFilter(signedInUser.id))
-        .maybeSingle();
-
       if (!isAppRole(role)) {
-        role = isAppRole(profile?.role)
-          ? profile.role
+        role = isAppRole(standing?.role)
+          ? standing.role
           : isAppRole(signedInUser.user_metadata?.role)
             ? signedInUser.user_metadata.role
             : undefined;
       }
 
       displayName =
-        profile?.first_name ??
-        profile?.full_name?.trim().split(/\s+/)[0] ??
+        standing?.first_name ??
+        standing?.full_name?.trim().split(/\s+/)[0] ??
         displayName;
     }
 
@@ -771,6 +781,14 @@ export async function logOut() {
   await supabase.auth.signOut({ scope: "local" });
   revalidatePath("/", "layout");
   redirect("/signin");
+}
+
+/** Clears the session and returns to the public homepage (Safari-safe server redirect). */
+export async function logOutToHome() {
+  const supabase = await createClient();
+  await supabase.auth.signOut({ scope: "local" });
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 export async function sendPasswordResetLink(

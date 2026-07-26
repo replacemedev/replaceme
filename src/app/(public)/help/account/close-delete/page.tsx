@@ -76,7 +76,17 @@ export default function CloseDeleteAccountHelpPage() {
             <p>
               Billing ledger and invoices may be retained for up to{" "}
               {ACCOUNT_LIFECYCLE_TIMELINES.billingRetainYears} years where tax or accounting law
-              requires. Data an Employer already unlocked is controlled by that Employer—see the{" "}
+              requires. After your account is closed, sign-in shows an Account Closed notice instead
+              of the dashboard. Contact{" "}
+              <a
+                href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                {DELETION_REQUEST_SUPPORT_EMAIL}
+              </a>{" "}
+              to appeal or request access to retained records you are entitled to under RA 10173 /
+              applicable privacy law. Data an Employer already unlocked is controlled by that
+              Employer—see the{" "}
               <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
                 Employer DPA
               </Link>

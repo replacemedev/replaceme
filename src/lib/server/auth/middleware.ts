@@ -91,6 +91,16 @@ export async function updateSession(request: NextRequest) {
     const isWorkerRoute = pathname.startsWith("/worker");
     const isEmployerRoute = pathname.startsWith("/employer");
     const isProtectedRoute = isWorkerRoute || isEmployerRoute || isAdminRoute;
+    const isSuspendedRoute = pathname === "/suspended";
+    const isClosedRoute = pathname === "/closed";
+    const isAccountRestrictionRoute = isSuspendedRoute || isClosedRoute;
+    const isRestrictionHelpRoute =
+      pathname.startsWith("/help") ||
+      pathname === "/privacy-policy" ||
+      pathname === "/terms-of-service" ||
+      pathname === "/cookie-policy" ||
+      pathname === "/employer-dpa" ||
+      pathname === "/subprocessors";
 
     const isGuestBlockedWorkerIdentityRoute =
       pathname.startsWith("/workers/") ||
@@ -138,12 +148,41 @@ export async function updateSession(request: NextRequest) {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, role, professional_title, location, skills")
+        .select(
+          "id, role, professional_title, location, skills, account_status, deleted_at"
+        )
         .or(profileIdFilter(user.id))
         .maybeSingle();
 
       const role = resolveRoleFromUser(user, profile?.role);
       const profileId = profile?.id ?? user.id;
+      const isAccountClosed = Boolean(profile?.deleted_at);
+      const isAccountSuspended =
+        !isAccountClosed && profile?.account_status === "suspended";
+      const restrictionPath = isAccountClosed
+        ? "/closed"
+        : isAccountSuspended
+          ? "/suspended"
+          : null;
+
+      // Closed/suspended users never enter onboarding or app shells.
+      if (restrictionPath) {
+        if (pathname === restrictionPath || isRestrictionHelpRoute) {
+          applyIdleCookie(supabaseResponse);
+          return supabaseResponse;
+        }
+        return NextResponse.redirect(new URL(restrictionPath, request.url));
+      }
+
+      if (isAccountRestrictionRoute) {
+        const activeHome =
+          role === "admin"
+            ? ROLE_HOME_PATH.admin
+            : role === "employer"
+              ? ROLE_HOME_PATH.employer
+              : ROLE_HOME_PATH.worker;
+        return NextResponse.redirect(new URL(activeHome, request.url));
+      }
 
       const homePath =
         role === "admin"
