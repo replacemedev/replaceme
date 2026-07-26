@@ -7,7 +7,7 @@ import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { emitAuditLog } from "@/lib/server/audit/emit-audit-log";
 import type { AdminAuditLogRow } from "@/types/admin.types";
 
-export const SECURITY_EVENT_ACTIONS = [
+const SECURITY_EVENT_ACTIONS = [
   "suspend_user",
   "unsuspend_user",
   "delete_user_account",
