@@ -41,8 +41,6 @@ type ProfileLite = {
   role: string;
 };
 
-export type { CaseSource };
-
 export type AdminCaseRow = {
   caseId: string;
   source: CaseSource;
