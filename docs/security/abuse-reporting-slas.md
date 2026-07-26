@@ -2,24 +2,34 @@
 
 **Audience:** Trust & Safety / Admin ops  
 **Last updated:** 2026-07-26  
-**Product feature:** User reports + admin queue (`src/actions/reports.ts`, `/admin/reports`)
+**Product feature:** Platform reports + Disputes Case Center (`/admin/reports`, `/admin/disputes`)
 
 ## Scope
 
-Covers product abuse reports (platform issues, job reports, user-to-user reports), not general support tickets. For security breaches, use `incident-runbook.md`.
+Covers product abuse reports and the unified Case Center. For security breaches, use `incident-runbook.md`.
 
 ## Intake channels
 
-| Channel | Queue tab | Notes |
-|---------|-----------|--------|
-| Platform issue forms | Platform Issues | Rate-limited; evidence optional |
-| Job report modal | Job Reports | Worker → job |
-| Worker “Report Employer” | Employer Reports | Confidential; `user_reports` |
-| Employer “Report Worker” | Worker Reports | Confidential; `user_reports` |
-| Messaging auto-flags / “Report conversation” | `/admin/moderation` | Flagged-only queue; human review audit-logged (`chat_moderation_flags`) |
-| Email / contact form | Triage → Reports or legal | Escalate if illegal content / threats |
-| Legacy disputes | `/admin/disputes` | Historical wage/mediation rows |
+| Channel | Queue | Notes |
+|---------|-------|--------|
+| Platform issue forms | `/admin/reports` · Platform Issues | Rate-limited; evidence optional |
+| Job report modal | `/admin/reports` · Job Reports | Worker → job |
+| Worker “Report Employer” | `/admin/disputes` | Confidential; `user_reports` |
+| Employer “Report Worker” | `/admin/disputes` | Confidential; `user_reports` |
+| Messaging auto-flags / “Report conversation” | `/admin/moderation` (+ may create `user_reports`) | Flagged-only queue; audit-logged |
+| Email / contact form | Triage → Reports or Disputes | Escalate if illegal content / threats |
+| Legacy mediation rows | `/admin/disputes` · Financial / Resolved | Historical `disputes` table |
 | Stripe disputes | Admin billing | Parallel path; not this SLA |
+
+## Case Center tabs (`/admin/disputes`)
+
+| Tab | Contents |
+|-----|----------|
+| Active Mediation (Financial) | `wage_dispute` + open legacy disputes |
+| Safety & Policy | Other U2U violations (open/investigating) |
+| Resolved / Closed | Resolved/dismissed/closed cases |
+
+Financial outcomes are **advisory only** — the platform does not hold engagement escrow or move wage funds.
 
 ## Violation categories (user-to-user)
 
@@ -37,13 +47,13 @@ Reporter identity is **admin-only**. Do not name the reporter in warning emails,
 | **P2** | Harassment, scam jobs, clear ToS violations | 1 business day | 3 business days |
 | **P3** | Spam, low-quality listings, preference disputes | 2 business days | 7 business days |
 
-“First response” = status moved from open + optional reporter acknowledgment when product supports it.
+“First response” = status/stage moved from open + optional reporter acknowledgment when product supports it.
 
 ## Handling procedure
 
 1. **Triage** — assign priority; duplicate-check related reports.
 2. **Preserve** — do not delete evidence attachments until resolution + retention window.
-3. **Act** — Review case → Send warning / Suspend reported user / Dismiss with notes (`logAdminAction` writes audit). Never reveal the reporter.
+3. **Act** — Open case → advisory financial outcome / warn / suspend / dismiss with notes (`logAdminAction` writes audit). Never reveal the reporter.
 4. **Document** — admin notes required for dismiss/resolved; include reason codes.
 5. **Escalate** — P1 security-adjacent cases → incident lead per runbook.
 
@@ -55,4 +65,4 @@ Reporter identity is **admin-only**. Do not name the reporter in warning emails,
 
 ## Owners
 
-Assign named owners in your Ops roster (not stored in repo). Engineering ownership of the queue UI: Admin Reports module.
+Assign named owners in your Ops roster (not stored in repo). Engineering ownership: Admin Reports + Disputes Case Center modules.

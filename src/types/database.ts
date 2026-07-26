@@ -2402,8 +2402,12 @@ export type Database = {
       user_reports: {
         Row: {
           admin_notes: string | null
+          case_stage: string
           created_at: string
+          defendant_response: string | null
           description: string
+          disputed_amount_cents: number | null
+          disputed_currency: string | null
           evidence_file_size_bytes: number | null
           evidence_mime_type: string | null
           evidence_storage_path: string | null
@@ -2411,6 +2415,7 @@ export type Database = {
           job_id: string | null
           reported_user_id: string
           reporter_id: string
+          resolution_outcome: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -2421,8 +2426,12 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          case_stage?: string
           created_at?: string
+          defendant_response?: string | null
           description: string
+          disputed_amount_cents?: number | null
+          disputed_currency?: string | null
           evidence_file_size_bytes?: number | null
           evidence_mime_type?: string | null
           evidence_storage_path?: string | null
@@ -2430,6 +2439,7 @@ export type Database = {
           job_id?: string | null
           reported_user_id: string
           reporter_id: string
+          resolution_outcome?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -2440,8 +2450,12 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          case_stage?: string
           created_at?: string
+          defendant_response?: string | null
           description?: string
+          disputed_amount_cents?: number | null
+          disputed_currency?: string | null
           evidence_file_size_bytes?: number | null
           evidence_mime_type?: string | null
           evidence_storage_path?: string | null
@@ -2449,6 +2463,7 @@ export type Database = {
           job_id?: string | null
           reported_user_id?: string
           reporter_id?: string
+          resolution_outcome?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string

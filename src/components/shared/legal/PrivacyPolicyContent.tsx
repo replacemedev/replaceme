@@ -485,7 +485,8 @@ export function PrivacyPolicyContent({
           investigation requires longer retention. Hired application packets may be retained with
           employment or contract records under applicable employment and tax rules. Platform
           administrators may access application contents, job post moderation records,
-          confidential user-to-user abuse reports, and{" "}
+          confidential user-to-user abuse reports and Case Center records (including optional
+          disputed-amount notes and non-binding resolution outcomes—not escrow balances), and{" "}
           <strong className="font-semibold text-slate-800">
             messaging threads only when justified
           </strong>{" "}

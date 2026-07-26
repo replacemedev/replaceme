@@ -42,6 +42,13 @@ const STYLES: Record<string, string> = {
   Investigating: "bg-blue-50 text-blue-700 ring-blue-600/20",
   resolved: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   Resolved: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  awaiting_evidence: "bg-amber-50 text-amber-800 ring-amber-600/25",
+  "Awaiting Evidence": "bg-amber-50 text-amber-800 ring-amber-600/25",
+  in_mediation: "bg-violet-50 text-violet-800 ring-violet-600/25",
+  "In Mediation": "bg-violet-50 text-violet-800 ring-violet-600/25",
+  arbitration_noted: "bg-red-50 text-red-800 ring-red-600/25",
+  "Arbitration Noted": "bg-red-50 text-red-800 ring-red-600/25",
+  Dismissed: "bg-slate-100 text-slate-600 ring-slate-500/20",
 };
 
 function formatLabel(value: string): string {

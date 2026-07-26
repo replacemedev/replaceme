@@ -1012,33 +1012,40 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             Disputes between users—including without limitation unpaid wages or fees, incomplete
             work, quality complaints, IP theft or ownership, confidentiality breaches, harassment,
             or failed engagements—must be resolved{" "}
-            <strong className="font-semibold text-slate-800">strictly between those users</strong>.
+            <strong className="font-semibold text-slate-800">primarily between those users</strong>.
             Replaceme is{" "}
             <strong className="font-semibold text-slate-800">
-              not a mediator, arbitrator, escrow agent (unless separately contracted in writing),
-              judge, or insurer
+              not an escrow agent, binding arbitrator, judge, or insurer
             </strong>{" "}
-            of user-to-user relationships and has no obligation to investigate, intervene in, or
-            decide such disputes. Replaceme will not voluntarily join, intervene in, or take sides
-            in user-to-user litigation or regulatory complaints; if lawfully compelled by a valid
-            court order, subpoena, or governmental demand, Replaceme may produce only what the
-            process requires and may seek reimbursement of compliance costs from the requesting or
-            responsible user(s) under Section 9.5.
+            of user-to-user engagement funds (unless separately contracted in writing). Replaceme
+            will not voluntarily join, intervene in, or take sides in user-to-user litigation or
+            regulatory complaints; if lawfully compelled by a valid court order, subpoena, or
+            governmental demand, Replaceme may produce only what the process requires and may seek
+            reimbursement of compliance costs from the requesting or responsible user(s) under
+            Section 9.5.
           </p>
           <p>
             Separately, you may submit{" "}
             <strong className="font-semibold text-slate-800">confidential Trust &amp; Safety reports</strong>{" "}
             (fraud, harassment, off-platform payment circumvention, wage-payment concerns, and similar
             policy violations) through in-product reporting tools, including reporting a conversation
-            from messaging. Reports are reviewed by Platform administrators. Messages may also be
-            automatically scanned for safety and fraud signals; human review of message content occurs
-            only with justified cause (flag, report, legal process, or active investigation) and is
+            from messaging. Reports are reviewed in Replaceme&apos;s Case Center. Platform
+            administrators may conduct a{" "}
+            <strong className="font-semibold text-slate-800">non-binding case review</strong>{" "}
+            (including advisory recommendations on wage-payment concerns). Those recommendations do{" "}
+            <strong className="font-semibold text-slate-800">not</strong> transfer, freeze, hold, or
+            release engagement funds, and do not constitute binding arbitration of the underlying
+            engagement. If the parties later agree to private mediation or arbitration among
+            themselves, that process is solely between them; Replaceme does not administer binding
+            arbitration of Employer–Worker engagement disputes. Messages may also be automatically
+            scanned for safety and fraud signals; human review of message content occurs only with
+            justified cause (flag, report, legal process, or active investigation) and is
             audit-logged. Reporter identity is kept confidential from the reported user and is not
             disclosed in warning or enforcement notices, except where disclosure is required by law
             or you consent. Retaliation against a good-faith reporter may itself result in
             suspension or termination. Platform enforcement (warnings, suspensions, listing removal)
-            does not make Replaceme a party to, or guarantor of, the underlying user-to-user
-            engagement.
+            and advisory case outcomes do not make Replaceme a party to, or guarantor of, the
+            underlying user-to-user engagement.
           </p>
           <p className="font-semibold uppercase text-slate-800">
             CLASS ACTION WAIVER. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AND
@@ -1087,8 +1094,9 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         <p>
           Platform billing redress does{" "}
           <strong className="font-semibold text-slate-800">not</strong> convert Replaceme into a
-          mediator of Employer–Worker engagement disputes (see Section 9.6). Those remain
-          user-to-user matters.
+          binding arbitrator or escrow agent for Employer–Worker engagement disputes (see Section
+          9.6). Those remain user-to-user matters, subject only to confidential Trust &amp; Safety
+          review and non-binding case recommendations where applicable.
         </p>
         <p>How to file an internal complaint:</p>
         <ol className="list-decimal space-y-2 pl-5">

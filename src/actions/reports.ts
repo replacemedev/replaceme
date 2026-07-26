@@ -1033,6 +1033,7 @@ export async function updateUserReportStatus(input: unknown) {
 
     await cacheDel(CacheKeys.adminReportsList("all"));
     revalidatePath("/admin/reports");
+    revalidatePath("/admin/disputes");
     return ok();
   });
 }
