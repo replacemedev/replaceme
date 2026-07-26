@@ -8,10 +8,8 @@ import { SignInWelcomePanel } from "@/components/auth/marketing/SignInWelcomePan
 import { AUTH_LINK, AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import { SIGNIN_PAGE } from "@/lib/auth/static-copy";
 import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
-import {
-  parseSignInAccountReason,
-  SignInAccountStatusBanner,
-} from "@/components/auth/SignInAccountStatusBanner";
+import { SignInAccountStatusBanner } from "@/components/auth/SignInAccountStatusBanner";
+import { parseSignInAccountReason } from "@/lib/auth/signin-account-reason";
 
 export const metadata = {
   title: "Sign In | Replaceme",

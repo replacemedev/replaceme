@@ -66,7 +66,16 @@ export async function proxy(request: NextRequest) {
     headers: requestHeaders,
   });
 
-  const response = await updateSession(requestWithNonce);
+  let response: NextResponse;
+  try {
+    response = await updateSession(requestWithNonce);
+  } catch (error) {
+    console.error(
+      "[proxy] updateSession failed; falling through to public route.",
+      error
+    );
+    response = NextResponse.next({ request: requestWithNonce });
+  }
   applyCspHeaders(response, nonce);
   return response;
 }

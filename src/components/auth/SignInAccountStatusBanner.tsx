@@ -6,8 +6,9 @@ import {
   APPEAL_SLA_COPY,
   DELETION_REQUEST_SUPPORT_EMAIL,
 } from "@/lib/data/legal";
+import type { SignInAccountReason } from "@/lib/auth/signin-account-reason";
 
-export type SignInAccountReason = "suspended" | "account_closed";
+export type { SignInAccountReason };
 
 export function SignInAccountStatusBanner({
   reason,
@@ -53,11 +54,4 @@ export function SignInAccountStatusBanner({
       </div>
     </div>
   );
-}
-
-export function parseSignInAccountReason(
-  raw: string | undefined
-): SignInAccountReason | null {
-  if (raw === "suspended" || raw === "account_closed") return raw;
-  return null;
 }
