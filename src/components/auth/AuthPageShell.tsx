@@ -26,13 +26,13 @@ export function AuthPageShell({
 }: AuthPageShellProps) {
   if (centered) {
     return (
-      <main className="flex min-h-[100dvh] flex-col items-center justify-center bg-background p-4 py-12 sm:p-8 lg:px-8">
-        <div className="w-full max-w-md space-y-6">
-          <div className="flex justify-start">
-            <NavBrand homeHref={brandHref} compact />
+      <main className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#f8fafe] px-4 py-12 sm:p-8">
+        <div className="flex w-full max-w-md flex-col items-center space-y-6">
+          <div className="flex w-full justify-center">
+            <NavBrand homeHref={brandHref} compact className="justify-center" />
           </div>
-          {children}
-          {footer}
+          <div className="w-full">{children}</div>
+          {footer ? <div className="w-full text-center">{footer}</div> : null}
         </div>
       </main>
     );

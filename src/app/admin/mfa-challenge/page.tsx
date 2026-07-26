@@ -36,10 +36,10 @@ export default async function AdminMfaChallengePage() {
   }
 
   return (
-    <AuthPageShell brandHref="/admin/dashboard">
-      <header className="mb-6 space-y-2">
+    <AuthPageShell brandHref="/admin/dashboard" centered>
+      <header className="mb-6 space-y-2 text-center">
         <h1 className={AUTH_TITLE}>Two-factor authentication</h1>
-        <p className={AUTH_SUBTITLE}>
+        <p className={`${AUTH_SUBTITLE} mx-auto max-w-sm`}>
           Enter the 6-digit code from your authenticator app to access the admin
           panel.
         </p>

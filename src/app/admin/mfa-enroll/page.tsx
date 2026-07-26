@@ -36,10 +36,10 @@ export default async function AdminMfaEnrollPage() {
   }
 
   return (
-    <AuthPageShell brandHref="/admin/dashboard">
-      <header className="mb-6 space-y-2">
+    <AuthPageShell brandHref="/admin/dashboard" centered>
+      <header className="mb-6 space-y-2 text-center">
         <h1 className={AUTH_TITLE}>Set up authenticator</h1>
-        <p className={AUTH_SUBTITLE}>
+        <p className={`${AUTH_SUBTITLE} mx-auto max-w-sm`}>
           Admin access requires a TOTP authenticator app. Enroll once, then
           verify on each elevated session.
         </p>

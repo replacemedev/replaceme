@@ -1,4 +1,3 @@
-import { AdminHeader } from "@/components/admin/layout/AdminHeader";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +10,6 @@ export default function AdminMfaChallengeLayout({
   return (
     <>
       <AuthFlashToast />
-      <AdminHeader />
       {children}
     </>
   );
