@@ -135,14 +135,22 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           under the laws of the Philippines, the United States, the European Union / UK, Canada,
           Australia, Singapore, or any other jurisdiction. We do not place Workers into jobs for a
           fee, do not assign tasks, do not manage work product, and do not process Worker payroll or
-          statutory benefits.
+          statutory benefits. Replaceme is also{" "}
+          <strong className="font-semibold text-slate-800">
+            not a contractor or subcontractor under DOLE Department Order No. 174 (2017)
+          </strong>
+          ; we do not supply labor to Employers and are not a principal in any labor-only contracting
+          arrangement between users.
         </p>
         <p>
           Replaceme is{" "}
           <strong className="font-semibold text-slate-800">strictly not a party</strong> to any
           employment contract, independent-contractor agreement, NDA, SOW, consultancy, agency, or
           other working arrangement formed between an Employer and a Worker. Any such contract is
-          solely between those users. We do not guarantee the quality, safety, legality, truthfulness,
+          solely between those users. If an Employer–Worker relationship is employment under
+          applicable law, telecommuting or remote-work rules (including the Philippine Telecommuting
+          Act, Republic Act No. 11165) apply between <em>those parties</em>—not between either party
+          and Replaceme. We do not guarantee the quality, safety, legality, truthfulness,
           timeliness, or delivery of any work, nor the solvency, identity accuracy, or fitness of any
           user. Platform tools (profiles, messaging, unlocks, badges) are informational only and do
           not create endorsements or warranties.
@@ -867,10 +875,12 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
           </p>
           <p>
             Employers alone are responsible for correctly classifying Workers as employees or
-            independent contractors under every applicable law, and for structuring engagements
-            accordingly. Labels in these Terms do not create an employment relationship that the
-            facts otherwise negate; conversely, Users may not re-characterize Replaceme as an
-            employer, joint employer, or EOR based solely on using our directory software.
+            independent contractors under every applicable law (including DOLE four-fold /
+            economic-reality analysis and DOLE DO 174 where contracting is used), and for
+            structuring engagements accordingly. Labels in these Terms do not create an employment
+            relationship that the facts otherwise negate; conversely, Users may not re-characterize
+            Replaceme as an employer, joint employer, principal contractor, or EOR based solely on
+            using our directory software.
           </p>
         </div>
 
@@ -894,15 +904,22 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
             and does not act as a withholding agent for any cross-border engagement between users.
           </p>
           <p>
-            The <strong className="font-semibold text-slate-800">Employer and the Worker accept one hundred percent (100%) absolute responsibility</strong>{" "}
+            The{" "}
+            <strong className="font-semibold text-slate-800">
+              Employer and the Worker accept primary responsibility
+            </strong>{" "}
             for complying with all applicable local, national, and international labor laws, wage
             and hour rules, immigration and work-authorization requirements, tax registration and
             reporting, VAT/GST, social-security contributions, and cross-border withholding
-            obligations arising from their relationship. Replaceme{" "}
-            <strong className="font-semibold text-slate-800">universally disclaims all liability</strong>{" "}
+            obligations arising from their relationship. To the maximum extent permitted by
+            applicable law, Replaceme{" "}
+            <strong className="font-semibold text-slate-800">
+              disclaims liability
+            </strong>{" "}
             for tax evasion, misclassification, unpaid wages, overtime, severance, unfair dismissal,
             workplace injury, harassment, discrimination, IP ownership disputes, or any labor-law
-            violation allegedly committed by any user.
+            violation allegedly committed by any user. Nothing in this section limits liability that
+            cannot be excluded under mandatory consumer, privacy, or other non-waivable law.
           </p>
           <p>
             Nothing in these Terms requires Replaceme to build, operate, or maintain tax collection,

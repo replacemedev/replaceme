@@ -1347,6 +1347,7 @@ export async function fetchAdminEmployersSafe(): Promise<
         employer_id,
         company_name,
         industry,
+        company_verification_status,
         created_at,
         profiles!company_profiles_employer_id_fkey (
           email,
@@ -1380,6 +1381,8 @@ export async function fetchAdminEmployersSafe(): Promise<
         company_name: row.company_name,
         email: profile?.email ?? null,
         industry: row.industry,
+        company_verification_status:
+          row.company_verification_status ?? "unverified",
         account_status: profile?.account_status ?? "active",
         subscription_status: subscription?.status ?? null,
         created_at: row.created_at,

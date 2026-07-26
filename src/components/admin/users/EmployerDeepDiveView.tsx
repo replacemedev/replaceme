@@ -7,6 +7,7 @@ import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { CompanyVerificationCard } from "@/components/admin/users/CompanyVerificationCard";
 import type { AdminEmployerDeepDive } from "@/actions/admin/deep-dive";
 
 interface EmployerDeepDiveViewProps {
@@ -35,25 +36,39 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
     <div className="space-y-6">
       <Link
         href="/admin/users?tab=employers"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
+        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Back to employers
       </Link>
 
+      <CompanyVerificationCard
+        employerId={data.employerId}
+        status={data.companyVerificationStatus}
+        verifiedAt={data.verifiedAt}
+        hiringRegions={data.hiringRegions}
+      />
+
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-slate-900 break-words">
                 {data.companyName}
               </h1>
-              <p className="text-sm text-slate-400 mt-0.5">
+              <p className="mt-0.5 break-all text-sm text-slate-400 [overflow-wrap:anywhere]">
                 Employer account ID: {data.employerId}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={data.accountStatus} />
+              <StatusBadge
+                status={
+                  data.companyVerificationStatus === "verified"
+                    ? "verified"
+                    : "unverified"
+                }
+              />
               {sub ? (
                 <PlanTierBadge tier={sub.planName ?? "Free"} />
               ) : (

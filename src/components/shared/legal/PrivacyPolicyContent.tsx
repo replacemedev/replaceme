@@ -99,7 +99,17 @@ export function PrivacyPolicyContent({
       <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
         For Platform account administration, verification, billing orchestration, security, and
         marketplace operations, Replaceme acts as a Personal Information Controller (PIC) under RA
-        10173 (and as a controller under GDPR where that law applies). Our website is{" "}
+        10173 (and as a controller under GDPR where that law applies). Where Employers unlock,
+        message, or otherwise process Worker profile data for their own hiring purposes, those
+        Employers act as{" "}
+        <strong className="font-semibold text-slate-800">separate Personal Information Controllers</strong>{" "}
+        (and GDPR controllers) for that processing; Replaceme may act as a Personal Information
+        Processor (PIP) only to the extent we process such data solely on documented Employer
+        instructions under the{" "}
+        <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
+          Employer Data Processing Addendum
+        </Link>
+        . Our website is{" "}
         <Link href="https://replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
           https://replaceme.ph
         </Link>

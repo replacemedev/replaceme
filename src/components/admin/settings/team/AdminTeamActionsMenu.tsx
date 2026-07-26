@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  deleteAdminUser,
   resendAdminInvite,
+  revokeAdminInvite,
   triggerAdminPasswordReset,
   updateAdminStatus,
 } from "@/actions/admin/team";
@@ -35,7 +35,7 @@ type PendingAction =
   | { type: "unsuspend"; userId: string; label: string }
   | { type: "reset"; userId: string; label: string }
   | { type: "resend"; userId: string; label: string }
-  | { type: "delete"; userId: string; label: string };
+  | { type: "revoke"; userId: string; label: string };
 
 export function AdminTeamActionsMenu({
   member,
@@ -84,8 +84,8 @@ export function AdminTeamActionsMenu({
         case "resend":
           result = await resendAdminInvite({ userId: action.userId });
           break;
-        case "delete":
-          result = await deleteAdminUser({ userId: action.userId });
+        case "revoke":
+          result = await revokeAdminInvite({ userId: action.userId });
           break;
         default:
           result = { success: false, error: "Unknown action" };
@@ -93,7 +93,11 @@ export function AdminTeamActionsMenu({
 
       if (result.success) {
         toast.success(
-          action.type === "resend" ? "Invite resent" : "Admin account updated"
+          action.type === "resend"
+            ? "Invite resent"
+            : action.type === "revoke"
+              ? "Invite revoked"
+              : "Admin account updated"
         );
         setConfirm(null);
         closeMenu();
@@ -115,12 +119,12 @@ export function AdminTeamActionsMenu({
         className="relative"
         onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}
       >
-        <summary className="flex cursor-pointer list-none items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
           <MoreHorizontal className="h-4 w-4" aria-hidden />
           <span className="sr-only">Actions for {displayLabel}</span>
         </summary>
         {open ? (
-          <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+          <div className="absolute right-0 z-20 mt-2 w-56 max-w-[min(14rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
             <MenuButton
               icon={Shield}
               label="Edit access"
@@ -186,7 +190,7 @@ export function AdminTeamActionsMenu({
                 danger
                 onClick={() =>
                   setConfirm({
-                    type: "delete",
+                    type: "revoke",
                     userId: member.id,
                     label: displayLabel,
                   })
@@ -200,10 +204,8 @@ export function AdminTeamActionsMenu({
       <ConfirmDialog
         open={confirm !== null}
         title={
-          confirm?.type === "delete"
-            ? pendingInvite
-              ? "Revoke invite?"
-              : "Delete admin account?"
+          confirm?.type === "revoke"
+            ? "Revoke invite?"
             : confirm?.type === "suspend"
               ? "Suspend admin account?"
               : confirm?.type === "resend"
@@ -213,10 +215,8 @@ export function AdminTeamActionsMenu({
                   : "Activate admin account?"
         }
         description={
-          confirm?.type === "delete"
-            ? pendingInvite
-              ? `Revoke the pending invite for ${confirm.label}? They will lose portal access.`
-              : `This permanently removes ${confirm.label} and revokes all admin access.`
+          confirm?.type === "revoke"
+            ? `Revoke the pending invite for ${confirm.label}? They will lose portal access.`
             : confirm?.type === "suspend"
               ? `Suspend ${confirm?.label ?? "this admin"}? Sessions are revoked and they cannot sign in.`
               : confirm?.type === "resend"
@@ -226,15 +226,13 @@ export function AdminTeamActionsMenu({
                   : `Reactivate ${confirm?.label ?? "this admin"}?`
         }
         confirmLabel={
-          confirm?.type === "delete"
-            ? pendingInvite
-              ? "Revoke"
-              : "Delete"
+          confirm?.type === "revoke"
+            ? "Revoke"
             : confirm?.type === "reset" || confirm?.type === "resend"
               ? "Send email"
               : "Confirm"
         }
-        variant={confirm?.type === "delete" ? "danger" : "default"}
+        variant={confirm?.type === "revoke" ? "danger" : "default"}
         loading={pending}
         onConfirm={() => confirm && runAction(confirm)}
         onCancel={() => {
@@ -261,7 +259,7 @@ function MenuButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+      className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
         danger
           ? "text-red-600 hover:bg-red-50"
           : "text-slate-700 hover:bg-slate-50"

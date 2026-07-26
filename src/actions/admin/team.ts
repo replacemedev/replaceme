@@ -806,7 +806,7 @@ export async function deleteAdminUser(
       return { success: false, error: error.message };
     }
 
-    await logAdminAction("delete_admin", "admin_profile", parsed.userId, {
+    await logAdminAction("revoke_admin_invite", "admin_profile", parsed.userId, {
       email: target.email,
       pending_invite: true,
     });
@@ -819,4 +819,11 @@ export async function deleteAdminUser(
       error: err instanceof Error ? err.message : "Failed to delete admin",
     };
   }
+}
+
+/** Pending-invite revocation (same hard-delete path; clearer audit/API name). */
+export async function revokeAdminInvite(
+  input: z.infer<typeof adminTeamUserIdSchema>
+): Promise<ActionResult> {
+  return deleteAdminUser(input);
 }

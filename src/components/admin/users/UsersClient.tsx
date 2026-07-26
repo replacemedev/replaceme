@@ -483,6 +483,13 @@ export function UsersClient({
                       <StatusBadge
                         status={employer.subscription_status ?? "inactive"}
                       />
+                      <StatusBadge
+                        status={
+                          employer.company_verification_status === "verified"
+                            ? "verified"
+                            : "unverified"
+                        }
+                      />
                       <AccountStatusBadge
                         deletedAt={employer.deleted_at}
                         accountStatus={employer.account_status}
@@ -632,9 +639,18 @@ export function UsersClient({
                               {employer.industry ?? "—"}
                             </td>
                             <td className={ADMIN_TABLE_TD}>
-                              <StatusBadge
-                                status={employer.subscription_status ?? "inactive"}
-                              />
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <StatusBadge
+                                  status={employer.subscription_status ?? "inactive"}
+                                />
+                                <StatusBadge
+                                  status={
+                                    employer.company_verification_status === "verified"
+                                      ? "verified"
+                                      : "unverified"
+                                  }
+                                />
+                              </div>
                             </td>
                             <td className={ADMIN_TABLE_TD}>
                               <AccountStatusBadge

@@ -3,6 +3,7 @@
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
 import { companyProfileSchema, CompanyProfileInput, DropdownOption } from "@/lib/validations/employer/company";
+import { EMPLOYER_INDUSTRIES } from "@/lib/data/industries";
 import { revalidatePath } from "next/cache";
 import {
   PROFILE_IMAGE_MAX_BYTES,
@@ -16,10 +17,9 @@ const COMPANY_LOGO_BUCKET = "company-logos";
 
 /**
  * Fetch industries list.
- * Currently returns empty stub per scaffolding requirements.
  */
 export async function getIndustries(): Promise<DropdownOption[]> {
-  return [];
+  return [...EMPLOYER_INDUSTRIES];
 }
 
 /**
@@ -49,7 +49,7 @@ export async function getCompanyProfile(): Promise<CompanyProfileInput | null> {
     // Fetch company details from company_profiles table directly
     const { data: companyProfile, error: companyError } = await supabase
       .from("company_profiles")
-      .select("company_name, website_url, industry, company_bio, logo_url")
+      .select("company_name, website_url, industry, company_bio, logo_url, hiring_regions")
       .eq("employer_id", profile.id)
       .maybeSingle();
 
@@ -60,6 +60,9 @@ export async function getCompanyProfile(): Promise<CompanyProfileInput | null> {
       industry: companyProfile?.industry || "",
       companyBio: companyProfile?.company_bio || "",
       logoUrl: companyProfile?.logo_url || "",
+      hiringRegions: Array.isArray(companyProfile?.hiring_regions)
+        ? companyProfile.hiring_regions.filter((r): r is string => typeof r === "string")
+        : [],
     };
   } catch (err) {
     safeError("getCompanyProfile error occurred:", err);
@@ -106,6 +109,7 @@ export async function updateCompanyProfile(payload: CompanyProfileInput) {
       industry: parsed.data.industry || null,
       company_bio: parsed.data.companyBio || null,
       logo_url: parsed.data.logoUrl || null,
+      hiring_regions: parsed.data.hiringRegions,
       updated_at: new Date().toISOString(),
     };
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { ErrorState } from "@/components/shared/ErrorState";
@@ -33,11 +34,20 @@ export default async function AdminMyProfilePage() {
     <AdminPageShell>
       <AdminPageHeader
         title="My profile"
-        description="Manage your photo, contact details, and password for the admin portal."
+        description="Manage your photo, contact details, and password. MFA lives in Security Center."
       />
       <div className="space-y-4 sm:space-y-5">
         <AdminPersonalProfileCard profile={result.data} />
         <AdminAccountSecurityCard />
+        <p className="text-sm text-slate-500">
+          Need session or MFA controls?{" "}
+          <Link
+            href="/admin/security"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Open Security Center
+          </Link>
+        </p>
       </div>
     </AdminPageShell>
   );

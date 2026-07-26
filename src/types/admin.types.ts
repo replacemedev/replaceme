@@ -113,6 +113,7 @@ export const adminEmployerRowSchema = z.object({
   company_name: z.string(),
   email: z.string().nullable(),
   industry: z.string().nullable(),
+  company_verification_status: z.string().catch("unverified"),
   account_status: accountStatusSchema.catch("active"),
   subscription_status: z.string().nullable(),
   created_at: z.string(),
@@ -196,6 +197,7 @@ export interface AdminEmployerRow {
   company_name: string;
   email: string | null;
   industry: string | null;
+  company_verification_status: string;
   account_status: AccountStatus;
   subscription_status: string | null;
   created_at: string;

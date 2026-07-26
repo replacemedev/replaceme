@@ -42,6 +42,7 @@ export function CompanyProfileForm({
       industry: initialData?.industry || "",
       companyBio: initialData?.companyBio || "",
       logoUrl: initialData?.logoUrl || "",
+      hiringRegions: initialData?.hiringRegions || [],
     },
   });
 

@@ -107,6 +107,9 @@ export type AdminEmployerDeepDive = {
   industry: string | null;
   websiteUrl: string | null;
   companyBio: string | null;
+  hiringRegions: string[];
+  companyVerificationStatus: string;
+  verifiedAt: string | null;
   accountStatus: string;
   createdAt: string;
   phoneNumber?: string | null;
@@ -157,7 +160,9 @@ export async function getAdminEmployerDeepDive(
           .maybeSingle(),
         supabase
           .from("company_profiles")
-          .select("company_name, industry, website_url, company_bio, created_at")
+          .select(
+            "company_name, industry, website_url, company_bio, created_at, hiring_regions, company_verification_status, verified_at"
+          )
           .eq("employer_id", id)
           .maybeSingle(),
         supabase
@@ -208,6 +213,12 @@ export async function getAdminEmployerDeepDive(
       industry: company?.industry ?? null,
       websiteUrl: company?.website_url ?? null,
       companyBio: company?.company_bio ?? null,
+      hiringRegions: Array.isArray(company?.hiring_regions)
+        ? company.hiring_regions.filter((r): r is string => typeof r === "string")
+        : [],
+      companyVerificationStatus:
+        company?.company_verification_status ?? "unverified",
+      verifiedAt: company?.verified_at ?? null,
       accountStatus: profile.account_status,
       createdAt: company?.created_at ?? profile.created_at,
       phoneNumber: profile.phone_number,

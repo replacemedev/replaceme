@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { HIRING_REGION_VALUES } from "@/lib/data/industries";
+
+const hiringRegionSet = new Set<string>(HIRING_REGION_VALUES);
 
 export const companyProfileSchema = z
   .object({
@@ -15,10 +18,18 @@ export const companyProfileSchema = z
       .max(500, "Bio cannot exceed 500 characters")
       .optional(),
     logoUrl: z.string().optional(),
+    hiringRegions: z.array(z.string()).max(8).optional(),
   })
-  .strict();
+  .strict()
+  .transform((data) => ({
+    ...data,
+    hiringRegions: (data.hiringRegions ?? []).filter((r) =>
+      hiringRegionSet.has(r)
+    ),
+  }));
 
-export type CompanyProfileInput = z.infer<typeof companyProfileSchema>;
+export type CompanyProfileInput = z.input<typeof companyProfileSchema>;
+export type CompanyProfileParsed = z.output<typeof companyProfileSchema>;
 
 export interface DropdownOption {
   label: string;
