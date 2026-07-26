@@ -2,12 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { logAdminAction, suspendUser } from "@/actions/admin-actions";
+import { logAdminAction } from "@/actions/admin-actions";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { formatFullName } from "@/lib/format/name";
 import {
   CHAT_MODERATION_REASON_CODES,
-  CHAT_MODERATION_STATUSES,
   formatChatModerationReason,
   violationToChatReason,
   type ChatModerationReasonCode,
@@ -18,7 +17,10 @@ import { USER_REPORT_VIOLATIONS } from "@/lib/reporting/constants";
 import { rateLimitReportSubmission } from "@/lib/server/rate-limit";
 import { getSession } from "@/lib/server/auth/session";
 import { createAdminClient } from "@/lib/supabase/server";
-import type { AdminChatModerationFlagRow } from "@/types/admin.types";
+import type {
+  AdminChatModerationFlagRow,
+  AdminModerationThreadDetail,
+} from "@/types/admin.types";
 import { safeError } from "@/utils/logger";
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -146,30 +148,6 @@ export async function fetchAdminModerationFlags(
     };
   });
 }
-
-export type AdminModerationThreadMessage = {
-  id: string;
-  sender_id: string;
-  content: string;
-  created_at: string;
-  is_flagged: boolean;
-};
-
-export type AdminModerationThreadDetail = {
-  threadId: string;
-  flagId: string;
-  reasonLabel: string;
-  source: ChatModerationSource;
-  reasonCode: ChatModerationReasonCode;
-  status: ChatModerationStatus;
-  flaggedMessageId: string | null;
-  workerId: string;
-  workerName: string | null;
-  employerUserId: string | null;
-  companyName: string | null;
-  jobTitle: string | null;
-  messages: AdminModerationThreadMessage[];
-};
 
 export async function fetchAdminModerationThread(
   threadId: string,
@@ -485,5 +463,3 @@ export async function reportMessagingThread(payload: unknown): Promise<{
     return { error: "Something went wrong" };
   }
 }
-
-export { CHAT_MODERATION_STATUSES };

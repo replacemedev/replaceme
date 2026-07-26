@@ -651,3 +651,27 @@ export type AdminChatModerationFlagRow = z.infer<
 >;
 /** @deprecated Prefer AdminChatModerationFlagRow */
 export type AdminChatThreadRow = AdminChatModerationFlagRow;
+
+export type AdminModerationThreadMessage = {
+  id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  is_flagged: boolean;
+};
+
+export type AdminModerationThreadDetail = {
+  threadId: string;
+  flagId: string;
+  reasonLabel: string;
+  source: AdminChatModerationFlagRow["source"];
+  reasonCode: AdminChatModerationFlagRow["reason_code"];
+  status: AdminChatModerationFlagRow["status"];
+  flaggedMessageId: string | null;
+  workerId: string;
+  workerName: string | null;
+  employerUserId: string | null;
+  companyName: string | null;
+  jobTitle: string | null;
+  messages: AdminModerationThreadMessage[];
+};

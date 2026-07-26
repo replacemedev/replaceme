@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ShieldAlert, UserX, XCircle } from "lucide-react";
-import type { AdminModerationThreadDetail } from "@/actions/admin/messaging-moderation";
 import {
   dismissModerationFlag,
   updateModerationFlagStatus,
@@ -12,9 +11,8 @@ import {
 import { suspendUser } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { ACCOUNT_LIFECYCLE_TIMELINES } from "@/lib/data/legal";
-import {
-  CHAT_MODERATION_STATUS_LABELS,
-} from "@/lib/reporting/messaging-moderation";
+import { CHAT_MODERATION_STATUS_LABELS } from "@/lib/reporting/messaging-moderation";
+import type { AdminModerationThreadDetail } from "@/types/admin.types";
 
 type DurationDays = 7 | 14 | 30 | 90 | null;
 type DialogMode = "dismiss" | "resolve" | "suspend_worker" | "suspend_employer" | null;
