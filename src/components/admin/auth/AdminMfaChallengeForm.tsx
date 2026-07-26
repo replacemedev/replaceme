@@ -6,74 +6,81 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export function AdminMfaChallengeForm() {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const submitLockRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function readOtp() {
+    const raw = inputRef.current?.value ?? code;
+    return raw.replace(/\D/g, "").slice(0, 6);
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (submitLockRef.current) return;
 
-    const otp = code.trim();
-    if (otp.length !== 6) return;
+    const otp = readOtp();
+    setCode(otp);
+    if (otp.length !== 6) {
+      toast.error("Enter the 6-digit code");
+      return;
+    }
 
     submitLockRef.current = true;
     setIsLoading(true);
 
     try {
       const supabase = createClient();
+      // Ensure cookies/session are bound before challenge/verify.
+      await supabase.auth.getSession();
+
       const { data: factorsData, error: factorsError } =
         await supabase.auth.mfa.listFactors();
       if (factorsError) throw factorsError;
 
-      const totpFactor = factorsData.totp.find((f) => f.status === "verified");
-      if (!totpFactor) {
+      // Prefer newest verified factor first (often the one just enrolled),
+      // then try every verified TOTP — admins can have multiple authenticators.
+      const factors = [...(factorsData.totp ?? [])]
+        .filter((f) => f.status === "verified")
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+      if (factors.length === 0) {
         toast.error("No authenticator found. Enroll MFA first.");
         window.location.assign("/admin/mfa-enroll");
         return;
       }
 
-      const factorId = totpFactor.id;
+      let lastError: { message?: string } | null = null;
 
-      // Official flow: challenge → verify (fresh challenge per attempt).
-      // See https://supabase.com/docs/guides/auth/auth-mfa/totp
-      const verifyOnce = async () => {
-        const { data: challengeData, error: challengeError } =
-          await supabase.auth.mfa.challenge({ factorId });
-        if (challengeError) throw challengeError;
+      for (const factor of factors) {
+        const { error: verifyError } =
+          await supabase.auth.mfa.challengeAndVerify({
+            factorId: factor.id,
+            code: otp,
+          });
 
-        const { error: verifyError } = await supabase.auth.mfa.verify({
-          factorId,
-          challengeId: challengeData.id,
-          code: otp,
-        });
-        return verifyError;
-      };
+        if (!verifyError) {
+          window.location.assign("/admin/dashboard");
+          return;
+        }
 
-      let verifyError = await verifyOnce();
+        lastError = verifyError;
 
-      // Clock-skew / period-boundary: one retry with a new challenge.
-      if (verifyError) {
-        await delay(400);
-        verifyError = await verifyOnce();
-      }
-
-      if (verifyError) {
-        // Concurrent submit race: first attempt may have already upgraded AAL2.
+        // First attempt may have already upgraded AAL2 (cookie race).
         const { data: aal } =
           await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-        if (aal?.currentLevel !== "aal2") {
-          throw verifyError;
+        if (aal?.currentLevel === "aal2") {
+          window.location.assign("/admin/dashboard");
+          return;
         }
       }
 
-      // Hard nav so the next request uses the upgraded AAL2 cookies.
-      window.location.assign("/admin/dashboard");
+      throw lastError ?? new Error("Invalid code");
     } catch {
       toast.error("Invalid code. Please try again.");
       submitLockRef.current = false;
@@ -84,6 +91,7 @@ export function AdminMfaChallengeForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
+        ref={inputRef}
         value={code}
         onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
         placeholder="000000"
