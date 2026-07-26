@@ -45,7 +45,7 @@ export async function getApplyJobPageData(
       .eq("status", "Active")
       .maybeSingle();
 
-    if (jobError || !job?.id || !job.title) {
+    if (jobError || !job?.id || !job.title || !job.employer_id) {
       if (jobError) safeError("getApplyJobPageData job:", jobError);
       return null;
     }
@@ -145,7 +145,7 @@ export async function submitJobApplication(
       .eq("status", "Active")
       .maybeSingle();
 
-    if (!job) {
+    if (!job?.employer_id) {
       return { success: false, error: "This job is no longer available." };
     }
 

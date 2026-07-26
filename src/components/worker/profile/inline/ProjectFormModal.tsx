@@ -76,8 +76,8 @@ export function ProjectFormModal({
         toast.success("Project updated");
       } else {
         const result = await createWorkerProject(payload);
-        if (result.error) {
-          toast.error(result.error);
+        if (result.error || !result.id) {
+          toast.error(result.error ?? "Failed to add project.");
           return;
         }
         onSaved({

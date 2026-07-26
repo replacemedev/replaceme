@@ -81,7 +81,7 @@ export async function getWorkerEarningsSummary(
     dateFrom = `${now.getFullYear()}-01-01`;
   }
 
-  // Fetch contracts with related job title and employer company name
+  // Fetch contracts with related job title + company (via job_posts; no FK to company_profiles)
   let query = supabase
     .from("contracts")
     .select(
@@ -92,8 +92,7 @@ export async function getWorkerEarningsSummary(
       weekly_hours,
       employment_type,
       status,
-      job_posts ( title ),
-      company_profiles!contracts_employer_id_fkey ( company_name )
+      job_posts ( title, company_name )
       `,
       { count: "exact" }
     )
@@ -122,28 +121,14 @@ export async function getWorkerEarningsSummary(
 
   // Map to clean shape; apply optional search filter in memory
   // (Supabase doesn't support ilike on joined columns without views)
-  type ContractRow = {
-    id: string;
-    start_date: string;
-    hourly_rate: number | string;
-    weekly_hours: number | string;
-    employment_type: string;
-    status: string;
-    job_posts: { title: string } | { title: string }[] | null;
-    company_profiles: { company_name: string } | { company_name: string }[] | null;
-  };
-
-  const mapped: WorkerHireRecord[] = (data as ContractRow[]).map((row) => {
+  const mapped: WorkerHireRecord[] = data.map((row) => {
     const job = Array.isArray(row.job_posts) ? row.job_posts[0] : row.job_posts;
-    const company = Array.isArray(row.company_profiles)
-      ? row.company_profiles[0]
-      : row.company_profiles;
 
     return {
       id: row.id,
       dateHired: row.start_date,
       jobTitle: job?.title ?? "—",
-      employerName: company?.company_name ?? "—",
+      employerName: job?.company_name ?? "—",
       hourlyRate: Number(row.hourly_rate),
       weeklyHours: Number(row.weekly_hours),
       employmentType: row.employment_type,

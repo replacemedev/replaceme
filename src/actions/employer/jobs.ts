@@ -358,7 +358,7 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
         name: job.hiring_manager_name ?? "Hiring team",
         role: job.hiring_manager_role ?? "Recruiter",
         avatarUrl: null,
-        email: job.hiring_manager_email ?? null,
+        email: job.hiring_manager_email ?? "",
       }
     };
   } catch (err) {

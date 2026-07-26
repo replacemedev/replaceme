@@ -25,6 +25,7 @@ import { WorkerDashboardOnboardedBanner } from "@/components/worker/dashboard/Wo
 import { WorkerKycResubmitBanner } from "@/components/worker/verification/WorkerKycResubmitBanner";
 import { computeWorkerProfileStrength } from "@/lib/worker/profile-strength";
 import type { VerificationStatus } from "@/types/verification";
+import type { RecommendedJob } from "@/types/worker";
 
 export const dynamic = "force-dynamic";
 
@@ -92,20 +93,34 @@ export default async function WorkerDashboard() {
   const workerSkillsSet = new Set(
     skills?.map((s) => s.skill_name.toLowerCase()) ?? []
   );
-  const processedJobs = (recommendedJobs ?? []).map((job) => {
-    const jobSkills = job.skills || [];
-    const matchedCount = jobSkills.filter((s: string) =>
-      workerSkillsSet.has(s.toLowerCase())
-    ).length;
-    const score =
-      jobSkills.length > 0
-        ? Math.round((matchedCount / jobSkills.length) * 100)
-        : 0;
-    return {
-      ...job,
-      match_score: score >= 50 ? 95 : 0,
-    };
-  });
+  const processedJobs: RecommendedJob[] = (recommendedJobs ?? []).flatMap(
+    (job) => {
+      if (!job.id || !job.employer_id || !job.title) return [];
+      const jobSkills = job.skills ?? [];
+      const matchedCount = jobSkills.filter((s) =>
+        workerSkillsSet.has(s.toLowerCase())
+      ).length;
+      const score =
+        jobSkills.length > 0
+          ? Math.round((matchedCount / jobSkills.length) * 100)
+          : 0;
+      return [
+        {
+          id: job.id,
+          employer_id: job.employer_id,
+          title: job.title,
+          employment_type: job.employment_type ?? "Any",
+          monthly_salary: Number(job.monthly_salary ?? 0),
+          salary_currency: job.salary_currency,
+          hours_per_week: Number(job.hours_per_week ?? 0),
+          skills: jobSkills,
+          company_name: job.company_name ?? "Company",
+          logo_url: job.logo_url ?? null,
+          match_score: score >= 50 ? 95 : 0,
+        },
+      ];
+    }
+  );
 
   const displayMessages: RecentMessage[] = threads
     .sort((a, b) => {

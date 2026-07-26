@@ -32,8 +32,11 @@ import {
   replaceStorageImage,
   storagePathFromPublicUrl,
 } from "@/lib/storage/replace-storage-image";
+import type { Database } from "@/types/database";
 
 const PROFILE_AVATAR_BUCKET = "profile-avatars";
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 function emptyToNull(value: string | null | undefined) {
   if (value === null || value === undefined) return value;
@@ -50,7 +53,7 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   }
 
   const data = parsed.data;
-  const update: Record<string, unknown> = {
+  const update: ProfileUpdate = {
     updated_at: new Date().toISOString(),
   };
 
@@ -171,8 +174,8 @@ export async function createWorkerSkill(payload: unknown) {
     years_with_skill: parsed.data.yearsWithSkill ?? null,
   }).select("id").single();
 
-  if (error) {
-    if (error.code === "23505") return { error: "Skill already exists." };
+  if (error || !data?.id) {
+    if (error?.code === "23505") return { error: "Skill already exists." };
     return { error: "Failed to add skill." };
   }
 
@@ -248,7 +251,7 @@ export async function createWorkerProject(payload: unknown) {
     skills_used: parsed.data.skillsUsed,
   }).select("id").single();
 
-  if (error) return { error: "Failed to add project." };
+  if (error || !data?.id) return { error: "Failed to add project." };
 
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);

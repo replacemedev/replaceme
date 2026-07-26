@@ -227,20 +227,12 @@ export async function uploadCompanyLogo(formData: FormData) {
     }
 
     if (!updatedRow) {
-      const { error: insertError } = await supabase.from("company_profiles").insert({
-        employer_id: user.id,
-        logo_url: logoUrl,
-        updated_at: now,
-      });
-
-      if (insertError) {
-        safeError("uploadCompanyLogo db insert:", insertError);
-        await admin.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
-        return {
-          error:
-            "Your logo uploaded but we couldn't save it to your company profile. Please try again.",
-        };
-      }
+      // company_name is required on insert — logo upload cannot create a bare profile.
+      await admin.storage.from(COMPANY_LOGO_BUCKET).remove([storagePath]);
+      return {
+        error:
+          "Create your company profile first, then upload a logo.",
+      };
     }
 
     revalidatePath("/employer/settings/company");

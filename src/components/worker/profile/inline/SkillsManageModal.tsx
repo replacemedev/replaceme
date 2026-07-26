@@ -85,8 +85,8 @@ export function SkillsManageModal({
           category: "top",
           experienceDuration: form.experienceDuration || undefined,
         });
-        if (result.error) {
-          toast.error(result.error);
+        if (result.error || !result.id) {
+          toast.error(result.error ?? "Failed to add skill.");
           return;
         }
         const optimistic: WorkerSkillDetailed = {
