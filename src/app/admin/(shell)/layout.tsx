@@ -6,6 +6,7 @@ import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
 import { AdminLayoutChrome } from "@/components/admin/layout/AdminLayoutChrome";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { ADMIN_MAIN_BG } from "@/lib/admin/ui-tokens";
+import { resolveAdminMfaRedirect } from "@/lib/server/auth/admin-mfa";
 import { getCurrentAdminCapabilities } from "@/lib/server/auth/require-capability";
 
 export const dynamic = "force-dynamic";
@@ -27,10 +28,8 @@ export default async function AdminShellLayout({
 
   const { data: aalData } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-
-  if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
-    redirect("/admin/mfa-challenge");
-  }
+  const mfaRedirect = resolveAdminMfaRedirect(aalData);
+  if (mfaRedirect) redirect(mfaRedirect);
 
   const session = await getNavSession();
   const { isSuperAdmin, capabilities, adminRole } =

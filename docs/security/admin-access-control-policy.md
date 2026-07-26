@@ -11,6 +11,13 @@ Internal artifact supporting RA 10173 / NPC Circular No. 2023-06 access-control 
 
 Platform identity remains JWT `app_metadata.role = admin` + MFA (AAL2). Tier and capabilities live on `admin_profiles`.
 
+## MFA (mandatory)
+
+1. Every admin must **enroll a TOTP authenticator** in-portal (`/admin/mfa-enroll` or Security Center) before the admin shell is available.
+2. After enrollment, sessions must reach **AAL2** via `/admin/mfa-challenge` (middleware, shell layout, and `requireAdmin` for Server Actions).
+3. Enroll / unenroll events are audit-logged as `auth.mfa_enrolled` / `auth.mfa_unenrolled`.
+4. Super admins can review **team MFA posture** on `/admin/security`.
+
 ## Module capabilities
 
 | Capability | Default moderator | Notes |
@@ -19,13 +26,13 @@ Platform identity remains JWT `app_metadata.role = admin` + MFA (AAL2). Tier and
 | `users`, `applications`, `jobs` | Off | Operations |
 | `identity`, `reports`, `moderation`, `disputes`, `notifications` | On | Trust & Safety need-to-know |
 | `billing` | Off | Revenue |
-| `audit_log`, `security` | Off | Platform — audit_log is read + CSV export only; rows are append-only |
+| `audit_log`, `security` | Off | Platform — `audit_log` is full read + CSV; `security` is Security Center + security-event feed (append-only rows) |
 | `settings` | On | Self profile (photo, contact) + account security |
 | `team`, `email` | Never | Super admin only |
 
 ## Staff profile & passwords
 
-- Every signed-in admin with `settings` can update **their own** photo (with crop), name, department, phone, timezone, bio, and password (in-app change or email reset).
+- Every signed-in admin with `settings` can update **their own** photo (with crop), name, department, phone, timezone, bio, and password (in-app change or email reset). Password + MFA management also live on `/admin/security` (requires `security` capability or superadmin).
 - Staff photos live in `profile-avatars` and are dual-written to `profiles` / `admin_profiles` for shell identity.
 - **Public directory:** opt-in via `admin_profiles.directory_public`. Publishes name, photo, department, timezone, and bio on `/team` only. Email/phone never published.
 - Admin-internal directory: `/admin/settings/directory` (all active staff, settings capability).
@@ -34,7 +41,7 @@ Platform identity remains JWT `app_metadata.role = admin` + MFA (AAL2). Tier and
 ## Lifecycle
 
 1. Super admin **invites** by work email (7-day expiry); no shared temporary password.
-2. Invitee sets password via recovery link, then completes MFA.
+2. Invitee sets password via recovery link, then **must enroll MFA** before shell access.
 3. Super admin may **edit access**, **resend invite**, **suspend** (ban + status), or **revoke** pending invites.
 4. Denied capability probes are audit-logged as `capability_denied`.
 
@@ -42,6 +49,7 @@ Platform identity remains JWT `app_metadata.role = admin` + MFA (AAL2). Tier and
 
 - Nav filter + page redirects (`requireAdminPageCapability`)
 - Server Actions (`requireAdminCapability` / `requireSuperAdmin`)
+- MFA gate: `resolveAdminMfaRedirect` in middleware, shell layout, and `requireAdmin`
 - SQL helper `has_admin_capability(cap)` for future RLS tightening
 
 ## Review

@@ -54,11 +54,13 @@ curl -sI "https://replaceme.ph/auth/callback?code=fake&next=//evil.com"
 
 Expect redirect to your site’s `/signin` with error — never `Location: //evil.com` or `https://evil.com`.
 
-## 5. Admin MFA (AAL2)
+## 5. Admin MFA (TOTP enroll + AAL2)
 
-1. Enroll TOTP for an admin.
-2. Sign in without completing MFA challenge.
-3. Call any admin Server Action (e.g. suspend user) via the UI — must fail / redirect to `/admin/mfa-challenge`.
+1. New admin with no TOTP: sign in → must land on `/admin/mfa-enroll` (not the shell).
+2. Complete enroll (scan QR + verify code) → redirect to dashboard at AAL2.
+3. Sign out, sign in again without challenge → shell/actions redirect to `/admin/mfa-challenge`.
+4. `/admin/security`: manage TOTP, change password, revoke sessions; superadmin sees team MFA posture.
+5. Moderator with only `security` (no `audit_log`) can still load the security event feed.
 
 ## 6. WAF / DDoS dashboard (manual toggles)
 

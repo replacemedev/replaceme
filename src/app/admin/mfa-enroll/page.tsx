@@ -1,21 +1,21 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AdminMfaChallengeForm } from "@/components/admin/auth/AdminMfaChallengeForm";
+import { AdminMfaEnrollForm } from "@/components/admin/auth/AdminMfaEnrollForm";
 import { AuthPageShell, AuthFormCard } from "@/components/auth/AuthPageShell";
 import { AUTH_SUBTITLE, AUTH_TITLE } from "@/lib/auth/ui-tokens";
 import {
   isAdminMfaEnrolled,
   isAdminMfaSatisfied,
-  MFA_ENROLL_PATH,
+  MFA_CHALLENGE_PATH,
 } from "@/lib/server/auth/admin-mfa";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "MFA Verification | Admin",
+  title: "Enroll MFA | Admin",
 };
 
-export default async function AdminMfaChallengePage() {
+export default async function AdminMfaEnrollPage() {
   const supabase = await createClient();
 
   const {
@@ -31,21 +31,21 @@ export default async function AdminMfaChallengePage() {
   if (isAdminMfaSatisfied(aalData)) {
     redirect("/admin/dashboard");
   }
-  if (!isAdminMfaEnrolled(aalData)) {
-    redirect(MFA_ENROLL_PATH);
+  if (isAdminMfaEnrolled(aalData)) {
+    redirect(MFA_CHALLENGE_PATH);
   }
 
   return (
     <AuthPageShell brandHref="/admin/dashboard">
       <header className="mb-6 space-y-2">
-        <h1 className={AUTH_TITLE}>Two-factor authentication</h1>
+        <h1 className={AUTH_TITLE}>Set up authenticator</h1>
         <p className={AUTH_SUBTITLE}>
-          Enter the 6-digit code from your authenticator app to access the admin
-          panel.
+          Admin access requires a TOTP authenticator app. Enroll once, then
+          verify on each elevated session.
         </p>
       </header>
       <AuthFormCard>
-        <AdminMfaChallengeForm />
+        <AdminMfaEnrollForm />
       </AuthFormCard>
     </AuthPageShell>
   );

@@ -7,8 +7,11 @@ import {
   isSessionIdle,
 } from "@/lib/security/session-idle";
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
-
-const MFA_CHALLENGE_PATH = "/admin/mfa-challenge";
+import {
+  MFA_CHALLENGE_PATH,
+  MFA_ENROLL_PATH,
+  resolveAdminMfaRedirect,
+} from "@/lib/server/auth/admin-mfa";
 
 const IDLE_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -88,6 +91,8 @@ export async function updateSession(request: NextRequest) {
       pathname === "/update-password" || pathname.startsWith("/auth/");
     const isAdminRoute = pathname.startsWith("/admin");
     const isMfaChallenge = pathname === MFA_CHALLENGE_PATH;
+    const isMfaEnroll = pathname === MFA_ENROLL_PATH;
+    const isMfaGate = isMfaChallenge || isMfaEnroll;
     const isWorkerRoute = pathname.startsWith("/worker");
     const isEmployerRoute = pathname.startsWith("/employer");
     const isProtectedRoute = isWorkerRoute || isEmployerRoute || isAdminRoute;
@@ -114,7 +119,7 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(signInUrl);
     }
 
-    if (isAdminRoute && !isMfaChallenge) {
+    if (isAdminRoute && !isMfaGate) {
       if (!user) {
         return NextResponse.redirect(new URL("/signin", request.url));
       }
@@ -123,12 +128,13 @@ export async function updateSession(request: NextRequest) {
       }
       const { data: aalData } =
         await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
-        return NextResponse.redirect(new URL(MFA_CHALLENGE_PATH, request.url));
+      const mfaRedirect = resolveAdminMfaRedirect(aalData);
+      if (mfaRedirect) {
+        return NextResponse.redirect(new URL(mfaRedirect, request.url));
       }
     }
 
-    if (isMfaChallenge) {
+    if (isMfaGate) {
       if (!user) {
         return NextResponse.redirect(new URL("/signin", request.url));
       }

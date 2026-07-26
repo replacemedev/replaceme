@@ -191,10 +191,11 @@ Items **not** on the original gate image, but required (or strongly recommended)
 
 ## A. Identity & account security
 
-- [~] **MFA for admins** — Partial *(deferred — not in this hardening pass)*  
-  - AAL2 challenge enforced for admin shell when enrolled  
-  - Security page shows enrollment status  
-  - **Gap:** No in-app MFA enrollment UX; workers/employers have no MFA requirement
+- [x] **MFA for admins** — Full
+  - Mandatory TOTP enrollment (`/admin/mfa-enroll`) before admin shell
+  - AAL2 challenge enforced for admin shell when enrolled
+  - Security Center: enroll/manage TOTP, password, sessions, security event feed, superadmin team MFA posture
+  - Workers/employers: MFA not required (product decision)
 
 - [x] **Account lockout / progressive delay after failed logins** — Full  
   - Cognito/OWASP-style: after 5 failures, lock `min(2^(n-5), 900)` seconds  
@@ -329,7 +330,7 @@ Items **not** on the original gate image, but required (or strongly recommended)
 ## Still open (production-ready extras)
 
 10. **[x]** Error monitoring + health check + incident runbook (2026-07-14)  
-11. **[ ]** In-app admin MFA enrollment; decide MFA policy for employers *(deferred)*  
+11. **[x]** In-app admin MFA enrollment (TOTP); employer/worker MFA still deferred  
 12. **[ ]** Data export/delete flows for compliance readiness  
 13. **[~]** Nonce / `strict-dynamic` CSP via `proxy.ts` — report-only live; enforce via `CSP_ENFORCE_NONCE=1`  
 14. **[ ]** Resolve Next.js nested `postcss` moderate advisory when upstream ships fix  

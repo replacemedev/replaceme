@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { resolveAdminMfaRedirect } from "@/lib/server/auth/admin-mfa";
 import { requireAuth, AuthError } from "@/lib/server/auth/session";
 
 export class AdminAuthError extends AuthError {
@@ -19,10 +20,14 @@ export const requireAdmin = cache(async (): Promise<{
     throw new AdminAuthError();
   }
 
-  // Enforce AAL2 when MFA is enrolled — layout alone is not enough for Server Actions.
+  // Layout alone is not enough for Server Actions — require enrolled + AAL2.
   const { data: aalData } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
+  const mfaRedirect = resolveAdminMfaRedirect(aalData);
+  if (mfaRedirect === "/admin/mfa-enroll") {
+    throw new AdminAuthError("MFA enrollment required before admin actions");
+  }
+  if (mfaRedirect === "/admin/mfa-challenge") {
     throw new AdminAuthError("MFA challenge required before admin actions");
   }
 

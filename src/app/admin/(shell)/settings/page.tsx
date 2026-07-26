@@ -97,7 +97,7 @@ export default async function AdminSettingsPage() {
           value={isSuperAdmin ? "Super admin" : "Moderator"}
         />
         <SettingsRow label="Admin auth" value="JWT app_metadata.role = admin" />
-        <SettingsRow label="MFA policy" value="AAL2 required in admin shell" />
+        <SettingsRow label="MFA policy" value="TOTP enroll required · AAL2 for admin shell" />
       </section>
 
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 flex items-start gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">

@@ -21,7 +21,7 @@ Mark when countersigned agreements are on file (shared drive / contract system).
 ## Subprocessor publication
 
 - Public page: `/subprocessors` (Phase 1 account-lifecycle disclosures).
-- Keep the public `SUBPROCESSORS` constant aligned with executed DPAs; internal checklist above may include vendors not yet listed publicly.
+- Keep the public `SUBPROCESSORS` constant aligned with vendors that process personal data in production (Stripe, Resend, Supabase, Vercel, Cloudflare, Upstash, Sentry when enabled). Executed DPA checkboxes above remain a Legal/Ops ownership item.
 
 ## Transfer / residency notes
 

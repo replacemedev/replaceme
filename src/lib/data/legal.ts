@@ -97,7 +97,7 @@ export const DATA_RETENTION_PERIODS = [
   {
     category: "Admin staff operational data",
     period:
-      "Work email, optional staff profile photo, department, timezone, short bio, MFA enrollment metadata, invite timestamps, module capability grants, directory opt-in flag, and admin action audit logs—retained up to 24 months with security/audit logs (or longer under legal hold). Staff who opt in may publish name, photo, department, timezone, and bio on the public /team page (email and phone stay private). Password credentials are handled by the auth provider (hashed); in-app password change and email reset are available to each signed-in admin. Processed as employment/contractor operational data under RA 10173 / GDPR accountability",
+      "Work email, optional staff profile photo, department, timezone, short bio, MFA enrollment metadata (TOTP factors managed in the admin Security Center), invite timestamps, module capability grants, directory opt-in flag, and admin action audit logs—retained up to 24 months with security/audit logs (or longer under legal hold). Staff who opt in may publish name, photo, department, timezone, and bio on the public /team page (email and phone stay private). Password credentials are handled by the auth provider (hashed); in-app password change and email reset are available to each signed-in admin. Processed as employment/contractor operational data under RA 10173 / GDPR accountability",
   },
   {
     category: "Cookie consent records",
@@ -139,6 +139,26 @@ export const SUBPROCESSORS = [
     name: "Supabase",
     purpose: "Database, authentication, storage, and hosting infrastructure",
     region: "Configured project region (Southeast Asia / global edge)",
+  },
+  {
+    name: "Vercel",
+    purpose: "Application hosting, edge delivery, and serverless compute",
+    region: "United States / global edge",
+  },
+  {
+    name: "Cloudflare",
+    purpose: "Bot protection (Turnstile) and related edge security services",
+    region: "Global",
+  },
+  {
+    name: "Upstash",
+    purpose: "Redis-backed rate limiting and ephemeral operational caches",
+    region: "Configured project region",
+  },
+  {
+    name: "Sentry",
+    purpose: "Application error monitoring (when enabled for the environment)",
+    region: "United States / global",
   },
 ] as const;
 

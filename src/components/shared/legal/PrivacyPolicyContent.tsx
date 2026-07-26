@@ -483,7 +483,9 @@ export function PrivacyPolicyContent({
           (who manage the admin team, email broadcasts, and full module access) and{" "}
           <strong className="font-semibold text-slate-800">Moderators</strong>{" "}
           (who receive module capabilities—such as Trust &amp; Safety queues, Users, or Billing—granted
-          by a Super administrator). Access is MFA-gated, capability-scoped, and audit-logged,
+          by a Super administrator). Access is MFA-gated (staff must enroll a TOTP
+          authenticator in the admin Security Center before using the portal, and complete
+          a challenge on elevated sessions), capability-scoped, and audit-logged,
           consistent with RA 10173 / NPC Circular No. 2023-06 least-privilege and access-control
           requirements and GDPR accountability principles. Privileged staff actions and sensitive-data
           access (including identity-document views) are written to an append-only audit log with

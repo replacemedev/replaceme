@@ -25,7 +25,8 @@ export function AdminMfaChallengeForm() {
 
       const totpFactor = factorsData.totp.find((f) => f.status === "verified");
       if (!totpFactor) {
-        toast.error("No authenticator found. Contact admin.");
+        toast.error("No authenticator found. Enroll MFA first.");
+        router.push("/admin/mfa-enroll");
         return;
       }
 

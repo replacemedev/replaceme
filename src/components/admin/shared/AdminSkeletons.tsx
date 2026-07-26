@@ -198,9 +198,14 @@ export function AdminIdentityPageSkeleton() {
 
 export function AdminSecurityPageSkeleton() {
   return (
-    <AdminPageShell className="space-y-6" aria-busy="true" aria-label="Loading security">
+    <AdminPageShell className="space-y-8" aria-busy="true" aria-label="Loading security">
       <AdminPageHeaderSkeleton />
-      <AdminPanelSkeleton height="min-h-[160px]" rows={2} />
+      <AdminCardGridSkeleton count={3} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+        <AdminPanelSkeleton height="min-h-[280px]" rows={4} />
+        <AdminPanelSkeleton height="min-h-[280px]" rows={4} />
+      </div>
+      <AdminPanelSkeleton height="min-h-[200px]" rows={3} />
       <AdminPanelSkeleton height="min-h-[240px]" rows={4} />
     </AdminPageShell>
   );
