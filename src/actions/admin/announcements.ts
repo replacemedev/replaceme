@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireSuperAdmin } from "@/lib/server/auth/require-super-admin";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/server/auth/session";
 import { fetchEmployerEntitlements } from "@/lib/server/entitlements";
@@ -57,7 +57,7 @@ const upsertSchema = z.object({
 export async function listProductAnnouncements(): Promise<{
   announcements: ProductAnnouncementRow[];
 }> {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const admin = await createAdminClient();
   const { data, error } = await admin
     .from("product_announcements")

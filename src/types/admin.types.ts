@@ -138,7 +138,12 @@ export const adminRoleSchema = z.enum(["moderator", "superadmin"]);
 export const adminTeamRowSchema = adminAdminRowSchema.extend({
   admin_role: adminRoleSchema.catch("moderator"),
   display_name: z.string().nullable().optional(),
+  department: z.string().nullable().optional(),
+  avatar_url: z.string().nullable().optional(),
   last_sign_in_at: z.string().nullable().optional(),
+  capabilities: z.array(z.string()).catch([]),
+  invited_at: z.string().nullable().optional(),
+  invite_accepted_at: z.string().nullable().optional(),
 });
 
 export const adminTeamListSchema = z.array(adminTeamRowSchema);
@@ -216,7 +221,12 @@ export type AdminRole = "moderator" | "superadmin";
 export interface AdminTeamRow extends AdminAdminRow {
   admin_role: AdminRole;
   display_name?: string | null;
+  department?: string | null;
+  avatar_url?: string | null;
   last_sign_in_at?: string | null;
+  capabilities: string[];
+  invited_at?: string | null;
+  invite_accepted_at?: string | null;
 }
 
 export interface AdminJobRow {

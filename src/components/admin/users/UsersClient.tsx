@@ -510,7 +510,7 @@ export function UsersClient({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2 py-0.5 text-[11px] font-semibold text-[#006e2f]">
                       <ShieldCheck className="h-3 w-3" aria-hidden />
-                      Platform Admin
+                      Admin
                     </span>
                     <StatusBadge status={admin.account_status} />
                   </div>
@@ -678,7 +678,7 @@ export function UsersClient({
                               <td className={ADMIN_TABLE_TD}>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2.5 py-1 text-[11px] font-semibold text-[#006e2f]">
                                   <ShieldCheck className="h-3 w-3" aria-hidden />
-                                  Platform Admin
+                                  Admin
                                 </span>
                               </td>
                               <td className={ADMIN_TABLE_TD}>

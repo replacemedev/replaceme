@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { computeKeywordMatchScore } from "@/lib/matching/keyword-match-score";
@@ -195,7 +195,7 @@ async function resolveSearchFilters(
 export async function fetchAdminApplications(
   query: AdminApplicationsQuery = {}
 ): Promise<AdminApplicationsListResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("applications");
 
   const page = Math.max(1, Number(query.page ?? 1) || 1);
   const from = (page - 1) * PAGE_SIZE;
@@ -298,7 +298,7 @@ export async function fetchAdminApplicationDeepDive(
 ): Promise<AdminApplicationDeepDive | null> {
   try {
     const id = z.string().uuid().parse(applicationId);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("applications");
 
     const { data, error } = await supabase
       .from("applications")
@@ -441,7 +441,7 @@ export async function getAdminApplicationResumeSignedUrl(
 ): Promise<{ success: true; url: string } | { success: false; error: string }> {
   try {
     const id = z.string().uuid().parse(applicationId);
-    await requireAdmin();
+    await requireAdminCapability("applications");
     const admin = await createAdminClient();
 
     const { data, error } = await admin
@@ -500,7 +500,7 @@ export async function moderateAdminApplication(input: {
       };
     }
 
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("applications");
     const admin = await createAdminClient();
     const { applicationId, mode, reason } = parsed.data;
 
@@ -552,7 +552,7 @@ export async function clearAdminApplicationFlag(
 ): Promise<ActionResult> {
   try {
     const id = z.string().uuid().parse(applicationId);
-    await requireAdmin();
+    await requireAdminCapability("applications");
     const admin = await createAdminClient();
 
     const { data: updated, error } = await admin

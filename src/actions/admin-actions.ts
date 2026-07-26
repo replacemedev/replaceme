@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { safeWarn } from "@/utils/logger";
@@ -209,7 +210,7 @@ export async function suspendUser(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = suspendUserSchema.parse(input);
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("users");
 
     const result = await suspendAccount({
       userId: parsed.userId,
@@ -260,7 +261,7 @@ export async function unsuspendUser(
 ): Promise<ActionResult> {
   try {
     const id = z.string().uuid().parse(userId);
-    await requireAdmin();
+    await requireAdminCapability("users");
 
     const result = await unsuspendAccount({ userId: id, notifyUser });
     if (!result.success) {
@@ -295,7 +296,7 @@ export async function unsuspendUser(
 
 export async function getUserClosureBlockers(userId: string) {
   const id = z.string().uuid().parse(userId);
-  await requireAdmin();
+  await requireAdminCapability("users");
   const admin = await createAdminClient();
   return getAccountClosureBlockers(admin, id);
 }
@@ -310,7 +311,7 @@ export async function scheduleUserAccountDeletion(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = deleteAccountSchema.parse({ ...input, mode: "schedule" });
-    await requireAdmin();
+    await requireAdminCapability("users");
 
     const admin = await createAdminClient();
     const { data: profile, error: profileError } = await admin
@@ -376,7 +377,7 @@ export async function deleteUserAccount(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = deleteAccountSchema.parse({ ...input, mode: "immediate" });
-    await requireAdmin();
+    await requireAdminCapability("users");
 
     const admin = await createAdminClient();
     const { data: profile, error: profileError } = await admin
@@ -437,7 +438,7 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
     // Authz first; mutate with service role so RLS cannot silently no-op the update.
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("jobs");
     const admin = await createAdminClient();
 
     const { data: existing, error: loadError } = await admin
@@ -505,7 +506,7 @@ export async function rejectJobPost(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = rejectJobSchema.parse(input);
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("jobs");
     const admin = await createAdminClient();
     const trimmedReason = parsed.reason?.trim() || null;
     const now = new Date().toISOString();
@@ -626,7 +627,7 @@ export async function bulkRejectJobPosts(input: {
 }
 
 export async function countJobsPendingReview(): Promise<number> {
-  await requireAdmin();
+  await requireAdminCapability("jobs");
   const admin = await createAdminClient();
   const { count, error } = await admin
     .from("jobs")
@@ -647,7 +648,7 @@ export async function deleteJobPost(
       jobId,
       reason: reason.trim() || "Removed by admin",
     });
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("jobs");
     const admin = await createAdminClient();
     const now = new Date().toISOString();
     const deletionReason = parsed.reason ?? "Removed by admin";
@@ -698,7 +699,7 @@ export async function deleteJobPost(
 export async function restoreJobPost(jobId: string): Promise<ActionResult> {
   try {
     const id = moderateJobSchema.shape.jobId.parse(jobId);
-    await requireAdmin();
+    await requireAdminCapability("jobs");
     const admin = await createAdminClient();
 
     const { data: existing, error: loadError } = await admin
@@ -748,7 +749,7 @@ export async function reviewWorkerVerification(
 ): Promise<ActionResult> {
   try {
     const parsed = reviewVerificationSchema.parse({ workerId, decision, reason });
-    const { user, supabase } = await requireAdmin();
+    const { user, supabase } = await requireAdminCapability("identity");
 
     const nextStatus = parsed.decision;
     const trimmedReason = parsed.reason?.trim() || null;
@@ -840,7 +841,7 @@ function statusesForTab(tab: IdentityQueueTab): readonly string[] {
 export async function fetchVerificationQueue(
   filters: IdentityQueueFilters = {}
 ): Promise<IdentityQueueResult> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("identity");
   const tab: IdentityQueueTab = filters.tab ?? "pending";
   const sort = filters.sort ?? "newest";
   const pageSize = Math.min(Math.max(filters.pageSize ?? 20, 1), 100);
@@ -1009,7 +1010,7 @@ export async function fetchWorkerVerificationDocuments(
   workerId: string
 ): Promise<AdminVerificationDocument[]> {
   const id = z.string().uuid().parse(workerId);
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("identity");
 
   const { data, error } = await supabase
     .from("verification_documents")
@@ -1102,7 +1103,7 @@ export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
   documents: AdminVerificationDocument[];
 } | null> {
   const id = z.string().uuid().parse(workerId);
-  const { user, supabase } = await requireAdmin();
+  const { user, supabase } = await requireAdminCapability("identity");
 
   const { data: worker, error } = await supabase
     .from("profiles")
@@ -1195,7 +1196,7 @@ export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
 }
 
 export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
-  await requireAdmin();
+  await requireAdminCapability("dashboard");
 
   return getOrSet(
     CacheKeys.adminPlatformMetrics(),
@@ -1215,13 +1216,13 @@ export async function fetchDashboardMetrics(): Promise<PlatformMetrics> {
 }
 
 export async function fetchRecentAuditLogs(limit = 10) {
-  await requireAdmin();
+  await requireAdminCapability("dashboard");
 
   return getOrSet(
     CacheKeys.adminRecentAuditLogs(limit),
     CACHE_TTL_SECONDS.adminAuditLogs,
     async () => {
-      const { supabase } = await requireAdmin();
+      const { supabase } = await requireAdminCapability("dashboard");
 
       const { data } = await supabase
         .from("audit_logs")
@@ -1244,7 +1245,7 @@ export async function fetchAdminWorkersSafe(): Promise<
   AdminFetchResult<AdminWorkerRow[]>
 > {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("users");
 
     const { data, error } = await supabase
       .from("profiles")
@@ -1329,7 +1330,7 @@ export async function fetchAdminEmployersSafe(): Promise<
   AdminFetchResult<AdminEmployerRow[]>
 > {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("users");
 
     const { data, error } = await supabase
       .from("company_profiles")
@@ -1409,7 +1410,7 @@ export async function fetchAdminAdminsSafe(): Promise<
   AdminFetchResult<AdminAdminRow[]>
 > {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("users");
 
     const { data, error } = await supabase
       .from("profiles")
@@ -1499,7 +1500,7 @@ export async function fetchAdminJobs(
     search?: string;
   }
 ): Promise<AdminJobRow[]> {
-  await requireAdmin();
+  await requireAdminCapability("jobs");
   const supabase = await createAdminClient();
 
   let query = supabase
@@ -1592,7 +1593,7 @@ export async function fetchAdminJobs(
 export async function fetchAdminSubscriptions(): Promise<
   AdminSubscriptionRow[]
 > {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("billing");
 
   const { data, error } = await supabase
     .from("employer_subscriptions")
@@ -1684,7 +1685,7 @@ export async function fetchAdminSubscriptions(): Promise<
 }
 
 export async function fetchAuditLogs(limit = 100): Promise<AdminAuditLogRow[]> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("audit_log");
 
   const { data, error } = await supabase
     .from("audit_logs")
@@ -1725,7 +1726,7 @@ export async function fetchAuditLogs(limit = 100): Promise<AdminAuditLogRow[]> {
 export async function fetchAdminDisputes(
   status?: string
 ): Promise<AdminDisputeRow[]> {
-  await requireAdmin();
+  await requireAdminCapability("disputes");
   const adminClient = await createAdminClient();
 
   let query = adminClient
@@ -1803,7 +1804,7 @@ export async function updateDisputeStatus(
       status,
       adminNotes,
     });
-    await requireAdmin();
+    await requireAdminCapability("disputes");
     const adminClient = await createAdminClient();
 
     const { error } = await adminClient
@@ -1852,7 +1853,7 @@ export async function adminOverrideSubscriptionUsage(
       unlocksUsed,
       note,
     });
-    await requireAdmin();
+    await requireAdminCapability("billing");
     const adminClient = await createAdminClient();
 
     const { error } = await adminClient

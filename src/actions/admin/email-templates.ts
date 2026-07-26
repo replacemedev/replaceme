@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { requireSuperAdmin } from "@/lib/server/auth/require-super-admin";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient } from "@/lib/supabase/server";
 import { invalidateEmployerCache } from "@/lib/server/entitlements";
 import { safeError } from "@/utils/logger";
@@ -18,7 +18,7 @@ const EMAIL_PATH = "/admin/reports/email";
 type ActionResult = { success: true } | { success: false; error: string };
 
 export async function getScaleEarlyAccessEnabled(): Promise<boolean> {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const admin = await createAdminClient();
   const { data, error } = await admin
     .from("billing_plans")
@@ -79,7 +79,7 @@ export type AdminEmailTemplateRow = EmailTemplateRegistryItem & {
 export async function listEmailTemplates(): Promise<{
   templates: AdminEmailTemplateRow[];
 }> {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const admin = await createAdminClient();
   const { data } = await admin
     .from("email_template_settings")
@@ -149,7 +149,7 @@ export async function previewEmailTemplate(templateKey: string): Promise<
   | { success: true; subject: string; html: string }
   | { success: false; error: string }
 > {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const item = EMAIL_TEMPLATE_REGISTRY.find((t) => t.key === templateKey);
   if (!item) return { success: false, error: "Unknown template." };
 

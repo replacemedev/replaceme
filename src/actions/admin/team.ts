@@ -4,12 +4,19 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { logAdminAction } from "@/actions/admin-actions";
 import { authCallbackUrl } from "@/lib/auth/site-url";
+import {
+  capabilitiesForRole,
+  isInvitePending,
+  randomInvitePassword,
+  sendAdminInviteEmail,
+} from "@/lib/admin/team-invite";
 import { requireAdmin } from "@/lib/server/auth/require-admin";
 import { requireSuperAdmin } from "@/lib/server/auth/require-super-admin";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
   adminTeamUserIdSchema,
-  createAdminSchema,
+  inviteAdminSchema,
+  updateAdminCapabilitiesSchema,
   updateAdminRoleSchema,
   updateAdminStatusSchema,
 } from "@/lib/validations/admin-team";
@@ -25,10 +32,15 @@ const TEAM_PATH = "/admin/settings/team";
 
 const TEAM_AUDIT_ACTIONS = [
   "create_admin",
+  "invite_admin",
+  "resend_admin_invite",
+  "revoke_admin_invite",
   "update_admin_status",
   "update_admin_role",
+  "update_admin_capabilities",
   "admin_password_reset",
   "delete_admin",
+  "capability_denied",
 ] as const;
 
 type ActionResult = { success: true } | { success: false; error: string };
@@ -115,7 +127,7 @@ async function enrichWithLastSignIn(
 
   const adminClient = await createAdminClient();
 
-  const enriched = await Promise.all(
+  return Promise.all(
     rows.map(async (row) => {
       const { data, error } = await adminClient.auth.admin.getUserById(row.id);
       if (error) {
@@ -127,8 +139,6 @@ async function enrichWithLastSignIn(
       };
     })
   );
-
-  return enriched;
 }
 
 export async function fetchAdminTeam(): Promise<
@@ -140,7 +150,9 @@ export async function fetchAdminTeam(): Promise<
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("id, first_name, last_name, email, account_status, created_at")
+      .select(
+        "id, first_name, last_name, email, account_status, created_at, avatar_url"
+      )
       .eq("role", "admin")
       .order("created_at", { ascending: false });
 
@@ -149,15 +161,25 @@ export async function fetchAdminTeam(): Promise<
     }
 
     const adminIds = (profiles ?? []).map((row) => row.id);
-    const roleByUserId = new Map<
+    const metaByUserId = new Map<
       string,
-      { admin_role: AdminRole; display_name: string | null }
+      {
+        admin_role: AdminRole;
+        display_name: string | null;
+        department: string | null;
+        avatar_url: string | null;
+        capabilities: string[];
+        invited_at: string | null;
+        invite_accepted_at: string | null;
+      }
     >();
 
     if (adminIds.length > 0) {
       const { data: adminProfiles, error: adminProfilesError } = await supabase
         .from("admin_profiles")
-        .select("user_id, admin_role, display_name")
+        .select(
+          "user_id, admin_role, display_name, department, avatar_url, capabilities, invited_at, invite_accepted_at"
+        )
         .in("user_id", adminIds);
 
       if (adminProfilesError) {
@@ -165,19 +187,29 @@ export async function fetchAdminTeam(): Promise<
       }
 
       for (const row of adminProfiles ?? []) {
-        roleByUserId.set(row.user_id, {
+        metaByUserId.set(row.user_id, {
           admin_role: row.admin_role,
           display_name: row.display_name,
+          department: row.department,
+          avatar_url: row.avatar_url,
+          capabilities: row.capabilities ?? [],
+          invited_at: row.invited_at,
+          invite_accepted_at: row.invite_accepted_at,
         });
       }
     }
 
     const merged = (profiles ?? []).map((profile) => {
-      const adminProfile = roleByUserId.get(profile.id);
+      const meta = metaByUserId.get(profile.id);
       return {
         ...profile,
-        admin_role: adminProfile?.admin_role ?? ("moderator" as const),
-        display_name: adminProfile?.display_name ?? null,
+        admin_role: meta?.admin_role ?? ("moderator" as const),
+        display_name: meta?.display_name ?? null,
+        department: meta?.department ?? null,
+        avatar_url: profile.avatar_url ?? meta?.avatar_url ?? null,
+        capabilities: meta?.capabilities ?? [],
+        invited_at: meta?.invited_at ?? null,
+        invite_accepted_at: meta?.invite_accepted_at ?? null,
         last_sign_in_at: null,
       };
     });
@@ -262,12 +294,12 @@ export async function fetchAdminTeamActivity(
   }
 }
 
-export async function createAdminUser(
-  input: z.infer<typeof createAdminSchema>
+export async function inviteAdminUser(
+  input: z.infer<typeof inviteAdminSchema>
 ): Promise<ActionResult & { userId?: string }> {
   try {
     const { user } = await requireSuperAdmin();
-    const parsed = createAdminSchema.parse(input);
+    const parsed = inviteAdminSchema.parse(input);
 
     const nameParts = parsed.fullName.trim().split(/\s+/);
     const firstName = nameParts[0] ?? "Admin";
@@ -276,11 +308,16 @@ export async function createAdminUser(
 
     const normalizedEmail = parsed.email.trim().toLowerCase();
     const adminClient = await createAdminClient();
+    const capabilities = capabilitiesForRole(
+      parsed.admin_role,
+      parsed.capabilities
+    );
+    const now = new Date().toISOString();
 
     const { data: created, error: createError } =
       await adminClient.auth.admin.createUser({
         email: normalizedEmail,
-        password: parsed.password,
+        password: randomInvitePassword(),
         email_confirm: true,
         app_metadata: { role: "admin" },
         user_metadata: {
@@ -298,7 +335,10 @@ export async function createAdminUser(
         message.includes("already registered") ||
         message.includes("already exists")
       ) {
-        return { success: false, error: "An account with this email already exists." };
+        return {
+          success: false,
+          error: "An account with this email already exists.",
+        };
       }
       if (message.includes("Username") || message.includes("username")) {
         return { success: false, error: "This username is already taken." };
@@ -308,23 +348,43 @@ export async function createAdminUser(
 
     const newUserId = created.user.id;
 
-    const { error: profileError } = await adminClient.from("admin_profiles").upsert(
-      {
-        user_id: newUserId,
-        admin_role: parsed.admin_role,
-        display_name: parsed.fullName.trim(),
-      },
-      { onConflict: "user_id" }
-    );
+    const { error: profileError } = await adminClient
+      .from("admin_profiles")
+      .upsert(
+        {
+          user_id: newUserId,
+          admin_role: parsed.admin_role,
+          display_name: parsed.fullName.trim(),
+          capabilities,
+          invited_at: now,
+          invite_accepted_at: null,
+        },
+        { onConflict: "user_id" }
+      );
 
     if (profileError) {
       await adminClient.auth.admin.deleteUser(newUserId);
       return { success: false, error: profileError.message };
     }
 
-    await logAdminAction("create_admin", "admin_profile", newUserId, {
+    const emailed = await sendAdminInviteEmail({
+      email: normalizedEmail,
+      fullName: parsed.fullName.trim(),
+      userId: newUserId,
+    });
+
+    if (!emailed.success) {
+      await adminClient.auth.admin.deleteUser(newUserId);
+      return {
+        success: false,
+        error: emailed.error || "Invite created but email failed to send.",
+      };
+    }
+
+    await logAdminAction("invite_admin", "admin_profile", newUserId, {
       email: normalizedEmail,
       admin_role: parsed.admin_role,
+      capabilities,
       created_by: user.id,
     });
 
@@ -333,7 +393,143 @@ export async function createAdminUser(
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to create admin",
+      error: err instanceof Error ? err.message : "Failed to invite admin",
+    };
+  }
+}
+
+/** @deprecated Prefer inviteAdminUser */
+export async function createAdminUser(
+  input: z.infer<typeof inviteAdminSchema>
+): Promise<ActionResult & { userId?: string }> {
+  return inviteAdminUser(input);
+}
+
+export async function resendAdminInvite(
+  input: z.infer<typeof adminTeamUserIdSchema>
+): Promise<ActionResult> {
+  try {
+    await requireSuperAdmin();
+    const parsed = adminTeamUserIdSchema.parse(input);
+    const target = await assertTargetAdmin(parsed.userId);
+
+    if (!target.email) {
+      return { success: false, error: "Admin account has no email on file." };
+    }
+
+    const db = await getTeamDbClient();
+    const { data: profile, error } = await db
+      .from("admin_profiles")
+      .select("display_name, invited_at, invite_accepted_at")
+      .eq("user_id", parsed.userId)
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    if (profile?.invite_accepted_at) {
+      return {
+        success: false,
+        error: "This admin already accepted their invite. Use password reset instead.",
+      };
+    }
+
+    const emailed = await sendAdminInviteEmail({
+      email: target.email,
+      fullName: profile?.display_name || target.email,
+      userId: parsed.userId,
+    });
+
+    if (!emailed.success) {
+      return { success: false, error: emailed.error };
+    }
+
+    const now = new Date().toISOString();
+    await db
+      .from("admin_profiles")
+      .update({ invited_at: now })
+      .eq("user_id", parsed.userId);
+
+    await logAdminAction("resend_admin_invite", "admin_profile", parsed.userId, {
+      email: target.email,
+    });
+
+    revalidateTeamSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to resend admin invite",
+    };
+  }
+}
+
+export async function updateAdminCapabilities(
+  input: z.infer<typeof updateAdminCapabilitiesSchema>
+): Promise<ActionResult> {
+  try {
+    const { user } = await requireSuperAdmin();
+    const parsed = updateAdminCapabilitiesSchema.parse(input);
+
+    if (parsed.userId === user.id) {
+      return {
+        success: false,
+        error: "You cannot change your own role or capabilities here.",
+      };
+    }
+
+    await assertTargetAdmin(parsed.userId);
+
+    const db = await getTeamDbClient();
+    const { data: current, error: currentError } = await db
+      .from("admin_profiles")
+      .select("admin_role")
+      .eq("user_id", parsed.userId)
+      .maybeSingle();
+
+    if (currentError) throw new Error(currentError.message);
+
+    if (
+      current?.admin_role === "superadmin" &&
+      parsed.admin_role !== "superadmin"
+    ) {
+      await assertNotLastSuperadmin(parsed.userId);
+    }
+
+    const capabilities = capabilitiesForRole(
+      parsed.admin_role,
+      parsed.capabilities
+    );
+
+    const { error } = await db.from("admin_profiles").upsert(
+      {
+        user_id: parsed.userId,
+        admin_role: parsed.admin_role,
+        capabilities,
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (error) throw new Error(error.message);
+
+    await logAdminAction(
+      "update_admin_capabilities",
+      "admin_profile",
+      parsed.userId,
+      {
+        admin_role: parsed.admin_role,
+        capabilities,
+      }
+    );
+
+    revalidateTeamSurfaces();
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to update admin access",
     };
   }
 }
@@ -406,7 +602,7 @@ export async function updateAdminRole(
     const db = await getTeamDbClient();
     const { data: current, error: currentError } = await db
       .from("admin_profiles")
-      .select("admin_role")
+      .select("admin_role, capabilities")
       .eq("user_id", parsed.userId)
       .maybeSingle();
 
@@ -419,20 +615,28 @@ export async function updateAdminRole(
       await assertNotLastSuperadmin(parsed.userId);
     }
 
-    const { error } = await db
-      .from("admin_profiles")
-      .upsert(
-        {
-          user_id: parsed.userId,
-          admin_role: parsed.admin_role,
-        },
-        { onConflict: "user_id" }
-      );
+    const capabilities =
+      parsed.admin_role === "superadmin"
+        ? []
+        : capabilitiesForRole(
+            "moderator",
+            current?.capabilities ?? undefined
+          );
+
+    const { error } = await db.from("admin_profiles").upsert(
+      {
+        user_id: parsed.userId,
+        admin_role: parsed.admin_role,
+        capabilities,
+      },
+      { onConflict: "user_id" }
+    );
 
     if (error) throw new Error(error.message);
 
     await logAdminAction("update_admin_role", "admin_profile", parsed.userId, {
       admin_role: parsed.admin_role,
+      capabilities,
     });
 
     revalidateTeamSurfaces();
@@ -531,6 +735,22 @@ export async function deleteAdminUser(
     const target = await assertTargetAdmin(parsed.userId);
     await assertNotLastSuperadmin(parsed.userId);
 
+    const db = await getTeamDbClient();
+    const { data: profile } = await db
+      .from("admin_profiles")
+      .select("invited_at, invite_accepted_at")
+      .eq("user_id", parsed.userId)
+      .maybeSingle();
+
+    // Hard delete only for never-accepted invites; use Suspend for soft offboard.
+    if (!isInvitePending(profile ?? {})) {
+      return {
+        success: false,
+        error:
+          "Suspend this admin instead of deleting. Hard delete is only for pending invites.",
+      };
+    }
+
     const adminClient = await createAdminClient();
     const { error } = await adminClient.auth.admin.deleteUser(parsed.userId);
 
@@ -540,6 +760,7 @@ export async function deleteAdminUser(
 
     await logAdminAction("delete_admin", "admin_profile", parsed.userId, {
       email: target.email,
+      pending_invite: true,
     });
 
     revalidateTeamSurfaces();

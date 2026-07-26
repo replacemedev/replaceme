@@ -951,6 +951,20 @@ export async function updatePassword(formData: {
       };
     }
 
+    // Mark admin invite accepted when the invitee sets their password.
+    if (user.app_metadata?.role === "admin") {
+      try {
+        const admin = await createAdminClient();
+        await admin
+          .from("admin_profiles")
+          .update({ invite_accepted_at: new Date().toISOString() })
+          .eq("user_id", user.id)
+          .is("invite_accepted_at", null);
+      } catch (err) {
+        safeError("[Auth] admin invite_accepted_at update failed:", err);
+      }
+    }
+
     await supabase.auth.signOut({ scope: "global" });
     revalidatePath("/", "layout");
     redirect("/signin?reset=success");

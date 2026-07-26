@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 
 const statusSchema = z
   .enum([
@@ -55,7 +55,7 @@ export type AdminEmailEventRow = {
 export async function listEmailMessages(
   input: z.infer<typeof listSchema>
 ): Promise<{ messages: AdminEmailMessageRow[] }> {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const parsed = listSchema.parse(input);
   const admin = await createAdminClient();
 
@@ -81,7 +81,7 @@ export async function listEmailMessages(
 export async function listEmailEvents(messageId: string): Promise<{
   events: AdminEmailEventRow[];
 }> {
-  await requireAdmin();
+  await requireAdminCapability("email");
   const admin = await createAdminClient();
 
   const { data, error } = await admin

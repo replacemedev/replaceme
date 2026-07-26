@@ -6,6 +6,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { ModerationThreadReviewClient } from "@/components/admin/moderation/ModerationThreadReviewClient";
 import { fetchAdminModerationThread } from "@/actions/admin/messaging-moderation";
 import { CHAT_MODERATION_STATUS_LABELS } from "@/lib/reporting/messaging-moderation";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Review Thread | Moderation",
@@ -20,6 +21,8 @@ export default async function AdminModerationThreadPage({
   params: Promise<{ threadId: string }>;
   searchParams: Promise<{ flag?: string }>;
 }) {
+  await requireAdminPageCapability("moderation");
+
   const { threadId } = await params;
   const { flag } = await searchParams;
 

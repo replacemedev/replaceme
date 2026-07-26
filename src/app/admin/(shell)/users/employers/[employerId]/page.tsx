@@ -3,6 +3,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { EmployerDeepDiveView } from "@/components/admin/users/EmployerDeepDiveView";
 import { getAdminEmployerDeepDive } from "@/actions/admin/deep-dive";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,10 @@ interface PageProps {
   params: Promise<{ employerId: string }>;
 }
 
-export default async function AdminEmployerDeepDivePage({ params }: PageProps) {
+export default async function AdminEmployerDeepDivePage({
+ params }: PageProps) {
+  await requireAdminPageCapability("users");
+
   const { employerId } = await params;
   const data = await getAdminEmployerDeepDive(employerId);
 

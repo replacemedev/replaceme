@@ -69,7 +69,7 @@ export function AdminDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex h-full ${DRAWER_WIDTH[size]} flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+        className={`relative flex h-[100dvh] max-h-[100dvh] ${DRAWER_WIDTH[size]} flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -89,7 +89,7 @@ export function AdminDrawer({
             ref={closeBtnRef}
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -97,7 +97,7 @@ export function AdminDrawer({
         </div>
 
         {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-white">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 bg-white [-webkit-overflow-scrolling:touch]">
           {children}
         </div>
 

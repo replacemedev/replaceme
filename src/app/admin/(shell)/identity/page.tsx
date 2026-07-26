@@ -3,6 +3,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { IdentityReviewClient } from "@/components/admin/identity/IdentityReviewClient";
 import { fetchVerificationQueue } from "@/actions/admin-actions";
 import type { IdentityQueueTab } from "@/types/admin.types";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Identity Verification | Admin",
@@ -27,6 +28,8 @@ export default async function AdminIdentityPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireAdminPageCapability("identity");
+
   const params = await searchParams;
   const tab = parseTab(
     typeof params.tab === "string" ? params.tab : undefined

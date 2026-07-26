@@ -465,13 +465,36 @@ export function PrivacyPolicyContent({
             Identity verification (KYC) security.
           </strong>{" "}
           Government ID images and verification selfies are stored in a private, encrypted
-          object store and transmitted only over HTTPS. Platform administrators may view these
-          documents solely to complete identity verification under least-privilege access; each
-          view and each approve/reject decision is recorded in an access audit log. After the
+          object store and transmitted only over HTTPS. Super administrators and Moderators
+          with the Identity module grant may view these documents solely to complete identity
+          verification under least-privilege access; each view and each approve/reject decision
+          is recorded in an access audit log. After the
           verification purpose is fulfilled, ID images and related verification metadata are
           deleted or anonymized within{" "}
           {ACCOUNT_LIFECYCLE_TIMELINES.kycImageDaysAfterPurpose} days unless a legal hold,
           dispute, or fraud investigation requires longer retention.
+        </p>
+        <p>
+          <strong className="font-semibold text-slate-800">
+            Staff roles &amp; access control.
+          </strong>{" "}
+          Replaceme operates an internal admin portal with two tiers:{" "}
+          <strong className="font-semibold text-slate-800">Super administrators</strong>{" "}
+          (who manage the admin team, email broadcasts, and full module access) and{" "}
+          <strong className="font-semibold text-slate-800">Moderators</strong>{" "}
+          (who receive module capabilities—such as Trust &amp; Safety queues, Users, or Billing—granted
+          by a Super administrator). Access is MFA-gated, capability-scoped, and audit-logged,
+          consistent with RA 10173 / NPC Circular No. 2023-06 least-privilege and access-control
+          requirements and GDPR accountability principles. Staff work email, optional internal
+          profile photo, department, timezone, short bio, MFA metadata, and action audit logs are
+          processed as employment/contractor operational data and retained with security/audit
+          logs (see retention table). By default staff photos and bios are for admin-team identity
+          only. Staff may opt in to appear on the public{" "}
+          <strong className="font-semibold text-slate-800">/team</strong> directory with name,
+          photo, department, timezone, and bio only — email and phone are never published there.
+          Each signed-in administrator may update their own password in the portal or request an
+          email reset link; Super administrators may send password-reset emails to other team
+          members.
         </p>
         <p>
           <strong className="font-semibold text-slate-800">
@@ -483,8 +506,9 @@ export function PrivacyPolicyContent({
           a terminal decision if the job remains open), aligned with RA 10173 storage-limitation
           principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
           investigation requires longer retention. Hired application packets may be retained with
-          employment or contract records under applicable employment and tax rules. Platform
-          administrators may access application contents, job post moderation records,
+          employment or contract records under applicable employment and tax rules. Authorized
+          administrators (Super administrators or Moderators with the relevant module grant) may
+          access application contents, job post moderation records,
           confidential user-to-user abuse reports and Case Center records (including optional
           disputed-amount notes and non-binding resolution outcomes—not escrow balances), and{" "}
           <strong className="font-semibold text-slate-800">
@@ -499,7 +523,7 @@ export function PrivacyPolicyContent({
           legal basis arises.           Job post moderation
           decisions (including reason category, optional explanation, and soft-delete metadata) are
           retained as listed in the retention table above. Soft-deleted job posts are excluded from
-          public Worker boards and Employer live listings but may remain visible to Platform
+          public Worker boards and Employer live listings but may remain visible to authorized
           administrators for audit and restore during that retention window. Administrator in-app
           notifications about Identity reviews, Moderation queues, Billing, and System events are
           retained for up to{" "}

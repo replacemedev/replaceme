@@ -3,6 +3,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { AdminBillingDashboard } from "@/components/admin/billing/AdminBillingDashboard";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { fetchAdminBillingPageData } from "@/actions/admin/billing";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Billing | Admin",
@@ -14,7 +15,11 @@ interface PageProps {
   searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function AdminBillingPage({ searchParams }: PageProps) {
+export default async function AdminBillingPage({
+  searchParams,
+}: PageProps) {
+  await requireAdminPageCapability("billing");
+
   const params = await searchParams;
   const activeTab = params.tab ?? "overview";
 

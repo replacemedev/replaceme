@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   KeyRound,
+  Mail,
   MoreHorizontal,
   Shield,
   Trash2,
@@ -13,30 +14,33 @@ import {
 import { toast } from "sonner";
 import {
   deleteAdminUser,
+  resendAdminInvite,
   triggerAdminPasswordReset,
-  updateAdminRole,
   updateAdminStatus,
 } from "@/actions/admin/team";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { AdminSelfPasswordActions } from "@/components/admin/settings/AdminSelfPasswordActions";
-import type { AdminRole, AdminTeamRow } from "@/types/admin.types";
+import { isInvitePending } from "@/lib/admin/invite-status";
+import type { AdminTeamRow } from "@/types/admin.types";
 import { formatFullName } from "@/lib/format/name";
 
 interface AdminTeamActionsMenuProps {
   member: AdminTeamRow;
   currentUserId: string;
+  onEditAccess: () => void;
 }
 
 type PendingAction =
   | { type: "suspend"; userId: string; label: string }
   | { type: "unsuspend"; userId: string; label: string }
   | { type: "reset"; userId: string; label: string }
-  | { type: "delete"; userId: string; label: string }
-  | { type: "role"; userId: string; label: string; nextRole: AdminRole };
+  | { type: "resend"; userId: string; label: string }
+  | { type: "delete"; userId: string; label: string };
 
 export function AdminTeamActionsMenu({
   member,
   currentUserId,
+  onEditAccess,
 }: AdminTeamActionsMenuProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -45,6 +49,7 @@ export function AdminTeamActionsMenu({
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   const isSelf = member.id === currentUserId;
+  const pendingInvite = isInvitePending(member);
   const displayLabel =
     formatFullName(member.first_name, member.middle_name, member.last_name).trim() ||
     member.email ||
@@ -76,21 +81,20 @@ export function AdminTeamActionsMenu({
         case "reset":
           result = await triggerAdminPasswordReset({ userId: action.userId });
           break;
+        case "resend":
+          result = await resendAdminInvite({ userId: action.userId });
+          break;
         case "delete":
           result = await deleteAdminUser({ userId: action.userId });
-          break;
-        case "role":
-          result = await updateAdminRole({
-            userId: action.userId,
-            admin_role: action.nextRole,
-          });
           break;
         default:
           result = { success: false, error: "Unknown action" };
       }
 
       if (result.success) {
-        toast.success("Admin account updated");
+        toast.success(
+          action.type === "resend" ? "Invite resent" : "Admin account updated"
+        );
         setConfirm(null);
         closeMenu();
         router.refresh();
@@ -104,9 +108,6 @@ export function AdminTeamActionsMenu({
     return <AdminSelfPasswordActions />;
   }
 
-  const nextRole: AdminRole =
-    member.admin_role === "superadmin" ? "moderator" : "superadmin";
-
   return (
     <>
       <details
@@ -119,7 +120,15 @@ export function AdminTeamActionsMenu({
           <span className="sr-only">Actions for {displayLabel}</span>
         </summary>
         {open ? (
-          <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+          <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
+            <MenuButton
+              icon={Shield}
+              label="Edit access"
+              onClick={() => {
+                closeMenu();
+                onEditAccess();
+              }}
+            />
             {member.account_status === "active" ? (
               <MenuButton
                 icon={UserX}
@@ -145,45 +154,45 @@ export function AdminTeamActionsMenu({
                 }
               />
             )}
-            <MenuButton
-              icon={Shield}
-              label={
-                member.admin_role === "superadmin"
-                  ? "Demote to moderator"
-                  : "Promote to super admin"
-              }
-              onClick={() =>
-                setConfirm({
-                  type: "role",
-                  userId: member.id,
-                  label: displayLabel,
-                  nextRole,
-                })
-              }
-            />
-            <MenuButton
-              icon={KeyRound}
-              label="Send password reset"
-              onClick={() =>
-                setConfirm({
-                  type: "reset",
-                  userId: member.id,
-                  label: displayLabel,
-                })
-              }
-            />
-            <MenuButton
-              icon={Trash2}
-              label="Delete account"
-              danger
-              onClick={() =>
-                setConfirm({
-                  type: "delete",
-                  userId: member.id,
-                  label: displayLabel,
-                })
-              }
-            />
+            {pendingInvite ? (
+              <MenuButton
+                icon={Mail}
+                label="Resend invite"
+                onClick={() =>
+                  setConfirm({
+                    type: "resend",
+                    userId: member.id,
+                    label: displayLabel,
+                  })
+                }
+              />
+            ) : (
+              <MenuButton
+                icon={KeyRound}
+                label="Send password reset"
+                onClick={() =>
+                  setConfirm({
+                    type: "reset",
+                    userId: member.id,
+                    label: displayLabel,
+                  })
+                }
+              />
+            )}
+            {pendingInvite ? (
+              <MenuButton
+                icon={Trash2}
+                label="Revoke invite"
+                danger
+                onClick={() =>
+                  setConfirm({
+                    type: "delete",
+                    userId: member.id,
+                    label: displayLabel,
+                  })
+                }
+              />
+            ) : null}
           </div>
         ) : null}
       </details>
@@ -192,31 +201,37 @@ export function AdminTeamActionsMenu({
         open={confirm !== null}
         title={
           confirm?.type === "delete"
-            ? "Delete admin account?"
+            ? pendingInvite
+              ? "Revoke invite?"
+              : "Delete admin account?"
             : confirm?.type === "suspend"
               ? "Suspend admin account?"
-              : confirm?.type === "role"
-                ? "Change admin role?"
+              : confirm?.type === "resend"
+                ? "Resend invite?"
                 : confirm?.type === "reset"
                   ? "Send password reset?"
                   : "Activate admin account?"
         }
         description={
           confirm?.type === "delete"
-            ? `This permanently removes ${confirm.label} and revokes all admin access.`
+            ? pendingInvite
+              ? `Revoke the pending invite for ${confirm.label}? They will lose portal access.`
+              : `This permanently removes ${confirm.label} and revokes all admin access.`
             : confirm?.type === "suspend"
-              ? `Suspend ${confirm?.label ?? "this admin"}? They will be banned from signing in.`
-              : confirm?.type === "role"
-                ? `Change ${confirm?.label ?? "this admin"} to ${confirm?.nextRole === "superadmin" ? "super admin" : "moderator"}?`
+              ? `Suspend ${confirm?.label ?? "this admin"}? Sessions are revoked and they cannot sign in.`
+              : confirm?.type === "resend"
+                ? `Send a fresh invite email to ${confirm?.label ?? "this admin"}? Prior invite links stop working after they set a password.`
                 : confirm?.type === "reset"
                   ? `Send a password reset email to ${confirm?.label ?? "this admin"}?`
                   : `Reactivate ${confirm?.label ?? "this admin"}?`
         }
         confirmLabel={
           confirm?.type === "delete"
-            ? "Delete"
-            : confirm?.type === "reset"
-              ? "Send reset email"
+            ? pendingInvite
+              ? "Revoke"
+              : "Delete"
+            : confirm?.type === "reset" || confirm?.type === "resend"
+              ? "Send email"
               : "Confirm"
         }
         variant={confirm?.type === "delete" ? "danger" : "default"}

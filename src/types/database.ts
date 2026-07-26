@@ -18,27 +18,39 @@ export type Database = {
         Row: {
           admin_role: Database["public"]["Enums"]["admin_role"]
           avatar_url: string | null
+          capabilities: string[]
           created_at: string
           department: string | null
           display_name: string | null
+          invite_accepted_at: string | null
+          invited_at: string | null
+          directory_public: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_role?: Database["public"]["Enums"]["admin_role"]
           avatar_url?: string | null
+          capabilities?: string[]
           created_at?: string
           department?: string | null
           display_name?: string | null
+          invite_accepted_at?: string | null
+          invited_at?: string | null
+          directory_public?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_role?: Database["public"]["Enums"]["admin_role"]
           avatar_url?: string | null
+          capabilities?: string[]
           created_at?: string
           department?: string | null
           display_name?: string | null
+          invite_accepted_at?: string | null
+          invited_at?: string | null
+          directory_public?: boolean
           updated_at?: string
           user_id?: string
         }

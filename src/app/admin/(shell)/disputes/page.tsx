@@ -4,6 +4,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { DisputesClient } from "@/components/admin/disputes/DisputesClient";
 import { getAdminCases } from "@/actions/admin/disputes";
 import type { AdminDisputesTab } from "@/lib/reporting/constants";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Disputes | Admin",
@@ -16,6 +17,8 @@ export default async function AdminDisputesPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
+  await requireAdminPageCapability("disputes");
+
   const params = await searchParams;
   const tab = (
     ["financial", "safety", "resolved"].includes(params.tab ?? "")

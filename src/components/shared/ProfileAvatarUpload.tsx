@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
+import { AvatarCropDialog } from "@/components/shared/AvatarCropDialog";
 import { toast } from "sonner";
 import {
   removeWorkerAvatar,
@@ -18,7 +19,23 @@ import {
 
 type AvatarSize = "md" | "lg" | "xl";
 
-const SIZE_CLASSES: Record<AvatarSize, { ring: string; avatar: "md" | "lg" | "xl" }> = {
+type AvatarActionResult =
+  | { success: true; avatarUrl?: string }
+  | { success?: false; error?: string }
+  | { error: string };
+
+export type ProfileAvatarUploadAction = (
+  formData: FormData
+) => Promise<AvatarActionResult>;
+
+export type ProfileAvatarRemoveAction = () => Promise<
+  { success: true } | { error: string } | { success?: false; error?: string }
+>;
+
+const SIZE_CLASSES: Record<
+  AvatarSize,
+  { ring: string; avatar: "md" | "lg" | "xl" }
+> = {
   md: { ring: "w-24 h-24 sm:w-28 sm:h-28", avatar: "md" },
   lg: { ring: "w-32 h-32 sm:w-36 sm:h-36", avatar: "lg" },
   xl: { ring: "w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48", avatar: "xl" },
@@ -38,6 +55,11 @@ export interface ProfileAvatarUploadProps {
   size?: AvatarSize;
   onAvatarChange?: (url: string | null) => void;
   helperText?: string;
+  /** Defaults to worker avatar actions when omitted. */
+  uploadAction?: ProfileAvatarUploadAction;
+  removeAction?: ProfileAvatarRemoveAction;
+  /** Square crop before upload. Default true. */
+  enableCrop?: boolean;
 }
 
 export function ProfileAvatarUpload({
@@ -47,35 +69,36 @@ export function ProfileAvatarUpload({
   size = "lg",
   onAvatarChange,
   helperText,
+  uploadAction = uploadWorkerAvatar,
+  removeAction = removeWorkerAvatar,
+  enableCrop = true,
 }: ProfileAvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(avatarUrl);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropMeta, setCropMeta] = useState<{
+    fileName: string;
+    mimeType: string;
+  } | null>(null);
 
   useEffect(() => {
     setPreviewUrl(avatarUrl);
   }, [avatarUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (cropSrc) URL.revokeObjectURL(cropSrc);
+    };
+  }, [cropSrc]);
 
   const busy = isUploading || isRemoving;
   const initials = initialsFromName(displayName);
   const sizeClass = SIZE_CLASSES[size];
   const iconSize = size === "xl" ? 22 : size === "lg" ? 20 : 18;
 
-  const handleFile = async (file: File) => {
-    if (!editable || busy) return;
-
-    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      toast.error(profileImageSizeError());
-      return;
-    }
-
-    const mimeType = resolveProfileImageMime(file);
-    if (!mimeType) {
-      toast.error("Only JPG and PNG allowed.");
-      return;
-    }
-
+  const uploadFile = async (file: File) => {
     setIsUploading(true);
     const toastId = toast.loading("Uploading photo…");
 
@@ -83,7 +106,7 @@ export function ProfileAvatarUpload({
       const formData = new FormData();
       formData.append("file", file);
 
-      const result = await uploadWorkerAvatar(formData);
+      const result = await uploadAction(formData);
       if ("error" in result && result.error) {
         toast.error(result.error, { id: toastId });
         return;
@@ -102,6 +125,37 @@ export function ProfileAvatarUpload({
     }
   };
 
+  const handleFile = async (file: File) => {
+    if (!editable || busy) return;
+
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      toast.error(profileImageSizeError());
+      return;
+    }
+
+    const mimeType = resolveProfileImageMime(file);
+    if (!mimeType) {
+      toast.error("Only JPG and PNG allowed.");
+      return;
+    }
+
+    if (enableCrop) {
+      if (cropSrc) URL.revokeObjectURL(cropSrc);
+      setCropSrc(URL.createObjectURL(file));
+      setCropMeta({ fileName: file.name, mimeType });
+      return;
+    }
+
+    await uploadFile(file);
+  };
+
+  const closeCrop = () => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    setCropMeta(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
   const handleRemove = async () => {
     if (!editable || busy || !previewUrl) return;
 
@@ -109,8 +163,8 @@ export function ProfileAvatarUpload({
     const toastId = toast.loading("Removing photo…");
 
     try {
-      const result = await removeWorkerAvatar();
-      if (result.error) {
+      const result = await removeAction();
+      if ("error" in result && result.error) {
         toast.error(result.error, { id: toastId });
         return;
       }
@@ -200,7 +254,7 @@ export function ProfileAvatarUpload({
         type="button"
         disabled={busy}
         onClick={() => inputRef.current?.click()}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-[#006e2f]/30 hover:bg-[#fafdfb] hover:text-[#006e2f] disabled:opacity-50 sm:hidden"
+        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-[#006e2f]/30 hover:bg-[#fafdfb] hover:text-[#006e2f] disabled:opacity-50 sm:hidden"
       >
         <Upload size={14} />
         {previewUrl ? "Change photo" : "Add photo"}
@@ -215,6 +269,18 @@ export function ProfileAvatarUpload({
           {profileImageHelperText()}
         </p>
       )}
+
+      <AvatarCropDialog
+        open={Boolean(cropSrc && cropMeta)}
+        imageSrc={cropSrc}
+        fileName={cropMeta?.fileName ?? "avatar.jpg"}
+        mimeType={cropMeta?.mimeType ?? "image/jpeg"}
+        onCancel={closeCrop}
+        onConfirm={(file) => {
+          closeCrop();
+          void uploadFile(file);
+        }}
+      />
     </div>
   );
 }

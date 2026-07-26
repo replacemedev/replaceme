@@ -2,6 +2,7 @@ import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminPageShell } from "@/components/admin/layout";
 import { ModerationClient } from "@/components/admin/moderation/ModerationClient";
 import { fetchAdminModerationFlags } from "@/actions/admin/messaging-moderation";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Messaging Trust & Safety | Admin",
@@ -10,6 +11,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminModerationPage() {
+  await requireAdminPageCapability("moderation");
+
   // Load full set so client filters work without refetch; queue is flag-gated.
   const [active, dismissed, resolved] = await Promise.all([
     fetchAdminModerationFlags("active"),

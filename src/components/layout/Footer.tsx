@@ -69,6 +69,9 @@ export function Footer() {
               Company &amp; Legal
             </h3>
             <nav className="space-y-3" aria-label="Company and legal links">
+              <Link className={linkClassName} href="/team">
+                Our Team
+              </Link>
               <Link className={linkClassName} href="/help">
                 Help Center
               </Link>

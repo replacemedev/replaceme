@@ -6,7 +6,7 @@ import { AdminSidebar } from "@/components/admin/layout/AdminSidebar";
 import { AdminLayoutChrome } from "@/components/admin/layout/AdminLayoutChrome";
 import { AuthFlashToast } from "@/components/auth/AuthFlashToast";
 import { ADMIN_MAIN_BG } from "@/lib/admin/ui-tokens";
-import { isCurrentUserSuperAdmin } from "@/lib/server/auth/require-super-admin";
+import { getCurrentAdminCapabilities } from "@/lib/server/auth/require-capability";
 
 export const dynamic = "force-dynamic";
 
@@ -33,22 +33,32 @@ export default async function AdminShellLayout({
   }
 
   const session = await getNavSession();
-  const isSuperAdmin = await isCurrentUserSuperAdmin();
+  const { isSuperAdmin, capabilities, adminRole } =
+    await getCurrentAdminCapabilities();
 
   const sidebarProfile = {
     displayName: session.displayName,
-    roleLabel: isSuperAdmin ? "Super Admin" : "Platform Admin",
+    roleLabel: isSuperAdmin ? "Super admin" : "Moderator",
     initials: session.initials,
     avatarUrl: session.profile?.avatar_url ?? null,
     homeHref: session.homeHref,
   };
 
   return (
-    <AdminLayoutChrome profile={sidebarProfile} isSuperAdmin={isSuperAdmin}>
+    <AdminLayoutChrome
+      profile={sidebarProfile}
+      isSuperAdmin={isSuperAdmin}
+      capabilities={capabilities}
+      adminRole={adminRole}
+    >
       <div className="min-h-screen bg-slate-50 w-full max-w-[100vw] overflow-x-hidden">
         <AuthFlashToast />
         <div className="flex min-h-screen">
-          <AdminSidebar profile={sidebarProfile} isSuperAdmin={isSuperAdmin} />
+          <AdminSidebar
+            profile={sidebarProfile}
+            isSuperAdmin={isSuperAdmin}
+            capabilities={capabilities}
+          />
           <div className="flex flex-1 flex-col min-w-0 min-h-screen w-full max-w-[100vw] overflow-x-hidden">
             <AdminHeader session={session} />
             <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>

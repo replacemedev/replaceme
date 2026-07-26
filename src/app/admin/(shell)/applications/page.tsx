@@ -4,6 +4,7 @@ import { AdminPageShell } from "@/components/admin/layout";
 import { ApplicationsClient } from "@/components/admin/applications/ApplicationsClient";
 import { fetchAdminApplications } from "@/actions/admin/applications";
 import { AdminListPageSkeleton } from "@/components/admin/shared/AdminSkeletons";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Applications | Admin",
@@ -39,11 +40,13 @@ async function ApplicationsList({ searchParams }: { searchParams: SearchParams }
   );
 }
 
-export default function AdminApplicationsPage({
+export default async function AdminApplicationsPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
+  await requireAdminPageCapability("applications");
+
   return (
     <AdminPageShell>
       <AdminPageHeader

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { logAdminAction } from "@/actions/admin-actions";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { formatFullName } from "@/lib/format/name";
 import {
   CHAT_MODERATION_REASON_CODES,
@@ -54,7 +54,7 @@ const reportThreadSchema = z.object({
 export async function fetchAdminModerationFlags(
   statusFilter: ChatModerationStatus | "active" = "active"
 ): Promise<AdminChatModerationFlagRow[]> {
-  await requireAdmin();
+  await requireAdminCapability("moderation");
   const admin = await createAdminClient();
 
   let query = admin
@@ -153,7 +153,7 @@ export async function fetchAdminModerationThread(
   threadId: string,
   flagId?: string | null
 ): Promise<AdminModerationThreadDetail | null> {
-  await requireAdmin();
+  await requireAdminCapability("moderation");
   const admin = await createAdminClient();
   const tid = z.string().uuid().parse(threadId);
 
@@ -306,7 +306,7 @@ export async function dismissModerationFlag(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = dismissFlagSchema.parse(input);
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("moderation");
     const admin = await createAdminClient();
 
     const { error } = await admin
@@ -341,7 +341,7 @@ export async function updateModerationFlagStatus(input: {
 }): Promise<ActionResult> {
   try {
     const parsed = updateFlagStatusSchema.parse(input);
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("moderation");
     const admin = await createAdminClient();
 
     const { error } = await admin

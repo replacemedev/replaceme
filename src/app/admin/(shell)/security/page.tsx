@@ -7,6 +7,7 @@ import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatCard } from "@/components/shared/StatCard";
 import { fetchAuditLogs } from "@/actions/admin-actions";
 import { SessionSecurityPanel } from "@/components/shared/security/SessionSecurityPanel";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Security | Admin",
@@ -15,6 +16,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminSecurityPage() {
+  await requireAdminPageCapability("security");
+
   const supabase = await createClient();
   const {
     data: { user },

@@ -21,6 +21,7 @@ import {
   platformMetricsSchema,
   type PlatformMetrics,
 } from "@/types/admin.types";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Admin Dashboard | Replaceme",
@@ -29,6 +30,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  await requireAdminPageCapability("dashboard");
+
   const admin = await createAdminClient();
 
   const [{ data: rawMetrics }, { data: auditLogs }] = await Promise.all([

@@ -5,6 +5,7 @@ import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { AdminNotificationsClient } from "@/components/admin/notifications/AdminNotificationsClient";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Notifications | Admin",
@@ -13,6 +14,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminNotificationsPage() {
+  await requireAdminPageCapability("notifications");
+
   const supabase = await createClient();
   const {
     data: { user },

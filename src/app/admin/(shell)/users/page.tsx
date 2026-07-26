@@ -6,6 +6,7 @@ import { AdminTabsSkeleton } from "@/components/admin/shared/AdminSkeletons";
 import { UsersClient } from "@/components/admin/users/UsersClient";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { fetchAdminUsersPageData } from "@/actions/admin-actions";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Users | Admin",
@@ -25,7 +26,11 @@ interface PageProps {
   searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function AdminUsersPage({ searchParams }: PageProps) {
+export default async function AdminUsersPage({
+  searchParams,
+}: PageProps) {
+  await requireAdminPageCapability("users");
+
   const params = await searchParams;
   const tab = parseUserTab(params.tab);
 

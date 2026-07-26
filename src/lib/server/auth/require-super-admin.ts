@@ -20,7 +20,7 @@ export const getCurrentAdminProfile = cache(
     const { data, error } = await adminClient
       .from("admin_profiles")
       .select(
-        "user_id, admin_role, display_name, avatar_url, department, created_at, updated_at"
+        "user_id, admin_role, display_name, avatar_url, department, capabilities, invited_at, invite_accepted_at, directory_public, created_at, updated_at"
       )
       .eq("user_id", user.id)
       .maybeSingle();

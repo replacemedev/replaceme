@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { safeError } from "@/utils/logger";
 import { parseJobDescription } from "@/types/job-details";
 
@@ -31,7 +31,7 @@ export type AdminJobDeepDive = {
 export async function getAdminJobDeepDive(jobId: string): Promise<AdminJobDeepDive | null> {
   try {
     const id = z.string().uuid().parse(jobId);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("jobs");
 
     const { data, error } = await supabase
       .from("jobs")
@@ -146,7 +146,7 @@ export async function getAdminEmployerDeepDive(
 ): Promise<AdminEmployerDeepDive | null> {
   try {
     const id = z.string().uuid().parse(employerId);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("jobs");
 
     const [{ data: profile }, { data: company }, { data: subscription }, { data: jobs }, { data: ledger }] =
       await Promise.all([
@@ -302,7 +302,7 @@ export async function getAdminWorkerProfileDeepDive(
 ): Promise<AdminWorkerProfileDeepDive | null> {
   try {
     const id = z.string().uuid().parse(workerId);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("jobs");
 
     const [{ data: profile }, { data: skills }, { data: projects }] =
       await Promise.all([

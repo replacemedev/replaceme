@@ -6,6 +6,7 @@ import {
   fetchAdminJobs,
 } from "@/actions/admin-actions";
 import { DISCOVERY_JOB_APPROVAL_SLA } from "@/lib/data/legal";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Job Posts | Admin",
@@ -25,6 +26,8 @@ export default async function AdminJobsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  await requireAdminPageCapability("jobs");
+
   const params = await searchParams;
   const statusParam = firstParam(params.status);
 

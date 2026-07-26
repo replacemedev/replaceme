@@ -1,6 +1,5 @@
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminPageShell } from "@/components/admin/layout/AdminPageShell";
-import { isCurrentUserSuperAdmin } from "@/lib/server/auth/require-super-admin";
 import { listEmailMessages } from "@/actions/admin/email-management";
 import { getBroadcastComplianceStatus } from "@/actions/admin/email-broadcasts";
 import {
@@ -9,6 +8,7 @@ import {
 } from "@/actions/admin/email-templates";
 import { listProductAnnouncements } from "@/actions/admin/announcements";
 import { AdminEmailManagementClient } from "@/components/admin/reports/email/AdminEmailManagementClient";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Email Management | Admin",
@@ -17,7 +17,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminEmailManagementPage() {
-  const isSuperAdmin = await isCurrentUserSuperAdmin();
+  await requireAdminPageCapability("email");
+
   const [initial, compliance, scaleEarlyAccess, templates, announcements] =
     await Promise.all([
       listEmailMessages({ limit: 50 }),
@@ -35,7 +36,7 @@ export default async function AdminEmailManagementPage() {
       />
       <AdminEmailManagementClient
         initial={initial.messages}
-        isSuperAdmin={isSuperAdmin}
+        isSuperAdmin
         broadcastReady={compliance.ready}
         scaleEarlyAccess={scaleEarlyAccess}
         initialTemplates={templates.templates}

@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { getAdminCaseById } from "@/actions/admin/disputes";
 import { DisputeCaseDetailClient } from "@/components/admin/disputes/DisputeCaseDetailClient";
 import { AdminPageShell } from "@/components/admin/layout";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Case details | Disputes | Admin",
@@ -16,6 +17,8 @@ export default async function AdminDisputeCasePage({
 }: {
   params: Promise<{ caseId: string }>;
 }) {
+  await requireAdminPageCapability("disputes");
+
   const { caseId } = await params;
   const detail = await getAdminCaseById(decodeURIComponent(caseId));
   if (!detail) notFound();

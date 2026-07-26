@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
-import { ChevronDown, LayoutDashboard, LogOut, Shield } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Shield, User } from "lucide-react";
 import { logOut } from "@/actions/auth";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import type { NavProfile } from "@/types/nav";
@@ -103,11 +103,21 @@ export function AdminDropdown({
             <Link
               href="/admin/dashboard"
               onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               role="menuitem"
             >
               <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
               Admin Dashboard
+            </Link>
+
+            <Link
+              href="/admin/settings/profile"
+              onClick={() => setDropdownOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              role="menuitem"
+            >
+              <User size={14} className="text-slate-400 shrink-0" />
+              My profile
             </Link>
 
             <div className="h-px bg-slate-200/60 my-1 mx-2" />
@@ -116,7 +126,7 @@ export function AdminDropdown({
               type="button"
               disabled={isPending}
               onClick={handleLogout}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 min-h-11 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
               role="menuitem"
             >
               <LogOut size={14} className="text-red-500 shrink-0" />
@@ -158,11 +168,21 @@ export function AdminDropdown({
           <Link
             href="/admin/dashboard"
             onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            className="flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
             role="menuitem"
           >
             <LayoutDashboard size={14} className="text-slate-400 shrink-0" />
             Admin Dashboard
+          </Link>
+
+          <Link
+            href="/admin/settings/profile"
+            onClick={() => setDropdownOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+            role="menuitem"
+          >
+            <User size={14} className="text-slate-400 shrink-0" />
+            My profile
           </Link>
 
           <div className="h-px bg-slate-100 my-1" />
@@ -171,7 +191,7 @@ export function AdminDropdown({
             type="button"
             disabled={isPending}
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-3 px-4 py-2.5 min-h-11 text-xs text-red-600 hover:bg-red-50/50 transition-colors w-full text-left font-bold disabled:opacity-50 cursor-pointer"
             role="menuitem"
           >
             <LogOut size={14} className="text-red-500 shrink-0" />

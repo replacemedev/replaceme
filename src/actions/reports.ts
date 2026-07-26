@@ -4,7 +4,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/server/auth/session";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatFullName } from "@/lib/format/name";
 import { runAction, ok, fail } from "@/lib/server/action-result";
@@ -324,7 +324,7 @@ export async function getAdminReports(input: unknown): Promise<{
 } | null> {
   try {
     const parsed = adminReportsQuerySchema.parse(input);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("reports");
 
     const cacheKey = adminReportsCacheKey(parsed);
     return await getOrSet(cacheKey, CACHE_TTL_SECONDS.adminReports, async () => {
@@ -407,7 +407,7 @@ export async function getAdminReportById(
 ): Promise<AdminReportDeepDive | null> {
   try {
     const id = z.string().uuid().parse(reportId);
-    await requireAdmin();
+    await requireAdminCapability("reports");
 
     const adminSupabase = await createAdminClient();
     const { data, error } = await adminSupabase
@@ -490,7 +490,7 @@ export async function updateReportStatus(input: unknown) {
     const parsed = updateReportSchema.safeParse(input);
     if (!parsed.success) return fail("Invalid update.");
 
-    const { supabase, user } = await requireAdmin();
+    const { supabase, user } = await requireAdminCapability("reports");
     const now = new Date().toISOString();
 
     const update: Record<string, unknown> = {
@@ -619,7 +619,7 @@ export async function getAdminJobReports(input: unknown): Promise<{
 } | null> {
   try {
     const parsed = adminJobReportsQuerySchema.parse(input);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("reports");
 
     let query = supabase
       .from("reported_jobs")
@@ -732,7 +732,7 @@ export async function updateJobReportStatus(input: unknown) {
     const parsed = updateJobReportStatusSchema.safeParse(input);
     if (!parsed.success) return fail("Invalid update.");
 
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("reports");
     const now = new Date().toISOString();
 
     const update: Record<string, unknown> = {
@@ -821,7 +821,7 @@ export async function getAdminUserReports(input: unknown): Promise<{
 } | null> {
   try {
     const parsed = adminUserReportsQuerySchema.parse(input);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("reports");
 
     let query = supabase
       .from("user_reports")
@@ -918,7 +918,7 @@ export async function getAdminUserReportById(
 ): Promise<AdminUserReportDeepDive | null> {
   try {
     const id = z.string().uuid().parse(reportId);
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("reports");
 
     const { data, error } = await supabase
       .from("user_reports")
@@ -1000,7 +1000,7 @@ export async function updateUserReportStatus(input: unknown) {
     const parsed = updateUserReportSchema.safeParse(input);
     if (!parsed.success) return fail("Invalid update.");
 
-    const { supabase, user } = await requireAdmin();
+    const { supabase, user } = await requireAdminCapability("reports");
     const now = new Date().toISOString();
 
     const update: Record<string, unknown> = {
@@ -1054,7 +1054,7 @@ export async function warnReportedUser(input: unknown) {
       return fail(parsed.error.issues[0]?.message ?? "Invalid warning.");
     }
 
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("reports");
     const admin = await createAdminClient();
 
     const { data: profile, error } = await admin

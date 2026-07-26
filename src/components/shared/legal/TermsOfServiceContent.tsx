@@ -757,8 +757,9 @@ export function TermsOfServiceContent({ hideSidebar = false }: { hideSidebar?: b
         grant Replaceme a worldwide, non-exclusive license to host, display, and process that
         content solely to operate and improve the Services—including automated safety analysis of
         messages and, where justified by a system flag, user report, legal process, or active
-        investigation, human Trust &amp; Safety review under least-privilege access with audit
-        logging. You must not use our marks without prior
+        investigation, human Trust &amp; Safety review by authorized administrators (Super
+        administrators or Moderators with the relevant module grant) under least-privilege access
+        with audit logging. You must not use our marks without prior
         written permission.
       </p>
 

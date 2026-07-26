@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { AdminPageShell } from "@/components/admin/layout";
 import { ApplicationDeepDiveView } from "@/components/admin/applications/ApplicationDeepDiveView";
 import { fetchAdminApplicationDeepDive } from "@/actions/admin/applications";
+import { requireAdminPageCapability } from "@/lib/server/auth/require-page-capability";
 
 export const metadata = {
   title: "Application details | Admin",
@@ -23,6 +24,8 @@ export default async function AdminApplicationDetailPage({
   params: Promise<{ id: string }>;
   searchParams: SearchParams;
 }) {
+  await requireAdminPageCapability("applications");
+
   const { id } = await params;
   const query = await searchParams;
   const data = await fetchAdminApplicationDeepDive(id);

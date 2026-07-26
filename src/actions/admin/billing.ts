@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/server/stripe/client";
 import { monthlyMrrCents } from "@/lib/server/stripe/subscription-price";
@@ -88,7 +88,7 @@ function buildMetrics(subscriptions: AdminSubscriptionRow[]): AdminBillingMetric
 }
 
 export async function fetchAdminBillingPageData(): Promise<AdminBillingPageData> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminCapability("billing");
   const subscriptions = await fetchAdminSubscriptions();
 
   const { data: ledgerRows, error } = await supabase
@@ -155,7 +155,7 @@ export async function fetchAdminBillingPageData(): Promise<AdminBillingPageData>
 export async function adminOverrideEmployerPlan(input: unknown): Promise<ActionResult> {
   try {
     const parsed = adminPlanOverrideSchema.parse(input);
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("billing");
     const admin = await createAdminClient();
 
     const { data: plan, error: planError } = await admin
@@ -212,7 +212,7 @@ export async function adminRevokeEmployerPlanOverride(
 ): Promise<ActionResult> {
   try {
     const parsed = adminRevokePlanOverrideSchema.parse(input);
-    await requireAdmin();
+    await requireAdminCapability("billing");
     const admin = await createAdminClient();
 
     const { error } = await admin
@@ -251,7 +251,7 @@ export async function adminRevokeEmployerPlanOverride(
 export async function adminIssueStripeRefund(input: unknown): Promise<ActionResult> {
   try {
     const parsed = adminIssueRefundSchema.parse(input);
-    await requireAdmin();
+    await requireAdminCapability("billing");
 
     const stripe = getStripe();
     if (!stripe) {

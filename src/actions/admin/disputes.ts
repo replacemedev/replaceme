@@ -14,7 +14,7 @@ import {
   type UserReportViolation,
 } from "@/lib/reporting/constants";
 import { runAction, ok, fail } from "@/lib/server/action-result";
-import { requireAdmin } from "@/lib/server/auth/require-admin";
+import { requireAdminCapability } from "@/lib/server/auth/require-capability";
 import {
   CACHE_TTL_SECONDS,
   CacheKeys,
@@ -236,7 +236,7 @@ export async function getAdminCases(input: unknown): Promise<{
 } | null> {
   try {
     const parsed = listSchema.parse(input ?? {});
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminCapability("disputes");
     const tab = parsed.tab as AdminDisputesTab;
 
     const selectCols = `
@@ -401,7 +401,7 @@ export async function getAdminCaseById(
   try {
     const parsed = parseCasePathId(casePathId);
     if (!parsed) return null;
-    await requireAdmin();
+    await requireAdminCapability("disputes");
     const admin = await createAdminClient();
 
     if (parsed.source === "legacy_dispute") {
@@ -558,7 +558,7 @@ export async function updateAdminCase(input: unknown) {
     const path = parseCasePathId(parsed.data.caseId);
     if (!path) return fail("Invalid case id.");
 
-    const { user } = await requireAdmin();
+    const { user } = await requireAdminCapability("disputes");
     const admin = await createAdminClient();
     const now = new Date().toISOString();
 

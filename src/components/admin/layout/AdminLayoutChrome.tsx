@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, use, useState } from "react";
+import type { AdminCapability } from "@/lib/admin/capabilities";
 import { AdminMobileDrawer } from "./AdminMobileDrawer";
 
 interface AdminNavProfile {
@@ -27,17 +28,20 @@ export function useAdminNav() {
 interface AdminLayoutChromeProps {
   profile?: AdminNavProfile;
   isSuperAdmin?: boolean;
+  capabilities?: readonly AdminCapability[];
+  adminRole?: "moderator" | "superadmin";
 }
 
 const defaultProfile: AdminNavProfile = {
   displayName: "Admin",
-  roleLabel: "Platform Admin",
+  roleLabel: "Moderator",
   initials: "A",
 };
 
 export function AdminLayoutChrome({
   profile = defaultProfile,
   isSuperAdmin = false,
+  capabilities = [],
   children,
 }: AdminLayoutChromeProps & { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -54,6 +58,7 @@ export function AdminLayoutChrome({
         onClose={() => setDrawerOpen(false)}
         profile={profile}
         isSuperAdmin={isSuperAdmin}
+        capabilities={capabilities}
       />
     </AdminNavContext>
   );

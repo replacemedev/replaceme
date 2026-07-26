@@ -86,12 +86,17 @@ export const DATA_RETENTION_PERIODS = [
   {
     category: "Job post moderation records",
     period:
-      "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by Platform administrators during that audit window",
+      "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by authorized administrators (capability-scoped) during that audit window",
   },
   {
     category: "User-to-user abuse & safety reports",
     period:
-      "Up to 24 months after case closure (resolved or dismissed), including violation category, evidence attachments, admin notes, and actor IDs—for Trust & Safety investigation, anti-retaliation, and legal defense. Reporter identity is restricted to authorized administrators and is not disclosed to the reported party except by court order or explicit reporter consent (RA 10173 / GDPR)",
+      "Up to 24 months after case closure (resolved or dismissed), including violation category, evidence attachments, admin notes, and actor IDs—for Trust & Safety investigation, anti-retaliation, and legal defense. Reporter identity is restricted to Super administrators and Moderators with Reports/Disputes capability and is not disclosed to the reported party except by court order or explicit reporter consent (RA 10173 / GDPR)",
+  },
+  {
+    category: "Admin staff operational data",
+    period:
+      "Work email, optional staff profile photo, department, timezone, short bio, MFA enrollment metadata, invite timestamps, module capability grants, directory opt-in flag, and admin action audit logs—retained up to 24 months with security/audit logs (or longer under legal hold). Staff who opt in may publish name, photo, department, timezone, and bio on the public /team page (email and phone stay private). Password credentials are handled by the auth provider (hashed); in-app password change and email reset are available to each signed-in admin. Processed as employment/contractor operational data under RA 10173 / GDPR accountability",
   },
   {
     category: "Cookie consent records",
