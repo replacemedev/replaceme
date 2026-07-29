@@ -84,7 +84,7 @@ export function DashboardWelcomeState({
                 Post a Job
               </p>
               <p className="text-xs font-medium text-slate-500 mt-0.5 leading-relaxed">
-                Go live in minutes
+                Go live
               </p>
             </div>
           </Link>

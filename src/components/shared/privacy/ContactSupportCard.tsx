@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { LifeBuoy, Mail } from "lucide-react";
 import { DELETION_REQUEST_SUPPORT_EMAIL } from "@/lib/data/legal";
 
@@ -15,6 +14,7 @@ export function ContactSupportCard({
   subject = "Support request",
   className = "",
 }: ContactSupportCardProps) {
+  // Native <a> required: next/link intercepts navigation and does not open mailto: clients.
   const mailto = `mailto:${DELETION_REQUEST_SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}`;
 
   return (
@@ -30,13 +30,13 @@ export function ContactSupportCard({
           <p className="mt-1 text-sm leading-relaxed text-slate-500">{description}</p>
         </div>
       </div>
-      <Link
+      <a
         href={mailto}
-        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-800 sm:w-auto [-webkit-tap-highlight-color:transparent]"
+        className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#005c26] sm:w-auto [-webkit-tap-highlight-color:transparent]"
       >
         <Mail className="h-4 w-4 shrink-0" aria-hidden />
         Contact support
-      </Link>
+      </a>
     </div>
   );
 }
