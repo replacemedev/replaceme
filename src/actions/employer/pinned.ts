@@ -33,6 +33,7 @@ async function loadPinnedWorkersForEmployer(
           first_name,
           middle_name,
           last_name,
+          suffix,
           avatar_url,
           professional_title,
           skills,
@@ -58,6 +59,7 @@ async function loadPinnedWorkersForEmployer(
       first_name?: string | null;
       middle_name?: string | null;
       last_name?: string | null;
+      suffix?: string | null;
       avatar_url?: string | null;
       professional_title?: string | null;
       skills?: string[] | null;
@@ -69,7 +71,12 @@ async function loadPinnedWorkersForEmployer(
     if (!worker) continue;
 
     const name =
-      formatFullName(worker.first_name, worker.middle_name, worker.last_name) || "Worker";
+      formatFullName(
+        worker.first_name,
+        worker.middle_name,
+        worker.last_name,
+        worker.suffix
+      ) || "Worker";
 
     pinnedList.push({
       id: worker.id,

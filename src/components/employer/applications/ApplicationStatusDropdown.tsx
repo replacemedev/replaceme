@@ -21,8 +21,6 @@ interface ApplicationStatusDropdownProps {
 
 function selectStyles(status: ApplicationStatus): string {
   switch (status) {
-    case "INTERVIEW_SCHEDULED":
-      return "border-blue-200 bg-blue-50 text-blue-800 focus:ring-blue-500/30";
     case "UNDER_REVIEW":
       return "border-emerald-200 bg-emerald-50 text-emerald-800 focus:ring-emerald-500/30";
     case "REJECTED":

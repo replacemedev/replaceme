@@ -32,6 +32,7 @@ export type EmployerEntitlements = {
   approvalMode: BillingApprovalMode;
   priorityListing: boolean;
   prioritySupport: boolean;
+  emailSupport: boolean;
   earlyAccess: boolean;
 };
 
@@ -91,6 +92,7 @@ function parseEntitlementsJson(raw: Json | null): EmployerEntitlements | null {
     approvalMode: (row.approval_mode as BillingApprovalMode) ?? "queued_2d",
     priorityListing: Boolean(row.priority_listing),
     prioritySupport: Boolean(row.priority_support),
+    emailSupport: true,
     earlyAccess: Boolean(row.early_access),
   };
 }

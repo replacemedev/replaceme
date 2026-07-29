@@ -24,7 +24,6 @@ export function extractErrorMessage(error: unknown): string {
 /** Stable auth action error codes for signup / password-reset UX. */
 export const AUTH_ERROR = {
   EMAIL_EXISTS: "EMAIL_EXISTS",
-  USERNAME_EXISTS: "USERNAME_EXISTS",
   EMAIL_NOT_FOUND: "EMAIL_NOT_FOUND",
 } as const;
 
@@ -32,7 +31,6 @@ export type AuthErrorCode = (typeof AUTH_ERROR)[keyof typeof AUTH_ERROR];
 
 export const AUTH_ERROR_MESSAGE: Record<AuthErrorCode, string> = {
   EMAIL_EXISTS: "This email is already registered. Please log in.",
-  USERNAME_EXISTS: "This username is already taken. Please choose another one.",
   EMAIL_NOT_FOUND: "No account found with this email address.",
 };
 
@@ -43,15 +41,6 @@ export function mapSignupDatabaseError(message: string): string {
     lower.includes("database error saving new user")
   ) {
     return "We could not finish setting up your account. Please try again in a moment.";
-  }
-  if (
-    (lower.includes("username") &&
-      (lower.includes("already taken") || lower.includes("already exists"))) ||
-    lower.includes("profiles_username_key") ||
-    lower.includes("company_profiles_username_key") ||
-    lower.includes("unique_username")
-  ) {
-    return AUTH_ERROR.USERNAME_EXISTS;
   }
   if (
     lower.includes("already registered") ||

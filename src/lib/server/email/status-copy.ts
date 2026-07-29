@@ -1,14 +1,7 @@
 import type { ApplicationStatus } from "@/types/applications";
 
-export type ApplicationStatusTone =
-  | "viewed"
-  | "shortlisted"
-  | "interview"
-  | "hired"
-  | "declined";
-
 export type WorkerStatusEmailCopy = {
-  tone: ApplicationStatusTone;
+  tone: "viewed" | "shortlisted" | "hired" | "declined";
   headline: string;
   body: string;
   /** Skip email for statuses that aren't employer-driven updates. */
@@ -27,13 +20,6 @@ export function workerStatusEmailCopy(
         tone: "shortlisted",
         headline: "You've been shortlisted!",
         body: "Great news — the employer shortlisted your application and may reach out soon.",
-        shouldNotify: true,
-      };
-    case "INTERVIEW_SCHEDULED":
-      return {
-        tone: "interview",
-        headline: "Interview scheduled",
-        body: "You've been invited to interview. Open your applications to review the details.",
         shouldNotify: true,
       };
     case "HIRED":

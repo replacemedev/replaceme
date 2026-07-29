@@ -145,13 +145,14 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
     >
       <div>
         <label className="block text-sm font-body-bold font-bold text-slate-800 mb-2">
-          Email or Username
+          Email
         </label>
         <Input
           {...register("email")}
-          placeholder="Enter your email or username"
+          type="email"
+          placeholder="you@example.com"
           icon={<Mail size={18} />}
-          autoComplete="username"
+          autoComplete="email"
           disabled={isLoading}
         />
       </div>

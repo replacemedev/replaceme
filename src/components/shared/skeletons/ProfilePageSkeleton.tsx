@@ -191,25 +191,17 @@ export function ProfilePageSkeleton() {
 
             {/* Details List */}
             <div className="space-y-3.5 pt-2 border-t border-slate-100 text-left text-xs font-bold text-slate-600">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <SkeletonBlock className="h-3.5 w-16 rounded-md" />
                 <SkeletonBlock className="h-3.5 w-28 rounded-md" />
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <SkeletonBlock className="h-3.5 w-24 rounded-md" />
                 <SkeletonBlock className="h-3.5 w-20 rounded-md" />
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <SkeletonBlock className="h-3.5 w-12 rounded-md" />
                 <SkeletonBlock className="h-3.5 w-24 rounded-md" />
-              </div>
-              <div className="flex justify-between items-center">
-                <SkeletonBlock className="h-3.5 w-16 rounded-md" />
-                <SkeletonBlock className="h-3.5 w-16 rounded-md" />
-              </div>
-              <div className="flex justify-between items-center">
-                <SkeletonBlock className="h-3.5 w-16 rounded-md" />
-                <SkeletonBlock className="h-3.5 w-20 rounded-md" />
               </div>
             </div>
 

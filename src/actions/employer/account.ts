@@ -2,17 +2,15 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export type EmployerAccountDetails = {
   firstName: string | null;
-  middleName: string | null;
   lastName: string | null;
-  username: string | null;
   email: string | null;
   role: string;
   avatarUrl: string | null;
-  phoneNumber: string | null;
-  country: string | null;
 };
 
 export async function getEmployerAccountDetails(): Promise<EmployerAccountDetails | null> {
@@ -27,9 +25,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select(
-        "first_name, middle_name, last_name, username, email, avatar_url, role, phone_number, country"
-      )
+      .select("first_name, last_name, email, avatar_url, role")
       .eq("id", user.id)
       .single();
 
@@ -37,14 +33,10 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
     return {
       firstName: profile.first_name,
-      middleName: profile.middle_name,
       lastName: profile.last_name,
-      username: profile.username,
       email: profile.email ?? user.email ?? null,
       role: profile.role,
       avatarUrl: profile.avatar_url,
-      phoneNumber: profile.phone_number,
-      country: profile.country,
     };
   } catch (err) {
     safeError("getEmployerAccountDetails error:", err);
@@ -54,10 +46,7 @@ export async function getEmployerAccountDetails(): Promise<EmployerAccountDetail
 
 export async function updateEmployerAccountDetails(data: {
   firstName: string;
-  middleName?: string | null;
   lastName: string;
-  phoneNumber?: string | null;
-  country?: string | null;
 }) {
   try {
     const supabase = await createClient();
@@ -72,14 +61,11 @@ export async function updateEmployerAccountDetails(data: {
       .from("profiles")
       .update({
         first_name: data.firstName,
-        middle_name: data.middleName || null,
         last_name: data.lastName,
-        phone_number: data.phoneNumber || null,
         tin_number: null,
         birth_date: null,
         gender: null,
         civil_status: null,
-        country: data.country || null,
       })
       .eq("id", user.id);
 
@@ -88,5 +74,67 @@ export async function updateEmployerAccountDetails(data: {
   } catch (err) {
     safeError("updateEmployerAccountDetails error:", err);
     return { success: false, error: "Failed to update profile details." };
+  }
+}
+
+const notificationPrefSchema = z.enum([
+  "email_every_applicant",
+  "email_daily_summary",
+  "dashboard_only",
+]);
+
+export async function updateEmployerNotificationPref(
+  pref: z.infer<typeof notificationPrefSchema>
+) {
+  try {
+    const parsed = notificationPrefSchema.parse(pref);
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) return { success: false, error: "Unauthorized" };
+
+    const { error } = await supabase
+      .from("company_profiles")
+      .update({
+        application_notification_pref: parsed,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("employer_id", user.id);
+
+    if (error) throw error;
+    revalidatePath("/employer/settings/account");
+    return { success: true as const };
+  } catch (err) {
+    safeError("updateEmployerNotificationPref error:", err);
+    return { success: false, error: "Failed to update notification preference." };
+  }
+}
+
+export async function getEmployerNotificationPref(): Promise<
+  z.infer<typeof notificationPrefSchema>
+> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return "email_every_applicant";
+
+    const { data } = await supabase
+      .from("company_profiles")
+      .select("application_notification_pref")
+      .eq("employer_id", user.id)
+      .maybeSingle();
+
+    return (
+      (data?.application_notification_pref as z.infer<
+        typeof notificationPrefSchema
+      >) ?? "email_every_applicant"
+    );
+  } catch {
+    return "email_every_applicant";
   }
 }

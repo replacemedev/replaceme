@@ -23,7 +23,6 @@ import { emitWorkerAuditLog } from "@/lib/server/audit/worker-events";
 const WITHDRAWABLE_STATUSES: ApplicationStatus[] = [
   "PENDING",
   "UNDER_REVIEW",
-  "INTERVIEW_SCHEDULED",
 ];
 
 type JobPostJoin = {
@@ -116,13 +115,6 @@ export async function getWorkerApplicationById(applicationId: string) {
           monthly_salary,
           hours_per_week,
           salary_currency
-        ),
-        interviews (
-          id,
-          scheduled_at,
-          meeting_link,
-          notes,
-          status
         )
       `
       )
@@ -131,34 +123,8 @@ export async function getWorkerApplicationById(applicationId: string) {
       .maybeSingle();
 
     if (error || !data) return null;
-    
-    const mapped = mapApplicationRow(data);
-    if (!mapped) return null;
 
-    const interview = Array.isArray(data.interviews) ? data.interviews[0] : data.interviews;
-    const hasInterview = !!interview;
-    const isInterviewScheduled = mapped.status === "INTERVIEW_SCHEDULED";
-
-    return {
-      ...mapped,
-      interview: hasInterview
-        ? {
-            id: interview.id,
-            scheduledAt: interview.scheduled_at,
-            meetingUrl: interview.meeting_link,
-            notes: interview.notes,
-            status: interview.status,
-          }
-        : isInterviewScheduled
-        ? {
-            id: data.id,
-            scheduledAt: data.created_at,
-            meetingUrl: null,
-            notes: null,
-            status: "scheduled",
-          }
-        : null,
-    };
+    return mapApplicationRow(data);
   } catch (err) {
     safeError("getWorkerApplicationById:", err);
     return null;
@@ -232,9 +198,6 @@ export async function getWorkerApplicationStats(): Promise<WorkerApplicationStat
       underReview: applications.filter((a) =>
         UNDER_REVIEW_STATUSES.includes(a.status)
       ).length,
-      interviewsScheduled: applications.filter(
-        (a) => a.status === "INTERVIEW_SCHEDULED"
-      ).length,
     };
   } catch (err) {
     safeError("getWorkerApplicationStats:", err);
@@ -242,7 +205,6 @@ export async function getWorkerApplicationStats(): Promise<WorkerApplicationStat
       totalSent: 0,
       sentThisWeek: 0,
       underReview: 0,
-      interviewsScheduled: 0,
     };
   }
 }

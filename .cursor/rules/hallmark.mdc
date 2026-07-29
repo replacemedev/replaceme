@@ -1,0 +1,33 @@
+---
+description: Hallmark ON for frontend UI — anti-AI-slop design required
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+  - "**/*.css"
+  - "**/*.scss"
+  - "**/components/**"
+  - "**/app/**/*.tsx"
+  - "**/src/components/**"
+  - "**/src/app/**"
+---
+# Hallmark — ON for frontend design
+
+**Status: REQUIRED.** Hallmark is turned ON whenever this rule matches (UI / frontend files).
+
+## Mandatory agent behavior
+
+1. Before designing or editing UI in matched files, **read and follow** the installed skill:
+   - `.cursor/skills/hallmark/SKILL.md`
+   - Load only the `references/` files the skill step asks for (do not dump the whole folder).
+2. Treat every non-trivial screen / layout / visual change as a Hallmark **default** design flow (or `hallmark redesign` / `hallmark audit` / `hallmark study` when the user asks).
+3. Refuse generic AI-slop layouts: purple gradients, stock 3-card grids, invent metrics, italic display headers, re-drawn browser chrome.
+4. Prefer intentional structure + theme fingerprint over template sameness.
+5. Still respect product stack constraints when building this app: Tailwind, existing design tokens, shadcn/Lucide where already in use — Hallmark guides **structure and craft**, not a license to delete the design system.
+6. `ponytail` may still apply for tiny non-visual logic fixes; **Hallmark wins** on anything the user can see.
+7. Do **not** disable Hallmark unless the user says `stop hallmark` / `hallmark off`.
+
+## Vault / SDLC
+
+- **Phase 05:** fix loop until Policy B green — no frontend work yet. See Obsidian `[[Phase_05_Fix_Loop]]`.
+- **Phase 06+:** Hallmark is primary for UI. See Obsidian `[[Frontend]]` + `[[03_Token_Saver_and_ECC]]`. Counts as 1 of ≤2 ECC surfaces per task.
+- **Frozen backend (06+):** do not edit API/DB without human Yes — `[[Backend_Freeze]]`.

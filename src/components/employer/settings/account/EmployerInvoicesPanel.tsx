@@ -82,7 +82,8 @@ export function EmployerInvoicesPanel({
             Invoices
           </h2>
           <p className="mt-1 text-xs font-medium text-slate-500">
-            Stripe invoices for this account. Open View for the hosted receipt or PDF.
+            Stripe invoices for this account (totals may include tax collected via
+            Stripe Tax). Open View for the hosted receipt or PDF.
           </p>
         </div>
 
@@ -146,11 +147,21 @@ export function EmployerInvoicesPanel({
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-extrabold text-slate-900">
-                    {formatMoney(inv.amountPaid / 100, inv.currency, {
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
+                  <div>
+                    <p className="text-sm font-extrabold text-slate-900">
+                      {formatMoney(inv.amountPaid / 100, inv.currency, {
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                    {inv.taxAmount > 0 ? (
+                      <p className="text-[10px] font-semibold text-slate-400">
+                        incl. tax{" "}
+                        {formatMoney(inv.taxAmount / 100, inv.currency, {
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
                   {inv.hostedInvoiceUrl || inv.invoicePdf ? (
                     <a
                       href={inv.hostedInvoiceUrl ?? inv.invoicePdf ?? "#"}
@@ -202,9 +213,19 @@ export function EmployerInvoicesPanel({
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3.5 font-bold text-slate-900">
-                      {formatMoney(inv.amountPaid / 100, inv.currency, {
-                        maximumFractionDigits: 2,
-                      })}
+                      <div>
+                        {formatMoney(inv.amountPaid / 100, inv.currency, {
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+                      {inv.taxAmount > 0 ? (
+                        <div className="text-[10px] font-semibold text-slate-400">
+                          tax{" "}
+                          {formatMoney(inv.taxAmount / 100, inv.currency, {
+                            maximumFractionDigits: 2,
+                          })}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="whitespace-nowrap px-5 py-3.5 text-right">
                       {inv.hostedInvoiceUrl || inv.invoicePdf ? (

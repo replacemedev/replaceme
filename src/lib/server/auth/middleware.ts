@@ -107,8 +107,7 @@ export async function updateSession(request: NextRequest) {
       pathname === "/privacy-policy" ||
       pathname === "/terms-of-service" ||
       pathname === "/cookie-policy" ||
-      pathname === "/employer-dpa" ||
-      pathname === "/subprocessors";
+      pathname === "/refund-policy";
 
     const isGuestBlockedWorkerIdentityRoute =
       pathname.startsWith("/workers/") ||

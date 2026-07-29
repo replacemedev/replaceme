@@ -18,8 +18,6 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:employer:${employerId}:applicants:${jobId}`,
   employerMessagingThreads: (employerId: string) =>
     `rm:${CACHE_VERSION}:employer:${employerId}:messaging-threads`,
-  employerInterviews: (employerId: string) =>
-    `rm:${CACHE_VERSION}:employer:${employerId}:interviews`,
   employerHired: (employerId: string) =>
     `rm:${CACHE_VERSION}:employer:${employerId}:hired`,
   employerPinned: (employerId: string) =>
@@ -36,8 +34,6 @@ export const CacheKeys = {
     `rm:${CACHE_VERSION}:worker:${workerId}:saved-jobs`,
   workerMessagingThreads: (workerId: string) =>
     `rm:${CACHE_VERSION}:worker:${workerId}:messaging-threads`,
-  workerInterviews: (workerId: string) =>
-    `rm:${CACHE_VERSION}:worker:${workerId}:interviews`,
   workerEarnings: (workerId: string) =>
     `rm:${CACHE_VERSION}:worker:${workerId}:earnings`,
   adminPlatformMetrics: () =>
@@ -67,7 +63,6 @@ export const CACHE_TTL_SECONDS = {
   jobSearch: 60,
   savedJobs: 60,
   employerHiring: 45,
-  workerInterviews: 45,
   workerEarnings: 120,
   adminMetrics: 30,
   adminAuditLogs: 30,
@@ -83,7 +78,6 @@ export function employerCacheKeys(employerId: string): string[] {
     CacheKeys.employerRecentJobs(employerId),
     CacheKeys.employerRecentApplicants(employerId),
     CacheKeys.employerMessagingThreads(employerId),
-    CacheKeys.employerInterviews(employerId),
     CacheKeys.employerHired(employerId),
     CacheKeys.employerPinned(employerId),
   ];
@@ -97,7 +91,6 @@ export function workerCacheKeys(workerId: string): string[] {
     CacheKeys.workerJobSearch(workerId),
     CacheKeys.workerSavedJobs(workerId),
     CacheKeys.workerMessagingThreads(workerId),
-    CacheKeys.workerInterviews(workerId),
     CacheKeys.workerEarnings(workerId),
   ];
 }

@@ -33,7 +33,6 @@ function resolveDisplayName(profile: AdminSelfProfile): string {
   return (
     profile.displayName?.trim() ||
     full ||
-    profile.username ||
     profile.email ||
     "Admin"
   );
@@ -48,7 +47,6 @@ export function AdminPersonalProfileCard({
   const [pending, startTransition] = useTransition();
   const [firstName, setFirstName] = useState(profile.firstName ?? "");
   const [lastName, setLastName] = useState(profile.lastName ?? "");
-  const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber ?? "");
   const [department, setDepartment] = useState(profile.department ?? "");
   const [displayName, setDisplayName] = useState(profile.displayName ?? "");
   const [timezone, setTimezone] = useState(profile.timezone ?? "Asia/Manila");
@@ -62,7 +60,6 @@ export function AdminPersonalProfileCard({
   const openEdit = () => {
     setFirstName(profile.firstName ?? "");
     setLastName(profile.lastName ?? "");
-    setPhoneNumber(profile.phoneNumber ?? "");
     setDepartment(profile.department ?? "");
     setDisplayName(profile.displayName ?? "");
     setTimezone(profile.timezone ?? "Asia/Manila");
@@ -77,7 +74,6 @@ export function AdminPersonalProfileCard({
       const result = await updateAdminSelfProfile({
         firstName,
         lastName,
-        phoneNumber,
         department,
         displayName,
         timezone,
@@ -126,10 +122,7 @@ export function AdminPersonalProfileCard({
             onAvatarChange={() => router.refresh()}
           />
 
-          <AccountLoginIdentity
-            email={profile.email}
-            username={profile.username}
-          />
+          <AccountLoginIdentity email={profile.email} />
 
           <div className="border-t border-slate-50 pt-6">
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -142,14 +135,6 @@ export function AdminPersonalProfileCard({
                 </dt>
                 <dd className="mt-1 text-sm font-semibold text-slate-800">
                   {name}
-                </dd>
-              </div>
-              <div className="min-w-0">
-                <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                  Phone
-                </dt>
-                <dd className="mt-1 text-sm font-semibold text-slate-800">
-                  {profile.phoneNumber || "—"}
                 </dd>
               </div>
               <div className="min-w-0">
@@ -288,19 +273,6 @@ export function AdminPersonalProfileCard({
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-slate-600">
-              Phone
-            </label>
-            <input
-              className={inputClassName}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              autoComplete="tel"
-              inputMode="tel"
-              disabled={pending}
-            />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-600">
               Department
             </label>
             <input
@@ -358,7 +330,7 @@ export function AdminPersonalProfileCard({
               </span>
               <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
                 Publishes your name, photo, department, timezone, and bio on{" "}
-                <span className="font-semibold">/team</span>. Email and phone stay
+                <span className="font-semibold">/team</span>. Email stays
                 private.
               </span>
             </span>

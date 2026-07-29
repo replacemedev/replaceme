@@ -5,7 +5,6 @@
 export const APPLICATION_STATUSES = [
   "PENDING",
   "UNDER_REVIEW",
-  "INTERVIEW_SCHEDULED",
   "REJECTED",
   "HIRED",
   "WITHDRAWN",
@@ -21,7 +20,6 @@ export function isApplicationStatus(value: string): value is ApplicationStatus {
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   PENDING: "Pending",
   UNDER_REVIEW: "Under Review",
-  INTERVIEW_SCHEDULED: "Interviewing",
   REJECTED: "Rejected",
   HIRED: "Hired",
   WITHDRAWN: "Withdrawn",
@@ -40,12 +38,11 @@ export type ApplicationDateFilter =
   | "last_30_days"
   | "last_90_days";
 
-/** Aggregated stats for the three top cards — computed from real rows. */
+/** Aggregated stats for worker application dashboard cards. */
 export interface WorkerApplicationStats {
   totalSent: number;
   sentThisWeek: number;
   underReview: number;
-  interviewsScheduled: number;
 }
 
 /** Single application row with joined job + company context. */
@@ -85,7 +82,6 @@ export function formatHourlyRate(
 
 export type StatusBadgeVariant =
   | "review"
-  | "interview"
   | "shortlisted"
   | "declined"
   | "hired"
@@ -95,8 +91,6 @@ export function getStatusBadge(
   status: ApplicationStatus
 ): { label: string; variant: StatusBadgeVariant } {
   switch (status) {
-    case "INTERVIEW_SCHEDULED":
-      return { label: "Interview Scheduled", variant: "interview" };
     case "UNDER_REVIEW":
       return { label: "Under Review", variant: "shortlisted" };
     case "REJECTED":

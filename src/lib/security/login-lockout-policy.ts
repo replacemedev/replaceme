@@ -24,7 +24,7 @@ export function lockedUntilKey(accountKey: string): string {
   return `rm:login:locked_until:${accountKey}`;
 }
 
-/** Normalize email/username for lockout keys. */
+/** Normalize email for lockout keys. */
 export function normalizeLockoutAccountKey(identifier: string): string {
   return identifier.trim().toLowerCase();
 }

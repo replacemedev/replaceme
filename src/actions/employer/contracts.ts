@@ -60,7 +60,7 @@ export async function getEmployerContract(
       start_date,
       show_hired_badge,
       employment_status,
-      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, professional_title, is_verified ),
+      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, suffix, professional_title, is_verified ),
       jobs ( title )
     `
     )
@@ -72,8 +72,9 @@ export async function getEmployerContract(
 
   const worker = contract.profiles as {
     first_name?: string;
-    middle_name?: string;
+    middle_name?: string | null;
     last_name?: string;
+    suffix?: string | null;
     professional_title?: string;
     is_verified?: boolean | null;
   } | null;
@@ -83,7 +84,12 @@ export async function getEmployerContract(
     id: contract.id,
     workerId: contract.worker_id,
     workerName:
-      formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) || "Worker",
+      formatFullName(
+        worker?.first_name,
+        worker?.middle_name,
+        worker?.last_name,
+        worker?.suffix
+      ) || "Worker",
     workerRole: worker?.professional_title ?? "Professional",
     jobId: contract.job_id,
     jobTitle: job?.title ?? null,

@@ -34,6 +34,7 @@ const TIER_DETAILS: Record<string, TierDetail> = {
       { text: "Anonymous Candidate Previews", included: true },
       { text: "Skills, Experience & Salary Visible", included: true },
       { text: "Names, Contact Details & Resume Locked", included: true },
+      { text: "Email Support", included: true },
     ],
     ctaText: "Post a Job for Free",
   },
@@ -267,7 +268,12 @@ export function PricingCards({
         })}
       </div>
       <p className="text-center text-xs text-slate-400 font-semibold max-w-xl mx-auto leading-relaxed pt-4">
-        All prices are billed exclusively in USD through Stripe. Cancel anytime.
+        All prices are billed exclusively in USD through Stripe (tax-exclusive).
+        Applicable tax is calculated at checkout. Cancel anytime.{" "}
+        <Link href="/refund-policy" className="font-semibold text-[#006e2f] hover:underline">
+          Refund Policy
+        </Link>
+        .
       </p>
     </div>
   );

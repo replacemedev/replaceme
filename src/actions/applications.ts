@@ -16,7 +16,6 @@ import { safeError } from "@/utils/logger";
 
 const ADVANCE_STATUSES = new Set<ApplicationStatus>([
   "UNDER_REVIEW",
-  "INTERVIEW_SCHEDULED",
   "HIRED",
 ]);
 
@@ -150,45 +149,6 @@ export async function updateApplicationStatus(
       }
     }
 
-    // Sync associated interview status
-    if (parsed.status !== "INTERVIEW_SCHEDULED") {
-      const { data: interview } = await supabase
-        .from("interviews")
-        .select("id")
-        .eq("application_id", parsed.applicationId)
-        .maybeSingle();
-
-      if (interview) {
-        const nextInterviewStatus = parsed.status === "HIRED" ? "completed" : "cancelled";
-        await supabase
-          .from("interviews")
-          .update({ status: nextInterviewStatus })
-          .eq("id", interview.id);
-      }
-    } else {
-      // If status is INTERVIEW_SCHEDULED, check if an interview record exists.
-      // If not, auto-create a default one so the page is not empty.
-      const { data: interview } = await supabase
-        .from("interviews")
-        .select("id")
-        .eq("application_id", parsed.applicationId)
-        .maybeSingle();
-
-      if (!interview) {
-        const tomorrow = new Date();
-        tomorrow.setHours(tomorrow.getHours() + 24);
-
-        await supabase.from("interviews").insert({
-          application_id: parsed.applicationId,
-          employer_id: profile.id,
-          worker_id: application.candidate_id,
-          job_id: application.job_id,
-          scheduled_at: tomorrow.toISOString(),
-          status: "scheduled",
-        });
-      }
-    }
-
     await invalidateEmployerApplicantsCache(profile.id, application.job_id);
     await invalidateWorkerCache(application.candidate_id);
 
@@ -204,7 +164,6 @@ export async function updateApplicationStatus(
     const jobId = application.job_id;
     revalidatePath(`/employer/jobs/${jobId}`);
     revalidatePath(`/employer/jobs/${jobId}/applicants`);
-    revalidatePath("/employer/interviews");
     revalidatePath("/worker/applications");
     revalidatePath("/worker/dashboard");
 
@@ -262,7 +221,6 @@ export async function deleteApplication(
     const jobId = application.job_id;
     revalidatePath(`/employer/jobs/${jobId}`);
     revalidatePath(`/employer/jobs/${jobId}/applicants`);
-    revalidatePath("/employer/interviews");
     revalidatePath("/worker/applications");
     revalidatePath("/worker/dashboard");
 

@@ -45,11 +45,7 @@ interface AdminTeamClientProps {
 }
 
 function displayName(member: AdminTeamRow): string {
-  const name = formatFullName(
-    member.first_name,
-    member.middle_name,
-    member.last_name
-  ).trim();
+  const name = formatFullName(member.first_name, member.last_name).trim();
   return name || member.display_name || member.email || "Admin";
 }
 

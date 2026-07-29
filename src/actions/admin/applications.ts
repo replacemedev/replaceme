@@ -84,6 +84,7 @@ function mapApplicationRow(row: {
         first_name?: string | null;
         middle_name?: string | null;
         last_name?: string | null;
+        suffix?: string | null;
         email?: string | null;
         is_verified?: boolean | null;
         skills?: string[] | null;
@@ -128,8 +129,10 @@ function mapApplicationRow(row: {
       formatFullName(
         workerRecord?.first_name,
         workerRecord?.middle_name,
-        workerRecord?.last_name
-      ) || null,
+        workerRecord?.last_name,
+        workerRecord?.suffix
+      ) ||
+      null,
     worker_email: workerRecord?.email ?? null,
     worker_is_verified: Boolean(workerRecord?.is_verified),
     status: row.status,
@@ -155,7 +158,7 @@ async function resolveSearchFilters(
       .select("id")
       .eq("role", "worker")
       .or(
-        `email.ilike."${pattern}",first_name.ilike."${pattern}",last_name.ilike."${pattern}",middle_name.ilike."${pattern}"`
+        `email.ilike."${pattern}",first_name.ilike."${pattern}",last_name.ilike."${pattern}"`
       )
       .limit(150),
     supabase.from("jobs").select("id").ilike("title", pattern).limit(150),
@@ -228,6 +231,7 @@ export async function fetchAdminApplications(
         first_name,
         middle_name,
         last_name,
+        suffix,
         email,
         is_verified,
         skills,
@@ -329,6 +333,7 @@ export async function fetchAdminApplicationDeepDive(
           first_name,
           middle_name,
           last_name,
+          suffix,
           email,
           is_verified,
           skills,

@@ -9,7 +9,7 @@ import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
   title: "My Applications | Replaceme",
-  description: "Track your sent proposals and interview statuses.",
+  description: "Track your sent proposals and hiring status.",
 };
 
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function WorkerApplicationsPage() {
     <WorkerPageShell width="wide" className="py-8 gap-4">
       <WorkerPageHeader
         title="My Applications"
-        subhead="Track your sent proposals and interview statuses."
+        subhead="Track your sent proposals and hiring status."
       />
       <ApplicationsClient applications={applications} stats={stats} />
     </WorkerPageShell>

@@ -6,9 +6,8 @@ import {
   getEmployerPlanUsage,
   listEmployerInvoices,
 } from "@/actions/employer/billing";
-import { getEmployerAccountDetails } from "@/actions/employer/account";
+import { getEmployerAccountDetails, getEmployerNotificationPref } from "@/actions/employer/account";
 import { getEmailVerificationStatus } from "@/actions/auth";
-import { getLatestDeletionRequestStatus } from "@/actions/privacy/deletion-request";
 import { AccountSettingsClient } from "./AccountSettingsClient";
 import {
   EmployerPageHeader,
@@ -41,13 +40,13 @@ export default async function AccountSettingsPage() {
     redirect("/dashboard");
   }
 
-  const [initialSettings, planUsage, accountDetails, invoiceResult, deletionStatus] =
+  const [initialSettings, planUsage, accountDetails, invoiceResult, notificationPref] =
     await Promise.all([
       getAccountSettings(),
       getEmployerPlanUsage(),
       getEmployerAccountDetails(),
       listEmployerInvoices(),
-      getLatestDeletionRequestStatus(),
+      getEmployerNotificationPref(),
     ]);
 
   const defaultSettings = initialSettings || {
@@ -88,7 +87,7 @@ export default async function AccountSettingsPage() {
               : []
           }
           invoicesError={"error" in invoiceResult ? invoiceResult.error : null}
-          deletionStatus={deletionStatus}
+          notificationPref={notificationPref}
         />
       </Suspense>
     </EmployerPageShell>

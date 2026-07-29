@@ -39,7 +39,8 @@ export function AuthPageSkeleton({
                 <SkeletonBlock className="h-12 w-full rounded-xl" />
               </div>
 
-              {/* Email & Password Fields */}
+              {/* Email, Password, Confirm */}
+              <SkeletonBlock className="h-12 w-full rounded-xl" />
               <SkeletonBlock className="h-12 w-full rounded-xl" />
               <SkeletonBlock className="h-12 w-full rounded-xl" />
 

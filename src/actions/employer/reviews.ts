@@ -34,7 +34,7 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
       id,
       worker_id,
       status,
-      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, is_verified )
+      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, suffix, is_verified )
     `
     )
     .eq("employer_id", profile.id)
@@ -50,14 +50,20 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
   return (contracts ?? []).map((c) => {
     const worker = c.profiles as {
       first_name?: string;
-      middle_name?: string;
+      middle_name?: string | null;
       last_name?: string;
+      suffix?: string | null;
       is_verified?: boolean | null;
     } | null;
     return {
       workerId: c.worker_id,
       workerName:
-        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) || "Worker",
+      formatFullName(
+        worker?.first_name,
+        worker?.middle_name,
+        worker?.last_name,
+        worker?.suffix
+      ) || "Worker",
       contractId: c.id,
       hasReview: reviewed.has(c.worker_id),
       isVerified: Boolean(worker?.is_verified),

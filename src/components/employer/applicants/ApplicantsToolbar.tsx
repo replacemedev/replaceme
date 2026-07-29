@@ -11,7 +11,6 @@ const STATUS_OPTIONS: { value: ApplicantStatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "PENDING", label: "New" },
   { value: "UNDER_REVIEW", label: "Review" },
-  { value: "INTERVIEW_SCHEDULED", label: "Interview" },
   { value: "HIRED", label: "Hired" },
   { value: "REJECTED", label: "Declined" },
 ];

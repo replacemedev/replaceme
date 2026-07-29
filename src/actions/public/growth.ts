@@ -2,7 +2,7 @@
 
 import { cache } from "react";
 import { z } from "zod";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createPublicClient, createAdminClient } from "@/lib/supabase/server";
 import { safeError } from "@/utils/logger";
 import { invalidateEmployerApplicantsCache } from "@/lib/server/redis-cache";
 import { computeJobHourlyRate } from "@/types/job-search";
@@ -51,7 +51,8 @@ function mapPublicJob(row: {
 
 export async function getPublicJobListings(): Promise<PublicJobListing[]> {
   try {
-    const supabase = await createClient();
+    // Cookie-less client so /sitemap.xml and other static/public paths stay static.
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("job_posts")
       .select(
@@ -82,7 +83,7 @@ export async function getPublicJobListings(): Promise<PublicJobListing[]> {
 export const getPublicJobById = cache(
   async (jobId: string): Promise<WorkerJobDetails | null> => {
     try {
-      const supabase = await createClient();
+      const supabase = createPublicClient();
       const { data: job, error } = await supabase
         .from("job_posts")
         .select("*")
@@ -185,7 +186,7 @@ export async function getPublicCompanyDirectory(): Promise<
   PublicCompanyListing[]
 > {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data: companies, error } = await supabase
       .from("company_profiles")
       .select(
@@ -247,7 +248,7 @@ export async function getPublicCompanyById(
   companyId: string
 ): Promise<{ company: PublicCompanyListing; jobs: PublicJobListing[] } | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data: row, error } = await supabase
       .from("company_profiles")
       .select(

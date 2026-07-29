@@ -12,14 +12,15 @@ Covers product abuse reports and the unified Case Center. For security breaches,
 
 | Channel | Queue | Notes |
 |---------|-------|--------|
-| Platform issue forms | `/admin/reports` · Platform Issues | Rate-limited; evidence optional |
+| Platform issue forms | `/admin/reports` · Platform Issues | Rate-limited; evidence optional. Employers use “Report an issue”. |
 | Job report modal | `/admin/reports` · Job Reports | Worker → job |
-| Worker “Report Employer” | `/admin/disputes` | Confidential; `user_reports` |
-| Employer “Report Worker” | `/admin/disputes` | Confidential; `user_reports` |
-| Messaging auto-flags / “Report conversation” | `/admin/moderation` (+ may create `user_reports`) | Flagged-only queue; audit-logged |
+| Worker “Report Employer” / report conversation | `/admin/disputes` | Confidential; `user_reports` (reported party is always an employer) |
+| Messaging auto-flags | `/admin/moderation` (+ may create `user_reports`) | Flagged-only queue; audit-logged. Employers cannot file worker reports. |
 | Email / contact form | Triage → Reports or Disputes | Escalate if illegal content / threats |
 | Legacy mediation rows | `/admin/disputes` · Financial / Resolved | Historical `disputes` table |
 | Stripe disputes | Admin billing | Parallel path; not this SLA |
+
+> **Policy (2026-07-29):** Employer → worker reporting is retired. Workers are not listed as defendants from employer-filed U2U reports. Employers still use platform “Report an issue” for product/technical problems.
 
 ## Case Center tabs (`/admin/disputes`)
 

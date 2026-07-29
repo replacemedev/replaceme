@@ -9,12 +9,11 @@ import {
   type EmployerOnboardingDraft,
 } from "@/actions/onboarding";
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
-import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import { SkillSelectDropdown } from "@/components/shared/SkillSelectDropdown";
 import { CompanyLogoUpload } from "@/components/shared/CompanyLogoUpload";
 import { companyLogoHelperText } from "@/lib/storage/profile-image";
 import {
   COMPANY_SIZE_OPTIONS,
-  DEFAULT_SKILL_OPTIONS,
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
 
@@ -29,7 +28,7 @@ const INDUSTRIES = [
   "Other",
 ] as const;
 
-type WizardPhase = "welcome" | "company" | "hiring" | "details" | "personal";
+type WizardPhase = "welcome" | "company" | "hiring" | "details" | "notification";
 
 interface EmployerOnboardingWizardProps {
   draft: EmployerOnboardingDraft;
@@ -42,21 +41,22 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
 
   const [companyName, setCompanyName] = useState(draft.companyName);
   const [industry, setIndustry] = useState(draft.industry);
+  const [industryCustom, setIndustryCustom] = useState(draft.industryCustom ?? "");
   const [companySize, setCompanySize] = useState(draft.companySize);
   const [skills, setSkills] = useState<string[]>(draft.skills);
   const [websiteUrl, setWebsiteUrl] = useState(draft.websiteUrl);
   const [companyBio, setCompanyBio] = useState(draft.companyBio);
   const [logoUrl, setLogoUrl] = useState<string | null>(draft.logoUrl);
-
-  const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
-  const [country, setCountry] = useState(draft.country || "");
+  const [notificationPreference, setNotificationPreference] = useState<string>(
+    draft.notificationPreference ?? "email_every_applicant"
+  );
 
   const stepIndex: Record<WizardPhase, number> = {
     welcome: 0,
     company: 1,
     hiring: 2,
     details: 3,
-    personal: 4,
+    notification: 4,
   };
 
   const finish = async () => {
@@ -112,13 +112,14 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
         title="Company basics"
         description="Your company name and industry appear on every job post."
         onBack={() => setPhase("welcome")}
-        isNextDisabled={!companyName.trim() || !industry || !companySize}
+        isNextDisabled={!companyName.trim() || !industry || !companySize || (industry === "Other" && !industryCustom.trim())}
         onNext={() => {
           startTransition(async () => {
             const result = await saveEmployerOnboardingStep("company", {
               companyName: companyName.trim(),
               industry,
               companySize,
+              industryCustom: industry === "Other" ? industryCustom.trim() : undefined,
             });
             if (!result.success) {
               toast.error(result.error);
@@ -160,6 +161,18 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
             ))}
           </select>
         </label>
+        {industry === "Other" && (
+          <label className="block space-y-2 text-sm font-medium text-slate-700">
+            Describe your industry
+            <input
+              required
+              value={industryCustom}
+              onChange={(e) => setIndustryCustom(e.target.value)}
+              placeholder="e.g. Renewable Energy"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+            />
+          </label>
+        )}
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Company size
           <select
@@ -202,13 +215,11 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
           });
         }}
       >
-        <SkillPicker
+        <SkillSelectDropdown
           label="Top skills you hire for"
-          hint="Select or add the skills you most often need on your team."
-          options={DEFAULT_SKILL_OPTIONS}
+          hint="Select up to 5 skills you most often need on your team"
           value={skills}
           onChange={setSkills}
-          maxSkills={8}
           disabled={isPending}
         />
       </OnboardingWizardShell>
@@ -224,7 +235,10 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
         description="Optional links and bio — you can update these anytime in settings."
         onBack={() => setPhase("hiring")}
         canSkip
-        onSkip={() => setPhase("personal")}
+        nextLabel="Next"
+        onSkip={() => {
+          startTransition(async () => { setPhase("notification"); });
+        }}
         onNext={() => {
           startTransition(async () => {
             const result = await saveEmployerOnboardingStep("details", {
@@ -235,7 +249,7 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
               toast.error(result.error);
               return;
             }
-            setPhase("personal");
+            setPhase("notification");
           });
         }}
       >
@@ -262,55 +276,65 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
     );
   }
 
-  const isPersonalNextDisabled = !phoneNumber.trim() || !country.trim();
-
-  return (
-    <OnboardingWizardShell
-      {...shellProps}
-      stepLabel="Contact details"
-      title="Contact details"
-      description="We only need a phone number and country so we can reach you about hiring activity."
-      onBack={() => setPhase("details")}
-      nextLabel="Finish"
-      isNextDisabled={isPersonalNextDisabled}
-      onNext={() => {
-        startTransition(async () => {
-          const result = await saveEmployerOnboardingStep("personal", {
-            phoneNumber: phoneNumber.trim(),
-            country: country.trim(),
+  if (phase === "notification") {
+    const options = [
+      {
+        value: "email_every_applicant",
+        label: "Email for every new applicant",
+        description: "Get notified immediately when someone applies.",
+      },
+      {
+        value: "email_daily_summary",
+        label: "Daily email summary",
+        description: "Receive a digest of all activity once per day.",
+      },
+      {
+        value: "dashboard_only",
+        label: "Manage through dashboard only",
+        description: "No email notifications. Check your dashboard when ready.",
+      },
+    ];
+    return (
+      <OnboardingWizardShell
+        {...shellProps}
+        stepLabel="Notifications"
+        title="How should we notify you?"
+        description="Choose how you'd like to hear about new applicants. You can change this anytime."
+        onBack={() => setPhase("details")}
+        nextLabel="Finish"
+        onNext={() => {
+          startTransition(async () => {
+            const result = await saveEmployerOnboardingStep("notification", {
+              notificationPreference,
+            });
+            if (!result.success) {
+              toast.error(result.error);
+              return;
+            }
+            await finish();
           });
-          if (!result.success) {
-            toast.error(result.error);
-            return;
-          }
-          await finish();
-        });
-      }}
-    >
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Phone Number
-          <input
-            type="tel"
-            required
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            placeholder="+1 234 567 8900"
-            className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-          />
-        </label>
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Country
-          <input
-            type="text"
-            required
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            placeholder="Country"
-            className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
-          />
-        </label>
-      </div>
-    </OnboardingWizardShell>
-  );
+        }}
+      >
+        <div className="space-y-3">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setNotificationPreference(opt.value)}
+              className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
+                notificationPreference === opt.value
+                  ? "border-[#006e2f] bg-[#ebfdf2]"
+                  : "border-slate-200 bg-white hover:border-slate-300"
+              }`}
+            >
+              <p className="text-sm font-semibold text-slate-800">{opt.label}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{opt.description}</p>
+            </button>
+          ))}
+        </div>
+      </OnboardingWizardShell>
+    );
+  }
+
+  return null;
 }

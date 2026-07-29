@@ -46,7 +46,12 @@ export function IdentityReviewDetailClient({
   );
 
   const name =
-    formatFullName(worker.first_name, worker.middle_name, worker.last_name) ||
+    formatFullName(
+      worker.first_name,
+      worker.middle_name,
+      worker.last_name,
+      worker.suffix
+    ) ||
     worker.email ||
     "Unknown worker";
 

@@ -37,6 +37,11 @@ export const PUBLIC_HELP_ARTICLES = [
     description: "Platform rules and acceptable use for all roles.",
   },
   {
+    href: "/refund-policy",
+    title: "Refund Policy",
+    description: "Employer plan refunds, billing errors, and chargebacks.",
+  },
+  {
     href: "/privacy-policy",
     title: "Privacy Policy",
     description: "How we collect, store, and protect your data.",

@@ -75,7 +75,6 @@ function getArticleIcon(article: HelpArticleConfig) {
   if (titleLower.includes("application") || titleLower.includes("seeker")) return UserCheck;
   if (titleLower.includes("worker onboarding") || titleLower.includes("hired")) return ShieldCheck;
   if (titleLower.includes("profile")) return Sparkles;
-  if (titleLower.includes("interview")) return Video;
   if (titleLower.includes("faq")) return HelpCircle;
   if (titleLower.includes("trust") || titleLower.includes("safety")) return Lock;
   if (titleLower.includes("contact") || titleLower.includes("support")) return LifeBuoy;

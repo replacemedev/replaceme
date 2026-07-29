@@ -4,7 +4,6 @@ import {
   Bookmark,
   FileText,
   MessageSquare,
-  Calendar,
   Handshake,
   User,
   Settings,
@@ -26,7 +25,6 @@ export const WORKER_NAV_ITEMS: WorkerNavItem[] = [
   { href: "/worker/jobs", label: "Jobs", icon: Briefcase },
   { href: "/worker/saved-jobs", label: "Saved Jobs", icon: Bookmark },
   { href: "/worker/applications", label: "Applications", icon: FileText },
-  { href: "/worker/interviews", label: "Interviews", icon: Calendar },
   { href: "/worker/messages", label: "Messages", icon: MessageSquare },
 ];
 

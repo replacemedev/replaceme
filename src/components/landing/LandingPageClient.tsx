@@ -368,8 +368,8 @@ export function LandingPageClient({
                 <div className="flex gap-4 sm:gap-6 items-start relative z-10">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">3</div>
                   <div>
-                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Message &amp; Interview</h4>
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Chat directly with candidates on paid plans to set up interviews, evaluate fit, and discuss role expectations.</p>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Message Candidates</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">Chat directly with candidates on paid plans to evaluate fit, answer questions, and discuss role expectations.</p>
                   </div>
                 </div>
                 <div className="flex gap-4 sm:gap-6 items-start relative z-10">
@@ -408,7 +408,7 @@ export function LandingPageClient({
                 <div className="flex gap-4 sm:gap-6 items-start relative z-10">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#22c55e] text-white flex items-center justify-center text-sm sm:text-lg font-bold shrink-0 shadow-sm">3</div>
                   <div>
-                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Interview &amp; Chat</h4>
+                    <h4 className="font-body-bold text-base sm:text-lg mb-1 text-slate-800 font-bold">Chat with Employers</h4>
                     <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">When employers unlock your application, chat directly in the platform to discuss job details.</p>
                   </div>
                 </div>

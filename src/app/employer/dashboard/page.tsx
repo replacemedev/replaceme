@@ -4,13 +4,11 @@ import Link from "next/link";
 import {
   Briefcase,
   FileUser,
-  Calendar,
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentJobs, getRecentApplicants } from "@/actions/employer/dashboard";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
-import { getEmployerInterviews } from "@/actions/employer/hiring";
 import { getHiredData } from "@/actions/employer/hired";
 import { formatFullName } from "@/lib/format/name";
 import { JobCard } from "@/components/employer/JobCard";
@@ -20,13 +18,14 @@ import { DashboardOnboardedBanner } from "@/components/employer/dashboard/Dashbo
 import { EmployerAnnouncementBanner } from "@/components/employer/dashboard/EmployerAnnouncementBanner";
 import { DashboardPoller } from "@/components/employer/dashboard/DashboardPoller";
 import { getActiveEmployerAnnouncement } from "@/actions/admin/announcements";
-import { EmptyState } from "@/components/shared/EmptyState";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import {
   isActiveJobLimitReached,
 } from "@/lib/entitlements/limits";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { DashboardHiringSummary } from "@/components/employer/dashboard/DashboardHiringSummary";
+import { DashboardWelcomeState } from "@/components/employer/dashboard/DashboardWelcomeState";
 import {
   EmployerPageHeader,
   EmployerPageShell,
@@ -50,7 +49,7 @@ export default async function EmployerDashboard() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, first_name, middle_name, last_name, role")
+    .select("id, first_name, last_name, role")
     .eq("id", user.id)
     .single();
 
@@ -59,15 +58,14 @@ export default async function EmployerDashboard() {
   }
 
   const employerName =
-    formatFullName(profile.first_name, profile.middle_name, profile.last_name) ||
+    formatFullName(profile.first_name, profile.last_name) ||
     "Employer";
 
-  const [jobs, recentApplicants, planUsage, interviews, hiredData, announcement] =
+  const [jobs, recentApplicants, planUsage, hiredData, announcement] =
     await Promise.all([
       getRecentJobs(profile.id),
       getRecentApplicants(profile.id),
       getEmployerPlanUsage(),
-      getEmployerInterviews(),
       getHiredData(),
       getActiveEmployerAnnouncement().catch(() => null),
     ]);
@@ -111,13 +109,6 @@ export default async function EmployerDashboard() {
       hint: "Across all job posts",
       icon: FileUser,
       href: "/employer/jobs",
-    },
-    {
-      label: "Interviews",
-      value: interviews.length,
-      hint: "Scheduled stage",
-      icon: Calendar,
-      href: "/employer/interviews",
     },
     {
       label: "Active hires",
@@ -184,7 +175,7 @@ export default async function EmployerDashboard() {
             </Link>
           </div>
 
-          {jobs.length > 0 ? (
+          {jobs.length > 2 ? (
             <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
               {jobs.map((job) => (
                 <JobCard
@@ -194,18 +185,21 @@ export default async function EmployerDashboard() {
                 />
               ))}
             </div>
+          ) : jobs.length > 0 ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 items-stretch gap-6">
+                {jobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
+                  />
+                ))}
+              </div>
+              <DashboardWelcomeState planUsage={planUsage} compact />
+            </div>
           ) : (
-            <EmptyState
-              icon={<Briefcase size={22} />}
-              description="You haven't posted any jobs yet. Create your first listing to start hiring."
-              action={
-                <PostJobCTA
-                  planUsage={planUsage}
-                  label="Post a New Job"
-                  compact
-                />
-              }
-            />
+            <DashboardWelcomeState planUsage={planUsage} />
           )}
         </div>
 
@@ -245,9 +239,7 @@ export default async function EmployerDashboard() {
           </EmployerSectionCard>
 
           <DashboardHiringSummary
-            interviewCount={interviews.length}
             activeHires={hiredData.stats.totalActive}
-            upcomingInterviews={interviews}
           />
 
           {planUsage ? <PlanUsageCard usage={planUsage} /> : null}

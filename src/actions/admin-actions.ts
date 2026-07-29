@@ -144,6 +144,8 @@ export async function logAdminAction(
   const actor = await resolveAuditActorSnapshot(user.id, "admin");
 
   const { error } = await admin.from("audit_logs").insert({
+    prev_hash: "pending",
+    entry_hash: "pending",
     admin_id: user.id,
     action_type: actionType,
     target_type: targetType ?? null,
@@ -862,7 +864,7 @@ export async function fetchVerificationQueue(
   const { data: workers, error } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
+      "id, first_name, middle_name, last_name, suffix, email, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
     )
     .eq("role", "worker")
     .in("verification_status", [...QUEUE_STATUSES]);
@@ -891,13 +893,12 @@ export async function fetchVerificationQueue(
     reviewerIds.length > 0
       ? supabase
           .from("profiles")
-          .select("id, first_name, middle_name, last_name, email")
+          .select("id, first_name, last_name, email")
           .in("id", reviewerIds)
       : Promise.resolve({
           data: [] as {
             id: string;
             first_name: string | null;
-            middle_name: string | null;
             last_name: string | null;
             email: string | null;
           }[],
@@ -920,7 +921,7 @@ export async function fetchVerificationQueue(
   for (const r of reviewersResult.data ?? []) {
     reviewerNameById.set(
       r.id,
-      formatFullName(r.first_name, r.middle_name, r.last_name) ||
+      formatFullName(r.first_name, r.last_name) ||
         r.email ||
         "Admin"
     );
@@ -931,11 +932,10 @@ export async function fetchVerificationQueue(
     return {
       id: w.id,
       first_name: w.first_name,
-      middle_name: w.middle_name,
+      middle_name: w.middle_name ?? null,
       last_name: w.last_name,
+      suffix: w.suffix ?? null,
       email: w.email,
-      username: w.username ?? null,
-      phone_number: w.phone_number ?? null,
       tin_number: w.tin_number ?? null,
       birth_date: w.birth_date ?? null,
       region: w.region ?? null,
@@ -1119,7 +1119,7 @@ export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
   const { data: worker, error } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, middle_name, last_name, email, username, phone_number, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
+      "id, first_name, middle_name, last_name, suffix, email, tin_number, birth_date, region, city, location, address_line_1, id_type, id_number, id_expiration_date, id_issuing_country, verification_status, is_verified, created_at, kyc_reviewed_by, kyc_reviewed_at"
     )
     .eq("id", id)
     .eq("role", "worker")
@@ -1154,16 +1154,12 @@ export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
   if (worker.kyc_reviewed_by) {
     const { data: reviewer } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name, email")
+      .select("first_name, last_name, email")
       .eq("id", worker.kyc_reviewed_by)
       .maybeSingle();
     if (reviewer) {
       reviewerName =
-        formatFullName(
-          reviewer.first_name,
-          reviewer.middle_name,
-          reviewer.last_name
-        ) ||
+        formatFullName(reviewer.first_name, reviewer.last_name) ||
         reviewer.email ||
         "Admin";
     }
@@ -1178,11 +1174,10 @@ export async function fetchWorkerKycReviewBundle(workerId: string): Promise<{
     worker: {
       id: worker.id,
       first_name: worker.first_name,
-      middle_name: worker.middle_name,
+      middle_name: worker.middle_name ?? null,
       last_name: worker.last_name,
+      suffix: worker.suffix ?? null,
       email: worker.email,
-      username: worker.username ?? null,
-      phone_number: worker.phone_number ?? null,
       tin_number: worker.tin_number ?? null,
       birth_date: worker.birth_date ?? null,
       region: worker.region ?? null,
@@ -1266,6 +1261,7 @@ export async function fetchAdminWorkersSafe(): Promise<
         first_name,
         middle_name,
         last_name,
+        suffix,
         email,
         professional_title,
         account_status,
@@ -1429,7 +1425,7 @@ export async function fetchAdminAdminsSafe(): Promise<
     const { data, error } = await supabase
       .from("profiles")
       .select(
-        "id, first_name, middle_name, last_name, email, account_status, created_at"
+        "id, first_name, last_name, email, account_status, created_at"
       )
       .eq("role", "admin")
       .order("created_at", { ascending: false });
@@ -1806,7 +1802,7 @@ async function enrichAuditLogRows(
     const [{ data: profiles }, { data: adminProfiles }] = await Promise.all([
       adminClient
         .from("profiles")
-        .select("id, email, first_name, middle_name, last_name, avatar_url")
+        .select("id, email, first_name, last_name, avatar_url")
         .in("id", adminIds),
       adminClient
         .from("admin_profiles")
@@ -1820,7 +1816,7 @@ async function enrichAuditLogRows(
 
     for (const p of profiles ?? []) {
       const meta = metaById.get(p.id);
-      const fullName = formatFullName(p.first_name, p.middle_name, p.last_name);
+      const fullName = formatFullName(p.first_name, null, p.last_name);
       actorById.set(p.id, {
         email: p.email ?? null,
         displayName:
@@ -1855,11 +1851,11 @@ async function enrichAuditLogRows(
   if (profileTargetIds.length > 0) {
     const { data: targets } = await adminClient
       .from("profiles")
-      .select("id, first_name, middle_name, last_name, email, role")
+      .select("id, first_name, last_name, email, role")
       .in("id", profileTargetIds);
     for (const t of targets ?? []) {
       const name =
-        formatFullName(t.first_name, t.middle_name, t.last_name).trim() ||
+        formatFullName(t.first_name, t.last_name).trim() ||
         t.email ||
         null;
       const role =
@@ -1955,11 +1951,11 @@ export async function fetchAdminDisputes(
   if (workerIds.length > 0) {
     const { data: workers } = await adminClient
       .from("profiles")
-      .select("id, first_name, middle_name, last_name, email, is_verified")
+      .select("id, first_name, middle_name, last_name, suffix, email, is_verified")
       .in("id", workerIds);
 
     for (const w of workers ?? []) {
-      const name = formatFullName(w.first_name, w.middle_name, w.last_name) || "Worker";
+      const name = formatFullName(w.first_name, w.middle_name, w.last_name, w.suffix) || "Worker";
       workerById.set(w.id, {
         name,
         email: w.email,

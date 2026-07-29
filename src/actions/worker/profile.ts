@@ -58,8 +58,9 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   };
 
   if (data.firstName !== undefined) update.first_name = data.firstName;
-  if (data.middleName !== undefined) update.middle_name = data.middleName || null;
+  if (data.middleName !== undefined) update.middle_name = emptyToNull(data.middleName);
   if (data.lastName !== undefined) update.last_name = data.lastName;
+  if (data.suffix !== undefined) update.suffix = emptyToNull(data.suffix);
   if (data.professionalTitle !== undefined) {
     update.professional_title = data.professionalTitle;
   }
@@ -93,8 +94,6 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   if (data.resumeUrl !== undefined) update.resume_url = emptyToNull(data.resumeUrl);
   if (data.cvUrl !== undefined) update.cv_url = emptyToNull(data.cvUrl);
   if (data.birthDate !== undefined) update.birth_date = data.birthDate;
-  if (data.suffix !== undefined) update.suffix = emptyToNull(data.suffix);
-  if (data.phoneNumber !== undefined) update.phone_number = emptyToNull(data.phoneNumber);
   if (data.gender !== undefined) update.gender = emptyToNull(data.gender);
   if (data.civilStatus !== undefined) update.civil_status = emptyToNull(data.civilStatus);
   if (data.preferredLanguage !== undefined) update.preferred_language = emptyToNull(data.preferredLanguage);

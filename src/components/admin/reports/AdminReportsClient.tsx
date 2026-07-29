@@ -218,6 +218,18 @@ export function AdminReportsClient({
 
   return (
     <div className="min-w-0 space-y-6">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-600">
+        Platform and job listing flags only. Employer→worker reports are retired so workers are not
+        surfaced as defendants here. Worker→employer safety cases live in{" "}
+        <a href="/admin/disputes" className="font-semibold text-[#006e2f] hover:underline">
+          Disputes
+        </a>
+        . For product issues, employers still use “Report an issue” or{" "}
+        <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
+          support@replaceme.ph
+        </a>
+        .
+      </div>
       <AdminTabs tabs={tabs} />
 
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

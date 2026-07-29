@@ -1,226 +1,119 @@
-import Link from "next/link";
-import { Cookie, Shield } from "lucide-react";
-import { LegalSectionHeading } from "./LegalSectionHeading";
-
-const tocItems = [
-  { href: "#1-what-are-cookies", label: "1. What Are Cookies?" },
-  { href: "#2-who-this-covers", label: "2. Who This Covers" },
-  { href: "#3-categories", label: "3. Cookie Categories" },
-  { href: "#4-consent", label: "4. Consent Standards" },
-  { href: "#5-manage", label: "5. Managing Preferences" },
-  { href: "#6-duration", label: "6. Duration & Third Parties" },
-  { href: "#7-updates", label: "7. Updates" },
-  { href: "#8-contact", label: "8. Contact" },
-];
-
-function BulletItem({ children }: { children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <li className="flex items-start gap-3 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-        <Cookie className="h-3 w-3" aria-hidden />
-      </span>
-      <span>{children}</span>
-    </li>
+    <section id={id} className="scroll-mt-24 space-y-4">
+      <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{title}</h2>
+      <div className="space-y-3 text-[15px] leading-relaxed text-slate-600 sm:text-base">
+        {children}
+      </div>
+    </section>
   );
 }
 
-export function CookiePolicyContent({ hideSidebar = false }: { hideSidebar?: boolean }) {
-  const articleContent = (
-    <article
-      className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 lg:p-10 ${hideSidebar ? "" : "order-1 lg:order-2"}`}
-    >
-      <div className="mb-10 rounded-xl border border-slate-100 bg-slate-50 p-5 sm:p-6">
-        <h2 className="mb-3 flex items-center gap-2 font-bold text-[#22c55e]">
-          <Shield className="h-4 w-4 shrink-0" aria-hidden />
-          Summary
-        </h2>
-        <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-          Replaceme uses cookies and similar technologies for users in the Philippines and
-          worldwide. Strictly necessary cookies keep the marketplace secure and functional.
-          Analytics and marketing cookies are off by default and load only after you give freely
-          given, specific, and informed consent—consistent with NPC Circular No. 2023-04, RA 10173,
-          GDPR, and CCPA/CPRA disclosure expectations. Pre-checked boxes for optional cookies are
-          never used.
-        </p>
-      </div>
+type CookieType = {
+  name: string;
+  purpose: string;
+  required: boolean;
+};
 
-      <LegalSectionHeading id="1-what-are-cookies" number={1} title="What Are Cookies?" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        Cookies are small text files placed on your device when you visit a website. Similar
-        technologies include local storage, pixels, and SDKs. They help sites remember sign-in
-        state, prevent fraud, measure performance, and—only with consent—support analytics or
-        advertising.
+const COOKIE_TYPES: CookieType[] = [
+  {
+    name: "Essential Cookies",
+    purpose:
+      "Keep you logged in, remember your session, and make the platform work. These cannot be turned off.",
+    required: true,
+  },
+  {
+    name: "Functional Cookies",
+    purpose:
+      "Remember your preferences like language settings and notification choices.",
+    required: false,
+  },
+  {
+    name: "Analytics Cookies",
+    purpose:
+      "Help us understand how people use the platform so we can improve it. Data is aggregated and anonymous.",
+    required: false,
+  },
+];
+
+export function CookiePolicyContent() {
+  return (
+    <div className="mx-auto max-w-3xl space-y-10 rounded-2xl border border-slate-200 bg-white px-6 py-8 shadow-xs sm:px-10 sm:py-12">
+      <p className="inline-block rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">
+        Last updated: July 2026
       </p>
 
-      <LegalSectionHeading id="2-who-this-covers" number={2} title="Who This Policy Covers" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        This Cookie Policy applies globally to all visitors and account holders on{" "}
-        <Link href="https://replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-          replaceme.ph
-        </Link>
-        —including Workers and Employers in the Philippines and international users browsing from
-        the EU/EEA, UK, United States, and other jurisdictions. It complements our{" "}
-        <Link href="/privacy-policy" className="font-semibold text-[#006e2f] hover:underline">
-          Privacy Policy
-        </Link>
-        .
+      <p className="text-[15px] leading-relaxed text-slate-600 sm:text-base">
+        This policy explains what cookies Replace Me uses, why, and how to manage them.
       </p>
 
-      <LegalSectionHeading id="3-categories" number={3} title="Cookie Categories We Use" />
-      <ul className="space-y-4">
-        <BulletItem>
-          <strong className="font-semibold text-slate-800">Strictly necessary (always on).</strong>{" "}
-          Required for authentication (Supabase session cookies), security (CSRF / idle-timeout),
-          load balancing, fraud prevention, and storing your cookie consent choice itself. These do
-          not require optional consent because the Platform cannot function safely without them.
-        </BulletItem>
-        <BulletItem>
-          <strong className="font-semibold text-slate-800">Analytics (opt-in).</strong> Help us
-          understand traffic, page performance, and product funnels (for example, which hiring steps
-          drop off). We do not enable analytics scripts until you accept analytics or &quot;Accept
-          all.&quot;
-        </BulletItem>
-        <BulletItem>
-          <strong className="font-semibold text-slate-800">Marketing (opt-in).</strong> Used for
-          advertising measurement, retargeting, or campaign attribution. Disabled until you
-          affirmatively opt in. Silence, scrolling, or continued browsing alone never counts as
-          consent.
-        </BulletItem>
-      </ul>
-
-      <LegalSectionHeading
-        id="4-consent"
-        number={4}
-        title="Consent Standards (NPC, GDPR & CCPA)"
-      />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+      <Section id="1-what-are-cookies" title="What Are Cookies?">
         <p>
-          For optional cookies, Replaceme obtains consent that is{" "}
-          <strong className="font-semibold text-slate-800">freely given, specific, informed, and
-          evidenced</strong> under NPC Circular No. 2023-04 and equivalent GDPR Article 7
-          principles:
+          Cookies are small text files stored on your device when you visit a website. They help
+          websites remember you and your preferences across visits.
         </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>Clear affirmative action (button click / toggle)—no pre-ticked optional boxes;</li>
-          <li>
-            Equal prominence for accepting, rejecting non-essential, and managing preferences;
-          </li>
-          <li>Granular control separately for analytics and marketing;</li>
-          <li>
-            Layered notice linking to this Policy and the ability to withdraw as easily as consent
-            was given via Cookie settings in the footer; and
-          </li>
-          <li>
-            California residents: we disclose cookie/advertising uses in our Privacy Policy; we do
-            not sell personal information in the traditional sense, and marketing cookies run only
-            after opt-in.
-          </li>
-        </ul>
-      </div>
+      </Section>
 
-      <LegalSectionHeading id="5-manage" number={5} title="How to Manage Preferences" />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>On your first visit (and after material Cookie Policy version updates), a banner offers:</p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
-            <strong className="font-semibold text-slate-800">Accept all</strong> — enables analytics
-            and marketing;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Reject non-essential</strong> — keeps
-            only strictly necessary cookies; and
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Manage preferences</strong> — toggle
-            categories individually (analytics and marketing default off).
-          </li>
-        </ul>
+      <Section id="2-what-we-use" title="Cookies We Use">
+        <div className="space-y-4">
+          {COOKIE_TYPES.map((type) => (
+            <div
+              key={type.name}
+              className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-start sm:gap-4"
+            >
+              <div className="shrink-0">
+                <span
+                  className={[
+                    "inline-block rounded-full px-2.5 py-0.5 text-xs font-bold",
+                    type.required
+                      ? "bg-slate-200 text-slate-700"
+                      : "bg-emerald-100 text-emerald-700",
+                  ].join(" ")}
+                >
+                  {type.required ? "Required" : "Optional"}
+                </span>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800">{type.name}</p>
+                <p className="text-sm text-slate-600">{type.purpose}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section id="3-manage" title="How to Manage Cookies">
         <p>
-          Preferences are stored in your browser&apos;s local storage under a consent record keyed
-          to the current Cookie Policy version. If you are signed in, we may also sync preferences
-          to your account so they apply across devices. You can reopen settings anytime from the
-          site footer (&quot;Cookie settings&quot;).
+          You can control cookies through our cookie banner, which appears the first time you visit the
+          site. You can also update your preferences at any time from the footer of any page.
         </p>
         <p>
-          You may also clear or block cookies via your browser; blocking strictly necessary cookies
-          may prevent sign-in or core marketplace features from working.
+          You can also manage cookies through your browser settings — most browsers let you block or
+          delete cookies. Note that disabling essential cookies may prevent the platform from working
+          correctly.
         </p>
-      </div>
+      </Section>
 
-      <LegalSectionHeading id="6-duration" number={6} title="Duration & Third Parties" />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+      <Section id="4-contact" title="Questions?">
         <p>
-          Session cookies expire when you close the browser; persistent cookies remain until they
-          expire or you delete them. Consent records are retained long enough to demonstrate
-          compliance and until you withdraw or a new policy version requires fresh consent.
-          Third-party processors (for example, analytics or ads vendors you enable) set their own
-          cookies subject to their policies; we only load those vendors after opt-in.
-        </p>
-        <p>
-          Closing or deleting your account does not automatically clear strictly necessary cookies
-          on your next visit to the site. Marketing and analytics cookies require fresh consent if
-          prior optional consent is no longer valid or you clear browser storage.
-        </p>
-      </div>
-
-      <LegalSectionHeading id="7-updates" number={7} title="Updates to This Policy" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        When we change cookie purposes, categories, or vendors in a material way, we update this
-        Policy, bump the Cookie Policy version, and request renewed consent where required so prior
-        optional consent is not treated as continuing for incompatible uses.
-      </p>
-
-      <LegalSectionHeading id="8-contact" number={8} title="Contact" />
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-5 py-4 text-base leading-relaxed text-slate-700 sm:px-6 sm:py-5 sm:text-[17px]">
-        <p>
-          Cookie or consent questions:{" "}
+          If you have questions about our use of cookies, email us at{" "}
           <a
             href="mailto:support@replaceme.ph"
-            className="font-semibold text-[#22c55e] underline underline-offset-2 hover:text-[#16a34a]"
+            className="font-semibold text-emerald-700 hover:underline"
           >
             support@replaceme.ph
           </a>
-        </p>
-        <p className="mt-2">
-          Or use our{" "}
-          <Link href="/contact" className="font-semibold text-[#006e2f] hover:underline">
-            Contact page
-          </Link>
           .
         </p>
-      </div>
-    </article>
-  );
-
-  if (hideSidebar) {
-    return articleContent;
-  }
-
-  return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-      <aside className="order-2 self-start lg:sticky lg:top-28 lg:order-1">
-        <nav
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
-          aria-label="Table of contents"
-        >
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Contents
-          </p>
-          <ol className="max-h-[70vh] space-y-2.5 overflow-y-auto text-sm">
-            {tocItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="leading-snug text-slate-600 transition-colors hover:text-[#22c55e]"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </aside>
-      {articleContent}
+      </Section>
     </div>
   );
 }

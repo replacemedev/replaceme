@@ -17,13 +17,6 @@ export const inviteAdminSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
     fullName: z.string().min(2, "Full name is required"),
-    username: z
-      .string()
-      .min(3, "Username must be at least 3 characters")
-      .regex(
-        /^[a-zA-Z0-9_]+$/,
-        "Username can only contain letters, numbers, and underscores"
-      ),
     admin_role: adminRoleSchema.default("moderator"),
     capabilities: z.array(adminCapabilitySchema).default([]),
   })

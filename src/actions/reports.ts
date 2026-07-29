@@ -641,7 +641,6 @@ export async function getAdminJobReports(input: unknown): Promise<{
         profiles:reporter_id (
           email,
           first_name,
-          middle_name,
           last_name
         )
         `,
@@ -682,14 +681,14 @@ export async function getAdminJobReports(input: unknown): Promise<{
       job_id: string;
       reporter_id: string;
       jobs: { title: string; employer_id: string } | { title: string; employer_id: string }[] | null;
-      profiles: { email: string; first_name: string | null; middle_name: string | null; last_name: string | null } | { email: string; first_name: string | null; middle_name: string | null; last_name: string | null }[] | null;
+      profiles: { email: string; first_name: string | null; last_name: string | null } | { email: string; first_name: string | null; last_name: string | null }[] | null;
     }
 
     const items: AdminJobReportRow[] = (data as unknown as DbJobReport[] ?? []).map((r) => {
       const job = Array.isArray(r.jobs) ? r.jobs[0] : r.jobs;
       const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
       const reporterName = profile
-        ? formatFullName(profile.first_name, profile.middle_name, profile.last_name)
+        ? formatFullName(profile.first_name, profile.last_name)
         : "";
 
       return {
@@ -766,7 +765,8 @@ export async function updateJobReportStatus(input: unknown) {
 
 const adminUserReportsQuerySchema = z
   .object({
-    reportedRole: z.enum(["employer", "worker"]),
+    // Employer→worker reports are retired; only reports about employers remain.
+    reportedRole: z.literal("employer"),
     status: z.enum(USER_REPORT_STATUSES).optional(),
     violationCategory: z.enum(USER_REPORT_VIOLATIONS).optional(),
     q: z.string().trim().max(120).optional(),
@@ -781,7 +781,6 @@ type ProfileLite = {
   id: string;
   email: string | null;
   first_name: string | null;
-  middle_name: string | null;
   last_name: string | null;
   role: string;
 };
@@ -807,7 +806,7 @@ export type AdminUserReportRow = {
 
 function mapProfileName(p: ProfileLite | null | undefined): string {
   if (!p) return "Unknown";
-  return formatFullName(p.first_name, p.middle_name, p.last_name) || "Unknown";
+  return formatFullName(p.first_name, p.last_name) || "Unknown";
 }
 
 function asProfile(value: ProfileLite | ProfileLite[] | null): ProfileLite | null {
@@ -838,10 +837,10 @@ export async function getAdminUserReports(input: unknown): Promise<{
         reporter_id,
         reported_user_id,
         reporter:profiles!user_reports_reporter_id_fkey (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         ),
         reported:profiles!user_reports_reported_user_id_fkey!inner (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         )
         `,
         { count: "exact" }
@@ -938,10 +937,10 @@ export async function getAdminUserReportById(
         reviewed_by,
         reviewed_at,
         reporter:profiles!user_reports_reporter_id_fkey (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         ),
         reported:profiles!user_reports_reported_user_id_fkey (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         )
         `
       )

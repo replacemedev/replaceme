@@ -26,7 +26,6 @@ const STYLES: Record<string, string> = {
   verified: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
   PENDING: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  INTERVIEW_SCHEDULED: "bg-amber-50 text-amber-800 ring-amber-600/25",
   HIRED: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
   WITHDRAWN: "bg-slate-100 text-slate-600 ring-slate-500/20",
   flagged: "bg-orange-50 text-orange-700 ring-orange-600/20",

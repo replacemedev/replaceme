@@ -24,8 +24,8 @@
 ```bash
 # .env.local (TEST keys only)
 STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...   # from `stripe listen` OR Dashboard test endpoint
+# Optional: STRIPE_AUTOMATIC_TAX=false if Stripe Tax is not activated in the test account yet
 ```
 
 Confirm `billing_plans.stripe_price_id` matches **test** prices:

@@ -10,10 +10,28 @@ export type EmployerInvoiceRow = {
   status: string | null;
   description: string;
   amountPaid: number;
+  /** Tax portion in cents when Stripe Tax applied; 0 if none. */
+  taxAmount: number;
   currency: string;
   hostedInvoiceUrl: string | null;
   invoicePdf: string | null;
 };
+
+function invoiceTaxCents(invoice: Stripe.Invoice): number {
+  const totals = invoice.total_taxes;
+  if (Array.isArray(totals) && totals.length > 0) {
+    return totals.reduce((sum, row) => sum + (row.amount ?? 0), 0);
+  }
+  const exclusive = invoice.total_excluding_tax;
+  if (
+    typeof exclusive === "number" &&
+    typeof invoice.total === "number" &&
+    invoice.total > exclusive
+  ) {
+    return invoice.total - exclusive;
+  }
+  return 0;
+}
 
 function invoiceDescription(invoice: Stripe.Invoice): string {
   const lines = invoice.lines?.data ?? [];
@@ -47,6 +65,7 @@ export async function listInvoicesForCustomer(
     status: inv.status,
     description: invoiceDescription(inv),
     amountPaid: inv.amount_paid ?? inv.amount_due ?? 0,
+    taxAmount: invoiceTaxCents(inv),
     currency: (inv.currency ?? "usd").toUpperCase(),
     hostedInvoiceUrl: inv.hosted_invoice_url ?? null,
     invoicePdf: inv.invoice_pdf ?? null,

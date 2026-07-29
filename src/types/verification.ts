@@ -109,7 +109,6 @@ export function isPersonalInfoComplete(profile: {
   last_name: string | null;
   email: string | null;
   professional_title: string | null;
-  phone_number?: string | null;
   id_type?: string | null;
   id_number?: string | null;
   id_expiration_date?: string | null;
@@ -120,7 +119,6 @@ export function isPersonalInfoComplete(profile: {
       profile.last_name?.trim() &&
       profile.email?.trim() &&
       profile.professional_title?.trim() &&
-      profile.phone_number?.trim() &&
       profile.id_type?.trim() &&
       profile.id_number?.trim() &&
       profile.id_expiration_date?.trim() &&

@@ -8,13 +8,6 @@ export interface JobPerformance {
   shortlistedCount: number;
 }
 
-export interface HiringTeamMember {
-  name: string;
-  role: string;
-  avatarUrl: string | null;
-  email: string;
-}
-
 export interface JobDetails {
   id: string;
   title: string;
@@ -28,6 +21,5 @@ export interface JobDetails {
   description: string;
   requiredSkills: string[];
   performance: JobPerformance;
-  hiringTeam: HiringTeamMember;
   priorityScore: number;
 }

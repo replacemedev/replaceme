@@ -17,7 +17,7 @@ export function TestimonialCard({ testimonial }: TestimonialCardProps) {
   ].filter(Boolean).join(", ");
 
   const fullName =
-    formatFullName(testimonial.employer_first_name, testimonial.employer_middle_name, testimonial.employer_last_name) ||
+    formatFullName(testimonial.employer_first_name, testimonial.employer_last_name) ||
     "Employer Partner";
 
   const initials = testimonial.employer_first_name 

@@ -85,17 +85,12 @@ export default function CloseDeleteAccountHelpPage() {
                 {DELETION_REQUEST_SUPPORT_EMAIL}
               </a>{" "}
               to appeal or request access to retained records you are entitled to under RA 10173 /
-              applicable privacy law. Data an Employer already unlocked is controlled by that
-              Employer—see the{" "}
-              <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
-                Employer DPA
-              </Link>
-              . Full retention details:{" "}
+              applicable privacy law.               Data an employer already unlocked is controlled by that employer. Full retention details:{" "}
               <Link
-                href="/privacy-policy#9-retention"
+                href="/privacy-policy#6-retention"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy §9
+                Privacy Policy — retention
               </Link>
               .
             </p>

@@ -43,6 +43,7 @@ async function loadHiredDataForEmployer(
           first_name,
           middle_name,
           last_name,
+          suffix,
           avatar_url,
           professional_title,
           is_verified
@@ -68,6 +69,7 @@ async function loadHiredDataForEmployer(
       first_name?: string | null;
       middle_name?: string | null;
       last_name?: string | null;
+      suffix?: string | null;
       avatar_url?: string | null;
       professional_title?: string | null;
       is_verified?: boolean | null;
@@ -75,7 +77,12 @@ async function loadHiredDataForEmployer(
     if (!worker) continue;
 
     const name =
-      formatFullName(worker.first_name, worker.middle_name, worker.last_name) || "Worker";
+      formatFullName(
+        worker.first_name,
+        worker.middle_name,
+        worker.last_name,
+        worker.suffix
+      ) || "Worker";
 
     const nameLower = name.toLowerCase();
     const online = !(

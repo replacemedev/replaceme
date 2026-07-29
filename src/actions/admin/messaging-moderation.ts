@@ -75,7 +75,7 @@ export async function fetchAdminModerationFlags(
         updated_at,
         jobs ( title ),
         company_profiles ( company_name, employer_id ),
-        profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, is_verified )
+        profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, suffix, is_verified )
       )
     `
     )
@@ -131,7 +131,8 @@ export async function fetchAdminModerationFlags(
         formatFullName(
           worker?.first_name,
           worker?.middle_name,
-          worker?.last_name
+          worker?.last_name,
+          worker?.suffix
         ) || null,
       worker_is_verified: Boolean(worker?.is_verified),
       employer_user_id: company?.employer_id ?? null,
@@ -172,7 +173,7 @@ export async function fetchAdminModerationThread(
         worker_id,
         jobs ( title ),
         company_profiles ( company_name, employer_id ),
-        profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name )
+        profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, suffix )
       )
     `
     )
@@ -196,7 +197,7 @@ export async function fetchAdminModerationThread(
           worker_id,
           jobs ( title ),
           company_profiles ( company_name, employer_id ),
-          profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name )
+          profiles!chat_threads_worker_id_fkey ( first_name, middle_name, last_name, suffix )
         )
       `
       )
@@ -285,7 +286,8 @@ export async function fetchAdminModerationThread(
       formatFullName(
         worker?.first_name,
         worker?.middle_name,
-        worker?.last_name
+        worker?.last_name,
+        worker?.suffix
       ) || null,
     employerUserId: company?.employer_id ?? null,
     companyName: company?.company_name ?? null,
@@ -406,12 +408,31 @@ export async function reportMessagingThread(payload: unknown): Promise<{
       return { error: "Access denied" };
     }
 
+    // Employers cannot report workers — only workers may file U2U reports.
+    if (employerId === ctx.user.id) {
+      return {
+        error:
+          "Employers cannot report workers. Contact support@replaceme.ph for platform issues.",
+      };
+    }
+
     const reportedUserId =
       ctx.user.id === thread.worker_id ? employerId : thread.worker_id;
 
     if (!reportedUserId) return { error: "Could not identify reported party" };
     if (reportedUserId === ctx.user.id) {
       return { error: "You cannot report yourself" };
+    }
+
+    // Defense in depth: only allow reporting employers.
+    const { data: reportedProfile } = await ctx.supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", reportedUserId)
+      .maybeSingle();
+
+    if (!reportedProfile || reportedProfile.role !== "employer") {
+      return { error: "Only employers can be reported through this channel." };
     }
 
     const admin = await createAdminClient();

@@ -208,7 +208,8 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   formatFullName(
                     worker.first_name,
                     worker.middle_name,
-                    worker.last_name
+                    worker.last_name,
+                    worker.suffix
                   ) ||
                   worker.email ||
                   "Unknown worker";
@@ -285,10 +286,11 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                   {queue.rows.map((worker) => {
                     const name =
                       formatFullName(
-                        worker.first_name,
-                        worker.middle_name,
-                        worker.last_name
-                      ) ||
+                    worker.first_name,
+                    worker.middle_name,
+                    worker.last_name,
+                    worker.suffix
+                  ) ||
                       worker.email ||
                       "Unknown worker";
                     return (

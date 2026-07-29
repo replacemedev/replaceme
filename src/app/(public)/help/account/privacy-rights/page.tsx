@@ -53,8 +53,14 @@ export default function PrivacyRightsHelpPage() {
           <section className="space-y-3 text-base leading-relaxed text-slate-600">
             <h2 className="text-lg font-bold text-slate-900">Erasure / account closure</h2>
             <p>
-              Use <strong className="text-slate-800">Request data deletion</strong> in account
-              settings, or email support. {DELETION_REQUEST_SLA} See{" "}
+              Email{" "}
+              <a
+                href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}?subject=Account%20deletion%20request`}
+                className="font-semibold text-[#006e2f] hover:underline"
+              >
+                {DELETION_REQUEST_SUPPORT_EMAIL}
+              </a>{" "}
+              or use the delete option in account settings. {DELETION_REQUEST_SLA} See{" "}
               <Link
                 href="/help/account/close-delete"
                 className="font-semibold text-[#006e2f] hover:underline"
@@ -63,10 +69,10 @@ export default function PrivacyRightsHelpPage() {
               </Link>{" "}
               and{" "}
               <Link
-                href="/privacy-policy#9-retention"
+                href="/privacy-policy#6-retention"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy §9
+                Privacy Policy — retention
               </Link>
               .
             </p>
@@ -88,18 +94,14 @@ export default function PrivacyRightsHelpPage() {
           </section>
 
           <section className="space-y-3 text-base leading-relaxed text-slate-600">
-            <h2 className="text-lg font-bold text-slate-900">Appeals &amp; processors</h2>
+            <h2 className="text-lg font-bold text-slate-900">Appeals</h2>
             <p>
-              {APPEAL_SLA_COPY} Our current subprocessors are listed at{" "}
-              <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
-                /subprocessors
-              </Link>
-              . Full rights language:{" "}
+              {APPEAL_SLA_COPY} Full rights language:{" "}
               <Link
-                href="/privacy-policy#11-rights"
+                href="/privacy-policy#7-your-rights"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy §11
+                Privacy Policy — your rights
               </Link>
               .
             </p>

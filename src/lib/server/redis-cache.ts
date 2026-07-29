@@ -80,19 +80,15 @@ export async function invalidateEmployerApplicantsCache(
     CacheKeys.employerApplicants(employerId, jobId),
     CacheKeys.employerRecentJobs(employerId),
     CacheKeys.employerRecentApplicants(employerId),
-    CacheKeys.employerInterviews(employerId),
     CacheKeys.employerHired(employerId)
   );
 }
 
-/** Drop interviews + hired lists (contract mutations, offers). */
+/** Drop hired lists (contract mutations, offers). */
 export async function invalidateEmployerHiringCache(
   employerId: string
 ): Promise<void> {
-  await cacheDel(
-    CacheKeys.employerInterviews(employerId),
-    CacheKeys.employerHired(employerId)
-  );
+  await cacheDel(CacheKeys.employerHired(employerId));
 }
 
 /** Drop pinned workers list after pin/unpin. */

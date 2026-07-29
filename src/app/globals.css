@@ -690,3 +690,89 @@ body {
 .dark [data-sonner-toast] [data-close-button]:hover {
   background-color: rgba(255, 255, 255, 0.08) !important;
 }
+/* =====================================================
+   Cross-Browser Safety Rules (Safari, iOS, Firefox)
+   ===================================================== */
+
+/* Prevent horizontal scroll on all browsers including Safari */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+/* Fix flexbox/grid min-size bug in Safari (items overflow containers) */
+* {
+  min-width: 0;
+}
+
+/* Ensure long words wrap properly everywhere (critical for mobile + Safari) */
+h1, h2, h3, h4, h5, h6, p, span, a, label, li {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Fix gap in flex layouts for older Safari (< 14.5) */
+.flex {
+  gap: var(--tw-gap, 0);
+}
+
+/* Prevent text size adjustment on iOS Safari (portrait/landscape flipping) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Smooth scrolling with Safari support */
+html {
+  scroll-behavior: smooth;
+  -webkit-scroll-behavior: smooth;
+}
+
+/* Fix -webkit-backdrop-filter for Safari glass effects */
+.backdrop-blur-md,
+.backdrop-blur-sm,
+.backdrop-blur-lg,
+.backdrop-blur {
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
+
+/* Fix tap highlight on iOS Safari */
+a, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Fix Safari input styling */
+input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: inherit;
+}
+
+/* Fix position: sticky on Safari (requires explicit overflow on parent) */
+[data-sticky-parent] {
+  overflow: visible !important;
+}
+
+/* Reduce motion - accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Fix button text wrapping on small screens */
+button, [role="button"] {
+  white-space: nowrap;
+}
+
+/* Allow wrapping in CTA/label buttons that explicitly need it */
+.btn-wrap {
+  white-space: normal;
+}

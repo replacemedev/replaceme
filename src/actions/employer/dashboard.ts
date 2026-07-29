@@ -167,6 +167,7 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
           first_name,
           middle_name,
           last_name,
+          suffix,
           avatar_url,
           professional_title,
           is_verified
@@ -199,7 +200,12 @@ export async function getRecentApplicants(employerProfileId: string): Promise<Re
           const appCode = idClean.length >= 3 ? idClean.substring(0, 3) : "402";
 
           const name = hasFullIdentity
-            ? formatFullName(candidate?.first_name, candidate?.middle_name, candidate?.last_name)
+            ? formatFullName(
+                candidate?.first_name,
+                candidate?.middle_name,
+                candidate?.last_name,
+                candidate?.suffix
+              )
             : `Applicant #${appCode}`;
 
           const avatarUrl = hasFullIdentity

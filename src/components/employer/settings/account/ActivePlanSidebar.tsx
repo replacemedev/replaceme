@@ -53,6 +53,7 @@ function getFeatures(plan: SubscriptionTier): string[] {
         "10 applicants per job",
         "Anonymous candidate previews",
         "2-day job approval",
+        "Email support",
       ];
   }
 }

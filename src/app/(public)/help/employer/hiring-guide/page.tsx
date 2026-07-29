@@ -62,19 +62,19 @@ const STEPS = [
       "View work experience, technical skills, and salary expectations.",
       "Paid plan subscribers can unlock full names, contact info, and download resumes.",
       "Free plan subscribers see anonymous candidate previews to test candidate quality.",
-      "Sort applications into shortlist, interview, or declined stages with one click.",
+      "Sort applications into shortlist, in review, or declined stages with one click.",
     ],
   },
   {
     stepNumber: 3,
-    title: "Message & Interview Candidates Directly",
+    title: "Message Candidates Directly",
     icon: Handshake,
     badgeText: "Direct Communication",
     summary:
-      "Connect directly with shortlisted candidates to set up interviews and ask key questions.",
+      "Connect directly with shortlisted candidates to ask key questions and move hiring forward.",
     details: [
       "Use built-in direct messaging to communicate securely with applicants.",
-      "Schedule video interviews or send quick pre-screening questions.",
+      "Discuss role details, availability, and next steps in one thread.",
       "No middleman or agency agent sits between you and your candidate.",
     ],
   },

@@ -4,7 +4,6 @@ import { WorkerSettingsClient } from "@/components/worker/settings/WorkerSetting
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 import { EmailVerificationBanner } from "@/components/shared/settings/EmailVerificationBanner";
 import { getEmailVerificationStatus } from "@/actions/auth";
-import { getLatestDeletionRequestStatus } from "@/actions/privacy/deletion-request";
 
 export const metadata = {
   title: "Account Settings | Replaceme",
@@ -19,16 +18,15 @@ export default async function WorkerSettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/signin");
 
-  const [{ data: profile }, verification, deletionStatus] = await Promise.all([
+  const [{ data: profile }, verification] = await Promise.all([
     supabase
       .from("profiles")
       .select(
-        "availability, hourly_rate, is_remote, salary_currency, role, email, username"
+        "availability, hourly_rate, is_remote, salary_currency, role, email"
       )
       .eq("id", user.id)
       .single(),
     getEmailVerificationStatus(),
-    getLatestDeletionRequestStatus(),
   ]);
 
   if (!profile || profile.role !== "worker") redirect("/signin");
@@ -37,7 +35,7 @@ export default async function WorkerSettingsPage() {
     <WorkerPageShell width="content">
       <WorkerPageHeader
         title="Account settings"
-        subhead="View your login identity, manage availability, and submit trust & safety reports."
+        subhead="View your login identity and manage availability."
       />
       <div className="mb-6">
         <EmailVerificationBanner
@@ -48,7 +46,6 @@ export default async function WorkerSettingsPage() {
       <WorkerSettingsClient
         identity={{
           email: profile.email ?? user.email ?? null,
-          username: profile.username ?? null,
         }}
         initial={{
           availability: profile.availability ?? "Full-time",
@@ -56,7 +53,6 @@ export default async function WorkerSettingsPage() {
           isRemote: Boolean(profile.is_remote),
           salaryCurrency: profile.salary_currency ?? "PHP",
         }}
-        deletionStatus={deletionStatus}
       />
     </WorkerPageShell>
   );

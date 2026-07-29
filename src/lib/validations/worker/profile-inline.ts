@@ -9,7 +9,6 @@ export const patchWorkerProfileSchema = z
     middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional().nullable(),
     lastName: z.string().min(1, "Last name is required.").max(80, "Last name cannot exceed 80 characters."),
     suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional().nullable(),
-    phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25, "Phone number cannot exceed 25 characters.").optional().nullable(),
     gender: z.string().optional().nullable(),
     civilStatus: z.string().optional().nullable(),
     preferredLanguage: z.string().optional().nullable(),

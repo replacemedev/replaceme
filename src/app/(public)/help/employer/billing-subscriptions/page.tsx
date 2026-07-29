@@ -37,7 +37,7 @@ const BILLING_RULES = [
   {
     title: "Flat-Rate Monthly Billing (No Markups)",
     icon: CreditCard,
-    copy: "Replaceme uses flat-rate monthly subscriptions billed in USD through Stripe. We never charge placement fees, success cuts, or hourly markups on worker salaries.",
+    copy: "Replaceme uses flat-rate monthly subscriptions billed in USD through Stripe. An Australian business is the merchant of record. List prices are tax-exclusive; Stripe Tax may add GST/VAT only when required for your billing location. We never charge placement fees or cuts from worker salaries.",
   },
   {
     title: "Instant vs. Manual Job Post Approvals",
@@ -45,9 +45,9 @@ const BILLING_RULES = [
     copy: "Subscribers on paid plans (Starter, Growth, Scale) enjoy instant job post approvals when listings meet posting rules. Discovery plan posts are reviewed within 2 business days. If we reject a post, we notify you with a reason category so you can revise and resubmit. Soft-deleted posts leave Worker boards but may be retained for moderation audit under our Privacy Policy.",
   },
   {
-    title: "Changing or Canceling Your Subscription",
+    title: "Changing, Canceling & Refunds",
     icon: RefreshCw,
-    copy: "You can upgrade, downgrade, or cancel your subscription at any time from your Employer Settings. Upgrades take effect immediately. Downgrades or cancellations apply at the end of your active billing period via Stripe.",
+    copy: "Upgrade, downgrade, or cancel anytime from Employer Settings. Upgrades take effect immediately. Downgrades or cancellations apply at period end. Commenced B2B periods are generally non-refundable except billing errors, mandatory law, or limited goodwill — see the Refund Policy.",
   },
   {
     title: "Direct Worker Payments (0% Commission)",
@@ -96,7 +96,15 @@ function EmployerBillingFallback() {
             Manage Your Subscription & Billing
           </h3>
           <p className="text-emerald-100/90 text-sm sm:text-base mb-6 leading-relaxed">
-            Ready to upgrade your hiring capabilities or view your invoice history? Access your employer billing dashboard now.
+            Ready to upgrade or view invoices? Access your employer billing
+            dashboard. See also our{" "}
+            <Link
+              href="/refund-policy"
+              className="font-semibold text-white underline underline-offset-2 hover:text-emerald-200"
+            >
+              Refund Policy
+            </Link>
+            .
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <Link
@@ -121,7 +129,7 @@ function EmployerBillingFallback() {
 
 export default function EmployerBillingPage() {
   return (
-    <main className="bg-slate-50/50 min-h-[calc(100vh-4rem)] py-8 md:py-12 lg:py-16">
+    <main className="bg-slate-50/50 min-h-[100dvh] py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200 mb-3">

@@ -36,7 +36,6 @@ type ProfileLite = {
   id: string;
   email: string | null;
   first_name: string | null;
-  middle_name: string | null;
   last_name: string | null;
   role: string;
 };
@@ -82,7 +81,7 @@ export type AdminCaseDetail = AdminCaseRow & {
 
 function mapProfileName(p: ProfileLite | null | undefined): string {
   if (!p) return "Unknown";
-  return formatFullName(p.first_name, p.middle_name, p.last_name) || "Unknown";
+  return formatFullName(p.first_name, p.last_name) || "Unknown";
 }
 
 function asProfile(value: ProfileLite | ProfileLite[] | null): ProfileLite | null {
@@ -256,16 +255,18 @@ export async function getAdminCases(input: unknown): Promise<{
       reporter_id,
       reported_user_id,
       reporter:profiles!user_reports_reporter_id_fkey (
-        id, email, first_name, middle_name, last_name, role
+        id, email, first_name, last_name, role
       ),
-      reported:profiles!user_reports_reported_user_id_fkey (
-        id, email, first_name, middle_name, last_name, role
+      reported:profiles!user_reports_reported_user_id_fkey!inner (
+        id, email, first_name, last_name, role
       )
     `;
 
     let query = supabase
       .from("user_reports")
       .select(selectCols, { count: "exact" })
+      // Worker safety: no employer→worker reports in Case Center.
+      .eq("reported.role", "employer")
       .order("created_at", { ascending: false });
 
     if (tab === "financial") {
@@ -342,7 +343,7 @@ export async function getAdminCases(input: unknown): Promise<{
         if (profileIds.length > 0) {
           const { data: profiles } = await admin
             .from("profiles")
-            .select("id, email, first_name, middle_name, last_name, role")
+            .select("id, email, first_name, last_name, role")
             .in("id", profileIds);
           for (const p of profiles ?? []) {
             profileById.set(p.id, p as ProfileLite);
@@ -422,7 +423,7 @@ export async function getAdminCaseById(
       if (ids.length) {
         const { data: profiles } = await admin
           .from("profiles")
-          .select("id, email, first_name, middle_name, last_name, role")
+          .select("id, email, first_name, last_name, role")
           .in("id", ids);
         for (const p of profiles ?? []) profileById.set(p.id, p as ProfileLite);
       }
@@ -486,10 +487,10 @@ export async function getAdminCaseById(
         reviewed_by,
         reviewed_at,
         reporter:profiles!user_reports_reporter_id_fkey (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         ),
         reported:profiles!user_reports_reported_user_id_fkey (
-          id, email, first_name, middle_name, last_name, role
+          id, email, first_name, last_name, role
         )
         `
       )
@@ -498,6 +499,14 @@ export async function getAdminCaseById(
 
     if (error || !data) {
       if (error) safeError("getAdminCaseById:", error);
+      return null;
+    }
+
+    const reportedProfile = asProfile(
+      data.reported as ProfileLite | ProfileLite[] | null
+    );
+    // Employer→worker reports are retired from Case Center.
+    if (reportedProfile?.role === "worker") {
       return null;
     }
 

@@ -87,8 +87,9 @@ export const accountReasonCategorySchema = z.enum([
 export const adminWorkerRowSchema = z.object({
   id: z.string().uuid(),
   first_name: nullableOptionalString,
-  middle_name: nullableOptionalString,
+  middle_name: nullableOptionalString.catch(null),
   last_name: nullableOptionalString,
+  suffix: nullableOptionalString.catch(null),
   email: nullableOptionalString,
   professional_title: nullableOptionalString,
   account_status: accountStatusSchema.catch("active"),
@@ -127,7 +128,6 @@ export const adminEmployerRowSchema = z.object({
 export const adminAdminRowSchema = z.object({
   id: z.string().uuid(),
   first_name: nullableOptionalString,
-  middle_name: nullableOptionalString,
   last_name: nullableOptionalString,
   email: nullableOptionalString,
   account_status: accountStatusSchema.catch("active"),
@@ -172,6 +172,7 @@ export interface AdminWorkerRow {
   first_name: string | null;
   middle_name: string | null;
   last_name: string | null;
+  suffix: string | null;
   email: string | null;
   professional_title: string | null;
   account_status: AccountStatus;
@@ -211,7 +212,6 @@ export interface AdminEmployerRow {
 export interface AdminAdminRow {
   id: string;
   first_name: string | null;
-  middle_name: string | null;
   last_name: string | null;
   email: string | null;
   account_status: AccountStatus;
@@ -256,9 +256,8 @@ export interface AdminVerificationQueueRow {
   first_name: string | null;
   middle_name: string | null;
   last_name: string | null;
+  suffix: string | null;
   email: string | null;
-  username: string | null;
-  phone_number: string | null;
   tin_number: string | null;
   birth_date: string | null;
   region: string | null;

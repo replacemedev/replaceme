@@ -204,16 +204,12 @@ export async function createUpgradeCheckout(planId: string) {
     const supabase = await createClient();
     const { data: employerProfile } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name")
+      .select("first_name, last_name")
       .eq("id", profile.id)
       .single();
 
     const name =
-      formatFullName(
-        employerProfile?.first_name,
-        employerProfile?.middle_name,
-        employerProfile?.last_name
-      ) || "Employer";
+      formatFullName(employerProfile?.first_name, employerProfile?.last_name) || "Employer";
 
     const session = await createPlanChangeSession({
       employerId: profile.id,
@@ -254,16 +250,12 @@ export async function createCustomerPortalSession() {
       await createClient()
     )
       .from("profiles")
-      .select("first_name, middle_name, last_name")
+      .select("first_name, last_name")
       .eq("id", profile.id)
       .single();
 
     const name =
-      formatFullName(
-        employerProfile?.first_name,
-        employerProfile?.middle_name,
-        employerProfile?.last_name
-      ) || "Employer";
+      formatFullName(employerProfile?.first_name, employerProfile?.last_name) || "Employer";
 
     const session = await createBillingPortalSession({
       employerId: profile.id,

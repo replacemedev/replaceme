@@ -7,7 +7,6 @@ import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { JobHeader } from "@/components/employer/jobs/view/JobHeader";
 import { JobDescriptionCard } from "@/components/employer/jobs/view/JobDescriptionCard";
 import { PerformanceMetricsCard } from "@/components/employer/jobs/view/PerformanceMetricsCard";
-import { HiringTeamCard } from "@/components/employer/jobs/view/HiringTeamCard";
 import { UpgradeCTA } from "@/components/shared/entitlements/UpgradeCTA";
 import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip";
 import { EmployerPageShell } from "@/components/employer/layout";
@@ -111,7 +110,6 @@ export default async function JobListingViewPage({ params }: PageProps) {
             applicantsPerJobLimit={planUsage?.applicantsPerJobLimit ?? null}
             priorityScore={job.priorityScore}
           />
-          <HiringTeamCard hiringTeam={job.hiringTeam} />
         </div>
       </div>
       </EmployerPageShell>

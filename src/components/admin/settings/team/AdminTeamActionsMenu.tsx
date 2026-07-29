@@ -57,7 +57,7 @@ export function AdminTeamActionsMenu({
   const isSelf = member.id === currentUserId;
   const pendingInvite = isInvitePending(member);
   const displayLabel =
-    formatFullName(member.first_name, member.middle_name, member.last_name).trim() ||
+    formatFullName(member.first_name, member.last_name).trim() ||
     member.email ||
     "this admin";
 

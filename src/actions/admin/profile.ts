@@ -28,11 +28,8 @@ const PROFILE_PATH = "/admin/settings/profile";
 export type AdminSelfProfile = {
   userId: string;
   email: string | null;
-  username: string | null;
   firstName: string | null;
   lastName: string | null;
-  middleName: string | null;
-  phoneNumber: string | null;
   avatarUrl: string | null;
   displayName: string | null;
   department: string | null;
@@ -77,7 +74,7 @@ export async function getAdminSelfProfile(): Promise<
         admin
           .from("profiles")
           .select(
-            "id, email, username, first_name, last_name, middle_name, phone_number, avatar_url, timezone, bio"
+            "id, email, first_name, last_name, avatar_url, timezone, bio"
           )
           .eq("id", user.id)
           .maybeSingle(),
@@ -104,11 +101,8 @@ export async function getAdminSelfProfile(): Promise<
       data: {
         userId: profile.id,
         email: profile.email,
-        username: profile.username,
         firstName: profile.first_name,
         lastName: profile.last_name,
-        middleName: profile.middle_name,
-        phoneNumber: profile.phone_number,
         avatarUrl: profile.avatar_url ?? adminProfile?.avatar_url ?? null,
         displayName: adminProfile?.display_name ?? null,
         department: adminProfile?.department ?? null,
@@ -137,7 +131,6 @@ export async function updateAdminSelfProfile(
 
     const firstName = parsed.firstName.trim();
     const lastName = parsed.lastName.trim();
-    const phoneNumber = parsed.phoneNumber?.trim() || null;
     const department = parsed.department?.trim() || null;
     const timezone = parsed.timezone?.trim() || null;
     const bio = parsed.bio?.trim() || null;
@@ -146,15 +139,12 @@ export async function updateAdminSelfProfile(
       parsed.displayName?.trim() ||
       [firstName, lastName].filter(Boolean).join(" ").trim() ||
       null;
-    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
     const { error: profileError } = await admin
       .from("profiles")
       .update({
         first_name: firstName,
         last_name: lastName,
-        phone_number: phoneNumber,
-        full_name: fullName || null,
         timezone,
         bio,
         updated_at: new Date().toISOString(),
@@ -185,7 +175,6 @@ export async function updateAdminSelfProfile(
       fields: [
         "first_name",
         "last_name",
-        "phone_number",
         "department",
         "display_name",
         "timezone",

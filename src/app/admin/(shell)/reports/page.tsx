@@ -36,7 +36,7 @@ export default async function AdminReportsPage({
     <AdminPageShell>
       <AdminPageHeader
         title="Platform Reports"
-        description="Technical platform issues and job listing flags. Employer and worker Trust & Safety cases live in Disputes."
+        description="Platform and job flags for moderation. Live worker→employer Trust & Safety cases are in Disputes."
       />
       <AdminReportsClient initial={initial} />
     </AdminPageShell>

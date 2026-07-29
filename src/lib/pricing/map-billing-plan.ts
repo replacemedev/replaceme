@@ -64,7 +64,7 @@ function buildFeatures(plan: BillingPlanRow): string[] {
     features.push("No Messaging");
   }
 
-  if (slug === "starter") features.push("Email Support");
+  if (slug === "discovery" || slug === "starter") features.push("Email Support");
   if (plan.priority_listing) features.push("Priority Listing");
   if (plan.priority_support) features.push("Priority Support");
   if (plan.early_access) features.push("Early Access");

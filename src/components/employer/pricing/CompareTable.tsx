@@ -137,8 +137,8 @@ export function CompareTable({
       </h3>
       <p className="text-center text-sm text-slate-500 font-medium mb-10 max-w-xl mx-auto">
         {currentPlanSlug
-          ? "All paid plans bill monthly in USD through Stripe. Your current plan is highlighted below."
-          : "All paid plans bill monthly in USD through Stripe. Compare tiers and sign up when you're ready."}
+          ? "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Your current plan is highlighted below."
+          : "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Compare tiers and sign up when you're ready."}
       </p>
       <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: "thin", scrollbarColor: "#e2e8f0 transparent" }}>
         <div className="overflow-hidden rounded-xl shadow-sm ring-1 ring-gray-900/5 bg-white min-w-[640px]">

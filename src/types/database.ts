@@ -21,10 +21,10 @@ export type Database = {
           capabilities: string[]
           created_at: string
           department: string | null
+          directory_public: boolean
           display_name: string | null
           invite_accepted_at: string | null
           invited_at: string | null
-          directory_public: boolean
           updated_at: string
           user_id: string
         }
@@ -34,10 +34,10 @@ export type Database = {
           capabilities?: string[]
           created_at?: string
           department?: string | null
+          directory_public?: boolean
           display_name?: string | null
           invite_accepted_at?: string | null
           invited_at?: string | null
-          directory_public?: boolean
           updated_at?: string
           user_id: string
         }
@@ -47,14 +47,61 @@ export type Database = {
           capabilities?: string[]
           created_at?: string
           department?: string | null
+          directory_public?: boolean
           display_name?: string | null
           invite_accepted_at?: string | null
           invited_at?: string | null
-          directory_public?: boolean
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      announcement_dismissals: {
+        Row: {
+          announcement_id: string
+          dismissed_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          dismissed_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          dismissed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_dismissals_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "product_announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_dismissals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_dismissals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "announcement_dismissals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
       }
       application_stage_history: {
         Row: {
@@ -206,6 +253,27 @@ export type Database = {
             referencedColumns: ["worker_id"]
           },
           {
+            foreignKeyName: "applications_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "applications_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
             foreignKeyName: "applications_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -224,40 +292,49 @@ export type Database = {
       audit_logs: {
         Row: {
           action_type: string
-          admin_id: string | null
           actor_display_name: string | null
           actor_email: string | null
           actor_type: string
+          admin_id: string | null
+          chain_seq: number
           created_at: string
+          entry_hash: string
           id: string
           ip_address: unknown
           metadata: Json | null
+          prev_hash: string
           target_id: string | null
           target_type: string | null
         }
         Insert: {
           action_type: string
-          admin_id?: string | null
           actor_display_name?: string | null
           actor_email?: string | null
           actor_type?: string
+          admin_id?: string | null
+          chain_seq?: number
           created_at?: string
+          entry_hash: string
           id?: string
           ip_address?: unknown
           metadata?: Json | null
+          prev_hash: string
           target_id?: string | null
           target_type?: string | null
         }
         Update: {
           action_type?: string
-          admin_id?: string | null
           actor_display_name?: string | null
           actor_email?: string | null
           actor_type?: string
+          admin_id?: string | null
+          chain_seq?: number
           created_at?: string
+          entry_hash?: string
           id?: string
           ip_address?: unknown
           metadata?: Json | null
+          prev_hash?: string
           target_id?: string | null
           target_type?: string | null
         }
@@ -514,11 +591,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "chat_moderation_flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
             foreignKeyName: "chat_moderation_flags_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "chat_moderation_flags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
           },
           {
             foreignKeyName: "chat_moderation_flags_thread_id_fkey"
@@ -626,6 +731,7 @@ export type Database = {
       }
       company_profiles: {
         Row: {
+          application_notification_pref: Database["public"]["Enums"]["employer_notification_preference"]
           company_bio: string | null
           company_name: string
           company_size: string | null
@@ -635,15 +741,16 @@ export type Database = {
           hiring_regions: string[] | null
           id: string
           industry: string | null
+          industry_custom: string | null
           logo_url: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           timezone: string | null
           updated_at: string
-          username: string | null
           verified_at: string | null
           website_url: string | null
         }
         Insert: {
+          application_notification_pref?: Database["public"]["Enums"]["employer_notification_preference"]
           company_bio?: string | null
           company_name: string
           company_size?: string | null
@@ -653,15 +760,16 @@ export type Database = {
           hiring_regions?: string[] | null
           id?: string
           industry?: string | null
+          industry_custom?: string | null
           logo_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           timezone?: string | null
           updated_at?: string
-          username?: string | null
           verified_at?: string | null
           website_url?: string | null
         }
         Update: {
+          application_notification_pref?: Database["public"]["Enums"]["employer_notification_preference"]
           company_bio?: string | null
           company_name?: string
           company_size?: string | null
@@ -671,11 +779,11 @@ export type Database = {
           hiring_regions?: string[] | null
           id?: string
           industry?: string | null
+          industry_custom?: string | null
           logo_url?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           timezone?: string | null
           updated_at?: string
-          username?: string | null
           verified_at?: string | null
           website_url?: string | null
         }
@@ -1246,104 +1354,19 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      product_announcements: {
-        Row: {
-          audience: string
-          body: string | null
-          created_at: string
-          created_by: string | null
-          cta_href: string | null
-          cta_label: string | null
-          enabled: boolean
-          ends_at: string | null
-          feature_key: string
-          id: string
-          requires_early_access: boolean
-          starts_at: string | null
-          status: string
-          summary: string
-          teaser_summary: string | null
-          teaser_title: string | null
-          title: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          audience?: string
-          body?: string | null
-          created_at?: string
-          created_by?: string | null
-          cta_href?: string | null
-          cta_label?: string | null
-          enabled?: boolean
-          ends_at?: string | null
-          feature_key: string
-          id?: string
-          requires_early_access?: boolean
-          starts_at?: string | null
-          status?: string
-          summary: string
-          teaser_summary?: string | null
-          teaser_title?: string | null
-          title: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          audience?: string
-          body?: string | null
-          created_at?: string
-          created_by?: string | null
-          cta_href?: string | null
-          cta_label?: string | null
-          enabled?: boolean
-          ends_at?: string | null
-          feature_key?: string
-          id?: string
-          requires_early_access?: boolean
-          starts_at?: string | null
-          status?: string
-          summary?: string
-          teaser_summary?: string | null
-          teaser_title?: string | null
-          title?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      announcement_dismissals: {
-        Row: {
-          announcement_id: string
-          dismissed_at: string
-          user_id: string
-        }
-        Insert: {
-          announcement_id: string
-          dismissed_at?: string
-          user_id: string
-        }
-        Update: {
-          announcement_id?: string
-          dismissed_at?: string
-          user_id?: string
-        }
-        Relationships: [
           {
-            foreignKeyName: "announcement_dismissals_announcement_id_fkey"
-            columns: ["announcement_id"]
+            foreignKeyName: "email_template_settings_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
-            referencedRelation: "product_announcements"
-            referencedColumns: ["id"]
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
           },
           {
-            foreignKeyName: "announcement_dismissals_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "email_template_settings_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
           },
         ]
       }
@@ -1721,119 +1744,6 @@ export type Database = {
         }
         Relationships: []
       }
-      interviews: {
-        Row: {
-          application_id: string
-          created_at: string
-          employer_id: string
-          id: string
-          job_id: string
-          meeting_link: string | null
-          notes: string | null
-          scheduled_at: string
-          status: Database["public"]["Enums"]["interview_status"]
-          updated_at: string
-          worker_id: string
-        }
-        Insert: {
-          application_id: string
-          created_at?: string
-          employer_id: string
-          id?: string
-          job_id: string
-          meeting_link?: string | null
-          notes?: string | null
-          scheduled_at: string
-          status?: Database["public"]["Enums"]["interview_status"]
-          updated_at?: string
-          worker_id: string
-        }
-        Update: {
-          application_id?: string
-          created_at?: string
-          employer_id?: string
-          id?: string
-          job_id?: string
-          meeting_link?: string | null
-          notes?: string | null
-          scheduled_at?: string
-          status?: Database["public"]["Enums"]["interview_status"]
-          updated_at?: string
-          worker_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "interviews_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: true
-            referencedRelation: "applications"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: true
-            referencedRelation: "job_applications"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "interviews_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-          {
-            foreignKeyName: "interviews_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "job_posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interviews_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "interviews_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
       jobs: {
         Row: {
           application_cap_reached_at: string | null
@@ -1847,9 +1757,6 @@ export type Database = {
           description: string
           employer_id: string
           employment_type: string
-          hiring_manager_email: string | null
-          hiring_manager_name: string | null
-          hiring_manager_role: string | null
           hourly_rate: number | null
           hours_per_week: number
           id: string
@@ -1858,10 +1765,10 @@ export type Database = {
           monthly_salary: number
           paused_reason: string | null
           priority_score: number
-          rejection_category: string | null
-          rejection_reason: string | null
           rejected_at: string | null
           rejected_by: string | null
+          rejection_category: string | null
+          rejection_reason: string | null
           salary_currency: string
           skills: string[]
           status: string
@@ -1883,9 +1790,6 @@ export type Database = {
           description: string
           employer_id: string
           employment_type: string
-          hiring_manager_email?: string | null
-          hiring_manager_name?: string | null
-          hiring_manager_role?: string | null
           hourly_rate?: number | null
           hours_per_week: number
           id?: string
@@ -1894,10 +1798,10 @@ export type Database = {
           monthly_salary: number
           paused_reason?: string | null
           priority_score?: number
-          rejection_category?: string | null
-          rejection_reason?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
+          rejection_category?: string | null
+          rejection_reason?: string | null
           salary_currency?: string
           skills?: string[]
           status?: string
@@ -1919,9 +1823,6 @@ export type Database = {
           description?: string
           employer_id?: string
           employment_type?: string
-          hiring_manager_email?: string | null
-          hiring_manager_name?: string | null
-          hiring_manager_role?: string | null
           hourly_rate?: number | null
           hours_per_week?: number
           id?: string
@@ -1930,10 +1831,10 @@ export type Database = {
           monthly_salary?: number
           paused_reason?: string | null
           priority_score?: number
-          rejection_category?: string | null
-          rejection_reason?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
+          rejection_category?: string | null
+          rejection_reason?: string | null
           salary_currency?: string
           skills?: string[]
           status?: string
@@ -1966,6 +1867,27 @@ export type Database = {
             referencedColumns: ["worker_id"]
           },
           {
+            foreignKeyName: "jobs_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "jobs_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
             foreignKeyName: "jobs_employer_id_fkey"
             columns: ["employer_id"]
             isOneToOne: false
@@ -1982,6 +1904,27 @@ export type Database = {
           {
             foreignKeyName: "jobs_employer_id_fkey"
             columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "jobs_rejected_by_fkey"
+            columns: ["rejected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_rejected_by_fkey"
+            columns: ["rejected_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "jobs_rejected_by_fkey"
+            columns: ["rejected_by"]
             isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
@@ -2162,6 +2105,115 @@ export type Database = {
           },
         ]
       }
+      product_announcements: {
+        Row: {
+          audience: string
+          body: string | null
+          created_at: string
+          created_by: string | null
+          cta_href: string | null
+          cta_label: string | null
+          enabled: boolean
+          ends_at: string | null
+          feature_key: string
+          id: string
+          requires_early_access: boolean
+          starts_at: string | null
+          status: string
+          summary: string
+          teaser_summary: string | null
+          teaser_title: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audience?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_href?: string | null
+          cta_label?: string | null
+          enabled?: boolean
+          ends_at?: string | null
+          feature_key: string
+          id?: string
+          requires_early_access?: boolean
+          starts_at?: string | null
+          status?: string
+          summary: string
+          teaser_summary?: string | null
+          teaser_title?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_href?: string | null
+          cta_label?: string | null
+          enabled?: boolean
+          ends_at?: string | null
+          feature_key?: string
+          id?: string
+          requires_early_access?: boolean
+          starts_at?: string | null
+          status?: string
+          summary?: string
+          teaser_summary?: string | null
+          teaser_title?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "product_announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "product_announcements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_announcements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "product_announcements_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"]
@@ -2203,7 +2255,6 @@ export type Database = {
           location: string | null
           middle_name: string | null
           onboarding_completed_at: string | null
-          phone_number: string | null
           portfolio_url: string | null
           preferred_language: string | null
           professional_title: string | null
@@ -2222,7 +2273,6 @@ export type Database = {
           timezone: string | null
           tin_number: string | null
           updated_at: string
-          username: string | null
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
@@ -2265,7 +2315,6 @@ export type Database = {
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
-          phone_number?: string | null
           portfolio_url?: string | null
           preferred_language?: string | null
           professional_title?: string | null
@@ -2284,7 +2333,6 @@ export type Database = {
           timezone?: string | null
           tin_number?: string | null
           updated_at?: string
-          username?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Update: {
@@ -2327,7 +2375,6 @@ export type Database = {
           location?: string | null
           middle_name?: string | null
           onboarding_completed_at?: string | null
-          phone_number?: string | null
           portfolio_url?: string | null
           preferred_language?: string | null
           professional_title?: string | null
@@ -2346,10 +2393,31 @@ export type Database = {
           timezone?: string | null
           tin_number?: string | null
           updated_at?: string
-          username?: string | null
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_kyc_reviewed_by_fkey"
+            columns: ["kyc_reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_kyc_reviewed_by_fkey"
+            columns: ["kyc_reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "profiles_kyc_reviewed_by_fkey"
+            columns: ["kyc_reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
       }
       reported_jobs: {
         Row: {
@@ -2420,124 +2488,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
-          },
-        ]
-      }
-      user_reports: {
-        Row: {
-          admin_notes: string | null
-          case_stage: string
-          created_at: string
-          defendant_response: string | null
-          description: string
-          disputed_amount_cents: number | null
-          disputed_currency: string | null
-          evidence_file_size_bytes: number | null
-          evidence_mime_type: string | null
-          evidence_storage_path: string | null
-          id: string
-          job_id: string | null
-          reported_user_id: string
-          reporter_id: string
-          resolution_outcome: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: string
-          thread_id: string | null
-          title: string
-          updated_at: string
-          violation_category: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          case_stage?: string
-          created_at?: string
-          defendant_response?: string | null
-          description: string
-          disputed_amount_cents?: number | null
-          disputed_currency?: string | null
-          evidence_file_size_bytes?: number | null
-          evidence_mime_type?: string | null
-          evidence_storage_path?: string | null
-          id?: string
-          job_id?: string | null
-          reported_user_id: string
-          reporter_id: string
-          resolution_outcome?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
-          thread_id?: string | null
-          title: string
-          updated_at?: string
-          violation_category: string
-        }
-        Update: {
-          admin_notes?: string | null
-          case_stage?: string
-          created_at?: string
-          defendant_response?: string | null
-          description?: string
-          disputed_amount_cents?: number | null
-          disputed_currency?: string | null
-          evidence_file_size_bytes?: number | null
-          evidence_mime_type?: string | null
-          evidence_storage_path?: string | null
-          id?: string
-          job_id?: string | null
-          reported_user_id?: string
-          reporter_id?: string
-          resolution_outcome?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string
-          thread_id?: string | null
-          title?: string
-          updated_at?: string
-          violation_category?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_reports_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "job_posts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_reports_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_reports_reported_user_id_fkey"
-            columns: ["reported_user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_reports_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_reports_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_reports_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "chat_threads"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -2824,6 +2774,166 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["worker_id"]
+          },
+        ]
+      }
+      user_reports: {
+        Row: {
+          admin_notes: string | null
+          case_stage: string
+          created_at: string
+          defendant_response: string | null
+          description: string
+          disputed_amount_cents: number | null
+          disputed_currency: string | null
+          evidence_file_size_bytes: number | null
+          evidence_mime_type: string | null
+          evidence_storage_path: string | null
+          id: string
+          job_id: string | null
+          reported_user_id: string
+          reporter_id: string
+          resolution_outcome: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          thread_id: string | null
+          title: string
+          updated_at: string
+          violation_category: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          case_stage?: string
+          created_at?: string
+          defendant_response?: string | null
+          description: string
+          disputed_amount_cents?: number | null
+          disputed_currency?: string | null
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
+          id?: string
+          job_id?: string | null
+          reported_user_id: string
+          reporter_id: string
+          resolution_outcome?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          thread_id?: string | null
+          title: string
+          updated_at?: string
+          violation_category: string
+        }
+        Update: {
+          admin_notes?: string | null
+          case_stage?: string
+          created_at?: string
+          defendant_response?: string | null
+          description?: string
+          disputed_amount_cents?: number | null
+          disputed_currency?: string | null
+          evidence_file_size_bytes?: number | null
+          evidence_mime_type?: string | null
+          evidence_storage_path?: string | null
+          id?: string
+          job_id?: string | null
+          reported_user_id?: string
+          reporter_id?: string
+          resolution_outcome?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          thread_id?: string | null
+          title?: string
+          updated_at?: string
+          violation_category?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "user_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "user_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "user_reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+          {
+            foreignKeyName: "user_reports_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3413,32 +3523,19 @@ export type Database = {
       worker_profiles: {
         Row: {
           avatar_url: string | null
-          birth_date: string | null
-          civil_status: string | null
-          country: string | null
           created_at: string | null
           email: string | null
           experience_years: number | null
           first_name: string | null
           full_name: string | null
-          gender: string | null
           hourly_rate: number | null
-          id_expiration_date: string | null
-          id_issuing_country: string | null
-          id_number: string | null
-          id_type: string | null
           is_verified: boolean | null
-          kyc_rejection_reason: string | null
           last_name: string | null
           middle_name: string | null
-          phone_number: string | null
-          preferred_language: string | null
           professional_title: string | null
           profile_id: string | null
           skills: string[] | null
           suffix: string | null
-          timezone: string | null
-          tin_number: string | null
           updated_at: string | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
@@ -3447,32 +3544,19 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          birth_date?: string | null
-          civil_status?: string | null
-          country?: string | null
           created_at?: string | null
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
-          gender?: string | null
           hourly_rate?: number | null
-          id_expiration_date?: string | null
-          id_issuing_country?: string | null
-          id_number?: string | null
-          id_type?: string | null
           is_verified?: boolean | null
-          kyc_rejection_reason?: string | null
           last_name?: string | null
           middle_name?: string | null
-          phone_number?: string | null
-          preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
           suffix?: string | null
-          timezone?: string | null
-          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -3481,32 +3565,19 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
-          birth_date?: string | null
-          civil_status?: string | null
-          country?: string | null
           created_at?: string | null
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
-          gender?: string | null
           hourly_rate?: number | null
-          id_expiration_date?: string | null
-          id_issuing_country?: string | null
-          id_number?: string | null
-          id_type?: string | null
           is_verified?: boolean | null
-          kyc_rejection_reason?: string | null
           last_name?: string | null
           middle_name?: string | null
-          phone_number?: string | null
-          preferred_language?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
           suffix?: string | null
-          timezone?: string | null
-          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -3517,6 +3588,23 @@ export type Database = {
       }
     }
     Functions: {
+      audit_log_compute_entry_hash: {
+        Args: {
+          p_action_type: string
+          p_actor_display_name: string
+          p_actor_email: string
+          p_actor_type: string
+          p_admin_id: string
+          p_created_at: string
+          p_id: string
+          p_ip_address: string
+          p_metadata: Json
+          p_prev_hash: string
+          p_target_id: string
+          p_target_type: string
+        }
+        Returns: string
+      }
       auth_user_is_employer: { Args: never; Returns: boolean }
       auth_user_is_worker: { Args: never; Returns: boolean }
       create_notification: {
@@ -3552,6 +3640,7 @@ export type Database = {
         Returns: Json
       }
       get_platform_metrics: { Args: never; Returns: Json }
+      has_admin_capability: { Args: { cap: string }; Returns: boolean }
       increment_job_clicks: {
         Args: { target_job_id: string }
         Returns: undefined
@@ -3581,6 +3670,15 @@ export type Database = {
         Args: { p_employer_id: string }
         Returns: string
       }
+      verify_audit_log_chain: {
+        Args: { p_limit?: number }
+        Returns: {
+          checked: number
+          detail: string
+          first_bad_id: string
+          ok: boolean
+        }[]
+      }
       worker_has_chat_with_company_profile: {
         Args: { p_company_profile_id: string }
         Returns: boolean
@@ -3593,13 +3691,16 @@ export type Database = {
       application_status:
         | "PENDING"
         | "UNDER_REVIEW"
-        | "INTERVIEW_SCHEDULED"
         | "REJECTED"
         | "HIRED"
         | "WITHDRAWN"
       billing_approval_mode: "queued_2d" | "instant"
       billing_identity_mode: "anonymous_preview" | "full"
       dispute_status: "open" | "under_review" | "resolved" | "closed"
+      employer_notification_preference:
+        | "email_every_applicant"
+        | "email_daily_summary"
+        | "dashboard_only"
       entitlement_denial_type:
         | "job_limit"
         | "applicant_limit"
@@ -3607,7 +3708,6 @@ export type Database = {
         | "resume"
         | "identity"
         | "early_access"
-      interview_status: "scheduled" | "completed" | "cancelled" | "no_show"
       user_role: "employer" | "worker" | "admin"
       verification_status:
         | "unverified"
@@ -3750,7 +3850,6 @@ export const Constants = {
       application_status: [
         "PENDING",
         "UNDER_REVIEW",
-        "INTERVIEW_SCHEDULED",
         "REJECTED",
         "HIRED",
         "WITHDRAWN",
@@ -3758,6 +3857,11 @@ export const Constants = {
       billing_approval_mode: ["queued_2d", "instant"],
       billing_identity_mode: ["anonymous_preview", "full"],
       dispute_status: ["open", "under_review", "resolved", "closed"],
+      employer_notification_preference: [
+        "email_every_applicant",
+        "email_daily_summary",
+        "dashboard_only",
+      ],
       entitlement_denial_type: [
         "job_limit",
         "applicant_limit",
@@ -3766,7 +3870,6 @@ export const Constants = {
         "identity",
         "early_access",
       ],
-      interview_status: ["scheduled", "completed", "cancelled", "no_show"],
       user_role: ["employer", "worker", "admin"],
       verification_status: [
         "unverified",

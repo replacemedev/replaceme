@@ -15,7 +15,6 @@ import { useFixedMenuPosition } from "@/hooks/useFixedMenuPosition";
 interface WorkerProfile {
   first_name: string | null;
   last_name: string | null;
-  username: string | null;
   avatar_url: string | null;
 }
 

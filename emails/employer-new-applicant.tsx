@@ -3,11 +3,13 @@ import { Text } from "@react-email/components";
 import { EmailLayout } from "./_components/EmailLayout";
 import { BRAND } from "./_components/brand";
 
+import type { EmailTierLabel } from "@/lib/server/email/mailer";
+
 export type EmployerNewApplicantEmailProps = {
   companyName?: string | null;
   jobTitle: string;
   applicantName?: string | null;
-  planLabel: "Starter" | "Growth" | "Scale";
+  planLabel: EmailTierLabel;
   ctaUrl: string;
   siteUrl?: string;
 };

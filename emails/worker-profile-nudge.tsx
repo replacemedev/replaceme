@@ -17,7 +17,7 @@ export default function WorkerProfileNudgeEmail({
   siteUrl = BRAND.siteUrl,
 }: WorkerProfileNudgeEmailProps) {
   const greeting = workerName ? `Hi ${workerName},` : "Hi there,";
-  const preview = "Complete your Replaceme profile to get more interviews";
+  const preview = "Complete your Replaceme profile to get discovered faster";
 
   return (
     <EmailLayout

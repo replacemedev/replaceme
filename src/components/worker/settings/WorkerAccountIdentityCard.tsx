@@ -4,12 +4,10 @@ import { AccountLoginIdentity } from "@/components/shared/settings/AccountLoginI
 
 export type WorkerAccountIdentityCardProps = {
   email: string | null;
-  username: string | null;
 };
 
 export function WorkerAccountIdentityCard({
   email,
-  username,
 }: WorkerAccountIdentityCardProps) {
   return (
     <section
@@ -38,7 +36,7 @@ export function WorkerAccountIdentityCard({
       </div>
 
       <div className="p-5 sm:p-6">
-        <AccountLoginIdentity email={email} username={username} />
+        <AccountLoginIdentity email={email} />
       </div>
 
       <div className="border-t border-slate-50 bg-slate-50/40 px-5 py-4 sm:px-6">

@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
-import { Lock, Mail, AtSign } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 
 export type AccountLoginIdentityProps = {
   email: string | null;
-  username: string | null;
   /** Optional class on the outer wrapper */
   className?: string;
 };
@@ -32,7 +31,9 @@ function LockedField({
             </dt>
             <dd
               className={`mt-1 text-sm font-semibold text-slate-800 ${
-                breakAll ? "break-all" : "truncate"
+                breakAll
+                  ? "break-all [overflow-wrap:anywhere]"
+                  : "truncate"
               }`}
             >
               {value}
@@ -51,19 +52,12 @@ function LockedField({
   );
 }
 
-/**
- * Read-only login identity (email + username).
- * Intentionally non-editable for workers and employers.
- */
+/** Read-only login identity (email). Intentionally non-editable. */
 export function AccountLoginIdentity({
   email,
-  username,
   className,
 }: AccountLoginIdentityProps) {
   const emailDisplay = email?.trim() || "—";
-  const usernameDisplay = username?.trim()
-    ? `@${username.trim()}`
-    : "—";
 
   return (
     <div className={className}>
@@ -72,17 +66,12 @@ export function AccountLoginIdentity({
           Login identity
         </h3>
       </div>
-      <dl className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+      <dl className="grid min-w-0 grid-cols-1 gap-3">
         <LockedField
           label="Email"
           icon={<Mail className="h-4 w-4" aria-hidden />}
           value={emailDisplay}
           breakAll
-        />
-        <LockedField
-          label="Username"
-          icon={<AtSign className="h-4 w-4" aria-hidden />}
-          value={usernameDisplay}
         />
       </dl>
     </div>

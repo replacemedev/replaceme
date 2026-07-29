@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { Virtuoso } from "react-virtuoso";
 import {
   ALL_JOB_ROLES,
@@ -12,7 +13,7 @@ import {
 } from "@/types/messaging";
 import { InboxThreadItem } from "./InboxThreadItem";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Inbox, Search } from "lucide-react";
+import { Inbox, Search, Bookmark } from "lucide-react";
 
 interface InboxSidebarProps {
   threads: MessagingThread[];
@@ -78,9 +79,20 @@ export function InboxSidebar({
       }`}
     >
       <div className="p-4 border-b border-slate-100 shrink-0">
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
-          {role === "employer" ? "Candidate Inbox" : "Inbox"}
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            {role === "employer" ? "Candidate Inbox" : "Inbox"}
+          </h2>
+          {role === "employer" ? (
+            <Link
+              href="/employer/pinned"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors"
+            >
+              <Bookmark size={13} />
+              Talent Pool
+            </Link>
+          ) : null}
+        </div>
 
         <div className="relative mb-3">
           <Search className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400 pointer-events-none" />

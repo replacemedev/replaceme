@@ -1,0 +1,53 @@
+---
+description: Obsidian vault SDLC workflow — phases, code boundary, Phase 05 fix loop, backend freeze
+alwaysApply: true
+---
+# Obsidian SDLC Workflow (v3.1)
+
+**Vault:** `Obisidian-vault-knowledge-base` · Boot: `Prompts/vault-boot.md` · Canon: `System_Rules/00_Agent_Rules_and_Workflow.md`
+
+## Phase sequence (strict)
+
+```
+01 Planning → 02 Architecture → 03 DB → 04 API (contracts only)
+→ 05 Backend (fix loop → freeze) → 06 Frontend → 07 Integration
+→ 08 Perf/Security → 09 Docs → 10 Deploy
+```
+
+| Phase | Code? | Rule |
+|-------|-------|------|
+| 01–04 | No | Vault specs only — no `local_code` implement |
+| 05 | Yes | First implement + Policy B tests + **fix loop until green** |
+| 06–10 | Yes (UI/ops) | Same repo — **backend frozen** after Phase 05 gate |
+
+## Phase 05 fix loop (explicit)
+
+Backend is **not** frozen during this loop. Repeat until **100% green**:
+
+```
+IMPLEMENT → VERIFY (seed · vitest · Playwright API-only)
+     ↑              │
+     │           FAIL
+     └── FIX ←─────┘   (Bug_Log TOP · 1 line per bug)
+ALL GREEN → tick checklist → human gate Yes → backend_frozen: true → Phase 06
+```
+
+- **Ban:** VERIFIED or gate Yes while any test red or CI deferred/n/a
+- **Thrash:** `turns > 8` without gate → HALT → human **Yes** resets `turns: 0` (`stop_reason: fix-loop-continue`)
+- **Vault diagram:** `Templates/Phase_05_Fix_Loop.md`
+
+## Backend freeze (after Phase 05 gate Yes)
+
+- Session_State: `backend_frozen: true`
+- Phases 06–10: any API/DB/service/migration change → **HALT** → ask human **Yes / No / Modify**
+- Post-freeze bug: Scenario C2 — fix only after human Yes, re-run Policy B, re-freeze
+
+## Agent discipline
+
+- Read Session_State first (≤15 lines): `local_code`, `backend_frozen`, `turns`
+- DoR required before Phase 05 coding (`stop_reason: dor`)
+- Cursor ticks `## Done checklist`; human gates phases only
+- ≤2 ECC skills/task · Policy B: vitest + API Playwright (05) · Manual QA UI (06)
+- Phase 06+: Hallmark ON for frontend — see `hallmark.mdc`
+- Dry-run files: `01_PRD`…`10_Deployment` — never bare `PRD.md` (alias clash)
+- Use Obsidian MCP for vault reads/writes when working the SDLC workflow

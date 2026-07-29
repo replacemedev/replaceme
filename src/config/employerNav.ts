@@ -2,9 +2,7 @@ import {
   LayoutDashboard,
   Briefcase,
   MessageSquare,
-  Calendar,
   Users,
-  Pin,
   Settings,
   Bell,
   Star,
@@ -35,9 +33,7 @@ export const EMPLOYER_MORE_TAB = {
 
 /** Drawer / More sheet secondary destinations. */
 export const EMPLOYER_MORE_NAV_ITEMS: EmployerNavItem[] = [
-  { href: "/employer/interviews", label: "Interviews", icon: Calendar },
   { href: "/employer/hired", label: "Hired", icon: Users },
-  { href: "/employer/pinned", label: "Pinned", icon: Pin },
   { href: "/employer/settings/account", label: "Account & Billing", icon: Settings },
   { href: EMPLOYER_NOTIFICATIONS_HREF, label: "Notifications", icon: Bell },
   { href: "/employer/reviews", label: "Reviews", icon: Star },

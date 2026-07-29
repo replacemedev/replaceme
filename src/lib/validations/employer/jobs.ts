@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { uuidSchema } from "@/lib/validations/common";
 import { salaryCurrencySchema } from "@/lib/validations/onboarding";
+import { ORDERED_SKILLS } from "@/data/skills";
+
+const allowedSkillSchema = z
+  .string()
+  .refine(
+    (skill) => ORDERED_SKILLS.some((s) => s.toLowerCase() === skill.toLowerCase()),
+    "Select a skill from the catalog"
+  );
 
 export const createJobSchema = z
   .object({
@@ -20,9 +28,9 @@ export const createJobSchema = z
       .min(1, "Hours per week must be at least 1")
       .max(168, "Hours per week cannot exceed 168"),
     skills: z
-      .array(z.string())
+      .array(allowedSkillSchema)
       .min(1, "Please select at least 1 skill")
-      .max(3, "You can select up to 3 skills"),
+      .max(5, "You can select up to 5 skills"),
     notificationPreference: z.enum(["daily", "immediate"]),
     intent: z.enum(["standard", "premium"]),
   })

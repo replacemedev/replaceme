@@ -118,7 +118,7 @@ async function forceCloseEngagementsForUser(
       .from("applications")
       .update({ status: "WITHDRAWN" })
       .eq("candidate_id", userId)
-      .in("status", ["PENDING", "UNDER_REVIEW", "INTERVIEW_SCHEDULED"]);
+      .in("status", ["PENDING", "UNDER_REVIEW"]);
 
     await admin
       .from("contracts")
@@ -366,7 +366,7 @@ export async function executeAccountErasure(
         .from("applications")
         .update({ status: "WITHDRAWN" })
         .eq("candidate_id", input.userId)
-        .in("status", ["PENDING", "UNDER_REVIEW", "INTERVIEW_SCHEDULED"]);
+        .in("status", ["PENDING", "UNDER_REVIEW"]);
       await admin
         .from("contracts")
         .update({ show_hired_badge: false })
@@ -385,7 +385,6 @@ export async function executeAccountErasure(
           website_url: null,
           company_bio: null,
           industry: null,
-          username: null,
         })
         .eq("employer_id", input.userId);
     }
@@ -405,8 +404,6 @@ export async function executeAccountErasure(
         middle_name: null,
         last_name: null,
         suffix: null,
-        full_name: null,
-        phone_number: null,
         avatar_url: null,
         bio: null,
         professional_title: null,
@@ -428,7 +425,6 @@ export async function executeAccountErasure(
         birth_date: null,
         gender: null,
         civil_status: null,
-        username: null,
         is_verified: false,
         verification_status: "unverified",
         kyc_rejection_reason: null,

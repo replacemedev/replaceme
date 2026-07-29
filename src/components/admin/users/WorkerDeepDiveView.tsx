@@ -32,9 +32,6 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
             <VerifiedBadge show={data.isVerified} size="md" />
           </h2>
           <p className="mt-1 text-sm text-slate-500">{data.email}</p>
-          {data.username ? (
-            <p className="mt-0.5 text-xs text-slate-400">@{data.username}</p>
-          ) : null}
           <p className="mt-2 text-sm font-medium text-slate-700">
             {data.professionalTitle ?? "—"}
           </p>
@@ -67,14 +64,6 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Remote</dt>
               <dd className="text-slate-800 font-semibold">{data.isRemote ? "Yes" : "No"}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase text-slate-400">Suffix</dt>
-              <dd className="text-slate-800 font-semibold">{data.suffix ?? "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase text-slate-400">Phone Number</dt>
-              <dd className="text-slate-800 font-semibold">{data.phoneNumber ?? "—"}</dd>
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Gender</dt>

@@ -16,7 +16,7 @@ function displayName(account: EmployerAccountDetails): string {
     .filter(Boolean)
     .join(" ")
     .trim();
-  return full || account.username || "Employer";
+  return full || "Employer";
 }
 
 export function EmployerPersonalProfileCard({
@@ -51,10 +51,7 @@ export function EmployerPersonalProfileCard({
       </div>
 
       <div className="space-y-6 p-5 sm:p-6">
-        <AccountLoginIdentity
-          email={account.email}
-          username={account.username}
-        />
+        <AccountLoginIdentity email={account.email} />
 
         <div className="border-t border-slate-50 pt-6">
           <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -69,22 +66,6 @@ export function EmployerPersonalProfileCard({
                 {name}
               </dd>
             </div>
-            <div className="min-w-0">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Phone Number
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.phoneNumber ?? "—"}
-              </dd>
-            </div>
-            <div className="min-w-0 sm:col-span-2">
-              <dt className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-                Country
-              </dt>
-              <dd className="mt-1 text-sm font-semibold text-slate-800">
-                {account.country ?? "—"}
-              </dd>
-            </div>
           </dl>
         </div>
       </div>
@@ -94,10 +75,7 @@ export function EmployerPersonalProfileCard({
         onClose={() => setEditModalOpen(false)}
         initial={{
           firstName: account.firstName || "",
-          middleName: account.middleName || "",
           lastName: account.lastName || "",
-          phoneNumber: account.phoneNumber || "",
-          country: account.country || "",
         }}
         onSaved={() => {
           router.refresh();

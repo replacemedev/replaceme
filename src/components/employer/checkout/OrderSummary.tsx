@@ -54,7 +54,8 @@ export function OrderSummary({
             <span className="text-gray-400 text-sm font-bold">/month</span>
           </div>
           <p className="text-xs font-semibold text-slate-500 mt-2">
-            Billed monthly in USD · Cancel anytime
+            Billed monthly in USD · Tax calculated at Stripe Checkout when
+            applicable · Cancel anytime
           </p>
         </div>
 

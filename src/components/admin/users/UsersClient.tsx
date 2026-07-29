@@ -34,11 +34,12 @@ interface UsersClientProps {
 
 function displayName(
   first: string | null | undefined,
-  middle: string | null | undefined,
   last: string | null | undefined,
-  fallback: string
+  fallback: string,
+  middle?: string | null | undefined,
+  suffix?: string | null | undefined
 ): string {
-  const name = formatFullName(first, middle, last).trim();
+  const name = formatFullName(first, middle ?? null, last, suffix).trim();
   return name || fallback;
 }
 
@@ -203,7 +204,7 @@ export function UsersClient({
       list = list.filter((row) => {
         if (tab === "workers") {
           const w = row as AdminWorkerRow;
-          const name = displayName(w.first_name, w.middle_name, w.last_name, "");
+          const name = displayName(w.first_name, w.last_name, "", w.middle_name, w.suffix);
           return (
             name.toLowerCase().includes(q) ||
             (w.email?.toLowerCase().includes(q) ?? false) ||
@@ -221,7 +222,7 @@ export function UsersClient({
           );
         } else {
           const a = row as AdminAdminRow;
-          const name = displayName(a.first_name, a.middle_name, a.last_name, "");
+          const name = displayName(a.first_name, a.last_name, "");
           return (
             name.toLowerCase().includes(q) ||
             (a.email?.toLowerCase().includes(q) ?? false) ||
@@ -405,9 +406,10 @@ export function UsersClient({
                 const worker = row as AdminWorkerRow;
                 const name = displayName(
                   worker.first_name,
-                  worker.middle_name,
                   worker.last_name,
-                  "Unnamed"
+                  "Unnamed",
+                  worker.middle_name,
+                  worker.suffix
                 );
                 return (
                   <AdminMobileCard
@@ -508,7 +510,7 @@ export function UsersClient({
                 );
               }
               const admin = row as AdminAdminRow;
-              const name = displayName(admin.first_name, admin.middle_name, admin.last_name, "Unnamed");
+              const name = displayName(admin.first_name, admin.last_name, "Unnamed");
               return (
                 <AdminMobileCard
                   key={admin.id}
@@ -559,9 +561,10 @@ export function UsersClient({
                     ? (paginatedFiltered as AdminWorkerRow[]).map((worker) => {
                         const name = displayName(
                           worker.first_name,
-                          worker.middle_name,
                           worker.last_name,
-                          "Unnamed"
+                          "Unnamed",
+                          worker.middle_name,
+                          worker.suffix
                         );
                         return (
                           <tr key={worker.id} className={ADMIN_TABLE_ROW}>
@@ -686,7 +689,6 @@ export function UsersClient({
                                 <UserIdentityCell
                                   name={displayName(
                                     admin.first_name,
-                                    admin.middle_name,
                                     admin.last_name,
                                     "Unnamed"
                                   )}

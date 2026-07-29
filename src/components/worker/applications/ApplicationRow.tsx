@@ -13,7 +13,6 @@ interface ApplicationRowProps {
 
 const badgeStyles = {
   review: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  interview: "bg-blue-50 text-blue-700 border-blue-100",
   shortlisted: "bg-violet-50 text-violet-700 border-violet-100",
   declined: "bg-slate-100 text-slate-600 border-slate-200",
   hired: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/20",

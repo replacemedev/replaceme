@@ -18,7 +18,6 @@ interface WorkerEditDetailsModalProps {
     gender: string;
     civilStatus: string;
     preferredLanguage: string;
-    phoneNumber: string;
     tinNumber: string;
     idType: string;
     idNumber: string;
@@ -44,7 +43,6 @@ export function WorkerEditDetailsModal({
   const [gender, setGender] = useState(initial.gender);
   const [civilStatus, setCivilStatus] = useState(initial.civilStatus);
   const [preferredLanguage, setPreferredLanguage] = useState(initial.preferredLanguage);
-  const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
   const [tinNumber, setTinNumber] = useState(initial.tinNumber);
   const [idType, setIdType] = useState(initial.idType);
   const [idNumber, setIdNumber] = useState(initial.idNumber);
@@ -66,7 +64,6 @@ export function WorkerEditDetailsModal({
         gender: gender || null,
         civilStatus: civilStatus || null,
         preferredLanguage: preferredLanguage || null,
-        phoneNumber: phoneNumber || null,
         tinNumber: tinNumber || null,
         idType: idType || null,
         idNumber: idNumber || null,
@@ -92,7 +89,7 @@ export function WorkerEditDetailsModal({
   }
 
   const inputClass =
-    "w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-700 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#006e2f]/20 focus:border-[#006e2f] transition-all";
+    "w-full min-w-0 rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-700 bg-white placeholder-slate-400 break-words focus:outline-hidden focus:ring-2 focus:ring-[#006e2f]/20 focus:border-[#006e2f] transition-all";
 
   return (
     <ProfileModal
@@ -124,28 +121,30 @@ export function WorkerEditDetailsModal({
       }
     >
       <div className="space-y-6">
-        {/* Name Fields */}
-        <div className="space-y-3">
+        <div className="space-y-3 min-w-0">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Legal Name</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
+            <label className="block min-w-0 space-y-1 text-xs font-bold text-slate-500">
               First Name
               <input
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                autoComplete="given-name"
                 className={inputClass}
               />
               {errors.firstName && (
                 <p className="text-[10px] font-semibold text-red-500">{errors.firstName}</p>
               )}
             </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
+            <label className="block min-w-0 space-y-1 text-xs font-bold text-slate-500">
               Middle Name
+              <span className="ml-1 font-normal text-slate-400">(optional)</span>
               <input
                 value={middleName}
                 onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="Optional"
+                placeholder="Legal middle name"
+                autoComplete="additional-name"
                 className={inputClass}
               />
               {errors.middleName && (
@@ -153,25 +152,28 @@ export function WorkerEditDetailsModal({
               )}
             </label>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <label className="block col-span-2 space-y-1 text-xs font-bold text-slate-500">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label className="block min-w-0 space-y-1 text-xs font-bold text-slate-500">
               Last Name
               <input
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                autoComplete="family-name"
                 className={inputClass}
               />
               {errors.lastName && (
                 <p className="text-[10px] font-semibold text-red-500">{errors.lastName}</p>
               )}
             </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
+            <label className="block min-w-0 space-y-1 text-xs font-bold text-slate-500">
               Suffix
+              <span className="ml-1 font-normal text-slate-400">(optional)</span>
               <input
                 value={suffix}
                 onChange={(e) => setSuffix(e.target.value)}
-                placeholder="Jr/III"
+                placeholder="Jr., III, PhD"
+                autoComplete="honorific-suffix"
                 className={inputClass}
               />
               {errors.suffix && (
@@ -181,9 +183,8 @@ export function WorkerEditDetailsModal({
           </div>
         </div>
 
-        {/* Demographics & Contact */}
         <div className="space-y-3 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Demographics & Contact</h3>
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Demographics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <label className="block space-y-1 text-xs font-bold text-slate-500">
               Birthdate
@@ -195,19 +196,6 @@ export function WorkerEditDetailsModal({
               />
               {errors.birthDate && (
                 <p className="text-[10px] font-semibold text-red-500">{errors.birthDate}</p>
-              )}
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Phone Number
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+63 912 345 6789"
-                className={inputClass}
-              />
-              {errors.phoneNumber && (
-                <p className="text-[10px] font-semibold text-red-500">{errors.phoneNumber}</p>
               )}
             </label>
           </div>
@@ -252,7 +240,6 @@ export function WorkerEditDetailsModal({
           </div>
         </div>
 
-        {/* Statutory Numbers */}
         <div className="space-y-3 pt-4 border-t border-slate-100">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Statutory Details</h3>
           <label className="block space-y-1 text-xs font-bold text-slate-500 w-full">
@@ -266,7 +253,6 @@ export function WorkerEditDetailsModal({
           </label>
         </div>
 
-        {/* ID Verification Details */}
         <div className="space-y-3 pt-4 border-t border-slate-100">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Identity Document Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

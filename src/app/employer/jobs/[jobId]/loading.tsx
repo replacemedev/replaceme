@@ -21,7 +21,6 @@ export default function EmployerJobDetailLoading() {
         <div className="lg:col-span-1 space-y-6">
           <CardSkeleton minHeight="min-h-[220px]" />
           <CardSkeleton minHeight="min-h-[200px]" />
-          <CardSkeleton minHeight="min-h-[180px]" />
         </div>
       </div>
     </EmployerPageShell>

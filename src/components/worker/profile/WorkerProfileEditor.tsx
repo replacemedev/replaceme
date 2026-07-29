@@ -120,7 +120,12 @@ export function WorkerProfileEditor({
 
   const fullName =
     profile.full_name ||
-    formatFullName(profile.first_name, profile.middle_name, profile.last_name, profile.suffix) ||
+    formatFullName(
+      profile.first_name,
+      profile.middle_name,
+      profile.last_name,
+      profile.suffix
+    ) ||
     "Worker Profile";
   const initials = profile.first_name ? profile.first_name[0].toUpperCase() : "W";
 
@@ -138,7 +143,20 @@ export function WorkerProfileEditor({
       ...(patch.middleName !== undefined ? { middle_name: patch.middleName } : {}),
       ...(patch.lastName !== undefined ? { last_name: patch.lastName } : {}),
       ...(patch.suffix !== undefined ? { suffix: patch.suffix } : {}),
-      ...(patch.phoneNumber !== undefined ? { phone_number: patch.phoneNumber } : {}),
+      ...((patch.firstName !== undefined ||
+        patch.middleName !== undefined ||
+        patch.lastName !== undefined ||
+        patch.suffix !== undefined)
+        ? {
+          full_name:
+            formatFullName(
+              patch.firstName !== undefined ? patch.firstName : prev.first_name,
+              patch.middleName !== undefined ? patch.middleName : prev.middle_name,
+              patch.lastName !== undefined ? patch.lastName : prev.last_name,
+              patch.suffix !== undefined ? patch.suffix : prev.suffix
+            ) || null,
+        }
+        : {}),
       ...(patch.gender !== undefined ? { gender: patch.gender } : {}),
       ...(patch.civilStatus !== undefined ? { civil_status: patch.civilStatus } : {}),
       ...(patch.preferredLanguage !== undefined ? { preferred_language: patch.preferredLanguage } : {}),
@@ -332,7 +350,7 @@ export function WorkerProfileEditor({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
               <div className="space-y-4">
-                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Demographics & Contact</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">Demographics</h4>
                 <div className="space-y-2.5">
                   <div className="flex justify-between py-1 border-b border-slate-50">
                     <span className="text-slate-500 font-medium">Gender</span>
@@ -345,19 +363,6 @@ export function WorkerProfileEditor({
                   <div className="flex justify-between py-1 border-b border-slate-50">
                     <span className="text-slate-500 font-medium">Preferred Language</span>
                     <span className="text-slate-800 font-semibold">{profile.preferred_language || "Not specified"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-500 font-medium">Phone Number</span>
-                    {canViewFullIdentity ? (
-                      <span className="text-slate-800 font-semibold">{profile.phone_number || "Not specified"}</span>
-                    ) : (
-                      <span className="text-slate-400 font-semibold select-none flex items-center gap-1.5">
-                        <span className="blur-xs font-mono">0917-123-XXXX</span>
-                        <span className="text-[9px] font-black uppercase tracking-tight bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200/50">
-                          🔒 Premium
-                        </span>
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
@@ -853,7 +858,6 @@ export function WorkerProfileEditor({
               gender: profile.gender || "",
               civilStatus: profile.civil_status || "",
               preferredLanguage: profile.preferred_language || "",
-              phoneNumber: profile.phone_number || "",
               tinNumber: profile.tin_number || "",
               idType: profile.id_type || "",
               idNumber: profile.id_number || "",

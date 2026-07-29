@@ -23,9 +23,10 @@ import { ActivePlanSidebar } from "@/components/employer/settings/account/Active
 import { EmployerInvoicesPanel } from "@/components/employer/settings/account/EmployerInvoicesPanel";
 import { PlanFeatureChecklist } from "@/components/employer/settings/account/PlanFeatureChecklist";
 import { EmployerEmailSupportCard } from "@/components/employer/settings/account/EmployerEmailSupportCard";
+import { EmployerApplicationNotificationCard } from "@/components/employer/settings/account/EmployerApplicationNotificationCard";
+import type { ApplicationNotificationPref } from "@/components/employer/settings/account/EmployerApplicationNotificationCard";
 import { PlanUsageCard } from "@/components/shared/billing/PlanUsageCard";
 import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
-import { ReportWorkerCard } from "@/components/employer/settings/account/ReportWorkerCard";
 import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
 interface AccountSettingsClientProps {
@@ -34,7 +35,7 @@ interface AccountSettingsClientProps {
   accountDetails: EmployerAccountDetails | null;
   invoices: EmployerInvoiceRow[];
   invoicesError?: string | null;
-  deletionStatus?: { status: string; createdAt: string; scheduledFor?: string | null } | null;
+  notificationPref: ApplicationNotificationPref;
 }
 
 function formatDate(iso: string): string {
@@ -51,7 +52,7 @@ export function AccountSettingsClient({
   accountDetails,
   invoices,
   invoicesError,
-  deletionStatus = null,
+  notificationPref,
 }: AccountSettingsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -300,18 +301,16 @@ export function AccountSettingsClient({
         planUsage={planUsage}
       />
 
-      <EmployerEmailSupportCard currentPlan={initialSettings.plan} />
+      <EmployerApplicationNotificationCard initialPref={notificationPref} />
+
+      <EmployerEmailSupportCard />
 
       <div className="w-full flex flex-col lg:grid lg:grid-cols-3 gap-8 items-start">
         <div className="w-full lg:col-span-2 space-y-8">
           {accountDetails ? (
             <EmployerPersonalProfileCard account={accountDetails} />
           ) : null}
-          <DataDeletionRequestCard
-            latestStatus={deletionStatus}
-            scheduledFor={deletionStatus?.scheduledFor}
-          />
-          <ReportWorkerCard />
+          <DataDeletionRequestCard />
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}

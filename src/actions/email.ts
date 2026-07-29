@@ -18,6 +18,7 @@ import { renderReactEmail } from "@/lib/server/email/render-react-email";
 import {
   isPaidEmailTier,
   normalizeEmailTierSlug,
+  emailPlanLabel,
   paidPlanLabel,
 } from "@/lib/server/email/paid-tier";
 import { workerStatusEmailCopy } from "@/lib/server/email/status-copy";
@@ -42,13 +43,11 @@ import EmployerSubscriptionAlertEmail, {
 } from "@emails/employer-subscription-alert";
 
 const PAID_SUPPORT_TIERS = new Set<EmailTierSlug>([
+  "discovery",
   "starter",
   "growth",
   "scale",
 ]);
-
-const FREE_SUPPORT_ERROR =
-  "Email support is only available on paid plans. Please upgrade to contact support.";
 
 const employerSupportSchema = z
   .object({
@@ -157,8 +156,8 @@ async function workerAllowsEmail(
 }
 
 /**
- * Paid-plan employers send support tickets to the admin inbox via Resend.
- * Discovery / free tiers are rejected with an explicit upgrade error.
+ * Send support tickets to the admin inbox via Resend.
+ * Available on all employer plans including Discovery.
  */
 export async function sendEmployerSupportEmail(input: {
   subject: string;
@@ -180,14 +179,10 @@ export async function sendEmployerSupportEmail(input: {
     const entitlements = await fetchEmployerEntitlements(profile.id, supabase);
     const tierSlug = normalizeEmailTierSlug(entitlements?.planSlug);
 
-    if (!PAID_SUPPORT_TIERS.has(tierSlug)) {
-      return fail(FREE_SUPPORT_ERROR);
-    }
-
     const [{ data: account }, { data: company }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("first_name, middle_name, last_name, email")
+        .select("first_name, last_name, email")
         .eq("id", profile.id)
         .maybeSingle(),
       supabase
@@ -203,7 +198,7 @@ export async function sendEmployerSupportEmail(input: {
     }
 
     const employerName =
-      formatFullName(account?.first_name, account?.middle_name, account?.last_name) ||
+      formatFullName(account?.first_name, account?.last_name) ||
       company?.company_name ||
       "Employer";
 
@@ -259,7 +254,7 @@ export async function sendWorkerNotification(input: {
     const admin = await createAdminClient();
     const { data: worker, error } = await admin
       .from("profiles")
-      .select("id, email, role, first_name, middle_name, last_name")
+      .select("id, email, role, first_name, middle_name, last_name, suffix")
       .eq("id", parsed.userId)
       .maybeSingle();
 
@@ -276,7 +271,8 @@ export async function sendWorkerNotification(input: {
     const recipientName = formatFullName(
       worker.first_name,
       worker.middle_name,
-      worker.last_name
+      worker.last_name,
+      worker.suffix
     );
 
     const email = renderWorkerNotificationEmail({
@@ -346,7 +342,7 @@ export async function notifyWorkerStatusUpdate(input: {
     const [{ data: worker }, { data: job }] = await Promise.all([
       admin
         .from("profiles")
-        .select("id, email, first_name, middle_name, last_name, role")
+        .select("id, email, first_name, middle_name, last_name, suffix, role")
         .eq("id", application.candidate_id)
         .maybeSingle(),
       admin
@@ -374,7 +370,8 @@ export async function notifyWorkerStatusUpdate(input: {
     const workerName = formatFullName(
       worker.first_name,
       worker.middle_name,
-      worker.last_name
+      worker.last_name,
+      worker.suffix
     );
     const jobTitle = job?.title ?? "your role";
     const ctaUrl = `${siteUrl}/worker/applications/${application.id}`;
@@ -419,8 +416,8 @@ export async function notifyWorkerStatusUpdate(input: {
 }
 
 /**
- * Paid-tier gate: notify employer of a new applicant (Starter / Growth / Scale).
- * Discovery / free tiers abort silently.
+ * Notify employer of a new applicant when their notification preference is
+ * email_every_applicant. All plans (including Discovery) are eligible.
  */
 export async function notifyEmployerNewApplicant(input: {
   applicationId: string;
@@ -437,23 +434,16 @@ export async function notifyEmployerNewApplicant(input: {
     );
     const tierSlug = normalizeEmailTierSlug(entitlements?.planSlug);
 
-    if (!isPaidEmailTier(tierSlug)) {
-      safeLog(
-        `notifyEmployerNewApplicant: aborted (tier=${tierSlug}) employer=${parsed.employerId}`
-      );
-      return { success: true, skipped: true };
-    }
-
     const [{ data: employer }, { data: company }, { data: job }, { data: application }] =
       await Promise.all([
         admin
           .from("profiles")
-          .select("id, email, role, first_name, middle_name, last_name")
+          .select("id, email, role, first_name, middle_name, last_name, suffix")
           .eq("id", parsed.employerId)
           .maybeSingle(),
         admin
           .from("company_profiles")
-          .select("company_name")
+          .select("company_name, application_notification_pref")
           .eq("employer_id", parsed.employerId)
           .maybeSingle(),
         admin
@@ -472,20 +462,30 @@ export async function notifyEmployerNewApplicant(input: {
       return { success: true, skipped: true };
     }
 
+    const notifPref = company?.application_notification_pref ?? "email_every_applicant";
+    if (notifPref === "dashboard_only" || notifPref === "email_daily_summary") {
+      return { success: true, skipped: true };
+    }
+
     let applicantName: string | null = null;
     if (application?.candidate_id) {
       const { data: worker } = await admin
         .from("profiles")
-        .select("first_name, middle_name, last_name")
+        .select("first_name, middle_name, last_name, suffix")
         .eq("id", application.candidate_id)
         .maybeSingle();
       applicantName =
-        formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
+        formatFullName(
+          worker?.first_name,
+          worker?.middle_name,
+          worker?.last_name,
+          worker?.suffix
+        ) ||
         null;
     }
 
     const siteUrl = getSiteUrl();
-    const planLabel = paidPlanLabel(tierSlug);
+    const planLabel = emailPlanLabel(tierSlug);
     const jobTitle = job?.title ?? "your job post";
     const ctaUrl = `${siteUrl}/employer/jobs/${parsed.jobId}/applicants`;
 
@@ -548,12 +548,12 @@ export async function notifyWorkerNewMessage(input: {
     const [{ data: worker }, { data: sender }] = await Promise.all([
       admin
         .from("profiles")
-        .select("id, email, role, first_name, middle_name, last_name")
+        .select("id, email, role, first_name, middle_name, last_name, suffix")
         .eq("id", parsed.recipientId)
         .maybeSingle(),
       admin
         .from("profiles")
-        .select("first_name, middle_name, last_name, role")
+        .select("first_name, last_name, role")
         .eq("id", parsed.senderId)
         .maybeSingle(),
     ]);
@@ -570,14 +570,15 @@ export async function notifyWorkerNewMessage(input: {
 
     const employerName =
       company?.company_name ||
-      formatFullName(sender?.first_name, sender?.middle_name, sender?.last_name) ||
+      formatFullName(sender?.first_name, sender?.last_name) ||
       "An employer";
 
     const siteUrl = getSiteUrl();
     const workerName = formatFullName(
       worker.first_name,
       worker.middle_name,
-      worker.last_name
+      worker.last_name,
+      worker.suffix
     );
 
     const { html, text } = await renderReactEmail(
@@ -645,12 +646,12 @@ export async function notifyEmployerNewMessage(input: {
     const [{ data: employer }, { data: worker }] = await Promise.all([
       admin
         .from("profiles")
-        .select("id, email, role, first_name, middle_name, last_name")
+        .select("id, email, role, first_name, middle_name, last_name, suffix")
         .eq("id", parsed.recipientId)
         .maybeSingle(),
       admin
         .from("profiles")
-        .select("first_name, middle_name, last_name")
+        .select("first_name, middle_name, last_name, suffix")
         .eq("id", parsed.senderId)
         .maybeSingle(),
     ]);
@@ -659,13 +660,14 @@ export async function notifyEmployerNewMessage(input: {
       return { success: true, skipped: true };
     }
 
-    const employerName = formatFullName(
-      employer.first_name,
-      employer.middle_name,
-      employer.last_name
-    );
+    const employerName = formatFullName(employer.first_name, employer.last_name);
     const workerName =
-      formatFullName(worker?.first_name, worker?.middle_name, worker?.last_name) ||
+      formatFullName(
+        worker?.first_name,
+        worker?.middle_name,
+        worker?.last_name,
+        worker?.suffix
+      ) ||
       "A candidate";
     const siteUrl = getSiteUrl();
     const planLabel = paidPlanLabel(tierSlug);
@@ -726,7 +728,7 @@ export async function notifyEmployerSubscriptionAlert(input: {
 
     const { data: employer } = await admin
       .from("profiles")
-      .select("id, email, role, first_name, middle_name, last_name")
+      .select("id, email, role, first_name, middle_name, last_name, suffix")
       .eq("id", parsed.employerId)
       .maybeSingle();
 
@@ -740,11 +742,7 @@ export async function notifyEmployerSubscriptionAlert(input: {
       ? planLabelForSlug(normalizeEmailTierSlug(parsed.previousPlanSlug))
       : null;
     const siteUrl = getSiteUrl();
-    const employerName = formatFullName(
-      employer.first_name,
-      employer.middle_name,
-      employer.last_name
-    );
+    const employerName = formatFullName(employer.first_name, employer.last_name);
 
     const { html, text } = await renderReactEmail(
       React.createElement(EmployerSubscriptionAlertEmail, {
@@ -805,7 +803,7 @@ export async function notifyWorkerProfileNudge(input: {
     const { data: worker } = await admin
       .from("profiles")
       .select(
-        "id, email, role, first_name, middle_name, last_name, is_verified, created_at"
+        "id, email, role, first_name, middle_name, last_name, suffix, is_verified, created_at"
       )
       .eq("id", parsed.workerId)
       .maybeSingle();
@@ -841,7 +839,8 @@ export async function notifyWorkerProfileNudge(input: {
     const workerName = formatFullName(
       worker.first_name,
       worker.middle_name,
-      worker.last_name
+      worker.last_name,
+      worker.suffix
     );
 
     const { html, text } = await renderReactEmail(

@@ -1,28 +1,17 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
-import { LifeBuoy, Lock, Send } from "lucide-react";
-import type { SubscriptionTier } from "@/types/employer/billing";
+import { LifeBuoy, Send } from "lucide-react";
 import { sendEmployerSupportEmail } from "@/actions/email";
-import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
 
-interface EmployerEmailSupportCardProps {
-  currentPlan: SubscriptionTier;
-}
-
-export function EmployerEmailSupportCard({
-  currentPlan,
-}: EmployerEmailSupportCardProps) {
-  const isPaid = currentPlan !== "discovery";
+export function EmployerEmailSupportCard() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!isPaid) return;
 
     startTransition(async () => {
       const toastId = toast.loading("Sending support request...");
@@ -32,7 +21,7 @@ export function EmployerEmailSupportCard({
           toast.error(result.error, { id: toastId });
           return;
         }
-        toast.success("Support email sent. We’ll reply to your account email.", {
+        toast.success("Support email sent. We'll reply to your account email.", {
           id: toastId,
         });
         setSubject("");
@@ -54,81 +43,61 @@ export function EmployerEmailSupportCard({
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-slate-900">Email support</h3>
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
-            {isPaid
-              ? `Available on your ${TIER_LABELS[currentPlan]} plan. Messages go to our team with reply-to set to your account email.`
-              : "Email support is included on Starter, Growth, and Scale. Upgrade to contact the team from your dashboard."}
+            Available on all plans, including Discovery. We reply to your account email.
           </p>
         </div>
       </div>
 
-      {!isPaid ? (
-        <div className="mt-5 flex flex-col gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2 text-sm text-amber-950">
-            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
-            <p className="font-medium leading-relaxed">
-              Discovery (free) cannot send email support. Upgrade to unlock this
-              channel.
-            </p>
-          </div>
-          <Link
-            href="/employer/pricing"
-            className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl bg-[#006e2f] px-4 text-xs font-bold text-white transition-colors hover:bg-[#005c26]"
+      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <div>
+          <label
+            htmlFor="employer-support-subject"
+            className="block text-xs font-bold text-slate-700"
           >
-            View plans
-          </Link>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          <div>
-            <label
-              htmlFor="employer-support-subject"
-              className="block text-xs font-bold text-slate-700"
-            >
-              Subject
-            </label>
-            <input
-              id="employer-support-subject"
-              type="text"
-              required
-              minLength={3}
-              maxLength={120}
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              disabled={isPending}
-              placeholder="e.g. Billing question about my Growth plan"
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-shadow placeholder:text-slate-400 focus:border-[#006e2f]/50 focus:ring-2 focus:ring-[#006e2f]/15 disabled:opacity-60"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="employer-support-message"
-              className="block text-xs font-bold text-slate-700"
-            >
-              Message
-            </label>
-            <textarea
-              id="employer-support-message"
-              required
-              minLength={20}
-              maxLength={4000}
-              rows={5}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              disabled={isPending}
-              placeholder="Describe what you need help with. Include job IDs or invoice details if relevant."
-              className="mt-1.5 w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-shadow placeholder:text-slate-400 focus:border-[#006e2f]/50 focus:ring-2 focus:ring-[#006e2f]/15 disabled:opacity-60"
-            />
-          </div>
-          <button
-            type="submit"
+            Subject
+          </label>
+          <input
+            id="employer-support-subject"
+            type="text"
+            required
+            minLength={3}
+            maxLength={120}
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
             disabled={isPending}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 text-sm font-bold text-white transition-colors hover:bg-[#005c26] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            placeholder="e.g. Billing question"
+            className="mt-1.5 w-full min-h-11 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-shadow placeholder:text-slate-400 focus:border-[#006e2f]/50 focus:ring-2 focus:ring-[#006e2f]/15 disabled:opacity-60"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="employer-support-message"
+            className="block text-xs font-bold text-slate-700"
           >
-            <Send className="h-4 w-4" aria-hidden />
-            {isPending ? "Sending…" : "Send support email"}
-          </button>
-        </form>
-      )}
+            Message
+          </label>
+          <textarea
+            id="employer-support-message"
+            required
+            minLength={20}
+            maxLength={4000}
+            rows={5}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            disabled={isPending}
+            placeholder="Describe what you need help with."
+            className="mt-1.5 w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition-shadow placeholder:text-slate-400 focus:border-[#006e2f]/50 focus:ring-2 focus:ring-[#006e2f]/15 disabled:opacity-60"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 text-sm font-bold text-white transition-colors hover:bg-[#005c26] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto [-webkit-tap-highlight-color:transparent]"
+        >
+          <Send className="h-4 w-4" aria-hidden />
+          {isPending ? "Sending…" : "Send support email"}
+        </button>
+      </form>
     </div>
   );
 }

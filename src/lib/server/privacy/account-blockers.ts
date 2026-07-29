@@ -17,7 +17,6 @@ export type AccountClosureBlockers = {
 const OPEN_APPLICATION_STATUSES = [
   "PENDING",
   "UNDER_REVIEW",
-  "INTERVIEW_SCHEDULED",
 ] as const;
 
 type AdminClient = SupabaseClient<Database>;

@@ -3,15 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { MessageSquare, Trash2, Eye, Lock, Edit, Calendar } from "lucide-react";
+import { MessageSquare, Trash2, Eye, Lock } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
-import { ApplicantActions } from "./ApplicantActions";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
 import { ClientFormattedDate } from "@/components/shared/ClientFormattedDate";
-import { InterviewDetailModal } from "../interviews/InterviewDetailModal";
 import { DownloadResumeButton } from "../candidates/DownloadResumeButton";
 
 const AGENT_SKILLS = new Set([
@@ -51,7 +49,6 @@ export function ApplicantCard({
   onMessageClick,
   onDeleteClick,
 }: ApplicantCardProps) {
-  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const isPreview = !applicant.isUnlocked;
   const initials = applicant.name
     .split(" ")
@@ -131,27 +128,6 @@ export function ApplicantCard({
           />
         </div>
 
-        {applicant.status === "INTERVIEW_SCHEDULED" && (
-          <div className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <Calendar className="h-3.5 w-3.5 text-slate-405 shrink-0" />
-              <p className="text-[10px] font-extrabold text-slate-650 truncate">
-                <ClientFormattedDate
-                  date={applicant.interview?.scheduled_at || applicant.createdAt}
-                />
-              </p>
-            </div>
-            <button
-              onClick={() => setIsRescheduleOpen(true)}
-              type="button"
-              className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-150 rounded-full shrink-0 transition-colors cursor-pointer"
-              title="Edit/Reschedule Interview"
-            >
-              <Edit size={12} />
-            </button>
-          </div>
-        )}
-
         <div className="flex flex-wrap gap-2">
           {applicant.skills.map((skill, idx) => {
             const isAgent = isAgentSkill(skill);
@@ -173,12 +149,6 @@ export function ApplicantCard({
           <UnlockOverlay feature="identity" currentPlan={planSlug} compact />
         ) : null}
       </div>
-
-      <ApplicantActions
-        applicationId={applicant.id}
-        status={applicant.status}
-        isUnlocked={applicant.isUnlocked}
-      />
 
       <div className="flex w-full items-center gap-2 mt-4 pt-4 border-t border-gray-100">
         {isRejected ? (
@@ -240,42 +210,6 @@ export function ApplicantCard({
         )}
       </div>
 
-      {isRescheduleOpen && (
-        <InterviewDetailModal
-          open={isRescheduleOpen}
-          onClose={() => setIsRescheduleOpen(false)}
-          interview={
-            applicant.interview
-              ? {
-                id: applicant.interview.id,
-                applicationId: applicant.id,
-                jobId: applicant.jobId,
-                candidateId: applicant.candidateId,
-                jobTitle: applicant.role,
-                candidateName: applicant.name,
-                scheduledAt: applicant.interview.scheduled_at,
-                meetingUrl: applicant.interview.meeting_link,
-                status: applicant.interview.status,
-                notes: applicant.interview.notes,
-                isPreview,
-                isVerified: isPreview ? false : applicant.isVerified,
-              }
-              : {
-                applicationId: applicant.id,
-                jobId: applicant.jobId,
-                candidateId: applicant.candidateId,
-                jobTitle: applicant.role,
-                candidateName: applicant.name,
-                scheduledAt: applicant.createdAt,
-                meetingUrl: null,
-                status: "scheduled",
-                notes: null,
-                isPreview,
-                isVerified: isPreview ? false : applicant.isVerified,
-              }
-          }
-        />
-      )}
     </div>
   );
 }

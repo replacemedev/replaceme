@@ -11,7 +11,7 @@ import {
   employerCompanyStepSchema,
   employerDetailsStepSchema,
   employerHiringStepSchema,
-  employerPersonalStepSchema,
+  employerNotificationStepSchema,
   employerOnboardingSchema,
   EmployerOnboardingStep,
   workerAboutStepSchema,
@@ -36,7 +36,6 @@ export type WorkerOnboardingDraft = {
   middleName: string;
   lastName: string;
   suffix: string;
-  phoneNumber: string;
   gender: string;
   civilStatus: string;
   preferredLanguage: string;
@@ -65,8 +64,8 @@ export type EmployerOnboardingDraft = {
   websiteUrl: string;
   companyBio: string;
   logoUrl: string | null;
-  phoneNumber: string;
-  country: string;
+  industryCustom?: string;
+  notificationPreference?: string;
 };
 
 async function syncOnboardingWorkerSkills(
@@ -157,7 +156,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, middle_name, last_name, suffix, phone_number, gender, civil_status, preferred_language, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
+        "professional_title, first_name, middle_name, last_name, suffix, gender, civil_status, preferred_language, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
       )
       .eq("id", user.id)
       .single();
@@ -170,7 +169,6 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       middleName: profile.middle_name ?? "",
       lastName: profile.last_name ?? "",
       suffix: profile.suffix ?? "",
-      phoneNumber: profile.phone_number ?? "",
       gender: profile.gender ?? "",
       civilStatus: profile.civil_status ?? "",
       preferredLanguage: profile.preferred_language ?? "",
@@ -202,12 +200,14 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
     const [{ data: profile }, { data: company }] = await Promise.all([
       supabase
         .from("profiles")
-        .select("skills, phone_number, country")
+        .select("skills")
         .eq("id", user.id)
         .single(),
       supabase
         .from("company_profiles")
-        .select("company_name, industry, company_size, website_url, company_bio, logo_url")
+        .select(
+          "company_name, industry, company_size, website_url, company_bio, logo_url, industry_custom, application_notification_pref"
+        )
         .eq("employer_id", user.id)
         .maybeSingle(),
     ]);
@@ -220,8 +220,9 @@ export async function getEmployerOnboardingDraft(): Promise<EmployerOnboardingDr
       websiteUrl: company?.website_url ?? "",
       companyBio: company?.company_bio ?? "",
       logoUrl: company?.logo_url ?? null,
-      phoneNumber: profile?.phone_number ?? "",
-      country: profile?.country ?? "",
+      industryCustom: company?.industry_custom ?? undefined,
+      notificationPreference:
+        company?.application_notification_pref ?? "email_every_applicant",
     };
   } catch {
     return null;
@@ -247,7 +248,6 @@ export async function saveWorkerOnboardingStep(
             middle_name: parsed.middleName || null,
             last_name: parsed.lastName,
             suffix: parsed.suffix || null,
-            phone_number: parsed.phoneNumber || null,
             gender: parsed.gender || null,
             civil_status: parsed.civilStatus || null,
             preferred_language: parsed.preferredLanguage || null,
@@ -361,6 +361,7 @@ export async function saveEmployerOnboardingStep(
           company_name: parsed.companyName,
           industry: parsed.industry,
           company_size: parsed.companySize,
+          industry_custom: parsed.industryCustom ?? null,
           updated_at: now,
         };
 
@@ -401,21 +402,16 @@ export async function saveEmployerOnboardingStep(
         if (error) return fail("Failed to save company details.");
         break;
       }
-      case "personal": {
-        const parsed = employerPersonalStepSchema.parse(input);
+      case "notification": {
+        const parsed = employerNotificationStepSchema.parse(input);
         const { error } = await supabase
-          .from("profiles")
+          .from("company_profiles")
           .update({
-            phone_number: parsed.phoneNumber,
-            country: parsed.country || null,
-            tin_number: null,
-            birth_date: null,
-            gender: null,
-            civil_status: null,
+            application_notification_pref: parsed.notificationPreference,
             updated_at: now,
           })
-          .eq("id", user.id);
-        if (error) return fail("Failed to save contact details.");
+          .eq("employer_id", user.id);
+        if (error) return fail("Failed to save notification preference.");
         break;
       }
       default:

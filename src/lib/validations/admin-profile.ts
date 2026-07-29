@@ -11,12 +11,6 @@ export const updateAdminSelfProfileSchema = z.object({
     .trim()
     .min(1, "Last name is required")
     .max(80, "Last name is too long"),
-  phoneNumber: z
-    .string()
-    .trim()
-    .max(32, "Phone number is too long")
-    .optional()
-    .or(z.literal("")),
   department: z
     .string()
     .trim()

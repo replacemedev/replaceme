@@ -9,6 +9,7 @@ import { closeJobOwnedByEmployer } from "@/lib/server/dal/jobs";
 import { revalidatePath } from "next/cache";
 import { JobDetails } from "@/types/employer/jobs";
 import { DEFAULT_SKILL_OPTIONS } from "@/config/onboarding";
+import { getSuggestedHourlyRate } from "@/lib/compensation/suggested-rates";
 import {
   assertEmployerCanPostJob,
   countHiddenApplicantsForJob,
@@ -40,6 +41,16 @@ export async function getSkills(): Promise<DropdownOption[]> {
     label: skill,
     value: skill,
   }));
+}
+
+export async function suggestCompetitiveHourlyRate(input: {
+  title?: string;
+  skills?: string[];
+}) {
+  return runAction("suggestCompetitiveHourlyRate", async () => {
+    const range = getSuggestedHourlyRate(input);
+    return ok(range);
+  });
 }
 
 /**
@@ -354,12 +365,6 @@ export async function getJobById(jobId: string): Promise<JobDetails | null> {
         shortlistedCount: shortlistedCount || 0,
       },
       priorityScore: Number(job.priority_score ?? 0),
-      hiringTeam: {
-        name: job.hiring_manager_name ?? "Hiring team",
-        role: job.hiring_manager_role ?? "Recruiter",
-        avatarUrl: null,
-        email: job.hiring_manager_email ?? "",
-      }
     };
   } catch (err) {
     safeError("getJobById error occurred:", err);

@@ -1,6 +1,7 @@
 "use server";
 
 import { safeError, safeLog } from "@/utils/logger";
+import { formatFullName } from "@/lib/format/name";
 import { Applicant, MatchLabel } from "@/types/employer/applicants";
 import { ApplicationStatus } from "@/types/applications";
 import { revalidatePath } from "next/cache";
@@ -55,13 +56,18 @@ function mapPreviewToApplicant(
   const matchScore = preview.match_score ?? app.match_score ?? 0;
 
   if (isFull) {
-    const firstName = String(candidate.first_name ?? "");
-    const lastName = String(candidate.last_name ?? "");
+    const name =
+      formatFullName(
+        candidate.first_name as string | null,
+        (candidate.middle_name as string | null) ?? null,
+        candidate.last_name as string | null,
+        (candidate.suffix as string | null) ?? null
+      ) || previewDisplayName(app.candidate_id);
     return {
       id: app.id,
       jobId: app.job_id,
       candidateId: app.candidate_id,
-      name: `${firstName} ${lastName}`.trim() || previewDisplayName(app.candidate_id),
+      name,
       role: String(candidate.professional_title ?? "Developer"),
       matchScore,
       matchLabel: matchLabelFromScore(matchScore),
@@ -150,14 +156,7 @@ async function loadApplicantsForJob(
       candidate_id,
       status,
       match_score,
-      created_at,
-      interviews (
-        id,
-        scheduled_at,
-        meeting_link,
-        status,
-        notes
-      )
+      created_at
     `)
     .eq("job_id", jobId)
     .eq("is_within_plan_cap", true)
@@ -183,22 +182,9 @@ async function loadApplicantsForJob(
     const preview = await fetchApplicantPreview(supabase, app.id, employerId);
     const mapped = mapPreviewToApplicant(app, preview, identityMode);
     if (mapped) {
-      const interview = Array.isArray(app.interviews)
-        ? app.interviews[0]
-        : app.interviews;
-
       dbApplicants.push({
         ...mapped,
         messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
-        interview: interview
-          ? {
-              id: interview.id,
-              scheduled_at: interview.scheduled_at,
-              meeting_link: interview.meeting_link,
-              status: interview.status,
-              notes: interview.notes,
-            }
-          : null,
       });
     }
   }

@@ -1,747 +1,250 @@
 import Link from "next/link";
-import { Briefcase, Check, Shield, User } from "lucide-react";
-import {
-  ACCOUNT_LIFECYCLE_TIMELINES,
-  APPEAL_SLA_COPY,
-  APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE,
-  DATA_RETENTION_PERIODS,
-  DELETION_REQUEST_SLA,
-  DELETION_REQUEST_SUPPORT_EMAIL,
-} from "@/lib/data/legal";
-import { LegalSectionHeading } from "./LegalSectionHeading";
 
 const tocItems = [
-  { href: "#1-controller", label: "1. Who We Are" },
-  { href: "#2-scope", label: "2. Scope & Dual Roles" },
-  { href: "#3-worker-data", label: "3. Worker Data (RA 10173)" },
-  { href: "#4-employer-data", label: "4. Employer Data" },
-  { href: "#5-purposes", label: "5. Purposes & Legal Bases" },
-  { href: "#6-sharing", label: "6. Sharing & PIC Obligations" },
-  { href: "#7-payment-data", label: "7. Payment Data & Cross-Border" },
-  { href: "#8-cross-border", label: "8. Cross-Border Transfers" },
-  { href: "#9-retention", label: "9. Retention & Security" },
-  { href: "#10-breach", label: "10. Breach Notification (NPC 2026-02)" },
-  { href: "#11-rights", label: "11. Your Rights" },
-  { href: "#12-cookies", label: "12. Cookies" },
-  { href: "#13-children", label: "13. Children" },
-  { href: "#14-changes", label: "14. Changes" },
-  { href: "#15-contact", label: "15. Contact" },
+  { href: "#1-who-we-are", label: "1. Who We Are" },
+  { href: "#2-what-we-collect", label: "2. What We Collect" },
+  { href: "#3-how-we-use-it", label: "3. How We Use It" },
+  { href: "#4-sharing", label: "4. Who We Share It With" },
+  { href: "#5-security", label: "5. Data Security" },
+  { href: "#6-retention", label: "6. How Long We Keep It" },
+  { href: "#7-your-rights", label: "7. Your Rights" },
+  { href: "#8-cookies", label: "8. Cookies" },
+  { href: "#9-changes", label: "9. Changes to This Policy" },
+  { href: "#10-contact", label: "10. Contact Us" },
 ];
 
-function CheckItem({ label, children }: { label?: string; children: React.ReactNode }) {
-  return (
-    <li className="flex items-start gap-3 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-        <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
-      </span>
-      <span>
-        {label ? <strong className="font-semibold text-slate-800">{label} </strong> : null}
-        {children}
-      </span>
-    </li>
-  );
-}
-
-function RolePanel({
+function Section({
   id,
-  icon: Icon,
   title,
   children,
 }: {
   id: string;
-  icon: typeof User;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <div
-      id={id}
-      className="scroll-mt-28 rounded-xl border border-slate-100 bg-slate-50 p-5 sm:p-6"
-    >
-      <h3 className="mb-3 flex items-center gap-2.5 font-bold text-slate-900">
-        <Icon className="h-4 w-4 shrink-0 text-[#22c55e]" aria-hidden />
-        {title}
-      </h3>
-      {children}
-    </div>
+    <section id={id} className="scroll-mt-24 space-y-4">
+      <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{title}</h2>
+      <div className="space-y-3 text-[15px] leading-relaxed text-slate-600 sm:text-base">
+        {children}
+      </div>
+    </section>
   );
 }
 
-export function PrivacyPolicyContent({
-  hideSidebar = false,
-  isModal = false,
-}: {
-  hideSidebar?: boolean;
-  isModal?: boolean;
-}) {
-  const articleContent = (
-    <article
-      className={`rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 ${
-        isModal ? "md:p-10" : "lg:p-10"
-      } ${hideSidebar ? "" : isModal ? "order-1 md:order-2" : "order-1 lg:order-2"}`}
-    >
-      <div className="mb-10 rounded-xl border border-slate-100 bg-slate-50 p-5 sm:p-6">
-        <h2 className="mb-3 flex items-center gap-2 font-bold text-[#22c55e]">
-          <Shield className="h-4 w-4 shrink-0" aria-hidden />
-          Summary
-        </h2>
-        <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-          Replaceme protects personal data under the Philippine Data Privacy Act of 2012 (Republic
-          Act No. 10173) and its IRR, NPC circulars and advisories, and—where applicable—the EU/UK
-          GDPR and California CCPA/CPRA for international visitors and Employers. This Policy
-          explains what we collect from Workers and Employers, how we use it, how Stripe handles
-          payment credentials (PCI), when data leaves your home country, when Employers become
-          separate controllers of Worker data, and how we notify breaches within NPC timelines.
-        </p>
-      </div>
+function Bullet({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2.5">
+      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
+      <span>{children}</span>
+    </li>
+  );
+}
 
-      <LegalSectionHeading id="1-controller" number={1} title="Who We Are (Personal Information Controller)" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        For Platform account administration, verification, billing orchestration, security, and
-        marketplace operations, Replaceme acts as a Personal Information Controller (PIC) under RA
-        10173 (and as a controller under GDPR where that law applies). Where Employers unlock,
-        message, or otherwise process Worker profile data for their own hiring purposes, those
-        Employers act as{" "}
-        <strong className="font-semibold text-slate-800">separate Personal Information Controllers</strong>{" "}
-        (and GDPR controllers) for that processing; Replaceme may act as a Personal Information
-        Processor (PIP) only to the extent we process such data solely on documented Employer
-        instructions under the{" "}
-        <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
-          Employer Data Processing Addendum
-        </Link>
-        . Our website is{" "}
-        <Link href="https://replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-          https://replaceme.ph
-        </Link>
-        . Privacy inquiries:{" "}
-        <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-          support@replaceme.ph
-        </a>
-        . Commercial (marketing) emails include a working unsubscribe link; when a registered
-        physical postal address is configured for the business, that address also appears in the
-        email footer (CAN-SPAM). Product notices inside your signed-in dashboard are service
-        communications and may be dismissed in-product.
+export function PrivacyPolicyContent() {
+  return (
+    <div className="mx-auto max-w-3xl space-y-10 rounded-2xl border border-slate-200 bg-white px-6 py-8 shadow-xs sm:px-10 sm:py-12">
+      {/* Last updated */}
+      <p className="inline-block rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">
+        Last updated: July 2026
       </p>
 
-      <LegalSectionHeading id="2-scope" number={2} title="Scope & Dual-Sided Marketplace" />
-      <p className="mb-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        This Policy covers Workers (Filipino citizens offering services through the Platform; platform
-        work and identity verification are strictly restricted to citizens of the Philippines) and Employers
-        (local or global companies hiring through Replaceme). It applies to website visitors,
-        applicants, and account holders. Separately negotiated contracts (for example, enterprise
-        DPAs) may supplement this Policy.
+      {/* Intro */}
+      <p className="text-[15px] leading-relaxed text-slate-600 sm:text-base">
+        At Replace Me (<strong>replaceme.app</strong>), we take your privacy seriously. This policy explains what personal
+        information we collect, why we collect it, and how we protect it. We follow the{" "}
+        <strong>Philippines Data Privacy Act of 2012 (RA 10173)</strong> and aim to be as transparent as possible.
       </p>
 
-      <LegalSectionHeading
-        id="3-worker-data"
-        number={3}
-        title="Worker Personal Data (Philippines — RA 10173)"
-      />
-      <RolePanel id="worker-data-detail" icon={User} title="What we collect from Workers">
-        <ul className="space-y-3">
-          <CheckItem label="Account & identity:">
-            name, email, phone, username, password hashes, and government ID images/numbers submitted
-            for RA 11967 listing verification (e.g., PhilID, Passport, Driver&apos;s License).
-          </CheckItem>
-          <CheckItem label="Sensitive Personal Information (SPI):">
-            government-issued ID numbers and document images submitted for
-            verification, birth date (for age eligibility), and optional gender or civil
-            status if you choose to provide them. We do{" "}
-            <strong className="font-semibold text-slate-800">not</strong> collect SSS,
-            PhilHealth, Pag-IBIG numbers, or emergency contacts. We process SPI only with
-            appropriate legal basis (including explicit consent at ID verification),
-            heightened safeguards, and limited access. Government ID images and verification
-            selfies are stored in encrypted private storage; administrator access is
-            least-privilege and logged for audit.
-          </CheckItem>
-          <CheckItem label="Location:">
-            region, province, and city for matching. Street-level address is optional and
-            not required to use the Platform.
-          </CheckItem>
-          <CheckItem label="Professional profile:">
-            resume/CV, skills, work history, education, portfolio links, preferred rates,
-            availability, and application materials.
-          </CheckItem>
-          <CheckItem label="Tax / regulatory:">
-            TIN and BIR registration evidence when required under BIR RR 15-2024 for listed online
-            service providers.
-          </CheckItem>
-          <CheckItem label="Usage & device:">
-            IP address, device/browser data, logs, and approximate location derived from IP for
-            security and fraud prevention.
-          </CheckItem>
-          <CheckItem label="Messaging safety signals:">
-            Messages you send on the Platform may be automatically scanned for fraud, harassment,
-            and Terms violations. Human administrators review message content only when a system
-            flag, user report, legal process, or active investigation creates justified cause;
-            reviews are audit-logged under least-privilege access (RA 10173 / GDPR).
-          </CheckItem>
-        </ul>
-      </RolePanel>
-
-      <LegalSectionHeading id="4-employer-data" number={4} title="Employer Business & Billing Data" />
-      <RolePanel id="employer-data-detail" icon={Briefcase} title="What we collect from Employers">
-        <ul className="space-y-3">
-          <CheckItem label="Company profile:">
-            legal/trade name, industry, company size, website, logo, and job post content.
-          </CheckItem>
-          <CheckItem label="Representatives:">
-            name, work email, phone, role/title, country, and authentication data for hiring
-            managers and billing contacts. We do{" "}
-            <strong className="font-semibold text-slate-800">not</strong> collect employer date of
-            birth, gender, civil status, personal home address, TIN, EIN, or other statutory tax
-            identification numbers as part of employer account profiles.
-          </CheckItem>
-          <CheckItem label="Financial / billing:">
-            subscription tier, invoices, payment status, and billing contact details. Full payment
-            card numbers, expiration dates, and CVV/CVC codes are{" "}
-            <strong className="font-semibold text-slate-800">not</strong> collected or stored on
-            Replaceme servers; they are transmitted directly to and vaulted by{" "}
-            <strong className="font-semibold text-slate-800">Stripe</strong>. See Section 7.
-          </CheckItem>
-          <CheckItem label="Hiring activity:">
-            jobs posted, candidates viewed/unlocked, messages, interview notes you enter, and
-            plan-usage metrics.
-          </CheckItem>
-          <CheckItem label="Job post moderation:">
-            Trust &amp; Safety review outcomes for your listings (approve, reject, or soft-delete),
-            reason category, optional moderator explanation, related timestamps (including
-            rejection and soft-delete times), deletion reason where recorded, and the admin actor
-            for audit—used to enforce marketplace and labor-compliance rules, keep rejected or
-            soft-deleted posts off Worker boards, notify you of rejection decisions, and retain a
-            limited audit trail as described in Section 9.
-          </CheckItem>
-          <CheckItem label="User-to-user safety reports:">
-            When you report another user (or are reported), we process the report title,
-            description, violation category, optional job reference, optional conversation
-            reference, and evidence. Reporter identity
-            is treated as confidential personal information under RA 10173 and GDPR principles and
-            is accessible only to authorized Trust &amp; Safety administrators—not disclosed to the
-            reported party except by court order or your explicit consent. We may send the reported
-            party a warning, suspension notice, or other enforcement message that does not name the
-            reporter.
-          </CheckItem>
-          <CheckItem label="Messaging safety signals:">
-            Platform messages may be automatically scanned for fraud, harassment, and Terms
-            violations (such as sharing contact details or soliciting off-platform payment). Human
-            administrators review message transcripts only when a system flag, user report, legal
-            process, or active investigation creates justified cause, and each such review is
-            audit-logged.
-          </CheckItem>
-        </ul>
-      </RolePanel>
-
-      <LegalSectionHeading id="5-purposes" number={5} title="Purposes & Legal Bases" />
-      <ul className="mb-4 space-y-3">
-        <CheckItem label="Contract / service delivery:">
-          create accounts, match Workers and Employers, enable messaging, and administer
-          subscriptions.
-        </CheckItem>
-        <CheckItem label="Legal obligation:">
-          identity listing rules under RA 11967; tax-platform duties under BIR RR 15-2024; respond to
-          lawful orders; NPC breach reporting.
-        </CheckItem>
-        <CheckItem label="Consent:">
-          optional analytics/marketing cookies (see Cookie Policy); certain marketing emails (with
-          unsubscribe).
-        </CheckItem>
-        <CheckItem label="Legitimate interests (balanced):">
-          security, fraud prevention, product improvement using aggregated metrics, and enforcing
-          Terms—including job post moderation, automated messaging safety signals, and employer
-          notices—where consent is not required and rights are not overridden.
-        </CheckItem>
-      </ul>
-
-      <LegalSectionHeading
-        id="6-sharing"
-        number={6}
-        title="Data Sharing & Employer Responsibility (Critical)"
-      />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>We do not sell personal data. We share data only as needed to operate the marketplace:</p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
-            <strong className="font-semibold text-slate-800">With Employers:</strong> anonymous
-            previews on Discovery; full name, contact details, resume, and profile fields when an
-            Employer&apos;s plan unlocks or a Worker applies / consents to share;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Processors:</strong> hosting (e.g.,
-            cloud infrastructure), email delivery, customer support tools, analytics (only with
-            consent), and Stripe for payments. A current list of subprocessors is published at{" "}
-            <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
-              /subprocessors
-            </Link>
-            ;
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Authorities:</strong> when required by
-            law, regulation, or valid legal process (DTI, NPC, BIR, courts, law enforcement).
-          </li>
-        </ul>
-        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-5 sm:p-6">
-          <p className="font-semibold text-slate-900">When an Employer unlocks Worker data</p>
-          <p className="mt-2">
-            Once an Employer unlocks or otherwise receives a Worker&apos;s full profile—including
-            contact details, resume, and government or tax identifiers if shared—the Employer
-            becomes a <strong className="font-semibold text-slate-800">separate Personal Information Controller (PIC)</strong>{" "}
-            and/or Processor under RA 10173 (and a controller/processor under GDPR/CCPA where those
-            laws apply) for that data. The Employer must:
-          </p>
-          <ul className="mt-3 list-disc space-y-2 pl-5">
-            <li>Use the data only for legitimate hiring related to the opportunity;</li>
-            <li>
-              Implement appropriate organizational and technical security measures;
-            </li>
-            <li>
-              Honor data-subject rights requests directed to them regarding data they control; and
-            </li>
-            <li>
-              Not resell, scrape, or use Worker contact information for unrelated marketing or
-              unlawful surveillance.
-            </li>
-          </ul>
-          <p className="mt-3">
-            Replaceme remains PIC for Platform-held copies but is not responsible for an
-            Employer&apos;s independent misuse after unlock, except to the extent required by law or
-            our ability to suspend abusing accounts.
-          </p>
-        </div>
-      </div>
-
-      <LegalSectionHeading
-        id="7-payment-data"
-        number={7}
-        title="Payment Information, Data Sharing, and Cross-Border Transfers"
-      />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <h3
-          id="71-pci"
-          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
-        >
-          7.1 PCI-DSS Compliance &amp; Card Data Storage
-        </h3>
-        <p>
-          Replaceme{" "}
-          <strong className="font-semibold text-slate-800">
-            does not collect, process, or store full credit or debit card numbers, card expiration
-            dates, or CVV/CVC security codes on our servers
-          </strong>
-          . All sensitive payment credentials are entered by you directly into Stripe-hosted Checkout
-          or Elements interfaces and are transmitted to and vaulted by Stripe under Stripe&apos;s PCI
-          DSS–compliant infrastructure. Replaceme may receive limited payment metadata only (for
-          example, Stripe customer ID, payment method brand/last four digits, invoice status,
-          subscription status, and dispute status) necessary to provision entitlements, display
-          billing history, and prevent fraud.
-        </p>
-
-        <h3
-          id="72-sharing-stripe"
-          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
-        >
-          7.2 Data Sharing with Stripe &amp; Cross-Border Transfers
-        </h3>
-        <p>
-          To facilitate payments, prevent fraud, manage subscriptions, issue invoices, and handle
-          chargebacks, we share necessary personal and business data with Stripe—including name,
-          email address, billing address, company details, tax identifiers where provided, and
-          transaction history. The primary lawful basis for this sharing under the Philippine Data
-          Privacy Act of 2012 (RA 10173) and, where applicable, the GDPR is{" "}
-          <strong className="font-semibold text-slate-800">contractual necessity</strong> (performance
-          of the subscription contract and related payment obligations). Additional bases may include
-          legal obligation (tax, AML, and dispute-handling rules) and legitimate interests in
-          securing the Platform against fraud, balanced against your rights.
-        </p>
-        <p>
-          Because Replaceme serves international Employers worldwide, payment-related and account
-          data may be{" "}
-          <strong className="font-semibold text-slate-800">
-            transferred to and processed on servers located outside your home country
-          </strong>
-          —including in the United States, the European Union / European Economic Area, the United
-          Kingdom, Singapore, and other regions where Stripe or its sub-processors operate—under the
-          same contractual-necessity basis and subject to the safeguards below.
-        </p>
-
-        <h3
-          id="73-global-privacy"
-          className="scroll-mt-28 text-base font-bold text-slate-900 sm:text-lg"
-        >
-          7.3 Global Privacy Compliance (RA 10173, GDPR, CCPA)
-        </h3>
-        <p>
-          This payment data sharing complies with the Philippine Data Privacy Act of 2012 (RA 10173)
-          and its IRR. Stripe acts as a legitimate third-party Personal Information Processor (and,
-          under GDPR terminology, a data processor) bound by Stripe&apos;s{" "}
-          <a
-            href="https://stripe.com/legal/dpa"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            Data Processing Agreement
-          </a>
-          , which incorporates the{" "}
-          <a
-            href="https://stripe.com/legal/dta"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            Data Transfers Addendum
-          </a>
-          . Cross-border transfers to Stripe, LLC in the United States rely on internationally
-          recognized transfer mechanisms, including the EU-U.S. Data Privacy Framework where
-          available and the European Commission&apos;s Standard Contractual Clauses (SCCs), together
-          with the UK International Data Transfer Addendum where UK GDPR applies.
-        </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
-            <strong className="font-semibold text-slate-800">GDPR:</strong> Where we process personal
-            data of individuals in the EEA/UK, payment processing by Stripe is conducted under
-            Article 28 processor terms and Article 46 transfer safeguards (SCCs / DPF) as described
-            in Stripe&apos;s DPA.
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">CCPA/CPRA:</strong> Stripe certifies, in
-            its processor capacity, that it does not sell or share personal information as those
-            terms are defined under California law except as permitted to provide the payment
-            services. Replaceme does not sell Employer or Worker personal information.
-          </li>
-          <li>
-            <strong className="font-semibold text-slate-800">Your choices:</strong> You may update
-            billing contacts and payment methods via the Stripe Customer Portal. Card-detail
-            corrections and deletion of vaulted PAN data are handled by Stripe as the card vault
-            operator; contact us at{" "}
-            <a
-              href="mailto:support@replaceme.ph"
-              className="font-semibold text-[#006e2f] hover:underline"
-            >
-              support@replaceme.ph
-            </a>{" "}
-            and we will coordinate deletion or restriction requests consistent with retention needed
-            for invoices, tax, and dispute defense.
-          </li>
-        </ul>
-      </div>
-
-      <LegalSectionHeading id="8-cross-border" number={8} title="Cross-Border & B2B Transfers" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        Apart from payment processing described in Section 7, Worker data may be accessed by
-        Employers and service providers outside the Philippines, including in the United States,
-        EU/EEA, UK, Singapore, and other regions. We implement appropriate safeguards consistent with
-        RA 10173 / NPC rules and, for GDPR-covered transfers, mechanisms such as Standard Contractual
-        Clauses or adequacy decisions where available. US Employers handling California residents&apos;
-        data must also meet CCPA/CPRA business obligations. Employers receiving Filipino Worker data
-        must ensure their own cross-border compliance programs.
-      </p>
-
-      <LegalSectionHeading id="9-retention" number={9} title="Retention & Security" />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>
-          We retain personal data only as long as needed for the purposes described in this Policy
-          and to meet legal, tax, dispute, and security obligations. Documented periods include:
-        </p>
-        <ul className="list-disc space-y-2 pl-5">
-          {DATA_RETENTION_PERIODS.map((item) => (
-            <li key={item.category}>
-              <strong className="font-semibold text-slate-800">{item.category}:</strong>{" "}
-              {item.period}
+      {/* TOC */}
+      <nav aria-label="Table of contents" className="rounded-xl border border-slate-100 bg-slate-50 p-5">
+        <p className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-500">On this page</p>
+        <ol className="space-y-1.5">
+          {tocItems.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                className="text-sm font-medium text-emerald-700 hover:underline"
+              >
+                {item.label}
+              </a>
             </li>
           ))}
+        </ol>
+      </nav>
+
+      {/* Sections */}
+      <Section id="1-who-we-are" title="1. Who We Are">
+        <p>
+          Replace Me is an online hiring platform that connects employers with remote workers,
+          primarily in the Philippines. We are the data controller for all personal information
+          collected through this website.
+        </p>
+        <p>
+          Our registered contact for privacy matters is:{" "}
+          <a href="mailto:support@replaceme.ph" className="font-semibold text-emerald-700 hover:underline">
+          support@replaceme.ph
+          </a>
+        </p>
+      </Section>
+
+      <Section id="2-what-we-collect" title="2. What We Collect">
+        <p>We collect information you provide directly and information generated as you use the platform.</p>
+
+        <p className="font-semibold text-slate-800">Information you give us:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>Name, email address, and password when you create an account</Bullet>
+          <Bullet>Professional details: job title, skills, work experience, and bio (workers)</Bullet>
+          <Bullet>Company name, industry, size, and website (employers)</Bullet>
+          <Bullet>Profile photos or company logos you upload</Bullet>
+          <Bullet>Messages and communications sent through the platform</Bullet>
+          <Bullet>Payment billing details (processed securely by Stripe — we do not store card numbers)</Bullet>
+        </ul>
+
+        <p className="font-semibold text-slate-800">Information collected automatically:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>Device type, browser, and operating system</Bullet>
+          <Bullet>Pages visited and features used</Bullet>
+          <Bullet>IP address and general location (country/city level)</Bullet>
+          <Bullet>Cookies and similar tracking technologies (see Section 8)</Bullet>
+        </ul>
+      </Section>
+
+      <Section id="3-how-we-use-it" title="3. How We Use It">
+        <p>We use your information to:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>Create and manage your account</Bullet>
+          <Bullet>Match workers with relevant job postings</Bullet>
+          <Bullet>Enable employers and workers to communicate</Bullet>
+          <Bullet>Process subscription payments and credits</Bullet>
+          <Bullet>Send you important notifications about your account or applications</Bullet>
+          <Bullet>Improve the platform, fix bugs, and develop new features</Bullet>
+          <Bullet>Comply with legal obligations under Philippine law</Bullet>
         </ul>
         <p>
-          <strong className="font-semibold text-slate-800">Account closure lifecycle.</strong>{" "}
-          Suspension restricts login and marketplace activity but does{" "}
-          <strong className="font-semibold text-slate-800">not</strong> erase your data. When an
-          account is closed (self-service deletion request or admin soft-delete), we keep a recovery
-          window of {ACCOUNT_LIFECYCLE_TIMELINES.deletionGraceCalendarDays} calendar days, then
-          anonymize or erase Platform-held personal data that is no longer needed. Billing ledger and
-          invoice records may be retained for up to{" "}
-          {ACCOUNT_LIFECYCLE_TIMELINES.billingRetainYears} years where tax or accounting law
-          requires. After closure, you may email{" "}
-          <a
-            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            {DELETION_REQUEST_SUPPORT_EMAIL}
-          </a>{" "}
-          to appeal the decision or exercise access rights to retained records under RA 10173 and
-          applicable privacy laws (including GDPR where it applies). When backups are restored, we
-          re-apply erasure so closed accounts do not reappear with identifiable data.
+          We will not use your information for purposes incompatible with what is described here without
+          obtaining your explicit consent first.
         </p>
-        <p>
-          <strong className="font-semibold text-slate-800">
-            Identity verification (KYC) security.
-          </strong>{" "}
-          Government ID images and verification selfies are stored in a private, encrypted
-          object store and transmitted only over HTTPS. Super administrators and Moderators
-          with the Identity module grant may view these documents solely to complete identity
-          verification under least-privilege access; each view and each approve/reject decision
-          is recorded in an access audit log. After the
-          verification purpose is fulfilled, ID images and related verification metadata are
-          deleted or anonymized within{" "}
-          {ACCOUNT_LIFECYCLE_TIMELINES.kycImageDaysAfterPurpose} days unless a legal hold,
-          dispute, or fraud investigation requires longer retention.
-        </p>
-        <p>
-          <strong className="font-semibold text-slate-800">
-            Staff roles &amp; access control.
-          </strong>{" "}
-          Replaceme operates an internal admin portal with two tiers:{" "}
-          <strong className="font-semibold text-slate-800">Super administrators</strong>{" "}
-          (who manage the admin team, email broadcasts, and full module access) and{" "}
-          <strong className="font-semibold text-slate-800">Moderators</strong>{" "}
-          (who receive module capabilities—such as Trust &amp; Safety queues, Users, or Billing—granted
-          by a Super administrator). Access is MFA-gated (staff must enroll a TOTP
-          authenticator in the admin Security Center before using the portal, and complete
-          a challenge on elevated sessions), capability-scoped on a need-to-know basis
-          (dashboards, notifications, and audit evidence are limited to granted modules;
-          Super administrators retain unscoped visibility), and audit-logged,
-          consistent with RA 10173 / NPC Circular No. 2023-06 least-privilege and access-control
-          requirements and GDPR accountability principles. Privileged staff actions and sensitive-data
-          access (including identity-document views) are written to an append-only audit log with
-          actor identity, timestamp, target, and source context; authorized administrators with the
-          Audit Log capability may filter and export CSV evidence for compliance reviews within their
-          granted modules (Super administrators may review the full log). Staff work
-          email, optional internal
-          profile photo, department, timezone, short bio, MFA metadata, and action audit logs are
-          processed as employment/contractor operational data and retained with security/audit
-          logs (see retention table). By default staff photos and bios are for admin-team identity
-          only. Staff may opt in to appear on the public{" "}
-          <strong className="font-semibold text-slate-800">/team</strong> directory with name,
-          photo, department, timezone, and bio only — email and phone are never published there.
-          Each signed-in administrator may update their own password in the portal or request an
-          email reset link; Super administrators may send password-reset emails to other team
-          members.
-        </p>
-        <p>
-          <strong className="font-semibold text-slate-800">
-            Job applications &amp; Trust &amp; Safety access.
-          </strong>{" "}
-          Cover letters, resumes, and application stage history are processed to run the hiring
-          marketplace. Unsuccessful or withdrawn applications are deleted or anonymized{" "}
-          {APPLICATION_RETENTION_MONTHS_AFTER_JOB_CLOSE} months after the related job closes (or after
-          a terminal decision if the job remains open), aligned with RA 10173 storage-limitation
-          principles and common GDPR recruitment practice, unless a legal hold, dispute, or fraud
-          investigation requires longer retention. Hired application packets may be retained with
-          employment or contract records under applicable employment and tax rules. Authorized
-          administrators (Super administrators or Moderators with the relevant module grant) may
-          access application contents, job post moderation records,
-          confidential user-to-user abuse reports and Case Center records (including optional
-          disputed-amount notes and non-binding resolution outcomes—not escrow balances), and{" "}
-          <strong className="font-semibold text-slate-800">
-            messaging threads only when justified
-          </strong>{" "}
-          (system safety flags, user reports, legal process, or an active investigation)—for Trust
-          &amp; Safety, fraud prevention, abuse investigation, legal compliance, and support—under
-          least-privilege access controls with audit logging. Messages may be{" "}
-          <strong className="font-semibold text-slate-800">automatically analyzed</strong> for
-          safety and fraud signals (for example contact-information sharing or payment-circumvention
-          indicators); human moderators review message content only after such a flag, report, or
-          legal basis arises.           Job post moderation
-          decisions (including reason category, optional explanation, and soft-delete metadata) are
-          retained as listed in the retention table above. Soft-deleted job posts are excluded from
-          public Worker boards and Employer live listings but may remain visible to authorized
-          administrators for audit and restore during that retention window. Administrator in-app
-          notifications about Identity reviews, Moderation queues, Billing, and System events are
-          retained for up to{" "}
-          {ACCOUNT_LIFECYCLE_TIMELINES.auditLogMonths} months as a secondary operational alert
-          trail; dismissing or archiving a notification only hides it from that administrator&apos;s
-          inbox and does not delete the underlying record. You may exercise privacy rights as
-          described in Section 11.
-        </p>
-        <p>
-          <strong className="font-semibold text-slate-800">
-            NPC Advisory No. 2026-01 (public directories).
-          </strong>{" "}
-          Public profile and company-directory fields may be collected by third parties through
-          scraping or similar means once published. You may object to certain public displays via
-          account settings or by contacting{" "}
-          <a
-            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            {DELETION_REQUEST_SUPPORT_EMAIL}
-          </a>
-          .
-        </p>
-        <p>
-        We use encryption in transit and at rest for identity documents, access controls, logging of
-        administrator views and decisions on government ID images, and vendor diligence. No method of
-        transmission or storage is 100% secure. Workers and Employers may submit a deletion request
-        from account settings or by emailing{" "}
-          <a
-            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            {DELETION_REQUEST_SUPPORT_EMAIL}
-          </a>
-          .
-        </p>
-      </div>
+      </Section>
 
-      <LegalSectionHeading
-        id="10-breach"
-        number={10}
-        title="Personal Data Breach Notification (NPC Advisory 2026-02)"
-      />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
+      <Section id="4-sharing" title="4. Who We Share It With">
+        <p>We do not sell your personal data. We share information only in these circumstances:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>
+            <strong>Between users:</strong> Employers see worker profiles when you apply or your profile matches their search.
+            Workers see employer company profiles and job details.
+          </Bullet>
+          <Bullet>
+            <strong>Service providers:</strong> We use trusted third-party services to operate the platform,
+            including Supabase (database), Stripe (payments), Resend (email), and Vercel (hosting).
+            These providers only process data as needed to provide their services.
+          </Bullet>
+          <Bullet>
+            <strong>Legal requirements:</strong> We may disclose information when required by law,
+            court order, or to protect the rights and safety of our users.
+          </Bullet>
+          <Bullet>
+            <strong>Safety reports:</strong> Workers may confidentially report employers or jobs.
+            Employers use platform issue reporting or support email for product problems — not
+            worker-report tools.
+          </Bullet>
+          <Bullet>
+            <strong>Business transfers:</strong> If Replace Me is acquired or merges with another company,
+            your information may be transferred as part of that transaction. You will be notified in advance.
+          </Bullet>
+        </ul>
+      </Section>
+
+      <Section id="5-security" title="5. Data Security">
         <p>
-          Replaceme maintains a personal data breach management process aligned with{" "}
-          <strong className="font-semibold text-slate-800">NPC Circular No. 16-03</strong> and{" "}
-          <strong className="font-semibold text-slate-800">NPC Advisory No. 2026-02</strong>. Where
-          a personal data breach is notifiable:
+          We protect your data using industry-standard security measures, including encryption in transit
+          (TLS/HTTPS), encrypted storage, strict access controls, and regular security audits.
         </p>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>
-            We will notify the National Privacy Commission within{" "}
-            <strong className="font-semibold text-slate-800">seventy-two (72) hours</strong> of
-            knowledge or reasonable belief that a personal data breach has occurred, based on
-            available information;
-          </li>
-          <li>
-            We will submit the{" "}
-            <strong className="font-semibold text-slate-800">full breach report within five (5) days</strong>{" "}
-            of discovery, in strict adherence to NPC Circular 16-03 as clarified by NPC Advisory
-            2026-02—filing postponement, exemption, or alternative-notification requests through the
-            DBNMS does <strong className="font-semibold text-slate-800">not</strong> suspend this
-            five-day full-report deadline unless the NPC expressly grants additional time in writing;
-            and
-          </li>
-          <li>
-            We will notify affected data subjects within the prescribed periods when required,
-            providing information needed to mitigate harm.
-          </li>
+        <p>
+          While we take every reasonable precaution, no system is 100% secure. If a security breach
+          affects your data, we will notify you in accordance with our obligations under RA 10173 and
+          the NPC Circular 2022-01.
+        </p>
+      </Section>
+
+      <Section id="6-retention" title="6. How Long We Keep It">
+        <p>We keep your personal data for as long as your account is active or as needed to provide our services.</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>Active account data is retained for the duration of your account</Bullet>
+          <Bullet>If you delete your account, we remove your personal data within 30 days</Bullet>
+          <Bullet>Certain records may be retained longer for legal, tax, or compliance purposes</Bullet>
+          <Bullet>Anonymised or aggregated data may be kept indefinitely for platform analytics</Bullet>
+        </ul>
+      </Section>
+
+      <Section id="7-your-rights" title="7. Your Rights">
+        <p>Under the Philippine Data Privacy Act, you have the right to:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet><strong>Access</strong> the personal data we hold about you</Bullet>
+          <Bullet><strong>Correct</strong> inaccurate or incomplete data</Bullet>
+          <Bullet><strong>Delete</strong> your account and personal data</Bullet>
+          <Bullet><strong>Object</strong> to how we process your data in certain circumstances</Bullet>
+          <Bullet><strong>Data portability</strong> — receive a copy of your data in a readable format</Bullet>
+          <Bullet><strong>Withdraw consent</strong> at any time where we rely on consent to process your data</Bullet>
         </ul>
         <p>
-          If you believe your account or data has been compromised, contact{" "}
-          <a href="mailto:support@replaceme.ph" className="font-semibold text-[#006e2f] hover:underline">
-            support@replaceme.ph
-          </a>{" "}
-          immediately.
-        </p>
-      </div>
-
-      <LegalSectionHeading id="11-rights" number={11} title="Rights of the Data Subject" />
-      <div className="space-y-4 text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        <p>
-          Under <strong className="font-semibold text-slate-800">RA 10173</strong>, you have the
-          rights to be informed, to object, to access, to correct (rectification), to erasure or
-          blocking, to data portability (where applicable), to file a complaint with the NPC, and to
-          damages for violations of your rights. EU/UK GDPR rights (access, rectification, erasure,
-          restriction, objection, portability, withdraw consent) and CCPA/CPRA rights (know, delete,
-          correct, opt-out of sale/share, non-discrimination) apply to eligible individuals.
-        </p>
-        <p>
-          To exercise rights against Replaceme as PIC, use the{" "}
-          <strong className="font-semibold text-slate-800">Request data deletion</strong> form in
-          your account settings, or email{" "}
-          <a
-            href={`mailto:${DELETION_REQUEST_SUPPORT_EMAIL}`}
-            className="font-semibold text-[#006e2f] hover:underline"
-          >
-            {DELETION_REQUEST_SUPPORT_EMAIL}
+          To exercise any of these rights, email us at{" "}
+          <a href="mailto:support@replaceme.ph" className="font-semibold text-emerald-700 hover:underline">
+          support@replaceme.ph
           </a>
-          . {DELETION_REQUEST_SLA} We may need to verify your identity. For{" "}
-          <strong className="font-semibold text-slate-800">data portability</strong> in this version
-          of the Platform, email support to request a structured export of account data we hold as
-          PIC. Account suspension or moderation appeals: {APPEAL_SLA_COPY} Processors we use are
-          listed at{" "}
-          <Link href="/subprocessors" className="font-semibold text-[#006e2f] hover:underline">
-            /subprocessors
-          </Link>
-          . Requests relating to data controlled solely by an Employer after unlock should be
-          directed primarily to that Employer; we will assist where feasible. See also our{" "}
-          <Link href="/employer-dpa" className="font-semibold text-[#006e2f] hover:underline">
-            Employer Data Processing Agreement
-          </Link>
+          . We will respond within 30 days.
+        </p>
+        <p>
+          If you want to delete your account, you can also contact our support team at{" "}
+          <a href="mailto:support@replaceme.ph" className="font-semibold text-emerald-700 hover:underline">
+            support@replaceme.ph
+          </a>
           .
         </p>
-      </div>
+      </Section>
 
-      <LegalSectionHeading id="12-cookies" number={12} title="Cookies & Similar Technologies" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        We use strictly necessary cookies to operate the Platform. Analytics and marketing cookies
-        require prior opt-in consent consistent with NPC Circular No. 2023-04 (Guidelines on Consent)
-        and GDPR. Details are in our{" "}
-        <Link href="/cookie-policy" className="font-semibold text-[#006e2f] hover:underline">
-          Cookie Policy
-        </Link>
-        .
-      </p>
-
-      <LegalSectionHeading id="13-children" number={13} title="Children" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        The Platform is not directed to individuals under 18. We do not knowingly collect personal
-        data from children. If you believe a minor has provided data, contact us for deletion.
-      </p>
-
-      <LegalSectionHeading id="14-changes" number={14} title="Changes to This Policy" />
-      <p className="text-base leading-relaxed text-slate-600 sm:text-[17px]">
-        We may update this Policy to reflect legal or operational changes (including NPC advisories
-        and international privacy laws). We will revise the &quot;Last Updated&quot; date and provide
-        additional notice when changes are material.
-      </p>
-
-      <LegalSectionHeading id="15-contact" number={15} title="Contact" />
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-5 py-4 text-center text-base leading-relaxed text-slate-700 sm:px-6 sm:py-5 sm:text-[17px]">
+      <Section id="8-cookies" title="8. Cookies">
         <p>
-          For privacy requests and general support:{" "}
-          <a
-            href="mailto:support@replaceme.ph"
-            className="font-semibold text-[#22c55e] underline underline-offset-2 hover:text-[#16a34a]"
-          >
+          We use cookies to keep you logged in, remember your preferences, and understand how people use
+          the platform. See our{" "}
+          <Link href="/cookie-policy" className="font-semibold text-emerald-700 hover:underline">
+            Cookie Policy
+          </Link>{" "}
+          for full details and how to manage your preferences.
+        </p>
+      </Section>
+
+      <Section id="9-changes" title="9. Changes to This Policy">
+        <p>
+          We may update this policy from time to time. When we do, we will update the date at the top
+          of this page and, for significant changes, notify you via email or an in-app notice.
+        </p>
+        <p>
+          Your continued use of Replace Me after changes are posted means you accept the updated policy.
+        </p>
+      </Section>
+
+      <Section id="10-contact" title="10. Contact Us">
+        <p>Have a question about this policy or your data? Reach out:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>
+            <strong>Privacy matters:</strong>{" "}
+            <a href="mailto:support@replaceme.ph" className="font-semibold text-emerald-700 hover:underline">
             support@replaceme.ph
-          </a>
+            </a>
+          </Bullet>
+          <Bullet>
+            <strong>General support:</strong>{" "}
+            <a href="mailto:support@replaceme.ph" className="font-semibold text-emerald-700 hover:underline">
+              support@replaceme.ph
+            </a>
+          </Bullet>
+        </ul>
+        <p>
+          You also have the right to lodge a complaint with the Philippine{" "}
+          <strong>National Privacy Commission (NPC)</strong> if you believe your rights have been violated.
         </p>
-        <p className="mt-2 text-sm text-slate-500">
-          You may also lodge a complaint with the National Privacy Commission (privacy.gov.ph) or
-          your local supervisory authority.
-        </p>
-      </div>
-    </article>
-  );
-
-  if (hideSidebar) {
-    return articleContent;
-  }
-
-  const gridClasses = isModal
-    ? "grid grid-cols-1 items-start gap-6 md:grid-cols-[240px_minmax(0,1fr)] md:gap-8"
-    : "grid grid-cols-1 items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10";
-
-  const asideClasses = isModal
-    ? "order-2 self-start md:sticky md:top-4 md:order-1 w-full"
-    : "order-2 self-start lg:sticky lg:top-28 lg:order-1";
-
-  const listMaxHeightClass = isModal ? "max-h-[50vh]" : "max-h-[70vh]";
-
-  return (
-    <div className={gridClasses}>
-      <aside className={asideClasses}>
-        <nav
-          className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
-          aria-label="Table of contents"
-        >
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Contents
-          </p>
-          <ol className={`${listMaxHeightClass} space-y-2.5 overflow-y-auto text-sm`}>
-            {tocItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="leading-snug text-slate-600 transition-colors hover:text-[#22c55e]"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </aside>
-      {articleContent}
+      </Section>
     </div>
   );
 }

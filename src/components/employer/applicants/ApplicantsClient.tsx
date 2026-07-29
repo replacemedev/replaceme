@@ -23,7 +23,6 @@ import { PlanUsageStrip } from "@/components/shared/entitlements/PlanUsageStrip"
 import { ContextualUpgradeBanner } from "@/components/shared/entitlements/ContextualUpgradeBanner";
 import { HiddenApplicantsBanner } from "@/components/shared/entitlements/HiddenApplicantsBanner";
 import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
-import { ScheduleInterviewModal } from "./ScheduleInterviewModal";
 import { updateApplicationStatus, deleteApplication } from "@/actions/applications";
 import { ApplicationStatus } from "@/types/applications";
 import { toast } from "sonner";
@@ -59,7 +58,6 @@ export function ApplicantsClient({
   const [statusFilter, setStatusFilter] = useState<ApplicantStatusFilter>("all");
   const [sortKey, setSortKey] = useState<ApplicantSortKey>("newest");
   const [viewMode, setViewMode] = useState<"pipeline" | "cards" | "table">("pipeline");
-  const [schedulingApp, setSchedulingApp] = useState<{ id: string; name: string } | null>(null);
   const [hiringApp, setHiringApp] = useState<{ id: string; name: string } | null>(null);
   const [expandedMobileStage, setExpandedMobileStage] = useState<ApplicationStatus | null>("PENDING");
   const [deletingApp, setDeletingApp] = useState<{ id: string; name: string } | null>(null);
@@ -98,9 +96,7 @@ export function ApplicantsClient({
     const app = applicants.find((a) => a.id === id);
     if (!app || app.status === targetStatus) return;
 
-    if (targetStatus === "INTERVIEW_SCHEDULED") {
-      setSchedulingApp({ id, name: app.name });
-    } else if (targetStatus === "HIRED") {
+    if (targetStatus === "HIRED") {
       setHiringApp({ id, name: app.name });
     } else {
       await triggerStatusChange(id, targetStatus);
@@ -201,8 +197,7 @@ export function ApplicantsClient({
   const stages: { key: ApplicationStatus; label: string; bg: string; text: string }[] = [
     { key: "PENDING", label: "Applied", bg: "bg-slate-50/50 border-slate-200/50", text: "text-slate-700" },
     { key: "UNDER_REVIEW", label: "Shortlisted", bg: "bg-emerald-50/50 border-emerald-100/50", text: "text-[#006e2f]" },
-    { key: "INTERVIEW_SCHEDULED", label: "Interview", bg: "bg-blue-50/50 border-blue-100/50", text: "text-blue-800" },
-    { key: "HIRED", label: "Hired", bg: "bg-violet-50/50 border-violet-100/50", text: "text-violet-850" },
+    { key: "HIRED", label: "Hired", bg: "bg-violet-50/50 border-violet-100/50", text: "text-violet-800" },
     { key: "REJECTED", label: "Declined", bg: "bg-red-50/50 border-red-100/50", text: "text-red-800" },
   ];
 
@@ -388,7 +383,6 @@ export function ApplicantsClient({
                         <span className={`inline-flex h-2.5 w-2.5 rounded-full ${
                           stage.key === "PENDING" ? "bg-slate-400" :
                           stage.key === "UNDER_REVIEW" ? "bg-emerald-500" :
-                          stage.key === "INTERVIEW_SCHEDULED" ? "bg-blue-500" :
                           stage.key === "HIRED" ? "bg-violet-500" : "bg-red-500"
                         }`} />
                         <span>{stage.label}</span>
@@ -486,21 +480,6 @@ export function ApplicantsClient({
             </div>
           )}
         </>
-      )}
-
-      {/* Scheduling interview popup */}
-      {schedulingApp && (
-        <ScheduleInterviewModal
-          open={!!schedulingApp}
-          onClose={() => setSchedulingApp(null)}
-          applicationId={schedulingApp.id}
-          candidateName={schedulingApp.name}
-          onSuccess={() => {
-            // Re-fetch or locally update is handled by server action revalidating paths.
-            // But we can reset list/state locally to be sure.
-            setSchedulingApp(null);
-          }}
-        />
       )}
 
       {deletingApp && (

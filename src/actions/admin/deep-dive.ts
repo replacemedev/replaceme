@@ -105,6 +105,8 @@ export type AdminEmployerDeepDive = {
   companyName: string;
   email: string | null;
   industry: string | null;
+  industryCustom: string | null;
+  applicationNotificationPref: string;
   websiteUrl: string | null;
   companyBio: string | null;
   hiringRegions: string[];
@@ -112,8 +114,6 @@ export type AdminEmployerDeepDive = {
   verifiedAt: string | null;
   accountStatus: string;
   createdAt: string;
-  phoneNumber?: string | null;
-  country?: string | null;
   subscription: {
     status: string;
     planSlug: string | null;
@@ -155,13 +155,13 @@ export async function getAdminEmployerDeepDive(
       await Promise.all([
         supabase
           .from("profiles")
-          .select("id, email, account_status, created_at, role, phone_number, country")
+          .select("id, email, account_status, created_at, role")
           .eq("id", id)
           .maybeSingle(),
         supabase
           .from("company_profiles")
           .select(
-            "company_name, industry, website_url, company_bio, created_at, hiring_regions, company_verification_status, verified_at"
+            "company_name, industry, industry_custom, application_notification_pref, website_url, company_bio, created_at, hiring_regions, company_verification_status, verified_at"
           )
           .eq("employer_id", id)
           .maybeSingle(),
@@ -211,6 +211,9 @@ export async function getAdminEmployerDeepDive(
       companyName: company?.company_name ?? "Unnamed company",
       email: profile.email,
       industry: company?.industry ?? null,
+      industryCustom: company?.industry_custom ?? null,
+      applicationNotificationPref:
+        company?.application_notification_pref ?? "email_every_applicant",
       websiteUrl: company?.website_url ?? null,
       companyBio: company?.company_bio ?? null,
       hiringRegions: Array.isArray(company?.hiring_regions)
@@ -221,8 +224,6 @@ export async function getAdminEmployerDeepDive(
       verifiedAt: company?.verified_at ?? null,
       accountStatus: profile.account_status,
       createdAt: company?.created_at ?? profile.created_at,
-      phoneNumber: profile.phone_number,
-      country: profile.country,
       subscription: subscription
         ? {
             status: subscription.status,
@@ -265,7 +266,7 @@ export type AdminWorkerProfileDeepDive = {
   firstName: string | null;
   middleName: string | null;
   lastName: string | null;
-  username: string | null;
+  suffix: string | null;
   email: string | null;
   professionalTitle: string | null;
   bio: string | null;
@@ -282,8 +283,6 @@ export type AdminWorkerProfileDeepDive = {
   accountStatus: string;
   verificationStatus: string | null;
   isVerified: boolean;
-  suffix?: string | null;
-  phoneNumber?: string | null;
   gender?: string | null;
   civilStatus?: string | null;
   preferredLanguage?: string | null;
@@ -320,7 +319,7 @@ export async function getAdminWorkerProfileDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, middle_name, last_name, username, suffix, phone_number, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status, is_verified"
+            "id, first_name, middle_name, last_name, suffix, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status, is_verified"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -345,7 +344,7 @@ export async function getAdminWorkerProfileDeepDive(
       firstName: profile.first_name,
       middleName: profile.middle_name,
       lastName: profile.last_name,
-      username: profile.username ?? null,
+      suffix: profile.suffix,
       email: profile.email,
       professionalTitle: profile.professional_title,
       bio: profile.bio,
@@ -362,8 +361,6 @@ export async function getAdminWorkerProfileDeepDive(
       accountStatus: profile.account_status,
       verificationStatus: profile.verification_status ?? null,
       isVerified: Boolean(profile.is_verified),
-      suffix: profile.suffix,
-      phoneNumber: profile.phone_number,
       gender: profile.gender,
       civilStatus: profile.civil_status,
       preferredLanguage: profile.preferred_language,

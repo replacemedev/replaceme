@@ -9,7 +9,6 @@ import type { ApplicationStatus } from "@/types/applications";
 const WITHDRAWABLE: ApplicationStatus[] = [
   "PENDING",
   "UNDER_REVIEW",
-  "INTERVIEW_SCHEDULED",
 ];
 
 interface WithdrawApplicationButtonProps {

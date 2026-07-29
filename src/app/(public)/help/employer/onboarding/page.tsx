@@ -86,7 +86,7 @@ const STEPS = [
       "Review candidates as they apply, organize applicant statuses, and message talent directly.",
     details: [
       "Filter applicants by experience, skill ratings, and expected pay.",
-      "Use built-in direct messaging (on paid plans) to arrange video interviews.",
+      "Use built-in direct messaging (on paid plans) to discuss role details and next steps.",
       "Hire directly with 0% platform salary markup—pay 100% of agreed compensation directly to your worker.",
     ],
   },

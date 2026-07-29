@@ -7,7 +7,7 @@ export type WorkerApplicationStatusEmailProps = {
   workerName?: string | null;
   jobTitle: string;
   companyName: string;
-  statusTone: "viewed" | "shortlisted" | "interview" | "hired" | "declined";
+  statusTone: "viewed" | "shortlisted" | "hired" | "declined";
   statusHeadline: string;
   statusBody: string;
   ctaUrl: string;

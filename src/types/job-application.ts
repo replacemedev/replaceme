@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { formatMoney } from "@/lib/format/currency";
 
-export const CONTACT_METHOD_TYPES = ["email", "phone"] as const;
+export const CONTACT_METHOD_TYPES = ["email"] as const;
 export type ContactMethodType = (typeof CONTACT_METHOD_TYPES)[number];
 
 export const contactMethodSchema = z
@@ -102,14 +102,10 @@ export function formatPostedShort(iso: string): string {
 
 export function buildDefaultContactMethods(profile: {
   email: string | null;
-  phone_number: string | null;
 }): ContactMethod[] {
   const methods: ContactMethod[] = [];
   if (profile.email?.trim()) {
     methods.push({ type: "email", value: profile.email.trim() });
-  }
-  if (profile.phone_number?.trim()) {
-    methods.push({ type: "phone", value: profile.phone_number.trim() });
   }
   return methods.length > 0
     ? methods

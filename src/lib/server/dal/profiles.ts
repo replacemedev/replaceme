@@ -6,7 +6,6 @@ export type ProfileRow = {
   role: AppRole;
   email: string | null;
   first_name: string | null;
-  middle_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
   professional_title: string | null;
@@ -24,7 +23,7 @@ export async function getProfileById(
   return supabase
     .from("profiles")
     .select(
-      "id, role, email, first_name, middle_name, last_name, avatar_url, professional_title, bio, skills, experience_years, resume_url, is_verified"
+      "id, role, email, first_name, last_name, avatar_url, professional_title, bio, skills, experience_years, resume_url, is_verified"
     )
     .eq("id", profileId)
     .maybeSingle();

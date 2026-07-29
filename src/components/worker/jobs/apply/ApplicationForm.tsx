@@ -36,7 +36,6 @@ interface ApplicationFormProps {
 
 const contactTypeLabels: Record<(typeof CONTACT_METHOD_TYPES)[number], string> = {
   email: "Email",
-  phone: "Phone",
 };
 
 function ProfileAssetButton({
@@ -339,7 +338,7 @@ export function ApplicationForm({
           <ul className="space-y-3">
             {fields.map((field, index) => {
               const currentType = contactMethodsValues?.[index]?.type;
-              const isOther = currentType === "other" || (currentType && currentType !== "email" && currentType !== "phone");
+              const isOther = currentType === "other" || (currentType && currentType !== "email");
 
               return (
                 <li
@@ -354,7 +353,6 @@ export function ApplicationForm({
                       {...register(`contactMethods.${index}.type`)}
                     >
                       <option value="email">Email</option>
-                      <option value="phone">Phone</option>
                       <option value="other">Other (Specify)</option>
                     </select>
 
@@ -382,9 +380,7 @@ export function ApplicationForm({
                     <div className="flex flex-col flex-1 min-w-0">
                       <Input
                         placeholder={
-                          currentType === "phone"
-                            ? "+1 234 567 8900"
-                            : currentType === "email"
+                          currentType === "email"
                             ? "user.professional@email.com"
                             : "Contact value"
                         }

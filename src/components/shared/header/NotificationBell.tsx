@@ -8,7 +8,6 @@ import {
   Loader2,
   AlertCircle,
   Inbox,
-  Calendar,
   MessageSquare,
   Briefcase,
   CheckCircle,
@@ -238,8 +237,6 @@ function NotificationItem({
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case "interview_rescheduled":
-        return <Calendar className="h-4 w-4 text-amber-500" />;
       case "new_message":
         return <MessageSquare className="h-4 w-4 text-blue-500" />;
       case "application_status":

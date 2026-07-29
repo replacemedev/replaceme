@@ -16,13 +16,12 @@ const currentYear = new Date().getFullYear();
 export const workerIdentityStepSchema = z.object({
   professionalTitle: nonEmptyStringSchema.max(100, "Professional title cannot exceed 100 characters."),
   firstName: nonEmptyStringSchema.max(80, "First name cannot exceed 80 characters."),
-  middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional(),
+  middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional().nullable(),
   lastName: nonEmptyStringSchema.max(80, "Last name cannot exceed 80 characters."),
   suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional().nullable(),
   gender: z.string().optional().nullable(),
   civilStatus: z.string().optional().nullable(),
   preferredLanguage: z.string().optional().nullable(),
-  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25).optional().nullable(),
 });
 
 export const workerLocationStepSchema = z.object({
@@ -103,13 +102,14 @@ export const employerCompanyStepSchema = z.object({
   companyName: nonEmptyStringSchema.max(120),
   industry: nonEmptyStringSchema,
   companySize: nonEmptyStringSchema.max(80),
+  industryCustom: z.string().max(200).optional(),
 });
 
 export const employerHiringStepSchema = z.object({
   skills: z
     .array(z.string().min(1))
     .min(1, "Select at least one skill")
-    .max(8),
+    .max(5),
 });
 
 export const employerDetailsStepSchema = z.object({
@@ -121,14 +121,13 @@ export const employerOnboardingSchema = z.object({
   companyName: nonEmptyStringSchema.max(120),
   industry: nonEmptyStringSchema,
   companySize: nonEmptyStringSchema.max(80),
-  skills: z.array(z.string().min(1)).min(1, "Select at least one skill").max(8),
+  skills: z.array(z.string().min(1)).min(1, "Select at least one skill").max(5),
   websiteUrl: z.union([z.string().url(), z.literal("")]).optional(),
   companyBio: z.string().max(500).optional(),
 });
 
-export const employerPersonalStepSchema = z.object({
-  phoneNumber: z.string().min(5, "Phone number must be at least 5 characters.").max(25),
-  country: z.string().min(1, "Country is required."),
+export const employerNotificationStepSchema = z.object({
+  notificationPreference: z.enum(["email_every_applicant", "email_daily_summary", "dashboard_only"]),
 });
 
 export type WorkerOnboardingStep =
@@ -139,4 +138,4 @@ export type WorkerOnboardingStep =
   | "about"
   | "project";
 
-export type EmployerOnboardingStep = "company" | "hiring" | "details" | "personal";
+export type EmployerOnboardingStep = "company" | "hiring" | "details" | "notification";

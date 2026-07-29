@@ -49,7 +49,7 @@ export function EditAdminAccessDialog({
   if (!member) return null;
 
   const displayLabel =
-    formatFullName(member.first_name, member.middle_name, member.last_name).trim() ||
+    formatFullName(member.first_name, member.last_name).trim() ||
     member.email ||
     "Admin";
 

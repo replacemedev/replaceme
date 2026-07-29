@@ -204,8 +204,8 @@ export function buildJobFaqs(job: WorkerJobDetails): FAQItem[] {
         "Create a free worker account on Replaceme, complete your profile, then apply directly from this job page. There are no agency fees for workers.",
     },
     {
-      question: "What is the interview process?",
-      answer: `${job.companyName} manages screening and interviews directly through Replaceme messaging after you apply. Typical steps include profile review, a skills or culture screen, and a final conversation before an offer.`,
+      question: "What happens after I apply?",
+      answer: `${job.companyName} reviews applications and may follow up through Replaceme messaging. Typical steps include profile review, a skills or culture screen, and a final conversation before an offer.`,
     },
   ];
 }

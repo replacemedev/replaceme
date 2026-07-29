@@ -63,36 +63,47 @@ export function EmployerCheckoutClient({
 
         <ul className="space-y-2 text-xs font-medium text-slate-600">
           <li className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#006e2f]" aria-hidden />
-            Billed monthly in USD
+            <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
+            Billed monthly in USD (tax-exclusive list price)
           </li>
           <li className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#006e2f]" aria-hidden />
+            <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
+            Tax (if any) calculated at Stripe Checkout for your billing location
+          </li>
+          <li className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
             Cancel anytime from Account Settings
           </li>
           <li className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-[#006e2f]" aria-hidden />
+            <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
             Downgrades take effect at the end of your billing period
           </li>
         </ul>
 
         <a
           href={checkoutUrl}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-5 py-4 text-sm font-bold text-white transition-colors hover:bg-[#005c26]"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-5 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#005c26] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006e2f]"
         >
           {ctaLabel}
           <ArrowRight className="h-4 w-4" aria-hidden />
         </a>
 
-        <p className="text-center text-[11px] font-medium text-slate-400">
+        <p className="text-center text-[11px] font-medium text-slate-400 leading-relaxed">
           By continuing, you agree to our{" "}
           <Link
             href="/terms-of-service"
             className="text-[#006e2f] hover:underline"
           >
             Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/refund-policy"
+            className="text-[#006e2f] hover:underline"
+          >
+            Refund Policy
           </Link>
-          .
+          . Australian merchant of record · payments via Stripe.
         </p>
       </div>
     </div>

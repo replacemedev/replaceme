@@ -14,7 +14,7 @@ export const DISCOVERY_JOB_APPROVAL_SLA = {
   overdueAfterHours: 48,
 } as const;
 
-export const LEGAL_LAST_UPDATED = "July 27, 2026";
+export const LEGAL_LAST_UPDATED = "July 29, 2026";
 
 export const PRIVACY_PAGE_META: PageContentMeta = {
   lastUpdated: LEGAL_LAST_UPDATED,
@@ -37,12 +37,28 @@ export const COOKIE_PAGE_META: PageContentMeta = {
   wide: true,
 };
 
-export const EMPLOYER_DPA_PAGE_META: PageContentMeta = {
+
+export const REFUND_PAGE_META: PageContentMeta = {
   lastUpdated: LEGAL_LAST_UPDATED,
   badge: "Legal",
   badgeVariant: "pill",
   wide: true,
 };
+
+/**
+ * Merchant-of-record disclosure for Stripe employer subscriptions.
+ * Update ABN when issued; do not invent a registration number.
+ */
+export const BILLING_MERCHANT = {
+  country: "Australia",
+  countryCode: "AU",
+  /** Display name until a formal registered trading name is supplied. */
+  displayName: "Replaceme",
+  /** Set when the Australian entity has an ABN (e.g. "12 345 678 901"). */
+  abn: null as string | null,
+  supportEmail: "support@replaceme.ph",
+  billingCurrency: "USD",
+} as const;
 
 /** Bump when cookie purposes/categories change so the consent banner reappears. */
 export const COOKIE_POLICY_VERSION = "cookie-policy-v2";
@@ -90,9 +106,9 @@ export const DATA_RETENTION_PERIODS = [
       "Up to 24 months after a moderation decision (approve, reject, or soft-delete/remove), including reason category, optional explanation, soft-delete timestamps, and admin actor—for Trust & Safety, dispute, and compliance audits—unless a legal hold requires longer. Soft-deleted listings leave public boards but may remain recoverable by authorized administrators (capability-scoped) during that audit window",
   },
   {
-    category: "User-to-user abuse & safety reports",
+    category: "Worker→employer abuse & safety reports",
     period:
-      "Up to 24 months after case closure (resolved or dismissed), including violation category, evidence attachments, admin notes, and actor IDs—for Trust & Safety investigation, anti-retaliation, and legal defense. Reporter identity is restricted to Super administrators and Moderators with Reports/Disputes capability and is not disclosed to the reported party except by court order or explicit reporter consent (RA 10173 / GDPR)",
+      "Up to 24 months after case closure (resolved or dismissed), including violation category, evidence attachments, admin notes, and actor IDs—for Trust & Safety investigation, anti-retaliation, and legal defense. Employer→worker reporting is not offered. Reporter identity is restricted to Super administrators and Moderators with Reports/Disputes capability and is not disclosed to the reported party except by court order or explicit reporter consent (RA 10173 / GDPR)",
   },
   {
     category: "Admin staff operational data",
@@ -127,8 +143,9 @@ export const ACCOUNT_LIFECYCLE_TIMELINES = {
 export const SUBPROCESSORS = [
   {
     name: "Stripe",
-    purpose: "Payment processing, subscriptions, and billing ledger",
-    region: "United States / global",
+    purpose:
+      "Payment processing, subscriptions, invoicing, and Stripe Tax calculation for employer plan billing (Australian merchant of record)",
+    region: "United States / Australia / global",
   },
   {
     name: "Resend",

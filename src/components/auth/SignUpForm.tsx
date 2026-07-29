@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/shared/FormField";
-import { Lock, Mail, User, Loader2, Phone } from "lucide-react";
+import { Lock, Mail, User, Loader2 } from "lucide-react";
 import { signUp } from "@/actions/auth";
 import {
   AUTH_ERROR,
@@ -43,12 +43,10 @@ type SignUpRole = "employer" | "worker";
 
 const WORKER_DEFAULTS: WorkerSignUpFormValues = {
   role: "worker",
-  username: "",
   firstName: "",
   middleName: "",
   lastName: "",
   suffix: "",
-  phoneNumber: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -58,12 +56,8 @@ const WORKER_DEFAULTS: WorkerSignUpFormValues = {
 
 const EMPLOYER_DEFAULTS: EmployerSignUpFormValues = {
   role: "employer",
-  username: "",
   firstName: "",
-  middleName: "",
   lastName: "",
-  suffix: "",
-  phoneNumber: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -106,7 +100,6 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
     mode: "onSubmit",
   });
 
-  const usernameRegister = register("username");
   const emailRegister = register("email");
 
   const onSubmit = async (
@@ -142,20 +135,6 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
             ? result.message
             : null) ?? formatSignUpError(errCode);
 
-        if (
-          errCode === AUTH_ERROR.USERNAME_EXISTS ||
-          errCode === "auth/username-already-exists"
-        ) {
-          toast.error(AUTH_ERROR_MESSAGE.USERNAME_EXISTS);
-          setError("username", {
-            type: "server",
-            message: AUTH_ERROR_MESSAGE.USERNAME_EXISTS,
-          });
-          setFocus("username");
-          resetCaptcha();
-          submitLockRef.current = false;
-          return;
-        }
         if (
           errCode === AUTH_ERROR.EMAIL_EXISTS ||
           errCode === "auth/email-already-exists"
@@ -202,116 +181,110 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
       >
         <input type="hidden" {...register("role")} />
 
-        <FormField
-          label="Username"
-          htmlFor="signup-username"
-          required
-          error={errors.username?.message}
-        >
-          <Input
-            id="signup-username"
-            {...usernameRegister}
-            placeholder="janesmith"
-            icon={<User size={18} />}
-            autoComplete="username"
-            error={errors.username?.message}
-            showErrorMessage={false}
-            aria-describedby="signup-username-error"
-          />
-        </FormField>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-          <FormField
-            label="First Name"
-            htmlFor="signup-firstName"
-            required
-            error={errors.firstName?.message}
-            className="w-full"
-          >
-            <Input
-              id="signup-firstName"
-              {...register("firstName")}
-              placeholder="Jane"
-              icon={<User size={18} />}
-              autoComplete="given-name"
+        <div className="mb-4 space-y-4 min-w-0">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              label="First Name"
+              htmlFor="signup-firstName"
+              required
               error={errors.firstName?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-firstName-error"
-            />
-          </FormField>
+              className="min-w-0 w-full"
+            >
+              <Input
+                id="signup-firstName"
+                {...register("firstName")}
+                placeholder="Jane"
+                icon={<User size={18} />}
+                autoComplete="given-name"
+                error={errors.firstName?.message}
+                showErrorMessage={false}
+                aria-describedby="signup-firstName-error"
+              />
+            </FormField>
 
-          <FormField
-            label="Middle Name"
-            htmlFor="signup-middleName"
-            error={errors.middleName?.message}
-            className="w-full"
-          >
-            <Input
-              id="signup-middleName"
-              {...register("middleName")}
-              placeholder="Optional"
-              icon={<User size={18} />}
-              autoComplete="additional-name"
-              error={errors.middleName?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-middleName-error"
-            />
-          </FormField>
+            {role === "worker" ? (
+              <FormField
+                label="Middle Name"
+                htmlFor="signup-middleName"
+                description="Optional — use your legal middle name for KYC."
+                error={"middleName" in errors ? errors.middleName?.message : undefined}
+                className="min-w-0 w-full"
+              >
+                <Input
+                  id="signup-middleName"
+                  {...register("middleName")}
+                  placeholder="Marie"
+                  icon={<User size={18} />}
+                  autoComplete="additional-name"
+                  error={"middleName" in errors ? errors.middleName?.message : undefined}
+                  showErrorMessage={false}
+                  aria-describedby="signup-middleName-error"
+                />
+              </FormField>
+            ) : (
+              <FormField
+                label="Last Name"
+                htmlFor="signup-lastName"
+                required
+                error={errors.lastName?.message}
+                className="min-w-0 w-full"
+              >
+                <Input
+                  id="signup-lastName"
+                  {...register("lastName")}
+                  placeholder="Doe"
+                  icon={<User size={18} />}
+                  autoComplete="family-name"
+                  error={errors.lastName?.message}
+                  showErrorMessage={false}
+                  aria-describedby="signup-lastName-error"
+                />
+              </FormField>
+            )}
+          </div>
 
-          <FormField
-            label="Last Name"
-            htmlFor="signup-lastName"
-            required
-            error={errors.lastName?.message}
-            className="w-full"
-          >
-            <Input
-              id="signup-lastName"
-              {...register("lastName")}
-              placeholder="Doe"
-              icon={<User size={18} />}
-              autoComplete="family-name"
-              error={errors.lastName?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-lastName-error"
-            />
-          </FormField>
+          {role === "worker" ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                label="Last Name"
+                htmlFor="signup-lastName"
+                required
+                error={errors.lastName?.message}
+                className="min-w-0 w-full"
+              >
+                <Input
+                  id="signup-lastName"
+                  {...register("lastName")}
+                  placeholder="Doe"
+                  icon={<User size={18} />}
+                  autoComplete="family-name"
+                  error={errors.lastName?.message}
+                  showErrorMessage={false}
+                  aria-describedby="signup-lastName-error"
+                />
+              </FormField>
 
-          <FormField
-            label="Suffix"
-            htmlFor="signup-suffix"
-            error={errors.suffix?.message}
-            className="w-full"
-          >
-            <Input
-              id="signup-suffix"
-              {...register("suffix")}
-              placeholder="e.g. Jr."
-              icon={<User size={18} />}
-              error={errors.suffix?.message}
-              showErrorMessage={false}
-              aria-describedby="signup-suffix-error"
-            />
-          </FormField>
+              <FormField
+                label="Suffix"
+                htmlFor="signup-suffix"
+                description="Optional — e.g. Jr., III, PhD."
+                error={"suffix" in errors ? errors.suffix?.message : undefined}
+                className="min-w-0 w-full"
+              >
+                <Input
+                  id="signup-suffix"
+                  {...register("suffix")}
+                  placeholder="Jr."
+                  icon={<User size={18} />}
+                  autoComplete="honorific-suffix"
+                  error={"suffix" in errors ? errors.suffix?.message : undefined}
+                  showErrorMessage={false}
+                  aria-describedby="signup-suffix-error"
+                />
+              </FormField>
+            </div>
+          ) : null}
         </div>
-
-        <FormField
-          label="Phone Number"
-          htmlFor="signup-phoneNumber"
-          required
-          error={errors.phoneNumber?.message}
-        >
-          <Input
-            id="signup-phoneNumber"
-            {...register("phoneNumber")}
-            placeholder="+1 234 567 8900"
-            icon={<Phone size={18} />}
-            autoComplete="tel"
-            error={errors.phoneNumber?.message}
-            showErrorMessage={false}
-            aria-describedby="signup-phoneNumber-error"
-          />
-        </FormField>
 
         <FormField
           label="Email Address"
@@ -381,7 +354,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
                   onBlur={field.onBlur}
                   name={field.name}
                   ref={field.ref}
-                  className="mt-0.5"
+                  className="mt-0.5 shrink-0"
                   aria-invalid={errors.terms ? true : undefined}
                   aria-describedby={
                     errors.terms ? "signup-terms-error" : undefined
@@ -423,7 +396,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
             type="submit"
             variant="success"
             disabled={isSubmitting || (turnstileRequired && !turnstileToken)}
-            className="h-12 w-full text-base"
+            className="h-12 w-full min-h-11 text-base"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">

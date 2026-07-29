@@ -138,19 +138,9 @@ export function EmployerHeaderNav({
         ) : null}
       </NavUnderlineLink>
       <NavUnderlineLink
-        href="/employer/interviews"
-        label="Interviews"
-        isActive={isEmployerNavActive(pathname, "/employer/interviews")}
-      />
-      <NavUnderlineLink
         href="/employer/hired"
         label="Hired"
         isActive={isEmployerNavActive(pathname, "/employer/hired")}
-      />
-      <NavUnderlineLink
-        href="/employer/pinned"
-        label="Pinned"
-        isActive={isEmployerNavActive(pathname, "/employer/pinned")}
       />
       <div className="relative" ref={moreRef}>
         <button

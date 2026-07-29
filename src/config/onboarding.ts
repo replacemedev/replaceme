@@ -1,5 +1,7 @@
 /** Shared onboarding option lists — use `<select>` when choices are small and fixed. */
 
+export { ORDERED_SKILLS as DEFAULT_SKILL_OPTIONS } from "@/data/skills";
+
 export const WORKER_LOCATION_OPTIONS = [
   "Remote",
   "Philippines",
@@ -17,34 +19,6 @@ export const COMPANY_SIZE_OPTIONS = [
   "500+ employees",
 ] as const;
 
-export const DEFAULT_SKILL_OPTIONS = [
-  "React",
-  "TypeScript",
-  "Next.js",
-  "Tailwind CSS",
-  "Node.js",
-  "Python",
-  "Vue.js",
-  "Angular",
-  "Java",
-  "Go",
-  "SQL",
-  "PostgreSQL",
-  "UI/UX Design",
-  "Figma",
-  "DevOps",
-  "AWS",
-  "Docker",
-  "Product Management",
-  "Project Management",
-  "Marketing",
-  "SEO",
-  "Content Writing",
-  "Customer Support",
-  "Data Entry",
-  "Sales",
-  "Accounting",
-] as const;
 
 export const ONBOARDING_SELECT_CLASS =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30";

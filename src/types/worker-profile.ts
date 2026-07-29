@@ -1,10 +1,9 @@
 export interface WorkerProfile {
   id: string;
   first_name: string | null;
-  middle_name: string | null;
+  middle_name?: string | null;
   last_name: string | null;
   suffix?: string | null;
-  phone_number?: string | null;
   gender?: string | null;
   civil_status?: string | null;
   preferred_language?: string | null;
@@ -63,11 +62,9 @@ export interface EmployerTestimonial {
   rating: number;
   review_text: string;
   created_at: string;
-  // Joined fields from company_profiles and profiles
   company_name: string;
   company_logo: string | null;
   employer_first_name: string | null;
-  employer_middle_name: string | null;
   employer_last_name: string | null;
   employer_role: string | null;
 }

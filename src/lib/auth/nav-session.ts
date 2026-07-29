@@ -6,6 +6,7 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadMessagingCount } from "@/actions/messaging";
 import { getHomeHrefForRole } from "@/config/navigation";
+import { formatFullName } from "@/lib/format/name";
 import {
   GUEST_NAV_SESSION,
   type NavProfile,
@@ -30,7 +31,6 @@ function buildInitials(profile: NavProfile, role: UserRole): string {
   if (role === "employer" && profile.company_name) {
     return profile.company_name[0].toUpperCase();
   }
-  if (profile.username) return profile.username[0].toUpperCase();
   return role === "employer" ? "E" : role === "admin" ? "A" : "W";
 }
 
@@ -43,23 +43,20 @@ function buildDisplayName(
     return (
       profile.company_name ||
       profile.first_name ||
-      profile.username ||
       email?.split("@")[0] ||
       "Employer"
     );
   }
+  const fullName = formatFullName(
+    profile.first_name,
+    profile.middle_name,
+    profile.last_name,
+    profile.suffix
+  ).trim();
   if (role === "admin") {
-    const fullName = [profile.first_name, profile.middle_name, profile.last_name]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-    return fullName || profile.username || email?.split("@")[0] || "Admin";
+    return fullName || email?.split("@")[0] || "Admin";
   }
-  const fullName = [profile.first_name, profile.middle_name, profile.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  return fullName || profile.username || email?.split("@")[0] || "Worker";
+  return fullName || email?.split("@")[0] || "Worker";
 }
 
 function buildFallbackProfile(user: User): NavProfile {
@@ -73,13 +70,9 @@ function buildFallbackProfile(user: User): NavProfile {
       (typeof meta.first_name === "string" ? meta.first_name : null) ??
       nameParts[0] ??
       null,
-    middle_name:
-      (typeof meta.middle_name === "string" ? meta.middle_name : null) ??
-      (nameParts.length > 2 ? nameParts[1] : null),
     last_name:
       (typeof meta.last_name === "string" ? meta.last_name : null) ??
-      (nameParts.length > 2 ? nameParts.slice(2).join(" ") : nameParts.length > 1 ? nameParts[1] : null),
-    username: typeof meta.username === "string" ? meta.username : null,
+      (nameParts.length > 1 ? nameParts.slice(1).join(" ") : null),
     avatar_url: avatarFromUserMeta(user),
     is_verified: false,
     company_name:
@@ -121,7 +114,7 @@ type ProfileRow = {
   first_name: string | null;
   middle_name: string | null;
   last_name: string | null;
-  username: string | null;
+  suffix: string | null;
   avatar_url: string | null;
   role: string | null;
   is_verified: boolean | null;
@@ -144,7 +137,7 @@ function mapProfileRow(row: ProfileRow, user: User): NavProfile {
     first_name: row.first_name,
     middle_name: row.middle_name,
     last_name: row.last_name,
-    username: row.username,
+    suffix: row.suffix,
     avatar_url: row.avatar_url ?? avatarFromUserMeta(user),
     is_verified: Boolean(row.is_verified),
     company_name: companyName,
@@ -169,7 +162,7 @@ export const getNavSession = cache(async (): Promise<NavSession> => {
       first_name,
       middle_name,
       last_name,
-      username,
+      suffix,
       avatar_url,
       role,
       is_verified,

@@ -9,7 +9,6 @@ import { useSession } from "@/providers/SessionProvider";
 interface UserProfile {
   first_name: string | null;
   last_name: string | null;
-  username: string | null;
   avatar_url: string | null;
 }
 

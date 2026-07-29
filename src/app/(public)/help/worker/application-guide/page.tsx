@@ -82,10 +82,10 @@ const STEPS = [
     icon: ShieldCheck,
     badgeText: "0% Commission",
     summary:
-      "Interview directly with employers and receive job offers with no salary markups or deductions.",
+      "Chat directly with employers and receive job offers with no salary markups or deductions.",
     details: [
       "Employers on paid plans can message you directly in the platform chat.",
-      "Schedule video calls, answer screening questions, and agree on start dates.",
+      "Discuss role details, answer screening questions, and agree on start dates.",
       "Replaceme takes 0% commission from your salary—you receive 100% of your earnings directly from your employer.",
     ],
   },

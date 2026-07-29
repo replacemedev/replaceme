@@ -248,7 +248,8 @@ export function ManagePlanGrid({
       </div>
       <div className="border-t border-slate-100 bg-slate-50/50 p-4 text-center">
         <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-          All prices are billed exclusively in USD through Stripe. Cancel anytime.
+          All prices are billed exclusively in USD through Stripe (tax-exclusive).
+          Applicable tax is calculated at checkout. Cancel anytime.
         </p>
       </div>
     </section>

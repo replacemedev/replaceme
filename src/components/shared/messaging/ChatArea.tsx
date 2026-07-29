@@ -196,17 +196,19 @@ export function ChatArea({
                   <MailOpen className="h-3.5 w-3.5" />
                   Mark as unread
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMenu(false);
-                    setShowReport(true);
-                  }}
-                  className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <Flag className="h-3.5 w-3.5" />
-                  Report conversation
-                </button>
+                {role === "worker" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowMenu(false);
+                      setShowReport(true);
+                    }}
+                    className="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Flag className="h-3.5 w-3.5" />
+                    Report conversation
+                  </button>
+                ) : null}
                 <div className="h-px bg-slate-100 my-1" />
                 <button
                   type="button"
@@ -322,7 +324,7 @@ export function ChatArea({
         </div>
       )}
       <ReportConversationDialog
-        open={showReport}
+        open={role === "worker" && showReport}
         threadId={thread.id}
         onClose={() => setShowReport(false)}
       />

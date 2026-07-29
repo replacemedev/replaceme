@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Briefcase,
-  Calendar,
   CheckCircle,
   Plus,
   Bookmark,
@@ -72,8 +71,6 @@ export default async function WorkerDashboard() {
   ]);
 
   const appliedCount = apps?.length ?? 0;
-  const interviewsCount =
-    apps?.filter((a) => a.status === "INTERVIEW_SCHEDULED").length ?? 0;
   const hiredCount = apps?.filter((a) => a.status === "HIRED").length ?? 0;
   const savedJobsCount = savedJobs?.length ?? 0;
 
@@ -160,7 +157,7 @@ export default async function WorkerDashboard() {
 
       <WorkerPageHeader
         title={`Hello, ${workerName}`}
-        subhead="Your command center for applications, interviews, and employer conversations."
+        subhead="Your command center for applications and employer conversations."
         bordered={false}
       />
 
@@ -172,13 +169,6 @@ export default async function WorkerDashboard() {
             hint: "Total sent",
             icon: Briefcase,
             href: "/worker/applications",
-          },
-          {
-            label: "Interviews",
-            value: interviewsCount,
-            hint: "Scheduled",
-            icon: Calendar,
-            href: "/worker/interviews",
           },
           {
             label: "Hired",

@@ -18,6 +18,27 @@ function formatUsd(cents: number): string {
   return `$${(cents / 100).toLocaleString()}`;
 }
 
+function formatIndustry(industry: string | null, industryCustom: string | null): string {
+  if (!industry) return "—";
+  if (industry === "Other" && industryCustom?.trim()) {
+    return industryCustom.trim();
+  }
+  return industry;
+}
+
+function formatApplicationNotificationPref(value: string): string {
+  switch (value) {
+    case "email_every_applicant":
+      return "Email for every new applicant";
+    case "email_daily_summary":
+      return "Daily email summary";
+    case "dashboard_only":
+      return "Dashboard only";
+    default:
+      return value;
+  }
+}
+
 export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
   const sub = data.subscription;
 
@@ -90,16 +111,16 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
                 Industry
               </p>
               <p className="font-semibold text-slate-700 mt-1">
-                {data.industry ?? "—"}
+                {formatIndustry(data.industry, data.industryCustom)}
               </p>
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Phone Number</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.phoneNumber ?? "—"}</p>
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Country</p>
-              <p className="font-semibold text-slate-700 mt-1">{data.country ?? "—"}</p>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                Application notifications
+              </p>
+              <p className="font-semibold text-slate-700 mt-1">
+                {formatApplicationNotificationPref(data.applicationNotificationPref)}
+              </p>
             </div>
             {data.websiteUrl ? (
               <div className="min-w-0 md:col-span-2">

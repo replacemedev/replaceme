@@ -58,7 +58,7 @@ export async function getApplyJobPageData(
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, role, email, phone_number, resume_url, portfolio_url, cv_url")
+      .select("id, role, email, resume_url, portfolio_url, cv_url")
       .eq("id", user.id)
       .single();
 
@@ -95,7 +95,6 @@ export async function getApplyJobPageData(
       },
       defaultContactMethods: buildDefaultContactMethods({
         email: profile.email,
-        phone_number: profile.phone_number,
       }),
       hasApplied: Boolean(existing),
     };
@@ -235,7 +234,7 @@ export async function submitJobApplication(
     revalidatePath(`/employer/jobs/${jobId}/applicants`);
     revalidatePath("/employer/dashboard");
 
-    // Paid-plan instant applicant alert (Starter / Growth / Scale). Discovery aborts silently.
+    // Instant applicant alert when preference is email_every_applicant (all plans).
     try {
       await notifyEmployerNewApplicant({
         applicationId: inserted.id,

@@ -105,7 +105,7 @@ export function CreateJobForm({
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-10">
         <JobBasicsSection employmentTypes={employmentTypes} />
-        <JobRequirementsSection skillsOptions={skillsOptions} />
+        <JobRequirementsSection />
         <div className="max-w-xl">
           <button
             type="submit"

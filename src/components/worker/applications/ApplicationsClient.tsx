@@ -6,8 +6,8 @@ import {
   Filter,
   FileText,
   Hourglass,
-  CalendarDays,
   TrendingUp,
+  BadgeCheck,
 } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatCard } from "@/components/shared/StatCard";
@@ -112,10 +112,10 @@ export function ApplicationsClient({
     setVisibleCount(PAGE_SIZE);
   };
 
-  const interviewBadge =
-    stats.interviewsScheduled > 0
-      ? `${stats.interviewsScheduled} active`
-      : "None scheduled";
+  const hiredCount = useMemo(
+    () => applications.filter((app) => app.status === "HIRED").length,
+    [applications]
+  );
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
@@ -144,11 +144,11 @@ export function ApplicationsClient({
         />
         <StatCard
           variant="application"
-          label="Interviews Scheduled"
-          value={stats.interviewsScheduled}
-          badge={interviewBadge}
-          applicationVariant="interview"
-          watermarkIcon={CalendarDays}
+          label="Hired"
+          value={hiredCount}
+          badge={hiredCount > 0 ? "Congratulations!" : "Keep applying"}
+          applicationVariant="hired"
+          watermarkIcon={BadgeCheck}
         />
       </section>
 

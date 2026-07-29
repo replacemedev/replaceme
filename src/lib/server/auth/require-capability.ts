@@ -72,6 +72,8 @@ async function logDeniedCapability(
     );
     const actor = await resolveAuditActorSnapshot(userId, "admin");
     await admin.from("audit_logs").insert({
+      prev_hash: "pending",
+      entry_hash: "pending",
       admin_id: userId,
       action_type: "capability_denied",
       target_type: "admin_capability",

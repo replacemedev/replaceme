@@ -7,6 +7,12 @@ import {
   type AuditActorType,
 } from "@/lib/server/audit/resolve-actor";
 
+/** Overwritten by audit_logs_hash_chain_before_insert trigger. */
+const AUDIT_HASH_PLACEHOLDER = {
+  prev_hash: "pending",
+  entry_hash: "pending",
+} as const;
+
 /**
  * Security / product audit helper using the service role so worker and auth
  * actors can write without violating admin-only RLS on audit_logs.
@@ -43,6 +49,7 @@ export async function emitAuditLog(params: {
 
     const admin = await createAdminClient();
     const { error } = await admin.from("audit_logs").insert({
+      ...AUDIT_HASH_PLACEHOLDER,
       admin_id: params.adminId ?? null,
       action_type: params.actionType,
       target_type: params.targetType ?? null,

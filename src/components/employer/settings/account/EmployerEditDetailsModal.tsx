@@ -11,10 +11,7 @@ interface EmployerEditDetailsModalProps {
   onClose: () => void;
   initial: {
     firstName: string;
-    middleName: string;
     lastName: string;
-    phoneNumber: string;
-    country: string;
   };
   onSaved: () => void;
 }
@@ -28,19 +25,13 @@ export function EmployerEditDetailsModal({
   const [isPending, startTransition] = useTransition();
 
   const [firstName, setFirstName] = useState(initial.firstName);
-  const [middleName, setMiddleName] = useState(initial.middleName);
   const [lastName, setLastName] = useState(initial.lastName);
-  const [phoneNumber, setPhoneNumber] = useState(initial.phoneNumber);
-  const [country, setCountry] = useState(initial.country);
 
   function handleSave() {
     startTransition(async () => {
       const result = await updateEmployerAccountDetails({
         firstName,
-        middleName: middleName || null,
         lastName,
-        phoneNumber: phoneNumber || null,
-        country: country || null,
       });
 
       if (!result.success) {
@@ -86,63 +77,27 @@ export function EmployerEditDetailsModal({
         </div>
       }
     >
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Legal Name</h3>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              First Name
-              <input
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Middle Name
-              <input
-                value={middleName}
-                onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="Optional"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Last Name
-              <input
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className={inputClass}
-              />
-            </label>
-          </div>
-        </div>
-
-        <div className="space-y-3 border-t border-slate-100 pt-4">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Contact</h3>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Phone Number
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+1 234 567 8900"
-                className={inputClass}
-              />
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Country
-              <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Country"
-                className={inputClass}
-              />
-            </label>
-          </div>
+      <div className="space-y-3">
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Legal Name</h3>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <label className="block space-y-1 text-xs font-bold text-slate-500">
+            First Name
+            <input
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className={inputClass}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-bold text-slate-500">
+            Last Name
+            <input
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className={inputClass}
+            />
+          </label>
         </div>
       </div>
     </ProfileModal>

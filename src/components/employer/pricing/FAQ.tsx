@@ -22,7 +22,17 @@ const fallbackFaqs: FAQItem[] = [
   {
     question: "Can I change or cancel my plan anytime?",
     answer:
-      "Yes! You can upgrade, downgrade, or cancel your subscription plan at any time directly from your employer billing dashboard.",
+      "Yes. Upgrade, downgrade, or cancel anytime from Account Settings. Upgrades apply immediately; downgrades and cancellations take effect at the end of your billing period. You keep paid access until then.",
+  },
+  {
+    question: "Are list prices inclusive of tax?",
+    answer:
+      "No. Plan prices are shown in USD tax-exclusive. Stripe Tax may add Australian GST or other destination tax at checkout only when required for your billing location. Most overseas employers often see $0 AU GST. Tax goes to the government—not to Stripe as a fee.",
+  },
+  {
+    question: "What is your refund policy?",
+    answer:
+      "Commenced B2B plan periods are generally non-refundable, except for billing errors, mandatory law, or limited goodwill when access fails due to a Platform fault. See the Refund Policy linked in the site footer.",
   },
   {
     question: "Do job seekers have to pay to use the platform?",

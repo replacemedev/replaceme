@@ -15,7 +15,6 @@ const PRIMARY = [
 ];
 
 const MORE = [
-  { href: "/worker/interviews", label: "Interviews" },
   { href: "/worker/earnings", label: "Earnings" },
 ];
 

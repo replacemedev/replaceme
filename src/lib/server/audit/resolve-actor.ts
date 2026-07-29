@@ -39,11 +39,7 @@ export async function resolveAuditActorSnapshot(
       .maybeSingle(),
   ]);
 
-  const fullName = formatFullName(
-    profile?.first_name,
-    null,
-    profile?.last_name
-  );
+  const fullName = formatFullName(profile?.first_name, profile?.last_name);
   const displayName =
     (adminProfile?.display_name?.trim() || null) ??
     (fullName.trim() || null) ??

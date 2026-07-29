@@ -1,7 +1,7 @@
 "use client";
 
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { ExternalLink, MapPin, Phone, Briefcase, Clock, Wallet, Mail, MessageSquare } from "lucide-react";
+import { ExternalLink, MapPin, Briefcase, Clock, Wallet, Mail, MessageSquare, Phone } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
@@ -44,7 +44,6 @@ export type EmployerCandidateProfileData = {
     isVerified: boolean;
     resumeUrl: string | null;
     location: string | null;
-    phoneNumber: string | null;
     portfolioUrl: string | null;
     expectedSalaryMin: number | null;
     expectedSalaryMax: number | null;
@@ -234,10 +233,6 @@ export function EmployerCandidateProfile({
                       <dd>{candidate.location || "Manila, Philippines"}</dd>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-slate-400" />
-                      <dd>{candidate.phoneNumber || "+63 917 123 4567"}</dd>
-                    </div>
-                    <div className="flex items-center gap-2">
                       <ExternalLink className="h-4 w-4 text-slate-400" />
                       <dd>candidate-portfolio-link.com</dd>
                     </div>
@@ -343,7 +338,6 @@ export function EmployerCandidateProfile({
 
               {(candidate.location ||
                 candidate.portfolioUrl ||
-                candidate.phoneNumber ||
                 (contactMethods && contactMethods.length > 0)) && (
                 <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -421,27 +415,7 @@ export function EmployerCandidateProfile({
                           </div>
                         );
                       })
-                    ) : (
-                      candidate.phoneNumber ? (
-                        <div className="flex items-start gap-2 text-slate-600">
-                          <Phone
-                            className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
-                            aria-hidden
-                          />
-                          <div className="space-y-0.5">
-                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">Phone Number</span>
-                            <dd>
-                              <a
-                                href={`tel:${candidate.phoneNumber}`}
-                                className="font-semibold text-slate-800 hover:text-[#006e2f] transition-colors"
-                              >
-                                {candidate.phoneNumber}
-                              </a>
-                            </dd>
-                          </div>
-                        </div>
-                      ) : null
-                    )}
+                    ) : null}
 
                     {candidate.portfolioUrl ? (
                       <div className="flex items-start gap-2 sm:col-span-2">

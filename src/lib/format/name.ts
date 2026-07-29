@@ -1,19 +1,21 @@
-/**
- * Safely formats first name, middle name, and last name into a single string.
- * It handles null/undefined middle names cleanly.
- */
+/** Formats a legal display name from first/middle/last/suffix parts. */
 export function formatFullName(
   firstName: string | null | undefined,
-  middleName: string | null | undefined,
-  lastName: string | null | undefined,
+  middleOrLastName: string | null | undefined,
+  lastName?: string | null | undefined,
   suffix?: string | null | undefined
 ): string {
-  const parts = [
+  // Legacy 2-arg: (first, last)
+  if (lastName === undefined) {
+    return [firstName?.trim(), middleOrLastName?.trim()].filter(Boolean).join(" ");
+  }
+
+  return [
     firstName?.trim(),
-    middleName?.trim(),
+    middleOrLastName?.trim(),
     lastName?.trim(),
     suffix?.trim(),
-  ].filter(Boolean);
-
-  return parts.join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }

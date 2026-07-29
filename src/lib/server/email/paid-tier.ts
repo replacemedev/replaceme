@@ -1,4 +1,4 @@
-import type { EmailTierSlug } from "@/lib/server/email/mailer";
+import type { EmailTierSlug, EmailTierLabel } from "@/lib/server/email/mailer";
 
 /** Paid employer plans that receive premium transactional email alerts. */
 export const PAID_EMAIL_TIERS = new Set<EmailTierSlug>([
@@ -31,6 +31,19 @@ export function isPaidEmailTier(
   slug: EmailTierSlug
 ): slug is Exclude<EmailTierSlug, "discovery"> {
   return PAID_EMAIL_TIERS.has(slug);
+}
+
+export function emailPlanLabel(slug: EmailTierSlug): EmailTierLabel {
+  switch (slug) {
+    case "discovery":
+      return "Discovery";
+    case "starter":
+      return "Starter";
+    case "growth":
+      return "Growth";
+    case "scale":
+      return "Scale";
+  }
 }
 
 export function paidPlanLabel(

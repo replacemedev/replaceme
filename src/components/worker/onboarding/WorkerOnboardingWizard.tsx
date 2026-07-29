@@ -13,13 +13,12 @@ import {
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperTextOptional } from "@/lib/storage/profile-image";
-import { SkillPicker } from "@/components/shared/onboarding/SkillPicker";
+import { SkillSelectDropdown } from "@/components/shared/SkillSelectDropdown";
 import {
-  DEFAULT_SKILL_OPTIONS,
   ONBOARDING_SELECT_CLASS,
-  WORKER_LOCATION_OPTIONS,
 } from "@/config/onboarding";
 import { COMPENSATION_CURRENCIES } from "@/lib/format/currency";
+import { formatFullName } from "@/lib/format/name";
 
 const CONTENT_STEPS = 6;
 const AVAILABILITY_OPTIONS = [
@@ -54,12 +53,13 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const firstName = draft.firstName;
   const middleName = draft.middleName;
   const lastName = draft.lastName;
+  const suffix = draft.suffix;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
-  const [suffix, setSuffix] = useState(draft.suffix || "");
-  const [phoneNumber, setPhoneNumber] = useState(draft.phoneNumber || "");
   const [gender, setGender] = useState(draft.gender || "");
   const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
   const [preferredLanguage, setPreferredLanguage] = useState(draft.preferredLanguage || "");
+  const [middleNameDraft, setMiddleNameDraft] = useState(middleName || "");
+  const [suffixDraft, setSuffixDraft] = useState(suffix || "");
   const [region, setRegion] = useState(draft.region || "");
   const [province, setProvince] = useState(draft.province || "");
   const [city, setCity] = useState(draft.city || "");
@@ -139,7 +139,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
       !professionalTitle.trim() ||
       !firstName.trim() ||
       !lastName.trim() ||
-      !phoneNumber.trim() ||
       !preferredLanguage.trim();
 
     return (
@@ -155,10 +154,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             const result = await saveWorkerOnboardingStep("identity", {
               professionalTitle: professionalTitle.trim(),
               firstName: firstName.trim(),
-              middleName: middleName.trim(),
+              middleName: middleNameDraft.trim() || null,
               lastName: lastName.trim(),
-              suffix: suffix.trim() || null,
-              phoneNumber: phoneNumber.trim(),
+              suffix: suffixDraft.trim() || null,
               gender: gender || null,
               civilStatus: civilStatus || null,
               preferredLanguage: preferredLanguage.trim(),
@@ -174,7 +172,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         <ProfileAvatarUpload
           avatarUrl={avatarUrl}
           displayName={
-            [firstName, middleName, lastName, suffix].filter(Boolean).join(" ").trim() || professionalTitle.trim() || "Worker"
+            formatFullName(firstName, middleNameDraft, lastName, suffixDraft) ||
+            professionalTitle.trim() ||
+            "Worker"
           }
           size="md"
           onAvatarChange={setAvatarUrl}
@@ -190,69 +190,67 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             placeholder="e.g. Senior React Developer"
           />
         </label>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            First name
-            <input
-              required
-              readOnly
-              value={firstName}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
-            />
-          </label>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Middle name (Optional)
-            <input
-              readOnly
-              value={middleName || ""}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
-              placeholder="Optional"
-            />
-          </label>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Last name
-            <input
-              required
-              readOnly
-              value={lastName}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed px-4 py-3 focus:ring-0 opacity-80"
-            />
-          </label>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Suffix (Optional)
-            <input
-              value={suffix}
-              onChange={(e) => setSuffix(e.target.value)}
-              placeholder="e.g. Jr."
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
-            />
-          </label>
+        <div className="space-y-4 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Legal name
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label className="block min-w-0 space-y-2 text-sm font-medium text-slate-700">
+              First name
+              <input
+                required
+                readOnly
+                value={firstName}
+                className="w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500 opacity-80 cursor-not-allowed focus:ring-0"
+              />
+            </label>
+            <label className="block min-w-0 space-y-2 text-sm font-medium text-slate-700">
+              Middle name
+              <span className="ml-1 text-xs font-normal text-slate-400">(optional)</span>
+              <input
+                value={middleNameDraft}
+                onChange={(e) => setMiddleNameDraft(e.target.value)}
+                placeholder="Legal middle name"
+                autoComplete="additional-name"
+                className="w-full min-w-0 rounded-xl border border-slate-200 px-4 py-3 break-words"
+              />
+            </label>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label className="block min-w-0 space-y-2 text-sm font-medium text-slate-700">
+              Last name
+              <input
+                required
+                readOnly
+                value={lastName}
+                className="w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500 opacity-80 cursor-not-allowed focus:ring-0"
+              />
+            </label>
+            <label className="block min-w-0 space-y-2 text-sm font-medium text-slate-700">
+              Suffix
+              <span className="ml-1 text-xs font-normal text-slate-400">(optional)</span>
+              <input
+                value={suffixDraft}
+                onChange={(e) => setSuffixDraft(e.target.value)}
+                placeholder="Jr., III, PhD"
+                autoComplete="honorific-suffix"
+                className="w-full min-w-0 rounded-xl border border-slate-200 px-4 py-3 break-words"
+              />
+            </label>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Phone Number
-            <input
-              type="tel"
-              required
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="+63 912 345 6789"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
-            />
-          </label>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Preferred Language
-            <input
-              type="text"
-              required
-              value={preferredLanguage}
-              onChange={(e) => setPreferredLanguage(e.target.value)}
-              placeholder="e.g. English, Tagalog"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3"
-            />
-          </label>
-        </div>
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Preferred Language
+          <input
+            type="text"
+            required
+            value={preferredLanguage}
+            onChange={(e) => setPreferredLanguage(e.target.value)}
+            placeholder="e.g. English, Tagalog"
+            className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          />
+        </label>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <label className="block space-y-2 text-sm font-medium text-slate-700">
@@ -442,13 +440,11 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
-        <SkillPicker
+        <SkillSelectDropdown
           label="Top skills"
-          hint="Pick from the list or add skills that best describe your expertise."
-          options={DEFAULT_SKILL_OPTIONS}
+          hint="Pick up to 5 skills that best describe your expertise"
           value={skills}
           onChange={setSkills}
-          maxSkills={8}
           disabled={isPending}
         />
       </OnboardingWizardShell>
@@ -680,13 +676,11 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
         />
       </label>
-      <SkillPicker
+      <SkillSelectDropdown
         label="Skills used"
-        hint="Technologies or skills you applied on this project."
-        options={DEFAULT_SKILL_OPTIONS}
+        hint="Technologies or skills you applied on this project"
         value={projectSkills}
         onChange={setProjectSkills}
-        maxSkills={8}
         disabled={isPending}
       />
     </OnboardingWizardShell>

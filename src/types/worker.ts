@@ -29,7 +29,6 @@ export interface RecommendedJob {
 
 export interface WorkerStats {
   applied_count: number;
-  interviews_count: number;
   hired_count: number;
   profile_strength: number; // e.g. 78
 }

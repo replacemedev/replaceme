@@ -5,7 +5,7 @@ export interface NavProfile {
   first_name: string | null;
   middle_name?: string | null;
   last_name: string | null;
-  username: string | null;
+  suffix?: string | null;
   avatar_url: string | null;
   is_verified: boolean;
   company_name?: string | null;

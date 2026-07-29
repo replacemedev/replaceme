@@ -36,7 +36,6 @@ import {
   type ForgotPasswordFormValues,
 } from "@/lib/validations/auth";
 import Stripe from "stripe";
-import { formatFullName } from "@/lib/format/name";
 import { assertRateLimit } from "@/lib/server/rate-limit";
 import {
   AUTH_ERROR,
@@ -113,11 +112,11 @@ function handleAuthError(error: unknown): string {
   }
 
   if (message.includes("Email not confirmed")) {
-    return "Invalid email, username, or password. Please try again.";
+    return "Invalid email or password. Please try again.";
   }
 
   if (message.includes("Invalid login credentials")) {
-    return "Invalid email, username, or password. Please try again.";
+    return "Invalid email or password. Please try again.";
   }
 
   return message;
@@ -154,48 +153,21 @@ async function profileExistsByEmail(email: string): Promise<boolean> {
   }
 }
 
-type IdentityConflict =
-  | { conflict: "email" }
-  | { conflict: "username" }
-  | { conflict: null };
+type IdentityConflict = { conflict: "email" } | { conflict: null };
 
-/**
- * Pre-flight uniqueness check (service role) before Supabase Auth signUp.
- * Covers workers + employers: both store email on profiles; usernames must be
- * free on profiles and company_profiles.
- */
-async function checkSignupIdentityAvailable(
-  email: string,
-  username: string
-): Promise<IdentityConflict> {
+async function checkSignupEmailAvailable(email: string): Promise<IdentityConflict> {
   const normalizedEmail = email.trim().toLowerCase();
-  const normalizedUsername = username.trim();
 
   try {
     const { createAdminClient } = await import("@/lib/supabase/server");
     const admin = await createAdminClient();
 
-    const [emailResult, profileUsernameResult, companyUsernameResult] =
-      await Promise.all([
-        admin
-          .from("profiles")
-          .select("id")
-          .ilike("email", escapeIlikeExact(normalizedEmail))
-          .limit(1)
-          .maybeSingle(),
-        admin
-          .from("profiles")
-          .select("id")
-          .eq("username", normalizedUsername)
-          .limit(1)
-          .maybeSingle(),
-        admin
-          .from("company_profiles")
-          .select("employer_id")
-          .eq("username", normalizedUsername)
-          .limit(1)
-          .maybeSingle(),
-      ]);
+    const emailResult = await admin
+      .from("profiles")
+      .select("id")
+      .ilike("email", escapeIlikeExact(normalizedEmail))
+      .limit(1)
+      .maybeSingle();
 
     if (emailResult.error) {
       safeError("[Auth] signup email uniqueness check failed:", emailResult.error);
@@ -203,101 +175,26 @@ async function checkSignupIdentityAvailable(
       return { conflict: "email" };
     }
 
-    if (profileUsernameResult.error) {
-      safeError(
-        "[Auth] signup profile username uniqueness check failed:",
-        profileUsernameResult.error
-      );
-    } else if (profileUsernameResult.data) {
-      return { conflict: "username" };
-    }
-
-    if (companyUsernameResult.error) {
-      safeError(
-        "[Auth] signup company username uniqueness check failed:",
-        companyUsernameResult.error
-      );
-    } else if (companyUsernameResult.data) {
-      return { conflict: "username" };
-    }
-
     return { conflict: null };
   } catch (error) {
-    safeError("[Auth] checkSignupIdentityAvailable unexpected error:", error);
-    // Fail open to Auth + DB unique constraints rather than blocking legitimate signups.
+    safeError("[Auth] checkSignupEmailAvailable unexpected error:", error);
     return { conflict: null };
   }
 }
 
-function identityConflictResponse(conflict: "email" | "username") {
-  if (conflict === "email") {
-    return {
-      success: false as const,
-      error: AUTH_ERROR.EMAIL_EXISTS,
-      message: AUTH_ERROR_MESSAGE.EMAIL_EXISTS,
-    };
-  }
+function identityConflictResponse(conflict: "email") {
   return {
     success: false as const,
-    error: AUTH_ERROR.USERNAME_EXISTS,
-    message: AUTH_ERROR_MESSAGE.USERNAME_EXISTS,
+    error: AUTH_ERROR.EMAIL_EXISTS,
+    message: AUTH_ERROR_MESSAGE.EMAIL_EXISTS,
   };
 }
 
-/** Login identifier → auth email. Usernames require service role (RLS blocks anon SELECT on profiles). */
+/** Login identifier must be email (username column removed). */
 async function resolveEmailForLogin(identifier: string): Promise<string | null> {
   const trimmed = identifier.trim();
-  if (!trimmed) return null;
-
-  if (trimmed.includes("@")) {
-    return trimmed.toLowerCase();
-  }
-
-  try {
-    const { createAdminClient } = await import("@/lib/supabase/server");
-    const admin = await createAdminClient();
-
-    const { data: profileRow, error: profileError } = await admin
-      .from("profiles")
-      .select("email")
-      .eq("username", trimmed)
-      .maybeSingle();
-
-    if (profileError) {
-      safeError("[Auth] username lookup on profiles failed:", profileError);
-    } else if (profileRow?.email) {
-      return profileRow.email.trim().toLowerCase();
-    }
-
-    const { data: companyRow, error: companyError } = await admin
-      .from("company_profiles")
-      .select("employer_id")
-      .eq("username", trimmed)
-      .maybeSingle();
-
-    if (companyError) {
-      safeError("[Auth] username lookup on company_profiles failed:", companyError);
-      return null;
-    }
-
-    if (!companyRow?.employer_id) return null;
-
-    const { data: employerProfile, error: employerError } = await admin
-      .from("profiles")
-      .select("email")
-      .eq("id", companyRow.employer_id)
-      .maybeSingle();
-
-    if (employerError) {
-      safeError("[Auth] employer email lookup failed:", employerError);
-      return null;
-    }
-
-    return employerProfile?.email?.trim().toLowerCase() ?? null;
-  } catch (error) {
-    safeError("[Auth] resolveEmailForLogin unexpected error:", error);
-    return null;
-  }
+  if (!trimmed || !trimmed.includes("@")) return null;
+  return trimmed.toLowerCase();
 }
 
 export async function signUp(formData: SignUpFormValues) {
@@ -341,25 +238,17 @@ export async function signUp(formData: SignUpFormValues) {
     }
 
     const firstName = data.firstName.trim();
-    const middleName = data.middleName?.trim() || "";
+    const middleName =
+      role === "worker" ? data.middleName?.trim() || null : null;
     const lastName = data.lastName.trim();
-    const suffix = "suffix" in data ? (data.suffix as string | undefined)?.trim() : "";
-    const phoneNumber = "phoneNumber" in data ? (data.phoneNumber as string | undefined)?.trim() : "";
-    const fullName = formatFullName(firstName, middleName, lastName, suffix);
+    const suffix = role === "worker" ? data.suffix?.trim() || null : null;
     const normalizedEmail = data.email.trim().toLowerCase();
-    const normalizedUsername = data.username.trim();
 
-    // 2. Uniqueness pre-check (before Auth) — workers and employers share the namespace
-    const identity = await checkSignupIdentityAvailable(
-      normalizedEmail,
-      normalizedUsername
-    );
+    const identity = await checkSignupEmailAvailable(normalizedEmail);
     if (identity.conflict) {
       return identityConflictResponse(identity.conflict);
     }
 
-    // 3. Create the Auth user via Admin API (does not send a confirmation email).
-    // Metadata feeds the handle_new_user trigger; deferred verification stays in settings.
     const appRole = role === "employer" ? "employer" : "worker";
     const admin = await createAdminClient();
     const { data: authData, error: authError } = await admin.auth.admin.createUser({
@@ -371,35 +260,20 @@ export async function signUp(formData: SignUpFormValues) {
       },
       user_metadata: {
         role: data.role,
-        username: normalizedUsername,
-        full_name: fullName,
         first_name: firstName,
-        middle_name: middleName || null,
+        middle_name: middleName,
         last_name: lastName,
-        suffix: suffix || null,
-        phone_number: phoneNumber || null,
+        suffix,
       },
     });
 
     if (authError) {
       const msg = extractErrorMessage(authError);
       const mapped = mapSignupDatabaseError(msg);
-      if (mapped === AUTH_ERROR.USERNAME_EXISTS) {
-        return identityConflictResponse("username");
-      }
       if (mapped === AUTH_ERROR.EMAIL_EXISTS) {
         return identityConflictResponse("email");
       }
       const lower = msg.toLowerCase();
-      if (
-        msg.includes("profiles_username_key") ||
-        msg.includes("company_profiles_username_key") ||
-        msg.includes("unique_username") ||
-        (lower.includes("username") &&
-          (lower.includes("already") || msg.includes("23505")))
-      ) {
-        return identityConflictResponse("username");
-      }
       if (
         lower.includes("already registered") ||
         lower.includes("already exists") ||
@@ -475,7 +349,7 @@ export async function signUp(formData: SignUpFormValues) {
 }
 
 const GENERIC_LOGIN_ERROR =
-  "Invalid email, username, or password. Please try again.";
+  "Invalid email or password. Please try again.";
 
 function mapSignInInfrastructureError(error: unknown): string | null {
   if (isRedisInfrastructureError(error)) {

@@ -4,7 +4,6 @@ import { useEffect, useState, useTransition } from "react";
 import {
   Loader2,
   Mail,
-  Phone,
   Shield,
   ShieldCheck,
   ShieldAlert,
@@ -37,7 +36,7 @@ function formatWhen(value: string | null | undefined): string {
 
 function initialsFrom(data: AdminTeamMemberDeepDive): string {
   const name =
-    formatFullName(data.firstName, data.middleName, data.lastName).trim() ||
+    formatFullName(data.firstName, data.lastName).trim() ||
     data.displayName ||
     data.email ||
     "?";
@@ -101,7 +100,7 @@ export function AdminTeamMemberDetailsDrawer({
   }, [open, userId]);
 
   const fullName = data
-    ? formatFullName(data.firstName, data.middleName, data.lastName).trim() ||
+    ? formatFullName(data.firstName, data.lastName).trim() ||
       data.displayName ||
       data.email ||
       "Admin"
@@ -164,29 +163,12 @@ export function AdminTeamMemberDetailsDrawer({
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <DetailRow label="Legal name" value={fullName} />
               <DetailRow
-                label="Username"
-                value={data.username ? `@${data.username}` : "—"}
-              />
-              <DetailRow
                 label="Email"
                 value={
                   data.email ? (
                     <span className="inline-flex min-w-0 items-center gap-1.5">
                       <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
                       <span className="truncate">{data.email}</span>
-                    </span>
-                  ) : (
-                    "—"
-                  )
-                }
-              />
-              <DetailRow
-                label="Phone"
-                value={
-                  data.phoneNumber ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
-                      {data.phoneNumber}
                     </span>
                   ) : (
                     "—"

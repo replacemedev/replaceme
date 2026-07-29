@@ -11,11 +11,11 @@ export default function EmployerAccountSettingsLoading() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 space-y-6">
-          <CardSkeleton minHeight="min-h-[220px]" />
-          <CardSkeleton minHeight="min-h-[300px]" />
+          <CardSkeleton minHeight="min-h-[280px]" />
+          <CardSkeleton minHeight="min-h-[200px]" />
         </div>
         <aside className="space-y-6">
-          <CardSkeleton minHeight="min-h-[200px]" />
+          <CardSkeleton minHeight="min-h-[240px]" />
         </aside>
       </div>
     </EmployerPageShell>

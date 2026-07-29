@@ -81,14 +81,11 @@ export function Footer() {
               <Link className={linkClassName} href="/privacy-policy">
                 Privacy Policy
               </Link>
-              <Link className={linkClassName} href="/subprocessors">
-                Subprocessors
-              </Link>
-              <Link className={linkClassName} href="/employer-dpa">
-                Employer DPA
-              </Link>
               <Link className={linkClassName} href="/terms-of-service">
                 Terms of Service
+              </Link>
+              <Link className={linkClassName} href="/refund-policy">
+                Refund Policy
               </Link>
               <Link className={linkClassName} href="/cookie-policy">
                 Cookie Policy
@@ -105,8 +102,18 @@ export function Footer() {
           </p>
           <div className="text-xs text-gray-500 max-w-xl w-full md:max-w-md lg:max-w-lg md:text-right space-y-1.5 leading-relaxed break-words">
             <p>
-              Payments processed securely by Stripe. Replaceme is the merchant of
-              record for all subscriptions.
+              Employer plan payments are processed securely by Stripe. An
+              Australian business operating Replaceme is the merchant of record
+              for subscriptions (USD). Applicable tax is calculated at checkout
+              when required by law and remitted to tax authorities—not kept as a
+              Stripe fee. See our{" "}
+              <Link
+                href="/refund-policy"
+                className="underline hover:text-emerald-600 transition-colors"
+              >
+                Refund Policy
+              </Link>
+              .
             </p>
             <p>
               Platform work and identity verification are strictly restricted to
@@ -121,10 +128,10 @@ export function Footer() {
               </Link>{" "}
               and{" "}
               <Link
-                href="/employer-dpa"
+                href="/terms-of-service"
                 className="underline hover:text-emerald-600 transition-colors"
               >
-                Employer DPA
+                Terms of Service
               </Link>
               .
             </p>

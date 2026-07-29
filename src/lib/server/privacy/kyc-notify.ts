@@ -17,7 +17,7 @@ async function loadWorkerContact(workerId: string) {
   const admin = await createAdminClient();
   const { data: profile } = await admin
     .from("profiles")
-    .select("id, email, first_name, middle_name, last_name")
+    .select("id, email, first_name, middle_name, last_name, suffix")
     .eq("id", workerId)
     .maybeSingle();
 
@@ -27,7 +27,8 @@ async function loadWorkerContact(workerId: string) {
       formatFullName(
         profile?.first_name,
         profile?.middle_name,
-        profile?.last_name
+        profile?.last_name,
+        profile?.suffix
       ) || null,
   };
 }

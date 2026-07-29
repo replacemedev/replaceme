@@ -29,7 +29,6 @@ export function InviteAdminDialog({
 }: InviteAdminDialogProps) {
   const [pending, startTransition] = useTransition();
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [adminRole, setAdminRole] = useState<AdminRole>("moderator");
   const [capabilities, setCapabilities] = useState<AdminCapability[]>([
@@ -38,7 +37,6 @@ export function InviteAdminDialog({
 
   const resetForm = () => {
     setFullName("");
-    setUsername("");
     setEmail("");
     setAdminRole("moderator");
     setCapabilities([...DEFAULT_MODERATOR_CAPABILITIES]);
@@ -55,7 +53,6 @@ export function InviteAdminDialog({
     startTransition(async () => {
       const result = await inviteAdminUser({
         fullName,
-        username,
         email,
         admin_role: adminRole,
         capabilities: adminRole === "superadmin" ? [] : capabilities,
@@ -116,19 +113,6 @@ export function InviteAdminDialog({
             onChange={(e) => setFullName(e.target.value)}
             required
             autoComplete="name"
-            disabled={pending}
-          />
-        </div>
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
-            Username
-          </label>
-          <input
-            className={inputClassName}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            autoComplete="username"
             disabled={pending}
           />
         </div>

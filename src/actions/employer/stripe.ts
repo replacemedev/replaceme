@@ -40,7 +40,7 @@ export async function createStripeCheckoutSession(
 
     const { data: employerProfile } = await supabase
       .from("profiles")
-      .select("first_name, middle_name, last_name")
+      .select("first_name, last_name")
       .eq("id", profile.id)
       .single();
 
@@ -59,11 +59,7 @@ export async function createStripeCheckoutSession(
     }
 
     const name =
-      formatFullName(
-        employerProfile?.first_name,
-        employerProfile?.middle_name,
-        employerProfile?.last_name
-      ) || "Employer";
+      formatFullName(employerProfile?.first_name, employerProfile?.last_name) || "Employer";
 
     const session = await createPlanChangeSession({
       employerId: profile.id,

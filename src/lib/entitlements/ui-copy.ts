@@ -123,7 +123,7 @@ export function featureGateCopy(
       return {
         title: "Unlock direct messaging",
         description:
-          "Message candidates in real time, move faster on interviews, and close hires without leaving Replaceme.",
+          "Message candidates in real time and close hires without leaving Replaceme.",
         tier,
         price,
         tierLabel,
@@ -236,22 +236,4 @@ export function pinnedPageSubhead(
   }
 
   return `${tier} plan — ${countLabel}. Compare bookmarked talent and message from one place.`;
-}
-
-export function interviewsPageSubhead(
-  planSlug: string,
-  interviewCount: number,
-  messagingEnabled: boolean
-): string {
-  const tier = TIER_LABELS[normalizePlanSlug(planSlug)];
-  const countLabel =
-    interviewCount === 1
-      ? "1 interview scheduled"
-      : `${interviewCount} interviews scheduled`;
-
-  if (!messagingEnabled) {
-    return `${tier} plan — ${countLabel}. Upgrade to message candidates directly.`;
-  }
-
-  return `${tier} plan — ${countLabel}. Coordinate next steps from your applicant pipelines.`;
 }

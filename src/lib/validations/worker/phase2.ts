@@ -36,25 +36,6 @@ export const updateWorkerSettingsSchema = z
   })
   .strict();
 
-
-export const reportEmployerSchema = z
-  .object({
-    title: z.string().min(5).max(120),
-    description: z.string().min(10).max(2000),
-    violationCategory: z.enum([
-      "scam_fraud",
-      "payment_circumvention",
-      "harassment",
-      "wage_dispute",
-      "identity_misrepresentation",
-      "spam_misleading",
-      "other",
-    ]),
-    employerId: z.string().uuid(),
-    jobId: z.string().uuid().optional(),
-  })
-  .strict();
-
 export const contractResponseSchema = z
   .object({
     contractId: z.string().uuid(),
@@ -80,15 +61,5 @@ export interface WorkerContractRow {
   status: string;
   startDate: string;
   employmentType: string;
-}
-
-export interface WorkerInterviewRow {
-  interviewId: string;
-  applicationId: string;
-  jobTitle: string;
-  companyName: string;
-  scheduledAt: string;
-  meetingUrl: string | null;
-  status: string;
 }
 

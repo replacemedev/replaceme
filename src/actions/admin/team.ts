@@ -153,7 +153,7 @@ export async function fetchAdminTeam(): Promise<
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "id, first_name, middle_name, last_name, email, account_status, created_at, avatar_url"
+        "id, first_name, last_name, email, account_status, created_at, avatar_url"
       )
       .eq("role", "admin")
       .order("created_at", { ascending: false });
@@ -273,7 +273,7 @@ export async function fetchAdminTeamActivity(
       const [{ data: profiles }, { data: adminProfiles }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, email, first_name, middle_name, last_name, avatar_url")
+          .select("id, email, first_name, last_name, avatar_url")
           .in("id", adminIds),
         supabase
           .from("admin_profiles")
@@ -285,7 +285,7 @@ export async function fetchAdminTeamActivity(
       );
       for (const p of profiles ?? []) {
         const meta = metaById.get(p.id);
-        const fullName = [p.first_name, p.middle_name, p.last_name]
+        const fullName = [p.first_name, p.last_name]
           .filter(Boolean)
           .join(" ");
         actorById.set(p.id, {
@@ -377,7 +377,6 @@ export async function inviteAdminUser(
         },
         user_metadata: {
           role: "admin",
-          username: parsed.username,
           first_name: firstName,
           last_name: lastName,
           full_name: parsed.fullName.trim(),
@@ -394,9 +393,6 @@ export async function inviteAdminUser(
           success: false,
           error: "An account with this email already exists.",
         };
-      }
-      if (message.includes("Username") || message.includes("username")) {
-        return { success: false, error: "This username is already taken." };
       }
       return { success: false, error: message };
     }
@@ -848,11 +844,8 @@ export async function revokeAdminInvite(
 export type AdminTeamMemberDeepDive = {
   id: string;
   firstName: string | null;
-  middleName: string | null;
   lastName: string | null;
   email: string | null;
-  phoneNumber: string | null;
-  username: string | null;
   avatarUrl: string | null;
   displayName: string | null;
   department: string | null;
@@ -882,7 +875,7 @@ export async function getAdminTeamMemberDeepDive(
         supabase
           .from("profiles")
           .select(
-            "id, first_name, middle_name, last_name, email, phone_number, username, avatar_url, account_status, created_at"
+            "id, first_name, last_name, email, avatar_url, account_status, created_at"
           )
           .eq("id", id)
           .eq("role", "admin")
@@ -945,11 +938,8 @@ export async function getAdminTeamMemberDeepDive(
       data: {
         id: profile.id,
         firstName: profile.first_name ?? null,
-        middleName: profile.middle_name ?? null,
         lastName: profile.last_name ?? null,
         email: profile.email ?? null,
-        phoneNumber: profile.phone_number ?? null,
-        username: profile.username ?? null,
         avatarUrl: profile.avatar_url ?? meta?.avatar_url ?? null,
         displayName: meta?.display_name ?? null,
         department: meta?.department ?? null,

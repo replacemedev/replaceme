@@ -87,6 +87,13 @@ export async function createSubscriptionCheckoutSession(
   const siteUrl = getSiteUrl();
   const planSlug = plan.slug ?? input.planRef.toLowerCase();
 
+  // Stripe Tax (AU merchant of record). Set STRIPE_AUTOMATIC_TAX=false only in
+  // sandboxes where Tax is not activated in the Stripe Dashboard yet.
+  const automaticTaxEnabled = process.env.STRIPE_AUTOMATIC_TAX !== "false";
+
+  // Stripe Tax (AU merchant of record): calculate GST/VAT only when required
+  // for the buyer's location. Requires Tax enabled in Stripe Dashboard with
+  // Australian business origin. Do not hardcode PH VAT as seller remittance.
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerResult.customerId,
@@ -107,6 +114,19 @@ export async function createSubscriptionCheckoutSession(
       },
     },
     allow_promotion_codes: true,
+    ...(automaticTaxEnabled
+      ? {
+          automatic_tax: { enabled: true as const },
+          billing_address_collection: "required" as const,
+          tax_id_collection: { enabled: true as const },
+          customer_update: {
+            address: "auto" as const,
+            name: "auto" as const,
+          },
+        }
+      : {
+          billing_address_collection: "required" as const,
+        }),
   });
 
   if (!session.url) {

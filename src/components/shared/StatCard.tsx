@@ -19,7 +19,7 @@ type DashboardStatCardProps = {
   iconColorClass: string;
 };
 
-type ApplicationStatVariant = "default" | "review" | "interview";
+type ApplicationStatVariant = "default" | "review" | "hired";
 
 type ApplicationStatCardProps = {
   variant: "application";
@@ -52,11 +52,11 @@ const applicationVariantStyles: Record<
     watermark: "text-emerald-200",
     badge: "bg-emerald-50 text-emerald-700 border-emerald-100",
   },
-  interview: {
-    card: "bg-[#f0f7ff] border-blue-100",
-    label: "text-blue-700",
-    watermark: "text-blue-200",
-    badge: "bg-blue-50 text-blue-700 border-blue-100",
+  hired: {
+    card: "bg-[#ebfdf2] border-[#006e2f]/20",
+    label: "text-[#006e2f]",
+    watermark: "text-emerald-200",
+    badge: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/20",
   },
 };
 
