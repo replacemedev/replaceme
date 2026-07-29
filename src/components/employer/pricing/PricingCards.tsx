@@ -216,7 +216,7 @@ export function PricingCards({
                         </span>
                       ) : (
                         <span
-                          className="mt-[2px] inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-red-50"
+                          className="mt-[3px] inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-red-50"
                           aria-hidden
                         >
                           <X className="size-2.5 text-red-500 stroke-[3]" />
