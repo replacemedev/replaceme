@@ -25,6 +25,7 @@ import {
   AdminMobileCard,
 } from "@/components/admin/shared/AdminDataTable";
 import { JobRowActionsMenu } from "@/components/admin/jobs/JobRowActionsMenu";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   discoverySlaSortWeight,
   getDiscoverySlaState,
@@ -512,11 +513,10 @@ export function JobsModerationClient({
                 }
               >
                 <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={selectedIds.has(job.id)}
                     onChange={() => toggleOne(job.id)}
-                    className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                    className="mt-0.5 shrink-0"
                     aria-label={`Select ${job.title}`}
                   />
                   <div className="min-w-0 flex-1 space-y-2">
@@ -561,12 +561,11 @@ export function JobsModerationClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <th className="px-4 py-3 w-10">
-                    <input
-                      type="checkbox"
+                  <th className="w-10 px-4 py-3">
+                    <Checkbox
                       checked={allPageSelected}
                       onChange={toggleAllPage}
-                      className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                      className="shrink-0"
                       aria-label="Select all on this page"
                     />
                   </th>
@@ -583,11 +582,10 @@ export function JobsModerationClient({
                 {paginatedJobs.map((job) => (
                   <tr key={job.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-3 align-middle">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={selectedIds.has(job.id)}
                         onChange={() => toggleOne(job.id)}
-                        className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500/30"
+                        className="shrink-0"
                         aria-label={`Select ${job.title}`}
                       />
                     </td>

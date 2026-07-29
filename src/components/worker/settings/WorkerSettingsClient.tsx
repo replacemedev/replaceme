@@ -12,6 +12,7 @@ import {
 import { WorkerAccountIdentityCard } from "@/components/worker/settings/WorkerAccountIdentityCard";
 import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
 import { ContactSupportCard } from "@/components/shared/privacy/ContactSupportCard";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const SETTINGS_NAV = [
   {
@@ -169,12 +170,11 @@ export function WorkerSettingsClient({
               className={inputClassName}
             />
           </label>
-          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-semibold text-slate-700">
-            <input
-              type="checkbox"
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-semibold leading-snug text-slate-700">
+            <Checkbox
               checked={isRemote}
               onChange={(e) => setIsRemote(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#006e2f]/30"
+              className="shrink-0"
             />
             Open to remote work
           </label>

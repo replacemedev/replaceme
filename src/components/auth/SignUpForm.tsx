@@ -347,33 +347,45 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
             name="terms"
             control={control}
             render={({ field }) => (
-              <label className="group flex cursor-pointer items-start gap-3">
+              <label
+                htmlFor="signup-terms"
+                className="group flex cursor-pointer items-center gap-3"
+              >
                 <Checkbox
+                  id="signup-terms"
                   checked={field.value === true}
                   onChange={(event) => field.onChange(event.target.checked)}
                   onBlur={field.onBlur}
                   name={field.name}
                   ref={field.ref}
-                  className="mt-0.5 shrink-0"
+                  className="shrink-0"
                   aria-invalid={errors.terms ? true : undefined}
                   aria-describedby={
                     errors.terms ? "signup-terms-error" : undefined
                   }
                 />
-                <span className="text-sm font-body-base leading-relaxed text-slate-600">
+                <span className="text-sm font-body-base leading-snug text-slate-600">
                   I agree to the{" "}
                   <button
                     type="button"
-                    onClick={() => setActiveDocumentModal("terms")}
-                    className="text-[#22c55e] hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setActiveDocumentModal("terms");
+                    }}
+                    className="inline cursor-pointer border-none bg-transparent p-0 font-medium text-[#22c55e] hover:underline"
                   >
                     Terms of Service
                   </button>{" "}
                   and{" "}
                   <button
                     type="button"
-                    onClick={() => setActiveDocumentModal("privacy")}
-                    className="text-[#22c55e] hover:underline bg-transparent border-none p-0 inline font-medium cursor-pointer"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setActiveDocumentModal("privacy");
+                    }}
+                    className="inline cursor-pointer border-none bg-transparent p-0 font-medium text-[#22c55e] hover:underline"
                   >
                     Privacy Policy
                   </button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Checkbox } from "@/components/ui/checkbox";
 import { EmploymentTypeFacet } from "@/types/job-search";
 
 interface JobFilterSidebarProps {
@@ -187,14 +188,13 @@ export function JobFilterPanel({
               return (
                 <li key={type}>
                   <label className="flex items-center justify-between gap-3 cursor-pointer group">
-                    <span className="flex items-center gap-2.5 min-w-0">
-                      <input
-                        type="checkbox"
+                    <span className="flex min-w-0 items-center gap-3">
+                      <Checkbox
                         checked={checked}
                         onChange={() => handleLocalEmploymentToggle(type)}
-                        className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer"
+                        className="shrink-0"
                       />
-                      <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 truncate">
+                      <span className="truncate text-sm font-medium leading-snug text-slate-700 group-hover:text-slate-900">
                         {type}
                       </span>
                     </span>

@@ -15,6 +15,7 @@ import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { AccountLoginIdentity } from "@/components/shared/settings/AccountLoginIdentity";
 import { AdminDrawer } from "@/components/admin/shared/AdminDrawer";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { profileImageHelperText } from "@/lib/storage/profile-image";
 import {
   formatTimeZoneLabel,
@@ -317,18 +318,17 @@ export function AdminPersonalProfileCard({
             </p>
           </div>
           <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <input
-              type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#22c55e]/40"
+            <Checkbox
+              className="mt-0.5 shrink-0"
               checked={directoryPublic}
               onChange={(e) => setDirectoryPublic(e.target.checked)}
               disabled={pending}
             />
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-slate-800">
+              <span className="block text-sm font-semibold leading-snug text-slate-800">
                 Show on public team page
               </span>
-              <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">
+              <span className="mt-0.5 block text-xs leading-snug text-slate-500">
                 Publishes your name, photo, department, timezone, and bio on{" "}
                 <span className="font-semibold">/team</span>. Email stays
                 private.

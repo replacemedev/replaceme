@@ -6,6 +6,7 @@ import {
   GRANTABLE_MODERATOR_CAPABILITIES,
   type AdminCapability,
 } from "@/lib/admin/capabilities";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AdminCapabilityChecklistProps {
   value: readonly AdminCapability[];
@@ -69,18 +70,17 @@ export function AdminCapabilityChecklist({
                 return (
                   <label
                     key={cap}
-                    className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${
-                      locked ? "text-slate-500" : "text-slate-800 cursor-pointer hover:bg-white"
+                    className={`flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm ${
+                      locked ? "text-slate-500" : "cursor-pointer text-slate-800 hover:bg-white"
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#22c55e]/40"
+                    <Checkbox
+                      className="shrink-0"
                       checked={checked}
                       disabled={disabled || locked}
                       onChange={() => toggle(cap)}
                     />
-                    <span className="font-medium">
+                    <span className="font-medium leading-snug">
                       {ADMIN_CAPABILITY_LABELS[cap]}
                     </span>
                   </label>

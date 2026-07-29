@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   APPLICATION_STATUS_FILTERS,
   ApplicationDateFilter,
@@ -72,14 +73,13 @@ function FilterPanel({
             const checked = statusFilters.includes(item.value);
             return (
               <li key={item.value}>
-                <label className="flex items-center gap-2.5 cursor-pointer group">
-                  <input
-                    type="checkbox"
+                <label className="group flex cursor-pointer items-center gap-3">
+                  <Checkbox
                     checked={checked}
                     onChange={() => onStatusToggle(item.value)}
-                    className="h-4 w-4 rounded border-slate-300 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer"
+                    className="shrink-0"
                   />
-                  <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">
+                  <span className="text-sm font-medium leading-snug text-slate-600 group-hover:text-slate-900">
                     {item.label}
                   </span>
                 </label>

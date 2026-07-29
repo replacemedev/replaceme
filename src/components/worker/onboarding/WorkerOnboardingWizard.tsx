@@ -14,6 +14,7 @@ import { OnboardingWizardShell } from "@/components/shared/onboarding/Onboarding
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperTextOptional } from "@/lib/storage/profile-image";
 import { SkillSelectDropdown } from "@/components/shared/SkillSelectDropdown";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
@@ -407,12 +408,11 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             </select>
           </label>
         </div>
-        <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
-          <input
-            type="checkbox"
+        <label className="flex items-center gap-3 text-sm font-medium leading-snug text-slate-700">
+          <Checkbox
             checked={isRemote}
             onChange={(e) => setIsRemote(e.target.checked)}
-            className="size-4 rounded border-slate-300 text-primary focus:ring-primary/30"
+            className="shrink-0"
           />
           Open to fully remote roles
         </label>

@@ -4,13 +4,18 @@ import Link from "next/link";
 import { WorkerJobDetails, formatPostedDate } from "@/types/job-details";
 import { ApplyActionButtons } from "./ApplyActionButtons";
 import { DELETION_REQUEST_SUPPORT_EMAIL } from "@/lib/data/legal";
+import { buildSupportMailto } from "@/lib/email/support-mailto";
 
 interface JobDetailsHeroProps {
   job: WorkerJobDetails;
 }
 
 export function JobDetailsHero({ job }: JobDetailsHeroProps) {
-  const supportMailto = `mailto:${DELETION_REQUEST_SUPPORT_EMAIL}?subject=${encodeURIComponent(`Issue with job: ${job.title}`)}`;
+  // Native <a> for mailto — next/link does not open mail clients reliably.
+  const supportMailto = buildSupportMailto(
+    DELETION_REQUEST_SUPPORT_EMAIL,
+    `Issue with job: ${job.title}`
+  );
 
   return (
     <header className="relative bg-[#0a4a29] text-white overflow-hidden">
@@ -31,12 +36,12 @@ export function JobDetailsHero({ job }: JobDetailsHeroProps) {
           >
             ← Back to search results
           </Link>
-          <Link
+          <a
             href={supportMailto}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white/90 hover:bg-white/10 transition-colors min-h-11 [-webkit-tap-highlight-color:transparent]"
           >
             Contact support
-          </Link>
+          </a>
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">

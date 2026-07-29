@@ -122,7 +122,7 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
             Describe your industry <span className="text-red-500">*</span>
           </label>
           <p className="text-xs leading-relaxed text-slate-500">
-            Tell workers what space you operate in — this shows on your company profile.
+            Tell workers what space you operate in this shows on your company profile.
           </p>
           <div className="relative pb-5 pt-1">
             <Input

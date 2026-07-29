@@ -10,6 +10,7 @@ import {
   APPEAL_SLA_COPY,
   DELETION_REQUEST_SUPPORT_EMAIL,
 } from "@/lib/data/legal";
+import { buildSupportMailto } from "@/lib/email/support-mailto";
 
 export type AccountRestrictionKind = "suspended" | "closed";
 
@@ -19,9 +20,10 @@ type AccountRestrictionNoticeProps = {
   suspensionEndsAt?: string | null;
 };
 
-const SUPPORT_MAILTO = `mailto:${DELETION_REQUEST_SUPPORT_EMAIL}?subject=${encodeURIComponent(
+const SUPPORT_MAILTO = buildSupportMailto(
+  DELETION_REQUEST_SUPPORT_EMAIL,
   "Account Appeal"
-)}`;
+);
 
 export function AccountRestrictionNotice({
   kind,

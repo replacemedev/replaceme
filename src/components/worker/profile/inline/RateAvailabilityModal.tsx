@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateWorkerSettings } from "@/actions/worker/profile";
 import { COMPENSATION_CURRENCIES, type CompensationCurrency } from "@/lib/format/currency";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ProfileModal } from "./ProfileModal";
 
 const AVAILABILITY = [
@@ -132,12 +133,11 @@ export function RateAvailabilityModal({
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-          <input
-            type="checkbox"
+        <label className="flex items-center gap-3 text-sm font-medium leading-snug text-slate-700">
+          <Checkbox
             checked={isRemote}
             onChange={(e) => setIsRemote(e.target.checked)}
-            className="rounded border-slate-300 text-[#006e2f]"
+            className="shrink-0"
           />
           Open to remote work
         </label>

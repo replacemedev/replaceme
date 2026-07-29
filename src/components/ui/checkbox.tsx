@@ -3,7 +3,7 @@ import * as React from "react"
 export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 /**
- * Shared checkbox. Visual style (green fill + black check) lives in
+ * Shared checkbox. Visual style (green fill + white check) lives in
  * globals.css `input[type="checkbox"]` so raw checkboxes match too.
  */
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(

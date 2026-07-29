@@ -10,6 +10,7 @@ import {
 } from "@/actions/employer/contracts";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 import { ContractStickyActions } from "./ContractStickyActions";
 
@@ -130,19 +131,21 @@ export function ContractDetailClient({
           </select>
         </label>
 
-        <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-          <input
-            type="checkbox"
+        <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3.5">
+          <Checkbox
             id="show-hired-badge-detail-checkbox"
             checked={showHiredBadge}
             onChange={(e) => setShowHiredBadge(e.target.checked)}
-            className="w-4.5 h-4.5 rounded-md border-slate-350 text-[#006e2f] focus:ring-[#006e2f]/30 cursor-pointer mt-0.5 shrink-0"
+            className="mt-0.5 shrink-0"
           />
-          <label htmlFor="show-hired-badge-detail-checkbox" className="select-none cursor-pointer">
+          <label
+            htmlFor="show-hired-badge-detail-checkbox"
+            className="cursor-pointer select-none"
+          >
             <span className="block text-xs font-bold text-slate-850">
               Display 'Hired' badge on Worker's public profile
             </span>
-            <span className="block text-[10px] text-slate-500 font-semibold mt-0.5">
+            <span className="mt-0.5 block text-[10px] font-semibold leading-snug text-slate-500">
               This badge will be visible to everyone when checked. Toggle off to remove visibility immediately.
             </span>
           </label>

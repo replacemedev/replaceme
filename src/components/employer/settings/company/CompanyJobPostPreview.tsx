@@ -82,7 +82,7 @@ export function CompanyJobPostPreview({
       {isProfileComplete ? (
         <div className={`${EMPLOYER_CARD} p-5 text-center space-y-3`}>
           <p className="text-xs font-semibold text-slate-600 leading-relaxed">
-            Profile looks good — post your first job to start receiving
+            Profile looks good. Post your first job to start receiving
             applicants.
           </p>
           <PostJobCTA

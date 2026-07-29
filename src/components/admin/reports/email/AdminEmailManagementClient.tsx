@@ -14,6 +14,7 @@ import {
   AdminMobileCard,
 } from "@/components/admin/shared/AdminDataTable";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   listEmailEvents,
   listEmailMessages,
@@ -652,19 +653,18 @@ function AdminEmailManagementInner({
                   </select>
                 </label>
                 <div className="flex flex-wrap items-center gap-4 lg:col-span-12">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                    <input
-                      type="checkbox"
+                  <label className="flex items-center gap-3 text-sm font-semibold leading-snug text-slate-700">
+                    <Checkbox
                       checked={annForm.enabled}
                       onChange={(e) =>
                         setAnnForm((f) => ({ ...f, enabled: e.target.checked }))
                       }
+                      className="shrink-0"
                     />
                     Feature enabled
                   </label>
-                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                    <input
-                      type="checkbox"
+                  <label className="flex items-center gap-3 text-sm font-semibold leading-snug text-slate-700">
+                    <Checkbox
                       checked={annForm.requiresEarlyAccess}
                       onChange={(e) =>
                         setAnnForm((f) => ({
@@ -672,6 +672,7 @@ function AdminEmailManagementInner({
                           requiresEarlyAccess: e.target.checked,
                         }))
                       }
+                      className="shrink-0"
                     />
                     Requires Early Access
                   </label>

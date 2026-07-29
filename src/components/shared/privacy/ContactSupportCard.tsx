@@ -1,5 +1,9 @@
 import { LifeBuoy, Mail } from "lucide-react";
 import { DELETION_REQUEST_SUPPORT_EMAIL } from "@/lib/data/legal";
+import {
+  buildGmailComposeUrl,
+  buildSupportMailto,
+} from "@/lib/email/support-mailto";
 
 interface ContactSupportCardProps {
   title?: string;
@@ -15,7 +19,12 @@ export function ContactSupportCard({
   className = "",
 }: ContactSupportCardProps) {
   // Native <a> required: next/link intercepts navigation and does not open mailto: clients.
-  const mailto = `mailto:${DELETION_REQUEST_SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+  // Never use target="_blank" on mailto: — Brave/Chrome open a stranded blank tab instead.
+  const mailto = buildSupportMailto(DELETION_REQUEST_SUPPORT_EMAIL, subject);
+  const gmailCompose = buildGmailComposeUrl(
+    DELETION_REQUEST_SUPPORT_EMAIL,
+    subject
+  );
 
   return (
     <div
@@ -37,6 +46,18 @@ export function ContactSupportCard({
         <Mail className="h-4 w-4 shrink-0" aria-hidden />
         Contact support
       </a>
+      <p className="mt-3 text-xs leading-relaxed text-slate-500">
+        {DELETION_REQUEST_SUPPORT_EMAIL}
+        {" · "}
+        <a
+          href={gmailCompose}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-[#006e2f] hover:underline"
+        >
+          Open in Gmail
+        </a>
+      </p>
     </div>
   );
 }

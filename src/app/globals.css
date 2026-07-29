@@ -767,7 +767,7 @@ select {
   appearance: none;
 }
 
-/* Premium checkbox — green fill + black check (platform standard) */
+/* Premium checkbox — green fill + white check (platform standard) */
 input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;
@@ -792,7 +792,7 @@ input[type="checkbox"] {
 input[type="checkbox"]:checked {
   background-color: #22c55e;
   border-color: #22c55e;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.25 8.25L6.5 11.5L12.75 4.25' stroke='%23000000' stroke-width='2.35' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.25 8.25L6.5 11.5L12.75 4.25' stroke='%23ffffff' stroke-width='2.35' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
 }
 
 input[type="checkbox"]:focus-visible {

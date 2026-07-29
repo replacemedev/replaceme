@@ -171,9 +171,17 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
       </div>
 
       <div className="flex items-center justify-between pt-2">
-        <label className="flex items-center gap-2 cursor-pointer group">
-          <Checkbox {...register("rememberMe")} disabled={isLoading} />
-          <span className="text-sm font-body-base text-slate-600 group-hover:text-slate-900 transition-colors">
+        <label
+          htmlFor="login-remember-me"
+          className="group flex cursor-pointer items-center gap-3"
+        >
+          <Checkbox
+            id="login-remember-me"
+            {...register("rememberMe")}
+            disabled={isLoading}
+            className="shrink-0"
+          />
+          <span className="text-sm font-body-base leading-snug text-slate-600 transition-colors group-hover:text-slate-900">
             Remember me
           </span>
         </label>

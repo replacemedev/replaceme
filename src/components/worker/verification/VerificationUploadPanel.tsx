@@ -7,6 +7,7 @@ import { AlertTriangle, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { submitVerificationForReview } from "@/actions/verification";
 import { patchWorkerProfile } from "@/actions/worker/profile";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DocumentDropzone } from "./DocumentDropzone";
 import {
   VERIFICATION_DOCUMENT_TYPES,
@@ -286,16 +287,19 @@ export function VerificationUploadPanel({
 
       {canSubmitForReview && verificationStatus !== "under_review" && (
         <div className="space-y-4 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-          <label className="flex w-full cursor-pointer items-start gap-3">
-            <input
-              type="checkbox"
+          <label
+            htmlFor="kyc-consent"
+            className="flex w-full cursor-pointer items-start gap-3"
+          >
+            <Checkbox
+              id="kyc-consent"
               checked={kycConsent}
               onChange={(e) => setKycConsent(e.target.checked)}
-              className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-[#006e2f] focus:ring-2 focus:ring-[#006e2f]/40"
+              className="mt-0.5 shrink-0"
               required
               aria-required="true"
             />
-            <span className="min-w-0 text-sm leading-relaxed text-slate-600">
+            <span className="min-w-0 text-sm leading-snug text-slate-600">
               I consent to Replaceme collecting and processing my government-issued ID images and
               identity details solely for verification under RA 11967 and our{" "}
               <Link

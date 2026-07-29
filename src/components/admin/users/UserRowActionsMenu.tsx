@@ -21,6 +21,7 @@ import {
   unsuspendUser,
 } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ACCOUNT_LIFECYCLE_TIMELINES,
   DATA_RETENTION_PERIODS,
@@ -506,12 +507,11 @@ export function UserRowActionsMenu({
               </div>
             ) : null}
             {!blockers?.canProceedWithoutForce ? (
-              <label className="flex items-start gap-2.5 text-left text-sm text-slate-700">
-                <input
-                  type="checkbox"
+              <label className="flex items-center gap-3 text-left text-sm leading-snug text-slate-700">
+                <Checkbox
                   checked={forceClose}
                   onChange={(e) => setForceClose(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                  className="shrink-0"
                 />
                 Force close engagements (audited)
               </label>
@@ -613,12 +613,11 @@ function NotifyCheckbox({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-2.5 text-left text-sm text-slate-700">
-      <input
-        type="checkbox"
+    <label className="flex items-center gap-3 text-left text-sm leading-snug text-slate-700">
+      <Checkbox
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 rounded border-slate-300"
+        className="shrink-0"
       />
       Notify user by email
     </label>
