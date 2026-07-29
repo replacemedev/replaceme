@@ -4,7 +4,7 @@ import { getNotificationPreferences } from "@/actions/worker/notification-prefer
 import { NotificationPreferencesClient } from "@/components/worker/settings/NotificationPreferencesClient";
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
-export const metadata = { title: "Notification Preferences | Replaceme" };
+export const metadata = { title: "Notification Preferences" };
 export const dynamic = "force-dynamic";
 
 export default async function WorkerNotificationPreferencesPage() {

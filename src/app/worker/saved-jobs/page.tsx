@@ -9,7 +9,7 @@ import { parseSavedJobsQuery } from "@/types/saved-jobs";
 import { WorkerPageShell } from "@/components/worker/layout";
 
 export const metadata = {
-  title: "Saved Jobs | Replaceme",
+  title: "Saved Jobs",
   description: "Review and manage positions you've bookmarked for later application.",
 };
 

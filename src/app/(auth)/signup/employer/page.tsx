@@ -11,7 +11,7 @@ import { buildAuthHref, parseGuestCallbackUrl } from "@/lib/auth/safe-callback-u
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Sign Up as Employer | Replaceme",
+  title: "Sign Up as Employer",
   description: "Create your Replaceme employer account.",
 };
 

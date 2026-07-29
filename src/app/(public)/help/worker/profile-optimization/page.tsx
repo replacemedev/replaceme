@@ -15,7 +15,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Worker Profile Optimization Guide | Stand Out on Replaceme",
+  title: "Worker Profile Optimization Guide | Stand Out",
   description:
     "Learn expert tips to optimize your Replaceme worker profile, write compelling summaries, highlight key skills, and get hired faster by top remote employers.",
   keywords: [

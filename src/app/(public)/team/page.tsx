@@ -6,7 +6,7 @@ import { StaffDirectoryGrid } from "@/components/shared/staff/StaffDirectoryGrid
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Our Team | Replaceme",
+  title: "Our Team",
   description:
     "Meet the Replaceme people behind Trust & Safety and platform operations. Opted-in staff profiles only.",
   alternates: { canonical: `${BASE_URL}/team` },

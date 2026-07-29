@@ -14,7 +14,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Job Seeker Application Guide | How to Find Remote Jobs on Replaceme",
+  title: "Job Seeker Application Guide | How to Find Remote Jobs",
   description:
     "Learn how to build a standout worker profile, search active remote roles, and apply directly to hiring employers with 0% platform salary cuts.",
   keywords: [

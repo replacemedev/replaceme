@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | How Replaceme Handles Your Data",
+  title: "Privacy Policy | How We Handle Your Data",
   description:
     "How Replaceme protects Worker and Employer data under RA 10173, NPC Advisory 2026-02, GDPR, and CCPA — including Stripe PCI payment handling, cross-border transfers (SCCs), and Employer PIC duties after profile unlock.",
   alternates: { canonical: `${BASE_URL}/privacy-policy` },

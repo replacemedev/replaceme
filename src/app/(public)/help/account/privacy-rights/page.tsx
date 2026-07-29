@@ -10,7 +10,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Your Privacy Rights | Replaceme Help",
+  title: "Your Privacy Rights | Help",
   description:
     "How to exercise access, erasure, portability, and other privacy rights on Replaceme.",
   alternates: { canonical: `${BASE_URL}/help/account/privacy-rights` },

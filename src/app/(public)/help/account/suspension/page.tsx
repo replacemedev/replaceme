@@ -10,7 +10,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Account Suspension | Replaceme Help",
+  title: "Account Suspension | Help",
   description:
     "What account suspension means on Replaceme, how long it lasts, and how to appeal.",
   alternates: { canonical: `${BASE_URL}/help/account/suspension` },

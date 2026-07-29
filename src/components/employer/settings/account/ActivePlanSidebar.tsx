@@ -4,7 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { SubscriptionTier } from "@/types/employer/billing";
 import { Check, AlertTriangle, CalendarDays } from "lucide-react";
-import { TIER_LABELS } from "@/lib/entitlements/ui-copy";
+import { TIER_LABELS, TIER_PRICES } from "@/lib/entitlements/ui-copy";
+import {
+  TIER_ANNUAL_MONTHLY_EQUIV,
+  TIER_ANNUAL_PRICES,
+} from "@/lib/pricing/billing-interval";
 import { formatMoney } from "@/lib/format/currency";
 
 interface ActivePlanSidebarProps {
@@ -58,17 +62,20 @@ function getFeatures(plan: SubscriptionTier): string[] {
   }
 }
 
-function planPrice(plan: SubscriptionTier): string {
-  switch (plan) {
-    case "starter":
-      return `${formatMoney(19, "USD")}/mo`;
-    case "growth":
-      return `${formatMoney(39, "USD")}/mo`;
-    case "scale":
-      return `${formatMoney(79, "USD")}/mo`;
-    default:
-      return `${formatMoney(0, "USD")} — free forever`;
+function planPriceLines(plan: SubscriptionTier): {
+  primary: string;
+  secondary?: string;
+} {
+  if (plan === "discovery") {
+    return { primary: `${formatMoney(0, "USD")} — free forever` };
   }
+  const annualMo = TIER_ANNUAL_MONTHLY_EQUIV[plan];
+  const annualTotal = TIER_ANNUAL_PRICES[plan];
+  const monthly = TIER_PRICES[plan];
+  return {
+    primary: `From ${formatMoney(annualMo, "USD")}/mo billed annually`,
+    secondary: `${formatMoney(annualTotal, "USD")}/yr · or ${formatMoney(monthly, "USD")}/mo monthly`,
+  };
 }
 
 function formatBillingDate(date: string): string {
@@ -94,6 +101,7 @@ export function ActivePlanSidebar({
   const features = getFeatures(currentPlan);
   const isPaid = currentPlan !== "discovery";
   const planLabel = TIER_LABELS[currentPlan];
+  const priceLines = planPriceLines(currentPlan);
   const movingToDiscovery =
     cancelAtPeriodEnd || scheduledPlan === "discovery";
   const paidDowngrade =
@@ -108,8 +116,13 @@ export function ActivePlanSidebar({
           <div>
             <h3 className="text-base font-bold">{planLabel} Plan Features</h3>
             <p className="text-sm text-emerald-200/90 font-medium mt-1">
-              {planPrice(currentPlan)}
+              {priceLines.primary}
             </p>
+            {priceLines.secondary ? (
+              <p className="mt-1 text-[11px] font-medium text-emerald-100/70">
+                {priceLines.secondary}
+              </p>
+            ) : null}
             {isPaid && nextBillingDate ? (
               <p className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-emerald-100">
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden />

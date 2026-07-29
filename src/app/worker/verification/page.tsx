@@ -7,7 +7,7 @@ import { VerificationSidebar } from "@/components/worker/verification/Verificati
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
-  title: "Worker Verification | Replaceme",
+  title: "Worker Verification",
   description:
     "Verify your identity to unlock premium jobs and build trust with employers.",
 };

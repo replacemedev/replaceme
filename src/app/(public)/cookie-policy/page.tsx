@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | How Replaceme Uses Cookies",
+  title: "Cookie Policy | How We Use Cookies",
   description:
     "Global Cookie Policy for Replaceme — necessary, analytics, and marketing cookies with NPC- and GDPR-aligned opt-in consent for users in the Philippines and worldwide.",
   alternates: { canonical: `${BASE_URL}/cookie-policy` },

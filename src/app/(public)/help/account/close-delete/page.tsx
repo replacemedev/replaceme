@@ -10,7 +10,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Close or Delete Your Account | Replaceme Help",
+  title: "Close or Delete Your Account | Help",
   description:
     "How account closure works on Replaceme: grace period, anonymization, and what to resolve first.",
   alternates: { canonical: `${BASE_URL}/help/account/close-delete` },

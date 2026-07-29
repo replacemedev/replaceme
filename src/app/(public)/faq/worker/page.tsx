@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Job Seeker FAQs \u2014 Applying, Profiles & Getting Hired on Replaceme",
+  title: "Job Seeker FAQs \u2014 Applying, Profiles & Getting Hired",
   description:
     "Common questions from Filipino job seekers using Replaceme. Learn how to create a profile, apply to remote jobs, communicate with employers, and get paid directly with no platform fees.",
   keywords: [

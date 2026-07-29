@@ -14,7 +14,7 @@ import {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Employer Onboarding Guide | Getting Started on Replaceme",
+  title: "Employer Onboarding Guide | Getting Started",
   description:
     "Learn how to set up your company profile, choose your flat-rate pricing tier, and manage your applicant pipeline on Replaceme.",
   keywords: [

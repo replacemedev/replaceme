@@ -71,8 +71,8 @@ export function OrderSummary({
           ) : null}
           <p className="text-xs font-semibold text-slate-500 mt-2 leading-relaxed">
             {billingInterval === "year"
-              ? "Annual prepaid subscription · renews each year unless cancelled · tax calculated at Stripe Checkout when applicable"
-              : "Billed monthly in USD · tax calculated at Stripe Checkout when applicable · cancel anytime"}
+              ? "Annual prepaid subscription · Renews each year unless cancelled · Tax calculated at Stripe Checkout when applicable"
+              : "Billed monthly in USD · Tax calculated at Stripe Checkout when applicable · Cancel anytime"}
           </p>
         </div>
 

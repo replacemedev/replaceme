@@ -16,7 +16,7 @@ import {
 import { EmailVerificationBanner } from "@/components/shared/settings/EmailVerificationBanner";
 
 export const metadata = {
-  title: "Account Settings | Replaceme",
+  title: "Account Settings",
   description: "Manage your profile, security, and subscription plan.",
 };
 

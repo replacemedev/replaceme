@@ -12,7 +12,7 @@ import { parseGuestCallbackUrl } from "@/lib/auth/safe-callback-url";
 import { parseSignInAccountReason } from "@/lib/auth/signin-account-reason";
 
 export const metadata = {
-  title: "Sign In | Replaceme",
+  title: "Sign In",
   description: "Sign in to your Replaceme account.",
 };
 

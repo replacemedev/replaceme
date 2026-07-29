@@ -32,7 +32,7 @@ import {
 import { hasCapability } from "@/lib/admin/capabilities";
 
 export const metadata = {
-  title: "Admin Dashboard | Replaceme",
+  title: "Admin Dashboard",
 };
 
 export const dynamic = "force-dynamic";

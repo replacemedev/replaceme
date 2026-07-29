@@ -7,4 +7,5 @@ export const subscriptionTierSchema = z.enum(
 
 export const upgradeCheckoutSchema = z.object({
   planId: subscriptionTierSchema,
+  billingInterval: z.enum(["month", "year"]).default("year"),
 });

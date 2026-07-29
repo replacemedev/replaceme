@@ -5,7 +5,7 @@ import { getEmployerOnboardingDraft } from "@/actions/onboarding";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Employer Onboarding | Replaceme",
+  title: "Employer Onboarding",
   description:
     "Set up your company profile and start hiring on the Discovery plan.",
 };

@@ -7,7 +7,7 @@ import {
 import { SessionSecurityPanel } from "@/components/shared/security/SessionSecurityPanel";
 
 export const metadata = {
-  title: "Security | Replaceme",
+  title: "Security",
   description: "Manage sessions and sign out of other devices.",
 };
 

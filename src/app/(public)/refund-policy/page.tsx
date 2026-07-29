@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | Employer Plan Billing | Replaceme",
+  title: "Refund Policy | Employer Plan Billing",
   description:
     "Replaceme employer subscription refund policy — billing errors, mandatory-law carve-outs, cancel-anytime access, and Australian merchant-of-record billing via Stripe.",
   alternates: { canonical: `${BASE_URL}/refund-policy` },

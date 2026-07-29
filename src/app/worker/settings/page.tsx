@@ -6,7 +6,7 @@ import { EmailVerificationBanner } from "@/components/shared/settings/EmailVerif
 import { getEmailVerificationStatus } from "@/actions/auth";
 
 export const metadata = {
-  title: "Account Settings | Replaceme",
+  title: "Account Settings",
 };
 
 export const dynamic = "force-dynamic";

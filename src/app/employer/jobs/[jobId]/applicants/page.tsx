@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { jobId } = await params;
   const job = await getJobById(jobId);
   return {
-    title: `Applicants | ${job?.title || "Job Post"} | Replaceme`,
+    title: `Applicants | ${job?.title || "Job Post"}`,
     description: "Shortlist, review match ratings, and manage candidate workflows.",
   };
 }

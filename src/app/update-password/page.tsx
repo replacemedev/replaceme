@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Update Password | Replaceme",
+  title: "Update Password",
   description: "Set a new password for your Replaceme account.",
 };
 

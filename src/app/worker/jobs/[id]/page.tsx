@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { id } = await params;
   const job = await getWorkerJobDetails(id);
   return {
-    title: job ? `${job.title} | Replaceme` : "Job Not Found | Replaceme",
+    title: job ? job.title : "Job Not Found",
     description: job?.description?.slice(0, 160),
   };
 }

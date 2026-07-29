@@ -5,7 +5,7 @@ import { WorkerNotificationsClient } from "@/components/worker/notifications/Wor
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
-  title: "Notifications | Replaceme",
+  title: "Notifications",
 };
 
 export const dynamic = "force-dynamic";

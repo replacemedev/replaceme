@@ -4,7 +4,7 @@ import { getJobSearchData } from "@/actions/worker/job-search";
 import { JobSearchClient } from "@/components/worker/jobs/JobSearchClient";
 
 export const metadata = {
-  title: "Job Search | Replaceme",
+  title: "Job Search",
   description: "Discover roles at top companies matching your skills and aspirations.",
 };
 

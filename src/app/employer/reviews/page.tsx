@@ -5,7 +5,7 @@ import {
   EmployerPageShell,
 } from "@/components/employer/layout";
 
-export const metadata = { title: "Reviews | Replaceme" };
+export const metadata = { title: "Reviews" };
 export const dynamic = "force-dynamic";
 
 export default async function EmployerReviewsPage() {

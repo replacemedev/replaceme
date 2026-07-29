@@ -5,7 +5,7 @@ import { PasswordSecurityCard } from "@/components/shared/security/PasswordSecur
 import { SessionSecurityPanel } from "@/components/shared/security/SessionSecurityPanel";
 
 export const metadata = {
-  title: "Security | Replaceme",
+  title: "Security",
   description: "Change your password and manage signed-in devices.",
 };
 

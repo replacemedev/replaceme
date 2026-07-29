@@ -1,21 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import { SubscriptionTier } from "@/types/employer/billing";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2, Sparkles, Star } from "lucide-react";
+import { BillingIntervalToggle } from "@/components/employer/pricing/BillingIntervalToggle";
 import {
   isCurrentTier,
   isHigherTier,
   isLowerTier,
-  TIER_ANNUAL_MONTHLY,
   TIER_PRICES,
 } from "@/lib/entitlements/ui-copy";
+import {
+  DEFAULT_BILLING_INTERVAL,
+  TIER_ANNUAL_PRICES,
+  TIER_ANNUAL_SAVE_PERCENT,
+  displayMonthlyPrice,
+  type BillingInterval,
+} from "@/lib/pricing/billing-interval";
+import { formatMoney } from "@/lib/format/currency";
 
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
   isUpgrading: boolean;
   isCancelling?: boolean;
-  onUpgrade: (planId: SubscriptionTier) => void;
+  onUpgrade: (planId: SubscriptionTier, interval: BillingInterval) => void;
   onCancelToDiscovery?: () => void;
   onManageBilling: () => void;
   isOpeningPortal: boolean;
@@ -24,34 +33,40 @@ interface ManagePlanGridProps {
   cancelAtPeriodEnd?: boolean;
 }
 
-const UPGRADE_PLANS: {
+const PLAN_META: {
   slug: SubscriptionTier;
   label: string;
-  price: number;
-  detail?: string;
+  detail: string;
   highlight?: boolean;
 }[] = [
-  { slug: "discovery", label: "Discovery", price: 0 },
+  {
+    slug: "discovery",
+    label: "Discovery",
+    detail: "1 job · preview candidates",
+  },
   {
     slug: "starter",
     label: "Starter",
-    price: TIER_ANNUAL_MONTHLY.starter,
-    detail: `From $${TIER_ANNUAL_MONTHLY.starter}/mo billed annually · or $${TIER_PRICES.starter}/mo monthly`,
+    detail: "3 jobs · 20 applicants/job",
   },
   {
     slug: "growth",
     label: "Growth",
-    price: TIER_ANNUAL_MONTHLY.growth,
-    detail: `From $${TIER_ANNUAL_MONTHLY.growth}/mo billed annually · or $${TIER_PRICES.growth}/mo monthly`,
+    detail: "10 jobs · 50 applicants/job",
     highlight: true,
   },
   {
     slug: "scale",
     label: "Scale",
-    price: TIER_ANNUAL_MONTHLY.scale,
-    detail: `From $${TIER_ANNUAL_MONTHLY.scale}/mo billed annually · or $${TIER_PRICES.scale}/mo monthly`,
+    detail: "Unlimited jobs & applicants",
   },
 ];
+
+function paidSlug(
+  slug: SubscriptionTier
+): slug is "starter" | "growth" | "scale" {
+  return slug === "starter" || slug === "growth" || slug === "scale";
+}
 
 export function ManagePlanGrid({
   currentPlan,
@@ -60,34 +75,36 @@ export function ManagePlanGrid({
   onUpgrade,
   onCancelToDiscovery,
   onManageBilling,
-  isOpeningPortal,
   nextBillingDate,
   scheduledPlan = null,
   cancelAtPeriodEnd = false,
 }: ManagePlanGridProps) {
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>(
+    DEFAULT_BILLING_INTERVAL
+  );
+
   return (
     <section
       id="manage-plan"
       className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm scroll-mt-24"
     >
-      <div className="border-b border-slate-100 bg-gradient-to-br from-[#fafdfb] to-white p-6 sm:p-8">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="border-b border-slate-100 bg-gradient-to-br from-[#fafdfb] to-white p-5 sm:p-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <p className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700">
               Billing
             </p>
-            <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900">
+            <h2 className="mt-1 text-lg font-extrabold tracking-tight text-slate-900 sm:text-xl">
               Manage plan
             </h2>
             <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
-              Upgrades default to annual prepaid (confirm interval on Stripe).
-              Upgrades apply immediately (prorated invoice). Downgrades and
-              cancellations take effect at the end of your billing period — you
-              keep your current plan until then.
+              Same Annual / Monthly options as Pricing. Upgrades apply
+              immediately (prorated). Downgrades and cancellations take effect
+              at period end — you keep your current plan until then.
             </p>
           </div>
           {nextBillingDate && currentPlan !== "discovery" ? (
-            <p className="shrink-0 text-xs font-semibold text-slate-500 lg:text-right">
+            <p className="shrink-0 rounded-lg border border-slate-100 bg-white/80 px-3 py-2 text-xs font-semibold text-slate-500 lg:text-right">
               Next billing:{" "}
               <span className="whitespace-nowrap text-slate-800">
                 {new Date(nextBillingDate).toLocaleDateString("en-US", {
@@ -99,64 +116,132 @@ export function ManagePlanGrid({
             </p>
           ) : null}
         </div>
+
+        <div className="mt-5 flex justify-center sm:mt-6">
+          <BillingIntervalToggle
+            value={billingInterval}
+            onChange={setBillingInterval}
+            className="w-full sm:w-auto"
+          />
+        </div>
       </div>
 
-      <div className="p-6 sm:p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {UPGRADE_PLANS.map((plan) => {
+      <div className="p-5 sm:p-8">
+        <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 min-[480px]:gap-5 xl:grid-cols-4 xl:gap-6">
+          {PLAN_META.map((plan) => {
             const isCurrent = isCurrentTier(plan.slug, currentPlan);
             const isUpgrade = isHigherTier(plan.slug, currentPlan);
             const isDowngrade = isLowerTier(plan.slug, currentPlan);
-            const isPaid = plan.slug !== "discovery";
+            const paidKey = paidSlug(plan.slug) ? plan.slug : null;
+            const isPaid = paidKey != null;
+
+            const shownPrice = paidKey
+              ? displayMonthlyPrice(
+                  TIER_PRICES[paidKey],
+                  TIER_ANNUAL_PRICES[paidKey],
+                  billingInterval
+                )
+              : 0;
+
+            const annualTotal =
+              paidKey && billingInterval === "year"
+                ? TIER_ANNUAL_PRICES[paidKey]
+                : null;
+
+            const savePct =
+              paidKey && billingInterval === "year"
+                ? TIER_ANNUAL_SAVE_PERCENT[paidKey]
+                : null;
 
             return (
               <div
                 key={plan.slug}
-                className={`relative flex min-h-0 flex-col justify-between rounded-xl border p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${isCurrent
+                className={`relative flex h-full min-h-0 min-w-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-200 sm:p-6 ${
+                  isCurrent
                     ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
-                    : "border-slate-200 bg-white hover:border-slate-300"
-                  }`}
+                    : plan.highlight
+                      ? "border-[#006e2f]/40 bg-gradient-to-b from-[#fafdfb] to-white shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+                      : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                }`}
               >
                 {isCurrent ? (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#006e2f] text-white px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider">
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#006e2f] px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
                     Current
+                  </div>
+                ) : plan.highlight ? (
+                  <div className="absolute -top-2.5 left-1/2 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-[#006e2f] bg-[#e6fbf2] px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#006e2f]">
+                    <Star
+                      className="h-2.5 w-2.5 fill-[#006e2f] stroke-[#006e2f]"
+                      aria-hidden
+                    />
+                    Most Popular
                   </div>
                 ) : null}
 
-                <div>
+                <div className="min-w-0">
                   <p
-                    className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase flex items-center gap-1 ${plan.highlight ? "text-emerald-600" : "text-slate-500"
-                      }`}
+                    className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider sm:text-xs ${
+                      plan.highlight ? "text-emerald-600" : "text-slate-500"
+                    }`}
                   >
                     {plan.label}
                     {plan.slug === "scale" ? (
                       <Sparkles
                         size={10}
-                        className="text-yellow-500 fill-yellow-500"
+                        className="fill-yellow-500 text-yellow-500"
+                        aria-hidden
                       />
                     ) : null}
                   </p>
-                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 flex items-baseline">
-                    ${plan.price}
-                    <span className="text-sm sm:text-base font-semibold text-slate-500 ml-1">
-                      USD
+
+                  <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-1">
+                    <span className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                      {formatMoney(shownPrice, "USD", {
+                        asReact: true,
+                        codeClassName:
+                          "text-slate-500 text-sm font-semibold ml-1",
+                      })}
                     </span>
-                  </p>
-                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                    per month
-                  </p>
-                  {plan.detail ? (
-                    <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                      {plan.detail}
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                      /month
+                    </span>
+                    {savePct != null ? (
+                      <span className="inline-flex items-center rounded-full bg-[#e6fbf2] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#006e2f]">
+                        Save {savePct}%
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {annualTotal != null ? (
+                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
+                      Billed annually at{" "}
+                      {formatMoney(annualTotal, "USD", {
+                        asReact: true,
+                        codeClassName:
+                          "text-slate-400 text-[10px] font-semibold ml-0.5",
+                      })}
+                      /year
                     </p>
-                  ) : null}
+                  ) : isPaid && billingInterval === "month" ? (
+                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
+                      Billed monthly · save more on Annual
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
+                      Free forever
+                    </p>
+                  )}
+
+                  <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                    {plan.detail}
+                  </p>
                 </div>
 
                 {isCurrent ? (
                   <button
                     type="button"
                     disabled
-                    className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white mt-4 disabled:opacity-70 transition-colors"
+                    className="mt-5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
                   >
                     Current plan
                   </button>
@@ -164,42 +249,43 @@ export function ManagePlanGrid({
                   <button
                     type="button"
                     disabled={isUpgrading}
-                    onClick={() => onUpgrade(plan.slug)}
-                    className={`w-full min-h-[44px] py-2 px-4 rounded-lg text-sm font-medium transition-colors mt-4 disabled:opacity-50 flex items-center justify-center gap-2 ${plan.highlight
-                        ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                        : "bg-[#006e2f] hover:bg-[#005c26] text-white shadow-sm"
-                      }`}
+                    onClick={() => onUpgrade(plan.slug, billingInterval)}
+                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
                   >
                     {isUpgrading ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Redirecting to Stripe...
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        Redirecting…
                       </>
+                    ) : billingInterval === "year" ? (
+                      "Upgrade · annual"
                     ) : (
-                      "Upgrade"
+                      "Upgrade · monthly"
                     )}
                   </button>
                 ) : isDowngrade ? (
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-5 space-y-2">
                     {isPaid ? (
                       <button
                         type="button"
                         disabled={
-                          isUpgrading ||
-                          scheduledPlan === plan.slug
+                          isUpgrading || scheduledPlan === plan.slug
                         }
-                        onClick={() => onUpgrade(plan.slug)}
-                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        onClick={() => onUpgrade(plan.slug, billingInterval)}
+                        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
                       >
                         {scheduledPlan === plan.slug ? (
                           "Scheduled"
                         ) : isUpgrading ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Redirecting to Stripe...
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden
+                            />
+                            Redirecting…
                           </>
                         ) : (
-                          "Change"
+                          "Change plan"
                         )}
                       </button>
                     ) : (
@@ -215,21 +301,25 @@ export function ManagePlanGrid({
                             ? onCancelToDiscovery()
                             : onManageBilling()
                         }
-                        className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
                       >
-                        {cancelAtPeriodEnd || scheduledPlan === "discovery" ? (
+                        {cancelAtPeriodEnd ||
+                        scheduledPlan === "discovery" ? (
                           "Scheduled"
                         ) : isCancelling ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Redirecting to Stripe...
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden
+                            />
+                            Redirecting…
                           </>
                         ) : (
                           "Move to Discovery"
                         )}
                       </button>
                     )}
-                    <p className="text-[10px] text-center font-medium text-slate-400 leading-snug">
+                    <p className="text-center text-[10px] font-medium leading-snug text-slate-400">
                       {isPaid
                         ? "Takes effect at period end on Stripe"
                         : "Confirm on Stripe"}
@@ -239,7 +329,7 @@ export function ManagePlanGrid({
                   <button
                     type="button"
                     disabled
-                    className="w-full min-h-[44px] py-2 px-4 border border-slate-200 rounded-lg text-sm font-medium text-slate-400 bg-slate-50 mt-4"
+                    className="mt-5 min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-400"
                   >
                     Free tier
                   </button>
@@ -249,11 +339,26 @@ export function ManagePlanGrid({
           })}
         </div>
       </div>
-      <div className="border-t border-slate-100 bg-slate-50/50 p-4 text-center">
-        <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-          All prices are billed exclusively in USD through Stripe (tax-exclusive).
-          Applicable tax is calculated at checkout. Cancel anytime.
+
+      <div className="space-y-2 border-t border-slate-100 bg-slate-50/50 p-4 text-center">
+        <p className="mx-auto max-w-2xl text-[10px] font-semibold leading-relaxed text-slate-400">
+          Prices are tax-exclusive USD. Annual plans are prepaid for 12 months
+          (shown as a monthly equivalent). Tax is calculated at Stripe Checkout.
+          Cancel anytime online — access continues until period end.{" "}
+          <Link
+            href="/refund-policy"
+            className="font-semibold text-[#006e2f] hover:underline"
+          >
+            Refund Policy
+          </Link>
+          .
         </p>
+        <Link
+          href="/employer/pricing"
+          className="inline-flex min-h-10 items-center justify-center text-xs font-bold text-[#006e2f] hover:underline"
+        >
+          Compare all features →
+        </Link>
       </div>
     </section>
   );

@@ -188,10 +188,15 @@ type UpgradeCheckoutData = {
  * @see https://docs.stripe.com/customer-management/portal-deep-links
  * @see https://docs.stripe.com/payments/checkout
  */
-export async function createUpgradeCheckout(planId: string) {
+export async function createUpgradeCheckout(
+  planId: string,
+  billingInterval: "month" | "year" = "year"
+) {
   const result = await runAction("createUpgradeCheckout", async () => {
-    const parsed = upgradeCheckoutSchema.parse({ planId });
-    safeLog(`[Billing] Plan change session requested: ${parsed.planId}`);
+    const parsed = upgradeCheckoutSchema.parse({ planId, billingInterval });
+    safeLog(
+      `[Billing] Plan change session requested: ${parsed.planId} interval=${parsed.billingInterval}`
+    );
 
     const { user, profile } = await requireRole("employer");
 
@@ -216,6 +221,7 @@ export async function createUpgradeCheckout(planId: string) {
       email: user.email || "",
       name,
       planRef: parsed.planId,
+      billingInterval: parsed.billingInterval,
     });
 
     if ("error" in session) {

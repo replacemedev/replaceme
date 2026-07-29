@@ -8,7 +8,7 @@ import { ApplicationsClient } from "@/components/worker/applications/Application
 import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
 
 export const metadata = {
-  title: "My Applications | Replaceme",
+  title: "My Applications",
   description: "Track your sent proposals and hiring status.",
 };
 

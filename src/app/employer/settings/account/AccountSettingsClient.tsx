@@ -98,7 +98,10 @@ export function AccountSettingsClient({
     });
   };
 
-  const handleUpgrade = (planId: SubscriptionTier) => {
+  const handleUpgrade = (
+    planId: SubscriptionTier,
+    interval: "month" | "year" = "year"
+  ) => {
     if (planId === "discovery") {
       handleCancelToDiscovery();
       return;
@@ -107,7 +110,7 @@ export function AccountSettingsClient({
     startUpgradeTransition(async () => {
       const toastId = toast.loading("Redirecting to Stripe...");
       try {
-        const result = await createUpgradeCheckout(planId);
+        const result = await createUpgradeCheckout(planId, interval);
         if (result.error) {
           toast.error(result.error, { id: toastId });
           return;

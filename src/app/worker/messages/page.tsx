@@ -13,7 +13,7 @@ import { WorkerPageShell } from "@/components/worker/layout";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const metadata = {
-  title: "Messages | Replaceme",
+  title: "Messages",
   description: "Chat with employers about your applications.",
 };
 

@@ -19,7 +19,7 @@ import {
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 
 export const metadata = {
-  title: "Messaging Center | Replaceme",
+  title: "Messaging Center",
   description: "Connect and chat with candidates.",
 };
 
