@@ -125,13 +125,13 @@ export function CompareTable({
       );
     }
     if (val === "Instant" && isHighlight) {
-      return <span className="text-[#006e2f] font-semibold">{val}</span>;
+      return <span className="whitespace-nowrap text-[#006e2f] font-semibold">{val}</span>;
     }
-    return <span className="text-slate-600 font-medium">{val}</span>;
+    return <span className="whitespace-nowrap text-slate-600 font-medium">{val}</span>;
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
         Compare Features
       </h3>
@@ -140,73 +140,75 @@ export function CompareTable({
           ? "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Your current plan is highlighted below."
           : "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Compare tiers and sign up when you're ready."}
       </p>
-      <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: "thin", scrollbarColor: "#e2e8f0 transparent" }}>
-        <div className="overflow-hidden rounded-xl shadow-sm ring-1 ring-gray-900/5 bg-white min-w-[640px]">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="p-4 text-sm font-semibold text-gray-500 w-[18%]">
-                  Feature
-                </th>
+      {/* Scrollport only — page body must not scroll horizontally */}
+      <div
+        className="w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-xl shadow-sm ring-1 ring-gray-900/5 bg-white pb-1"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#e2e8f0 transparent" }}
+      >
+        <table className="w-full min-w-[720px] text-left border-collapse">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="sticky left-0 z-20 bg-white p-4 text-sm font-semibold text-gray-500 whitespace-nowrap min-w-[9.5rem] border-r border-gray-100">
+                Feature
+              </th>
+              {ordered.map((plan) => {
+                const isCurrent = currentPlanSlug
+                  ? isCurrentTier(plan.slug, currentPlanSlug)
+                  : false;
+                const isGrowth = plan.slug.toLowerCase() === "growth";
+                return (
+                  <th
+                    key={plan.id}
+                    className={`p-4 text-sm font-semibold text-center border-t-2 transition-all whitespace-nowrap min-w-[7rem] ${isGrowth
+                        ? "border-t-[#006e2f] bg-green-50/30 text-[#006e2f] font-bold"
+                        : isCurrent
+                          ? "border-t-transparent bg-[#fafdfb] text-[#006e2f]"
+                          : "border-t-transparent text-gray-900"
+                      }`}
+                  >
+                    <span className="block whitespace-nowrap">{plan.name}</span>
+                    {isCurrent ? (
+                      <span className="mt-1 inline-block rounded-full bg-[#006e2f] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white whitespace-nowrap">
+                        Current
+                      </span>
+                    ) : null}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {rows.map((row) => (
+              <tr
+                key={row.feature}
+                className="group hover:bg-gray-50 transition-colors"
+              >
+                <td className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 p-4 text-sm font-medium text-slate-900 whitespace-nowrap border-r border-gray-100">
+                  {row.feature}
+                </td>
                 {ordered.map((plan) => {
                   const isCurrent = currentPlanSlug
                     ? isCurrentTier(plan.slug, currentPlanSlug)
                     : false;
                   const isGrowth = plan.slug.toLowerCase() === "growth";
                   return (
-                    <th
+                    <td
                       key={plan.id}
-                      className={`p-4 text-sm font-semibold text-center border-t-2 transition-all ${isGrowth
-                          ? "border-t-[#006e2f] bg-green-50/30 text-[#006e2f] font-bold"
+                      className={`p-4 text-sm text-center transition-colors whitespace-nowrap ${isGrowth
+                          ? "bg-green-50/30 group-hover:bg-green-100/20"
                           : isCurrent
-                            ? "border-t-transparent bg-[#fafdfb] text-[#006e2f]"
-                            : "border-t-transparent text-gray-900"
+                            ? "bg-[#fafdfb]/60 group-hover:bg-[#fafdfb]/30"
+                            : ""
                         }`}
                     >
-                      <span className="block">{plan.name}</span>
-                      {isCurrent ? (
-                        <span className="mt-1 inline-block rounded-full bg-[#006e2f] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                          Current
-                        </span>
-                      ) : null}
-                    </th>
+                      {renderCell(row.values[plan.slug.toLowerCase()] ?? "—", row.highlight)}
+                    </td>
                   );
                 })}
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {rows.map((row) => (
-                <tr
-                  key={row.feature}
-                  className="group hover:bg-gray-50 transition-colors"
-                >
-                  <td className="p-4 text-sm font-medium text-slate-900 w-[18%]">
-                    {row.feature}
-                  </td>
-                  {ordered.map((plan) => {
-                    const isCurrent = currentPlanSlug
-                      ? isCurrentTier(plan.slug, currentPlanSlug)
-                      : false;
-                    const isGrowth = plan.slug.toLowerCase() === "growth";
-                    return (
-                      <td
-                        key={plan.id}
-                        className={`p-4 text-sm text-center transition-colors ${isGrowth
-                            ? "bg-green-50/30 group-hover:bg-green-100/20"
-                            : isCurrent
-                              ? "bg-[#fafdfb]/60 group-hover:bg-[#fafdfb]/30"
-                              : ""
-                          }`}
-                      >
-                        {renderCell(row.values[plan.slug.toLowerCase()] ?? "—", row.highlight)}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

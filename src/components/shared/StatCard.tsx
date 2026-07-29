@@ -68,10 +68,10 @@ function AdminStatCard({
   accentColor = "bg-emerald-50 text-emerald-600",
 }: AdminStatCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <article className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] min-w-0">
+      <div className="flex items-start justify-between gap-2 min-w-0">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 truncate">
             {label}
           </p>
           <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tabular-nums">
@@ -109,9 +109,9 @@ function DashboardStatCard({
   iconColorClass,
 }: DashboardStatCardProps) {
   return (
-    <div className="flex flex-col justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-xs gap-3 relative overflow-hidden select-none">
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-semibold text-slate-500 tracking-tight leading-snug">
+    <div className="flex flex-col justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow hover:shadow-xs gap-3 relative overflow-hidden select-none min-w-0">
+      <div className="flex items-start justify-between gap-2 min-w-0">
+        <span className="min-w-0 flex-1 text-xs font-semibold text-slate-500 tracking-tight leading-snug">
           {title}
         </span>
         <div
@@ -148,7 +148,7 @@ function ApplicationStatCard({
       />
 
       <p
-        className={`text-[11px] font-bold uppercase tracking-wider ${styles.label}`}
+        className={`min-w-0 pr-10 text-[11px] font-bold uppercase tracking-wider leading-snug ${styles.label}`}
       >
         {label}
       </p>

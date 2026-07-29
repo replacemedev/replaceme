@@ -349,7 +349,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
             render={({ field }) => (
               <label
                 htmlFor="signup-terms"
-                className="group flex cursor-pointer items-center gap-3"
+                className="group flex cursor-pointer items-start gap-2"
               >
                 <Checkbox
                   id="signup-terms"
@@ -395,13 +395,14 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
           />
         </FormField>
 
-        <TurnstileWidget
-          ref={turnstileRef}
-          onToken={setTurnstileToken}
-          onExpire={() => setTurnstileToken(null)}
-          onError={() => setTurnstileToken(null)}
-          className="pt-2"
-        />
+        <div className="flex w-full justify-center overflow-hidden pt-2">
+          <TurnstileWidget
+            ref={turnstileRef}
+            onToken={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+        </div>
 
         <div className="pt-3">
           <Button

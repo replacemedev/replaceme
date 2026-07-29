@@ -61,14 +61,7 @@ export function WorkerCard({
                 <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
                   <Lock className="h-4 w-4 text-slate-500" aria-hidden />
                 </span>
-              ) : (
-                <span
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-white rounded-full ${
-                    worker.online ? "bg-emerald-500" : "bg-slate-300"
-                  }`}
-                  title={worker.online ? "Online" : "Offline"}
-                />
-              )}
+              ) : null}
             </div>
 
             <div className="min-w-0">

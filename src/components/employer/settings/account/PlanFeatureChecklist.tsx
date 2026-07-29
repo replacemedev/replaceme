@@ -104,7 +104,7 @@ export function PlanFeatureChecklist({
                 aria-hidden
               />
             )}
-            <span className="leading-snug">{feature.label}</span>
+            <span className="min-w-0 leading-snug">{feature.label}</span>
           </li>
         ))}
       </ul>

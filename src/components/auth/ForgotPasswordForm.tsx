@@ -162,12 +162,14 @@ export function ForgotPasswordForm() {
       </p>
 
       <div className="space-y-3 pt-4">
-        <TurnstileWidget
-          ref={turnstileRef}
-          onToken={setTurnstileToken}
-          onExpire={() => setTurnstileToken(null)}
-          onError={() => setTurnstileToken(null)}
-        />
+        <div className="flex w-full justify-center overflow-hidden">
+          <TurnstileWidget
+            ref={turnstileRef}
+            onToken={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+        </div>
         <Button
           type="submit"
           disabled={isSubmitting || (turnstileRequired && !turnstileToken)}

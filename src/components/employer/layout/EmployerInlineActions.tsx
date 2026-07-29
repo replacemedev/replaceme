@@ -29,8 +29,8 @@ export function EmployerMessageAction({
     if (canOpenThread) {
       const buttonClass =
         variant === "button"
-          ? `inline-flex h-9 items-center gap-1.5 rounded-2xl border border-emerald-100 bg-[#f0fdf4]/50 px-4 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#f0fdf4] disabled:opacity-60 ${className}`
-          : `inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-60 ${className}`;
+          ? `inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-2xl border border-emerald-100 bg-[#f0fdf4]/50 px-4 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#f0fdf4] disabled:opacity-60 ${className}`
+          : `inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-60 ${className}`;
 
       return (
         <EmployerOpenMessagingThreadButton
@@ -54,7 +54,7 @@ export function EmployerMessageAction({
       return (
         <Link
           href="/employer/messages"
-          className={`inline-flex h-9 items-center gap-1.5 rounded-2xl border border-emerald-100 bg-[#f0fdf4]/50 px-4 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#f0fdf4] ${className}`}
+          className={`inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-2xl border border-emerald-100 bg-[#f0fdf4]/50 px-4 text-xs font-bold text-[#006e2f] transition-colors hover:bg-[#f0fdf4] ${className}`}
         >
           <MessageSquare size={13} aria-hidden />
           Message

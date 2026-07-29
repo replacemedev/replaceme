@@ -112,13 +112,6 @@ export function HiredWorkerCard({
             size="sm"
             rounded="2xl"
           />
-          {/* Online Dot */}
-          <span
-            className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full ${
-              worker.online ? "bg-emerald-500" : "bg-slate-300"
-            }`}
-            title={worker.online ? "Online" : "Offline"}
-          />
         </div>
 
         <div className="min-w-0">
@@ -188,7 +181,7 @@ export function HiredWorkerCard({
       </div>
 
       {/* Right Area: Action Buttons */}
-      <div className="flex items-center gap-2.5 shrink-0">
+      <div className="flex flex-wrap items-center gap-2.5 shrink-0">
         <EmployerMessageAction
           planSlug={planSlug}
           messagingEnabled={messagingEnabled}
@@ -197,7 +190,7 @@ export function HiredWorkerCard({
 
         <Link
           href={`/employer/contracts/${worker.id}`}
-          className="h-9 px-4 border border-slate-100 hover:bg-slate-50 text-slate-500 hover:text-slate-800 font-bold text-xs rounded-2xl transition-colors flex items-center justify-center cursor-pointer"
+          className="h-9 px-4 border border-slate-100 hover:bg-slate-50 text-slate-500 hover:text-slate-800 font-bold text-xs rounded-2xl transition-colors flex items-center justify-center cursor-pointer whitespace-nowrap"
         >
           View Contract
         </Link>

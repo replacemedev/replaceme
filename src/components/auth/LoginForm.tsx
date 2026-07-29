@@ -170,10 +170,10 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
         />
       </div>
 
-      <div className="flex items-center justify-between pt-2">
+      <div className="mb-4 flex w-full items-center justify-between gap-3">
         <label
           htmlFor="login-remember-me"
-          className="group flex cursor-pointer items-center gap-3"
+          className="group flex min-w-0 cursor-pointer items-center gap-2"
         >
           <Checkbox
             id="login-remember-me"
@@ -181,25 +181,27 @@ export function LoginForm({ forgotPasswordHref, callbackUrl }: LoginFormProps) {
             disabled={isLoading}
             className="shrink-0"
           />
-          <span className="text-sm font-body-base leading-snug text-slate-600 transition-colors group-hover:text-slate-900">
+          <span className="whitespace-nowrap text-sm font-body-base leading-snug text-slate-600 transition-colors group-hover:text-slate-900">
             Remember me
           </span>
         </label>
         <Link
           href={forgotPasswordHref}
-          className="text-sm font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors"
+          className="shrink-0 whitespace-nowrap text-sm font-body-bold font-bold text-[#006e2f] hover:text-[#005321] transition-colors"
         >
           Forgot password?
         </Link>
       </div>
 
-      <div className="pt-4 space-y-4">
-        <TurnstileWidget
-          ref={turnstileRef}
-          onToken={setTurnstileToken}
-          onExpire={() => setTurnstileToken(null)}
-          onError={() => setTurnstileToken(null)}
-        />
+      <div className="space-y-4">
+        <div className="flex w-full justify-center overflow-hidden">
+          <TurnstileWidget
+            ref={turnstileRef}
+            onToken={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+        </div>
         <Button
           type="submit"
           disabled={isLoading || (turnstileRequired && !turnstileToken)}

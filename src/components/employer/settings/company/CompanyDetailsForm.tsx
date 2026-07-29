@@ -167,12 +167,12 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex w-full flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <label className="block text-sm font-semibold text-slate-700">
             Company Bio
           </label>
           <span
-            className={`shrink-0 text-xs font-medium ${
+            className={`text-xs font-medium sm:shrink-0 sm:whitespace-nowrap ${
               remainingChars < 50 ? "font-bold text-red-500" : "text-slate-400"
             }`}
           >

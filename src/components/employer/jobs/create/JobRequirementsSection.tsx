@@ -117,10 +117,12 @@ export function JobRequirementsSection() {
             type="button"
             onClick={handleSuggestSalary}
             disabled={isSuggesting}
-            className="min-h-11 w-full px-4 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#006e2f] hover:border-[#006e2f]/40 hover:bg-[#ebfdf2]/50 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 [-webkit-tap-highlight-color:transparent]"
+            className="min-h-11 w-full overflow-visible px-4 py-2.5 rounded-xl border border-dashed border-slate-200 text-slate-600 hover:text-[#006e2f] hover:border-[#006e2f]/40 hover:bg-[#ebfdf2]/50 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 [-webkit-tap-highlight-color:transparent]"
           >
             <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-            {isSuggesting ? "Calculating…" : "Suggest competitive hourly rate"}
+            <span className="min-w-0 text-center leading-snug sm:whitespace-nowrap">
+              {isSuggesting ? "Calculating…" : "Suggest competitive hourly rate"}
+            </span>
           </button>
         </div>
       </div>

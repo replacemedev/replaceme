@@ -81,21 +81,21 @@ export function RecentApplicantRow({
       <div className="flex items-center gap-2 shrink-0">
         <Link
           href={`/employer/jobs/${applicant.job_id}/applicants`}
-          className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+          className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
         >
           Review
         </Link>
         {messagingEnabled ? (
           <Link
             href={`/employer/messages?jobId=${applicant.job_id}&candidateId=${applicant.candidate_id}`}
-            className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] rounded-lg transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-semibold text-white bg-[#006e2f] hover:bg-[#005c26] rounded-lg transition-colors cursor-pointer"
           >
             Message
           </Link>
         ) : (
           <Link
             href="/employer/pricing"
-            className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-[#006e2f] bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 rounded-lg transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-xs font-semibold text-[#006e2f] bg-[#ebfdf2] hover:bg-[#d4f8e4] border border-[#006e2f]/20 rounded-lg transition-colors cursor-pointer"
           >
             Upgrade
           </Link>

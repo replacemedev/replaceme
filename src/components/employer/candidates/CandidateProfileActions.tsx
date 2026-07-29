@@ -70,7 +70,7 @@ export function CandidateProfileActions({
           <EmployerOpenMessagingThreadButton
             jobId={jobId}
             candidateId={candidateId}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white transition-all shadow-sm hover:shadow-md hover:bg-[#005c26] active:scale-[0.98] disabled:opacity-60 cursor-pointer h-[42px]"
+            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white transition-all shadow-sm hover:shadow-md hover:bg-[#005c26] active:scale-[0.98] disabled:opacity-60 cursor-pointer h-[42px]"
           >
             <MessageSquare className="h-4 w-4" aria-hidden />
             Message candidate
