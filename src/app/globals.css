@@ -741,11 +741,14 @@ a, button, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Fix Safari input styling.
+/* Fix Safari text-field styling.
+   Exclude checkbox/radio — appearance:none removes their native chrome
+   and leaves them invisible unless fully custom-styled.
    Do NOT set border-radius here — an unlayered rule would override
-   Tailwind rounded-* utilities (same cascade trap as the old .flex gap bug).
-   Radius comes from shared Input / form control classNames (rounded-xl). */
-input, textarea, select {
+   Tailwind rounded-* utilities (same cascade trap as the old .flex gap bug). */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
   -webkit-appearance: none;
   appearance: none;
 }
