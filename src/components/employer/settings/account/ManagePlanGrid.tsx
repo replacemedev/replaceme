@@ -247,28 +247,21 @@ export function ManagePlanGrid({
                 </div>
 
                 {isCurrent && canSwitchInterval ? (
-                  <div className="mt-5 space-y-2">
-                    <button
-                      type="button"
-                      disabled={isUpgrading}
-                      onClick={() => onUpgrade(plan.slug, billingInterval)}
-                      className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
-                    >
-                      {isUpgrading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                          Redirecting
-                        </>
-                      ) : (
-                        "Switch"
-                      )}
-                    </button>
-                    <p className="text-center text-[10px] font-medium leading-snug text-slate-400">
-                      {billingInterval === "year"
-                        ? "Confirm on Stripe — billed once per year (prorated)"
-                        : "Confirm on Stripe — shorter interval starts at period end"}
-                    </p>
-                  </div>
+                  <button
+                    type="button"
+                    disabled={isUpgrading}
+                    onClick={() => onUpgrade(plan.slug, billingInterval)}
+                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
+                  >
+                    {isUpgrading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        Redirecting
+                      </>
+                    ) : (
+                      "Switch"
+                    )}
+                  </button>
                 ) : isCurrent ? (
                   <button
                     type="button"
@@ -294,67 +287,57 @@ export function ManagePlanGrid({
                     )}
                   </button>
                 ) : isDowngrade ? (
-                  <div className="mt-5 space-y-2">
-                    {isPaid ? (
-                      <button
-                        type="button"
-                        disabled={
-                          isUpgrading || scheduledPlan === plan.slug
-                        }
-                        onClick={() => onUpgrade(plan.slug, billingInterval)}
-                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
-                      >
-                        {scheduledPlan === plan.slug ? (
-                          "Scheduled"
-                        ) : isUpgrading ? (
-                          <>
-                            <Loader2
-                              className="h-4 w-4 animate-spin"
-                              aria-hidden
-                            />
-                            Redirecting
-                          </>
-                        ) : (
-                          "Change"
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={
-                          isCancelling ||
-                          cancelAtPeriodEnd ||
-                          scheduledPlan === "discovery"
-                        }
-                        onClick={() =>
-                          onCancelToDiscovery
-                            ? onCancelToDiscovery()
-                            : onManageBilling()
-                        }
-                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
-                      >
-                        {cancelAtPeriodEnd ||
-                        scheduledPlan === "discovery" ? (
-                          "Scheduled"
-                        ) : isCancelling ? (
-                          <>
-                            <Loader2
-                              className="h-4 w-4 animate-spin"
-                              aria-hidden
-                            />
-                            Redirecting
-                          </>
-                        ) : (
-                          "Cancel"
-                        )}
-                      </button>
-                    )}
-                    <p className="text-center text-[10px] font-medium leading-snug text-slate-400">
-                      {isPaid
-                        ? "Takes effect at period end on Stripe"
-                        : "Confirm on Stripe"}
-                    </p>
-                  </div>
+                  isPaid ? (
+                    <button
+                      type="button"
+                      disabled={isUpgrading || scheduledPlan === plan.slug}
+                      onClick={() => onUpgrade(plan.slug, billingInterval)}
+                      className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                    >
+                      {scheduledPlan === plan.slug ? (
+                        "Scheduled"
+                      ) : isUpgrading ? (
+                        <>
+                          <Loader2
+                            className="h-4 w-4 animate-spin"
+                            aria-hidden
+                          />
+                          Redirecting
+                        </>
+                      ) : (
+                        "Change"
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={
+                        isCancelling ||
+                        cancelAtPeriodEnd ||
+                        scheduledPlan === "discovery"
+                      }
+                      onClick={() =>
+                        onCancelToDiscovery
+                          ? onCancelToDiscovery()
+                          : onManageBilling()
+                      }
+                      className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                    >
+                      {cancelAtPeriodEnd || scheduledPlan === "discovery" ? (
+                        "Scheduled"
+                      ) : isCancelling ? (
+                        <>
+                          <Loader2
+                            className="h-4 w-4 animate-spin"
+                            aria-hidden
+                          />
+                          Redirecting
+                        </>
+                      ) : (
+                        "Cancel"
+                      )}
+                    </button>
+                  )
                 ) : (
                   <button
                     type="button"
@@ -374,7 +357,7 @@ export function ManagePlanGrid({
         <p className="mx-auto max-w-2xl text-[10px] font-semibold leading-relaxed text-slate-400">
           Prices are tax-exclusive USD. Annual plans are prepaid for 12 months
           (shown as a monthly equivalent). Tax is calculated at Stripe Checkout.
-          Cancel anytime online — access continues until period end.{" "}
+          Cancel anytime online access continues until period end.{" "}
           <Link
             href="/refund-policy"
             className="font-semibold text-[#006e2f] hover:underline"
