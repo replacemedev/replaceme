@@ -203,21 +203,27 @@ export function PricingCards({
                 {/* Divider */}
                 <div className="border-t border-gray-100 my-5" />
 
-                {/* Features List */}
+                {/* Features List — icon sized to first-line height so wrap doesn't look mid-aligned */}
                 <ul className="space-y-3 flex-1">
                   {detail.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
+                    <li key={idx} className="flex items-start gap-2.5">
                       {feature.included ? (
-                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e6fbf2]">
-                          <Check className="h-3.5 w-3.5 shrink-0 text-[#006e2f] stroke-[3]" />
-                        </div>
+                        <span
+                          className="mt-[2px] inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-[#e6fbf2]"
+                          aria-hidden
+                        >
+                          <Check className="size-2.5 text-[#006e2f] stroke-[3]" />
+                        </span>
                       ) : (
-                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50">
-                          <X className="h-3.5 w-3.5 shrink-0 text-red-500 stroke-[3]" />
-                        </div>
+                        <span
+                          className="mt-[2px] inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-red-50"
+                          aria-hidden
+                        >
+                          <X className="size-2.5 text-red-500 stroke-[3]" />
+                        </span>
                       )}
                       <span
-                        className={`text-xs font-medium leading-snug break-words ${
+                        className={`min-w-0 text-xs font-medium leading-snug ${
                           feature.included ? "text-gray-700" : "text-gray-400 line-through"
                         }`}
                       >

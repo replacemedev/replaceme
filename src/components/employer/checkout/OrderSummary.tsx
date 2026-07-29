@@ -69,10 +69,13 @@ export function OrderSummary({
           </h3>
           <ul className="space-y-4">
             {features.map((feat, idx) => (
-              <li key={idx} className="flex items-start gap-3">
-                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#006e2f]/10 bg-[#ebfdf2]">
-                  <Check className="h-3 w-3 text-[#006e2f] stroke-[3]" />
-                </div>
+              <li key={idx} className="flex items-start gap-2.5">
+                <span
+                  className="mt-[2px] inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-[#006e2f]/10 bg-[#ebfdf2]"
+                  aria-hidden
+                >
+                  <Check className="size-2.5 text-[#006e2f] stroke-[3]" />
+                </span>
                 <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                   {feat}
                 </span>
