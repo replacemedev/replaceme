@@ -206,7 +206,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
               <FormField
                 label="Middle Name"
                 htmlFor="signup-middleName"
-                description="Optional — use your legal middle name for KYC."
+                description=""
                 error={"middleName" in errors ? errors.middleName?.message : undefined}
                 className="min-w-0 w-full"
               >
@@ -267,7 +267,7 @@ export function SignUpForm({ role, callbackUrl, submitLabel }: SignUpFormProps) 
               <FormField
                 label="Suffix"
                 htmlFor="signup-suffix"
-                description="Optional — e.g. Jr., III, PhD."
+                description=""
                 error={"suffix" in errors ? errors.suffix?.message : undefined}
                 className="min-w-0 w-full"
               >
