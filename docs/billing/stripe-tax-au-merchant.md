@@ -11,7 +11,7 @@
 | Stripe processing fee | Stripe |
 | GST / VAT / sales tax on invoice | **Government** (collected via Stripe Tax; you remit) |
 
-List prices stay **tax-exclusive**. Do **not** hardcode Philippine 12% VAT as if Replaceme were a PH seller of every plan.
+List prices stay **tax-exclusive** for both **monthly** and **annual prepaid** plans. Do **not** hardcode Philippine 12% VAT as if Replaceme were a PH seller of every plan. Annual prepaid charges the full yearly amount once; Stripe Tax still applies to that charge when required for the buyer location.
 
 ## Checkout code
 

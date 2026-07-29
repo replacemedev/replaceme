@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { PricingCards } from "@/components/employer/pricing/PricingCards";
+import { BillingIntervalToggle } from "@/components/employer/pricing/BillingIntervalToggle";
 import { CompareTable } from "@/components/employer/pricing/CompareTable";
 import { FAQ } from "@/components/employer/pricing/FAQ";
 import type {
@@ -16,6 +17,10 @@ import type {
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { isActiveJobLimitReached } from "@/lib/entitlements/limits";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
+import {
+  DEFAULT_BILLING_INTERVAL,
+  type BillingInterval,
+} from "@/lib/pricing/billing-interval";
 import {
   isCurrentTier,
   isHigherTier,
@@ -40,6 +45,9 @@ export function EmployerPricingClient({
 }: EmployerPricingClientProps) {
   const router = useRouter();
   const [jobLimitGateOpen, setJobLimitGateOpen] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>(
+    DEFAULT_BILLING_INTERVAL
+  );
   const currentLabel = TIER_LABELS[currentPlanSlug];
   const isPaid = currentPlanSlug !== "discovery";
 
@@ -78,7 +86,7 @@ export function EmployerPricingClient({
     }
 
     if (isHigherTier(target, currentPlanSlug)) {
-      router.push(`/employer/checkout/${target}`);
+      router.push(`/employer/checkout/${target}?interval=${billingInterval}`);
     }
   };
 
@@ -107,9 +115,16 @@ export function EmployerPricingClient({
         </div>
       ) : null}
 
+      <BillingIntervalToggle
+        value={billingInterval}
+        onChange={setBillingInterval}
+        className="mb-2"
+      />
+
       <PricingCards
         plans={plans}
         currentPlanSlug={currentPlanSlug}
+        billingInterval={billingInterval}
         onSelectPlan={handleSelectPlan}
       />
 

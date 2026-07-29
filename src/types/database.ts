@@ -409,6 +409,7 @@ export type Database = {
       }
       billing_plans: {
         Row: {
+          annual_price: number | null
           applicants_per_job_limit: number | null
           approval_mode: Database["public"]["Enums"]["billing_approval_mode"]
           candidate_unlocks: number
@@ -427,9 +428,11 @@ export type Database = {
           resume_download_enabled: boolean
           slug: string | null
           stripe_price_id: string | null
+          stripe_price_id_yearly: string | null
           stripe_product_id: string | null
         }
         Insert: {
+          annual_price?: number | null
           applicants_per_job_limit?: number | null
           approval_mode?: Database["public"]["Enums"]["billing_approval_mode"]
           candidate_unlocks: number
@@ -448,9 +451,11 @@ export type Database = {
           resume_download_enabled?: boolean
           slug?: string | null
           stripe_price_id?: string | null
+          stripe_price_id_yearly?: string | null
           stripe_product_id?: string | null
         }
         Update: {
+          annual_price?: number | null
           applicants_per_job_limit?: number | null
           approval_mode?: Database["public"]["Enums"]["billing_approval_mode"]
           candidate_unlocks?: number
@@ -469,6 +474,7 @@ export type Database = {
           resume_download_enabled?: boolean
           slug?: string | null
           stripe_price_id?: string | null
+          stripe_price_id_yearly?: string | null
           stripe_product_id?: string | null
         }
         Relationships: []

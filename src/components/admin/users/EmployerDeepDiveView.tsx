@@ -9,6 +9,10 @@ import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { CompanyVerificationCard } from "@/components/admin/users/CompanyVerificationCard";
 import type { AdminEmployerDeepDive } from "@/actions/admin/deep-dive";
+import {
+  billingIntervalLabel,
+  formatAdminBillingAmount,
+} from "@/lib/admin/format-billing";
 
 interface EmployerDeepDiveViewProps {
   data: AdminEmployerDeepDive;
@@ -159,7 +163,16 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
                 <div className="flex justify-between">
                   <span className="text-slate-400">Plan price</span>
                   <span className="font-mono font-medium">
-                    {sub.unitAmountCents != null ? `$${(sub.unitAmountCents / 100).toFixed(0)}/mo` : "—"}
+                    {formatAdminBillingAmount(
+                      sub.unitAmountCents,
+                      sub.billingInterval
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Billing interval</span>
+                  <span className="font-medium">
+                    {billingIntervalLabel(sub.billingInterval) ?? "—"}
                   </span>
                 </div>
                 <div className="flex justify-between">

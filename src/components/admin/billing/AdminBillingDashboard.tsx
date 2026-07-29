@@ -23,6 +23,10 @@ import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminBillingPageData } from "@/types/admin.types";
 import { formatCurrency } from "@/lib/format/currency";
+import {
+  billingIntervalLabel,
+  formatAdminBillingAmount,
+} from "@/lib/admin/format-billing";
 
 interface AdminBillingDashboardProps {
   data: AdminBillingPageData;
@@ -48,6 +52,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
   const activeSearch = searchParams.get("search") ?? "";
   const activePlan = searchParams.get("plan") ?? "all";
   const activeStatus = searchParams.get("status") ?? "all";
+  const activeInterval = searchParams.get("interval") ?? "all";
   const activeEventType = searchParams.get("event_type") ?? "all";
 
   const [searchTerm, setSearchTerm] = useState(activeSearch);
@@ -96,7 +101,18 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
     } else {
       params.delete("status");
     }
-    params.delete("page"); // Reset page on filter change
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleIntervalChange = (val: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (val && val !== "all") {
+      params.set("interval", val);
+    } else {
+      params.delete("interval");
+    }
+    params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -115,8 +131,11 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
   const [ledgerPage, setLedgerPage] = useState(1);
   const itemsPerPage = 20;
 
-  const [prevSubFilterKey, setPrevSubFilterKey] = useState(activeSearch + activePlan + activeStatus);
-  const currentSubFilterKey = activeSearch + activePlan + activeStatus;
+  const [prevSubFilterKey, setPrevSubFilterKey] = useState(
+    activeSearch + activePlan + activeStatus + activeInterval
+  );
+  const currentSubFilterKey =
+    activeSearch + activePlan + activeStatus + activeInterval;
   if (currentSubFilterKey !== prevSubFilterKey) {
     setSubPage(1);
     setPrevSubFilterKey(currentSubFilterKey);
@@ -148,6 +167,12 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
 
     if (activeStatus !== "all") {
       if (sub.status?.toLowerCase() !== activeStatus.toLowerCase()) {
+        return false;
+      }
+    }
+
+    if (activeInterval !== "all") {
+      if ((sub.billing_interval ?? "month") !== activeInterval) {
         return false;
       }
     }
@@ -285,7 +310,9 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                     <p className="mt-3 text-2xl font-bold text-slate-900">
                       {formatCents(tier.mrr_cents)}
                     </p>
-                    <p className="text-xs text-slate-400">est. monthly</p>
+                    <p className="text-xs text-slate-400">
+                      est. monthly (annual prepaid normalized)
+                    </p>
                   </div>
                 ))}
               </div>
@@ -325,6 +352,18 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
 
                 <div className="flex flex-col min-w-[140px]">
                   <select
+                    value={activeInterval}
+                    onChange={(e) => handleIntervalChange(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
+                  >
+                    <option value="all">All intervals</option>
+                    <option value="year">Annual</option>
+                    <option value="month">Monthly</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col min-w-[140px]">
+                  <select
                     value={activeStatus}
                     onChange={(e) => handleStatusChange(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 focus:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 rounded-lg text-sm transition-colors text-slate-700 bg-white cursor-pointer"
@@ -340,7 +379,10 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                   </select>
                 </div>
 
-                {(activeSearch !== "" || activePlan !== "all" || activeStatus !== "all") && (
+                {(activeSearch !== "" ||
+                  activePlan !== "all" ||
+                  activeStatus !== "all" ||
+                  activeInterval !== "all") && (
                   <button
                     type="button"
                     onClick={() => {
@@ -349,6 +391,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                       params.delete("search");
                       params.delete("plan");
                       params.delete("status");
+                      params.delete("interval");
                       params.delete("page");
                       router.push(`${pathname}?${params.toString()}`, { scroll: false });
                     }}
@@ -407,7 +450,19 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                               {sub.plan_slug ? (
                                 <PlanTierBadge tier={sub.plan_slug} size="sm" />
                               ) : null}
+                              {billingIntervalLabel(sub.billing_interval) ? (
+                                <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                                  {billingIntervalLabel(sub.billing_interval)}
+                                </span>
+                              ) : null}
                             </div>
+                            <p className="mt-1 text-[11px] font-medium text-slate-400">
+                              {formatAdminBillingAmount(
+                                sub.unit_amount_cents,
+                                sub.billing_interval,
+                                sub.plan_price
+                              )}
+                            </p>
                           </td>
                           <td className="px-4 py-3">
                             <StatusBadge status={sub.status} />

@@ -10,19 +10,24 @@ const fallbackFaqs: FAQItem[] = [
       "Discovery ($0/mo) includes 1 active job post, up to 10 applicants per job, 2-day job approval, and anonymous candidate previews. Upgrading to a paid plan unlocks direct messaging and full candidate profiles.",
   },
   {
+    question: "How do monthly and annual billing work?",
+    answer:
+      "Both options show a monthly price. Monthly plans are charged every month ($19 / $39 / $79). Annual plans are prepaid once per year at a discount (shown as $13 / $26 / $52 per month; billed as $156 / $312 / $624 per year). Pricing defaults to Annual. You can switch to Monthly on the pricing page before checkout.",
+  },
+  {
     question: "How do Starter, Growth, and Scale compare?",
     answer:
-      "Starter ($19/mo) includes 3 jobs and messaging. Growth ($39/mo) provides 10 jobs and priority listings. Scale ($79/mo) unlocks unlimited jobs, unlimited applicants, and priority support.",
+      "Starter includes 3 jobs and messaging. Growth provides 10 jobs and priority listings. Scale unlocks unlimited jobs, unlimited applicants, and priority support. See Annual vs Monthly prices on the pricing cards.",
   },
   {
     question: "Are there any placement fees or salary commissions?",
     answer:
-      "No. You only pay a flat monthly subscription fee. We never charge placement fees, agency markups, or cuts from worker salaries.",
+      "No. You only pay a flat subscription fee. We never charge placement fees, agency markups, or cuts from worker salaries.",
   },
   {
     question: "Can I change or cancel my plan anytime?",
     answer:
-      "Yes. Upgrade, downgrade, or cancel anytime from Account Settings. Upgrades apply immediately; downgrades and cancellations take effect at the end of your billing period. You keep paid access until then.",
+      "Yes. Upgrade, downgrade, or cancel anytime from Account Settings (online via Stripe Customer Portal). Upgrades apply immediately; downgrades and cancellations take effect at the end of your paid billing period. You keep paid access until then. Annual prepaid periods run for 12 months.",
   },
   {
     question: "Are list prices inclusive of tax?",
@@ -32,7 +37,7 @@ const fallbackFaqs: FAQItem[] = [
   {
     question: "What is your refund policy?",
     answer:
-      "Commenced B2B plan periods are generally non-refundable, except for billing errors, mandatory law, or limited goodwill when access fails due to a Platform fault. See the Refund Policy linked in the site footer.",
+      "Commenced B2B plan periods (monthly or annual prepaid) are generally non-refundable, except for billing errors, mandatory law, or limited goodwill when access fails due to a Platform fault. See the Refund Policy linked in the site footer.",
   },
   {
     question: "Do job seekers have to pay to use the platform?",

@@ -1,4 +1,8 @@
 import { getSiteUrl } from "@/lib/auth/site-url";
+import {
+  type BillingInterval,
+  DEFAULT_BILLING_INTERVAL,
+} from "@/lib/pricing/billing-interval";
 import { requireStripe } from "@/lib/server/stripe/client";
 import { ensureStripeCustomer } from "@/lib/server/stripe/ensure-customer";
 import {
@@ -13,6 +17,7 @@ type CreateCheckoutInput = {
   email: string;
   name: string;
   planRef: string;
+  billingInterval?: BillingInterval;
 };
 
 /**
@@ -86,6 +91,7 @@ export async function createSubscriptionCheckoutSession(
 
   const siteUrl = getSiteUrl();
   const planSlug = plan.slug ?? input.planRef.toLowerCase();
+  const billingInterval = input.billingInterval ?? DEFAULT_BILLING_INTERVAL;
 
   // Stripe Tax (AU merchant of record). Set STRIPE_AUTOMATIC_TAX=false only in
   // sandboxes where Tax is not activated in the Stripe Dashboard yet.
@@ -98,19 +104,21 @@ export async function createSubscriptionCheckoutSession(
     mode: "subscription",
     customer: customerResult.customerId,
     client_reference_id: input.employerId,
-    line_items: [resolveCheckoutLineItem(plan)],
+    line_items: [resolveCheckoutLineItem(plan, billingInterval)],
     success_url: `${siteUrl}/employer/settings/account?checkout=success`,
     cancel_url: `${siteUrl}/employer/pricing?checkout=canceled`,
     metadata: {
       employer_id: input.employerId,
       plan_id: plan.id,
       plan_slug: planSlug,
+      billing_interval: billingInterval,
     },
     subscription_data: {
       metadata: {
         employer_id: input.employerId,
         plan_id: plan.id,
         plan_slug: planSlug,
+        billing_interval: billingInterval,
       },
     },
     allow_promotion_codes: true,

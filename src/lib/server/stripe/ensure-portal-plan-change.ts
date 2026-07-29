@@ -166,25 +166,32 @@ async function resolvePortalProducts(
   const supabase = await createAdminClient();
   const { data: plans } = await supabase
     .from("billing_plans")
-    .select("slug, stripe_price_id, stripe_product_id")
+    .select("slug, stripe_price_id, stripe_price_id_yearly, stripe_product_id")
     .in("slug", [...PAID_SLUGS]);
 
   for (const plan of plans ?? []) {
-    const priceId = plan.stripe_price_id?.trim();
-    if (!priceId) continue;
-    try {
-      const price = await stripe.prices.retrieve(priceId);
-      if (!price.active || !price.recurring) continue;
-      const productId =
-        plan.stripe_product_id?.trim() ||
-        (typeof price.product === "string" ? price.product : price.product.id);
-      if (!byProduct.has(productId)) byProduct.set(productId, new Set());
-      byProduct.get(productId)!.add(price.id);
-    } catch (err) {
-      safeError("[Billing] portal product resolve failed for plan price", {
-        priceId,
-        err,
-      });
+    const priceIds = [
+      plan.stripe_price_id?.trim(),
+      plan.stripe_price_id_yearly?.trim(),
+    ].filter((id): id is string => Boolean(id));
+
+    for (const priceId of priceIds) {
+      try {
+        const price = await stripe.prices.retrieve(priceId);
+        if (!price.active || !price.recurring) continue;
+        const productId =
+          plan.stripe_product_id?.trim() ||
+          (typeof price.product === "string"
+            ? price.product
+            : price.product.id);
+        if (!byProduct.has(productId)) byProduct.set(productId, new Set());
+        byProduct.get(productId)!.add(price.id);
+      } catch (err) {
+        safeError("[Billing] portal product resolve failed for plan price", {
+          priceId,
+          err,
+        });
+      }
     }
   }
 

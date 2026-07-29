@@ -27,11 +27,15 @@ export type StripeCheckoutResult = {
  * @see https://docs.stripe.com/customer-management/portal-deep-links
  */
 export async function createStripeCheckoutSession(
-  planId: string
+  planId: string,
+  billingInterval: "month" | "year" = "year"
 ): Promise<StripeCheckoutResult> {
   try {
     const parsed = planIdSchema.parse({ planId });
-    safeLog(`[Stripe] Plan change session for: ${parsed.planId}`);
+    const interval = billingInterval === "month" ? "month" : "year";
+    safeLog(
+      `[Stripe] Plan change session for: ${parsed.planId} interval=${interval}`
+    );
 
     const { user, profile } = await requireRole("employer");
 
@@ -66,17 +70,23 @@ export async function createStripeCheckoutSession(
       email: user.email || "",
       name,
       planRef: parsed.planId,
+      billingInterval: interval,
     });
 
     if ("error" in session) {
       return { error: session.error };
     }
 
+    const planPrice =
+      interval === "year" && plan.annual_price != null
+        ? Number(plan.annual_price)
+        : Number(plan.price);
+
     return {
       checkoutUrl: session.url,
       mode: session.mode,
       planName: plan.name,
-      planPrice: Number(plan.price),
+      planPrice,
       planSlug: session.planSlug,
     };
   } catch (err) {

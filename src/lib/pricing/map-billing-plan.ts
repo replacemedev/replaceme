@@ -7,6 +7,7 @@ export type BillingPlanRow = Pick<
   | "name"
   | "slug"
   | "price"
+  | "annual_price"
   | "job_post_limit"
   | "applicants_per_job_limit"
   | "approval_mode"
@@ -96,6 +97,10 @@ export function mapBillingPlanToPricingPlan(plan: BillingPlanRow): PricingPlan {
     slug,
     name: plan.name,
     price: Number(plan.price),
+    annualPrice:
+      plan.annual_price != null && Number(plan.annual_price) > 0
+        ? Number(plan.annual_price)
+        : null,
     features: buildFeatures(plan),
     ctaText,
     ctaStyle,

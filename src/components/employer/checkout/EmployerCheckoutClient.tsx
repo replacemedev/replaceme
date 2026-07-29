@@ -5,10 +5,15 @@ import Link from "next/link";
 import { ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import type { PricingPlan } from "@/types/employer/billing";
 import { OrderSummary } from "@/components/employer/checkout/OrderSummary";
+import {
+  type BillingInterval,
+  displayMonthlyPrice,
+} from "@/lib/pricing/billing-interval";
 
 interface EmployerCheckoutClientProps {
   plan: PricingPlan;
   checkoutUrl: string;
+  billingInterval?: BillingInterval;
   /** Immediately send the browser to Stripe (portal confirm flows). */
   autoRedirect?: boolean;
   ctaLabel?: string;
@@ -17,6 +22,7 @@ interface EmployerCheckoutClientProps {
 export function EmployerCheckoutClient({
   plan,
   checkoutUrl,
+  billingInterval = "year",
   autoRedirect = false,
   ctaLabel = "Continue to Stripe Checkout (USD)",
 }: EmployerCheckoutClientProps) {
@@ -24,6 +30,16 @@ export function EmployerCheckoutClient({
     if (!autoRedirect || !checkoutUrl) return;
     window.location.href = checkoutUrl;
   }, [autoRedirect, checkoutUrl]);
+
+  const monthlyDisplay = displayMonthlyPrice(
+    plan.price,
+    plan.annualPrice,
+    billingInterval
+  );
+  const annualTotal =
+    billingInterval === "year" && plan.annualPrice != null
+      ? plan.annualPrice
+      : null;
 
   if (autoRedirect) {
     return (
@@ -48,7 +64,9 @@ export function EmployerCheckoutClient({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
       <OrderSummary
         planName={plan.name}
-        planPrice={plan.price}
+        planPrice={monthlyDisplay}
+        annualTotal={annualTotal}
+        billingInterval={billingInterval}
         features={plan.features}
       />
 
@@ -64,7 +82,9 @@ export function EmployerCheckoutClient({
         <ul className="space-y-2 text-xs font-medium text-slate-600">
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
-            Billed monthly in USD (tax-exclusive list price)
+            {billingInterval === "year"
+              ? `Annual prepaid · ${annualTotal != null ? `$${annualTotal}` : "full year"} due today (USD, tax-exclusive)`
+              : "Billed monthly in USD (tax-exclusive list price)"}
           </li>
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
@@ -72,11 +92,12 @@ export function EmployerCheckoutClient({
           </li>
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
-            Cancel anytime from Account Settings
+            Renews automatically until you cancel in Account Settings
           </li>
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
-            Downgrades take effect at the end of your billing period
+            Cancel online anytime; access continues until the end of the paid
+            period
           </li>
         </ul>
 

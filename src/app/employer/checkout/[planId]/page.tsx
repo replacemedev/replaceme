@@ -14,9 +14,11 @@ import {
   isLowerTier,
   normalizePlanSlug,
 } from "@/lib/entitlements/ui-copy";
+import { parseBillingInterval } from "@/lib/pricing/billing-interval";
 
 interface CheckoutPageProps {
   params: Promise<{ planId: string }>;
+  searchParams: Promise<{ interval?: string }>;
 }
 
 export async function generateMetadata({ params }: CheckoutPageProps) {
@@ -28,8 +30,13 @@ export async function generateMetadata({ params }: CheckoutPageProps) {
   };
 }
 
-export default async function CheckoutPage({ params }: CheckoutPageProps) {
+export default async function CheckoutPage({
+  params,
+  searchParams,
+}: CheckoutPageProps) {
   const { planId } = await params;
+  const { interval: intervalParam } = await searchParams;
+  const billingInterval = parseBillingInterval(intervalParam);
   const targetPlan = normalizePlanSlug(planId);
 
   const supabase = await createClient();
@@ -68,7 +75,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
 
   const [plan, checkout] = await Promise.all([
     getPlanDetails(planId),
-    createStripeCheckoutSession(planId),
+    createStripeCheckoutSession(planId, billingInterval),
   ]);
 
   if (!plan) {
@@ -100,18 +107,23 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         subhead={
           isPortalUpdate
             ? "Confirm your plan change securely on Stripe Billing."
-            : "Review your order and continue to secure Stripe checkout."
+            : billingInterval === "year"
+              ? "Annual prepaid — review the total due today, then continue to Stripe."
+              : "Review your order and continue to secure Stripe checkout."
         }
         bordered={false}
       />
       <EmployerCheckoutClient
         plan={plan}
+        billingInterval={billingInterval}
         checkoutUrl={checkout.checkoutUrl}
         autoRedirect={isPortalUpdate}
         ctaLabel={
           isPortalUpdate
             ? "Continue to Stripe to confirm"
-            : "Continue to Stripe Checkout (USD)"
+            : billingInterval === "year"
+              ? "Subscribe · billed annually (USD)"
+              : "Subscribe · billed monthly (USD)"
         }
       />
     </EmployerPageShell>

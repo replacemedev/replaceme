@@ -26,20 +26,23 @@ function copyForKind(input: {
   previousPlanLabel?: string | null;
   amountLabel?: string | null;
 }): { title: string; body: string; preview: string } {
+  const amountNote = input.amountLabel
+    ? ` Charge: ${input.amountLabel}.`
+    : "";
   switch (input.kind) {
     case "upgraded":
       return {
         title: `Your ${input.planLabel} plan is active`,
         preview: `Your plan has been upgraded to ${input.planLabel}`,
         body: input.previousPlanLabel
-          ? `Your subscription moved from ${input.previousPlanLabel} to ${input.planLabel}. New limits and premium email alerts apply immediately.`
-          : `Your ${input.planLabel} subscription is now active. Premium hiring tools and email alerts are unlocked.`,
+          ? `Your subscription moved from ${input.previousPlanLabel} to ${input.planLabel}.${amountNote} New limits and premium email alerts apply immediately.`
+          : `Your ${input.planLabel} subscription is now active.${amountNote} Premium hiring tools and email alerts are unlocked.`,
       };
     case "downgraded":
       return {
         title: `Plan updated to ${input.planLabel}`,
         preview: `Your plan changed to ${input.planLabel}`,
-        body: `Your subscription is now on ${input.planLabel}. Some premium email alerts may no longer apply.`,
+        body: `Your subscription is now on ${input.planLabel}.${amountNote} Some premium email alerts may no longer apply.`,
       };
     case "payment_failed":
       return {
@@ -53,7 +56,7 @@ function copyForKind(input: {
       return {
         title: "Subscription canceled",
         preview: "Your Replaceme subscription was canceled",
-        body: `Your ${input.planLabel} subscription has been canceled. You can resubscribe anytime from Account & Billing.`,
+        body: `Your ${input.planLabel} subscription has been canceled.${amountNote} You can resubscribe anytime from Account & Billing.`,
       };
   }
 }

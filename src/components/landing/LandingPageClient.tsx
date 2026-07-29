@@ -25,8 +25,13 @@ import {
 import type { FAQItem, PricingPlan } from "@/types/employer/billing";
 import { LandingSkillsShowcase } from "@/components/landing/LandingSkillsShowcase";
 import { PricingCards } from "@/components/employer/pricing/PricingCards";
+import { BillingIntervalToggle } from "@/components/employer/pricing/BillingIntervalToggle";
 import { useRouter } from "next/navigation";
 import { CitationBlock } from "@/components/seo";
+import {
+  DEFAULT_BILLING_INTERVAL,
+  type BillingInterval,
+} from "@/lib/pricing/billing-interval";
 import {
   LANDING_AMBIENT_GLOW,
   LANDING_INNER,
@@ -76,6 +81,9 @@ export function LandingPageClient({
   // State for FAQ Accordion
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>(
+    DEFAULT_BILLING_INTERVAL
+  );
 
   // Scroll Reveal Observer
   useEffect(() => {
@@ -442,9 +450,14 @@ export function LandingPageClient({
             </p>
           </div>
 
-          <div className="text-left text-slate-900 mt-6 sm:mt-8">
+          <div className="text-left text-slate-900 mt-6 sm:mt-8 space-y-6">
+            <BillingIntervalToggle
+              value={billingInterval}
+              onChange={setBillingInterval}
+            />
             <PricingCards
               plans={pricingPlans}
+              billingInterval={billingInterval}
               onSelectPlan={() => router.push("/signup/employer")}
             />
           </div>

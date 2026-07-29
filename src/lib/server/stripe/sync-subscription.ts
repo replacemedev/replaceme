@@ -67,6 +67,9 @@ async function resolvePlanByUnitAmount(
     1900: "starter",
     3900: "growth",
     7900: "scale",
+    15600: "starter",
+    31200: "growth",
+    62400: "scale",
   };
   const slug = byAmount[unitAmountCents];
   if (!slug) return null;

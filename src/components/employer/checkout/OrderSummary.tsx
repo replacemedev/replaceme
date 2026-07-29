@@ -4,11 +4,15 @@ import { Check, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 import { formatCurrency } from "@/lib/format/currency";
+import type { BillingInterval } from "@/lib/pricing/billing-interval";
 
 interface OrderSummaryProps {
   planName: string;
   planPrice: number;
   features: string[];
+  billingInterval?: BillingInterval;
+  /** Yearly prepaid total due today when interval is year. */
+  annualTotal?: number | null;
   testimonial?: {
     quote: string;
     author: string;
@@ -22,12 +26,13 @@ export function OrderSummary({
   planName,
   planPrice,
   features,
+  billingInterval = "year",
+  annualTotal = null,
   testimonial,
 }: OrderSummaryProps) {
   return (
     <div className="flex flex-col justify-between h-full space-y-12 md:space-y-0">
       <div>
-        {/* Back Link */}
         <Link
           href="/employer/pricing"
           className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors group mb-8 cursor-pointer"
@@ -36,10 +41,8 @@ export function OrderSummary({
           Back to pricing
         </Link>
 
-        {/* Brand Name */}
         <NavBrand homeHref="/employer/dashboard" compact className="mb-12" />
 
-        {/* Plan Header */}
         <div className="space-y-3">
           <span className="text-xs font-black tracking-wider text-[#006e2f] uppercase">
             SUBSCRIBE TO
@@ -47,22 +50,34 @@ export function OrderSummary({
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight">
             {planName} Plan
           </h1>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-baseline gap-1 flex-wrap">
             <span className="text-4xl font-extrabold text-gray-900">
-              {formatCurrency(planPrice, "USD", { asReact: true, codeClassName: "text-gray-500 text-lg font-semibold ml-1" })}
+              {formatCurrency(planPrice, "USD", {
+                asReact: true,
+                codeClassName: "text-gray-500 text-lg font-semibold ml-1",
+              })}
             </span>
             <span className="text-gray-400 text-sm font-bold">/month</span>
           </div>
-          <p className="text-xs font-semibold text-slate-500 mt-2">
-            Billed monthly in USD · Tax calculated at Stripe Checkout when
-            applicable · Cancel anytime
+          {billingInterval === "year" && annualTotal != null ? (
+            <p className="text-sm font-bold text-slate-800 mt-2">
+              Total due today:{" "}
+              {formatCurrency(annualTotal, "USD", {
+                asReact: true,
+                codeClassName: "text-slate-500 text-xs font-semibold ml-0.5",
+              })}
+              <span className="text-slate-500 font-semibold"> /year</span>
+            </p>
+          ) : null}
+          <p className="text-xs font-semibold text-slate-500 mt-2 leading-relaxed">
+            {billingInterval === "year"
+              ? "Annual prepaid subscription · renews each year unless cancelled · tax calculated at Stripe Checkout when applicable"
+              : "Billed monthly in USD · tax calculated at Stripe Checkout when applicable · cancel anytime"}
           </p>
         </div>
 
-        {/* Divider */}
         <div className="h-px bg-gray-100 my-10" />
 
-        {/* Features List */}
         <div className="space-y-5">
           <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
             Key Benefits
@@ -85,7 +100,6 @@ export function OrderSummary({
         </div>
       </div>
 
-      {/* Testimonial Block */}
       {testimonial && (
         <div className="bg-[#f3f7fd] border border-blue-50/50 p-6 md:p-8 rounded-3xl space-y-5 mt-12 md:mt-auto relative overflow-hidden">
           <div className="absolute right-4 top-4 text-8xl text-blue-100/30 font-serif select-none pointer-events-none">

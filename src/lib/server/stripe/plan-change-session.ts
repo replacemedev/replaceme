@@ -1,12 +1,16 @@
 import type Stripe from "stripe";
 import { getSiteUrl } from "@/lib/auth/site-url";
+import {
+  type BillingInterval,
+  DEFAULT_BILLING_INTERVAL,
+} from "@/lib/pricing/billing-interval";
 import { requireStripe } from "@/lib/server/stripe/client";
 import { ensureStripeCustomer } from "@/lib/server/stripe/ensure-customer";
 import { createSubscriptionCheckoutSession } from "@/lib/server/stripe/checkout-session";
 import { ensurePortalPlanChangeConfiguration } from "@/lib/server/stripe/ensure-portal-plan-change";
 import {
   resolveBillingPlan,
-  resolveStripePriceIdFromEnv,
+  resolvePlanStripePriceId,
 } from "@/lib/server/stripe/plan";
 import { createAdminClient } from "@/lib/supabase/server";
 import { safeError, safeLog } from "@/utils/logger";
@@ -20,17 +24,6 @@ export type PlanChangeSessionResult =
       planSlug: string;
     }
   | { error: string };
-
-function resolvePlanPriceId(plan: {
-  stripe_price_id: string | null;
-  slug: string | null;
-}): string | null {
-  return (
-    plan.stripe_price_id ??
-    resolveStripePriceIdFromEnv(plan.slug ?? "") ??
-    null
-  );
-}
 
 /**
  * Generate a Stripe-hosted confirmation URL for a plan change.
@@ -47,6 +40,7 @@ export async function createPlanChangeSession(input: {
   email: string;
   name: string;
   planRef: string;
+  billingInterval?: BillingInterval;
 }): Promise<PlanChangeSessionResult> {
   const plan = await resolveBillingPlan(input.planRef);
   if (!plan) {
@@ -60,11 +54,14 @@ export async function createPlanChangeSession(input: {
     };
   }
 
-  const priceId = resolvePlanPriceId(plan);
+  const billingInterval = input.billingInterval ?? DEFAULT_BILLING_INTERVAL;
+  const priceId = resolvePlanStripePriceId(plan, billingInterval);
   if (!priceId) {
     return {
       error:
-        "This plan is missing a Stripe price ID. Configure stripe_price_id or STRIPE_PRICE_* env.",
+        billingInterval === "year"
+          ? "This plan is missing a yearly Stripe price ID. Configure stripe_price_id_yearly."
+          : "This plan is missing a Stripe price ID. Configure stripe_price_id or STRIPE_PRICE_* env.",
     };
   }
 
@@ -100,6 +97,7 @@ export async function createPlanChangeSession(input: {
     email: input.email,
     name: input.name,
     planRef: input.planRef,
+    billingInterval,
   });
 
   if ("error" in checkout) {

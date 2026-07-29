@@ -7,6 +7,8 @@ import {
   isCurrentTier,
   isHigherTier,
   isLowerTier,
+  TIER_ANNUAL_MONTHLY,
+  TIER_PRICES,
 } from "@/lib/entitlements/ui-copy";
 
 interface ManagePlanGridProps {
@@ -29,27 +31,27 @@ const UPGRADE_PLANS: {
   detail?: string;
   highlight?: boolean;
 }[] = [
-    { slug: "discovery", label: "Discovery", price: 0 },
-    {
-      slug: "starter",
-      label: "Starter",
-      price: 19,
-      detail: "3 jobs · 20 applicants/job",
-    },
-    {
-      slug: "growth",
-      label: "Growth",
-      price: 39,
-      detail: "10 jobs · 50 applicants/job",
-      highlight: true,
-    },
-    {
-      slug: "scale",
-      label: "Scale",
-      price: 79,
-      detail: "Unlimited jobs & applicants",
-    },
-  ];
+  { slug: "discovery", label: "Discovery", price: 0 },
+  {
+    slug: "starter",
+    label: "Starter",
+    price: TIER_ANNUAL_MONTHLY.starter,
+    detail: `From $${TIER_ANNUAL_MONTHLY.starter}/mo billed annually · or $${TIER_PRICES.starter}/mo monthly`,
+  },
+  {
+    slug: "growth",
+    label: "Growth",
+    price: TIER_ANNUAL_MONTHLY.growth,
+    detail: `From $${TIER_ANNUAL_MONTHLY.growth}/mo billed annually · or $${TIER_PRICES.growth}/mo monthly`,
+    highlight: true,
+  },
+  {
+    slug: "scale",
+    label: "Scale",
+    price: TIER_ANNUAL_MONTHLY.scale,
+    detail: `From $${TIER_ANNUAL_MONTHLY.scale}/mo billed annually · or $${TIER_PRICES.scale}/mo monthly`,
+  },
+];
 
 export function ManagePlanGrid({
   currentPlan,
@@ -78,6 +80,7 @@ export function ManagePlanGrid({
               Manage plan
             </h2>
             <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
+              Upgrades default to annual prepaid (confirm interval on Stripe).
               Upgrades apply immediately (prorated invoice). Downgrades and
               cancellations take effect at the end of your billing period — you
               keep your current plan until then.

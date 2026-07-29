@@ -15,20 +15,20 @@
 
 ### `billing_plans` ↔ sandbox prices (aligned)
 
-| Slug | USD | `stripe_price_id` | `stripe_product_id` |
-| --- | --- | --- | --- |
-| discovery | 0 | — | — |
-| starter | 19 | `price_1Tmx5S04XnBh2V7aYe5kFp8R` | `prod_UmW7J2RzVLIejM` |
-| growth | 39 | `price_1Tmx5S04XnBh2V7aaJdEfLUc` | `prod_UmW71PBiBAfnD5` |
-| scale | 79 | `price_1Tmx5V04XnBh2V7aGr4n1Ion` | `prod_UmW7Y9bQq0jFlA` |
+| Slug | Monthly USD | Monthly `stripe_price_id` | Yearly prepaid | Yearly `stripe_price_id_yearly` | Product |
+| --- | ---: | --- | ---: | --- | --- |
+| discovery | 0 | — | — | — | — |
+| starter | 19 | `price_1Tmx5S04XnBh2V7aYe5kFp8R` | 156 ($13/mo equiv) | `price_1TybEG04XnBh2V7aZBxzhKst` | `prod_UmW7J2RzVLIejM` |
+| growth | 39 | `price_1Tmx5S04XnBh2V7aaJdEfLUc` | 312 ($26/mo equiv) | `price_1TybEH04XnBh2V7adkdmowiB` | `prod_UmW71PBiBAfnD5` |
+| scale | 79 | `price_1Tmx5V04XnBh2V7aGr4n1Ion` | 624 ($52/mo equiv) | `price_1TybEL04XnBh2V7avnbFkbyH` | `prod_UmW7Y9bQq0jFlA` |
 
-All three prices: `livemode=false`, monthly USD, amounts correct.  
+Monthly + yearly prices: `livemode=false`, USD, `tax_behavior=exclusive`. UI defaults to **Annual** (prepaid once/year, shown as $/mo). Save badges: 32% / 33% / 34%.
 
 **Sandbox Tax (MCP applied 2026-07-27):**
 - Tax defaults: `tax_behavior=exclusive`, preset `tax_code=txcd_10103001` (SaaS Business Use)
 - Products Starter/Growth/Scale: `tax_code=txcd_10103001`
 - Prices: `tax_behavior=exclusive`
-- **Still manual:** set sandbox [Tax head office](https://dashboard.stripe.com/settings/tax) (AU address). Status stays `pending` until `head_office` is set.
+- Head office set; Tax status active when configured in Dashboard.
 
 ---
 
@@ -93,9 +93,10 @@ Toggle **off** test data.
 ### A5. Live catalog
 
 - [ ] Products Starter / Growth / Scale
-- [ ] Prices $19 / $39 / $79 monthly USD, `tax_behavior=exclusive`
+- [ ] Monthly prices $19 / $39 / $79, `tax_behavior=exclusive`
+- [ ] **Yearly** prices $156 / $312 / $624 (`interval=year`), `tax_behavior=exclusive`
 - [ ] Product tax code = SaaS Business Use `txcd_10103001`
-- [ ] Record live `prod_` / `price_` IDs
+- [ ] Record live monthly + yearly `prod_` / `price_` IDs into `billing_plans`
 
 ### A6. Stripe Tax
 

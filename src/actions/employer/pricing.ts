@@ -9,7 +9,7 @@ import {
 } from "@/lib/pricing/map-billing-plan";
 
 const PLAN_SELECT =
-  "id, name, slug, price, job_post_limit, applicants_per_job_limit, approval_mode, messaging_enabled, resume_download_enabled, identity_mode, priority_listing, priority_support, early_access, is_popular, display_order";
+  "id, name, slug, price, annual_price, job_post_limit, applicants_per_job_limit, approval_mode, messaging_enabled, resume_download_enabled, identity_mode, priority_listing, priority_support, early_access, is_popular, display_order";
 
 /**
  * Fetch dynamic pricing tiers from the database, and testimonials/FAQs.

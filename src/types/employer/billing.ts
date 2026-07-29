@@ -25,7 +25,10 @@ export interface PricingPlan {
   id: string;
   slug: string;
   name: string;
+  /** Monthly list price (USD, tax-exclusive). */
   price: number;
+  /** Yearly prepaid total (USD). Null for Discovery. */
+  annualPrice: number | null;
   features: string[];
   ctaText: string;
   ctaStyle: "primary" | "secondary" | "accent";

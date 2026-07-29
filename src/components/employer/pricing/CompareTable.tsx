@@ -137,8 +137,8 @@ export function CompareTable({
       </h3>
       <p className="text-center text-sm text-slate-500 font-medium mb-10 max-w-xl mx-auto">
         {currentPlanSlug
-          ? "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Your current plan is highlighted below."
-          : "All paid plans bill monthly in USD through Stripe (tax-exclusive list prices). Compare tiers and sign up when you're ready."}
+          ? "Paid plans are available monthly or annual prepaid (USD, tax-exclusive). Annual is shown as a monthly equivalent on pricing cards. Your current plan is highlighted below."
+          : "Paid plans are available monthly or annual prepaid (USD, tax-exclusive). Annual is shown as a monthly equivalent on pricing cards. Compare tiers and sign up when you're ready."}
       </p>
       {/* Scrollport only — page body must not scroll horizontally */}
       <div

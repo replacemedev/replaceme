@@ -40,6 +40,9 @@ async function resolveSlugFromPriceId(
       1900: "starter",
       3900: "growth",
       7900: "scale",
+      15600: "starter",
+      31200: "growth",
+      62400: "scale",
     };
     if (amount != null && byAmount[amount]) {
       const plan = await resolveBillingPlan(byAmount[amount]!);

@@ -9,10 +9,16 @@ import {
   isLowerTier,
 } from "@/lib/entitlements/ui-copy";
 import { formatMoney } from "@/lib/format/currency";
+import {
+  type BillingInterval,
+  TIER_ANNUAL_SAVE_PERCENT,
+  displayMonthlyPrice,
+} from "@/lib/pricing/billing-interval";
 
 interface PricingCardsProps {
   plans: PricingPlan[];
   currentPlanSlug?: SubscriptionTier | null;
+  billingInterval?: BillingInterval;
   onSelectPlan: (planSlug: string) => void;
 }
 
@@ -105,6 +111,7 @@ function ctaLabel(
 export function PricingCards({
   plans,
   currentPlanSlug = null,
+  billingInterval = "year",
   onSelectPlan,
 }: PricingCardsProps) {
   if (!plans || plans.length === 0) {
@@ -146,6 +153,22 @@ export function PricingCards({
             : false;
 
           const buttonText = ctaLabel(slug, currentPlanSlug, detail.ctaText);
+          const isPaid = slug !== "discovery";
+          const shownPrice = displayMonthlyPrice(
+            plan.price,
+            plan.annualPrice,
+            isPaid ? billingInterval : "month"
+          );
+          const savePct =
+            isPaid &&
+            billingInterval === "year" &&
+            (slug === "starter" || slug === "growth" || slug === "scale")
+              ? TIER_ANNUAL_SAVE_PERCENT[slug]
+              : null;
+          const annualTotal =
+            isPaid && billingInterval === "year" && plan.annualPrice != null
+              ? plan.annualPrice
+              : null;
 
           return (
             <div
@@ -178,17 +201,36 @@ export function PricingCards({
                 </h3>
 
                 {/* Price Display */}
-                <div className="mt-3 flex items-baseline flex-wrap">
+                <div className="mt-3 flex items-baseline flex-wrap gap-x-1 gap-y-1">
                   <span className="text-4xl font-extrabold text-gray-900 tracking-tight">
-                    {formatMoney(plan.price, "USD", {
+                    {formatMoney(shownPrice, "USD", {
                       asReact: true,
                       codeClassName: "text-gray-500 text-sm font-semibold ml-1",
                     })}
                   </span>
-                  <span className="text-gray-500 font-medium ml-1 text-sm">
+                  <span className="text-gray-500 font-medium text-sm">
                     /month
                   </span>
+                  {savePct != null ? (
+                    <span className="ml-1 inline-flex items-center rounded-full bg-[#e6fbf2] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#006e2f]">
+                      Save {savePct}%
+                    </span>
+                  ) : null}
                 </div>
+                {annualTotal != null ? (
+                  <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
+                    Billed annually at{" "}
+                    {formatMoney(annualTotal, "USD", {
+                      asReact: true,
+                      codeClassName: "text-slate-400 text-[10px] font-semibold ml-0.5",
+                    })}
+                    /year
+                  </p>
+                ) : isPaid && billingInterval === "month" ? (
+                  <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
+                    Billed monthly
+                  </p>
+                ) : null}
 
                 {/* Description (Purpose/Perfect for) */}
                 <div className="mt-4 min-h-[50px] flex flex-col justify-start">
@@ -274,8 +316,10 @@ export function PricingCards({
         })}
       </div>
       <p className="text-center text-xs text-slate-400 font-semibold max-w-xl mx-auto leading-relaxed pt-4">
-        All prices are billed exclusively in USD through Stripe (tax-exclusive).
-        Applicable tax is calculated at checkout. Cancel anytime.{" "}
+        All prices are tax-exclusive USD. Annual plans are prepaid for 12 months
+        (shown as a monthly equivalent). Applicable tax is calculated at
+        checkout. Subscriptions renew automatically until cancelled via Manage
+        billing.{" "}
         <Link href="/refund-policy" className="font-semibold text-[#006e2f] hover:underline">
           Refund Policy
         </Link>

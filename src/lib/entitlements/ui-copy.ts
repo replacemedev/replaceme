@@ -17,6 +17,26 @@ export const TIER_PRICES: Record<SubscriptionTier, number> = {
   scale: 79,
 };
 
+/** Yearly prepaid totals (USD). Prefer billing_plans.annual_price when available. */
+export const TIER_ANNUAL_PRICES: Record<
+  Exclude<SubscriptionTier, "discovery">,
+  number
+> = {
+  starter: 156,
+  growth: 312,
+  scale: 624,
+};
+
+/** Monthly-equivalent display for annual prepaid. */
+export const TIER_ANNUAL_MONTHLY: Record<
+  Exclude<SubscriptionTier, "discovery">,
+  number
+> = {
+  starter: 13,
+  growth: 26,
+  scale: 52,
+};
+
 export const TIER_LABELS: Record<SubscriptionTier, string> = {
   discovery: "Discovery",
   starter: "Starter",

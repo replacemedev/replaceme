@@ -25,7 +25,9 @@ export function RefundPolicyContent() {
       <LegalSectionHeading id="1-summary" number={1} title="Summary" />
       <ul className="list-disc space-y-2 pl-5">
         <li>
-          Paid plan periods that have started are generally{" "}
+          Paid plan periods that have started (monthly or{" "}
+          <strong className="font-semibold text-slate-800">annual prepaid</strong>
+          ) are generally{" "}
           <strong className="font-semibold text-slate-800">non-refundable</strong>{" "}
           for business subscriptions.
         </li>
@@ -36,12 +38,13 @@ export function RefundPolicyContent() {
         </li>
         <li>
           Mandatory consumer or other non-waivable law may require a different
-          outcome for qualifying individual consumers.
+          outcome for qualifying individual consumers (including under the
+          Australian Consumer Law where it applies).
         </li>
         <li>
-          Cancel anytime — you keep paid access until the end of the current
-          billing period. Canceling does not by itself create a partial refund
-          for unused days.
+          Cancel anytime online — you keep paid access until the end of the
+          current billing period (month or prepaid year). Canceling does not by
+          itself create a partial refund for unused days.
         </li>
       </ul>
 

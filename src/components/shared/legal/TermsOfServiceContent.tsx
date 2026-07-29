@@ -121,25 +121,45 @@ export function TermsOfServiceContent() {
 
       <Section id="5-payments" title="5. Payments & Subscriptions">
         <p>
-          Employer subscriptions are billed in advance on a monthly or annual basis. Payments are
-          processed securely by Stripe. By subscribing, you authorise us to charge the payment method
-          on file.
+          Employer subscriptions are billed in advance on a{" "}
+          <strong>monthly</strong> or <strong>annual prepaid</strong> basis
+          (USD, tax-exclusive list prices). Annual plans are charged once per
+          year; the website may show a monthly equivalent for comparison.
+          Payments are processed securely by Stripe. By subscribing, you
+          authorise us (or Stripe on our behalf) to charge the payment method on
+          file and to renew the subscription at the end of each billing period
+          until you cancel.
         </p>
         <ul className="space-y-2 pl-1">
           <Bullet>
-            <strong>Cancellations:</strong> You may cancel at any time. Your subscription will remain
-            active until the end of the current billing period.
+            <strong>Key terms at checkout:</strong> Before you pay, we disclose
+            the plan name, whether billing is monthly or annual, the amount due
+            today, that the subscription renews automatically, and that you can
+            cancel online from Account Settings (Stripe Customer Portal).
           </Bullet>
           <Bullet>
-            <strong>Refunds:</strong> Refunds are handled on a case-by-case basis. See our{" "}
+            <strong>Cancellations:</strong> You may cancel at any time online. Your
+            subscription remains active until the end of the current paid billing
+            period (end of the month for monthly plans, or end of the prepaid year
+            for annual plans). Cancellation does not by itself create a partial
+            refund for unused time.
+          </Bullet>
+          <Bullet>
+            <strong>Refunds:</strong> Refunds are handled under our{" "}
             <a href="/refund-policy" className="font-semibold text-emerald-700 hover:underline">
               Refund Policy
-            </a>{" "}
-            for details.
+            </a>
+            . Commenced B2B periods are generally non-refundable except for
+            billing errors, mandatory law, or limited goodwill for Platform fault.
           </Bullet>
           <Bullet>
-            <strong>Price changes:</strong> We will give you at least 30 days notice before changing
-            your subscription price.
+            <strong>Price changes:</strong> We will give you at least 30 days
+            notice before changing your subscription price for a renewal period.
+          </Bullet>
+          <Bullet>
+            <strong>Tax:</strong> Applicable GST/VAT or sales tax may be added at
+            checkout by Stripe Tax based on your billing location. Tax is remitted
+            to the relevant authority when required.
           </Bullet>
         </ul>
       </Section>

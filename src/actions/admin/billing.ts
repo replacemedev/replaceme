@@ -36,7 +36,8 @@ function subscriptionMrrCents(sub: AdminSubscriptionRow): number {
     return monthlyMrrCents(sub.unit_amount_cents, sub.billing_interval);
   }
 
-  if (sub.plan_price) {
+  // Catalog monthly price is only safe as MRR fallback for month interval (or unknown).
+  if (sub.plan_price && sub.billing_interval !== "year") {
     return Math.round(sub.plan_price * 100);
   }
 
