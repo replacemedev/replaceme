@@ -16,22 +16,26 @@ export default async function EmployerOnboardingPage() {
 
   return (
     <EmployerPageShell width="wide" className="gap-8 sm:gap-10">
-      <header className="space-y-2 text-center">
+      <header className="min-w-0 space-y-2 text-center">
         <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
           Welcome to Replaceme
         </p>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 break-words sm:text-3xl">
           Set up your employer account
         </h1>
-        <p className="mx-auto max-w-xl text-sm font-medium leading-relaxed text-slate-500">
-          Tell us about your company so workers recognize you when you post jobs
-          and review applicants.
+        <p className="mx-auto max-w-xl text-sm font-medium leading-relaxed text-slate-500 break-words">
+          Tell us about your company so workers recognize you when you post
+          jobs and review applicants.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-10">
-        <EmployerOnboardingWizard draft={draft} />
-        <OnboardingPlanWelcome />
+      <div className="grid min-w-0 grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-10">
+        <div className="min-w-0 w-full">
+          <EmployerOnboardingWizard draft={draft} />
+        </div>
+        <div className="min-w-0 w-full">
+          <OnboardingPlanWelcome />
+        </div>
       </div>
     </EmployerPageShell>
   );

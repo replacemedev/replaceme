@@ -11,20 +11,20 @@ const DISCOVERY_INCLUDES = [
 
 export function OnboardingPlanWelcome() {
   return (
-    <aside className="mx-auto max-w-lg space-y-6">
+    <aside className="mx-auto w-full max-w-lg min-w-0 space-y-6">
       <div className="rounded-3xl border border-[#006e2f]/15 bg-[#fafdfb] p-4 shadow-sm sm:p-6 md:p-8">
-        <div className="flex items-start gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#ebfdf2] text-[#006e2f]">
             <Sparkles className="h-5 w-5" aria-hidden />
           </span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f] break-words">
               You&apos;re starting on {TIER_LABELS.discovery}
             </p>
-            <p className="mt-1 text-sm font-extrabold text-slate-900">
+            <p className="mt-1 text-sm font-extrabold text-slate-900 break-words">
               Free forever — ${TIER_PRICES.discovery}/mo
             </p>
-            <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">
+            <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600 break-words">
               Complete your company profile, then post your first role. Upgrade
               anytime for full profiles, messaging, and instant approval.
             </p>
@@ -35,13 +35,13 @@ export function OnboardingPlanWelcome() {
           {DISCOVERY_INCLUDES.map((item) => (
             <li
               key={item}
-              className="flex items-start gap-2 text-xs font-semibold text-slate-700"
+              className="flex min-w-0 items-start gap-2 text-xs font-semibold text-slate-700"
             >
               <Check
                 className="mt-0.5 h-4 w-4 shrink-0 text-[#006e2f]"
                 aria-hidden
               />
-              {item}
+              <span className="min-w-0 break-words">{item}</span>
             </li>
           ))}
         </ul>

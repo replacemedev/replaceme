@@ -822,12 +822,19 @@ input[type="checkbox"]:disabled {
   }
 }
 
-/* Fix button text wrapping on small screens */
-button, [role="button"] {
+/* Prefer single-line labels on compact CTAs (Back / Continue / Finish).
+   Multi-line selection cards MUST opt out with .btn-wrap — this rule is
+   unlayered and otherwise beats Tailwind whitespace-* utilities. */
+button,
+[role="button"] {
   white-space: nowrap;
 }
 
-/* Allow wrapping in CTA/label buttons that explicitly need it */
+/* Opt-out for selection cards / multi-line button content */
+button.btn-wrap,
+[role="button"].btn-wrap,
 .btn-wrap {
   white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

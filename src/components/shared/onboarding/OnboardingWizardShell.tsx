@@ -34,21 +34,21 @@ export function OnboardingWizardShell({
   accentClass = "bg-primary hover:bg-primary/90",
 }: OnboardingWizardShellProps) {
   return (
-    <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
+    <section className="mx-auto w-full max-w-lg min-w-0 space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
       <OnboardingProgress
         currentStep={currentStep}
         totalSteps={totalSteps}
         label={stepLabel}
       />
 
-      <header className="space-y-1">
+      <header className="min-w-0 space-y-1">
         <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl md:text-2xl whitespace-normal break-words">{title}</h1>
         {description ? (
           <p className="text-xs font-medium leading-relaxed text-slate-600 sm:text-sm whitespace-normal break-words">{description}</p>
         ) : null}
       </header>
 
-      <div key={`${currentStep}-${stepLabel}`} className="onboarding-step-enter">
+      <div key={`${currentStep}-${stepLabel}`} className="onboarding-step-enter min-w-0 w-full">
         {children}
       </div>
 

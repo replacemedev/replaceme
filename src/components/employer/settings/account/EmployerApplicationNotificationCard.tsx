@@ -75,14 +75,16 @@ export function EmployerApplicationNotificationCard({
               aria-checked={selected}
               disabled={isPending}
               onClick={() => handleSelect(opt.value)}
-              className={`w-full text-left rounded-xl border-2 px-4 py-3.5 transition-all min-h-11 [-webkit-tap-highlight-color:transparent] ${
+              className={`btn-wrap w-full min-w-0 text-left rounded-xl border-2 px-4 py-3.5 transition-all min-h-11 [-webkit-tap-highlight-color:transparent] ${
                 selected
                   ? "border-[#006e2f] bg-[#ebfdf2]"
                   : "border-slate-200 bg-white hover:border-slate-300"
               } disabled:opacity-60`}
             >
-              <p className="text-sm font-semibold text-slate-800">{opt.label}</p>
-              <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{opt.description}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-800 break-words">{opt.label}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-slate-500 break-words">{opt.description}</p>
+              </div>
             </button>
           );
         })}

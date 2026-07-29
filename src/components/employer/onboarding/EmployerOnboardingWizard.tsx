@@ -315,22 +315,45 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
           });
         }}
       >
-        <div className="space-y-3">
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => setNotificationPreference(opt.value)}
-              className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
-                notificationPreference === opt.value
-                  ? "border-[#006e2f] bg-[#ebfdf2]"
-                  : "border-slate-200 bg-white hover:border-slate-300"
-              }`}
-            >
-              <p className="text-sm font-semibold text-slate-800">{opt.label}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{opt.description}</p>
-            </button>
-          ))}
+        <div className="w-full min-w-0 space-y-3" role="radiogroup" aria-label="Applicant notification preference">
+          {options.map((opt) => {
+            const selected = notificationPreference === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setNotificationPreference(opt.value)}
+                className={`btn-wrap flex w-full min-w-0 items-start gap-3 text-left rounded-xl border-2 p-4 transition-all sm:p-5 ${
+                  selected
+                    ? "border-[#006e2f] bg-[#ebfdf2]"
+                    : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
+              >
+                <span
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                    selected
+                      ? "border-[#006e2f] bg-[#006e2f]"
+                      : "border-slate-300 bg-white"
+                  }`}
+                  aria-hidden
+                >
+                  {selected ? (
+                    <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                  ) : null}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-800 break-words">
+                    {opt.label}
+                  </p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-slate-500 break-words">
+                    {opt.description}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </OnboardingWizardShell>
     );
