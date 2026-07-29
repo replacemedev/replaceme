@@ -478,19 +478,21 @@ export function LandingPageClient({
               return (
                 <div
                   key={index}
-                  className={`group bg-[#f8fafc] rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${isOpen
+                  className={`group min-w-0 bg-[#f8fafc] rounded-2xl border p-4 sm:p-6 transition-all duration-300 ${isOpen
                     ? "border-emerald-500/30 shadow-md"
                     : "border-slate-100 hover:border-emerald-500/25"
                     }`}
                 >
                   <button
+                    type="button"
                     onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                    className="w-full flex items-start justify-between gap-4 text-slate-800 text-left focus:outline-none"
+                    className="btn-wrap w-full min-w-0 flex items-start justify-between gap-3 sm:gap-4 text-slate-800 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 rounded-lg"
+                    aria-expanded={isOpen}
                   >
-                    <h3 className="min-w-0 flex-1 pr-2 text-left text-base sm:text-lg font-bold">
+                    <h3 className="min-w-0 flex-1 text-left text-base sm:text-lg font-bold leading-snug break-words">
                       {faq.question}
                     </h3>
-                    <span className="relative mt-0.5 w-6 h-6 shrink-0 bg-white rounded-full flex items-center justify-center shadow-xs border border-slate-100">
+                    <span className="mt-0.5 w-6 h-6 shrink-0 bg-white rounded-full flex items-center justify-center shadow-xs border border-slate-100">
                       <Plus
                         className={`h-4 w-4 text-[#22c55e] transition duration-300 ${isOpen ? "rotate-45" : ""}`}
                         aria-hidden

@@ -148,7 +148,7 @@ export function CompareTable({
         <table className="w-full min-w-[720px] text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-100">
-              <th className="sticky left-0 z-20 bg-white p-4 text-sm font-semibold text-gray-500 whitespace-nowrap min-w-[9.5rem] border-r border-gray-100">
+              <th className="p-4 text-sm font-semibold text-gray-500 whitespace-nowrap min-w-[9.5rem]">
                 Feature
               </th>
               {ordered.map((plan) => {
@@ -183,7 +183,7 @@ export function CompareTable({
                 key={row.feature}
                 className="group hover:bg-gray-50 transition-colors"
               >
-                <td className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 p-4 text-sm font-medium text-slate-900 whitespace-nowrap border-r border-gray-100">
+                <td className="p-4 text-sm font-medium text-slate-900 whitespace-nowrap">
                   {row.feature}
                 </td>
                 {ordered.map((plan) => {
