@@ -60,6 +60,7 @@ export default async function AccountSettingsPage() {
     cancelAtPeriodEnd: false,
     hasStripeSubscription: false,
     lastPaymentError: null,
+    billingInterval: null,
     scheduledPlan: null,
     scheduledEffectiveAt: null,
   };

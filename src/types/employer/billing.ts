@@ -16,6 +16,8 @@ export interface AccountSettings {
   cancelAtPeriodEnd: boolean;
   hasStripeSubscription: boolean;
   lastPaymentError: string | null;
+  /** Current Stripe billing interval for the paid subscription. */
+  billingInterval: "month" | "year" | null;
   /** Paid tier scheduled at period end (Stripe subscription schedule). */
   scheduledPlan: SubscriptionTier | null;
   scheduledEffectiveAt: string | null;

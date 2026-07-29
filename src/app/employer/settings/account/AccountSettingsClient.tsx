@@ -317,6 +317,7 @@ export function AccountSettingsClient({
           <AccountDetailsList />
           <ManagePlanGrid
             currentPlan={initialSettings.plan}
+            currentBillingInterval={initialSettings.billingInterval}
             isUpgrading={isUpgrading}
             isCancelling={isCancelling}
             onUpgrade={handleUpgrade}

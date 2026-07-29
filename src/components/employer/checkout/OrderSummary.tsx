@@ -33,14 +33,6 @@ export function OrderSummary({
   return (
     <div className="flex flex-col justify-between h-full space-y-12 md:space-y-0">
       <div>
-        <Link
-          href="/employer/pricing"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors group mb-8 cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          Back to pricing
-        </Link>
-
         <NavBrand homeHref="/employer/dashboard" compact className="mb-12" />
 
         <div className="space-y-3">

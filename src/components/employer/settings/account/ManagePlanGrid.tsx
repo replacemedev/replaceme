@@ -22,6 +22,8 @@ import { formatMoney } from "@/lib/format/currency";
 
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
+  /** Interval on the employer's live Stripe subscription (null if free / unknown). */
+  currentBillingInterval?: BillingInterval | null;
   isUpgrading: boolean;
   isCancelling?: boolean;
   onUpgrade: (planId: SubscriptionTier, interval: BillingInterval) => void;
@@ -70,6 +72,7 @@ function paidSlug(
 
 export function ManagePlanGrid({
   currentPlan,
+  currentBillingInterval = null,
   isUpgrading,
   isCancelling = false,
   onUpgrade,
@@ -98,9 +101,10 @@ export function ManagePlanGrid({
               Manage plan
             </h2>
             <p className="mt-2 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
-              Same Annual / Monthly options as Pricing. Upgrades apply
-              immediately (prorated). Downgrades and cancellations take effect
-              at period end — you keep your current plan until then.
+              Toggle Annual or Monthly (Annual is default). Use it to upgrade,
+              downgrade, or switch billing interval on your current plan.
+              Upgrades apply immediately (prorated). Switching to a shorter
+              interval or downgrading takes effect at period end.
             </p>
           </div>
           {nextBillingDate && currentPlan !== "discovery" ? (
@@ -134,6 +138,11 @@ export function ManagePlanGrid({
             const isDowngrade = isLowerTier(plan.slug, currentPlan);
             const paidKey = paidSlug(plan.slug) ? plan.slug : null;
             const isPaid = paidKey != null;
+            const canSwitchInterval =
+              isCurrent &&
+              isPaid &&
+              currentBillingInterval != null &&
+              billingInterval !== currentBillingInterval;
 
             const shownPrice = paidKey
               ? displayMonthlyPrice(
@@ -237,13 +246,42 @@ export function ManagePlanGrid({
                   </p>
                 </div>
 
-                {isCurrent ? (
+                {isCurrent && canSwitchInterval ? (
+                  <div className="mt-5 space-y-2">
+                    <button
+                      type="button"
+                      disabled={isUpgrading}
+                      onClick={() => onUpgrade(plan.slug, billingInterval)}
+                      className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
+                    >
+                      {isUpgrading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                          Redirecting…
+                        </>
+                      ) : billingInterval === "year" ? (
+                        "Switch to annual"
+                      ) : (
+                        "Switch to monthly"
+                      )}
+                    </button>
+                    <p className="text-center text-[10px] font-medium leading-snug text-slate-400">
+                      {billingInterval === "year"
+                        ? "Confirm on Stripe — billed once per year (prorated)"
+                        : "Confirm on Stripe — shorter interval starts at period end"}
+                    </p>
+                  </div>
+                ) : isCurrent ? (
                   <button
                     type="button"
                     disabled
                     className="mt-5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
                   >
-                    Current plan
+                    {currentBillingInterval === "month"
+                      ? "Current · monthly"
+                      : currentBillingInterval === "year"
+                        ? "Current · annual"
+                        : "Current plan"}
                   </button>
                 ) : isUpgrade && isPaid ? (
                   <button

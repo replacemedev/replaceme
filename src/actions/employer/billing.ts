@@ -58,6 +58,7 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
           plan_slug,
           current_period_end,
           billing_period_end,
+          billing_interval,
           cancel_at_period_end,
           stripe_subscription_id,
           unlocks_used,
@@ -84,6 +85,7 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
             plan_slug,
             current_period_end,
             billing_period_end,
+            billing_interval,
             cancel_at_period_end,
             stripe_subscription_id,
             unlocks_used,
@@ -122,6 +124,7 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
         cancelAtPeriodEnd: false,
         hasStripeSubscription: false,
         lastPaymentError: null,
+        billingInterval: null,
         scheduledPlan: null,
         scheduledEffectiveAt: null,
       };
@@ -151,6 +154,9 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
           : null;
 
     const status = String(subscription.status ?? "active");
+    const intervalRaw = subscription.billing_interval as string | null;
+    const billingInterval =
+      intervalRaw === "year" || intervalRaw === "month" ? intervalRaw : null;
 
     return {
       plan,
@@ -165,6 +171,7 @@ export async function getAccountSettings(): Promise<AccountSettings | null> {
       cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
       hasStripeSubscription: Boolean(subscription.stripe_subscription_id),
       lastPaymentError: (subscription.last_payment_error as string | null) ?? null,
+      billingInterval,
       scheduledPlan,
       scheduledEffectiveAt:
         (subscription.scheduled_effective_at as string | null) ?? null,
