@@ -80,11 +80,11 @@ export function CompanyProfileForm({
 
           <CompanyDetailsForm industries={industries} />
 
-          <div className="flex justify-end items-center gap-4 pt-6 border-t border-slate-100">
+          <div className="flex w-full flex-col-reverse items-stretch gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-end sm:gap-4">
             <button
               type="button"
               onClick={() => router.push("/employer/dashboard")}
-              className="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800 sm:w-auto"
             >
               Cancel
             </button>
@@ -92,7 +92,7 @@ export function CompanyProfileForm({
               type="submit"
               disabled={isSubmitting}
               variant="success"
-              className="w-auto px-6 h-12 flex items-center gap-2"
+              className="flex h-12 items-center gap-2 px-6 sm:!w-auto"
             >
               <Save size={16} aria-hidden />
               {isSubmitting ? "Saving..." : "Save changes"}
