@@ -99,7 +99,7 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
           Hiring regions
         </label>
         <p className="text-xs leading-relaxed text-slate-500">
-          Where you typically hire remote talent. Optional — helps workers understand fit.
+          Where you typically hire remote talent. It helps workers understand fit.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           {HIRING_REGIONS.map((region) => {

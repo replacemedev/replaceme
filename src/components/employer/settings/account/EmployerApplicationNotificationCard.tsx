@@ -59,7 +59,7 @@ export function EmployerApplicationNotificationCard({
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-slate-900">Applicant notifications</h3>
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
-            Choose how you hear about new job applications. Email only — no SMS.
+            Choose how you hear about new job applications. Email only.
           </p>
         </div>
       </div>

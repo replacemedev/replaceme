@@ -741,11 +741,13 @@ a, button, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Fix Safari input styling */
+/* Fix Safari input styling.
+   Do NOT set border-radius here — an unlayered rule would override
+   Tailwind rounded-* utilities (same cascade trap as the old .flex gap bug).
+   Radius comes from shared Input / form control classNames (rounded-xl). */
 input, textarea, select {
   -webkit-appearance: none;
   appearance: none;
-  border-radius: inherit;
 }
 
 /* Fix position: sticky on Safari (requires explicit overflow on parent) */

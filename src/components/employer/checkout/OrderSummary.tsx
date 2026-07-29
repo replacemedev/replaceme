@@ -70,8 +70,8 @@ export function OrderSummary({
           <ul className="space-y-4">
             {features.map((feat, idx) => (
               <li key={idx} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#ebfdf2] flex items-center justify-center relative top-0.5 border border-[#006e2f]/10">
-                  <Check className="w-3 h-3 text-[#006e2f] stroke-[3]" />
+                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#006e2f]/10 bg-[#ebfdf2]">
+                  <Check className="h-3 w-3 text-[#006e2f] stroke-[3]" />
                 </div>
                 <span className="text-sm font-semibold text-gray-700 leading-relaxed">
                   {feat}

@@ -208,12 +208,12 @@ export function PricingCards({
                   {detail.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       {feature.included ? (
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[#e6fbf2] flex items-center justify-center mt-0.5 shrink-0">
-                          <Check className="w-3.5 h-3.5 text-[#006e2f] stroke-[3] shrink-0" />
+                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e6fbf2]">
+                          <Check className="h-3.5 w-3.5 shrink-0 text-[#006e2f] stroke-[3]" />
                         </div>
                       ) : (
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-50 flex items-center justify-center mt-0.5 shrink-0">
-                          <X className="w-3.5 h-3.5 text-red-500 stroke-[3] shrink-0" />
+                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50">
+                          <X className="h-3.5 w-3.5 shrink-0 text-red-500 stroke-[3]" />
                         </div>
                       )}
                       <span

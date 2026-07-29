@@ -94,11 +94,17 @@ export function PlanFeatureChecklist({
             }`}
           >
             {feature.included ? (
-              <Check className="h-4 w-4 shrink-0 text-[#006e2f]" aria-hidden />
+              <Check
+                className="mt-0.5 h-4 w-4 shrink-0 text-[#006e2f]"
+                aria-hidden
+              />
             ) : (
-              <X className="h-4 w-4 shrink-0 text-slate-300" aria-hidden />
+              <X
+                className="mt-0.5 h-4 w-4 shrink-0 text-slate-300"
+                aria-hidden
+              />
             )}
-            <span>{feature.label}</span>
+            <span className="leading-snug">{feature.label}</span>
           </li>
         ))}
       </ul>

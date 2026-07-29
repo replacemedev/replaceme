@@ -130,12 +130,12 @@ export function ActivePlanSidebar({
             {features.map((feature) => (
               <li
                 key={feature}
-                className="flex items-center gap-3 text-sm font-medium text-emerald-100"
+                className="flex items-start gap-3 text-sm font-medium text-emerald-100"
               >
-                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white/10 text-white shrink-0">
+                <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                   <Check size={12} />
                 </span>
-                <span>{feature}</span>
+                <span className="leading-snug">{feature}</span>
               </li>
             ))}
           </ul>
