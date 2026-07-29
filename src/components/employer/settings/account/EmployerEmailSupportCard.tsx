@@ -43,7 +43,7 @@ export function EmployerEmailSupportCard() {
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-slate-900">Email support</h3>
           <p className="mt-1 text-sm leading-relaxed text-slate-500">
-            Available on all plans, including Discovery. We reply to your account email.
+            We reply to your account email.
           </p>
         </div>
       </div>

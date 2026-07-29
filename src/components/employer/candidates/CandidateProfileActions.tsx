@@ -41,10 +41,12 @@ export function CandidateProfileActions({
       if (result.success) {
         setIsPinned(result.pinned ?? false);
         toast.success(
-          result.pinned ? "Candidate saved to talent pool." : "Candidate removed from talent pool."
+          result.pinned
+            ? "Candidate saved to pinned workers."
+            : "Candidate removed from pinned workers."
         );
       } else {
-        toast.error(result.error ?? "Could not update talent pool status.");
+        toast.error(result.error ?? "Could not update pinned workers.");
       }
     });
   };
@@ -96,7 +98,7 @@ export function CandidateProfileActions({
             size={16}
             className={isPinned ? "fill-[#006e2f] text-[#006e2f]" : "text-slate-400"}
           />
-          {isPinned ? "Saved to Talent Pool" : "Save to Talent Pool"}
+          {isPinned ? "Saved to Pinned Workers" : "Pin Worker"}
         </button>
       </div>
 

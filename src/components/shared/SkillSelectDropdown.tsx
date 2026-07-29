@@ -35,7 +35,8 @@ export function SkillSelectDropdown({
       s.toLowerCase().includes(search.toLowerCase())
   );
 
-  const priorityFiltered = filtered.filter((s) => prioritySet.has(s));
+  // Preserve PRIORITY_SKILLS order (do not rely on Set iteration).
+  const priorityFiltered = PRIORITY_SKILLS.filter((s) => filtered.includes(s));
   const otherFiltered = filtered.filter((s) => !prioritySet.has(s));
 
   const toggleSkill = useCallback(
@@ -153,7 +154,7 @@ export function SkillSelectDropdown({
         {/* Dropdown */}
         {isOpen && !isAtMax && (
           <div
-            className="absolute left-0 right-0 top-full z-50 mt-1.5 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg"
+            className="absolute left-0 right-0 top-full z-50 mt-1.5 max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white shadow-lg"
             role="listbox"
             aria-label="Available skills"
           >

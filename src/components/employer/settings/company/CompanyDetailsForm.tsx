@@ -11,6 +11,13 @@ interface CompanyDetailsFormProps {
   industries: DropdownOption[];
 }
 
+const selectClass = (hasError: boolean) =>
+  `flex h-12 w-full min-w-0 rounded-xl border ${
+    hasError
+      ? "border-red-500 focus-visible:ring-red-500"
+      : "border-slate-200 focus-visible:ring-[#22c55e]"
+  } bg-white px-4 py-2 text-base text-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm`;
+
 export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
   const {
     register,
@@ -22,9 +29,12 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
   const companyBio = watch("companyBio") || "";
   const remainingChars = 500 - companyBio.length;
   const selectedRegions: string[] = watch("hiringRegions") || [];
+  const industry = watch("industry") || "";
+  const showIndustryCustom = industry === "Other";
 
   const industryOptions =
     industries.length > 0 ? industries : [...EMPLOYER_INDUSTRIES];
+  const industryKnown = industryOptions.some((ind) => ind.value === industry);
 
   const toggleRegion = (value: string) => {
     const next = selectedRegions.includes(value)
@@ -66,19 +76,28 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-semibold text-slate-700">
+          <label htmlFor="company-industry" className="block text-sm font-semibold text-slate-700">
             Industry <span className="text-red-500">*</span>
           </label>
           <div className="relative pb-5">
             <select
-              className={`flex h-12 w-full min-w-0 rounded-xl border ${
-                errors.industry
-                  ? "border-red-500 focus-visible:ring-red-500"
-                  : "border-slate-200 focus-visible:ring-[#22c55e]"
-              } bg-white px-4 py-2 text-base text-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm`}
-              {...register("industry")}
+              id="company-industry"
+              className={selectClass(Boolean(errors.industry))}
+              {...register("industry", {
+                onChange: (e) => {
+                  if (e.target.value !== "Other") {
+                    setValue("industryCustom", "", {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }
+                },
+              })}
             >
               <option value="">Select an industry</option>
+              {!industryKnown && industry ? (
+                <option value={industry}>{industry}</option>
+              ) : null}
               {industryOptions.map((ind) => (
                 <option key={ind.value} value={ind.value}>
                   {ind.label}
@@ -93,6 +112,30 @@ export function CompanyDetailsForm({ industries }: CompanyDetailsFormProps) {
           </div>
         </div>
       </div>
+
+      {showIndustryCustom ? (
+        <div className="space-y-2 rounded-xl border border-emerald-100 bg-[#ebfdf2]/60 p-4 sm:p-5">
+          <label
+            htmlFor="company-industry-custom"
+            className="block text-sm font-semibold text-slate-700"
+          >
+            Describe your industry <span className="text-red-500">*</span>
+          </label>
+          <p className="text-xs leading-relaxed text-slate-500">
+            Tell workers what space you operate in — this shows on your company profile.
+          </p>
+          <div className="relative pb-5 pt-1">
+            <Input
+              id="company-industry-custom"
+              type="text"
+              autoComplete="organization-title"
+              placeholder="e.g. Renewable Energy, Pet Care, Logistics"
+              error={errors.industryCustom?.message as string}
+              {...register("industryCustom")}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-slate-700">

@@ -40,6 +40,7 @@ export function CompanyProfileForm({
       companyName: initialData?.companyName || "",
       websiteUrl: initialData?.websiteUrl || "",
       industry: initialData?.industry || "",
+      industryCustom: initialData?.industryCustom || "",
       companyBio: initialData?.companyBio || "",
       logoUrl: initialData?.logoUrl || "",
       hiringRegions: initialData?.hiringRegions || [],

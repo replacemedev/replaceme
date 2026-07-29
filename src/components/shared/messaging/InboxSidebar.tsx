@@ -86,10 +86,10 @@ export function InboxSidebar({
           {role === "employer" ? (
             <Link
               href="/employer/pinned"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#006e2f] hover:text-[#005321] hover:underline transition-colors whitespace-nowrap"
             >
-              <Bookmark size={13} />
-              Talent Pool
+              <Bookmark size={13} aria-hidden />
+              Pinned Workers
             </Link>
           ) : null}
         </div>

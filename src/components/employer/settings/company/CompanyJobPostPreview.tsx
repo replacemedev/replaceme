@@ -21,10 +21,14 @@ export function CompanyJobPostPreview({
   const companyName = watch("companyName");
   const logoUrl = watch("logoUrl");
   const industry = watch("industry");
+  const industryCustom = watch("industryCustom");
   const companyBio = watch("companyBio");
 
   const displayName = companyName.trim() || "Your company";
-  const displayIndustry = industry || "Industry";
+  const displayIndustry =
+    industry === "Other"
+      ? industryCustom?.trim() || "Industry"
+      : industry || "Industry";
   const bioPreview =
     companyBio?.trim() ||
     "Your company bio appears here on job posts so workers know who they're applying to.";

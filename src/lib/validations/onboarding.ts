@@ -98,12 +98,27 @@ export const workerOnboardingSchema = z.object({
   bio: z.string().max(500).optional(),
 });
 
-export const employerCompanyStepSchema = z.object({
-  companyName: nonEmptyStringSchema.max(120),
-  industry: nonEmptyStringSchema,
-  companySize: nonEmptyStringSchema.max(80),
-  industryCustom: z.string().max(200).optional(),
-});
+export const employerCompanyStepSchema = z
+  .object({
+    companyName: nonEmptyStringSchema.max(120),
+    industry: nonEmptyStringSchema,
+    companySize: nonEmptyStringSchema.max(80),
+    industryCustom: z.string().max(200).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.industry === "Other" && !(data.industryCustom?.trim())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please describe your industry",
+        path: ["industryCustom"],
+      });
+    }
+  })
+  .transform((data) => ({
+    ...data,
+    industryCustom:
+      data.industry === "Other" ? data.industryCustom?.trim() || undefined : undefined,
+  }));
 
 export const employerHiringStepSchema = z.object({
   skills: z

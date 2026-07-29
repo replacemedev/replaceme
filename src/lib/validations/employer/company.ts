@@ -13,6 +13,7 @@ export const companyProfileSchema = z
       ])
       .optional(),
     industry: z.string().min(1, "Please select an industry"),
+    industryCustom: z.string().max(200, "Industry description is too long").optional(),
     companyBio: z
       .string()
       .max(500, "Bio cannot exceed 500 characters")
@@ -21,8 +22,19 @@ export const companyProfileSchema = z
     hiringRegions: z.array(z.string()).max(8).optional(),
   })
   .strict()
+  .superRefine((data, ctx) => {
+    if (data.industry === "Other" && !(data.industryCustom?.trim())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please describe your industry",
+        path: ["industryCustom"],
+      });
+    }
+  })
   .transform((data) => ({
     ...data,
+    industryCustom:
+      data.industry === "Other" ? data.industryCustom?.trim() || undefined : undefined,
     hiringRegions: (data.hiringRegions ?? []).filter((r) =>
       hiringRegionSet.has(r)
     ),

@@ -49,7 +49,9 @@ export async function getCompanyProfile(): Promise<CompanyProfileInput | null> {
     // Fetch company details from company_profiles table directly
     const { data: companyProfile, error: companyError } = await supabase
       .from("company_profiles")
-      .select("company_name, website_url, industry, company_bio, logo_url, hiring_regions")
+      .select(
+        "company_name, website_url, industry, industry_custom, company_bio, logo_url, hiring_regions"
+      )
       .eq("employer_id", profile.id)
       .maybeSingle();
 
@@ -58,6 +60,7 @@ export async function getCompanyProfile(): Promise<CompanyProfileInput | null> {
       companyName: companyProfile?.company_name || "",
       websiteUrl: companyProfile?.website_url || "",
       industry: companyProfile?.industry || "",
+      industryCustom: companyProfile?.industry_custom || "",
       companyBio: companyProfile?.company_bio || "",
       logoUrl: companyProfile?.logo_url || "",
       hiringRegions: Array.isArray(companyProfile?.hiring_regions)
@@ -107,6 +110,7 @@ export async function updateCompanyProfile(payload: CompanyProfileInput) {
       company_name: parsed.data.companyName,
       website_url: parsed.data.websiteUrl || null,
       industry: parsed.data.industry || null,
+      industry_custom: parsed.data.industryCustom ?? null,
       company_bio: parsed.data.companyBio || null,
       logo_url: parsed.data.logoUrl || null,
       hiring_regions: parsed.data.hiringRegions,

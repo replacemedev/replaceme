@@ -16,17 +16,9 @@ import {
   COMPANY_SIZE_OPTIONS,
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
+import { EMPLOYER_INDUSTRIES } from "@/lib/data/industries";
 
 const CONTENT_STEPS = 4;
-
-const INDUSTRIES = [
-  "Technology",
-  "E-commerce",
-  "Healthcare",
-  "Finance",
-  "Education",
-  "Other",
-] as const;
 
 type WizardPhase = "welcome" | "company" | "hiring" | "details" | "notification";
 
@@ -145,34 +137,58 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
             className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
           />
         </label>
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Industry
+        <div className="space-y-2">
+          <label
+            htmlFor="onboarding-industry"
+            className="block text-sm font-medium text-slate-700"
+          >
+            Industry
+          </label>
           <select
+            id="onboarding-industry"
             required
             value={industry}
-            onChange={(e) => setIndustry(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setIndustry(next);
+              if (next !== "Other") setIndustryCustom("");
+            }}
             className={ONBOARDING_SELECT_CLASS}
           >
             <option value="">Select industry</option>
-            {INDUSTRIES.map((item) => (
-              <option key={item} value={item}>
-                {item}
+            {industry &&
+            !EMPLOYER_INDUSTRIES.some((item) => item.value === industry) ? (
+              <option value={industry}>{industry}</option>
+            ) : null}
+            {EMPLOYER_INDUSTRIES.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
               </option>
             ))}
           </select>
-        </label>
-        {industry === "Other" && (
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Describe your industry
+        </div>
+        {industry === "Other" ? (
+          <div className="space-y-2 rounded-xl border border-emerald-100 bg-[#ebfdf2]/60 p-4">
+            <label
+              htmlFor="onboarding-industry-custom"
+              className="block text-sm font-medium text-slate-700"
+            >
+              Describe your industry
+            </label>
             <input
+              id="onboarding-industry-custom"
               required
               value={industryCustom}
               onChange={(e) => setIndustryCustom(e.target.value)}
-              placeholder="e.g. Renewable Energy"
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
+              placeholder="e.g. Renewable Energy, Pet Care, Logistics"
+              autoComplete="organization-title"
+              className="w-full min-h-12 rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30 sm:text-sm"
             />
-          </label>
-        )}
+            <p className="text-xs leading-relaxed text-slate-500">
+              Workers see this on your company profile when you post jobs.
+            </p>
+          </div>
+        ) : null}
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Company size
           <select
