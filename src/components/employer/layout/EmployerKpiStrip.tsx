@@ -20,7 +20,7 @@ export function EmployerKpiStrip({ items, className = "" }: EmployerKpiStripProp
 
   return (
     <div
-      className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 ${className}`}
+      className={`grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 ${className}`}
     >
       {items.map((item) => {
         const Icon = item.icon;

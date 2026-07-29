@@ -10,9 +10,9 @@ export default function EmployerDashboardLoading() {
         actions={<div className="h-10 w-32 bg-slate-200 rounded-xl" />}
       />
 
-      {/* KPI Strip Skeleton */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {Array.from({ length: 4 }).map((_, i) => (
+      {/* KPI Strip Skeleton — matches EmployerKpiStrip (3 metrics) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-1">
             <div className="flex items-center justify-between gap-2">
               <SkeletonBlock className="h-3 w-16 bg-slate-100 rounded" />
