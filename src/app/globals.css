@@ -712,10 +712,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, label, li {
   word-break: break-word;
 }
 
-/* Fix gap in flex layouts for older Safari (< 14.5) */
-.flex {
-  gap: var(--tw-gap, 0);
-}
+/* Do NOT add `.flex { gap: var(--tw-gap) }` — Tailwind v4 sets gap directly,
+   and an unlayered .flex rule will zero out all gap-* utilities app-wide. */
 
 /* Prevent text size adjustment on iOS Safari (portrait/landscape flipping) */
 html {

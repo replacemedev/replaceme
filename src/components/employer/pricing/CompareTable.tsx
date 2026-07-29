@@ -92,7 +92,7 @@ export function CompareTable({
       {
         feature: "Support",
         values: {
-          discovery: "None",
+          discovery: "Email",
           starter: "Email",
           growth: "Email",
           scale: "Priority",

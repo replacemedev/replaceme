@@ -30,11 +30,11 @@ export function FormField({
   const descriptionId = baseId ? `${baseId}-description` : undefined;
 
   return (
-    <div className={className}>
+    <div className={`flex flex-col gap-1.5 ${className}`}>
       {label ? (
         <label
           htmlFor={htmlFor}
-          className="mb-1.5 block text-sm font-body-bold font-bold text-slate-800"
+          className="block text-sm font-body-bold font-bold text-slate-800"
         >
           {label}
           {required ? (
@@ -50,7 +50,7 @@ export function FormField({
       {description && !error ? (
         <p
           id={descriptionId}
-          className="mt-1.5 text-xs leading-snug text-slate-500"
+          className="text-xs leading-snug text-slate-500"
         >
           {description}
         </p>
@@ -60,7 +60,7 @@ export function FormField({
         id={errorId}
         role={error ? "alert" : undefined}
         aria-live={error ? "polite" : undefined}
-        className={`mt-1.5 min-h-[1.125rem] text-xs leading-snug ${
+        className={`min-h-[1.125rem] text-xs leading-snug ${
           error ? "text-red-600" : "text-transparent"
         }`}
       >
