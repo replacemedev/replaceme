@@ -701,9 +701,24 @@ body {
   max-width: 100%;
 }
 
-/* Fix flexbox/grid min-size bug in Safari (items overflow containers) */
+/* Fix flexbox/grid min-size bug in Safari (items overflow containers).
+   Unlayered * beats Tailwind min-w-* — restore intrinsic min width on
+   controls so flex CTAs (e.g. onboarding Continue/Next with sm:w-auto)
+   do not collapse into tall, padded-less pills. */
 * {
   min-width: 0;
+}
+
+button,
+[role="button"],
+input,
+select,
+textarea,
+img,
+svg,
+video,
+iframe {
+  min-width: auto;
 }
 
 /* Ensure long words wrap properly everywhere (critical for mobile + Safari) */
@@ -742,15 +757,52 @@ a, button, [role="button"] {
 }
 
 /* Fix Safari text-field styling.
-   Exclude checkbox/radio — appearance:none removes their native chrome
-   and leaves them invisible unless fully custom-styled.
-   Do NOT set border-radius here — an unlayered rule would override
-   Tailwind rounded-* utilities (same cascade trap as the old .flex gap bug). */
+   Text inputs keep appearance:none; checkboxes are styled separately below.
+   Do NOT set border-radius on text fields here — an unlayered rule would
+   override Tailwind rounded-* utilities. */
 input:not([type="checkbox"]):not([type="radio"]),
 textarea,
 select {
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Premium checkbox — green fill + black check (platform standard) */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.75rem 0.75rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #22c55e;
+  border-color: #22c55e;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.25 8.25L6.5 11.5L12.75 4.25' stroke='%23000000' stroke-width='2.35' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E");
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Fix position: sticky on Safari (requires explicit overflow on parent) */

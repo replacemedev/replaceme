@@ -79,7 +79,7 @@ export function OnboardingWizardShell({
           type="button"
           onClick={onNext}
           disabled={isPending || isNextDisabled}
-          className={`w-full rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:opacity-50 sm:min-w-[140px] sm:w-auto ${accentClass}`}
+          className={`w-full shrink-0 rounded-xl px-6 py-3 text-sm font-bold text-white transition-colors disabled:opacity-50 sm:w-auto sm:min-w-[140px] ${accentClass}`}
         >
           {isPending ? "Saving…" : nextLabel}
         </button>

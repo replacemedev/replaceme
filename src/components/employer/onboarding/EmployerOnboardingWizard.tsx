@@ -89,7 +89,7 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
         <button
           type="button"
           onClick={() => setPhase("company")}
-          className="w-full rounded-xl bg-[#006e2f] py-3 text-sm font-bold text-white transition-colors hover:bg-[#005c26]"
+          className="w-full rounded-xl bg-[#006e2f] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#005c26]"
         >
           Get started
         </button>

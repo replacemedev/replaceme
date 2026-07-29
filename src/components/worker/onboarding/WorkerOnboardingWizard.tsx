@@ -120,7 +120,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         <button
           type="button"
           onClick={() => goNext("identity")}
-          className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90"
+          className="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90"
         >
           Get started
         </button>

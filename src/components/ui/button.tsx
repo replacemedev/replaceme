@@ -36,7 +36,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         break
     }
 
-    const baseClasses = "inline-flex items-center justify-center rounded-xl text-sm font-body-bold font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none w-full"
+    const baseClasses = "inline-flex items-center justify-center rounded-xl px-4 text-sm font-body-bold font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none w-full shrink-0"
     
     return (
       <button
