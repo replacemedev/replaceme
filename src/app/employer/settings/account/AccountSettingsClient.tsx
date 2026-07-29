@@ -72,7 +72,7 @@ export function AccountSettingsClient({
       if (result.success) {
         toast.success(
           result.planSlug
-            ? `Plan synced: ${result.planSlug}`
+            ? `Plan Synced: ${result.planSlug}`
             : "Billing synced from Stripe"
         );
         router.refresh();
@@ -295,7 +295,7 @@ export function AccountSettingsClient({
           href="/employer/settings/security"
           className="mt-3 inline-flex text-sm font-bold text-[#006e2f] hover:underline"
         >
-          Open security settings →
+          Open security settings
         </Link>
       </div>
 

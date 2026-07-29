@@ -252,17 +252,15 @@ export function ManagePlanGrid({
                       type="button"
                       disabled={isUpgrading}
                       onClick={() => onUpgrade(plan.slug, billingInterval)}
-                      className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
+                      className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
                     >
                       {isUpgrading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                          Redirecting…
+                          Redirecting
                         </>
-                      ) : billingInterval === "year" ? (
-                        "Switch to annual"
                       ) : (
-                        "Switch to monthly"
+                        "Switch"
                       )}
                     </button>
                     <p className="text-center text-[10px] font-medium leading-snug text-slate-400">
@@ -275,30 +273,24 @@ export function ManagePlanGrid({
                   <button
                     type="button"
                     disabled
-                    className="mt-5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
+                    className="mt-5 min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
                   >
-                    {currentBillingInterval === "month"
-                      ? "Current · monthly"
-                      : currentBillingInterval === "year"
-                        ? "Current · annual"
-                        : "Current plan"}
+                    Current
                   </button>
                 ) : isUpgrade && isPaid ? (
                   <button
                     type="button"
                     disabled={isUpgrading}
                     onClick={() => onUpgrade(plan.slug, billingInterval)}
-                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
+                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
                   >
                     {isUpgrading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                        Redirecting…
+                        Redirecting
                       </>
-                    ) : billingInterval === "year" ? (
-                      "Upgrade · annual"
                     ) : (
-                      "Upgrade · monthly"
+                      "Upgrade"
                     )}
                   </button>
                 ) : isDowngrade ? (
@@ -310,7 +302,7 @@ export function ManagePlanGrid({
                           isUpgrading || scheduledPlan === plan.slug
                         }
                         onClick={() => onUpgrade(plan.slug, billingInterval)}
-                        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
                       >
                         {scheduledPlan === plan.slug ? (
                           "Scheduled"
@@ -320,10 +312,10 @@ export function ManagePlanGrid({
                               className="h-4 w-4 animate-spin"
                               aria-hidden
                             />
-                            Redirecting…
+                            Redirecting
                           </>
                         ) : (
-                          "Change plan"
+                          "Change"
                         )}
                       </button>
                     ) : (
@@ -339,7 +331,7 @@ export function ManagePlanGrid({
                             ? onCancelToDiscovery()
                             : onManageBilling()
                         }
-                        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
                       >
                         {cancelAtPeriodEnd ||
                         scheduledPlan === "discovery" ? (
@@ -350,10 +342,10 @@ export function ManagePlanGrid({
                               className="h-4 w-4 animate-spin"
                               aria-hidden
                             />
-                            Redirecting…
+                            Redirecting
                           </>
                         ) : (
-                          "Move to Discovery"
+                          "Cancel"
                         )}
                       </button>
                     )}
@@ -367,9 +359,9 @@ export function ManagePlanGrid({
                   <button
                     type="button"
                     disabled
-                    className="mt-5 min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-400"
+                    className="mt-5 min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400"
                   >
-                    Free tier
+                    Free
                   </button>
                 )}
               </div>
@@ -395,7 +387,7 @@ export function ManagePlanGrid({
           href="/employer/pricing"
           className="inline-flex min-h-10 items-center justify-center text-xs font-bold text-[#006e2f] hover:underline"
         >
-          Compare all features →
+          Compare all features
         </Link>
       </div>
     </section>
