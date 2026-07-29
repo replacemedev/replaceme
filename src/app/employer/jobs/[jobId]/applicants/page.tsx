@@ -1,6 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { profileIdFilter } from "@/lib/auth/role";
 import { getApplicants } from "@/actions/employer/applicants";
 import { getJobById } from "@/actions/employer/jobs";
 import { getEmployerPlanUsage } from "@/actions/employer/billing";
@@ -28,12 +29,12 @@ export default async function ApplicantsPage({ params }: PageProps) {
     redirect("/signin");
   }
 
-  // Verify role is employer
+  // Match requireRole: profile.id may differ from auth.uid() (auth_user_id).
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, role")
-    .eq("id", user.id)
-    .single();
+    .or(profileIdFilter(user.id))
+    .maybeSingle();
 
   if (!profile || profile.role !== "employer") {
     redirect("/dashboard");
@@ -68,6 +69,7 @@ export default async function ApplicantsPage({ params }: PageProps) {
         resumeDownloadEnabled={applicantsData.resumeDownloadEnabled}
         applicantsPerJobLimit={applicantsData.applicantsPerJobLimit}
         hiddenApplicantCount={applicantsData.hiddenApplicantCount}
+        loadError={applicantsData.error}
       />
     </EmployerPageShell>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { WorkerBottomTabBar } from "./WorkerBottomTabBar";
+import { ScrollToTopOnNavigate } from "@/components/shared/layout/ScrollToTopOnNavigate";
 
 interface WorkerLayoutChromeProps {
   unreadMessageCount?: number;
@@ -9,5 +10,10 @@ interface WorkerLayoutChromeProps {
 export function WorkerLayoutChrome({
   unreadMessageCount = 0,
 }: WorkerLayoutChromeProps) {
-  return <WorkerBottomTabBar unreadMessageCount={unreadMessageCount} />;
+  return (
+    <>
+      <ScrollToTopOnNavigate />
+      <WorkerBottomTabBar unreadMessageCount={unreadMessageCount} />
+    </>
+  );
 }

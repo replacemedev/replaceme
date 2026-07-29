@@ -1,4 +1,8 @@
--- Include worker legal-name fields in employer applicant preview (KYC / full identity).
+-- Fix get_applicant_preview: profiles.phone_number was dropped in
+-- 20260729000001 / 20260729160000, but 20260729150000 still SELECTed it.
+-- Every RPC call failed with "column p.phone_number does not exist", so
+-- loadApplicantsForJob dropped all rows after a successful applications SELECT.
+-- Jobs list counts only application ids (no RPC) — hence count > 0 / pipeline empty.
 
 CREATE OR REPLACE FUNCTION public.get_applicant_preview(
   p_application_id UUID,
@@ -58,36 +62,40 @@ BEGIN
   WHERE p.id = v_app.candidate_id;
 
   IF v_full THEN
-    SELECT COALESCE(jsonb_agg(
-      jsonb_build_object(
+    SELECT COALESCE(jsonb_agg(skill_row), '[]'::jsonb)
+    INTO v_skills
+    FROM (
+      SELECT jsonb_build_object(
         'id', ws.id,
         'skill_name', ws.skill_name,
         'proficiency', ws.proficiency,
         'proficiency_label', ws.proficiency_label,
         'category', ws.category,
         'experience_duration', ws.experience_duration
-      ) ORDER BY ws.proficiency DESC
-    ), '[]'::jsonb)
-    INTO v_skills
-    FROM public.worker_skills ws
-    WHERE ws.worker_id = v_app.candidate_id
-      AND (ws.category = 'top' OR ws.category IS NULL)
-    LIMIT 12;
+      ) AS skill_row
+      FROM public.worker_skills ws
+      WHERE ws.worker_id = v_app.candidate_id
+        AND (ws.category = 'top' OR ws.category IS NULL)
+      ORDER BY ws.proficiency DESC
+      LIMIT 12
+    ) ranked_skills;
 
-    SELECT COALESCE(jsonb_agg(
-      jsonb_build_object(
+    SELECT COALESCE(jsonb_agg(project_row), '[]'::jsonb)
+    INTO v_projects
+    FROM (
+      SELECT jsonb_build_object(
         'id', wp.id,
         'title', wp.title,
         'role', wp.role,
         'year', wp.year,
         'description', wp.description,
         'skills_used', wp.skills_used
-      ) ORDER BY wp.year DESC
-    ), '[]'::jsonb)
-    INTO v_projects
-    FROM public.worker_projects wp
-    WHERE wp.worker_id = v_app.candidate_id
-    LIMIT 8;
+      ) AS project_row
+      FROM public.worker_projects wp
+      WHERE wp.worker_id = v_app.candidate_id
+      ORDER BY wp.year DESC
+      LIMIT 8
+    ) ranked_projects;
 
     RETURN jsonb_build_object(
       'application_id', v_app.id,
@@ -95,7 +103,7 @@ BEGIN
       'status', v_app.status,
       'match_score', v_app.match_score,
       'identity_mode', 'full',
-      'candidate', to_jsonb(v_worker) || jsonb_build_object(
+      'candidate', COALESCE(to_jsonb(v_worker), '{}'::jsonb) || jsonb_build_object(
         'worker_skills', v_skills,
         'worker_projects', v_projects
       )
@@ -121,3 +129,8 @@ BEGIN
   );
 END;
 $$;
+
+COMMENT ON FUNCTION public.get_applicant_preview(UUID, UUID) IS
+  'Employer applicant preview payload. Does not select dropped profiles.phone_number.';
+
+GRANT EXECUTE ON FUNCTION public.get_applicant_preview(UUID, UUID) TO authenticated;

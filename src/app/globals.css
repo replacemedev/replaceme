@@ -736,10 +736,11 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Smooth scrolling with Safari support */
+/* Instant scroll on route changes — never animate programmatic/nav scrolls.
+   In-page smooth scroll (landing anchors, etc.) must opt in via JS APIs. */
 html {
-  scroll-behavior: smooth;
-  -webkit-scroll-behavior: smooth;
+  scroll-behavior: auto;
+  -webkit-scroll-behavior: auto;
 }
 
 /* Fix -webkit-backdrop-filter for Safari glass effects */

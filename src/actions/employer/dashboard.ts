@@ -75,7 +75,8 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
         priority_score,
         applications (
           id,
-          is_within_plan_cap
+          is_within_plan_cap,
+          moderation_status
         )
       `)
           .eq("employer_id", employerProfileId)
@@ -93,10 +94,15 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
         }
 
         return jobs.map((job: any) => {
-          const totalApps = job.applications ? job.applications.length : 0;
-          const visibleApps = job.applications
-            ? job.applications.filter((app: any) => app.is_within_plan_cap).length
-            : 0;
+          // Match pipeline filters: exclude suspended; visible = in-plan only.
+          const countable = (job.applications ?? []).filter(
+            (app: { moderation_status?: string }) =>
+              app.moderation_status !== "suspended"
+          );
+          const totalApps = countable.length;
+          const visibleApps = countable.filter(
+            (app: { is_within_plan_cap?: boolean }) => app.is_within_plan_cap
+          ).length;
 
           return {
             id: job.id,

@@ -108,11 +108,15 @@ async function loadPinnedWorkersForEmployer(
     const jobIds = jobs?.map((j) => j.id) ?? [];
     if (jobIds.length > 0) {
       const workerIds = pinnedList.map((w) => w.id);
+      // Only attach job context when the worker actually applied (in-plan).
+      // `/employer/candidates/[id]` requires a real application — a fake
+      // fallback jobId causes a 404 on "View profile".
       const { data: applications } = await supabase
         .from("applications")
         .select("candidate_id, job_id, created_at")
         .in("candidate_id", workerIds)
         .in("job_id", jobIds)
+        .eq("is_within_plan_cap", true)
         .order("created_at", { ascending: false });
 
       const jobByCandidate = new Map<string, string>();
@@ -122,9 +126,11 @@ async function loadPinnedWorkersForEmployer(
         }
       }
 
-      const fallbackJobId = jobIds[0];
       for (const worker of pinnedList) {
-        worker.contextJobId = jobByCandidate.get(worker.id) ?? fallbackJobId;
+        const jobId = jobByCandidate.get(worker.id);
+        if (jobId) {
+          worker.contextJobId = jobId;
+        }
       }
     }
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { EmployerBottomTabBar } from "./EmployerBottomTabBar";
+import { ScrollToTopOnNavigate } from "@/components/shared/layout/ScrollToTopOnNavigate";
 import type { NavSession } from "@/types/nav";
 
 interface EmployerLayoutChromeProps {
@@ -12,5 +13,10 @@ export function EmployerLayoutChrome({
   unreadMessageCount = 0,
   session,
 }: EmployerLayoutChromeProps) {
-  return <EmployerBottomTabBar unreadMessageCount={unreadMessageCount} session={session} />;
+  return (
+    <>
+      <ScrollToTopOnNavigate />
+      <EmployerBottomTabBar unreadMessageCount={unreadMessageCount} session={session} />
+    </>
+  );
 }

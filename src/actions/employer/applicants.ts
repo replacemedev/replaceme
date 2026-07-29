@@ -34,19 +34,54 @@ function matchLabelFromScore(matchScore: number): MatchLabel {
 
 import { previewDisplayName } from "@/lib/entitlements/ui-copy";
 
+type ApplicationRow = {
+  id: string;
+  job_id: string;
+  candidate_id: string;
+  status: string;
+  match_score: number | null;
+  created_at: string;
+};
+
+/** Minimal row when preview RPC fails — keeps pipeline count aligned with jobs list. */
+function fallbackApplicant(
+  app: ApplicationRow,
+  identityMode: BillingIdentityMode
+): Applicant {
+  const isFull = identityMode === "full";
+  return {
+    id: app.id,
+    jobId: app.job_id,
+    candidateId: app.candidate_id,
+    name: previewDisplayName(app.candidate_id),
+    role: "Incomplete Profile",
+    matchScore: app.match_score ?? 0,
+    matchLabel: matchLabelFromScore(app.match_score ?? 0),
+    status: app.status as ApplicationStatus,
+    skills: [],
+    experienceYears: 0,
+    isUnlocked: isFull,
+    identityMode: isFull ? "full" : "anonymous_preview",
+    avatarUrl: null,
+    email: null,
+    bio: null,
+    resumeUrl: null,
+    expectedSalaryMin: null,
+    expectedSalaryMax: null,
+    salaryCurrency: "USD",
+    createdAt: app.created_at,
+    isVerified: false,
+  };
+}
+
 function mapPreviewToApplicant(
-  app: {
-    id: string;
-    job_id: string;
-    candidate_id: string;
-    status: string;
-    match_score: number | null;
-    created_at: string;
-  },
+  app: ApplicationRow,
   preview: Awaited<ReturnType<typeof fetchApplicantPreview>>,
   identityMode: BillingIdentityMode
-): Applicant | null {
-  if (!preview) return null;
+): Applicant {
+  if (!preview) {
+    return fallbackApplicant(app, identityMode);
+  }
 
   const candidate = preview.candidate;
   const isFull = identityMode === "full";
@@ -165,6 +200,7 @@ async function loadApplicantsForJob(
 
   if (appsError) {
     safeError("Error fetching applications:", appsError);
+    throw new Error(`Failed to load applications for job ${jobId}`);
   }
 
   const { data: threads } = await supabase
@@ -177,16 +213,32 @@ async function loadApplicantsForJob(
   );
 
   const dbApplicants: Applicant[] = [];
+  let previewFailures = 0;
 
   for (const app of applications ?? []) {
     const preview = await fetchApplicantPreview(supabase, app.id, employerId);
-    const mapped = mapPreviewToApplicant(app, preview, identityMode);
-    if (mapped) {
-      dbApplicants.push({
-        ...mapped,
-        messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
+    if (!preview) {
+      previewFailures += 1;
+      safeError("Applicant preview missing; using fallback row", {
+        applicationId: app.id,
+        jobId,
+        candidateId: app.candidate_id,
       });
     }
+    const mapped = mapPreviewToApplicant(app, preview, identityMode);
+    dbApplicants.push({
+      ...mapped,
+      messagingThreadId: threadByWorker.get(app.candidate_id) ?? null,
+    });
+  }
+
+  if (previewFailures > 0) {
+    safeError("get_applicant_preview failures during loadApplicantsForJob", {
+      jobId,
+      employerId,
+      previewFailures,
+      applicationCount: applications?.length ?? 0,
+    });
   }
 
   dbApplicants.sort((a, b) => {

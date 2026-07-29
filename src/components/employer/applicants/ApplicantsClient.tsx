@@ -37,6 +37,7 @@ interface ApplicantsClientProps {
   resumeDownloadEnabled: boolean;
   applicantsPerJobLimit: number | null;
   hiddenApplicantCount: number;
+  loadError?: string;
 }
 
 export function ApplicantsClient({
@@ -49,6 +50,7 @@ export function ApplicantsClient({
   resumeDownloadEnabled,
   applicantsPerJobLimit,
   hiddenApplicantCount,
+  loadError,
 }: ApplicantsClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -219,6 +221,16 @@ export function ApplicantsClient({
       />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
+
+      {loadError ? (
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <p className="font-medium">{loadError}</p>
+        </div>
+      ) : null}
 
       {applicantsPerJobLimit !== null ? (
         <JobApplicantUsageBar

@@ -1,5 +1,5 @@
 /** Bump when cached payload shapes change. */
-export const CACHE_VERSION = "v1";
+export const CACHE_VERSION = "v2";
 
 /**
  * Per-user / per-employer Redis keys. Never cache sensitive data under a shared key.
