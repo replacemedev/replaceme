@@ -11,8 +11,8 @@ function Section({
     <section id={id} className="scroll-mt-24 space-y-4">
       <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{title}</h2>
       <div className="space-y-3 text-[15px] leading-relaxed text-slate-600 sm:text-base">
-        {children}
-      </div>
+      {children}
+    </div>
     </section>
   );
 }
@@ -22,7 +22,7 @@ function Bullet({ children }: { children: React.ReactNode }) {
     <li className="flex items-start gap-2.5">
       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
       <span>{children}</span>
-    </li>
+          </li>
   );
 }
 

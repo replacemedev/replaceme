@@ -104,15 +104,14 @@ export function HiredWorkerCard({
     <div className="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-md hover:border-slate-200/50 transition-all duration-300 animate-fadeIn">
       {/* Left Area: Profile Details */}
       <div className="flex items-center gap-4 shrink-0 min-w-0 lg:max-w-md">
-        <div className="relative w-14 h-14 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
-          <AvatarImage
-            src={worker.avatarUrl}
-            alt={worker.name}
-            initials={initials}
-            size="sm"
-            rounded="2xl"
-          />
-        </div>
+        <AvatarImage
+          src={worker.avatarUrl}
+          alt={worker.name}
+          initials={initials}
+          size="sm"
+          rounded="2xl"
+          containerClassName="border border-slate-100 bg-emerald-50"
+        />
 
         <div className="min-w-0">
           <h3 className="text-sm font-extrabold text-slate-800 mb-1 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
