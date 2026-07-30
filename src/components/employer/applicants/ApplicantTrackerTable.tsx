@@ -57,14 +57,22 @@ export function ApplicantTrackerTable({
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-50 text-left text-slate-600 sticky top-0 z-10 shadow-[0_1px_0_0_rgb(226_232_240)]">
+        <table className="w-full min-w-[800px] text-sm text-left">
+          <thead className="bg-slate-50 text-slate-600 sticky top-0 z-10 shadow-[0_1px_0_0_rgb(226_232_240)]">
             <tr>
-              <th className="px-4 py-3 font-semibold text-xs">Candidate</th>
-              <th className="px-4 py-3 font-semibold text-xs">Match</th>
-              <th className="px-4 py-3 font-semibold text-xs">Status</th>
-              <th className="px-4 py-3 font-semibold text-xs">Applied</th>
-              <th className="px-4 py-3 font-semibold text-xs text-right">
+              <th className="px-4 py-3 font-semibold text-xs w-full">
+                Candidate
+              </th>
+              <th className="px-4 py-3 font-semibold text-xs whitespace-nowrap">
+                Match
+              </th>
+              <th className="px-4 py-3 font-semibold text-xs whitespace-nowrap">
+                Status
+              </th>
+              <th className="px-4 py-3 font-semibold text-xs whitespace-nowrap">
+                Applied
+              </th>
+              <th className="px-4 py-3 font-semibold text-xs text-right whitespace-nowrap">
                 Actions
               </th>
             </tr>
@@ -75,16 +83,16 @@ export function ApplicantTrackerTable({
                 key={row.id}
                 className="border-t border-slate-100 hover:bg-slate-50/50"
               >
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
+                <td className="px-4 py-3 w-full">
+                  <div className="flex items-center gap-3 min-w-0">
                     {row.avatarUrl && !row.isPreview ? (
                       <img
                         src={row.avatarUrl}
                         alt=""
-                        className="h-9 w-9 rounded-full object-cover"
+                        className="h-9 w-9 shrink-0 rounded-full object-cover"
                       />
                     ) : (
-                      <span className="relative h-9 w-9 rounded-full bg-slate-200 inline-flex items-center justify-center">
+                      <span className="relative h-9 w-9 shrink-0 rounded-full bg-slate-200 inline-flex items-center justify-center">
                         <span className="text-[10px] font-bold text-slate-400">
                           ?
                         </span>
@@ -110,10 +118,10 @@ export function ApplicantTrackerTable({
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 font-semibold tabular-nums">
+                <td className="px-4 py-3 font-semibold tabular-nums whitespace-nowrap">
                   {row.matchScore}%
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 whitespace-nowrap">
                   {row.isPreview ? (
                     <span className="text-slate-500 text-xs font-medium">
                       {APPLICATION_STATUS_LABELS[row.status]}
@@ -129,7 +137,7 @@ export function ApplicantTrackerTable({
                 <td className="px-4 py-3 text-slate-600 text-xs font-medium whitespace-nowrap">
                   {new Date(row.appliedAt).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 whitespace-nowrap text-right">
                   <EmployerInlineActions
                     planSlug={planSlug}
                     messagingEnabled={messagingEnabled}

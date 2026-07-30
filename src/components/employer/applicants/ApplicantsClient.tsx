@@ -461,7 +461,7 @@ export function ApplicantsClient({
 
           {/* 4. Table View */}
           {viewMode === "table" && (
-            <div className="hidden lg:block overflow-x-auto">
+            <div className="hidden lg:block w-full min-w-0">
               <ApplicantTrackerTable
                 rows={tableRows}
                 planSlug={planSlug}
