@@ -54,7 +54,7 @@ export function JobCreateStepIndicator({
       </ol>
       <p className="mt-5 flex items-center gap-2 text-[11px] font-medium text-slate-500 border-t border-slate-100 pt-4">
         <Check className="h-3.5 w-3.5 text-[#006e2f]" aria-hidden />
-        Single-page form — scroll to complete each section
+        Single-page form scroll to complete each section
       </p>
     </nav>
   );

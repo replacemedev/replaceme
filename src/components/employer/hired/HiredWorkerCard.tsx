@@ -3,7 +3,6 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { Receipt } from "lucide-react";
 import { HiredWorker } from "@/types/employer/hired";
 import { EmployerMessageAction } from "@/components/employer/layout/EmployerInlineActions";
 import { updateHiredBadgeVisibility } from "@/actions/employer/contracts";
@@ -193,14 +192,6 @@ export function HiredWorkerCard({
         >
           View Contract
         </Link>
-
-        <button
-          type="button"
-          className="w-9 h-9 bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-400 hover:text-slate-700 rounded-2xl flex items-center justify-center shrink-0 transition-colors cursor-pointer"
-          title="View Payments / Invoices"
-        >
-          <Receipt size={15} />
-        </button>
       </div>
     </div>
   );

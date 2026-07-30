@@ -13,7 +13,6 @@ import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
 import {
   EmployerPageHeader,
   EmployerPageShell,
-  EmployerSectionCard,
 } from "@/components/employer/layout";
 
 export const metadata = {
@@ -93,24 +92,6 @@ export default async function HiredPage() {
           </p>
         </div>
       )}
-
-      {workers.length > 0 ? (
-        <EmployerSectionCard
-          title="Grow your team"
-          description="Post another role or review applicants in your pipelines."
-          padded
-        >
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <PostJobCTA planUsage={planUsage} />
-            <Link
-              href="/employer/jobs"
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-              View pipelines
-            </Link>
-          </div>
-        </EmployerSectionCard>
-      ) : null}
     </EmployerPageShell>
   );
 }
