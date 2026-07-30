@@ -2,6 +2,7 @@
 
 import { useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ensureMessagingThread } from "@/actions/messaging";
 
@@ -56,9 +57,15 @@ export function EmployerOpenMessagingThreadButton({
       type="button"
       className={className}
       disabled={disabled || isPending}
+      aria-busy={isPending}
+      aria-label={isPending ? "Opening conversation" : undefined}
       onClick={() => openThread(jobId, candidateId)}
     >
-      {isPending ? "Opening…" : children}
+      {isPending ? (
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+      ) : (
+        children
+      )}
     </button>
   );
 }
