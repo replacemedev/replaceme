@@ -55,14 +55,19 @@ export function ApplicantTrackerTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full min-w-0">
       <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-        <table className="w-full min-w-[800px] text-sm text-left">
+        <table className="w-full min-w-[800px] table-fixed border-collapse text-sm text-left">
+          <colgroup>
+            <col className="w-[36%]" />
+            <col className="w-[12%]" />
+            <col className="w-[18%]" />
+            <col className="w-[14%]" />
+            <col className="w-[20%]" />
+          </colgroup>
           <thead className="bg-slate-50 text-slate-600 sticky top-0 z-10 shadow-[0_1px_0_0_rgb(226_232_240)]">
             <tr>
-              <th className="px-4 py-3 font-semibold text-xs w-full">
-                Candidate
-              </th>
+              <th className="px-4 py-3 font-semibold text-xs">Candidate</th>
               <th className="px-4 py-3 font-semibold text-xs whitespace-nowrap">
                 Match
               </th>
@@ -83,7 +88,7 @@ export function ApplicantTrackerTable({
                 key={row.id}
                 className="border-t border-slate-100 hover:bg-slate-50/50"
               >
-                <td className="px-4 py-3 w-full">
+                <td className="px-4 py-3 min-w-0">
                   <div className="flex items-center gap-3 min-w-0">
                     {row.avatarUrl && !row.isPreview ? (
                       <img
@@ -98,7 +103,7 @@ export function ApplicantTrackerTable({
                         </span>
                       </span>
                     )}
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <Link
                         href={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
                         className="font-semibold text-slate-900 hover:text-[#006e2f] hover:underline inline-flex items-center gap-1.5 min-w-0 max-w-full"
@@ -137,16 +142,18 @@ export function ApplicantTrackerTable({
                 <td className="px-4 py-3 text-slate-600 text-xs font-medium whitespace-nowrap">
                   {new Date(row.appliedAt).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap text-right">
-                  <EmployerInlineActions
-                    planSlug={planSlug}
-                    messagingEnabled={messagingEnabled}
-                    profileHref={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
-                    profileLabel={row.isPreview ? "Preview" : "Profile"}
-                    jobId={row.jobId}
-                    candidateId={row.candidateId}
-                    className="justify-end"
-                  />
+                <td className="px-4 py-3 text-right">
+                  <div className="inline-flex justify-end">
+                    <EmployerInlineActions
+                      planSlug={planSlug}
+                      messagingEnabled={messagingEnabled}
+                      profileHref={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}
+                      profileLabel={row.isPreview ? "Preview" : "Profile"}
+                      jobId={row.jobId}
+                      candidateId={row.candidateId}
+                      className="flex-nowrap justify-end"
+                    />
+                  </div>
                 </td>
               </tr>
             ))}
