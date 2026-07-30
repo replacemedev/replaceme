@@ -105,7 +105,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
 
   if (phase === "welcome") {
     return (
-      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
+      <section className="mx-auto flex w-full max-w-lg flex-col gap-6 rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:gap-7 sm:px-6 sm:py-12 md:gap-8 md:px-8 md:py-16 lg:py-20">
         <header className="space-y-2 text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-wider text-primary">
             Worker onboarding
@@ -191,7 +191,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             placeholder="e.g. Senior React Developer"
           />
         </label>
-        <div className="space-y-4 min-w-0">
+        <div className="space-y-6 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             Legal name
           </p>
@@ -313,7 +313,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
-        <div className="space-y-4">
+        <div className="space-y-6">
           {isLocationsLoading ? (
             <div className="flex items-center gap-2 text-sm text-slate-500 font-medium py-2">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-600" />

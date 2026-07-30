@@ -34,25 +34,28 @@ export function OnboardingWizardShell({
   accentClass = "bg-primary hover:bg-primary/90",
 }: OnboardingWizardShellProps) {
   return (
-    <section className="mx-auto w-full max-w-lg min-w-0 space-y-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 md:p-8">
+    <section className="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-6 rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:gap-7 sm:px-6 sm:py-12 md:gap-8 md:px-8 md:py-16 lg:py-20">
       <OnboardingProgress
         currentStep={currentStep}
         totalSteps={totalSteps}
         label={stepLabel}
       />
 
-      <header className="min-w-0 space-y-1">
+      <header className="min-w-0 space-y-2">
         <h1 className="text-lg font-bold tracking-tight text-slate-900 sm:text-xl md:text-2xl whitespace-normal break-words">{title}</h1>
         {description ? (
           <p className="text-xs font-medium leading-relaxed text-slate-600 sm:text-sm whitespace-normal break-words">{description}</p>
         ) : null}
       </header>
 
-      <div key={`${currentStep}-${stepLabel}`} className="onboarding-step-enter min-w-0 w-full">
+      <div
+        key={`${currentStep}-${stepLabel}`}
+        className="onboarding-step-enter flex min-w-0 w-full flex-col gap-6 md:gap-8"
+      >
         {children}
       </div>
 
-      <footer className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <footer className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex gap-2">
           {onBack ? (
             <button

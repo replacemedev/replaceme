@@ -46,16 +46,6 @@ export function ContactSupportCard({
         <Mail className="h-4 w-4 shrink-0" aria-hidden />
         Contact support
       </a>
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
-        <a
-          href={gmailCompose}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-[#006e2f] hover:underline"
-        >
-          {DELETION_REQUEST_SUPPORT_EMAIL}
-        </a>
-      </p>
     </div>
   );
 }

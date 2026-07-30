@@ -65,7 +65,7 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
 
   if (phase === "welcome") {
     return (
-      <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6 md:p-8">
+      <section className="mx-auto flex w-full max-w-lg flex-col gap-6 rounded-2xl border border-slate-100 bg-white px-4 py-8 shadow-sm sm:gap-7 sm:px-6 sm:py-12 md:gap-8 md:px-8 md:py-16 lg:py-20">
         <header className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
             Employer onboarding
@@ -331,7 +331,7 @@ export function EmployerOnboardingWizard({ draft }: EmployerOnboardingWizardProp
           });
         }}
       >
-        <div className="w-full min-w-0 space-y-3" role="radiogroup" aria-label="Applicant notification preference">
+        <div className="w-full min-w-0 space-y-4" role="radiogroup" aria-label="Applicant notification preference">
           {options.map((opt) => {
             const selected = notificationPreference === opt.value;
             return (
