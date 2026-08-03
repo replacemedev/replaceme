@@ -29,7 +29,7 @@ export async function AdminHeader({
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm supports-[backdrop-filter]:bg-white/80">
-      <div className="flex justify-between items-center px-4 md:px-margin-desktop max-w-7xl mx-auto h-16 gap-3">
+      <div className="flex justify-between items-center px-4 md:px-margin-desktop max-w-[1600px] w-full mx-auto h-16 gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <AdminMobileMenuButton />
           <NavBrand homeHref={resolvedSession.homeHref} compact />

@@ -3,10 +3,11 @@
  */
 
 export const ADMIN_SHELL_WIDTH = {
-  default: "max-w-container-max",
+  default: "max-w-[1600px]",
   content: "max-w-6xl",
-  wide: "max-w-7xl",
+  wide: "max-w-[1600px]",
   narrow: "max-w-3xl",
+  full: "w-full",
 } as const;
 
 export const ADMIN_SHELL_PADDING = "px-4 sm:px-6 lg:px-8 py-6 lg:py-8";

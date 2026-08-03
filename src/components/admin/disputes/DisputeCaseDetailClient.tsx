@@ -126,7 +126,7 @@ export function DisputeCaseDetailClient({
   };
 
   return (
-    <div className="space-y-4 min-w-0">
+    <div className="space-y-4 min-w-0 w-full">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-2">
           <div className="flex min-w-0 flex-wrap items-center gap-2">

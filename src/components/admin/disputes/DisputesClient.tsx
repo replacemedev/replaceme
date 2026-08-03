@@ -262,7 +262,7 @@ export function DisputesClient({
   );
 
   return (
-    <div className="space-y-4 min-w-0">
+    <div className="space-y-4 min-w-0 w-full">
       <AdminTabs tabs={TABS} />
 
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
