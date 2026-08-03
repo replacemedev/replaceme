@@ -29,9 +29,11 @@ export default async function UpdatePasswordPage() {
     <AuthPageShell centered={true} footer={<AuthFooter />}>
       <AuthFlashToast />
 
-      <header className="space-y-2">
+      <header className="mb-6 sm:mb-8 flex flex-col items-center text-center w-full space-y-2">
         <h1 className={AUTH_TITLE}>{UPDATE_PASSWORD_PAGE.headline}</h1>
-        <p className={AUTH_SUBTITLE}>{UPDATE_PASSWORD_PAGE.description}</p>
+        <p className={`${AUTH_SUBTITLE} max-w-md mx-auto`}>
+          {UPDATE_PASSWORD_PAGE.description}
+        </p>
       </header>
 
       <AuthFormCard>

@@ -135,7 +135,7 @@ export function ForgotPasswordForm() {
     <form
       method="POST"
       onSubmit={handleSubmit(onSubmit, onError)}
-      className="space-y-1"
+      className="space-y-2"
       noValidate
     >
       <FormField
@@ -157,11 +157,7 @@ export function ForgotPasswordForm() {
         />
       </FormField>
 
-      <p className="pt-1 text-xs text-slate-500">
-        We&apos;ll email you a secure link to reset your password.
-      </p>
-
-      <div className="space-y-3 pt-4">
+      <div className="space-y-3 pt-2">
         <div className="flex w-full justify-center overflow-hidden">
           <TurnstileWidget
             ref={turnstileRef}

@@ -27,7 +27,7 @@ export function AuthPageShell({
   if (centered) {
     return (
       <main className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#f8fafe] px-4 py-12 sm:p-8">
-        <div className="flex w-full max-w-md flex-col items-center space-y-6">
+        <div className="flex w-full max-w-md flex-col items-center space-y-6 sm:space-y-8">
           <div className="flex w-full justify-center">
             <NavBrand homeHref={brandHref} compact className="justify-center" />
           </div>
@@ -67,6 +67,12 @@ export function AuthPageShell({
   );
 }
 
-export function AuthFormCard({ children }: { children: ReactNode }) {
-  return <div className={AUTH_CARD}>{children}</div>;
+export function AuthFormCard({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`${AUTH_CARD} ${className}`.trim()}>{children}</div>;
 }

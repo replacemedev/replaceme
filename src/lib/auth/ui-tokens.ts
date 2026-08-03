@@ -8,7 +8,7 @@ export const AUTH_PANEL_PADDING =
   "px-4 py-8 sm:px-8 sm:py-10 lg:px-16 xl:px-24";
 
 export const AUTH_CARD =
-  "w-full rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-200 hover:shadow-[0_12px_36px_rgb(0,0,0,0.06)]";
+  "w-full rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-200 hover:shadow-[0_12px_36px_rgb(0,0,0,0.06)]";
 
 export const AUTH_TITLE =
   "text-2xl sm:text-display-lg font-display-lg font-bold text-slate-900 tracking-tight";

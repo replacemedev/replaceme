@@ -50,9 +50,21 @@ export default async function SignInPage({
     >
       <AuthFlashToast />
 
-      <header className={`${view === "forgot_password" ? "" : "mb-6"} space-y-2`}>
+      <header
+        className={
+          view === "forgot_password"
+            ? "mb-6 sm:mb-8 flex flex-col items-center text-center w-full space-y-2"
+            : "mb-6 space-y-2"
+        }
+      >
         <h1 className={AUTH_TITLE}>{copy.headline}</h1>
-        <p className={AUTH_SUBTITLE}>{copy.description}</p>
+        <p
+          className={`${AUTH_SUBTITLE} ${
+            view === "forgot_password" ? "max-w-md mx-auto" : ""
+          }`}
+        >
+          {copy.description}
+        </p>
       </header>
 
       <AuthFormCard>
