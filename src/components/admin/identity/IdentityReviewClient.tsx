@@ -333,7 +333,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                         <td className={`${ADMIN_TABLE_TD} text-right`}>
                           <Link
                             href={`/admin/identity/${worker.id}`}
-                            className="inline-flex items-center rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26]"
+                            className="inline-flex items-center rounded-xl bg-[#006e2f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#005c26] whitespace-nowrap shrink-0"
                           >
                             Review
                           </Link>

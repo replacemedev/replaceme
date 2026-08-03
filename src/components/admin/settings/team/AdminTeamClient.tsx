@@ -290,7 +290,7 @@ export function AdminTeamClient({
           ) : (
             <div className="space-y-4">
               {/* Desktop table */}
-              <div className="hidden md:block overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+              <div className="hidden md:block overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
                 <table className="w-full min-w-[800px] text-sm">
                   <thead className={ADMIN_TABLE_HEAD}>
                     <tr>
@@ -316,23 +316,23 @@ export function AdminTeamClient({
                           <td className={ADMIN_TABLE_TD}>
                             <MemberIdentity member={member} />
                           </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <span className="text-xs font-semibold text-slate-700">
+                          <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                            <span className="text-xs font-semibold text-slate-700 whitespace-nowrap">
                               {formatRole(member.admin_role)}
                             </span>
                           </td>
-                          <td className={ADMIN_TABLE_TD}>
-                            <div className="flex flex-wrap gap-1">
+                          <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                            <div className="flex flex-wrap gap-1 items-center whitespace-nowrap">
                               {accessLabels.slice(0, 3).map((label) => (
                                 <span
                                   key={label}
-                                  className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                                  className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 whitespace-nowrap"
                                 >
                                   {label}
                                 </span>
                               ))}
                               {accessLabels.length > 3 ? (
-                                <span className="text-[10px] font-semibold text-slate-400">
+                                <span className="text-[10px] font-semibold text-slate-400 whitespace-nowrap">
                                   +{accessLabels.length - 3}
                                 </span>
                               ) : null}

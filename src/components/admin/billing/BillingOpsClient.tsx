@@ -176,8 +176,8 @@ export function BillingOpsClient({ subscriptions }: BillingOpsClientProps) {
       ) : null}
 
       <div className="space-y-4">
-        <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+          <table className="w-full min-w-[800px] text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 <th className="px-4 py-3">Employer</th>

@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { StatCard } from "@/components/shared/StatCard";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
-import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import type { AdminSubscriptionRow } from "@/types/admin.types";
 import { formatCurrency } from "@/lib/format/currency";
@@ -75,7 +74,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
       <section className="space-y-4">
         <AdminSectionLabel>Subscription ledger</AdminSectionLabel>
         <div className="space-y-4">
-          <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+          <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
             <table className="w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
@@ -97,12 +96,7 @@ export function RevenueClient({ subscriptions }: RevenueClientProps) {
                       <p className="text-xs text-slate-400">{sub.employer_email}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <p className="text-slate-700 font-medium">{sub.plan_name ?? "—"}</p>
-                        {sub.plan_name ? (
-                          <PlanTierBadge tier={sub.plan_name} />
-                        ) : null}
-                      </div>
+                      <p className="text-slate-700 font-medium">{sub.plan_name ?? "—"}</p>
                       {sub.plan_price != null ? (
                         <p className="text-xs text-slate-400 font-mono mt-1">
                           {formatCurrency(sub.plan_price, "USD")}/mo

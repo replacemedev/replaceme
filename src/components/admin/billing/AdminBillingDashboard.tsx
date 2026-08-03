@@ -417,7 +417,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
               />
             ) : (
               <div className="space-y-4">
-                <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+                <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
                   <table className="w-full min-w-[860px] text-sm">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -447,9 +447,6 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                               <span className="font-medium text-slate-700">
                                 {sub.plan_name ?? "—"}
                               </span>
-                              {sub.plan_slug ? (
-                                <PlanTierBadge tier={sub.plan_slug} size="sm" />
-                              ) : null}
                               {billingIntervalLabel(sub.billing_interval) ? (
                                 <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600">
                                   {billingIntervalLabel(sub.billing_interval)}
@@ -621,7 +618,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
             />
           ) : (
             <div className="space-y-4">
-              <div className="overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
+              <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
                 <table className="w-full min-w-[720px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
