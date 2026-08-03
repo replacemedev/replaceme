@@ -4,7 +4,7 @@ export default function PublicJobDetailLoading() {
   return (
     <div className="min-h-screen bg-[#f4f7f6] pb-28 md:pb-12 animate-pulse">
       {/* Dark green header skeleton */}
-      <div className="relative bg-[#0a4a29] pt-5 pb-20 sm:pb-24 overflow-hidden">
+      <div className="relative bg-[#0a4a29] pt-6 sm:pt-8 md:pt-10 pb-20 sm:pb-24 overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.08] pointer-events-none"
           style={{
@@ -14,11 +14,6 @@ export default function PublicJobDetailLoading() {
           aria-hidden
         />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 mb-8">
-            <SkeletonBlock className="h-4 w-20 bg-white/20 rounded" />
-            <span className="text-white/30 text-xs">/</span>
-            <SkeletonBlock className="h-4 w-40 bg-white/20 rounded" />
-          </div>
           <div className="space-y-3">
             <SkeletonBlock className="h-8 sm:h-10 w-2/3 max-w-[24rem] bg-white/20 rounded-lg" />
             <SkeletonBlock className="h-4.5 w-1/3 max-w-[14rem] bg-white/20 rounded" />

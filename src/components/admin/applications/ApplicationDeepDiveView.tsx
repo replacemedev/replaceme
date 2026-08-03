@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { ApplicationRowActionsMenu } from "@/components/admin/applications/ApplicationRowActionsMenu";
@@ -20,14 +20,7 @@ export function ApplicationDeepDiveView({
     <div className="space-y-6 min-w-0">
       <ApplicationAuditScroll section={section} />
 
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <Link
-          href="/admin/applications"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to applications
-        </Link>
+      <div className="flex justify-end min-w-0">
         <ApplicationRowActionsMenu
           applicationId={data.id}
           workerLabel={data.workerName ?? "Worker"}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { formatFullName } from "@/lib/format/name";
@@ -17,14 +16,6 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/admin/users?tab=workers"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
-      >
-        <ArrowLeft className="h-4 w-4" aria-hidden />
-        Back to workers
-      </Link>
-
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
           <h2 className="text-xl font-bold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">

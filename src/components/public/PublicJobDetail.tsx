@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { JobOverviewCard } from "@/components/worker/jobs/details/JobOverviewCard";
 import { JobSidebarCards } from "@/components/worker/jobs/details/JobSidebarCards";
 import { PublicJobAuthWall } from "@/components/public/PublicJobAuthWall";
@@ -39,27 +37,7 @@ export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
           aria-hidden
         />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-20 sm:pb-24">
-          <nav aria-label="Breadcrumb" className="mb-8">
-            <ol className="flex flex-wrap items-center gap-1.5 text-sm font-semibold text-white/90">
-              <li>
-                <Link
-                  href="/jobs"
-                  className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
-                >
-                  <ArrowLeft size={14} aria-hidden />
-                  Job board
-                </Link>
-              </li>
-              <li aria-hidden className="text-white/50">
-                /
-              </li>
-              <li className="truncate text-white" aria-current="page">
-                {job.title}
-              </li>
-            </ol>
-          </nav>
-
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 md:pt-10 pb-20 sm:pb-24">
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase tracking-tight leading-tight">
               {job.title}

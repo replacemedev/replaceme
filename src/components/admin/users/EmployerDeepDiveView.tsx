@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { StatusBadge } from "@/components/admin/shared/StatusBadge";
 import { PlanTierBadge } from "@/components/shared/billing/PlanTierBadge";
@@ -59,14 +59,6 @@ export function EmployerDeepDiveView({ data }: EmployerDeepDiveViewProps) {
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/admin/users?tab=employers"
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-emerald-700"
-      >
-        <ArrowLeft className="h-4 w-4" aria-hidden />
-        Back to employers
-      </Link>
-
       <CompanyVerificationCard
         employerId={data.employerId}
         status={data.companyVerificationStatus}

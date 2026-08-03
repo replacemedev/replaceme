@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { Check, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { reviewWorkerVerification } from "@/actions/admin-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -113,13 +112,6 @@ export function IdentityReviewDetailClient({
     <div className="space-y-6 min-w-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-2">
-          <Link
-            href="/admin/identity"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-800"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            Back to queue
-          </Link>
           <div className="flex flex-wrap items-center gap-2 min-w-0">
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight break-words">
               {name}

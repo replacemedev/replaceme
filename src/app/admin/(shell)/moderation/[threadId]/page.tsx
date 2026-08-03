@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Flag } from "lucide-react";
+import { Flag } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminPageShell } from "@/components/admin/layout";
 import { ModerationThreadReviewClient } from "@/components/admin/moderation/ModerationThreadReviewClient";
@@ -31,15 +30,6 @@ export default async function AdminModerationThreadPage({
 
   return (
     <AdminPageShell>
-      <div className="mb-4 min-w-0">
-        <Link
-          href="/admin/moderation"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#006e2f] transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
-          Back to queue
-        </Link>
-      </div>
       <AdminPageHeader
         title="Review conversation"
         description={`${detail.reasonLabel} · ${CHAT_MODERATION_STATUS_LABELS[detail.status]}`}
