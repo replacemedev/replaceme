@@ -32,13 +32,13 @@ export function AdminTabs({ tabs, paramKey = "tab" }: AdminTabsProps) {
           <Link
             key={tab.id}
             href={href}
-            className={`shrink-0 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+            className={`shrink-0 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors capitalize ${
               isActive
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-slate-500 hover:text-slate-700"
             }`}
           >
-            {tab.label}
+            <span className="capitalize">{tab.label}</span>
             {tab.count !== undefined ? (
               <span className="ml-1.5 text-xs font-medium text-slate-400">
                 ({tab.count})

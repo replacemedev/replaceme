@@ -364,7 +364,7 @@ export function UsersClient({
                 <option value="under_review">Under Review</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
-                <option value="resubmission_required">Resubmission required</option>
+                <option value="resubmission_required">Resubmission Required</option>
               </select>
             </div>
           )}

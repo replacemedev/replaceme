@@ -22,13 +22,13 @@ export function AdminFilterPills({
               key={option}
               type="button"
               onClick={() => onChange(option)}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-colors shadow-xs shrink-0 ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-colors shadow-xs shrink-0 capitalize ${
                 isActive
                   ? "bg-[#006e2f] text-white"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"
               }`}
             >
-              {option}
+              <span className="capitalize">{option.replace(/_/g, " ")}</span>
               {count !== undefined && count > 0 ? (
                 <span
                   className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${

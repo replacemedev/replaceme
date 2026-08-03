@@ -44,9 +44,9 @@ export function AdminFilterBar({
             <button
               type="button"
               onClick={onOpenFilters}
-              className="h-10 w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-xs hover:bg-slate-50"
+              className="h-10 w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-xs hover:bg-slate-50 capitalize"
             >
-              {filtersLabel}
+              <span className="capitalize">{filtersLabel}</span>
             </button>
           ) : null}
           {children}

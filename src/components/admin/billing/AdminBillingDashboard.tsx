@@ -371,7 +371,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                     <option value="all">All Statuses</option>
                     <option value="active">Active</option>
                     <option value="trialing">Trialing</option>
-                    <option value="past_due">Past due</option>
+                    <option value="past_due">Past Due</option>
                     <option value="unpaid">Unpaid</option>
                     <option value="incomplete">Incomplete</option>
                     <option value="canceled">Canceled</option>
