@@ -36,7 +36,7 @@ export default async function AdminDisputesPage({
     <AdminPageShell>
       <AdminPageHeader
         title="Disputes"
-        description="Trust & Safety case center — financial mediation (advisory) and safety & policy violations."
+        description="Trust & Safety case center: Financial mediation (advisory) and safety & policy violations."
       />
       <Suspense fallback={null}>
         <DisputesClient initial={initial} initialTab={tab} />

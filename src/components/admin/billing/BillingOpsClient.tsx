@@ -163,7 +163,7 @@ export function BillingOpsClient({ subscriptions }: BillingOpsClientProps) {
           <ul className="mt-2 space-y-1 text-xs text-amber-900">
             {atRisk.slice(0, 8).map((s) => (
               <li key={s.id}>
-                {s.company_name ?? s.employer_email ?? s.employer_id} —{" "}
+                {s.company_name ?? s.employer_email ?? s.employer_id} ·{" "}
                 <StatusBadge status={s.status} />
                 {s.stripe_dispute_status
                   ? ` · dispute: ${s.stripe_dispute_status}`

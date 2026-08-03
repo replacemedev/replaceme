@@ -59,9 +59,9 @@ export function AdminMobileCard({
       <article
         className={`${ADMIN_CARD} relative z-0 p-4 min-w-0 w-full max-w-full overflow-visible has-[details[open]]:z-50`}
       >
-        <div className="flex items-start justify-between gap-3 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 min-w-0">
           <div className="min-w-0 flex-1 space-y-2.5">{children}</div>
-          <div className="relative z-20 shrink-0 -mt-0.5 -mr-0.5">{actions}</div>
+          <div className="relative z-20 shrink-0 sm:-mt-0.5 sm:-mr-0.5">{actions}</div>
         </div>
       </article>
     );

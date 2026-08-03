@@ -320,7 +320,7 @@ function AdminEmailManagementInner({
           >
             {broadcastReady ? (
               <p className="font-semibold">
-                Compliance ready — unsubscribe + physical address will be injected.
+                Compliance ready: Unsubscribe link and physical address will be injected.
               </p>
             ) : (
               <p className="font-semibold">
@@ -616,7 +616,7 @@ function AdminEmailManagementInner({
                   eaEnabled ? "bg-[#006e2f] hover:bg-[#0a4a29]" : "bg-slate-700 hover:bg-slate-800"
                 }`}
               >
-                {eaEnabled ? "On — Scale can try features" : "Off — Early Access paused"}
+                {eaEnabled ? "On: Scale can try features" : "Off: Early Access paused"}
               </button>
             </div>
           </div>

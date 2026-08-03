@@ -47,7 +47,7 @@ export default async function AdminModerationThreadPage({
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950 min-w-0">
         <Flag className="h-4 w-4 shrink-0 text-amber-700" aria-hidden />
         <p className="min-w-0 font-medium leading-snug">
-          Justified-cause review — this access is audit-logged. Highlighted
+          Justified-cause review: This access is audit-logged. Highlighted
           messages triggered the flag or report.
         </p>
       </div>

@@ -59,7 +59,7 @@ export default async function AdminUsersPage({
     <AdminPageShell>
       <AdminPageHeader
         title="User Management"
-        description="Browse and moderate accounts by role — workers, employers, and platform admins."
+        description="Browse and moderate accounts by role: Workers, employers, and platform admins."
       />
 
       <Suspense fallback={<AdminTabsSkeleton count={3} />}>

@@ -55,9 +55,9 @@ export function AdminStatGridSkeleton({
 
 export function AdminTabsSkeleton({ count = 2 }: { count?: number }) {
   return (
-    <div className="flex gap-2 border-b border-slate-200 pb-px animate-pulse">
+    <div className="flex w-full overflow-x-auto flex-nowrap custom-scrollbar gap-2 border-b border-slate-200 pb-px animate-pulse">
       {Array.from({ length: count }).map((_, index) => (
-        <SkeletonBlock key={index} className="h-10 w-28 rounded-t-xl bg-slate-100" />
+        <SkeletonBlock key={index} className="h-10 w-28 shrink-0 rounded-t-xl bg-slate-100" />
       ))}
     </div>
   );

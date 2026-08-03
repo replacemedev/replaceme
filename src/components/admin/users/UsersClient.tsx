@@ -305,7 +305,7 @@ export function UsersClient({
   const adminTeamHint = isSuperAdmin ? (
     <Link
       href="/admin/settings/team"
-      className="inline-flex items-center min-h-11 text-xs font-medium text-slate-400 hover:text-emerald-700 hover:underline"
+      className="inline-flex items-center min-h-11 text-xs font-medium text-slate-400 hover:text-emerald-700 hover:underline whitespace-normal text-left"
     >
       Manage in Admin Team settings
     </Link>
@@ -519,8 +519,8 @@ export function UsersClient({
                 >
                   <UserIdentityCell name={name} email={admin.email} />
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2 py-0.5 text-[11px] font-semibold text-[#006e2f]">
-                      <ShieldCheck className="h-3 w-3" aria-hidden />
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#ebfdf2] px-2 py-0.5 text-[11px] font-semibold text-[#006e2f] whitespace-nowrap">
+                      <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden />
                       Admin
                     </span>
                     <StatusBadge status={admin.account_status} />

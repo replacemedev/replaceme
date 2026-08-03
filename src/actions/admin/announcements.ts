@@ -179,7 +179,7 @@ export async function getActiveEmployerAnnouncement(): Promise<EmployerAnnouncem
         variant: "teaser",
         title:
           active.teaser_title ??
-          "Coming soon — Early Access on Scale",
+          "Coming soon: Early Access on Scale",
         summary:
           active.teaser_summary ??
           "This feature will be available soon on the Scale plan with Early Access to New Features.",
@@ -230,7 +230,7 @@ export async function getActiveEmployerAnnouncement(): Promise<EmployerAnnouncem
     variant: "teaser",
     title:
       active.teaser_title ??
-      "Coming soon — Early Access on Scale",
+      "Coming soon: Early Access on Scale",
     summary:
       active.teaser_summary ??
       "This feature will be available soon on the Scale plan with Early Access to New Features.",

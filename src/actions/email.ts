@@ -392,7 +392,7 @@ export async function notifyWorkerStatusUpdate(input: {
     const result = await sendTransactionalEmail({
       templateKey: "worker.application.status_update",
       to: worker.email,
-      subject: `${copy.headline} — ${jobTitle}`,
+      subject: `${copy.headline}: ${jobTitle}`,
       html,
       text,
       userId: worker.id,

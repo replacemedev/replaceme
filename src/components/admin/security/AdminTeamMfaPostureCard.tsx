@@ -30,14 +30,14 @@ export function AdminTeamMfaPostureCard({ rows }: { rows: AdminMfaPostureRow[] }
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="w-full overflow-x-auto custom-scrollbar">
         <table className="w-full min-w-[28rem] text-left text-sm">
           <thead>
             <tr className="border-b border-slate-50 text-xs uppercase tracking-wider text-slate-400">
-              <th className="px-5 py-3 font-semibold sm:px-6">Staff</th>
-              <th className="px-3 py-3 font-semibold">Role</th>
-              <th className="px-3 py-3 font-semibold">Status</th>
-              <th className="px-5 py-3 font-semibold sm:px-6">MFA</th>
+              <th className="px-5 py-3 font-semibold sm:px-6 whitespace-nowrap">Staff</th>
+              <th className="px-3 py-3 font-semibold whitespace-nowrap">Role</th>
+              <th className="px-3 py-3 font-semibold whitespace-nowrap">Status</th>
+              <th className="px-5 py-3 font-semibold sm:px-6 whitespace-nowrap">MFA</th>
             </tr>
           </thead>
           <tbody>
@@ -45,7 +45,7 @@ export function AdminTeamMfaPostureCard({ rows }: { rows: AdminMfaPostureRow[] }
               <tr>
                 <td
                   colSpan={4}
-                  className="px-5 py-8 text-center text-slate-400 sm:px-6"
+                  className="px-5 py-8 text-center text-slate-400 sm:px-6 whitespace-nowrap"
                 >
                   No admin accounts found.
                 </td>
@@ -56,7 +56,7 @@ export function AdminTeamMfaPostureCard({ rows }: { rows: AdminMfaPostureRow[] }
                   key={row.userId}
                   className="border-b border-slate-50 last:border-0"
                 >
-                  <td className="max-w-[14rem] px-5 py-3 sm:px-6">
+                  <td className="max-w-[14rem] px-5 py-3 sm:px-6 whitespace-nowrap">
                     <p className="truncate font-semibold text-slate-800">
                       {row.displayName}
                     </p>
@@ -64,25 +64,25 @@ export function AdminTeamMfaPostureCard({ rows }: { rows: AdminMfaPostureRow[] }
                       {row.email ?? "—"}
                     </p>
                   </td>
-                  <td className="px-3 py-3 capitalize text-slate-600">
+                  <td className="px-3 py-3 capitalize text-slate-600 whitespace-nowrap">
                     {row.adminRole === "superadmin" ? "Super admin" : "Moderator"}
                   </td>
-                  <td className="px-3 py-3 capitalize text-slate-600">
+                  <td className="px-3 py-3 capitalize text-slate-600 whitespace-nowrap">
                     {row.status}
                   </td>
-                  <td className="px-5 py-3 sm:px-6">
+                  <td className="px-5 py-3 sm:px-6 whitespace-nowrap">
                     {row.mfaEnrolled ? (
-                      <span className="inline-flex items-center gap-1.5 text-[#006e2f]">
-                        <ShieldCheck className="h-4 w-4" aria-hidden />
-                        <span className="font-semibold">
+                      <span className="inline-flex items-center gap-1.5 text-[#006e2f] whitespace-nowrap">
+                        <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
+                        <span className="font-semibold whitespace-nowrap">
                           Enrolled
                           {row.factorCount > 1 ? ` (${row.factorCount})` : ""}
                         </span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 text-amber-700">
-                        <ShieldAlert className="h-4 w-4" aria-hidden />
-                        <span className="font-semibold">Missing</span>
+                      <span className="inline-flex items-center gap-1.5 text-amber-700 whitespace-nowrap">
+                        <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden />
+                        <span className="font-semibold whitespace-nowrap">Missing</span>
                       </span>
                     )}
                   </td>

@@ -174,7 +174,7 @@ export function JobRowActionsMenu({
         toast.error(result.error);
         return;
       }
-      toast.success("Job rejected — employer notified");
+      toast.success("Job rejected: Employer notified.");
       resetDialog();
       closeMenu();
       onMutated?.();

@@ -769,7 +769,7 @@ export async function sendPasswordResetLink(
     const sent = await sendTransactionalEmail({
       templateKey: "auth.password_reset",
       to: normalizedEmail,
-      subject: "Reset your password — Replaceme",
+      subject: "Reset your password for Replaceme",
       html: rendered.html,
       text: rendered.text,
       idempotencyKey: `password-reset:${normalizedEmail}:${Math.floor(Date.now() / 60_000)}`,
@@ -1033,7 +1033,7 @@ export async function resendEmailVerification(): Promise<{
     const sent = await sendTransactionalEmail({
       templateKey: "auth.email_verification",
       to: user.email,
-      subject: "Verify your email — Replaceme",
+      subject: "Verify your email for Replaceme",
       html: rendered.html,
       text: rendered.text,
       userId: user.id,

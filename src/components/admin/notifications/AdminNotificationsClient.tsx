@@ -100,7 +100,7 @@ function emptyCopy(tab: AdminNotificationTabId): {
       return {
         title: "No archived alerts",
         description:
-          "Dismissed alerts stay here for audit review—nothing is permanently deleted.",
+          "Dismissed alerts stay here for audit review. Nothing is permanently deleted.",
       };
     case "identity":
       return {

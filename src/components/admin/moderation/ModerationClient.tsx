@@ -94,7 +94,7 @@ export function ModerationClient({ flags }: ModerationClientProps) {
       <EmptyState
         icon={<MessageSquare className="h-5 w-5" aria-hidden />}
         title="No flagged conversations"
-        description="Threads appear here only when auto-flagged for safety signals or reported by a user—admins do not browse private messages without cause."
+        description="Threads appear here only when auto-flagged for safety signals or reported by a user. Admins do not browse private messages without cause."
       />
     );
   }

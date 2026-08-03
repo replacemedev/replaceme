@@ -299,7 +299,7 @@ export function JobsModerationClient({
         return;
       }
       toast.success(
-        `Rejected ${result.rejected ?? selectedPendingIds.length} job(s) — employers notified`
+        `Rejected ${result.rejected ?? selectedPendingIds.length} job(s). Employers notified.`
       );
       setBulkRejectOpen(false);
       setBulkReason("");
@@ -479,7 +479,7 @@ export function JobsModerationClient({
             {slaSummary.dueSoon > 0
               ? `${slaSummary.dueSoon} due soon (past ${DISCOVERY_JOB_APPROVAL_SLA.remindAfterHours}h). `
               : null}
-            Paid plans stay instant. Discovery never auto-publishes — clear the queue manually.
+            Paid plans stay instant. Discovery never auto-publishes. Clear the queue manually.
           </p>
         </div>
       ) : null}

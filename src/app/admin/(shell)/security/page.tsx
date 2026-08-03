@@ -56,7 +56,7 @@ export default async function AdminSecurityPage() {
     <AdminPageShell className="space-y-8">
       <AdminPageHeader
         title="Security Center"
-        description="Password, authenticator, sessions, and security-related audit events — aligned with staff MFA requirements."
+        description="Password, authenticator, sessions, and security-related audit events aligned with staff MFA requirements."
       />
 
       <section className="space-y-4">
