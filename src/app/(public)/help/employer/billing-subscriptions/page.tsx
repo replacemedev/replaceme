@@ -129,14 +129,10 @@ function EmployerBillingFallback() {
 
 export default function EmployerBillingPage() {
   return (
-    <main className="bg-slate-50/50 min-h-[100dvh] py-8 md:py-12 lg:py-16">
+    <main className="bg-slate-50/50 min-h-[100dvh] py-6 sm:py-8 md:py-12 lg:py-16">
       <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-100/80 text-emerald-800 border border-emerald-200 mb-3">
-            <CreditCard size={13} className="text-[#006e2f] shrink-0" />
-            <span>Employer Billing</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2 sm:mb-3">
             Billing & Subscriptions Guide
           </h1>
           <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">

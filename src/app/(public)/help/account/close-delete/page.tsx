@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function CloseDeleteAccountHelpPage() {
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-slate-50/50 py-8 md:py-12 lg:py-16">
+    <main className="min-h-[calc(100vh-4rem)] bg-slate-50/50 py-6 sm:py-8 md:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
         <Link
           href="/help"
@@ -36,10 +36,6 @@ export default function CloseDeleteAccountHelpPage() {
         </Link>
 
         <header className="mb-8 max-w-2xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-100/80 px-3.5 py-1.5 text-xs font-semibold text-emerald-800">
-            <Trash2 size={13} className="shrink-0 text-[#006e2f]" aria-hidden />
-            Trust &amp; Safety
-          </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
             Close or delete your account
           </h1>
