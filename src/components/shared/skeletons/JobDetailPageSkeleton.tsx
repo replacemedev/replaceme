@@ -30,18 +30,6 @@ export function JobDetailPageSkeleton() {
       <div className="relative z-10 mx-auto -mt-12 sm:-mt-16 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            {/* In Summary card skeleton */}
-            <div className="rounded-2xl border border-emerald-100 bg-white p-6 sm:p-8 space-y-4">
-              <SkeletonBlock className="h-4 w-28 bg-slate-200 rounded" />
-              <SkeletonBlock className="h-4 w-full bg-slate-200 rounded" />
-              <SkeletonBlock className="h-4 w-5/6 bg-slate-200 rounded" />
-              <div className="pt-2 grid gap-3 sm:grid-cols-2">
-                <SkeletonBlock className="h-16 w-full bg-slate-100 rounded-xl" />
-                <SkeletonBlock className="h-16 w-full bg-slate-100 rounded-xl" />
-                <SkeletonBlock className="h-16 w-full bg-slate-100 rounded-xl sm:col-span-2" />
-              </div>
-            </div>
-
             {/* Overview Card Skeleton */}
             <CardSkeleton minHeight="min-h-[400px]" />
           </div>

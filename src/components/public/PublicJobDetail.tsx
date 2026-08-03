@@ -13,18 +13,7 @@ interface PublicJobDetailProps {
   faqs: FAQItem[];
 }
 
-/** GEO: declarative answers + lists in initial HTML (no client tabs). */
 export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
-  const compensation = formatCompensation(
-    job.monthlySalary,
-    job.salaryCurrency,
-    job.hoursPerWeek
-  );
-  const salaryLine =
-    job.monthlySalary > 0
-      ? `The base salary for this role is ${compensation}.`
-      : "Compensation for this role is listed as competitive and confirmed during hiring.";
-
   return (
     <div className="min-h-screen bg-[#f4f7f6] pb-28 md:pb-12">
       <header className="relative bg-[#0a4a29] text-white overflow-hidden">
@@ -52,50 +41,6 @@ export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
       <main className="relative z-10 mx-auto -mt-12 sm:-mt-16 max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <section
-              className="rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8"
-              aria-labelledby="job-summary-heading"
-            >
-              <h2
-                id="job-summary-heading"
-                className="text-sm font-extrabold uppercase tracking-wider text-slate-800"
-              >
-                In summary
-              </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
-                The key takeaway is that {job.companyName} is hiring a{" "}
-                <strong>{job.title}</strong> ({job.employmentType}) based in{" "}
-                {job.location}. {salaryLine} Apply directly on Replaceme with no
-                agency fees.
-              </p>
-              <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl bg-[#f4f7f6] px-4 py-3">
-                  <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Employment type
-                  </dt>
-                  <dd className="mt-1 text-sm font-bold text-slate-900">
-                    {job.employmentType}
-                  </dd>
-                </div>
-                <div className="rounded-xl bg-[#f4f7f6] px-4 py-3">
-                  <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Location
-                  </dt>
-                  <dd className="mt-1 text-sm font-bold text-slate-900">
-                    {job.location}
-                  </dd>
-                </div>
-                <div className="rounded-xl bg-[#f4f7f6] px-4 py-3 sm:col-span-2">
-                  <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    Compensation
-                  </dt>
-                  <dd className="mt-1 text-sm font-extrabold text-[#006e2f]">
-                    {job.monthlySalary > 0 ? compensation : "Competitive. Confirm with employer"}
-                  </dd>
-                </div>
-              </dl>
-            </section>
-
             <JobOverviewCard job={job} />
 
             {job.skills.length > 0 ? (
