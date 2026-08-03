@@ -67,13 +67,13 @@ export default async function AdminShellLayout({
             isSuperAdmin={isSuperAdmin}
             capabilities={capabilities}
           />
-          <div className="flex flex-1 flex-col min-w-0 min-h-screen w-full max-w-[100vw] overflow-x-hidden">
+          <div className="flex flex-1 flex-col min-w-0 min-h-screen w-full relative z-20">
             <AdminHeader
               session={session}
               capabilities={capabilities}
               isSuperAdmin={isSuperAdmin}
             />
-            <main className={`flex-1 ${ADMIN_MAIN_BG}`}>{children}</main>
+            <main className={`flex-1 min-w-0 overflow-x-hidden ${ADMIN_MAIN_BG}`}>{children}</main>
           </div>
         </div>
       </div>
