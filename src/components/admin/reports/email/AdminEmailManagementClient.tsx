@@ -282,7 +282,7 @@ function AdminEmailManagementInner({
                       ? advancedHtml.trim().length < 30
                       : body.trim().length < 10)
                   }
-                  className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0a4a29] transition-colors disabled:opacity-50"
                 >
                   Send broadcast
                 </button>
@@ -679,7 +679,7 @@ function AdminEmailManagementInner({
                   <button
                     type="button"
                     disabled={pending}
-                    className="ml-auto rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+                    className="ml-auto rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0a4a29] transition-colors disabled:opacity-50"
                     onClick={() => {
                       startTransition(async () => {
                         const result = await upsertProductAnnouncement({
@@ -802,7 +802,7 @@ function AdminEmailManagementInner({
               type="button"
               onClick={refresh}
               disabled={pending}
-              className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50"
+              className="shrink-0 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0a4a29] transition-colors disabled:opacity-50"
             >
               Refresh
             </button>
@@ -829,7 +829,7 @@ function AdminEmailManagementInner({
                     <p className="truncate text-sm font-bold text-slate-900">
                       {row.subject ?? "—"}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-slate-500 capitalize">
                       {row.kind} · {row.to_email ?? "Broadcast"}
                     </p>
                   </div>
@@ -841,7 +841,7 @@ function AdminEmailManagementInner({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full min-w-[840px] text-sm">
+            <table className="w-full min-w-[960px] text-sm">
               <thead className={ADMIN_TABLE_HEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Subject</th>
@@ -865,25 +865,25 @@ function AdminEmailManagementInner({
                           "—"}
                       </p>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
-                      <span className="text-xs font-semibold text-slate-700">
+                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                      <span className="text-xs font-semibold text-slate-700 capitalize whitespace-nowrap">
                         {row.kind}
                       </span>
                     </td>
-                    <td className={`${ADMIN_TABLE_TD} min-w-0`}>
+                    <td className={`${ADMIN_TABLE_TD} min-w-0 whitespace-nowrap`}>
                       <span className="block truncate text-xs text-slate-600">
                         {row.to_email ?? "Broadcast"}
                       </span>
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
                       <StatusBadge status={row.status} />
                     </td>
-                    <td className={ADMIN_TABLE_TD}>
+                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
                       <span className="whitespace-nowrap text-xs text-slate-500">
                         {formatWhen(row.last_event_at ?? row.created_at)}
                       </span>
                     </td>
-                    <td className={`${ADMIN_TABLE_TD} text-right`}>
+                    <td className={`${ADMIN_TABLE_TD} text-right whitespace-nowrap`}>
                       <EmailRowActionsMenu
                         row={row}
                         onViewEvents={() => openRow(row.id)}

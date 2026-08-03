@@ -418,22 +418,22 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
             ) : (
               <div className="space-y-4">
                 <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-                  <table className="w-full min-w-[860px] text-sm">
+                  <table className="w-full min-w-[960px] text-sm">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        <th className="px-4 py-3">Employer</th>
-                        <th className="px-4 py-3">Plan</th>
-                        <th className="px-4 py-3">Status</th>
-                        <th className="hidden md:table-cell px-4 py-3">Scheduled</th>
-                        <th className="hidden md:table-cell px-4 py-3">Payment</th>
-                        <th className="hidden lg:table-cell px-4 py-3">Period end</th>
-                        <th className="px-4 py-3">Stripe</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Employer</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Plan</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Status</th>
+                        <th className="hidden md:table-cell px-4 py-3 whitespace-nowrap">Scheduled</th>
+                        <th className="hidden md:table-cell px-4 py-3 whitespace-nowrap">Payment</th>
+                        <th className="hidden lg:table-cell px-4 py-3 whitespace-nowrap">Period end</th>
+                        <th className="px-4 py-3 whitespace-nowrap">Stripe</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {paginatedSubscriptions.map((sub) => (
                         <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <Link
                               href={`/admin/users/employers/${sub.employer_id}`}
                               className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
@@ -442,8 +442,8 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                             </Link>
                             <p className="text-xs text-slate-400">{sub.employer_email}</p>
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex flex-wrap items-center gap-2">
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center gap-2 whitespace-nowrap">
                               <span className="font-medium text-slate-700">
                                 {sub.plan_name ?? "—"}
                               </span>
@@ -453,7 +453,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                                 </span>
                               ) : null}
                             </div>
-                            <p className="mt-1 text-[11px] font-medium text-slate-400">
+                            <p className="mt-1 text-[11px] font-medium text-slate-400 whitespace-nowrap">
                               {formatAdminBillingAmount(
                                 sub.unit_amount_cents,
                                 sub.billing_interval,
@@ -461,12 +461,12 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                               )}
                             </p>
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <StatusBadge status={sub.status} />
                           </td>
-                          <td className="hidden md:table-cell px-4 py-3">
+                          <td className="hidden md:table-cell px-4 py-3 whitespace-nowrap">
                             {sub.scheduled_plan_slug || sub.cancel_at_period_end ? (
-                              <div className="space-y-0.5">
+                              <div className="space-y-0.5 whitespace-nowrap">
                                 <p className="text-xs font-semibold text-amber-800">
                                   →{" "}
                                   {sub.cancel_at_period_end &&
@@ -490,9 +490,9 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                               <span className="text-xs text-slate-400">—</span>
                             )}
                           </td>
-                          <td className="hidden md:table-cell px-4 py-3">
+                          <td className="hidden md:table-cell px-4 py-3 whitespace-nowrap">
                             {sub.last_payment_status ? (
-                              <div className="space-y-0.5">
+                              <div className="space-y-0.5 whitespace-nowrap">
                                 <StatusBadge status={sub.last_payment_status} />
                                 {sub.failed_payment_count > 0 ? (
                                   <p className="text-[10px] text-amber-700">
@@ -504,12 +504,12 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                               <span className="text-xs text-slate-400">—</span>
                             )}
                           </td>
-                          <td className="hidden lg:table-cell px-4 py-3 text-xs text-slate-500">
+                          <td className="hidden lg:table-cell px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
                             {sub.current_period_end
                               ? new Date(sub.current_period_end).toLocaleDateString()
                               : "—"}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             {sub.stripe_customer_id ? (
                               <a
                                 href={`https://dashboard.stripe.com/customers/${sub.stripe_customer_id}`}
@@ -619,15 +619,15 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
           ) : (
             <div className="space-y-4">
               <div className="overflow-x-auto custom-scrollbar w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-                <table className="w-full min-w-[720px] text-sm">
+                <table className="w-full min-w-[960px] text-sm">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      <th className="px-4 py-3">When</th>
-                      <th className="px-4 py-3">Employer</th>
-                      <th className="px-4 py-3">Event</th>
-                      <th className="px-4 py-3">Amount</th>
-                      <th className="hidden sm:table-cell px-4 py-3">Plan</th>
-                      <th className="px-4 py-3">Invoice</th>
+                      <th className="px-4 py-3 whitespace-nowrap">When</th>
+                      <th className="px-4 py-3 whitespace-nowrap">Employer</th>
+                      <th className="px-4 py-3 whitespace-nowrap">Event</th>
+                      <th className="px-4 py-3 whitespace-nowrap">Amount</th>
+                      <th className="hidden sm:table-cell px-4 py-3 whitespace-nowrap">Plan</th>
+                      <th className="px-4 py-3 whitespace-nowrap">Invoice</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
@@ -636,7 +636,7 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                         <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
                           {new Date(row.occurred_at).toLocaleString()}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           <Link
                             href={`/admin/users/employers/${row.employer_id}`}
                             className="font-medium text-slate-900 hover:text-emerald-700 hover:underline"
@@ -644,25 +644,25 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                             {row.company_name ?? "—"}
                           </Link>
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="capitalize text-slate-700">
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <span className="capitalize text-slate-700 whitespace-nowrap">
                             {formatEventType(row.event_type)}
                           </span>
                           {row.subscription_status ? (
-                            <p className="text-[10px] text-slate-400 mt-0.5">
+                            <p className="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">
                               {row.subscription_status}
                             </p>
                           ) : null}
                         </td>
-                        <td className="px-4 py-3 font-mono text-xs text-slate-700">
+                        <td className="px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">
                           {formatCents(row.amount_cents)}
                         </td>
-                        <td className="hidden sm:table-cell px-4 py-3">
-                          <span className="text-xs font-medium text-slate-700 capitalize">
+                        <td className="hidden sm:table-cell px-4 py-3 whitespace-nowrap">
+                          <span className="text-xs font-medium text-slate-700 capitalize whitespace-nowrap">
                             {row.plan_slug ?? "—"}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 whitespace-nowrap">
                           {row.stripe_invoice_id ? (
                             <a
                               href={`https://dashboard.stripe.com/invoices/${row.stripe_invoice_id}`}

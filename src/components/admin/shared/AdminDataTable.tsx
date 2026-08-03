@@ -40,7 +40,7 @@ export const ADMIN_TABLE_TH = "px-4 py-3 whitespace-nowrap";
 
 export const ADMIN_TABLE_ROW = "hover:bg-slate-50/50";
 
-export const ADMIN_TABLE_TD = "px-4 py-3 align-middle relative";
+export const ADMIN_TABLE_TD = "px-4 py-3 align-middle relative whitespace-nowrap";
 
 type ActionsPlacement = "header" | "footer";
 

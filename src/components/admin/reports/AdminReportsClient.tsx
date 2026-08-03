@@ -285,7 +285,7 @@ export function AdminReportsClient({
             type="button"
             onClick={handleSearch}
             disabled={pending}
-            className="shrink-0 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50"
+            className="shrink-0 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0a4a29] transition-colors disabled:opacity-50"
           >
             Search
           </button>
