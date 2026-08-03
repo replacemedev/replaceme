@@ -31,7 +31,7 @@ interface AuditLogClientProps {
 }
 
 const FILTER_SELECT =
-  "rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30 min-w-0";
+  "h-10 w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30 min-w-0";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -237,19 +237,6 @@ export function AuditLogClient({ logs, actionTypes }: AuditLogClientProps) {
         onSearchChange={setSearchDraft}
         searchPlaceholder="Search actor, action, target, IP…"
       >
-        <button
-          type="button"
-          onClick={() => void handleExport()}
-          disabled={logs.length === 0}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
-        >
-          <Download className="h-4 w-4" aria-hidden />
-          <span className="hidden sm:inline">Export CSV</span>
-          <span className="sm:hidden">CSV</span>
-        </button>
-      </AdminFilterBar>
-
-      <div className="hidden md:flex flex-wrap items-center gap-2 min-w-0">
         <select
           value={action}
           onChange={(e) => pushParams({ action: e.target.value })}
@@ -263,53 +250,33 @@ export function AuditLogClient({ logs, actionTypes }: AuditLogClientProps) {
             </option>
           ))}
         </select>
-        <input
-          type="date"
-          value={from}
-          onChange={(e) => pushParams({ from: e.target.value })}
-          className={FILTER_SELECT}
-          aria-label="From date"
-        />
-        <input
-          type="date"
-          value={to}
-          onChange={(e) => pushParams({ to: e.target.value })}
-          className={FILTER_SELECT}
-          aria-label="To date"
-        />
-      </div>
-
-      <div className="flex md:hidden flex-col gap-2 min-w-0">
-        <select
-          value={action}
-          onChange={(e) => pushParams({ action: e.target.value })}
-          className={`${FILTER_SELECT} w-full`}
-          aria-label="Filter by action"
-        >
-          <option value="all">All actions</option>
-          {actionTypes.map((a) => (
-            <option key={a} value={a}>
-              {formatAuditAction(a)}
-            </option>
-          ))}
-        </select>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5 w-full sm:flex sm:w-auto">
           <input
             type="date"
             value={from}
             onChange={(e) => pushParams({ from: e.target.value })}
-            className={`${FILTER_SELECT} w-full`}
+            className={`${FILTER_SELECT} min-w-0`}
             aria-label="From date"
           />
           <input
             type="date"
             value={to}
             onChange={(e) => pushParams({ to: e.target.value })}
-            className={`${FILTER_SELECT} w-full`}
+            className={`${FILTER_SELECT} min-w-0`}
             aria-label="To date"
           />
         </div>
-      </div>
+        <button
+          type="button"
+          onClick={() => void handleExport()}
+          disabled={logs.length === 0}
+          className="h-10 w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50"
+        >
+          <Download className="h-4 w-4" aria-hidden />
+          <span className="hidden sm:inline">Export CSV</span>
+          <span className="sm:hidden">CSV</span>
+        </button>
+      </AdminFilterBar>
 
       <div className="flex items-center justify-between gap-3 min-w-0">
         <AdminSectionLabel>Event log</AdminSectionLabel>

@@ -33,7 +33,7 @@ interface ApplicationsClientProps {
 }
 
 const FILTER_SELECT =
-  "rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30";
+  "h-10 w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30";
 
 function IdentityStack({
   href,
@@ -160,53 +160,10 @@ export function ApplicationsClient({
         onSearchChange={setSearchTerm}
         searchPlaceholder="Search worker, email, job, company…"
       >
-        <div className="hidden md:flex flex-wrap items-center gap-2 min-w-0">
-          <select
-            value={activeStatus}
-            onChange={(e) => pushParam("status", e.target.value)}
-            className={FILTER_SELECT}
-            aria-label="Filter by status"
-          >
-            <option value="all">All statuses</option>
-            {APPLICATION_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {APPLICATION_STATUS_LABELS[s]}
-              </option>
-            ))}
-          </select>
-          <select
-            value={activeModeration}
-            onChange={(e) => pushParam("moderation", e.target.value)}
-            className={FILTER_SELECT}
-            aria-label="Filter by moderation"
-          >
-            <option value="all">All moderation</option>
-            <option value="clear">Clear</option>
-            <option value="flagged">Flagged</option>
-            <option value="suspended">Suspended</option>
-          </select>
-          <input
-            type="date"
-            value={activeFrom}
-            onChange={(e) => pushParam("from", e.target.value)}
-            className={FILTER_SELECT}
-            aria-label="Applied from"
-          />
-          <input
-            type="date"
-            value={activeTo}
-            onChange={(e) => pushParam("to", e.target.value)}
-            className={FILTER_SELECT}
-            aria-label="Applied to"
-          />
-        </div>
-      </AdminFilterBar>
-
-      <div className="flex md:hidden flex-col gap-2 min-w-0">
         <select
           value={activeStatus}
           onChange={(e) => pushParam("status", e.target.value)}
-          className={`${FILTER_SELECT} w-full`}
+          className={FILTER_SELECT}
           aria-label="Filter by status"
         >
           <option value="all">All statuses</option>
@@ -219,7 +176,7 @@ export function ApplicationsClient({
         <select
           value={activeModeration}
           onChange={(e) => pushParam("moderation", e.target.value)}
-          className={`${FILTER_SELECT} w-full`}
+          className={FILTER_SELECT}
           aria-label="Filter by moderation"
         >
           <option value="all">All moderation</option>
@@ -227,23 +184,23 @@ export function ApplicationsClient({
           <option value="flagged">Flagged</option>
           <option value="suspended">Suspended</option>
         </select>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5 w-full sm:flex sm:w-auto">
           <input
             type="date"
             value={activeFrom}
             onChange={(e) => pushParam("from", e.target.value)}
-            className={`${FILTER_SELECT} w-full min-w-0`}
+            className={`${FILTER_SELECT} min-w-0`}
             aria-label="Applied from"
           />
           <input
             type="date"
             value={activeTo}
             onChange={(e) => pushParam("to", e.target.value)}
-            className={`${FILTER_SELECT} w-full min-w-0`}
+            className={`${FILTER_SELECT} min-w-0`}
             aria-label="Applied to"
           />
         </div>
-      </div>
+      </AdminFilterBar>
 
       {applications.length === 0 ? (
         <EmptyState
