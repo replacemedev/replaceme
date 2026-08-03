@@ -7,12 +7,15 @@ interface AdminDataTableProps {
   /** Card list for mobile. Shown below `md`. */
   mobileCards: ReactNode;
   className?: string;
+  /** Minimum width for the table container. Defaults to `min-w-[960px]`. */
+  minWidth?: string;
 }
 
 export function AdminDataTable({
   children,
   mobileCards,
   className = "",
+  minWidth = "min-w-[960px]",
 }: AdminDataTableProps) {
   return (
     <>
@@ -20,9 +23,11 @@ export function AdminDataTable({
         {mobileCards}
       </div>
       <div
-        className={`hidden md:block overflow-x-auto overflow-y-visible w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
+        className={`hidden md:block w-full max-w-full overflow-x-auto pb-1 custom-scrollbar rounded-lg shadow-sm border border-gray-200 bg-white ${className}`}
       >
-        {children}
+        <div className={`w-full ${minWidth} [&_table]:w-full [&_table]:${minWidth}`}>
+          {children}
+        </div>
       </div>
     </>
   );

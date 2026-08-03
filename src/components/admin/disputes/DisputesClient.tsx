@@ -181,7 +181,7 @@ export function DisputesClient({
     });
 
   const renderTable = (rows: AdminCaseRow[]) => (
-    <table className="w-full min-w-[720px] border-collapse text-left">
+    <table className="w-full min-w-[900px] border-collapse text-left">
       <thead className={ADMIN_TABLE_HEAD}>
         <tr>
           <th className={ADMIN_TABLE_TH}>Case</th>

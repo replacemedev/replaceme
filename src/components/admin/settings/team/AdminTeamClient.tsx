@@ -291,7 +291,7 @@ export function AdminTeamClient({
             <div className="space-y-4">
               {/* Desktop table */}
               <div className="hidden md:block overflow-x-auto w-full max-w-full rounded-lg shadow-sm border border-gray-200 bg-white">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[800px] text-sm">
                   <thead className={ADMIN_TABLE_HEAD}>
                     <tr>
                       <th className={ADMIN_TABLE_TH}>Member</th>

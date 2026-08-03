@@ -185,16 +185,16 @@ export function ModerationClient({ flags }: ModerationClientProps) {
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full min-w-0 text-sm table-fixed">
+            <table className="w-full min-w-[960px] text-sm">
               <thead>
                 <tr className={ADMIN_TABLE_HEAD}>
-                  <th className={`${ADMIN_TABLE_TH} w-[16%]`}>Worker</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[14%]`}>Company</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[18%]`}>Job context</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[22%]`}>Reason</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[8%]`}>Msgs</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[14%]`}>Activity</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[8%] text-right`}>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[150px]`}>Worker</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[130px]`}>Company</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[160px]`}>Job context</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[200px]`}>Reason</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[70px]`}>Msgs</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[130px]`}>Activity</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[60px] text-right`}>
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>

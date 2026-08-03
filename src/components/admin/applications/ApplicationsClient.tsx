@@ -262,16 +262,16 @@ export function ApplicationsClient({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full min-w-0 table-fixed text-sm">
+            <table className="w-full min-w-[960px] text-sm">
               <thead>
                 <tr className={ADMIN_TABLE_HEAD}>
-                  <th className={`${ADMIN_TABLE_TH} w-[22%]`}>Worker</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[18%]`}>Job</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[16%]`}>Employer</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[16%]`}>Status</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[10%]`}>Match</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[12%]`}>Applied</th>
-                  <th className={`${ADMIN_TABLE_TH} w-[6%] text-right`}>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[180px]`}>Worker</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[160px]`}>Job</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[150px]`}>Employer</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[140px]`}>Status</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[90px]`}>Match</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[110px]`}>Applied</th>
+                  <th className={`${ADMIN_TABLE_TH} min-w-[60px] text-right`}>
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>

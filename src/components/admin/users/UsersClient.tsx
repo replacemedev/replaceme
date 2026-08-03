@@ -529,7 +529,7 @@ export function UsersClient({
               );
             })}
           >
-            <table className="w-full min-w-[640px] text-sm">
+            <table className="w-full min-w-[960px] text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     <th className={ADMIN_TABLE_TH}>User</th>

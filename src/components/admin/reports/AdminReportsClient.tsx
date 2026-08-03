@@ -330,7 +330,7 @@ export function AdminReportsClient({
               )
             }
           >
-            <table className="w-full min-w-0 table-fixed text-sm">
+            <table className="w-full min-w-[960px] text-sm">
               <thead>
                 <tr className={ADMIN_TABLE_HEAD}>
                   <th className={`${ADMIN_TABLE_TH} w-[40%]`}>Report</th>
@@ -432,7 +432,7 @@ export function AdminReportsClient({
               )
             }
           >
-            <table className="w-full min-w-0 table-fixed text-sm">
+            <table className="w-full min-w-[960px] text-sm">
               <thead>
                 <tr className={ADMIN_TABLE_HEAD}>
                   <th className={`${ADMIN_TABLE_TH} w-[40%]`}>Report</th>

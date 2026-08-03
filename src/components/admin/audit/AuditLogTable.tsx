@@ -116,7 +116,7 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
           </AdminMobileCard>
         ))}
       >
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[900px] text-sm">
           <thead>
             <tr className={ADMIN_TABLE_HEAD}>
               <th className={ADMIN_TABLE_TH}>Timestamp</th>

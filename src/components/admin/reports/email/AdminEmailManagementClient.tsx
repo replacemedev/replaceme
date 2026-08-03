@@ -428,7 +428,7 @@ function AdminEmailManagementInner({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[840px] text-sm">
               <thead className={ADMIN_TABLE_HEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Template</th>
@@ -725,7 +725,7 @@ function AdminEmailManagementInner({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[840px] text-sm">
               <thead className={ADMIN_TABLE_HEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Announcement</th>
@@ -841,7 +841,7 @@ function AdminEmailManagementInner({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[840px] text-sm">
               <thead className={ADMIN_TABLE_HEAD}>
                 <tr>
                   <th className={ADMIN_TABLE_TH}>Subject</th>

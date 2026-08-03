@@ -267,7 +267,7 @@ export function IdentityReviewClient({ queue }: IdentityReviewClientProps) {
                 );
               })}
             >
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[840px] text-sm">
                 <thead className={ADMIN_TABLE_HEAD}>
                   <tr>
                     <th className={ADMIN_TABLE_TH}>Worker</th>

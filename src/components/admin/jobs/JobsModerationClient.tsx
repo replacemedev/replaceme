@@ -51,7 +51,7 @@ const SLA_BADGE_CLASS: Record<DiscoverySlaTone, string> = {
 function SlaBadge({ tone, label }: { tone: DiscoverySlaTone; label: string }) {
   return (
     <span
-      className={`inline-flex max-w-full items-center truncate rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${SLA_BADGE_CLASS[tone]}`}
+      className={`inline-flex max-w-full items-center whitespace-nowrap rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${SLA_BADGE_CLASS[tone]}`}
       title={label}
     >
       {tone === "overdue" ? "Overdue" : tone === "due_soon" ? "Due soon" : "In queue"}
@@ -75,12 +75,12 @@ function PlanStack({
 
   return (
     <div className="flex flex-col gap-0.5 min-w-0">
-      <span className="text-sm font-medium text-slate-800">{label}</span>
-      <span className="text-xs text-slate-500">
+      <span className="text-sm font-medium text-slate-800 whitespace-nowrap">{label}</span>
+      <span className="text-xs text-slate-500 whitespace-nowrap">
         {requiresManualApproval ? "2-day approval queue" : "Instant publish"}
       </span>
       {submittedAt ? (
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-slate-400 whitespace-nowrap">
           Submitted {new Date(submittedAt).toLocaleDateString()}
         </span>
       ) : null}
@@ -558,10 +558,10 @@ export function JobsModerationClient({
               </AdminMobileCard>
             ))}
           >
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[1000px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  <th className="w-10 px-4 py-3">
+                  <th className="w-10 px-4 py-3 shrink-0">
                     <Checkbox
                       checked={allPageSelected}
                       onChange={toggleAllPage}
@@ -569,19 +569,19 @@ export function JobsModerationClient({
                       aria-label="Select all on this page"
                     />
                   </th>
-                  <th className="px-4 py-3">Job</th>
-                  <th className="px-4 py-3">Employer</th>
-                  <th className="px-4 py-3">Plan</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Salary</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3 min-w-[200px]">Job</th>
+                  <th className="px-4 py-3 min-w-[140px] whitespace-nowrap">Employer</th>
+                  <th className="px-4 py-3 min-w-[140px] whitespace-nowrap">Plan</th>
+                  <th className="px-4 py-3 min-w-[110px] whitespace-nowrap">Type</th>
+                  <th className="px-4 py-3 min-w-[120px] whitespace-nowrap">Salary</th>
+                  <th className="px-4 py-3 min-w-[130px] whitespace-nowrap">Status</th>
+                  <th className="px-4 py-3 min-w-[80px] text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {paginatedJobs.map((job) => (
                   <tr key={job.id} className="hover:bg-slate-50/50">
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle shrink-0">
                       <Checkbox
                         checked={selectedIds.has(job.id)}
                         onChange={() => toggleOne(job.id)}
@@ -589,7 +589,7 @@ export function JobsModerationClient({
                         aria-label={`Select ${job.title}`}
                       />
                     </td>
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle min-w-[200px]">
                       <div className="flex flex-col gap-0.5 min-w-0">
                         <Link
                           href={`/admin/jobs/${job.id}`}
@@ -597,15 +597,15 @@ export function JobsModerationClient({
                         >
                           {job.title}
                         </Link>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-500 whitespace-nowrap">
                           Posted {new Date(job.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 align-middle text-slate-600">
+                    <td className="px-4 py-3 align-middle text-slate-600 min-w-[140px]">
                       {job.company_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle min-w-[140px] whitespace-nowrap">
                       <PlanStack
                         planSlug={job.plan_slug}
                         requiresManualApproval={job.requires_manual_approval}
@@ -617,20 +617,20 @@ export function JobsModerationClient({
                         })}
                       />
                     </td>
-                    <td className="px-4 py-3 align-middle text-slate-600">
+                    <td className="px-4 py-3 align-middle text-slate-600 min-w-[110px] whitespace-nowrap">
                       {job.employment_type}
                     </td>
-                    <td className="px-4 py-3 align-middle text-slate-600 font-mono text-xs">
+                    <td className="px-4 py-3 align-middle text-slate-600 font-mono text-xs min-w-[120px] whitespace-nowrap">
                       {formatMoney(
                         job.monthly_salary,
                         job.salary_currency ?? "PHP"
                       )}
                       /mo
                     </td>
-                    <td className="px-4 py-3 align-middle">
+                    <td className="px-4 py-3 align-middle min-w-[130px] whitespace-nowrap">
                       <StatusBadge status={job.status} />
                     </td>
-                    <td className="px-4 py-3 align-middle text-right">
+                    <td className="px-4 py-3 align-middle text-right min-w-[80px] whitespace-nowrap">
                       <JobRowActionsMenu
                         jobId={job.id}
                         title={job.title}
