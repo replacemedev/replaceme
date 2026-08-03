@@ -658,11 +658,9 @@ export function AdminBillingDashboard({ data, activeTab }: AdminBillingDashboard
                           {formatCents(row.amount_cents)}
                         </td>
                         <td className="hidden sm:table-cell px-4 py-3">
-                          {row.plan_slug ? (
-                            <PlanTierBadge tier={row.plan_slug} size="sm" />
-                          ) : (
-                            <span className="text-xs text-slate-400">—</span>
-                          )}
+                          <span className="text-xs font-medium text-slate-700 capitalize">
+                            {row.plan_slug ?? "—"}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
                           {row.stripe_invoice_id ? (
