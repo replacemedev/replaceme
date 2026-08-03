@@ -9,6 +9,8 @@ import {
 
 export const runtime = "edge";
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://replaceme.ph";
+
 export const metadata = {
   title: "Pricing | Scale Your Remote Team",
   description:
