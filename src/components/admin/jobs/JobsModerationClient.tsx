@@ -534,7 +534,7 @@ export function JobsModerationClient({
                       {job.company_name ? ` · ${job.company_name}` : null}
                     </p>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
-                      <span>{job.employment_type}</span>
+                      <span className="capitalize">{job.employment_type}</span>
                       <span>
                         {formatMoney(
                           job.monthly_salary,
@@ -617,7 +617,7 @@ export function JobsModerationClient({
                         })}
                       />
                     </td>
-                    <td className="px-4 py-3 align-middle text-slate-600 min-w-[110px] whitespace-nowrap">
+                    <td className="px-4 py-3 align-middle text-slate-600 min-w-[110px] whitespace-nowrap capitalize">
                       {job.employment_type}
                     </td>
                     <td className="px-4 py-3 align-middle text-slate-600 font-mono text-xs min-w-[120px] whitespace-nowrap">

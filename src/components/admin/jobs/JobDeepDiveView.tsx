@@ -25,7 +25,7 @@ export function JobDeepDiveView({ data }: JobDeepDiveViewProps) {
         <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{data.title}</h2>
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={data.status} />
-          <span className="text-sm text-slate-500">{data.employmentType}</span>
+          <span className="text-sm text-slate-500 capitalize">{data.employmentType}</span>
           <span className="text-sm font-mono text-slate-600">
             {formatMoney(data.monthlySalary, data.salaryCurrency)}/mo
           </span>

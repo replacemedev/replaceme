@@ -114,7 +114,7 @@ export function JobHeader({
             </div>
             <div className="flex items-center gap-1.5">
               <Clock size={16} className="text-slate-400" aria-hidden />
-              <span>{employmentType}</span>
+              <span className="capitalize">{employmentType}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <DollarSign size={16} className="text-slate-400" aria-hidden />

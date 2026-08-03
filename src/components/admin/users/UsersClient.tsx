@@ -592,7 +592,7 @@ export function UsersClient({
                                 const isVisible = activeContract.show_hired_badge;
                                 return (
                                   <div className="flex items-center gap-1.5">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#006e2f] border border-emerald-100">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-[#006e2f] border border-emerald-100 capitalize">
                                       Hired • {employmentStatus}
                                     </span>
                                     {!isVisible && (

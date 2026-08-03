@@ -33,7 +33,7 @@ export function RecommendedJobCard({ job, onApply }: RecommendedJobCardProps) {
           </span>
 
           {/* Job Type */}
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 capitalize">
             <Clock size={14} className="text-slate-400" />
             {job.employment_type}
           </span>

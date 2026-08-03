@@ -37,7 +37,7 @@ function SummaryRow({
           {label}
         </span>
       </div>
-      <span className="text-sm font-bold text-slate-900 text-right shrink-0">
+      <span className="text-sm font-bold text-slate-900 text-right shrink-0 capitalize">
         {value}
       </span>
     </div>

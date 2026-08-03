@@ -32,7 +32,7 @@ function DetailRow({
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {label}
         </p>
-        <p className="text-sm font-bold text-slate-900 mt-0.5">{value}</p>
+        <p className="text-sm font-bold text-slate-900 mt-0.5 capitalize">{value}</p>
       </div>
     </div>
   );

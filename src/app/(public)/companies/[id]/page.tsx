@@ -68,7 +68,7 @@ export default async function PublicCompanyDetailPage({ params }: PageProps) {
             >
               <p className="text-sm font-bold text-slate-900">{job.title}</p>
               <p className="text-xs text-slate-500 mt-0.5">
-                {job.employmentType} · {job.location}
+                <span className="capitalize">{job.employmentType}</span> · {job.location}
               </p>
             </Link>
           </li>

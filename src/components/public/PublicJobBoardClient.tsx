@@ -93,7 +93,7 @@ export function PublicJobBoardClient({ jobs }: PublicJobBoardClientProps) {
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 mt-3 sm:mt-4 font-normal">
                     <span>{daysSincePosted(job.createdAt)}</span>
                     <span className="text-slate-300">•</span>
-                    <span>{job.employmentType}</span>
+                    <span className="capitalize">{job.employmentType}</span>
                     <span className="text-slate-300">•</span>
                     <span>{job.location}</span>
                   </div>
