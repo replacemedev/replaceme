@@ -130,7 +130,7 @@ export function NotificationBell({
           id={panelId}
           role="dialog"
           aria-label="Notifications"
-          className="fixed top-16 left-4 right-4 mx-auto w-auto max-w-[380px] md:absolute md:top-[calc(100%+8px)] md:right-0 md:left-auto md:w-[380px] md:max-w-none md:mx-0 z-[60] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.12)]"
+          className="absolute right-0 top-full mt-2 w-[380px] max-w-[calc(100vw-2rem)] z-[100] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.12)]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
             <div>
@@ -154,7 +154,7 @@ export function NotificationBell({
             ) : null}
           </header>
 
-          <div className="max-h-[min(60vh,420px)] overflow-y-auto">
+          <div className="max-h-[400px] overflow-y-auto">
             {isLoading && notifications.length === 0 ? (
               <NotificationSkeletonList />
             ) : error ? (
