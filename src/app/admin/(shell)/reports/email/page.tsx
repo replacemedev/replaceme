@@ -16,12 +16,42 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminEmailManagementPage() {
+const VALID_STATUSES = [
+  "queued",
+  "scheduled",
+  "sent",
+  "delivered",
+  "opened",
+  "clicked",
+  "delayed",
+  "bounced",
+  "complained",
+  "suppressed",
+  "failed",
+];
+
+export default async function AdminEmailManagementPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   await requireAdminPageCapability("email");
+
+  const resolvedParams = searchParams ? await searchParams : {};
+  const kindParam =
+    typeof resolvedParams.kind === "string" &&
+    ["transactional", "broadcast"].includes(resolvedParams.kind)
+      ? (resolvedParams.kind as "transactional" | "broadcast")
+      : undefined;
+  const statusParam =
+    typeof resolvedParams.status === "string" &&
+    VALID_STATUSES.includes(resolvedParams.status)
+      ? (resolvedParams.status as never)
+      : undefined;
 
   const [initial, compliance, scaleEarlyAccess, templates, announcements] =
     await Promise.all([
-      listEmailMessages({ limit: 50 }),
+      listEmailMessages({ limit: 50, kind: kindParam, status: statusParam }),
       getBroadcastComplianceStatus(),
       getScaleEarlyAccessEnabled(),
       listEmailTemplates(),
@@ -45,3 +75,4 @@ export default async function AdminEmailManagementPage() {
     </AdminPageShell>
   );
 }
+

@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useMemo, useState, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { AdminTabs } from "@/components/admin/shared/AdminTabs";
 import { AdminFilterPills } from "@/components/admin/shared/AdminFilterPills";
@@ -88,13 +88,28 @@ function AdminEmailManagementInner({
   initialTemplates: AdminEmailTemplateRow[];
   initialAnnouncements: ProductAnnouncementRow[];
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? "broadcasts";
 
+  const initialKindParam = searchParams.get("kind");
+  const initialKind =
+    initialKindParam && KIND_FILTERS.includes(initialKindParam as never)
+      ? (initialKindParam as (typeof KIND_FILTERS)[number])
+      : "all";
+
+  const initialStatusParam = searchParams.get("status");
+  const initialStatus =
+    initialStatusParam && STATUS_FILTERS.includes(initialStatusParam as never)
+      ? (initialStatusParam as (typeof STATUS_FILTERS)[number])
+      : "all";
+
   const [pending, startTransition] = useTransition();
   const [status, setStatus] =
-    useState<(typeof STATUS_FILTERS)[number]>("all");
-  const [kind, setKind] = useState<(typeof KIND_FILTERS)[number]>("all");
+    useState<(typeof STATUS_FILTERS)[number]>(initialStatus);
+  const [kind, setKind] =
+    useState<(typeof KIND_FILTERS)[number]>(initialKind);
   const [rows, setRows] = useState(initial);
   const [templates, setTemplates] = useState(initialTemplates);
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
@@ -136,6 +151,64 @@ function AdminEmailManagementInner({
     setCurrentPage(1);
   }
 
+  useEffect(() => {
+    setRows(initial);
+  }, [initial]);
+
+  useEffect(() => {
+    const k = searchParams.get("kind");
+    const s = searchParams.get("status");
+    const validKind =
+      k && KIND_FILTERS.includes(k as never)
+        ? (k as (typeof KIND_FILTERS)[number])
+        : "all";
+    const validStatus =
+      s && STATUS_FILTERS.includes(s as never)
+        ? (s as (typeof STATUS_FILTERS)[number])
+        : "all";
+
+    setKind(validKind);
+    setStatus(validStatus);
+  }, [searchParams]);
+
+  const updateFilters = (
+    nextKind: (typeof KIND_FILTERS)[number],
+    nextStatus: (typeof STATUS_FILTERS)[number]
+  ) => {
+    setKind(nextKind);
+    setStatus(nextStatus);
+    setCurrentPage(1);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextKind === "all") {
+      params.delete("kind");
+    } else {
+      params.set("kind", nextKind);
+    }
+
+    if (nextStatus === "all") {
+      params.delete("status");
+    } else {
+      params.set("status", nextStatus);
+    }
+
+    const newQuery = params.toString();
+    router.replace(newQuery ? `${pathname}?${newQuery}` : pathname);
+
+    startTransition(async () => {
+      try {
+        const next = await listEmailMessages({
+          limit: 50,
+          status: nextStatus === "all" ? undefined : (nextStatus as never),
+          kind: nextKind === "all" ? undefined : nextKind,
+        });
+        setRows(next.messages);
+      } catch {
+        toast.error("Failed to filter email reports");
+      }
+    });
+  };
+
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const f of STATUS_FILTERS) map.set(f, 0);
@@ -148,12 +221,18 @@ function AdminEmailManagementInner({
 
   const refresh = () => {
     startTransition(async () => {
-      const next = await listEmailMessages({
-        limit: 50,
-        status: status === "all" ? undefined : (status as never),
-        kind: kind === "all" ? undefined : kind,
-      });
-      setRows(next.messages);
+      try {
+        const next = await listEmailMessages({
+          limit: 50,
+          status: status === "all" ? undefined : (status as never),
+          kind: kind === "all" ? undefined : kind,
+        });
+        setRows(next.messages);
+        router.refresh();
+        toast.success("Email reports refreshed");
+      } catch {
+        toast.error("Failed to refresh email reports");
+      }
     });
   };
 
@@ -782,14 +861,20 @@ function AdminEmailManagementInner({
                   k === "all" ? "All kinds" : k
                 )}
                 value={kind === "all" ? "All kinds" : kind}
-                onChange={(v) =>
-                  setKind(v === "All kinds" ? "all" : (v as typeof kind))
-                }
+                onChange={(v) => {
+                  const selectedKind =
+                    v === "All kinds" ? "all" : (v as typeof kind);
+                  updateFilters(selectedKind, status);
+                }}
               />
               <AdminFilterPills
                 options={STATUS_FILTERS.map((s) => (s === "all" ? "All" : s))}
                 value={status === "all" ? "All" : status}
-                onChange={(v) => setStatus(v === "All" ? "all" : (v as never))}
+                onChange={(v) => {
+                  const selectedStatus =
+                    v === "All" ? "all" : (v as typeof status);
+                  updateFilters(kind, selectedStatus);
+                }}
                 counts={Object.fromEntries(
                   STATUS_FILTERS.map((s) => [
                     s === "all" ? "All" : s,
@@ -804,7 +889,7 @@ function AdminEmailManagementInner({
               disabled={pending}
               className="shrink-0 rounded-xl bg-[#006e2f] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0a4a29] transition-colors disabled:opacity-50"
             >
-              Refresh
+              {pending ? "Refreshing..." : "Refresh"}
             </button>
           </div>
 
@@ -853,48 +938,59 @@ function AdminEmailManagementInner({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {paginatedRows.map((row) => (
-                  <tr key={row.id} className={ADMIN_TABLE_ROW}>
-                    <td className={`${ADMIN_TABLE_TD} min-w-0 max-w-[280px]`}>
-                      <p className="truncate font-semibold text-slate-900">
-                        {row.subject ?? "—"}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-slate-400">
-                        {row.provider_message_id ??
-                          row.provider_broadcast_id ??
-                          "—"}
-                      </p>
-                    </td>
-                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
-                      <span className="text-xs font-semibold text-slate-700 capitalize whitespace-nowrap">
-                        {row.kind}
-                      </span>
-                    </td>
-                    <td className={`${ADMIN_TABLE_TD} min-w-0 whitespace-nowrap`}>
-                      <span className="block truncate text-xs text-slate-600">
-                        {row.to_email ?? "Broadcast"}
-                      </span>
-                    </td>
-                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
-                      <StatusBadge status={row.status} />
-                    </td>
-                    <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
-                      <span className="whitespace-nowrap text-xs text-slate-500">
-                        {formatWhen(row.last_event_at ?? row.created_at)}
-                      </span>
-                    </td>
-                    <td className={`${ADMIN_TABLE_TD} text-right whitespace-nowrap`}>
-                      <EmailRowActionsMenu
-                        row={row}
-                        onViewEvents={() => openRow(row.id)}
-                        onDuplicateBroadcast={(s) => {
-                          setSubject(s);
-                          setShowAdvanced(false);
-                        }}
-                      />
+                {paginatedRows.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="py-12 text-center text-sm font-medium text-slate-500"
+                    >
+                      No email reports found matching the selected filters.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedRows.map((row) => (
+                    <tr key={row.id} className={ADMIN_TABLE_ROW}>
+                      <td className={`${ADMIN_TABLE_TD} min-w-0 max-w-[280px]`}>
+                        <p className="truncate font-semibold text-slate-900">
+                          {row.subject ?? "—"}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-slate-400">
+                          {row.provider_message_id ??
+                            row.provider_broadcast_id ??
+                            "—"}
+                        </p>
+                      </td>
+                      <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                        <span className="text-xs font-semibold text-slate-700 capitalize whitespace-nowrap">
+                          {row.kind}
+                        </span>
+                      </td>
+                      <td className={`${ADMIN_TABLE_TD} min-w-0 whitespace-nowrap`}>
+                        <span className="block truncate text-xs text-slate-600">
+                          {row.to_email ?? "Broadcast"}
+                        </span>
+                      </td>
+                      <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                        <StatusBadge status={row.status} />
+                      </td>
+                      <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
+                        <span className="whitespace-nowrap text-xs text-slate-500">
+                          {formatWhen(row.last_event_at ?? row.created_at)}
+                        </span>
+                      </td>
+                      <td className={`${ADMIN_TABLE_TD} text-right whitespace-nowrap`}>
+                        <EmailRowActionsMenu
+                          row={row}
+                          onViewEvents={() => openRow(row.id)}
+                          onDuplicateBroadcast={(s) => {
+                            setSubject(s);
+                            setShowAdvanced(false);
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </AdminDataTable>
