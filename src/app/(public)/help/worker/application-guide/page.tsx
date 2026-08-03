@@ -102,32 +102,24 @@ function WorkerApplicationFallback() {
               key={step.stepNumber}
               className="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-200"
             >
-              <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-5">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100/80 text-[#006e2f] flex items-center justify-center font-bold text-sm md:text-base shadow-xs">
-                  {step.stepNumber}
-                </div>
+              <div className="flex items-center gap-2.5 mb-2.5 min-w-0">
+                <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
+                  Step {step.stepNumber}: {step.title}
+                </h2>
+              </div>
 
-                <div className="flex-1 min-w-0 w-full">
-                  <div className="flex items-center gap-2.5 mb-2.5 min-w-0">
-                    <Icon className="w-5 h-5 text-[#006e2f] shrink-0" />
-                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-900">
-                      Step {step.stepNumber}: {step.title}
-                    </h2>
+              <p className="text-slate-600 text-sm sm:text-base font-normal mb-3.5 leading-relaxed">
+                {step.summary}
+              </p>
+
+              <div className="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-slate-100 space-y-2">
+                {step.details.map((detail, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600">
+                    <CheckCircle2 className="w-4 h-4 text-[#006e2f] mt-0.5 shrink-0" />
+                    <span className="flex-1 min-w-0 leading-relaxed">{detail}</span>
                   </div>
-
-                  <p className="text-slate-600 text-sm sm:text-base font-normal mb-3.5 leading-relaxed">
-                    {step.summary}
-                  </p>
-
-                  <div className="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-slate-100 space-y-2">
-                    {step.details.map((detail, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600">
-                        <CheckCircle2 className="w-4 h-4 text-[#006e2f] mt-0.5 shrink-0" />
-                        <span className="flex-1 min-w-0 leading-relaxed">{detail}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           );

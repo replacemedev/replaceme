@@ -19,23 +19,17 @@ export default function WorkerOnboardingLoading() {
             {Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs animate-pulse"
+                className="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs animate-pulse space-y-3"
               >
-                <div className="flex flex-col sm:flex-row items-start gap-4 md:gap-5">
-                  {/* Step Number Circle Skeleton */}
-                  <SkeletonBlock className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-200 shadow-xs" />
-                  <div className="flex-1 min-w-0 w-full space-y-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <SkeletonBlock className="h-6 w-1/2 rounded-md bg-slate-200" />
-                    </div>
-                    <SkeletonBlock className="h-4 w-full rounded-md bg-slate-100" />
-                    <SkeletonBlock className="h-4 w-4/5 rounded-md bg-slate-100" />
-                    <div className="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 space-y-2 border border-slate-100">
-                      <SkeletonBlock className="h-3.5 w-11/12 rounded-md bg-slate-100" />
-                      <SkeletonBlock className="h-3.5 w-4/5 rounded-md bg-slate-100" />
-                      <SkeletonBlock className="h-3.5 w-3/4 rounded-md bg-slate-100" />
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <SkeletonBlock className="h-6 w-1/2 rounded-md bg-slate-200" />
+                </div>
+                <SkeletonBlock className="h-4 w-full rounded-md bg-slate-100" />
+                <SkeletonBlock className="h-4 w-4/5 rounded-md bg-slate-100" />
+                <div className="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 space-y-2 border border-slate-100">
+                  <SkeletonBlock className="h-3.5 w-11/12 rounded-md bg-slate-100" />
+                  <SkeletonBlock className="h-3.5 w-4/5 rounded-md bg-slate-100" />
+                  <SkeletonBlock className="h-3.5 w-3/4 rounded-md bg-slate-100" />
                 </div>
               </div>
             ))}
