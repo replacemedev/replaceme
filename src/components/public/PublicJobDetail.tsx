@@ -112,7 +112,7 @@ export function PublicJobDetail({ job, faqs }: PublicJobDetailProps) {
                     Compensation
                   </dt>
                   <dd className="mt-1 text-sm font-extrabold text-[#006e2f]">
-                    {job.monthlySalary > 0 ? compensation : "Competitive — confirm with employer"}
+                    {job.monthlySalary > 0 ? compensation : "Competitive. Confirm with employer"}
                   </dd>
                 </div>
               </dl>

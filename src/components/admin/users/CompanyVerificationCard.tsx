@@ -49,7 +49,7 @@ export function CompanyVerificationCard({
             <StatusBadge status={isVerified ? "verified" : "unverified"} />
           </div>
           <p className="text-sm leading-relaxed text-slate-500">
-            Marketplace trust badge only — not tax KYC. Verified companies show a
+            Marketplace trust badge only, not tax KYC. Verified companies show a
             clearer signal to workers browsing listings.
           </p>
           {isVerified && verifiedAt ? (

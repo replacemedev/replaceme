@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Remote Jobs in the Philippines \u2014 Browse Active Roles",
     description:
-      "Find full-time and long-term remote roles posted by global employers. Apply directly — no agency fees, no middlemen.",
+      "Find full-time and long-term remote roles posted by global employers. Apply directly: no agency fees, no middlemen.",
     url: `${BASE_URL}/jobs`,
     type: "website",
   },

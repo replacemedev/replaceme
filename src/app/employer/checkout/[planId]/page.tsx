@@ -108,7 +108,7 @@ export default async function CheckoutPage({
           isPortalUpdate
             ? "Confirm your plan change securely on Stripe Billing."
             : billingInterval === "year"
-              ? "Annual prepaid — review the total due today, then continue to Stripe."
+              ? "Annual prepaid: review the total due today, then continue to Stripe."
               : "Review your order and continue to secure Stripe checkout."
         }
         bordered={false}

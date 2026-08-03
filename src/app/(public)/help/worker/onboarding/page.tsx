@@ -45,7 +45,7 @@ const STEPS = [
     details: [
       "Confirm core work hours, shift overlap, and timezone expectations.",
       "Agree on project scope, key performance indicators (KPIs), and communication tools.",
-      "Replaceme does not lock you into agency contracts—your relationship is 100% direct with the employer.",
+      "Replaceme does not lock you into agency contracts. Your relationship is 100% direct with the employer.",
     ],
   },
   {
@@ -54,7 +54,7 @@ const STEPS = [
     icon: DollarSign,
     badgeText: "100% Direct Pay",
     summary:
-      "Agree payment terms directly with your employer off-platform. Common options include Wise, PayPal, or bank transfer—Replaceme does not process or endorse any payment method.",
+      "Agree payment terms directly with your employer off-platform. Common options include Wise, PayPal, or bank transfer. Replaceme does not process or endorse any payment method.",
     details: [
       "Replaceme does NOT process payroll or take deductions from your salary.",
       "You receive 100% of the compensation agreed upon with your client.",

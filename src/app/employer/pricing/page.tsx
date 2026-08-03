@@ -12,7 +12,14 @@ export const runtime = "edge";
 export const metadata = {
   title: "Pricing | Scale Your Remote Team",
   description:
-    "Simple, transparent pricing. Discovery is free — upgrade to Starter, Growth, or Scale when you're ready to hire.",
+    "Simple, transparent pricing. Discovery is free. Upgrade to Starter, Growth, or Scale when you're ready to hire.",
+  openGraph: {
+    title: "Employer Pricing & Subscriptions | Replaceme",
+    description:
+      "Simple, transparent pricing. Discovery is free. Upgrade to Starter, Growth, or Scale when you're ready to hire.",
+    url: `${BASE_URL}/employer/pricing`,
+    type: "website",
+  },
 };
 
 export default async function PricingPage() {
@@ -29,7 +36,7 @@ export default async function PricingPage() {
     <EmployerPageShell width="wide" className="gap-10">
       <EmployerPageHeader
         title="Scale your remote team"
-        subhead="Simple, transparent pricing — Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."
+        subhead="Simple, transparent pricing. Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."
         bordered={false}
       />
       <EmployerPricingClient

@@ -41,7 +41,7 @@ export function CitationBlock({
       {stat && (
         <aside
           className="mt-auto pt-4 sm:pt-6 border-t border-slate-100 flex items-baseline gap-2 sm:gap-2.5"
-          aria-label={`Key statistic: ${stat} — ${statLabel}`}
+          aria-label={`Key statistic: ${stat}: ${statLabel}`}
         >
           <span
             className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22c55e] tracking-tight"

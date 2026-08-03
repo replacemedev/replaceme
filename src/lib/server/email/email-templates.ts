@@ -337,7 +337,7 @@ export function renderJobApprovedEmail(input: {
   const bodyHtml = `
     <p style="margin:0 0 16px 0;">${greeting}</p>
     <p style="margin:0 0 16px 0;">
-      Good news — <strong>${escapeHtml(input.jobTitle)}</strong> is approved and now visible to workers on Replaceme.
+      Good news: <strong>${escapeHtml(input.jobTitle)}</strong> is approved and now visible to workers on Replaceme.
     </p>
     ${detailCard(`
       ${detailRow("Status", `<span style="color:${BRAND.accent};">Active</span>`)}
@@ -410,7 +410,7 @@ export function renderAccountUnsuspendedEmail(input: {
   const subject = "Your Replaceme account has been reactivated";
 
   const bodyHtml = `
-    <p style="margin:0 0 16px 0;">Good news — your Replaceme account is active again. You can sign in and continue as usual.</p>
+    <p style="margin:0 0 16px 0;">Good news: your Replaceme account is active again. You can sign in and continue as usual.</p>
     ${detailCard(`
       ${detailRow("Status", `<span style="color:${BRAND.accent};">Active</span>`)}
       ${detailRow("Account type", escapeHtml(input.roleLabel))}
@@ -444,7 +444,7 @@ export function renderDeletionScheduledEmail(input: {
   const subject = "Your Replaceme account closure is scheduled";
 
   const bodyHtml = `
-    <p style="margin:0 0 16px 0;">Your Replaceme account is scheduled for closure. You keep full access until the date below — contact support before then if you want to cancel.</p>
+    <p style="margin:0 0 16px 0;">Your Replaceme account is scheduled for closure. You keep full access until the date below. Contact support before then if you want to cancel.</p>
     ${detailCard(`
       ${detailRow("Closure date", escapeHtml(input.scheduledForLabel))}
       ${detailRow("Recovery window", `${input.graceDays} calendar days`)}

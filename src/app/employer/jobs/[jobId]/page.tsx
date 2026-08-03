@@ -89,7 +89,7 @@ export default async function JobListingViewPage({ params }: PageProps) {
             feature="identity"
             currentPlan={planSlug}
             variant="secondary"
-            label="Skip the queue — upgrade"
+            label="Skip the queue (upgrade)"
           />
         </div>
       ) : null}

@@ -12,9 +12,9 @@
  *   <FactBox
  *     title="Replaceme Platform Facts"
  *     items={[
- *       { label: "Worker fee", value: "Free — $0 forever" },
+ *       { label: "Worker fee", value: "Free ($0 forever)" },
  *       { label: "Employer pricing", value: "4 flat-rate subscription tiers" },
- *       { label: "Salary commission", value: "0% — workers keep 100%" },
+ *       { label: "Salary commission", value: "0%: workers keep 100%" },
  *     ]}
  *   />
  */

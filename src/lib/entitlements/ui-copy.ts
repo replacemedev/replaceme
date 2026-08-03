@@ -197,7 +197,7 @@ export function featureGateCopy(
       return {
         title: "Early Access on Scale",
         description:
-          "Try new hiring features first with Scale — Early Access to New Features. Upgrade to unlock, or wait until they roll out to all plans.",
+          "Try new hiring features first with Scale: Early Access to New Features. Upgrade to unlock, or wait until they roll out to all plans.",
         tier: "scale",
         price: TIER_PRICES.scale,
         tierLabel: TIER_LABELS.scale,
@@ -232,14 +232,14 @@ export function planDashboardSubhead(
       : `${activeJobsCount} of ${activeJobsLimit} active jobs`;
 
   if (normalizePlanSlug(planSlug) === "discovery") {
-    return `${tier} plan — ${jobsPart}. Candidate profiles are in preview mode until you upgrade.`;
+    return `${tier} plan: ${jobsPart}. Candidate profiles are in preview mode until you upgrade.`;
   }
 
   if (identityMode === "anonymous_preview") {
-    return `${tier} plan — ${jobsPart}. Upgrade for full candidate profiles and messaging.`;
+    return `${tier} plan: ${jobsPart}. Upgrade for full candidate profiles and messaging.`;
   }
 
-  return `${tier} plan — ${jobsPart}. Manage listings and review applicants below.`;
+  return `${tier} plan: ${jobsPart}. Manage listings and review applicants below.`;
 }
 
 export function pinnedPageSubhead(
@@ -252,8 +252,8 @@ export function pinnedPageSubhead(
     pinnedCount === 1 ? "1 pinned worker" : `${pinnedCount} pinned workers`;
 
   if (identityMode === "anonymous_preview") {
-    return `${tier} plan — ${countLabel}. Profiles show preview names until you upgrade.`;
+    return `${tier} plan: ${countLabel}. Profiles show preview names until you upgrade.`;
   }
 
-  return `${tier} plan — ${countLabel}. Compare bookmarked talent and message from one place.`;
+  return `${tier} plan: ${countLabel}. Compare bookmarked talent and message from one place.`;
 }

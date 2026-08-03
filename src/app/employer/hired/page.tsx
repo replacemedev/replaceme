@@ -33,10 +33,10 @@ export default async function HiredPage() {
 
   const subhead =
     planSlug === "scale"
-      ? "Scale plan — manage active contracts, messaging, and team payroll in one place."
+      ? "Scale plan: manage active contracts, messaging, and team payroll in one place."
       : planSlug === "discovery"
-        ? "Discovery plan — review active hires. Upgrade for messaging and unlimited capacity."
-        : `${planSlug.charAt(0).toUpperCase() + planSlug.slice(1)} plan — manage active team members and their contracts.`;
+        ? "Discovery plan: review active hires. Upgrade for messaging and unlimited capacity."
+        : `${planSlug.charAt(0).toUpperCase() + planSlug.slice(1)} plan: manage active team members and their contracts.`;
 
   return (
     <EmployerPageShell className="gap-8">

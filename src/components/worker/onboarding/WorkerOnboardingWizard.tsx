@@ -426,7 +426,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         {...shellProps}
         stepLabel="Top skills"
         title="What are your strongest skills?"
-        description="Pick at least one — these power job matching and your profile."
+        description="Pick at least one. These power job matching and your profile."
         onBack={() => goBack("location")}
         isNextDisabled={skills.length === 0}
         onNext={() => {
@@ -457,7 +457,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         {...shellProps}
         stepLabel="Compensation"
         title="Set your rate expectations"
-        description="Optional — helps employers filter for budget fit. Billing stays in USD on paid plans."
+        description="Optional: helps employers filter for budget fit. Billing stays in USD on paid plans."
         onBack={() => goBack("skills")}
         canSkip
         onSkip={() => goNext("about")}
@@ -538,7 +538,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         {...shellProps}
         stepLabel="About you"
         title="Tell employers your story"
-        description="A short bio builds trust — you can expand this anytime on your profile."
+        description="A short bio builds trust. You can expand this anytime on your profile."
         onBack={() => goBack("compensation")}
         canSkip
         onSkip={() => goNext("project")}
@@ -590,7 +590,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
       {...shellProps}
       stepLabel="Project spotlight"
       title="Showcase a recent project"
-      description="Optional — one strong project helps you stand out in search."
+      description="Optional: one strong project helps you stand out in search."
       onBack={() => goBack("about")}
       canSkip
       onSkip={() => {

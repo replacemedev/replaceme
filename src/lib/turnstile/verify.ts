@@ -119,9 +119,9 @@ export async function requireTurnstileToken(
           errorCodes.includes("missing-input-secret")
             ? "Check TURNSTILE_SECRET_KEY matches the Cloudflare widget secret"
             : errorCodes.includes("timeout-or-duplicate")
-              ? "Token expired or already consumed — reset the widget and retry with a fresh challenge"
+              ? "Token expired or already consumed. Reset the widget and retry with a fresh challenge"
               : errorCodes.includes("invalid-input-response")
-                ? "Token expired or hostname mismatch — verify replaceme.ph is in the Turnstile widget hostnames"
+                ? "Token expired or hostname mismatch. Verify replaceme.ph is in the Turnstile widget hostnames"
                 : undefined,
       });
       return {

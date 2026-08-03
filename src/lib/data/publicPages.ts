@@ -23,7 +23,7 @@ export {
 export const PRICING_PAGE: PricingPageConfig = {
   headline: "Simple, Transparent Pricing",
   description:
-    "Discovery is free ($0). Starter $19/mo, Growth $39/mo, Scale $79/mo — workers always join for free.",
+    "Discovery is free ($0). Starter $19/mo, Growth $39/mo, Scale $79/mo. Workers always join for free.",
 };
 
 export const HELP_INDEX_CATEGORIES = [

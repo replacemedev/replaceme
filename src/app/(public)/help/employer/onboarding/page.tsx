@@ -72,7 +72,7 @@ const STEPS = [
       "Publish your job post with required skills, expected working hours, and salary range.",
     details: [
       "Paid subscribers (Starter, Growth, Scale) receive instant automated job post approvals.",
-      "Free Discovery plan posts are reviewed and approved within 2 business days (they stay pending until an admin decides — no auto-publish).",
+      "Free Discovery plan posts are reviewed and approved within 2 business days (they stay pending until an admin decides with no auto-publish).",
       "If we reject a listing, you receive a reason category so you can revise and resubmit. Soft-deleted listings leave Worker boards but may be retained for Trust & Safety audit.",
       "You can edit or pause your job listing at any time from your Employer Dashboard (except when rejected or soft-deleted by moderation).",
     ],
@@ -87,7 +87,7 @@ const STEPS = [
     details: [
       "Filter applicants by experience, skill ratings, and expected pay.",
       "Use built-in direct messaging (on paid plans) to discuss role details and next steps.",
-      "Hire directly with 0% platform salary markup—pay 100% of agreed compensation directly to your worker.",
+      "Hire directly with 0% platform salary markup. Pay 100% of agreed compensation directly to your worker.",
     ],
   },
 ];

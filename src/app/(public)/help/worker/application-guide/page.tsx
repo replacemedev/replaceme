@@ -86,7 +86,7 @@ const STEPS = [
     details: [
       "Employers on paid plans can message you directly in the platform chat.",
       "Discuss role details, answer screening questions, and agree on start dates.",
-      "Replaceme takes 0% commission from your salary—you receive 100% of your earnings directly from your employer.",
+      "Replaceme takes 0% commission from your salary. You receive 100% of your earnings directly from your employer.",
     ],
   },
 ];

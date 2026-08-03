@@ -10,7 +10,7 @@ export default function EmployerPricingLoading() {
     <EmployerPageShell width="wide" className="gap-10">
       <EmployerPageHeader
         title="Scale your remote team"
-        subhead="Simple, transparent pricing — Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."
+        subhead="Simple, transparent pricing. Discovery is free, then upgrade when you need full profiles, messaging, and instant approval."
         bordered={false}
       />
 

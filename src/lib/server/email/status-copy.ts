@@ -25,7 +25,7 @@ export function workerStatusEmailCopy(
     case "HIRED":
       return {
         tone: "hired",
-        headline: "Congratulations — you're hired!",
+        headline: "Congratulations! You're hired!",
         body: "An employer hired you through Replaceme. Check your dashboard for next steps.",
         shouldNotify: true,
       };
@@ -33,7 +33,7 @@ export function workerStatusEmailCopy(
       return {
         tone: "declined",
         headline: "Application update",
-        body: "This application was declined. Thank you for applying — keep exploring new roles.",
+        body: "This application was declined. Thank you for applying. Keep exploring new roles.",
         shouldNotify: true,
       };
     case "PENDING":

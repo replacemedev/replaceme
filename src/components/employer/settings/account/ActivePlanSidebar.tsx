@@ -67,14 +67,14 @@ function planPriceLines(plan: SubscriptionTier): {
   secondary?: string;
 } {
   if (plan === "discovery") {
-    return { primary: `${formatMoney(0, "USD")} — free forever` };
+    return { primary: `${formatMoney(0, "USD")} (free forever)` };
   }
   const annualMo = TIER_ANNUAL_MONTHLY_EQUIV[plan];
   const annualTotal = TIER_ANNUAL_PRICES[plan];
   const monthly = TIER_PRICES[plan];
   return {
     primary: `From ${formatMoney(annualMo, "USD")}/mo billed annually`,
-    secondary: `${formatMoney(annualTotal, "USD")}/yr · or ${formatMoney(monthly, "USD")}/mo monthly`,
+    secondary: `${formatMoney(annualTotal, "USD")}/yr or ${formatMoney(monthly, "USD")}/mo monthly`,
   };
 }
 

@@ -72,7 +72,7 @@ export function AccountSettingsClient({
       if (result.success) {
         toast.success(
           result.planSlug
-            ? `Plan Synced: ${result.planSlug}`
+            ? `Plan Synced: ${result.planSlug.charAt(0).toUpperCase() + result.planSlug.slice(1)}`
             : "Billing synced from Stripe"
         );
         router.refresh();
@@ -87,7 +87,7 @@ export function AccountSettingsClient({
       if (result.success) {
         toast.success(
           result.planSlug
-            ? `Plan is now ${result.planSlug}`
+            ? `Plan is now ${result.planSlug.charAt(0).toUpperCase() + result.planSlug.slice(1)}`
             : "Billing synced",
           { id: toastId }
         );

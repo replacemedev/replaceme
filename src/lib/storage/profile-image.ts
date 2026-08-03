@@ -73,7 +73,7 @@ export function mapProfileImageUploadError(
   }
 
   if (lower.includes("already exist") || lower.includes("duplicate")) {
-    return `Your ${label} is being updated — please try once more.`;
+    return `Your ${label} is being updated. Please try once more.`;
   }
 
   if (

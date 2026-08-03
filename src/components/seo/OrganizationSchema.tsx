@@ -39,7 +39,7 @@ export function OrganizationSchema() {
           availableLanguage: ["English"],
         },
         description:
-          "Replaceme is a direct-hire Filipino remote talent marketplace connecting global employers with top-tier Filipino professionals — without agency fees or salary commissions.",
+          "Replaceme is a direct-hire Filipino remote talent marketplace connecting global employers with top-tier Filipino professionals. No agency fees or salary commissions.",
         areaServed: {
           "@type": "Country",
           name: "Philippines",
@@ -84,7 +84,7 @@ export function OrganizationSchema() {
           "@id": `${BASE_URL}/#organization`,
         },
         description:
-          "Replaceme is a subscription-based SaaS platform for direct remote hiring. Employers access a curated Filipino talent pool at a flat subscription rate — zero agency markups, zero salary commissions.",
+          "Replaceme is a subscription-based SaaS platform for direct remote hiring. Employers access a curated Filipino talent pool at a flat subscription rate. Zero agency markups, zero salary commissions.",
         featureList: [
           "Direct-hire marketplace",
           "Zero placement fees",
@@ -101,7 +101,7 @@ export function OrganizationSchema() {
         "@id": `${BASE_URL}/#website`,
         url: BASE_URL,
         name: "Replaceme",
-        description: "Hire top Filipino remote talent directly — no agency fees, no middlemen.",
+        description: "Hire top Filipino remote talent directly: no agency fees, no middlemen.",
         publisher: {
           "@id": `${BASE_URL}/#organization`,
         },

@@ -34,7 +34,7 @@ export async function createSubscriptionCheckoutSession(
   }
 
   if (plan.slug === "discovery" || Number(plan.price) <= 0) {
-    return { error: "Discovery is free — no checkout required." };
+    return { error: "Discovery is free. No checkout required." };
   }
 
   const supabase = await createAdminClient();

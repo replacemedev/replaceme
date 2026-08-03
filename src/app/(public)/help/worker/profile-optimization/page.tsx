@@ -86,7 +86,7 @@ const OPTIMIZATION_TIPS = [
     details: [
       "Transparent pay rates help connect you with employers whose budgets align with your experience.",
       "Research standard market rates for your skill level before setting your target salary.",
-      "Remember: Replaceme takes 0% cut from your earnings—100% of your agreed salary goes to you.",
+      "Remember: Replaceme takes 0% cut from your earnings. 100% of your agreed salary goes to you.",
     ],
   },
 ];
