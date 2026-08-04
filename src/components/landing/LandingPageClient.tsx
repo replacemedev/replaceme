@@ -254,7 +254,7 @@ export function LandingPageClient({
           </div>
 
           {/* GEO: CitationBlock row — data-dense facts for LLM citation extraction */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch mt-10 sm:mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch mt-10 sm:mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
             <CitationBlock
               label="Salary Protection"
               headline="Workers receive 100% of their agreed salary"

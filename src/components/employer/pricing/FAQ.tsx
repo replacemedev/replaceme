@@ -32,7 +32,7 @@ const fallbackFaqs: FAQItem[] = [
   {
     question: "Are list prices inclusive of tax?",
     answer:
-      "No. Plan prices are shown in USD tax-exclusive. Stripe Tax may add Australian GST or other destination tax at checkout only when required for your billing location. Most overseas employers often see $0 AU GST. Tax goes to the government—not to Stripe as a fee.",
+      "No. Plan prices are shown in USD tax-exclusive. Stripe Tax may add Australian GST or other destination tax at checkout only when required for your billing location. Most overseas employers often see $0 AU GST. Tax goes to the government, not to Stripe as a fee.",
   },
   {
     question: "What is your refund policy?",

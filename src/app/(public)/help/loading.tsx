@@ -6,19 +6,19 @@ export default function PublicHelpLoading() {
     <main className={`bg-slate-50/50 min-h-[calc(100vh-4rem)] ${PUBLIC_PAGE_TOP}`}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Hero Skeleton */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 md:mb-16 flex flex-col items-center px-2 sm:px-0">
-          <SkeletonBlock className="h-7 w-44 rounded-full bg-slate-200 mb-4 animate-pulse" />
-          <SkeletonBlock className="h-9 sm:h-12 w-3/4 sm:w-2/3 rounded-xl bg-slate-200 mb-4 animate-pulse" />
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-14 flex flex-col items-center px-2 sm:px-0">
+          <SkeletonBlock className="h-8 sm:h-11 md:h-13 w-2/3 sm:w-1/2 rounded-xl bg-slate-200 mb-3 sm:mb-4 animate-pulse" />
           <SkeletonBlock className="h-5 w-full sm:w-5/6 rounded-lg bg-slate-100 animate-pulse mb-1.5" />
           <SkeletonBlock className="h-5 w-4/5 sm:w-2/3 rounded-lg bg-slate-100 animate-pulse" />
         </div>
 
-        {/* 3 Categories Skeletons */}
+        {/* 4 Categories Skeletons matching HELP_INDEX_CATEGORIES */}
         <div className="space-y-10 sm:space-y-14 md:space-y-16">
           {[
-            { id: "cat-1", cardCount: 4 },
-            { id: "cat-2", cardCount: 4 },
-            { id: "cat-3", cardCount: 5 },
+            { id: "employers", cardCount: 3 },
+            { id: "workers", cardCount: 3 },
+            { id: "account", cardCount: 3 },
+            { id: "general", cardCount: 3 },
           ].map((cat) => (
             <section key={cat.id} className="space-y-6">
               {/* Category Header Skeleton */}
@@ -64,3 +64,4 @@ export default function PublicHelpLoading() {
     </main>
   );
 }
+

@@ -19,7 +19,7 @@ export function CitationBlock({
 }: CitationBlockProps) {
   return (
     <article
-      className={`h-full flex flex-col bg-white rounded-2xl border border-slate-100 p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 ${className}`}
+      className={`h-full w-full flex flex-col bg-white rounded-2xl border border-slate-100 p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 ${className}`}
       itemScope
       itemType="https://schema.org/WebPageElement"
     >
@@ -40,11 +40,11 @@ export function CitationBlock({
 
       {stat && (
         <aside
-          className="mt-auto pt-4 sm:pt-6 border-t border-slate-100 flex items-baseline gap-2 sm:gap-2.5"
+          className="mt-auto pt-4 sm:pt-6 border-t border-slate-100 flex items-baseline gap-2 sm:gap-2.5 flex-wrap"
           aria-label={`Key statistic: ${stat}: ${statLabel}`}
         >
           <span
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22c55e] tracking-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22c55e] tracking-tight whitespace-nowrap"
             itemProp="value"
           >
             {stat}
@@ -89,7 +89,7 @@ export function CitationBlockSkeleton({ className = "" }: { className?: string }
 
 export function CitationBlockGridSkeleton({ className = "" }: { className?: string }) {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch ${className}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch ${className}`}>
       <CitationBlockSkeleton />
       <CitationBlockSkeleton />
       <CitationBlockSkeleton />
