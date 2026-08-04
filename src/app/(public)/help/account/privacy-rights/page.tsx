@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Shield } from "lucide-react";
 import {
   APPEAL_SLA_COPY,
   DELETION_REQUEST_SLA,
@@ -27,14 +26,6 @@ export default function PrivacyRightsHelpPage() {
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-slate-50/50 py-6 sm:py-8 md:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
-        <Link
-          href="/help"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#006e2f] hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to Help Center
-        </Link>
-
         <header className="mb-8 max-w-2xl">
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
             Your privacy rights

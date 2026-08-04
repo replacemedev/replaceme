@@ -2,9 +2,6 @@ export function HelpArticleSkeleton() {
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-slate-50/50 py-6 sm:py-8 md:py-12 lg:py-16 animate-pulse">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
-        {/* Back Link Skeleton */}
-        <div className="h-5 w-36 bg-slate-200 rounded-md mb-6" />
-
         {/* Header Skeleton */}
         <header className="mb-8 max-w-2xl">
           <div className="h-8 sm:h-9 md:h-10 w-3/4 sm:w-2/3 bg-slate-200 rounded-xl mb-3" />

@@ -147,12 +147,6 @@ function WorkerOnboardingFallback() {
               <span>Go to Worker Dashboard</span>
               <ArrowRight size={16} className="text-[#006e2f] shrink-0" />
             </Link>
-            <Link
-              href="/help"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition-colors duration-200 border border-emerald-500/30 text-center"
-            >
-              Back to Help Center
-            </Link>
           </div>
         </div>
       </div>
