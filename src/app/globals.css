@@ -85,6 +85,17 @@
   --text-caption: 14px;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 6rem;
+  }
+}
+
 @utility text-display-xl {
   font-size: 64px;
   line-height: 1.1;
