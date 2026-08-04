@@ -47,7 +47,7 @@ const BILLING_RULES = [
   {
     title: "Changing, Canceling & Refunds",
     icon: RefreshCw,
-    copy: "Upgrade, downgrade, or cancel anytime from Employer Settings. Upgrades take effect immediately. Downgrades or cancellations apply at period end. Commenced B2B periods are generally non-refundable except billing errors, mandatory law, or limited goodwill — see the Refund Policy.",
+    copy: "Upgrade, downgrade, or cancel anytime from Employer Settings. Upgrades take effect immediately. Downgrades or cancellations apply at period end. Commenced B2B periods are generally non-refundable except billing errors, mandatory law, or limited goodwill. See the Refund Policy.",
   },
   {
     title: "Direct Worker Payments (0% Commission)",

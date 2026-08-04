@@ -69,7 +69,7 @@ export function TermsOfServiceContent() {
 
       <Section id="1-about" title="1. About Replace Me">
         <p>
-          Replace Me (<strong>replaceme.app</strong>) is an online hiring marketplace that connects employers
+          Replace Me (<strong>replaceme.ph</strong>) is an online hiring marketplace that connects employers
           with remote workers. We provide the platform and tools — but we are not a party to any
           employment or service agreement between employers and workers. Any work arrangements are
           directly between the two parties.

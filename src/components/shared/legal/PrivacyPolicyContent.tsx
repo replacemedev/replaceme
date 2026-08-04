@@ -51,7 +51,7 @@ export function PrivacyPolicyContent() {
 
       {/* Intro */}
       <p className="text-[15px] leading-relaxed text-slate-600 sm:text-base">
-        At Replace Me (<strong>replaceme.app</strong>), we take your privacy seriously. This policy explains what personal
+        At Replace Me (<strong>replaceme.ph</strong>), we take your privacy seriously. This policy explains what personal
         information we collect, why we collect it, and how we protect it. We follow the{" "}
         <strong>Philippines Data Privacy Act of 2012 (RA 10173)</strong> and aim to be as transparent as possible.
       </p>

@@ -77,7 +77,7 @@ export default function CloseDeleteAccountHelpPage() {
                 href="/privacy-policy#6-retention"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy — retention
+                Privacy Policy. Retention
               </Link>
               .
             </p>

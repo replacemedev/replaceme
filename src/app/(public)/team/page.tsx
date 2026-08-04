@@ -35,7 +35,7 @@ export default async function PublicTeamPage() {
         </h1>
         <p className="mb-10 max-w-2xl text-sm leading-relaxed text-slate-500">
           People who keep Replaceme safe and running. Profiles appear here only
-          when a teammate opts in — no emails or phone numbers are published.
+          when a teammate opts in. No emails or phone numbers are published.
         </p>
         <StaffDirectoryGrid
           members={members}

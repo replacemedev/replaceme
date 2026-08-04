@@ -31,7 +31,7 @@ export default function PrivacyRightsHelpPage() {
             Your privacy rights
           </h1>
           <p className="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">
-            Under the Philippine Data Privacy Act (RA 10173)—and GDPR/CCPA where they apply—you can
+            Under the Philippine Data Privacy Act (RA 10173) and GDPR/CCPA where they apply. You can
             ask about, correct, or erase personal data Replaceme holds as controller.
           </p>
         </header>
@@ -59,7 +59,7 @@ export default function PrivacyRightsHelpPage() {
                 href="/privacy-policy#6-retention"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy — retention
+                Privacy Policy. Retention
               </Link>
               .
             </p>
@@ -88,7 +88,7 @@ export default function PrivacyRightsHelpPage() {
                 href="/privacy-policy#7-your-rights"
                 className="font-semibold text-[#006e2f] hover:underline"
               >
-                Privacy Policy — your rights
+                Privacy Policy. Your Rights
               </Link>
               .
             </p>
