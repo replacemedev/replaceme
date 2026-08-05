@@ -182,6 +182,7 @@ ALTER TABLE public.unlocked_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_ux_preferences ENABLE ROW LEVEL SECURITY;
 
 -- 18. Indexes for Database Performance Optimization
 CREATE INDEX idx_profiles_role ON public.profiles(role);
