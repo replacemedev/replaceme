@@ -22,7 +22,13 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function EmployerJobsPage() {
+interface PageProps {
+  searchParams?: Promise<{ q?: string; status?: string; sort?: string }>;
+}
+
+export default async function EmployerJobsPage({ searchParams }: PageProps) {
+  const { q, status, sort } = (await searchParams) ?? {};
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -44,7 +50,7 @@ export default async function EmployerJobsPage() {
   }
 
   const [jobs, planUsage] = await Promise.all([
-    getRecentJobs(profile.id),
+    getRecentJobs(profile.id, { q, status, sort }),
     getEmployerPlanUsage(),
   ]);
 

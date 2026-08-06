@@ -13,6 +13,7 @@ import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { StarRatingInput } from "./StarRatingInput";
 import { ReviewsToolbar, type ReviewStatusFilter } from "./ReviewsToolbar";
 import { Star, CheckCircle2, SearchX } from "lucide-react";
+import { useDebouncedUrlFilter } from "@/hooks/useDebouncedUrlFilter";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -145,10 +146,21 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
 }
 
 export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ReviewStatusFilter>("all");
+  const {
+    searchValue,
+    handleSearchChange,
+    getParam,
+    setParam,
+    resetAllFilters,
+    searchParams,
+  } = useDebouncedUrlFilter({ searchKey: "q", debounceMs: 300 });
 
-  if (workers.length === 0) {
+  const statusFilter = getParam("status", "all") as ReviewStatusFilter;
+
+  const hasActiveFilters =
+    Boolean(searchParams.get("q")) || Boolean(searchParams.get("status"));
+
+  if (workers.length === 0 && !hasActiveFilters) {
     return (
       <EmptyState
         icon={<Star size={22} />}
@@ -166,8 +178,8 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
     if (statusFilter === "reviewed" && !worker.hasReview) return false;
 
     // Search query filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
+    if (searchValue.trim()) {
+      const query = searchValue.toLowerCase().trim();
       if (!worker.workerName.toLowerCase().includes(query)) return false;
     }
 
@@ -178,10 +190,10 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
     <div className="space-y-6">
       {/* Search & Filter Toolbar */}
       <ReviewsToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchQuery={searchValue}
+        onSearchChange={handleSearchChange}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(val) => setParam("status", val)}
         totalCount={workers.length}
         filteredCount={filteredWorkers.length}
       />
@@ -196,15 +208,14 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
             No matching workers found
           </h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            We couldn&apos;t find any hired team members matching &quot;{searchQuery}&quot;.
+            {searchValue.trim()
+              ? `We couldn't find any hired team members matching "${searchValue}".`
+              : "No workers match the selected review status filter."}
           </p>
           <button
             type="button"
-            onClick={() => {
-              setSearchQuery("");
-              setStatusFilter("all");
-            }}
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all mt-2"
+            onClick={resetAllFilters}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all mt-2 cursor-pointer"
           >
             Reset search & filters
           </button>

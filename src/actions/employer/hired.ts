@@ -141,7 +141,11 @@ async function loadHiredDataForEmployer(
  * and dynamically aggregates hiring metrics (active count, payroll, tenure)
  * on the server side.
  */
-export async function getHiredData(): Promise<{
+export async function getHiredData(options?: {
+  q?: string;
+  status?: string;
+  type?: string;
+}): Promise<{
   workers: HiredWorker[];
   stats: HiredStats;
 }> {
@@ -166,11 +170,39 @@ export async function getHiredData(): Promise<{
       return EMPTY_HIRED;
     }
 
-    return getOrSet(
+    const data = await getOrSet(
       CacheKeys.employerHired(profile.id),
       CACHE_TTL_SECONDS.employerHiring,
       () => loadHiredDataForEmployer(profile.id)
     );
+
+    let filteredWorkers = [...data.workers];
+
+    if (options?.status && options.status !== "all") {
+      filteredWorkers = filteredWorkers.filter(
+        (w) => w.status === options.status
+      );
+    }
+
+    if (options?.type && options.type !== "all") {
+      filteredWorkers = filteredWorkers.filter(
+        (w) => w.employmentType === options.type
+      );
+    }
+
+    if (options?.q && options.q.trim()) {
+      const query = options.q.trim().toLowerCase();
+      filteredWorkers = filteredWorkers.filter(
+        (w) =>
+          w.name.toLowerCase().includes(query) ||
+          w.role.toLowerCase().includes(query)
+      );
+    }
+
+    return {
+      workers: filteredWorkers,
+      stats: data.stats,
+    };
   } catch (err) {
     safeError("getHiredData exception: [REDACTED_DB_ERROR]");
     return EMPTY_HIRED;

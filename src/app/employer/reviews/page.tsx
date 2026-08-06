@@ -8,8 +8,13 @@ import {
 export const metadata = { title: "Reviews" };
 export const dynamic = "force-dynamic";
 
-export default async function EmployerReviewsPage() {
-  const workers = await getReviewableWorkers();
+interface PageProps {
+  searchParams?: Promise<{ q?: string; status?: string }>;
+}
+
+export default async function EmployerReviewsPage({ searchParams }: PageProps) {
+  const { q, status } = (await searchParams) ?? {};
+  const workers = await getReviewableWorkers({ q, status });
 
   return (
     <EmployerPageShell width="content">

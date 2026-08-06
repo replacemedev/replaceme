@@ -51,7 +51,14 @@ async function verifyEmployerSession(employerProfileId: string): Promise<boolean
  * Fetches actual job posts for an employer directly from the database.
  * Resolves applicants count and hits (views) count from live records.
  */
-export async function getRecentJobs(employerProfileId: string): Promise<JobPost[]> {
+export async function getRecentJobs(
+  employerProfileId: string,
+  options?: {
+    q?: string;
+    status?: string;
+    sort?: string;
+  }
+): Promise<JobPost[]> {
   const isAuthorized = await verifyEmployerSession(employerProfileId);
   if (!isAuthorized) {
     throw new Error("Unauthorized access");
@@ -93,7 +100,7 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
           return [];
         }
 
-        return jobs.map((job: any) => {
+        let mappedJobs = jobs.map((job: any) => {
           // Match pipeline filters: exclude suspended; visible = in-plan only.
           const countable = (job.applications ?? []).filter(
             (app: { moderation_status?: string }) =>
@@ -115,6 +122,41 @@ export async function getRecentJobs(employerProfileId: string): Promise<JobPost[
             priority_score: Number(job.priority_score ?? 0),
           };
         });
+
+        if (options?.status && options.status !== "all") {
+          mappedJobs = mappedJobs.filter((j) => j.status === options.status);
+        }
+
+        if (options?.q && options.q.trim()) {
+          const query = options.q.trim().toLowerCase();
+          mappedJobs = mappedJobs.filter((j) =>
+            j.title.toLowerCase().includes(query)
+          );
+        }
+
+        if (options?.sort) {
+          mappedJobs.sort((a, b) => {
+            switch (options.sort) {
+              case "oldest":
+                return (
+                  new Date(a.created_at).getTime() -
+                  new Date(b.created_at).getTime()
+                );
+              case "applicants":
+                return b.applicants_count - a.applicants_count;
+              case "views":
+                return b.hits_count - a.hits_count;
+              case "newest":
+              default:
+                return (
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+                );
+            }
+          });
+        }
+
+        return mappedJobs;
       }
     );
   } catch (err) {

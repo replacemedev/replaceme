@@ -21,9 +21,14 @@ export const metadata = {
     "Manage your active team members, view contract terms, and monitor monthly payroll statistics.",
 };
 
-export default async function HiredPage() {
+interface PageProps {
+  searchParams?: Promise<{ q?: string; status?: string; type?: string }>;
+}
+
+export default async function HiredPage({ searchParams }: PageProps) {
+  const { q, status, type } = (await searchParams) ?? {};
   const [{ workers, stats }, planUsage] = await Promise.all([
-    getHiredData(),
+    getHiredData({ q, status, type }),
     getEmployerPlanUsage(),
   ]);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { Briefcase, Search, ArrowUpDown } from "lucide-react";
 import type { JobPost } from "@/types/employer";
@@ -9,6 +9,7 @@ import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 import { EmptyState } from "@/components/shared/EmptyState";
 import type { EmployerPlanUsage } from "@/lib/server/entitlements";
 import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
+import { useDebouncedUrlFilter } from "@/hooks/useDebouncedUrlFilter";
 
 type StatusFilter =
   | "all"
@@ -46,12 +47,25 @@ export function JobsListClient({
   planUsage,
   applicantsPerJobLimit,
 }: JobsListClientProps) {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("newest");
+  const {
+    searchValue,
+    handleSearchChange,
+    getParam,
+    setParam,
+    resetAllFilters,
+    searchParams,
+  } = useDebouncedUrlFilter({ searchKey: "q", debounceMs: 300 });
+
+  const statusFilter = getParam("status", "all") as StatusFilter;
+  const sortKey = getParam("sort", "newest") as SortKey;
+
+  const hasActiveFilters =
+    Boolean(searchParams.get("q")) ||
+    Boolean(searchParams.get("status")) ||
+    Boolean(searchParams.get("sort"));
 
   const filteredJobs = useMemo(() => {
-    const query = search.trim().toLowerCase();
+    const query = searchValue.trim().toLowerCase();
 
     let result = jobs.filter((job) => {
       const matchesSearch =
@@ -82,9 +96,9 @@ export function JobsListClient({
     });
 
     return result;
-  }, [jobs, search, statusFilter, sortKey]);
+  }, [jobs, searchValue, statusFilter, sortKey]);
 
-  if (jobs.length === 0) {
+  if (jobs.length === 0 && !hasActiveFilters) {
     return (
       <div className="space-y-4">
         <EmptyState
@@ -126,8 +140,8 @@ export function JobsListClient({
           <input
             type="search"
             placeholder="Search job titles..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchValue}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30 focus:bg-white transition-all font-medium"
           />
         </div>
@@ -142,7 +156,7 @@ export function JobsListClient({
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => setStatusFilter(opt.value)}
+                onClick={() => setParam("status", opt.value)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                   statusFilter === opt.value
                     ? "bg-[#006e2f] text-white"
@@ -161,7 +175,7 @@ export function JobsListClient({
             </span>
             <select
               value={sortKey}
-              onChange={(e) => setSortKey(e.target.value as SortKey)}
+              onChange={(e) => setParam("sort", e.target.value)}
               className="bg-transparent focus:outline-none cursor-pointer text-right sm:text-left flex-1 sm:flex-initial"
               aria-label="Sort jobs"
             >
@@ -176,22 +190,29 @@ export function JobsListClient({
       </div>
 
       {filteredJobs.length === 0 ? (
-        <div className={`${EMPLOYER_CARD} p-10 text-center`}>
+        <div className={`${EMPLOYER_CARD} p-10 text-center space-y-3`}>
           <p className="text-sm font-bold text-slate-800">
             No jobs match your filters
           </p>
-          <p className="text-xs text-slate-500 font-medium mt-2">
+          <p className="text-xs text-slate-500 font-medium">
             Try a different status or search term.
           </p>
+          <button
+            type="button"
+            onClick={resetAllFilters}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+          >
+            Reset search & filters
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                applicantsPerJobLimit={applicantsPerJobLimit}
-              />
+            <JobCard
+              key={job.id}
+              job={job}
+              applicantsPerJobLimit={applicantsPerJobLimit}
+            />
           ))}
         </div>
       )}

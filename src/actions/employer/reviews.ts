@@ -25,7 +25,10 @@ export interface ReviewableWorker {
   isVerified: boolean;
 }
 
-export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
+export async function getReviewableWorkers(options?: {
+  q?: string;
+  status?: string;
+}): Promise<ReviewableWorker[]> {
   const { supabase, profile } = await requireRole("employer");
 
   const { data: contracts } = await supabase
@@ -48,7 +51,7 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
 
   const reviewed = new Set((existing ?? []).map((r) => r.worker_id));
 
-  return (contracts ?? []).map((c) => {
+  let results = (contracts ?? []).map((c) => {
     const worker = c.profiles as {
       first_name?: string;
       middle_name?: string | null;
@@ -72,6 +75,19 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
       isVerified: Boolean(worker?.is_verified),
     };
   });
+
+  if (options?.status === "pending") {
+    results = results.filter((w) => !w.hasReview);
+  } else if (options?.status === "reviewed") {
+    results = results.filter((w) => w.hasReview);
+  }
+
+  if (options?.q && options.q.trim()) {
+    const term = options.q.trim().toLowerCase();
+    results = results.filter((w) => w.workerName.toLowerCase().includes(term));
+  }
+
+  return results;
 }
 
 export async function submitEmployerReview(payload: unknown) {

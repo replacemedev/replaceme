@@ -10,6 +10,7 @@ import { EmployerPageShell } from "@/components/employer/layout";
 
 interface PageProps {
   params: Promise<{ jobId: string }>;
+  searchParams?: Promise<{ q?: string; status?: string; sort?: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -21,7 +22,8 @@ export async function generateMetadata({ params }: PageProps) {
   };
 }
 
-export default async function ApplicantsPage({ params }: PageProps) {
+export default async function ApplicantsPage({ params, searchParams }: PageProps) {
+  const { q, status, sort } = (await searchParams) ?? {};
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -45,7 +47,7 @@ export default async function ApplicantsPage({ params }: PageProps) {
   // Parallel fetch: Job Details (for metadata/title) and Applicants
   const [job, applicantsData, planUsage] = await Promise.all([
     getJobById(jobId),
-    getApplicants(jobId),
+    getApplicants(jobId, { q, status, sort }),
     getEmployerPlanUsage(),
   ]);
 

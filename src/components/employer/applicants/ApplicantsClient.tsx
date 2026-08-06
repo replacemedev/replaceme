@@ -26,6 +26,7 @@ import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHea
 import { updateApplicationStatus, deleteApplication } from "@/actions/applications";
 import { ApplicationStatus } from "@/types/applications";
 import { toast } from "sonner";
+import { useDebouncedUrlFilter } from "@/hooks/useDebouncedUrlFilter";
 
 interface ApplicantsClientProps {
   initialApplicants: Applicant[];
@@ -56,9 +57,17 @@ export function ApplicantsClient({
   const [isPending, startTransition] = useTransition();
   const { openThread } = useOpenEmployerMessagingThread();
   const [applicants, setApplicants] = useState<Applicant[]>(initialApplicants);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ApplicantStatusFilter>("all");
-  const [sortKey, setSortKey] = useState<ApplicantSortKey>("newest");
+  const {
+    searchValue,
+    handleSearchChange,
+    getParam,
+    setParam,
+    resetAllFilters,
+    searchParams,
+  } = useDebouncedUrlFilter({ searchKey: "q", debounceMs: 300 });
+
+  const statusFilter = getParam("status", "all") as ApplicantStatusFilter;
+  const sortKey = getParam("sort", "newest") as ApplicantSortKey;
   const [viewMode, setViewMode] = useState<"pipeline" | "cards" | "table">("pipeline");
   const [hiringApp, setHiringApp] = useState<{ id: string; name: string } | null>(null);
   const [expandedMobileStage, setExpandedMobileStage] = useState<ApplicationStatus | null>("PENDING");
@@ -141,7 +150,7 @@ export function ApplicantsClient({
   };
 
   const filteredApplicants = useMemo(() => {
-    const query = searchQuery.toLowerCase();
+    const query = searchValue.toLowerCase();
 
     let result = applicants.filter((app) => {
       const matchesSearch =
@@ -173,7 +182,7 @@ export function ApplicantsClient({
     });
 
     return result;
-  }, [applicants, searchQuery, statusFilter, sortKey]);
+  }, [applicants, searchValue, statusFilter, sortKey]);
 
   const tableRows: ApplicantTrackerRow[] = useMemo(
     () =>
@@ -259,13 +268,13 @@ export function ApplicantsClient({
       ) : null}
 
       <ApplicantsToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchQuery={searchValue}
+        onSearchChange={handleSearchChange}
         totalCount={filteredApplicants.length}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(val) => setParam("status", val)}
         sortKey={sortKey}
-        onSortKeyChange={setSortKey}
+        onSortKeyChange={(val) => setParam("sort", val)}
       />
 
       <div className="flex items-center gap-2">
@@ -305,14 +314,21 @@ export function ApplicantsClient({
       </div>
 
       {filteredApplicants.length === 0 ? (
-        <div className="rounded-3xl border border-slate-100 bg-white p-16 text-center shadow-sm">
+        <div className="rounded-3xl border border-slate-100 bg-white p-16 text-center shadow-sm space-y-3">
           <div className="w-16 h-16 bg-slate-50 border border-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-5">
             <AlertCircle className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-slate-800">No candidates found</h3>
-          <p className="text-sm text-slate-500 font-medium mt-2 max-w-xs mx-auto leading-relaxed">
+          <p className="text-sm text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">
             No applicant matches the filter criteria or search keyword.
           </p>
+          <button
+            type="button"
+            onClick={resetAllFilters}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer mt-2"
+          >
+            Reset search & filters
+          </button>
         </div>
       ) : (
         <>

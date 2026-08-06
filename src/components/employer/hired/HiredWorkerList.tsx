@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { HiredWorker } from "@/types/employer/hired";
 import { HiredWorkerCard } from "./HiredWorkerCard";
 import {
@@ -9,6 +9,7 @@ import {
   HiredTypeFilter,
 } from "./HiredToolbar";
 import { SearchX, RotateCcw } from "lucide-react";
+import { useDebouncedUrlFilter } from "@/hooks/useDebouncedUrlFilter";
 
 interface HiredWorkerListProps {
   workers: HiredWorker[];
@@ -21,15 +22,28 @@ export function HiredWorkerList({
   planSlug,
   messagingEnabled = true,
 }: HiredWorkerListProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<HiredStatusFilter>("all");
-  const [typeFilter, setTypeFilter] = useState<HiredTypeFilter>("all");
+  const {
+    searchValue,
+    handleSearchChange,
+    getParam,
+    setParam,
+    resetAllFilters,
+    searchParams,
+  } = useDebouncedUrlFilter({ searchKey: "q", debounceMs: 300 });
+
+  const statusFilter = getParam("status", "all") as HiredStatusFilter;
+  const typeFilter = getParam("type", "all") as HiredTypeFilter;
+
+  const hasActiveFilters =
+    Boolean(searchParams.get("q")) ||
+    Boolean(searchParams.get("status")) ||
+    Boolean(searchParams.get("type"));
 
   const filteredWorkers = useMemo(() => {
     return workers.filter((worker) => {
       // Search query filter (name or role)
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
+      if (searchValue.trim()) {
+        const q = searchValue.toLowerCase().trim();
         const matchName = worker.name.toLowerCase().includes(q);
         const matchRole = worker.role.toLowerCase().includes(q);
         if (!matchName && !matchRole) return false;
@@ -47,15 +61,9 @@ export function HiredWorkerList({
 
       return true;
     });
-  }, [workers, searchQuery, statusFilter, typeFilter]);
+  }, [workers, searchValue, statusFilter, typeFilter]);
 
-  const handleResetFilters = () => {
-    setSearchQuery("");
-    setStatusFilter("all");
-    setTypeFilter("all");
-  };
-
-  if (workers.length === 0) {
+  if (workers.length === 0 && !hasActiveFilters) {
     return null;
   }
 
@@ -63,12 +71,12 @@ export function HiredWorkerList({
     <div className="space-y-6">
       {/* Responsive Search & Filter Toolbar */}
       <HiredToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchQuery={searchValue}
+        onSearchChange={handleSearchChange}
         statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
+        onStatusFilterChange={(val) => setParam("status", val)}
         typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
+        onTypeFilterChange={(val) => setParam("type", val)}
         totalCount={workers.length}
         filteredCount={filteredWorkers.length}
       />
@@ -98,7 +106,7 @@ export function HiredWorkerList({
           </p>
           <button
             type="button"
-            onClick={handleResetFilters}
+            onClick={resetAllFilters}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 cursor-pointer mt-2"
           >
             <RotateCcw size={14} />

@@ -260,7 +260,14 @@ async function loadApplicantsForJob(
 /**
  * Fetch applicants for a job with entitlement-aware identity (preview vs full).
  */
-export async function getApplicants(jobId: string): Promise<{
+export async function getApplicants(
+  jobId: string,
+  options?: {
+    q?: string;
+    status?: string;
+    sort?: string;
+  }
+): Promise<{
   applicants: Applicant[];
   creditsBalance: number;
   identityMode: BillingIdentityMode;
@@ -293,11 +300,52 @@ export async function getApplicants(jobId: string): Promise<{
       };
     }
 
-    return getOrSet(
+    const result = await getOrSet(
       CacheKeys.employerApplicants(profile.id, parsed.jobId),
       CACHE_TTL_SECONDS.applicants,
       () => loadApplicantsForJob(supabase, profile.id, parsed.jobId)
     );
+
+    let filtered = [...result.applicants];
+
+    if (options?.status && options.status !== "all") {
+      filtered = filtered.filter((a) => a.status === options.status);
+    }
+
+    if (options?.q && options.q.trim()) {
+      const query = options.q.trim().toLowerCase();
+      filtered = filtered.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.role.toLowerCase().includes(query) ||
+          a.skills.some((s) => s.toLowerCase().includes(query))
+      );
+    }
+
+    if (options?.sort) {
+      filtered.sort((a, b) => {
+        switch (options.sort) {
+          case "oldest":
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          case "match":
+            return b.matchScore - a.matchScore;
+          case "name":
+            return a.name.localeCompare(b.name);
+          case "newest":
+          default:
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+        }
+      });
+    }
+
+    return {
+      ...result,
+      applicants: filtered,
+    };
   } catch (err) {
     safeError("getApplicants error occurred:", err);
     return {
