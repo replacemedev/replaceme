@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Building2, Upload, Loader2, X } from "lucide-react";
 import { LogoImage } from "@/components/shared/media/LogoImage";
+import { AvatarCropDialog } from "@/components/shared/AvatarCropDialog";
 import { uploadCompanyLogo } from "@/actions/employer/company";
 import { toast } from "sonner";
 import {
@@ -17,28 +18,25 @@ export function LogoUpload() {
   const { setValue, watch } = useFormContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropMeta, setCropMeta] = useState<{
+    fileName: string;
+    mimeType: string;
+  } | null>(null);
 
   const logoUrl = watch("logoUrl");
+
+  useEffect(() => {
+    return () => {
+      if (cropSrc) URL.revokeObjectURL(cropSrc);
+    };
+  }, [cropSrc]);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Client-side quick checks
-    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      toast.error(profileImageSizeError());
-      return;
-    }
-
-    if (!resolveProfileImageMime(file)) {
-      toast.error("Only JPG and PNG allowed.");
-      return;
-    }
-
+  const uploadFile = async (file: File) => {
     setIsUploading(true);
     const toastId = toast.loading("Uploading logo...");
 
@@ -54,15 +52,41 @@ export function LogoUpload() {
         setValue("logoUrl", result.logoUrl, { shouldValidate: true });
         toast.success("Logo uploaded successfully!", { id: toastId });
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to upload image. Please try again.", { id: toastId });
     } finally {
       setIsUploading(false);
-      // Reset input value to allow uploading the same file again
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      toast.error(profileImageSizeError());
+      return;
+    }
+
+    const mimeType = resolveProfileImageMime(file);
+    if (!mimeType) {
+      toast.error("Only JPG and PNG allowed.");
+      return;
+    }
+
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(URL.createObjectURL(file));
+    setCropMeta({ fileName: file.name, mimeType });
+  };
+
+  const closeCrop = () => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    setCropMeta(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRemoveLogo = () => {
@@ -138,6 +162,19 @@ export function LogoUpload() {
           {logoUrl ? "Change Image" : "Upload Image"}
         </button>
       </div>
+
+      <AvatarCropDialog
+        open={Boolean(cropSrc && cropMeta)}
+        imageSrc={cropSrc}
+        fileName={cropMeta?.fileName ?? "logo.jpg"}
+        mimeType={cropMeta?.mimeType ?? "image/jpeg"}
+        shape="square"
+        onCancel={closeCrop}
+        onConfirm={(file) => {
+          closeCrop();
+          void uploadFile(file);
+        }}
+      />
     </div>
   );
 }

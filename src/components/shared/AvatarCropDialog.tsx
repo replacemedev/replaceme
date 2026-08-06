@@ -14,6 +14,7 @@ type AvatarCropDialogProps = {
   mimeType: string;
   onCancel: () => void;
   onConfirm: (file: File) => void;
+  shape?: "circle" | "square";
 };
 
 export function AvatarCropDialog({
@@ -23,6 +24,7 @@ export function AvatarCropDialog({
   mimeType,
   onCancel,
   onConfirm,
+  shape = "circle",
 }: AvatarCropDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -144,15 +146,21 @@ export function AvatarCropDialog({
         role="document"
       >
         <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="text-base font-extrabold text-slate-900">Crop photo</h2>
+          <h2 className="text-base font-extrabold text-slate-900">
+            {shape === "square" ? "Crop logo" : "Crop photo"}
+          </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Drag to reposition. Zoom to frame your face in the circle.
+            {shape === "square"
+              ? "Drag to reposition. Zoom to frame your logo in the square."
+              : "Drag to reposition. Zoom to frame your face in the circle."}
           </p>
         </div>
 
+
         <div className="space-y-4 p-5">
           <div
-            className="relative mx-auto touch-none select-none overflow-hidden rounded-full border border-slate-200 bg-slate-100"
+            className={`relative mx-auto touch-none select-none overflow-hidden border border-slate-200 bg-slate-100 ${shape === "square" ? "rounded-2xl" : "rounded-full"
+              }`}
             style={{ width: VIEWPORT, height: VIEWPORT }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}

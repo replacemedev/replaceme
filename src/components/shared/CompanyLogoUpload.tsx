@@ -5,6 +5,7 @@ import { Building2, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { uploadCompanyLogo } from "@/actions/employer/company";
 import { LogoImage } from "@/components/shared/media/LogoImage";
+import { AvatarCropDialog } from "@/components/shared/AvatarCropDialog";
 import {
   PROFILE_IMAGE_MAX_BYTES,
   companyLogoHelperText,
@@ -39,27 +40,26 @@ export function CompanyLogoUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(logoUrl);
   const [isUploading, setIsUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropMeta, setCropMeta] = useState<{
+    fileName: string;
+    mimeType: string;
+  } | null>(null);
 
   useEffect(() => {
     setPreviewUrl(logoUrl);
   }, [logoUrl]);
 
+  useEffect(() => {
+    return () => {
+      if (cropSrc) URL.revokeObjectURL(cropSrc);
+    };
+  }, [cropSrc]);
+
   const sizeClass = SIZE_CLASSES[size];
   const label = companyName.trim() || "Company";
 
-  const handleFile = async (file: File) => {
-    if (!editable || isUploading) return;
-
-    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
-      toast.error(profileImageSizeError());
-      return;
-    }
-
-    if (!resolveProfileImageMime(file)) {
-      toast.error("Only JPG and PNG allowed.");
-      return;
-    }
-
+  const uploadFile = async (file: File) => {
     setIsUploading(true);
     const toastId = toast.loading("Uploading logo…");
 
@@ -84,6 +84,32 @@ export function CompanyLogoUpload({
       setIsUploading(false);
       if (inputRef.current) inputRef.current.value = "";
     }
+  };
+
+  const handleFile = (file: File) => {
+    if (!editable || isUploading) return;
+
+    if (file.size > PROFILE_IMAGE_MAX_BYTES) {
+      toast.error(profileImageSizeError());
+      return;
+    }
+
+    const mimeType = resolveProfileImageMime(file);
+    if (!mimeType) {
+      toast.error("Only JPG and PNG allowed.");
+      return;
+    }
+
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(URL.createObjectURL(file));
+    setCropMeta({ fileName: file.name, mimeType });
+  };
+
+  const closeCrop = () => {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    setCropMeta(null);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   if (!editable) {
@@ -151,13 +177,26 @@ export function CompanyLogoUpload({
         className="sr-only"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) void handleFile(file);
+          if (file) handleFile(file);
         }}
       />
 
       <p className="max-w-xs text-center text-xs font-medium leading-relaxed text-slate-500">
         {helperText ?? companyLogoHelperText()}
       </p>
+
+      <AvatarCropDialog
+        open={Boolean(cropSrc && cropMeta)}
+        imageSrc={cropSrc}
+        fileName={cropMeta?.fileName ?? "logo.jpg"}
+        mimeType={cropMeta?.mimeType ?? "image/jpeg"}
+        shape="square"
+        onCancel={closeCrop}
+        onConfirm={(file) => {
+          closeCrop();
+          void uploadFile(file);
+        }}
+      />
     </div>
   );
 }
