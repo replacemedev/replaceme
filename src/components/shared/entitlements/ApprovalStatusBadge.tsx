@@ -16,8 +16,8 @@ function normalizeStatus(status: string): string {
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
   pending: "bg-amber-50 text-amber-800 border-amber-200",
-  rejected: "bg-slate-100 text-slate-700 border-slate-200",
-  deleted: "bg-slate-100 text-slate-700 border-slate-200",
+  rejected: "bg-red-50 text-red-800 border-red-200",
+  deleted: "bg-red-50 text-red-800 border-red-200",
   closed: "bg-slate-100 text-slate-700 border-slate-200",
 };
 

@@ -73,6 +73,10 @@ export function JobHeader({
     case "Pending Review":
       statusBadgeClasses = "bg-amber-50 text-amber-800 border-amber-200";
       break;
+    case "Rejected":
+    case "Deleted":
+      statusBadgeClasses = "bg-red-50 text-red-800 border-red-200";
+      break;
     default:
       statusBadgeClasses = "bg-slate-100 text-slate-700 border-slate-200";
       break;

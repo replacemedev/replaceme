@@ -389,7 +389,9 @@ export function ApplicantsClient({
                       className="flex items-center justify-between w-full p-4 font-bold text-sm text-slate-800 hover:bg-slate-50 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-slate-400" />
+                        <span className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                          stage.key === "REJECTED" ? "bg-red-500" : "bg-emerald-500"
+                        }`} />
                         <span>{stage.label}</span>
                         <span className="rounded-full bg-slate-50 border border-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">
                           {stageApps.length}

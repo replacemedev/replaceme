@@ -19,7 +19,10 @@ interface ApplicationStatusDropdownProps {
   candidateName?: string;
 }
 
-function selectStyles(_status: ApplicationStatus): string {
+function selectStyles(status: ApplicationStatus): string {
+  if (status === "REJECTED") {
+    return "border-red-200 bg-red-50 text-red-800 focus:ring-red-500/30";
+  }
   return "border-[#006e2f]/25 bg-[#ebfdf2] text-[#006e2f] focus:ring-[#006e2f]/30";
 }
 

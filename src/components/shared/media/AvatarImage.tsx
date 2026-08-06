@@ -88,7 +88,7 @@ export function AvatarImage({
       height={px}
       sizes={`${px}px`}
       priority={priority}
-      className={`${className} ${roundClass}`}
+      className={`w-full h-full object-cover ${className} ${roundClass}`}
       containerClassName={boxClass}
       transform={{
         width: retinaTransformWidth(px),

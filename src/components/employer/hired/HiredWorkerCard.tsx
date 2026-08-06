@@ -82,6 +82,7 @@ export function HiredWorkerCard({
       case "paused":
         return { dot: "bg-amber-500", text: "text-amber-800 bg-amber-50 border-amber-200" };
       case "terminated":
+        return { dot: "bg-red-500", text: "text-red-800 bg-red-50 border-red-200" };
       default:
         return { dot: "bg-slate-400", text: "text-slate-700 bg-slate-100 border-slate-200" };
     }
@@ -90,7 +91,7 @@ export function HiredWorkerCard({
   const statusStyle = getStatusStyle();
 
   return (
-    <div className="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-md hover:border-slate-200/50 transition-all duration-300 animate-fadeIn">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all duration-200">
       {/* Left Area: Profile Details */}
       <div className="flex items-center gap-4 shrink-0 min-w-0 lg:max-w-md">
         <AvatarImage
@@ -99,7 +100,7 @@ export function HiredWorkerCard({
           initials={initials}
           size="sm"
           rounded="2xl"
-          containerClassName="border border-slate-100 bg-emerald-50"
+          containerClassName="border border-slate-200/80 bg-slate-100 shadow-xs"
         />
 
         <div className="min-w-0">

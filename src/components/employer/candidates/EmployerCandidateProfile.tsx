@@ -1,7 +1,7 @@
 "use client";
 
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { ExternalLink, MapPin, Briefcase, Clock, Wallet, Mail, MessageSquare, Phone } from "lucide-react";
+import { ExternalLink, MapPin, Briefcase, Clock, Wallet, Mail, MessageSquare, Phone, Sparkles, FileText, FolderGit2, UserCheck, User } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
@@ -91,17 +91,16 @@ export function EmployerCandidateProfile({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 space-y-6">
           {/* Header Card Upgrade */}
-          <header className="relative bg-gradient-to-br from-emerald-50/20 via-white to-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-            <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-[#ebfdf2] shadow-sm">
-              <AvatarImage
-                src={candidate.avatarUrl}
-                alt={candidate.name}
-                initials={initials}
-                size="md"
-                rounded="2xl"
-              />
-            </div>
-            <div className="space-y-2 flex-1">
+          <header className="relative bg-gradient-to-br from-emerald-50/20 via-white to-slate-50/30 border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left transition-all hover:border-slate-300/80">
+            <AvatarImage
+              src={candidate.avatarUrl}
+              alt={candidate.name}
+              initials={initials}
+              size="md"
+              rounded="2xl"
+              containerClassName="h-20 w-20 sm:h-24 sm:w-24 aspect-square shadow-sm border border-slate-200/80 bg-slate-100 shrink-0"
+            />
+            <div className="space-y-2 flex-1 min-w-0">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 inline-flex flex-wrap items-center justify-center sm:justify-start gap-1.5 min-w-0">
                 <span className="truncate min-w-0 max-w-full">{candidate.name}</span>
                 <VerifiedBadge show={candidate.isVerified} size="md" />
@@ -117,18 +116,18 @@ export function EmployerCandidateProfile({
 
           {/* Compensation & Availability Grouped Card */}
           {(salary || candidate.hourlyRate != null || candidate.availability) && (
-            <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                <Wallet className="h-4 w-4 text-slate-500" />
+            <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-6 transition-all hover:border-slate-300/80">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                <Wallet className="h-4.5 w-4.5 text-emerald-700" />
                 Compensation &amp; Availability
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100/60">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                 {salary && (
                   <div className="space-y-1">
                     <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">
                       Expected Monthly Salary
                     </span>
-                    <p className="text-lg font-extrabold text-[#006e2f]">{salary}</p>
+                    <p className="text-lg font-extrabold text-emerald-700">{salary}</p>
                   </div>
                 )}
                 {candidate.hourlyRate != null && (
@@ -136,7 +135,7 @@ export function EmployerCandidateProfile({
                     <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">
                       Target Hourly Rate
                     </span>
-                    <p className="text-lg font-extrabold text-[#006e2f]">
+                    <p className="text-lg font-extrabold text-emerald-700">
                       <span className={isPreview ? "blur-xs select-none" : ""}>
                         {formatMoney(candidate.hourlyRate, candidate.salaryCurrency, {
                           perHour: true,
@@ -151,7 +150,7 @@ export function EmployerCandidateProfile({
                       Availability
                     </span>
                     <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5 mt-0.5">
-                      <Clock className="h-4 w-4 text-slate-400" />
+                      <Clock className="h-4 w-4 text-emerald-700 shrink-0" />
                       {isPreview ? (
                         <span className="blur-xs select-none">Full-time (40 hrs/wk)</span>
                       ) : (
@@ -165,17 +164,18 @@ export function EmployerCandidateProfile({
           )}
 
           {/* Skills & Experience Card */}
-          <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-4 transition-all hover:border-slate-300/80">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+              <Sparkles className="h-4.5 w-4.5 text-emerald-700" />
               Skills &amp; Expertise
             </h2>
-            <div className="pt-2 border-t border-slate-100/60">
+            <div className="pt-2 border-t border-slate-100">
               {detailedSkills ? (
                 <div className="flex flex-wrap gap-2">
                   {detailedSkills.map((skill) => (
                     <span
                       key={skill.id ?? skill.skill_name}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100 hover:border-slate-300"
+                      className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-emerald-50/60 hover:border-emerald-200 hover:text-emerald-900"
                     >
                       {skill.skill_name}
                       {skill.proficiency_label ? (
@@ -189,7 +189,7 @@ export function EmployerCandidateProfile({
                   {candidate.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-100 hover:border-slate-300"
+                      className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:bg-emerald-50/60 hover:border-emerald-200 hover:text-emerald-900"
                     >
                       {skill}
                     </span>
@@ -201,9 +201,9 @@ export function EmployerCandidateProfile({
             </div>
 
             <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-sm text-slate-600">
-              <Briefcase className="h-4 w-4 text-slate-400 shrink-0" aria-hidden />
+              <Briefcase className="h-4.5 w-4.5 text-emerald-700 shrink-0" aria-hidden />
               <span>
-                <strong>{candidate.experienceYears} years</strong> of professional experience
+                <strong className="text-slate-900">{candidate.experienceYears} years</strong> of professional experience
               </span>
             </div>
           </section>
@@ -283,20 +283,22 @@ export function EmployerCandidateProfile({
           ) : (
             <>
               {coverLetter && (
-                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-4 transition-all hover:border-slate-300/80">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <FileText className="h-4.5 w-4.5 text-emerald-700" />
                     Application Message
                   </h2>
-                  <div className="pt-4 border-t border-slate-100/60 prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                  <div className="pt-4 border-t border-slate-100 prose prose-slate max-w-none text-slate-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
                     {coverLetter}
                   </div>
                 </section>
               )}
 
               {candidate.workerProjects.length > 0 && (
-                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Project highlights
+                <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-4 transition-all hover:border-slate-300/80">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <FolderGit2 className="h-4.5 w-4.5 text-emerald-700" />
+                    Project Highlights
                   </h2>
                   <ul className="divide-y divide-slate-100 pt-2">
                     {candidate.workerProjects.map((project, idx) => (
@@ -306,13 +308,13 @@ export function EmployerCandidateProfile({
                             {project.title}
                           </h3>
                           {project.year ? (
-                            <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                            <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
                               {project.year}
                             </span>
                           ) : null}
                         </div>
                         {project.role ? (
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                             {project.role}
                           </p>
                         ) : null}
@@ -324,7 +326,7 @@ export function EmployerCandidateProfile({
                         {project.skills_used && project.skills_used.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5 pt-1.5">
                             {project.skills_used.map((sku) => (
-                              <span key={sku} className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 rounded px-2 py-0.5">
+                              <span key={sku} className="text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded px-2 py-0.5">
                                 {sku}
                               </span>
                             ))}
@@ -339,15 +341,16 @@ export function EmployerCandidateProfile({
               {(candidate.location ||
                 candidate.portfolioUrl ||
                 (contactMethods && contactMethods.length > 0)) && (
-                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-4">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Contact &amp; location
+                <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-4 transition-all hover:border-slate-300/80">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <UserCheck className="h-4.5 w-4.5 text-emerald-700" />
+                    Contact &amp; Location
                   </h2>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-sm">
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 text-sm">
                     {candidate.location ? (
                       <div className="flex items-start gap-2 text-slate-600">
                         <MapPin
-                          className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
+                          className="h-4.5 w-4.5 shrink-0 text-emerald-700 mt-0.5"
                           aria-hidden
                         />
                         <div className="space-y-0.5">
@@ -390,7 +393,7 @@ export function EmployerCandidateProfile({
                         return (
                           <div key={idx} className="flex items-start gap-2 text-slate-600">
                             <Icon
-                              className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
+                              className="h-4.5 w-4.5 shrink-0 text-emerald-700 mt-0.5"
                               aria-hidden
                             />
                             <div className="space-y-0.5 min-w-0 flex-1">
@@ -403,7 +406,7 @@ export function EmployerCandidateProfile({
                                     href={href}
                                     target={typeLower !== "email" && typeLower !== "phone" ? "_blank" : undefined}
                                     rel={typeLower !== "email" && typeLower !== "phone" ? "noopener noreferrer" : undefined}
-                                    className="font-semibold text-slate-800 hover:text-[#006e2f] transition-colors"
+                                    className="font-semibold text-slate-800 hover:text-emerald-700 transition-colors"
                                   >
                                     {method.value}
                                   </a>
@@ -420,7 +423,7 @@ export function EmployerCandidateProfile({
                     {candidate.portfolioUrl ? (
                       <div className="flex items-start gap-2 sm:col-span-2">
                         <ExternalLink
-                          className="h-4.5 w-4.5 shrink-0 text-slate-400 mt-0.5"
+                          className="h-4.5 w-4.5 shrink-0 text-emerald-700 mt-0.5"
                           aria-hidden
                         />
                         <div className="space-y-0.5">
@@ -430,7 +433,7 @@ export function EmployerCandidateProfile({
                               href={candidate.portfolioUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-bold text-[#006e2f] hover:underline flex items-center gap-1"
+                              className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
                             >
                               View portfolio
                             </a>
@@ -443,9 +446,12 @@ export function EmployerCandidateProfile({
               )}
 
               {candidate.bio ? (
-                <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 sm:p-8 space-y-3">
-                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">About Candidate</h2>
-                  <p className="text-sm text-slate-600 leading-relaxed pt-2 border-t border-slate-50 font-medium">
+                <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-3 transition-all hover:border-slate-300/80">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <User className="h-4.5 w-4.5 text-emerald-700" />
+                    About Candidate
+                  </h2>
+                  <p className="text-sm text-slate-600 leading-relaxed pt-2 border-t border-slate-100 font-medium">
                     {candidate.bio}
                   </p>
                 </section>
