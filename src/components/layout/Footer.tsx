@@ -96,16 +96,14 @@ export function Footer() {
         </div>
 
         {/* Bottom Zone — Fine Print */}
-        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:text-left md:gap-6">
-          <p className="text-sm text-gray-500 shrink-0">
-            © {new Date().getFullYear()} Replaceme. All rights reserved.
-          </p>
-          <div className="text-xs text-gray-500 max-w-xl w-full md:max-w-md lg:max-w-lg md:text-right space-y-1.5 leading-relaxed break-words">
+        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col gap-6">
+          {/* Legal Text Block */}
+          <div className="text-xs text-gray-500 text-left md:text-center space-y-2 leading-relaxed max-w-4xl mx-auto">
             <p>
               Employer plan payments are processed securely by Stripe. An
               Australian business operating Replaceme is the merchant of record
               for subscriptions (USD). Applicable tax is calculated at checkout
-              when required by law and remitted to tax authorities—not kept as a
+              when required by law and remitted to tax authorities. It is not kept as a
               Stripe fee. See our{" "}
               <Link
                 href="/refund-policy"
@@ -135,6 +133,11 @@ export function Footer() {
               </Link>
               .
             </p>
+          </div>
+
+          {/* Copyright & Links */}
+          <div className="flex flex-col md:flex-row justify-center md:justify-between items-center text-xs md:text-sm text-gray-500 gap-4 pt-2 border-t border-gray-100/60">
+            <span>© {new Date().getFullYear()} Replaceme. All rights reserved.</span>
           </div>
         </div>
       </div>
