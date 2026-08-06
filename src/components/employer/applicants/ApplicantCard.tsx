@@ -6,6 +6,7 @@ import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { MessageSquare, Trash2, Eye, Lock } from "lucide-react";
 import { Applicant } from "@/types/employer/applicants";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
+import { MatchScoreBadge } from "@/components/employer/applicants/MatchScoreBadge";
 import { ApplicationStatusDropdown } from "@/components/employer/applications/ApplicationStatusDropdown";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { suggestedUpgradeTier } from "@/lib/entitlements/ui-copy";
@@ -56,12 +57,6 @@ export function ApplicantCard({
     .join("")
     .substring(0, 2)
     .toUpperCase();
-
-  const isHighMatch = applicant.matchLabel === "high";
-  const matchPillStyle = isHighMatch
-    ? "bg-emerald-500 text-white"
-    : "bg-slate-100 text-slate-500";
-  const matchText = isHighMatch ? `${applicant.matchScore}% MATCH` : "LOW MATCH";
 
   const isRejected = applicant.status === "REJECTED";
 
@@ -114,11 +109,10 @@ export function ApplicantCard({
 
         {/* Status Row */}
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-wide uppercase whitespace-nowrap ${matchPillStyle}`}
-          >
-            {matchText}
-          </span>
+          <MatchScoreBadge
+            matchScore={applicant.matchScore}
+            matchLabel={applicant.matchLabel}
+          />
           <ApplicationStatusDropdown
             applicationId={applicant.id}
             status={applicant.status}

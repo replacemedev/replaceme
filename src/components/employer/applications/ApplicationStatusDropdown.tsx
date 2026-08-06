@@ -79,13 +79,7 @@ export function ApplicationStatusDropdown({
 
   return (
     <>
-      <div className="relative z-20 inline-flex items-center">
-        {isPending && (
-          <Loader2
-            className="absolute -left-5 h-3.5 w-3.5 animate-spin text-slate-400"
-            aria-hidden
-          />
-        )}
+      <div className="relative z-20 inline-flex items-center gap-1.5">
         <select
           value={status}
           disabled={disabled || isPending}
@@ -99,6 +93,12 @@ export function ApplicationStatusDropdown({
             </option>
           ))}
         </select>
+        {isPending && (
+          <Loader2
+            className="h-3.5 w-3.5 animate-spin text-slate-400 shrink-0"
+            aria-hidden
+          />
+        )}
       </div>
 
       <HireWorkerModal
