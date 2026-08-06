@@ -51,7 +51,9 @@ export async function getReviewableWorkers(options?: {
 
   const reviewed = new Set((existing ?? []).map((r) => r.worker_id));
 
-  let results = (contracts ?? []).map((c) => {
+  const workerMap = new Map<string, ReviewableWorker>();
+  for (const c of contracts ?? []) {
+    if (!c.worker_id || workerMap.has(c.worker_id)) continue;
     const worker = c.profiles as {
       first_name?: string;
       middle_name?: string | null;
@@ -60,7 +62,7 @@ export async function getReviewableWorkers(options?: {
       avatar_url?: string | null;
       is_verified?: boolean | null;
     } | null;
-    return {
+    workerMap.set(c.worker_id, {
       workerId: c.worker_id,
       workerName:
         formatFullName(
@@ -73,8 +75,10 @@ export async function getReviewableWorkers(options?: {
       contractId: c.id,
       hasReview: reviewed.has(c.worker_id),
       isVerified: Boolean(worker?.is_verified),
-    };
-  });
+    });
+  }
+
+  let results = Array.from(workerMap.values());
 
   if (options?.status === "pending") {
     results = results.filter((w) => !w.hasReview);

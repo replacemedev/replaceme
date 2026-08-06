@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -172,19 +172,21 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
     );
   }
 
-  const filteredWorkers = workers.filter((worker) => {
-    // Status filter
-    if (statusFilter === "pending" && worker.hasReview) return false;
-    if (statusFilter === "reviewed" && !worker.hasReview) return false;
+  const filteredWorkers = useMemo(() => {
+    return workers.filter((worker) => {
+      // Status filter
+      if (statusFilter === "pending" && worker.hasReview) return false;
+      if (statusFilter === "reviewed" && !worker.hasReview) return false;
 
-    // Search query filter
-    if (searchValue.trim()) {
-      const query = searchValue.toLowerCase().trim();
-      if (!worker.workerName.toLowerCase().includes(query)) return false;
-    }
+      // Search query filter
+      if (searchValue.trim()) {
+        const query = searchValue.toLowerCase().trim();
+        if (!worker.workerName.toLowerCase().includes(query)) return false;
+      }
 
-    return true;
-  });
+      return true;
+    });
+  }, [workers, statusFilter, searchValue]);
 
   return (
     <div className="space-y-6">
