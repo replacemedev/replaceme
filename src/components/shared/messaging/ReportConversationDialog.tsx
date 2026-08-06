@@ -49,7 +49,7 @@ export function ReportConversationDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
       <div
         role="dialog"
         aria-labelledby="report-conversation-title"

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { ReportIssueForm } from "./ReportIssueForm";
 
@@ -15,17 +16,28 @@ export function ReportIssueSlideover({
 }) {
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     lastActiveRef.current = document.activeElement as HTMLElement | null;
     closeBtnRef.current?.focus();
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open, onClose]);
 
   useEffect(() => {
@@ -33,13 +45,13 @@ export function ReportIssueSlideover({
     lastActiveRef.current?.focus?.();
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
         aria-label="Close report panel"
         onClick={onClose}
       />
@@ -47,7 +59,7 @@ export function ReportIssueSlideover({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-100 bg-white p-5 pb-6 shadow-2xl md:p-8 max-w-xl md:max-w-2xl"
+        className="relative z-10 w-full max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-100 bg-white p-5 pb-6 shadow-2xl md:p-8 max-w-xl md:max-w-2xl animate-in fade-in zoom-in-95 duration-200"
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div className="space-y-1">
@@ -73,5 +85,8 @@ export function ReportIssueSlideover({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
+
 
