@@ -43,7 +43,7 @@ function MarqueeRow({
 export function LandingSkillsShowcase() {
   return (
     <section
-      className={`${LANDING_SECTION} scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28 bg-gradient-to-b from-white via-[#f8fafc] to-white`}
+      className={`${LANDING_SECTION} bg-gradient-to-b from-white via-[#f8fafc] to-white`}
       id="skills"
       aria-labelledby="landing-skills-heading"
     >

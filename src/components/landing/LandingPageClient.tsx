@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { scroller } from "react-scroll";
+import { Element, scroller } from "react-scroll";
 import { GUEST_HEADER_NAV } from "@/config/publicNav";
 import { PUBLIC_HEADER_SCROLL_OFFSET } from "@/lib/layout/public-shell";
 import {
@@ -278,14 +278,13 @@ export function LandingPageClient({
             />
           </div>
         </div>
-      </section>
-
-      {/* For Job Seekers */}
-      <section id="find-work" className={`${LANDING_SECTION} scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28 bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9]`}>
+      </section>      {/* For Job Seekers */}
+      <section className={`${LANDING_SECTION} bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9]`}>
         <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] right-[-10%] bg-emerald-100/40`} aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
+          <Element name="find-work" id="find-work" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <div className="lg:col-span-5 space-y-4 sm:space-y-6 reveal-item">
               <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-label-mono text-[10px] uppercase tracking-widest">For Job Seekers</div>
@@ -336,11 +335,12 @@ export function LandingPageClient({
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className={`${LANDING_SECTION} scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28 bg-white`}>
+      <section className={`${LANDING_SECTION} bg-white`}>
         <div className={LANDING_SECTION_GRID} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} top-[-10%] right-[-10%] bg-emerald-50/50`} aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
+          <Element name="how-it-works" id="how-it-works" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
           {/* AEO: Question-format H2 targets "how does X work" voice-search and featured-snippet queries */}
           <div className="text-center mb-10 sm:mb-14 md:mb-20 reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">How Does Remote Hiring Work on Replaceme?</h2>
@@ -434,12 +434,13 @@ export function LandingPageClient({
       <LandingSkillsShowcase />
 
       {/* Pricing Section */}
-      <section id="pricing" className={`${LANDING_SECTION} scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28 bg-[#0a0f1d] text-white`}>
+      <section className={`${LANDING_SECTION} bg-[#0a0f1d] text-white`}>
         <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} -top-40 -right-40 bg-emerald-500/20 animate-float-slow-2`} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} -bottom-40 -left-40 bg-indigo-500/20 animate-float-slow-1`} aria-hidden />
 
         <div className={`${LANDING_INNER} max-w-7xl text-center relative z-10`}>
+          <Element name="pricing" id="pricing" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
           <div className="reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-3 sm:mb-4 font-bold tracking-tight">Simple, Transparent Pricing</h2>
             <p className="text-slate-300 mb-6 font-body-base text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -470,11 +471,12 @@ export function LandingPageClient({
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className={`${LANDING_SECTION} scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28 bg-white`}>
+      <section className={`${LANDING_SECTION} bg-white`}>
         <div className={LANDING_SECTION_GRID} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] left-[-10%] bg-emerald-50/45`} aria-hidden />
 
         <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
+          <Element name="faq" id="faq" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
           <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">What Do Employers and Job Seekers Ask About Replaceme?</h2>
             <p className="text-slate-600 font-body-base text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">Common questions about subscription plans, hiring flows, candidate privacy, and direct payments.</p>
