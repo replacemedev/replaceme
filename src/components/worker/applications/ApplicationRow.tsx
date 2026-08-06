@@ -46,13 +46,13 @@ export function ApplicationRow({ application }: ApplicationRowProps) {
   return (
     <article className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl shadow-xs transition-all duration-200 hover:border-emerald-200 hover:shadow-md">
       <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
-        <div className="relative shrink-0 w-11 h-11 overflow-hidden rounded-xl">
+        <div className="relative shrink-0 w-11 h-11 overflow-hidden rounded-full">
           <LogoImage
             src={application.companyLogoUrl}
             alt={`${application.companyName} logo`}
             label={application.companyName}
             sizePx={44}
-            rounded="xl"
+            rounded="full"
             colorClass={`flex items-center justify-center font-bold text-sm ${colorClass}`}
           />
         </div>

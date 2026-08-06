@@ -190,7 +190,6 @@ export function CompanyLogoUpload({
         imageSrc={cropSrc}
         fileName={cropMeta?.fileName ?? "logo.jpg"}
         mimeType={cropMeta?.mimeType ?? "image/jpeg"}
-        shape="square"
         onCancel={closeCrop}
         onConfirm={(file) => {
           closeCrop();

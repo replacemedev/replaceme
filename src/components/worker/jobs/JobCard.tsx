@@ -52,13 +52,13 @@ export function JobCard({ job, onSavedChange }: JobCardProps) {
     <article className={`flex flex-col h-full p-5 md:p-8 transition-all duration-200 gap-5 ${cardStyles}`}>
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 min-w-0">
-          <div className="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden">
+          <div className="relative shrink-0 w-12 h-12 rounded-full overflow-hidden">
             <LogoImage
               src={job.companyLogoUrl}
               alt={`${job.companyName} logo`}
               label={job.companyName}
               sizePx={48}
-              rounded="xl"
+              rounded="full"
               colorClass={`flex items-center justify-center font-bold text-sm ${colorClass}`}
             />
           </div>
