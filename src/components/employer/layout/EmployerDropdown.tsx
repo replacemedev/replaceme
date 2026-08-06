@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useTransition } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { ChevronDown, LogOut, Settings, User, Flag } from "lucide-react";
+import { ChevronDown, LogOut, Settings, Building2, Flag } from "lucide-react";
 import { logOut } from "@/actions/auth";
 import type { NavProfile } from "@/types/nav";
 import { ReportIssueSlideover } from "@/components/shared/reporting/ReportIssueSlideover";
@@ -127,7 +127,7 @@ export function EmployerDropdown({
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               role="menuitem"
             >
-              <User size={14} className="text-slate-400 shrink-0" />
+              <Settings size={14} className="text-slate-400 shrink-0" />
               Account Settings
             </Link>
 
@@ -137,7 +137,7 @@ export function EmployerDropdown({
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               role="menuitem"
             >
-              <Settings size={14} className="text-slate-400 shrink-0" />
+              <Building2 size={14} className="text-slate-400 shrink-0" />
               Company Profile
             </Link>
 
@@ -222,7 +222,7 @@ export function EmployerDropdown({
           className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
           role="menuitem"
         >
-          <User size={14} className="text-slate-400" />
+          <Settings size={14} className="text-slate-400" />
           Account Settings
         </Link>
 
@@ -232,7 +232,7 @@ export function EmployerDropdown({
           className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors w-full text-left font-semibold"
           role="menuitem"
         >
-          <Settings size={14} className="text-slate-400" />
+          <Building2 size={14} className="text-slate-400" />
           Company Profile
         </Link>
 

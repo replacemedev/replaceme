@@ -7,11 +7,12 @@ import {
   submitEmployerReview,
   type ReviewableWorker,
 } from "@/actions/employer/reviews";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { StarRatingInput } from "./StarRatingInput";
 import { ReviewsToolbar, type ReviewStatusFilter } from "./ReviewsToolbar";
-import { Star, CheckCircle2, User, SearchX } from "lucide-react";
+import { Star, CheckCircle2, SearchX } from "lucide-react";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -51,9 +52,14 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
     return (
       <li className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200/60 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0 select-none">
-            {initials || <User size={18} className="text-slate-400" />}
-          </div>
+          <AvatarImage
+            src={worker.avatarUrl}
+            alt={worker.workerName}
+            initials={initials}
+            size="sm"
+            rounded="full"
+            containerClassName="border border-slate-200/60 bg-slate-100 shadow-xs shrink-0"
+          />
           <div className="min-w-0">
             <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
               <span className="truncate min-w-0">{worker.workerName}</span>
@@ -75,9 +81,14 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
   return (
     <li className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all space-y-5">
       <div className="flex items-start gap-3.5 min-w-0">
-        <div className="h-11 w-11 rounded-full bg-emerald-50 border border-[#006e2f]/20 flex items-center justify-center font-extrabold text-[#006e2f] text-sm shrink-0 select-none">
-          {initials || <User size={20} className="text-[#006e2f]" />}
-        </div>
+        <AvatarImage
+          src={worker.avatarUrl}
+          alt={worker.workerName}
+          initials={initials}
+          size="sm"
+          rounded="full"
+          containerClassName="border border-[#006e2f]/20 bg-emerald-50 shadow-xs shrink-0"
+        />
         <div className="min-w-0 flex-1">
           <p className="text-base font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
             <span className="truncate min-w-0">{worker.workerName}</span>

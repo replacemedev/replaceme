@@ -19,6 +19,7 @@ const submitReviewSchema = z
 export interface ReviewableWorker {
   workerId: string;
   workerName: string;
+  avatarUrl: string | null;
   contractId: string;
   hasReview: boolean;
   isVerified: boolean;
@@ -34,7 +35,7 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
       id,
       worker_id,
       status,
-      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, suffix, is_verified )
+      profiles!contracts_worker_id_fkey ( first_name, middle_name, last_name, suffix, avatar_url, is_verified )
     `
     )
     .eq("employer_id", profile.id)
@@ -53,17 +54,19 @@ export async function getReviewableWorkers(): Promise<ReviewableWorker[]> {
       middle_name?: string | null;
       last_name?: string;
       suffix?: string | null;
+      avatar_url?: string | null;
       is_verified?: boolean | null;
     } | null;
     return {
       workerId: c.worker_id,
       workerName:
-      formatFullName(
-        worker?.first_name,
-        worker?.middle_name,
-        worker?.last_name,
-        worker?.suffix
-      ) || "Worker",
+        formatFullName(
+          worker?.first_name,
+          worker?.middle_name,
+          worker?.last_name,
+          worker?.suffix
+        ) || "Worker",
+      avatarUrl: worker?.avatar_url ?? null,
       contractId: c.id,
       hasReview: reviewed.has(c.worker_id),
       isVerified: Boolean(worker?.is_verified),
