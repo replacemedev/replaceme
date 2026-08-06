@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import Link from "next/link";
 import { HiredWorker } from "@/types/employer/hired";
 import { HiredWorkerCard } from "./HiredWorkerCard";
 import {
@@ -8,19 +9,23 @@ import {
   HiredStatusFilter,
   HiredTypeFilter,
 } from "./HiredToolbar";
-import { SearchX, RotateCcw } from "lucide-react";
+import { SearchX, RotateCcw, Users } from "lucide-react";
 import { useDebouncedUrlFilter } from "@/hooks/useDebouncedUrlFilter";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { PostJobCTA } from "@/components/employer/jobs/PostJobCTA";
 
 interface HiredWorkerListProps {
   workers: HiredWorker[];
   planSlug: string;
   messagingEnabled?: boolean;
+  planUsage?: any;
 }
 
 export function HiredWorkerList({
   workers,
   planSlug,
   messagingEnabled = true,
+  planUsage,
 }: HiredWorkerListProps) {
   const {
     searchValue,
@@ -63,10 +68,6 @@ export function HiredWorkerList({
     });
   }, [workers, searchValue, statusFilter, typeFilter]);
 
-  if (workers.length === 0 && !hasActiveFilters) {
-    return null;
-  }
-
   return (
     <div className="space-y-6">
       {/* Responsive Search & Filter Toolbar */}
@@ -81,7 +82,7 @@ export function HiredWorkerList({
         filteredCount={filteredWorkers.length}
       />
 
-      {/* Workers List or Empty Filter Results */}
+      {/* Workers List or Empty State */}
       {filteredWorkers.length > 0 ? (
         <div className="space-y-4">
           {filteredWorkers.map((worker) => (
@@ -92,6 +93,30 @@ export function HiredWorkerList({
               messagingEnabled={messagingEnabled}
             />
           ))}
+        </div>
+      ) : workers.length === 0 && !hasActiveFilters ? (
+        <div className="space-y-4">
+          <EmptyState
+            icon={<Users size={22} />}
+            title="No hired workers yet"
+            description="When you hire a candidate from your applicant pipeline, their contract details will appear here."
+            action={
+              <PostJobCTA
+                planUsage={planUsage}
+                label="Post a job"
+                compact
+              />
+            }
+          />
+          <p className="text-center text-sm text-slate-500 font-medium">
+            Or review applicants in your existing pipelines.{" "}
+            <Link
+              href="/employer/jobs"
+              className="font-bold text-[#006e2f] hover:underline"
+            >
+              View job posts
+            </Link>
+          </p>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-8 sm:p-12 text-center shadow-sm space-y-3">

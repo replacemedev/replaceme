@@ -10,7 +10,6 @@ export type HiredTypeFilter = "all" | EmploymentType;
 const STATUS_OPTIONS: { value: HiredStatusFilter; label: string }[] = [
   { value: "all", label: "All Statuses" },
   { value: "active", label: "Active" },
-  { value: "paused", label: "Paused" },
   { value: "terminated", label: "Terminated" },
 ];
 

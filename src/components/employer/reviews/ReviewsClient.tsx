@@ -160,18 +160,6 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
   const hasActiveFilters =
     Boolean(searchParams.get("q")) || Boolean(searchParams.get("status"));
 
-  if (workers.length === 0 && !hasActiveFilters) {
-    return (
-      <EmptyState
-        icon={<Star size={22} />}
-        title="No hires to review yet"
-        description="Hire a candidate first, then leave a testimonial for your team members here."
-        actionLabel="View hired workers"
-        actionHref="/employer/hired"
-      />
-    );
-  }
-
   const filteredWorkers = useMemo(() => {
     return workers.filter((worker) => {
       // Status filter
@@ -200,8 +188,22 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
         filteredCount={filteredWorkers.length}
       />
 
-      {/* Filtered List or Empty Filtered State */}
-      {filteredWorkers.length === 0 ? (
+      {/* Filtered List or Empty State */}
+      {filteredWorkers.length > 0 ? (
+        <ul className="space-y-4">
+          {filteredWorkers.map((worker) => (
+            <ReviewWorkerCard key={worker.workerId} worker={worker} />
+          ))}
+        </ul>
+      ) : workers.length === 0 && !hasActiveFilters ? (
+        <EmptyState
+          icon={<Star size={22} />}
+          title="No hires to review yet"
+          description="Hire a candidate first, then leave a testimonial for your team members here."
+          actionLabel="View hired workers"
+          actionHref="/employer/hired"
+        />
+      ) : (
         <div className="rounded-2xl border border-slate-200/80 bg-white p-12 text-center shadow-sm space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
             <SearchX size={24} />
@@ -222,12 +224,6 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
             Reset search & filters
           </button>
         </div>
-      ) : (
-        <ul className="space-y-4">
-          {filteredWorkers.map((worker) => (
-            <ReviewWorkerCard key={worker.workerId} worker={worker} />
-          ))}
-        </ul>
       )}
     </div>
   );

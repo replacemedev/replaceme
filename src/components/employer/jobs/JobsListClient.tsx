@@ -98,34 +98,6 @@ export function JobsListClient({
     return result;
   }, [jobs, searchValue, statusFilter, sortKey]);
 
-  if (jobs.length === 0 && !hasActiveFilters) {
-    return (
-      <div className="space-y-4">
-        <EmptyState
-          icon={<Briefcase size={22} />}
-          description="You haven't posted any jobs yet. Create your first listing to start hiring."
-          action={
-            <PostJobCTA
-              planUsage={planUsage}
-              label="Post a New Job"
-              compact
-            />
-          }
-        />
-        <p className="text-center text-sm text-slate-500 font-medium">
-          Compare plans and unlock messaging, full profiles, and instant
-          approval.{" "}
-          <Link
-            href="/employer/pricing"
-            className="font-bold text-[#006e2f] hover:underline"
-          >
-            View pricing
-          </Link>
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div
@@ -189,7 +161,41 @@ export function JobsListClient({
         </div>
       </div>
 
-      {filteredJobs.length === 0 ? (
+      {filteredJobs.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredJobs.map((job) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              applicantsPerJobLimit={applicantsPerJobLimit}
+            />
+          ))}
+        </div>
+      ) : jobs.length === 0 && !hasActiveFilters ? (
+        <div className="space-y-4">
+          <EmptyState
+            icon={<Briefcase size={22} />}
+            description="You haven't posted any jobs yet. Create your first listing to start hiring."
+            action={
+              <PostJobCTA
+                planUsage={planUsage}
+                label="Post a New Job"
+                compact
+              />
+            }
+          />
+          <p className="text-center text-sm text-slate-500 font-medium">
+            Compare plans and unlock messaging, full profiles, and instant
+            approval.{" "}
+            <Link
+              href="/employer/pricing"
+              className="font-bold text-[#006e2f] hover:underline"
+            >
+              View pricing
+            </Link>
+          </p>
+        </div>
+      ) : (
         <div className={`${EMPLOYER_CARD} p-10 text-center space-y-3`}>
           <p className="text-sm font-bold text-slate-800">
             No jobs match your filters
@@ -205,21 +211,13 @@ export function JobsListClient({
             Reset search & filters
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredJobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              applicantsPerJobLimit={applicantsPerJobLimit}
-            />
-          ))}
-        </div>
       )}
 
-      <div className="flex justify-center pt-2">
-        <PostJobCTA planUsage={planUsage} />
-      </div>
+      {jobs.length > 0 && (
+        <div className="flex justify-center pt-2">
+          <PostJobCTA planUsage={planUsage} />
+        </div>
+      )}
     </div>
   );
 }
