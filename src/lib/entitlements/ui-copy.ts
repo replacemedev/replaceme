@@ -95,6 +95,25 @@ export function normalizePlanSlug(plan: string): SubscriptionTier {
   return "discovery";
 }
 
+export function currentPlanBannerCopy(planSlug?: string | null): {
+  title: string;
+  subtitle: string;
+  isScale: boolean;
+} {
+  const safeSlug = planSlug ? String(planSlug) : "discovery";
+  const normalized = normalizePlanSlug(safeSlug);
+  const tierLabel = TIER_LABELS[normalized] ?? "Paid";
+  const isScale = normalized === "scale";
+
+  return {
+    title: `You're on the ${tierLabel} plan`,
+    subtitle: isScale
+      ? "Manage your subscription and billing in account settings. Downgrades take effect at the end of your billing cycle."
+      : "Upgrade to unlock more jobs and applicants, or manage billing in account settings. Downgrades take effect at the end of your billing cycle.",
+    isScale,
+  };
+}
+
 export function suggestedUpgradeTier(
   currentPlan: string,
   feature?: EntitlementFeature
