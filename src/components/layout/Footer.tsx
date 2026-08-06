@@ -135,8 +135,8 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Copyright & Links */}
-          <div className="flex flex-col md:flex-row justify-center md:justify-between items-center text-xs md:text-sm text-gray-500 gap-4 pt-2 border-t border-gray-100/60">
+          {/* Copyright */}
+          <div className="flex justify-center items-center text-center text-xs md:text-sm text-gray-500 pt-2 border-t border-gray-100/60 w-full">
             <span>© {new Date().getFullYear()} Replaceme. All rights reserved.</span>
           </div>
         </div>
