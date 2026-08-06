@@ -18,7 +18,7 @@ export interface PlanStatusBannerProps {
 export function PlanStatusBanner({
   currentPlanSlug,
   actionHref = "/employer/settings/account",
-  actionLabel = "Account & Billing",
+  actionLabel = "Account Settings",
   className = "max-w-3xl mx-auto mb-10",
 }: PlanStatusBannerProps) {
   const safeSlug = currentPlanSlug ? String(currentPlanSlug) : "discovery";

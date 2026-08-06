@@ -56,7 +56,7 @@ function copyForKind(input: {
       return {
         title: "Subscription canceled",
         preview: "Your Replaceme subscription was canceled",
-        body: `Your ${input.planLabel} subscription has been canceled.${amountNote} You can resubscribe anytime from Account & Billing.`,
+        body: `Your ${input.planLabel} subscription has been canceled.${amountNote} You can resubscribe anytime from Account Settings.`,
       };
   }
 }
