@@ -181,21 +181,39 @@ export function AvatarCropDialog({
             ) : null}
           </div>
 
-          <label className="block">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-600">
+          <div className="flex items-center gap-3 w-full pt-1">
+            <span className="text-xs font-semibold text-slate-600 shrink-0">
               Zoom
             </span>
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.01}
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-              className="w-full accent-[#006e2f]"
-              disabled={!ready || exporting}
-            />
-          </label>
+            <div className="relative flex-1 flex items-center h-6 select-none touch-none">
+              {/* Slider Track background */}
+              <div className="absolute inset-x-0 h-2 rounded-full bg-slate-200 overflow-hidden pointer-events-none">
+                {/* Active range fill */}
+                <div
+                  className="h-full bg-[#006e2f] transition-[width] duration-75 rounded-full"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(0, ((zoom - 1) / (3 - 1)) * 100)
+                    )}%`,
+                  }}
+                />
+              </div>
+
+              {/* Native range input layered on top with transparent track & styled thumb */}
+              <input
+                type="range"
+                aria-label="Zoom photo"
+                min={1}
+                max={3}
+                step={0.01}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="relative z-10 w-full h-6 appearance-none bg-transparent cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 rounded-full [&::-webkit-slider-runnable-track]:bg-transparent [&::-moz-range-track]:bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#006e2f] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#006e2f] [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!ready || exporting}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col-reverse gap-2 border-t border-slate-100 bg-slate-50 p-4 sm:flex-row sm:justify-end">
