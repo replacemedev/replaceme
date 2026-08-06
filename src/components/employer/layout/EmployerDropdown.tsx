@@ -138,7 +138,7 @@ export function EmployerDropdown({
               role="menuitem"
             >
               <Settings size={14} className="text-slate-400 shrink-0" />
-              Company Settings
+              Company Profile
             </Link>
 
             {planUsage && planUsage.planSlug !== "scale" && (
@@ -233,7 +233,7 @@ export function EmployerDropdown({
           role="menuitem"
         >
           <Settings size={14} className="text-slate-400" />
-          Company Settings
+          Company Profile
         </Link>
 
         <div className="h-px bg-slate-100 my-1" />

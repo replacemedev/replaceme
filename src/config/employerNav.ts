@@ -34,7 +34,6 @@ export const EMPLOYER_MORE_TAB = {
 /** Drawer / More sheet secondary destinations. */
 export const EMPLOYER_MORE_NAV_ITEMS: EmployerNavItem[] = [
   { href: "/employer/hired", label: "Hired", icon: Users },
-  { href: "/employer/settings/account", label: "Account & Billing", icon: Settings },
   { href: EMPLOYER_NOTIFICATIONS_HREF, label: "Notifications", icon: Bell },
   { href: "/employer/reviews", label: "Reviews", icon: Star },
   { href: "/employer/pricing", label: "Pricing", icon: CreditCard },
@@ -43,7 +42,6 @@ export const EMPLOYER_MORE_NAV_ITEMS: EmployerNavItem[] = [
 /** Desktop header "More" dropdown (subset aligned with sheet). */
 export const EMPLOYER_HEADER_MORE_LINKS = EMPLOYER_MORE_NAV_ITEMS.filter(
   (item) =>
-    item.href.startsWith("/employer/settings") ||
     item.href === EMPLOYER_NOTIFICATIONS_HREF ||
     item.href === "/employer/reviews" ||
     item.href === "/employer/pricing"
