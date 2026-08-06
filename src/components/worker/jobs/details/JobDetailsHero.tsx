@@ -1,21 +1,25 @@
 "use client";
 
-import Link from "next/link";
+import { toast } from "sonner";
 import { WorkerJobDetails, formatPostedDate } from "@/types/job-details";
 import { ApplyActionButtons } from "./ApplyActionButtons";
 import { DELETION_REQUEST_SUPPORT_EMAIL } from "@/lib/data/legal";
-import { buildSupportMailto } from "@/lib/email/support-mailto";
+import { buildGmailComposeUrl } from "@/lib/email/support-mailto";
 
 interface JobDetailsHeroProps {
   job: WorkerJobDetails;
 }
 
 export function JobDetailsHero({ job }: JobDetailsHeroProps) {
-  // Native <a> for mailto — next/link does not open mail clients reliably.
-  const supportMailto = buildSupportMailto(
+  const gmailCompose = buildGmailComposeUrl(
     DELETION_REQUEST_SUPPORT_EMAIL,
     `Issue with job: ${job.title}`
   );
+
+  const handleContactClick = () => {
+    navigator.clipboard.writeText(DELETION_REQUEST_SUPPORT_EMAIL);
+    toast.success(`Opening Gmail (Copied ${DELETION_REQUEST_SUPPORT_EMAIL})`);
+  };
 
   return (
     <header className="relative bg-[#0a4a29] text-white overflow-hidden">
@@ -29,15 +33,12 @@ export function JobDetailsHero({ job }: JobDetailsHeroProps) {
       />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-20 sm:pb-24">
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <Link
-            href="/worker/jobs"
-            className="text-sm font-semibold text-white/90 hover:text-white transition-colors"
-          >
-            ← Back to search results
-          </Link>
+        <div className="flex items-center justify-end w-full mb-6 sm:mb-8">
           <a
-            href={supportMailto}
+            href={gmailCompose}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleContactClick}
             className="inline-flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white/90 hover:bg-white/10 transition-colors min-h-11 [-webkit-tap-highlight-color:transparent]"
           >
             Contact support
