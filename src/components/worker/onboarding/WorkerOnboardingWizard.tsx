@@ -105,7 +105,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
 
   if (phase === "welcome") {
     return (
-      <section className="mx-auto flex w-full max-w-lg flex-col gap-6 rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:gap-7 sm:px-6 sm:py-12 md:gap-8 md:px-8 md:py-16 lg:py-20">
+      <section className="mx-auto flex w-full max-w-lg flex-col gap-5 rounded-2xl border border-slate-200 bg-white px-6 py-6 shadow-sm sm:gap-6 sm:px-8 sm:py-8">
         <header className="space-y-2 text-center sm:text-left">
           <p className="text-xs font-bold uppercase tracking-wider text-primary">
             Worker onboarding

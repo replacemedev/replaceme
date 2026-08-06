@@ -12,7 +12,7 @@ const DISCOVERY_INCLUDES = [
 export function OnboardingPlanWelcome() {
   return (
     <aside className="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-6 md:gap-8">
-      <div className="rounded-3xl border border-[#006e2f]/15 bg-[#fafdfb] px-4 py-8 shadow-sm sm:px-6 sm:py-12 md:px-8 md:py-16 lg:py-20">
+      <div className="rounded-3xl border border-[#006e2f]/15 bg-[#fafdfb] px-6 py-6 shadow-sm sm:px-8 sm:py-8">
         <div className="flex min-w-0 items-start gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#ebfdf2] text-[#006e2f]">
             <Sparkles className="h-5 w-5" aria-hidden />
@@ -56,7 +56,7 @@ export function OnboardingPlanWelcome() {
 
       <div className="rounded-2xl border border-slate-100 bg-white px-5 py-4 text-center shadow-sm">
         <p className="text-xs font-semibold text-slate-500">
-          After setup you&apos;ll land on your dashboard — ready to post your
+          After setup you&apos;ll land on your dashboard. Ready to post your
           first job.
         </p>
       </div>

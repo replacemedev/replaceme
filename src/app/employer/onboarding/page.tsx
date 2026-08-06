@@ -16,7 +16,7 @@ export default async function EmployerOnboardingPage() {
 
   return (
     <EmployerPageShell width="wide" className="!py-0 gap-0">
-      <div className="flex w-full min-w-0 flex-col gap-8 py-8 sm:gap-10 sm:py-12 md:gap-10 md:py-16 lg:gap-12 lg:py-20">
+      <div className="flex w-full min-w-0 flex-col gap-6 py-6 sm:gap-8 sm:py-8 md:py-10">
         <header className="min-w-0 space-y-3 text-center">
           <p className="text-xs font-bold uppercase tracking-wider text-[#006e2f]">
             Welcome to Replaceme
