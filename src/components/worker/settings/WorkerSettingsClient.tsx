@@ -187,14 +187,15 @@ export function WorkerSettingsClient({
           </button>
         </form>
 
-        <ContactSupportCard
-          title="Safety or billing concern?"
-          description="Email our support team about workplace issues, account problems, or platform questions."
-          subject="Worker support request"
-        />
+        <div className="flex flex-col gap-6">
+          <ContactSupportCard
+            title="Help & Support"
+            description="Email our support team about workplace issues, account problems, or platform questions."
+            subject="Worker support request"
+          />
+          <DataDeletionRequestCard />
+        </div>
       </div>
-
-      <DataDeletionRequestCard />
     </div>
   );
 }

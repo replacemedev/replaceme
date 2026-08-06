@@ -86,7 +86,7 @@ export default function WorkerSettingsLoading() {
           ))}
         </nav>
 
-        {/* Grid 2-cols: Form & Support */}
+        {/* Grid 2-cols: Form & Right Column (Support & Delete Account) */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8 items-start">
           {/* Availability & Rate Form Skeleton */}
           <div className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6">
@@ -113,34 +113,37 @@ export default function WorkerSettingsLoading() {
             <SkeletonBlock className="h-11 w-full sm:w-36 rounded-xl" />
           </div>
 
-          {/* Safety or billing concern? (ContactSupportCard) Skeleton */}
-          <div className="h-fit space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6">
-            <div className="flex items-start gap-3">
-              <SkeletonBlock className="h-10 w-10 shrink-0 rounded-xl" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <SkeletonBlock className="h-4 w-44 rounded" />
-                <SkeletonBlock className="h-3.5 w-full rounded" />
-                <SkeletonBlock className="h-3.5 w-4/5 rounded" />
+          {/* Right Column Skeletons */}
+          <div className="flex flex-col gap-6">
+            {/* Help & Support (ContactSupportCard) Skeleton */}
+            <div className="h-fit space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6">
+              <div className="flex items-start gap-3">
+                <SkeletonBlock className="h-10 w-10 shrink-0 rounded-xl" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <SkeletonBlock className="h-4 w-44 rounded" />
+                  <SkeletonBlock className="h-3.5 w-full rounded" />
+                  <SkeletonBlock className="h-3.5 w-4/5 rounded" />
+                </div>
+              </div>
+              <div className="mt-5">
+                <SkeletonBlock className="h-11 w-full sm:w-36 rounded-xl" />
               </div>
             </div>
-            <div className="mt-5">
-              <SkeletonBlock className="h-11 w-full sm:w-36 rounded-xl" />
-            </div>
-          </div>
-        </div>
 
-        {/* Delete your account (DataDeletionRequestCard) Skeleton */}
-        <div className="h-fit space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6">
-          <div className="flex items-start gap-3">
-            <SkeletonBlock className="h-10 w-10 shrink-0 rounded-xl" />
-            <div className="min-w-0 flex-1 space-y-2">
-              <SkeletonBlock className="h-4 w-40 rounded" />
-              <SkeletonBlock className="h-3.5 w-full rounded" />
-              <SkeletonBlock className="h-3.5 w-3/4 rounded" />
+            {/* Delete your account (DataDeletionRequestCard) Skeleton */}
+            <div className="h-fit space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6">
+              <div className="flex items-start gap-3">
+                <SkeletonBlock className="h-10 w-10 shrink-0 rounded-xl" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <SkeletonBlock className="h-4 w-40 rounded" />
+                  <SkeletonBlock className="h-3.5 w-full rounded" />
+                  <SkeletonBlock className="h-3.5 w-3/4 rounded" />
+                </div>
+              </div>
+              <div className="mt-5">
+                <SkeletonBlock className="h-11 w-full sm:w-36 rounded-xl" />
+              </div>
             </div>
-          </div>
-          <div className="mt-5">
-            <SkeletonBlock className="h-11 w-full sm:w-36 rounded-xl" />
           </div>
         </div>
       </div>

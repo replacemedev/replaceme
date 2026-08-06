@@ -44,7 +44,7 @@ export function WorkerAccountIdentityCard({
           href="/worker/profile"
           className="group inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-1 text-sm font-bold text-[#006e2f] transition-colors hover:text-[#005c26] sm:w-auto sm:justify-start"
         >
-          <span>Manage personal & career details on your profile</span>
+          <span>Edit profile & career details</span>
           <ChevronRight
             className="h-4 w-4 shrink-0 text-[#006e2f]/60 transition-transform group-hover:translate-x-0.5"
             aria-hidden
