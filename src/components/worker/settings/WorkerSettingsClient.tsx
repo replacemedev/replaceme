@@ -116,7 +116,7 @@ export function WorkerSettingsClient({
         })}
       </nav>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8 items-start">
         <form
           onSubmit={saveSettings}
           className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:p-6"
