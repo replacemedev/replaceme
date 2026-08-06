@@ -10,8 +10,16 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { StarRatingInput } from "./StarRatingInput";
-import { Star, CheckCircle2 } from "lucide-react";
-import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
+import { ReviewsToolbar, type ReviewStatusFilter } from "./ReviewsToolbar";
+import { Star, CheckCircle2, User, SearchX } from "lucide-react";
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
 
 function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
   const router = useRouter();
@@ -37,20 +45,27 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
     });
   };
 
+  const initials = getInitials(worker.workerName);
+
   if (worker.hasReview) {
     return (
-      <li className={`${EMPLOYER_CARD} flex items-center justify-between gap-4 p-5`}>
-        <div className="min-w-0">
-          <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-            <span className="truncate min-w-0">{worker.workerName}</span>
-            <VerifiedBadge show={worker.isVerified} size="sm" />
-          </p>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Hired team member
-          </p>
+      <li className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200/60 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0 select-none">
+            {initials || <User size={18} className="text-slate-400" />}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+              <span className="truncate min-w-0">{worker.workerName}</span>
+              <VerifiedBadge show={worker.isVerified} size="sm" />
+            </p>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Hired team member • Review completed
+            </p>
+          </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ebfdf2] px-3 py-1 text-[11px] font-bold text-[#006e2f]">
-          <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ebfdf2] border border-[#006e2f]/10 px-3.5 py-1.5 text-xs font-bold text-[#006e2f] shrink-0 self-start sm:self-center">
+          <CheckCircle2 className="h-4 w-4" aria-hidden />
           Reviewed
         </span>
       </li>
@@ -58,19 +73,26 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
   }
 
   return (
-    <li className={`${EMPLOYER_CARD} p-5 space-y-4`}>
-      <div className="min-w-0">
-        <p className="text-sm font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
-          <span className="truncate min-w-0">{worker.workerName}</span>
-          <VerifiedBadge show={worker.isVerified} size="sm" />
-        </p>
-        <p className="text-xs text-slate-500 font-medium mt-1">
-          Share your experience working together
-        </p>
+    <li className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm hover:shadow-md hover:border-slate-300/80 transition-all space-y-5">
+      <div className="flex items-start gap-3.5 min-w-0">
+        <div className="h-11 w-11 rounded-full bg-emerald-50 border border-[#006e2f]/20 flex items-center justify-center font-extrabold text-[#006e2f] text-sm shrink-0 select-none">
+          {initials || <User size={20} className="text-[#006e2f]" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-base font-extrabold text-slate-900 inline-flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
+            <span className="truncate min-w-0">{worker.workerName}</span>
+            <VerifiedBadge show={worker.isVerified} size="sm" />
+          </p>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
+            Share your experience working together on your team
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-xs font-bold text-slate-600">Your rating</p>
+      <div className="space-y-2 pt-1 border-t border-slate-100">
+        <label className="text-xs font-bold text-slate-700 block">
+          Your rating
+        </label>
         <StarRatingInput
           value={rating}
           onChange={setRating}
@@ -79,31 +101,41 @@ function ReviewWorkerCard({ worker }: { worker: ReviewableWorker }) {
       </div>
 
       <label className="block space-y-2">
-        <span className="text-xs font-bold text-slate-600">Review</span>
+        <span className="text-xs font-bold text-slate-700 block">
+          Written review
+        </span>
         <textarea
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
           rows={4}
           disabled={isPending}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30 disabled:opacity-50"
-          placeholder="What stood out about this professional on your team?"
+          className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006e2f]/20 focus:border-[#006e2f] transition-all disabled:opacity-50 min-h-[110px] resize-y"
+          placeholder="What stood out about this professional's work ethic, communication, and performance?"
         />
       </label>
 
-      <button
-        type="button"
-        disabled={isPending || reviewText.length < 10}
-        onClick={submit}
-        className="rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] disabled:opacity-50 transition-colors"
-      >
-        Submit review
-      </button>
+      <div className="flex items-center justify-between gap-4 pt-1">
+        <span className="text-[11px] font-medium text-slate-400">
+          {reviewText.length < 10
+            ? `At least 10 characters required (${reviewText.length}/10)`
+            : `${reviewText.length} characters`}
+        </span>
+        <button
+          type="button"
+          disabled={isPending || reviewText.length < 10}
+          onClick={submit}
+          className="rounded-xl bg-[#006e2f] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm hover:bg-[#005c26] hover:shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+        >
+          Submit review
+        </button>
+      </div>
     </li>
   );
 }
 
 export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
-  const pending = workers.filter((w) => !w.hasReview);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<ReviewStatusFilter>("all");
 
   if (workers.length === 0) {
     return (
@@ -117,23 +149,62 @@ export function ReviewsClient({ workers }: { workers: ReviewableWorker[] }) {
     );
   }
 
+  const filteredWorkers = workers.filter((worker) => {
+    // Status filter
+    if (statusFilter === "pending" && worker.hasReview) return false;
+    if (statusFilter === "reviewed" && !worker.hasReview) return false;
+
+    // Search query filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      if (!worker.workerName.toLowerCase().includes(query)) return false;
+    }
+
+    return true;
+  });
+
   return (
     <div className="space-y-6">
-      {pending.length > 0 ? (
-        <p className="text-xs font-bold text-slate-500">
-          {pending.length} review{pending.length === 1 ? "" : "s"} pending
-        </p>
-      ) : (
-        <p className="text-sm font-medium text-slate-500">
-          All hired workers have been reviewed. Thank you for your feedback.
-        </p>
-      )}
+      {/* Search & Filter Toolbar */}
+      <ReviewsToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        totalCount={workers.length}
+        filteredCount={filteredWorkers.length}
+      />
 
-      <ul className="space-y-4">
-        {workers.map((worker) => (
-          <ReviewWorkerCard key={worker.workerId} worker={worker} />
-        ))}
-      </ul>
+      {/* Filtered List or Empty Filtered State */}
+      {filteredWorkers.length === 0 ? (
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-12 text-center shadow-sm space-y-3">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <SearchX size={24} />
+          </div>
+          <h3 className="text-base font-bold text-slate-800">
+            No matching workers found
+          </h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            We couldn&apos;t find any hired team members matching &quot;{searchQuery}&quot;.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery("");
+              setStatusFilter("all");
+            }}
+            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all mt-2"
+          >
+            Reset search & filters
+          </button>
+        </div>
+      ) : (
+        <ul className="space-y-4">
+          {filteredWorkers.map((worker) => (
+            <ReviewWorkerCard key={worker.workerId} worker={worker} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
