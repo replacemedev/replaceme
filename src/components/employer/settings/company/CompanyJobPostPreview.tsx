@@ -50,7 +50,7 @@ export function CompanyJobPostPreview({
           <div className="flex items-center gap-3">
             <div
               key={logoUrl || "no-logo"}
-              className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white"
+              className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white"
             >
               <LogoImage
                 src={logoUrl || null}
@@ -58,9 +58,9 @@ export function CompanyJobPostPreview({
                 label={displayName}
                 sizePx={48}
                 sizes="48px"
-                rounded="xl"
-                fit="contain"
-                className="object-contain"
+                rounded="full"
+                fit="cover"
+                className="object-cover"
                 colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
               />
             </div>

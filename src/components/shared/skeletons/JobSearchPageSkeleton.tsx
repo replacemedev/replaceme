@@ -6,7 +6,7 @@ function JobCardSkeleton() {
     <article className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
       <header className="flex items-start justify-between gap-3 mb-3 w-full">
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          <SkeletonBlock className="shrink-0 w-11 h-11 rounded-xl bg-slate-100" />
+          <SkeletonBlock className="shrink-0 w-11 h-11 rounded-full bg-slate-100" />
           <div className="min-w-0 flex-1 space-y-2 mt-0.5">
             <SkeletonBlock className="h-4 w-3/4 rounded bg-slate-200/80" />
             <SkeletonBlock className="h-3.5 w-1/2 rounded bg-slate-100" />

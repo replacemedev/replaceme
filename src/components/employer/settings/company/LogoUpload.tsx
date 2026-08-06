@@ -96,8 +96,8 @@ export function LogoUpload() {
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-6 p-6 border border-slate-100 rounded-2xl bg-white shadow-sm">
-      {/* Dashed Square Logo Box */}
-      <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50 shrink-0 overflow-hidden group">
+      {/* Circle Logo */}
+      <div className="relative w-24 h-24 rounded-full border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50 shrink-0 overflow-hidden group">
         {logoUrl ? (
           <>
             <LogoImage
@@ -107,9 +107,9 @@ export function LogoUpload() {
               label="Company"
               sizePx={96}
               sizes="96px"
-              rounded="2xl"
-              fit="contain"
-              className="object-contain"
+              rounded="full"
+              fit="cover"
+              className="object-cover"
               colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
             />
             {/* Remove overlay */}

@@ -99,7 +99,7 @@ export function HiredWorkerCard({
           alt={worker.name}
           initials={initials}
           size="sm"
-          rounded="2xl"
+          rounded="full"
           containerClassName="border border-slate-200/80 bg-slate-100 shadow-xs"
         />
 

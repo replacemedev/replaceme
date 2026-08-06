@@ -7,7 +7,7 @@ export function JobCardSkeleton() {
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4 min-w-0 flex-grow">
           {/* Logo Skeleton */}
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-slate-200 animate-pulse" />
+          <div className="shrink-0 w-12 h-12 rounded-full bg-slate-200 animate-pulse" />
           
           <div className="min-w-0 flex-grow space-y-2">
             {/* Title Skeleton */}

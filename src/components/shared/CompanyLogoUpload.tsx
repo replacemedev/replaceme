@@ -115,14 +115,15 @@ export function CompanyLogoUpload({
   if (!editable) {
     return (
       <div
-        className={`relative mx-auto ${sizeClass.box} overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50`}
+        className={`relative mx-auto ${sizeClass.box} overflow-hidden rounded-full border-2 border-dashed border-slate-200 bg-slate-50`}
       >
         <LogoImage
           src={previewUrl}
           alt={`${label} logo`}
           label={label}
           sizePx={sizeClass.px}
-          rounded="2xl"
+          rounded="full"
+          fit="cover"
           colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
         />
       </div>
@@ -136,7 +137,7 @@ export function CompanyLogoUpload({
         onClick={() => !isUploading && inputRef.current?.click()}
         disabled={isUploading}
         aria-label={previewUrl ? "Change company logo" : "Upload company logo"}
-        className={`group relative ${sizeClass.box} overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100`}
+        className={`group relative ${sizeClass.box} overflow-hidden rounded-full border-2 border-dashed border-slate-200 bg-slate-50 transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100`}
       >
         {previewUrl ? (
           <LogoImage
@@ -145,9 +146,9 @@ export function CompanyLogoUpload({
             alt={`${label} logo`}
             label={label}
             sizePx={sizeClass.px}
-            rounded="2xl"
-            fit="contain"
-            className="object-contain"
+            rounded="full"
+            fit="cover"
+            className="object-cover"
             colorClass="flex h-full w-full items-center justify-center bg-slate-50 text-slate-400"
           />
         ) : (

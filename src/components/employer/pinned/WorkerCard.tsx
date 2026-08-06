@@ -37,18 +37,18 @@ export function WorkerCard({
       <div>
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-emerald-50">
+            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-emerald-50">
               {worker.avatarUrl && !isPreview ? (
                 <AvatarImage
                   src={worker.avatarUrl}
                   alt={worker.name}
                   initials={initials}
                   size="sm"
-                  rounded="2xl"
+                  rounded="full"
                 />
               ) : (
                 <div
-                  className={`w-full h-full flex items-center justify-center font-extrabold text-sm rounded-2xl ${
+                  className={`w-full h-full flex items-center justify-center font-extrabold text-sm rounded-full ${
                     isPreview
                       ? "bg-slate-100 text-slate-400 blur-[1px]"
                       : "bg-emerald-100 text-emerald-800"

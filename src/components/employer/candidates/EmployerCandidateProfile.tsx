@@ -97,7 +97,7 @@ export function EmployerCandidateProfile({
               alt={candidate.name}
               initials={initials}
               size="md"
-              rounded="2xl"
+              rounded="full"
               containerClassName="h-20 w-20 sm:h-24 sm:w-24 aspect-square shadow-sm border border-slate-200/80 bg-slate-100 shrink-0"
             />
             <div className="space-y-2 flex-1 min-w-0">

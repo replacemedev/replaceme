@@ -64,18 +64,18 @@ export function ApplicantCard({
     <div className="relative overflow-hidden bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow p-5 flex flex-col justify-between min-h-[220px]">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 min-w-0 w-full">
-          <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-emerald-50">
+          <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-emerald-50">
             {applicant.avatarUrl && !isPreview ? (
               <AvatarImage
                 src={applicant.avatarUrl}
                 alt={applicant.name}
                 initials={initials}
                 size="sm"
-                rounded="xl"
+                rounded="full"
               />
             ) : (
               <div
-                className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-xl ${isPreview
+                className={`w-full h-full flex items-center justify-center font-bold text-sm rounded-full ${isPreview
                   ? "bg-slate-100 text-slate-400 blur-[1px]"
                   : "bg-emerald-100 text-emerald-800"
                   }`}
