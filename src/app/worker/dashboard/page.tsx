@@ -87,6 +87,8 @@ export default async function WorkerDashboard() {
     skillCount: skills?.length ?? 0,
   });
 
+  const showProfileStrength = profileStrength.percentage < 100;
+
   const workerSkillsSet = new Set(
     skills?.map((s) => s.skill_name.toLowerCase()) ?? []
   );
@@ -203,8 +205,14 @@ export default async function WorkerDashboard() {
         )}
       </WorkerSectionCard>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-2 space-y-4">
+      <div
+        className={
+          showProfileStrength
+            ? "grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
+            : "grid grid-cols-1 gap-8 items-start"
+        }
+      >
+        <div className={showProfileStrength ? "lg:col-span-2 space-y-4" : "space-y-4"}>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
               Recommended for you
@@ -230,12 +238,14 @@ export default async function WorkerDashboard() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <ProfileStrengthCard
-            percentage={profileStrength.percentage}
-            tierLabel={profileStrength.label}
-          />
-        </div>
+        {showProfileStrength && (
+          <div className="flex flex-col gap-6">
+            <ProfileStrengthCard
+              percentage={profileStrength.percentage}
+              tierLabel={profileStrength.label}
+            />
+          </div>
+        )}
       </div>
 
       <WorkerSectionCard
