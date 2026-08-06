@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { logOut } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 export function AdminMfaChallengeForm() {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const submitLockRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -19,7 +21,7 @@ export function AdminMfaChallengeForm() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (submitLockRef.current) return;
+    if (submitLockRef.current || isPending) return;
 
     const otp = readOtp();
     setCode(otp);
@@ -88,6 +90,18 @@ export function AdminMfaChallengeForm() {
     }
   }
 
+  const handleLogout = () => {
+    startTransition(async () => {
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        await logOut();
+      } catch {
+        window.location.assign("/signin");
+      }
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
@@ -99,15 +113,26 @@ export function AdminMfaChallengeForm() {
         autoComplete="one-time-code"
         maxLength={6}
         className="min-h-11 text-center text-lg font-mono tracking-[0.3em]"
-        disabled={isLoading}
+        disabled={isLoading || isPending}
       />
-      <Button
-        type="submit"
-        disabled={isLoading || code.length !== 6}
-        className="w-full min-h-11"
-      >
-        {isLoading ? "Verifying..." : "Verify & Continue"}
-      </Button>
+      <div className="flex flex-col gap-3 mt-6">
+        <Button
+          type="submit"
+          disabled={isLoading || isPending || code.length !== 6}
+          className="w-full min-h-11"
+        >
+          {isLoading ? "Verifying..." : "Verify"}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isLoading || isPending}
+          onClick={handleLogout}
+          className="w-full min-h-11 text-slate-500 hover:text-slate-700"
+        >
+          {isPending ? "Signing out..." : "Logout"}
+        </Button>
+      </div>
     </form>
   );
 }

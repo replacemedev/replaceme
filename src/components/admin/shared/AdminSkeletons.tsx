@@ -4,6 +4,7 @@ import {
   TextLineSkeleton,
 } from "@/components/shared/skeletons/primitives";
 import { AdminPageShell } from "@/components/admin/layout/AdminPageShell";
+import { NotificationCardSkeleton } from "@/components/shared/notifications/NotificationCardSkeleton";
 
 /** Matches `AdminPageHeader` — title + muted description (+ optional action slot). */
 export function AdminPageHeaderSkeleton({ withAction = false }: { withAction?: boolean }) {
@@ -218,14 +219,7 @@ export function AdminNotificationsPageSkeleton() {
       <AdminTabsSkeleton count={7} />
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, index) => (
-          <div
-            key={index}
-            className="animate-pulse rounded-2xl border border-slate-200/80 bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
-          >
-            <SkeletonBlock className="h-4 w-1/3 max-w-[14rem] rounded bg-slate-200/70" />
-            <SkeletonBlock className="mt-3 h-3 w-full rounded bg-slate-100" />
-            <SkeletonBlock className="mt-2 h-3 w-4/5 rounded bg-slate-50" />
-          </div>
+          <NotificationCardSkeleton key={index} />
         ))}
       </div>
     </AdminPageShell>
