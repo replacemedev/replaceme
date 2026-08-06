@@ -217,7 +217,7 @@ export function ApplicantsClient({
             applicants
           </span>
         }
-        subhead="Applicant pipeline — review, shortlist, and move candidates through your hiring stages."
+        subhead="Applicant pipeline: Review, shortlist, and move candidates through your hiring stages."
       />
 
       {planUsage ? <PlanUsageStrip usage={planUsage} /> : null}
@@ -272,11 +272,10 @@ export function ApplicantsClient({
         <button
           type="button"
           onClick={() => setViewMode("pipeline")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-            viewMode === "pipeline"
-              ? "bg-[#006e2f] text-white"
-              : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
-          }`}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${viewMode === "pipeline"
+            ? "bg-[#006e2f] text-white"
+            : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
+            }`}
         >
           <KanbanSquare className="h-3.5 w-3.5" aria-hidden />
           Pipeline
@@ -284,11 +283,10 @@ export function ApplicantsClient({
         <button
           type="button"
           onClick={() => setViewMode("cards")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-            viewMode === "cards"
-              ? "bg-[#006e2f] text-white"
-              : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
-          }`}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${viewMode === "cards"
+            ? "bg-[#006e2f] text-white"
+            : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
+            }`}
         >
           <LayoutGrid className="h-3.5 w-3.5" aria-hidden />
           Cards
@@ -296,11 +294,10 @@ export function ApplicantsClient({
         <button
           type="button"
           onClick={() => setViewMode("table")}
-          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-            viewMode === "table"
-              ? "bg-[#006e2f] text-white"
-              : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
-          }`}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${viewMode === "table"
+            ? "bg-[#006e2f] text-white"
+            : "bg-white border border-slate-200 text-slate-650 hover:bg-slate-50"
+            }`}
         >
           <Table2 className="h-3.5 w-3.5" aria-hidden />
           Table

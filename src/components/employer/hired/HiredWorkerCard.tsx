@@ -76,7 +76,15 @@ export function HiredWorkerCard({
 
   // Status Style helper
   const getStatusStyle = () => {
-    return { dot: "bg-slate-400", text: "text-slate-800 bg-slate-100 border-slate-200" };
+    switch (worker.status) {
+      case "active":
+        return { dot: "bg-emerald-500", text: "text-[#006e2f] bg-[#ebfdf2] border-[#006e2f]/25" };
+      case "paused":
+        return { dot: "bg-amber-500", text: "text-amber-800 bg-amber-50 border-amber-200" };
+      case "terminated":
+      default:
+        return { dot: "bg-slate-400", text: "text-slate-700 bg-slate-100 border-slate-200" };
+    }
   };
 
   const statusStyle = getStatusStyle();

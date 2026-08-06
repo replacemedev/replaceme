@@ -8,10 +8,10 @@ const TIER_LABELS: Record<SubscriptionTier, string> = {
 };
 
 const TIER_STYLES: Record<SubscriptionTier, string> = {
-  discovery: "bg-slate-100 text-slate-800 border-slate-200",
-  starter: "bg-slate-100 text-slate-800 border-slate-200",
-  growth: "bg-slate-100 text-slate-800 border-slate-200",
-  scale: "bg-slate-100 text-slate-800 border-slate-200",
+  discovery: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
+  starter: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
+  growth: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
+  scale: "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25",
 };
 
 interface PlanTierBadgeProps {
@@ -30,7 +30,7 @@ export function PlanTierBadge({
     TIER_LABELS[normalized] ??
     tier.charAt(0).toUpperCase() + tier.slice(1);
   const style =
-    TIER_STYLES[normalized] ?? "bg-slate-100 text-slate-600 border-slate-200";
+    TIER_STYLES[normalized] ?? "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25";
 
   const sizeClass =
     size === "lg"

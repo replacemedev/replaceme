@@ -65,7 +65,18 @@ export function JobHeader({
   };
 
   // Determine status badge classes
-  const statusBadgeClasses = "bg-slate-100 text-slate-800 border-slate-200";
+  let statusBadgeClasses = "";
+  switch (status) {
+    case "Active":
+      statusBadgeClasses = "bg-[#ebfdf2] text-[#006e2f] border-[#006e2f]/25";
+      break;
+    case "Pending Review":
+      statusBadgeClasses = "bg-amber-50 text-amber-800 border-amber-200";
+      break;
+    default:
+      statusBadgeClasses = "bg-slate-100 text-slate-700 border-slate-200";
+      break;
+  }
 
   return (
     <div className="space-y-6">

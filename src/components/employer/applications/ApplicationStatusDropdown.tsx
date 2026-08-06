@@ -20,7 +20,7 @@ interface ApplicationStatusDropdownProps {
 }
 
 function selectStyles(_status: ApplicationStatus): string {
-  return "border-slate-200 bg-slate-100 text-slate-800 focus:ring-slate-500/30";
+  return "border-[#006e2f]/25 bg-[#ebfdf2] text-[#006e2f] focus:ring-[#006e2f]/30";
 }
 
 export function ApplicationStatusDropdown({
