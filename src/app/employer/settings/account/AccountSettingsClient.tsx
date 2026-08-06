@@ -284,7 +284,7 @@ export function AccountSettingsClient({
         </div>
       ) : null}
 
-      {planUsage ? <PlanUsageCard usage={planUsage} /> : null}
+      {planUsage ? <PlanUsageCard usage={planUsage} hideActionButton /> : null}
 
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
         <p className="text-sm font-bold text-slate-900">Account security</p>

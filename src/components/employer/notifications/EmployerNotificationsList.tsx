@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import Link from "next/link";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -9,13 +8,9 @@ import {
   markNotificationRead,
 } from "@/actions/notifications";
 import { EmptyState } from "@/components/shared/EmptyState";
-import {
-  getNotificationHref,
-  NOTIFICATION_TYPE_LABELS,
-  type Notification,
-} from "@/types/notifications.types";
+import { NotificationCard } from "@/components/shared/notifications/NotificationCard";
+import { type Notification } from "@/types/notifications.types";
 import { EmployerPageHeader } from "@/components/employer/layout/EmployerPageHeader";
-import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 interface EmployerNotificationsListProps {
   notifications: Notification[];
@@ -76,8 +71,12 @@ export function EmployerNotificationsList({
     });
   };
 
+  const handleMarkRead = (id: string) => {
+    void markNotificationRead(id);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-3xl mx-auto w-full">
       <EmployerPageHeader
         title="Notifications"
         subhead="Applicant updates, messages, and hiring activity."
@@ -87,7 +86,7 @@ export function EmployerNotificationsList({
               type="button"
               disabled={pending}
               onClick={handleMarkAllRead}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40"
             >
               {pending ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -109,9 +108,12 @@ export function EmployerNotificationsList({
       ) : (
         <div className="space-y-8">
           {unreadCount > 0 ? (
-            <p className="text-xs font-bold text-[#006e2f]">
-              {unreadCount} unread
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-[#006e2f] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#006e2f] animate-pulse" />
+                {unreadCount} unread notification{unreadCount === 1 ? "" : "s"}
+              </p>
+            </div>
           ) : null}
 
           {BUCKET_ORDER.map((bucket) => {
@@ -125,10 +127,12 @@ export function EmployerNotificationsList({
                 </h2>
                 <ul className="space-y-3">
                   {items.map((notification) => (
-                    <NotificationRow
-                      key={notification.id}
-                      notification={notification}
-                    />
+                    <li key={notification.id}>
+                      <NotificationCard
+                        notification={notification}
+                        onMarkRead={handleMarkRead}
+                      />
+                    </li>
                   ))}
                 </ul>
               </section>
@@ -137,87 +141,5 @@ export function EmployerNotificationsList({
         </div>
       )}
     </div>
-  );
-}
-
-function NotificationRow({ notification }: { notification: Notification }) {
-  const href = getNotificationHref(notification);
-  const typeLabel =
-    NOTIFICATION_TYPE_LABELS[notification.type] ?? notification.type;
-
-  const handleMarkRead = () => {
-    void markNotificationRead(notification.id);
-  };
-
-  const card = (
-    <article
-      className={`${EMPLOYER_CARD} px-4 py-3 transition-colors ${
-        notification.is_read
-          ? "border-slate-200"
-          : "border-[#006e2f]/25 bg-[#fafdfb]"
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
-            {typeLabel}
-          </p>
-          <p
-            className={`text-sm font-bold mt-0.5 ${
-              notification.is_read ? "text-slate-700" : "text-slate-900"
-            }`}
-          >
-            {notification.title}
-          </p>
-          <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-            {notification.message}
-          </p>
-          <p className="text-xs text-slate-400 mt-2 font-medium">
-            {new Date(notification.created_at).toLocaleString()}
-          </p>
-        </div>
-        {!notification.is_read ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleMarkRead();
-            }}
-            className="shrink-0 text-[11px] font-bold text-[#006e2f] hover:underline"
-          >
-            Mark read
-          </button>
-        ) : null}
-      </div>
-    </article>
-  );
-
-  if (href) {
-    return (
-      <li>
-        <Link
-          href={href}
-          onClick={() => {
-            if (!notification.is_read) handleMarkRead();
-          }}
-          className="block"
-        >
-          {card}
-        </Link>
-      </li>
-    );
-  }
-
-  return (
-    <li>
-      <button
-        type="button"
-        onClick={handleMarkRead}
-        className="block w-full text-left"
-      >
-        {card}
-      </button>
-    </li>
   );
 }

@@ -1,30 +1,63 @@
 "use client";
 
-import Link from "next/link";
 import { useTransition } from "react";
-import { Bell, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/actions/notifications";
 import { EmptyState } from "@/components/shared/EmptyState";
-import {
-  getNotificationHref,
-  type Notification,
-} from "@/types/notifications.types";
-import { WORKER_CARD } from "@/lib/worker/ui-tokens";
+import { NotificationCard } from "@/components/shared/notifications/NotificationCard";
+import { type Notification } from "@/types/notifications.types";
 
 interface WorkerNotificationsClientProps {
   notifications: Notification[];
   unreadCount: number;
 }
 
+type DateBucket = "Today" | "Yesterday" | "Earlier";
+
+function groupByDate(notifications: Notification[]) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const groups: Record<DateBucket, Notification[]> = {
+    Today: [],
+    Yesterday: [],
+    Earlier: [],
+  };
+
+  for (const notification of notifications) {
+    const date = new Date(notification.created_at);
+    if (Number.isNaN(date.getTime())) {
+      groups.Earlier.push(notification);
+      continue;
+    }
+    date.setHours(0, 0, 0, 0);
+
+    if (date.getTime() === today.getTime()) {
+      groups.Today.push(notification);
+    } else if (date.getTime() === yesterday.getTime()) {
+      groups.Yesterday.push(notification);
+    } else {
+      groups.Earlier.push(notification);
+    }
+  }
+
+  return groups;
+}
+
+const BUCKET_ORDER: DateBucket[] = ["Today", "Yesterday", "Earlier"];
+
 export function WorkerNotificationsClient({
   notifications: initialNotifications,
   unreadCount: initialUnread,
 }: WorkerNotificationsClientProps) {
   const [pending, startTransition] = useTransition();
+  const grouped = groupByDate(initialNotifications);
 
   function handleMarkAll() {
     startTransition(async () => {
@@ -43,75 +76,69 @@ export function WorkerNotificationsClient({
 
   if (initialNotifications.length === 0) {
     return (
-      <EmptyState
-        icon={<Bell size={22} aria-hidden />}
-        title="No notifications"
-        description="You're all caught up. New alerts will appear here."
-      />
+      <div className="max-w-3xl mx-auto w-full">
+        <EmptyState
+          icon={<Bell size={22} aria-hidden />}
+          title="No notifications"
+          description="You're all caught up. New alerts will appear here."
+        />
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {initialUnread > 0 ? (
-        <div className="flex justify-end">
+    <div className="space-y-6 max-w-3xl mx-auto w-full">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {initialUnread > 0 ? (
+          <p className="text-xs font-bold text-[#006e2f] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#006e2f] animate-pulse" />
+            {initialUnread} unread notification{initialUnread === 1 ? "" : "s"}
+          </p>
+        ) : (
+          <div />
+        )}
+
+        {initialUnread > 0 ? (
           <button
             type="button"
             onClick={handleMarkAll}
             disabled={pending}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#006e2f] hover:underline disabled:opacity-60"
+            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40"
           >
-            <CheckCheck className="h-4 w-4" aria-hidden />
+            {pending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+            ) : (
+              <CheckCheck className="h-3.5 w-3.5 text-[#006e2f]" aria-hidden />
+            )}
             Mark all read
           </button>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
-      <ul className="space-y-3">
-        {initialNotifications.map((notification) => {
-          const href = getNotificationHref(notification);
-          const content = (
-            <>
-              <p className="text-sm font-bold text-slate-900">
-                {notification.title}
-              </p>
-              <p className="text-sm text-slate-600 mt-0.5">
-                {notification.message}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">
-                {new Date(notification.created_at).toLocaleString()}
-              </p>
-            </>
-          );
+      <div className="space-y-8">
+        {BUCKET_ORDER.map((bucket) => {
+          const items = grouped[bucket];
+          if (items.length === 0) return null;
 
           return (
-            <li
-              key={notification.id}
-              className={`${WORKER_CARD} px-4 py-3 ${
-                notification.is_read ? "" : "border-[#006e2f]/30 bg-[#ebfdf2]/30"
-              }`}
-            >
-              {href ? (
-                <Link
-                  href={href}
-                  onClick={() => handleMarkOne(notification.id)}
-                  className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30 rounded-lg"
-                >
-                  {content}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleMarkOne(notification.id)}
-                  className="w-full text-left"
-                >
-                  {content}
-                </button>
-              )}
-            </li>
+            <section key={bucket} className="space-y-3">
+              <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                {bucket}
+              </h2>
+              <ul className="space-y-3">
+                {items.map((notification) => (
+                  <li key={notification.id}>
+                    <NotificationCard
+                      notification={notification}
+                      onMarkRead={handleMarkOne}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
 }

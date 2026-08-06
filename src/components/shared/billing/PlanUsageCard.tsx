@@ -21,9 +21,10 @@ function barClass(percent: number): string {
 
 interface PlanUsageCardProps {
   usage: EmployerPlanUsage;
+  hideActionButton?: boolean;
 }
 
-export function PlanUsageCard({ usage }: PlanUsageCardProps) {
+export function PlanUsageCard({ usage, hideActionButton = false }: PlanUsageCardProps) {
   const jobsPercent = usagePercent(usage.activeJobsCount, usage.activeJobsLimit);
   const jobsBarWidth = Math.min(jobsPercent, 100);
   const isAtOrOverLimit = usage.activeJobsLimit !== null && jobsPercent >= 100;
@@ -64,9 +65,8 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
           </div>
           {usage.activeJobsLimit !== null ? (
             <p
-              className={`text-[11px] font-bold ${
-                isAtOrOverLimit ? "text-rose-600" : jobsPercent >= 80 ? "text-amber-700" : "text-slate-500"
-              }`}
+              className={`text-[11px] font-bold ${isAtOrOverLimit ? "text-rose-600" : jobsPercent >= 80 ? "text-amber-700" : "text-slate-500"
+                }`}
             >
               {isAtOrOverLimit ? "Upgrade to post more jobs" : jobsPercent >= 80 ? "Near limit" : "Within plan limits"}
             </p>
@@ -86,11 +86,10 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
 
         <div className="grid grid-cols-1 gap-2 text-[11px] font-bold">
           <div
-            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${
-              usage.messagingEnabled
+            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${usage.messagingEnabled
                 ? "border-emerald-100 bg-[#ebfdf2] text-[#006e2f]"
                 : "border-slate-100 bg-slate-50 text-slate-600"
-            }`}
+              }`}
           >
             <span className="flex items-center gap-2 min-w-0">
               <MessageSquare className="h-4 w-4 shrink-0" aria-hidden />
@@ -102,11 +101,10 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
           </div>
 
           <div
-            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${
-              usage.resumeDownloadEnabled
+            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${usage.resumeDownloadEnabled
                 ? "border-emerald-100 bg-[#ebfdf2] text-[#006e2f]"
                 : "border-slate-100 bg-slate-50 text-slate-600"
-            }`}
+              }`}
           >
             <span className="flex items-center gap-2 min-w-0">
               <FileDown className="h-4 w-4 shrink-0" aria-hidden />
@@ -118,11 +116,10 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
           </div>
 
           <div
-            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${
-              usage.identityMode === "full"
+            className={`flex items-center justify-between gap-3 rounded-2xl border px-3.5 py-2.5 ${usage.identityMode === "full"
                 ? "border-emerald-100 bg-[#ebfdf2] text-[#006e2f]"
                 : "border-slate-100 bg-slate-50 text-slate-600"
-            }`}
+              }`}
           >
             <span className="flex items-center gap-2 min-w-0">
               <UserRound className="h-4 w-4 shrink-0" aria-hidden />
@@ -134,23 +131,25 @@ export function PlanUsageCard({ usage }: PlanUsageCardProps) {
           </div>
         </div>
 
-        <div>
-          {usage.planSlug === "discovery" ? (
-            <Link
-              href="/employer/pricing"
-              className="flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-[#006e2f] px-4 py-3 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-[#005c26]"
-            >
-              Upgrade plan
-            </Link>
-          ) : (
-            <Link
-              href="/employer/settings/account"
-              className="flex min-h-[44px] w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-900 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-300"
-            >
-              Manage subscription
-            </Link>
-          )}
-        </div>
+        {!hideActionButton ? (
+          <div>
+            {usage.planSlug === "discovery" ? (
+              <Link
+                href="/employer/pricing"
+                className="flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-[#006e2f] px-4 py-3 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-[#005c26]"
+              >
+                Upgrade plan
+              </Link>
+            ) : (
+              <Link
+                href="/employer/settings/account"
+                className="flex min-h-[44px] w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-900 shadow-sm transition-colors hover:bg-slate-50 hover:border-slate-300"
+              >
+                Manage subscription
+              </Link>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
