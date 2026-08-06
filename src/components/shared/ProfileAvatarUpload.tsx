@@ -190,6 +190,7 @@ export function ProfileAvatarUpload({
           initials={initials}
           size={sizeClass.avatar}
           priority
+          containerClassName="w-full h-full"
         />
       </div>
     );
@@ -211,6 +212,7 @@ export function ProfileAvatarUpload({
             initials={initials}
             size={sizeClass.avatar}
             priority
+            containerClassName="w-full h-full"
           />
 
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-slate-900/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">

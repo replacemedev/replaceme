@@ -61,7 +61,11 @@ export function AvatarImage({
   containerClassName = "",
 }: AvatarImageProps) {
   const px = SIZE_PX[size];
-  const sizeClass = SIZE_CLASS[size];
+  const isFluid =
+    containerClassName.includes("w-full") ||
+    containerClassName.includes("h-full") ||
+    containerClassName.includes("aspect-square");
+  const sizeClass = isFluid ? "" : SIZE_CLASS[size];
   const roundClass =
     rounded === "full"
       ? "rounded-full"
@@ -70,7 +74,7 @@ export function AvatarImage({
         : "rounded-xl";
 
   // Safari/WebKit: overflow + rounded on the box; object-cover on the image.
-  const boxClass = `relative block shrink-0 overflow-hidden ${sizeClass} ${roundClass} ${containerClassName}`;
+  const boxClass = `relative block shrink-0 overflow-hidden ${sizeClass} ${roundClass} ${containerClassName}`.trim();
 
   if (!src?.trim()) {
     return (

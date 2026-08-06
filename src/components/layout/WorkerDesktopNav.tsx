@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Bell, DollarSign } from "lucide-react";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 
 const PRIMARY = [
@@ -15,7 +15,8 @@ const PRIMARY = [
 ];
 
 const MORE = [
-  { href: "/worker/earnings", label: "Earnings" },
+  { href: "/worker/notifications", label: "Notifications", icon: Bell },
+  { href: "/worker/earnings", label: "Earnings", icon: DollarSign },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -89,24 +90,32 @@ export function WorkerDesktopNav({
         </button>
         {moreOpen ? (
           <div
-            className="absolute left-0 mt-2 w-44 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50"
+            className="absolute left-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
             role="menu"
           >
-            {MORE.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMoreOpen(false)}
-                className={`block px-4 py-2 text-sm hover:bg-slate-50 ${
-                  isActive(pathname, item.href)
-                    ? "text-[#006e2f] font-semibold"
-                    : "text-slate-600"
-                }`}
-                role="menuitem"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {MORE.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMoreOpen(false)}
+                  className={`flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
+                    active
+                      ? "text-[#006e2f] font-bold bg-emerald-50/50"
+                      : "text-slate-600 hover:text-slate-900 font-medium"
+                  }`}
+                  role="menuitem"
+                >
+                  <Icon
+                    size={16}
+                    className={active ? "text-[#006e2f]" : "text-slate-400"}
+                  />
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
         ) : null}
       </div>

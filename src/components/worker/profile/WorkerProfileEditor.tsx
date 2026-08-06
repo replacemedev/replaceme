@@ -569,6 +569,7 @@ export function WorkerProfileEditor({
                   initials={initials}
                   size="xl"
                   priority
+                  containerClassName="w-full h-full"
                 />
               </div>
             )}

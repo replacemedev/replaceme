@@ -10,6 +10,7 @@ import {
 import { EmptyState } from "@/components/shared/EmptyState";
 import { NotificationCard } from "@/components/shared/notifications/NotificationCard";
 import { type Notification } from "@/types/notifications.types";
+import { WorkerPageHeader } from "@/components/worker/layout";
 
 interface WorkerNotificationsClientProps {
   notifications: Notification[];
@@ -74,71 +75,71 @@ export function WorkerNotificationsClient({
     void markNotificationRead(id);
   }
 
-  if (initialNotifications.length === 0) {
-    return (
-      <div className="max-w-3xl mx-auto w-full">
+  return (
+    <div className="space-y-6 max-w-3xl mx-auto w-full">
+      <WorkerPageHeader
+        title="Notifications"
+        subhead="Updates about applications, messages, and offers."
+        actions={
+          initialUnread > 0 ? (
+            <button
+              type="button"
+              onClick={handleMarkAll}
+              disabled={pending}
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 cursor-pointer"
+            >
+              {pending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <CheckCheck className="h-4 w-4 text-[#006e2f]" aria-hidden />
+              )}
+              Mark all read
+            </button>
+          ) : null
+        }
+      />
+
+      {initialNotifications.length === 0 ? (
         <EmptyState
           icon={<Bell size={22} aria-hidden />}
           title="No notifications"
           description="You're all caught up. New alerts will appear here."
         />
-      </div>
-    );
-  }
+      ) : (
+        <div className="space-y-8">
+          {initialUnread > 0 ? (
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-[#006e2f] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#006e2f] animate-pulse" />
+                {initialUnread} unread notification{initialUnread === 1 ? "" : "s"}
+              </p>
+            </div>
+          ) : null}
 
-  return (
-    <div className="space-y-6 max-w-3xl mx-auto w-full">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        {initialUnread > 0 ? (
-          <p className="text-xs font-bold text-[#006e2f] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60 inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#006e2f] animate-pulse" />
-            {initialUnread} unread notification{initialUnread === 1 ? "" : "s"}
-          </p>
-        ) : (
-          <div />
-        )}
+          {BUCKET_ORDER.map((bucket) => {
+            const items = grouped[bucket];
+            if (items.length === 0) return null;
 
-        {initialUnread > 0 ? (
-          <button
-            type="button"
-            onClick={handleMarkAll}
-            disabled={pending}
-            className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40"
-          >
-            {pending ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
-            ) : (
-              <CheckCheck className="h-3.5 w-3.5 text-[#006e2f]" aria-hidden />
-            )}
-            Mark all read
-          </button>
-        ) : null}
-      </div>
-
-      <div className="space-y-8">
-        {BUCKET_ORDER.map((bucket) => {
-          const items = grouped[bucket];
-          if (items.length === 0) return null;
-
-          return (
-            <section key={bucket} className="space-y-3">
-              <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-                {bucket}
-              </h2>
-              <ul className="space-y-3">
-                {items.map((notification) => (
-                  <li key={notification.id}>
-                    <NotificationCard
-                      notification={notification}
-                      onMarkRead={handleMarkOne}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })}
-      </div>
+            return (
+              <section key={bucket} className="space-y-3">
+                <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                  {bucket}
+                </h2>
+                <ul className="space-y-3">
+                  {items.map((notification) => (
+                    <li key={notification.id}>
+                      <NotificationCard
+                        notification={notification}
+                        onMarkRead={handleMarkOne}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

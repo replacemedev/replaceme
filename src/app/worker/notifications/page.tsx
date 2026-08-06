@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotificationBootstrap } from "@/lib/notifications/fetch-initial";
 import { WorkerNotificationsClient } from "@/components/worker/notifications/WorkerNotificationsClient";
-import { WorkerPageShell, WorkerPageHeader } from "@/components/worker/layout";
+import { WorkerPageShell } from "@/components/worker/layout";
 
 export const metadata = {
   title: "Notifications",
@@ -24,11 +24,6 @@ export default async function WorkerNotificationsPage() {
 
   return (
     <WorkerPageShell width="content">
-      <WorkerPageHeader
-        title="Notifications"
-        subhead="Updates about applications, messages, and offers."
-      />
-
       <WorkerNotificationsClient
         notifications={notifications}
         unreadCount={unreadCount}
