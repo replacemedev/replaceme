@@ -197,10 +197,10 @@ export function ApplicantsClient({
     applicants.length >= Math.ceil(applicantsPerJobLimit * 0.8);
 
   const stages: { key: ApplicationStatus; label: string; bg: string; text: string }[] = [
-    { key: "PENDING", label: "Applied", bg: "bg-slate-50/50 border-slate-200/50", text: "text-slate-700" },
-    { key: "UNDER_REVIEW", label: "Shortlisted", bg: "bg-emerald-50/50 border-emerald-100/50", text: "text-[#006e2f]" },
-    { key: "HIRED", label: "Hired", bg: "bg-violet-50/50 border-violet-100/50", text: "text-violet-800" },
-    { key: "REJECTED", label: "Declined", bg: "bg-red-50/50 border-red-100/50", text: "text-red-800" },
+    { key: "PENDING", label: "Applied", bg: "bg-slate-50/50 border-slate-200/60", text: "text-slate-800" },
+    { key: "UNDER_REVIEW", label: "Shortlisted", bg: "bg-slate-50/50 border-slate-200/60", text: "text-slate-800" },
+    { key: "HIRED", label: "Hired", bg: "bg-slate-50/50 border-slate-200/60", text: "text-slate-800" },
+    { key: "REJECTED", label: "Declined", bg: "bg-slate-50/50 border-slate-200/60", text: "text-slate-800" },
   ];
 
   const content = (
@@ -209,7 +209,7 @@ export function ApplicantsClient({
         bordered
         title={`Job: ${jobTitle}`}
         badge={
-          <span className="text-sm font-black bg-[#ebfdf2] text-[#006e2f] border border-[#006e2f]/15 py-1 px-3 rounded-full shrink-0">
+          <span className="text-sm font-black bg-slate-100 text-slate-800 border border-slate-200 py-1 px-3 rounded-full shrink-0">
             {applicants.length}
             {applicantsPerJobLimit !== null
               ? ` / ${applicantsPerJobLimit}`
@@ -392,11 +392,7 @@ export function ApplicantsClient({
                       className="flex items-center justify-between w-full p-4 font-bold text-sm text-slate-800 hover:bg-slate-50 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex h-2.5 w-2.5 rounded-full ${
-                          stage.key === "PENDING" ? "bg-slate-400" :
-                          stage.key === "UNDER_REVIEW" ? "bg-emerald-500" :
-                          stage.key === "HIRED" ? "bg-violet-500" : "bg-red-500"
-                        }`} />
+                        <span className="inline-flex h-2.5 w-2.5 rounded-full bg-slate-400" />
                         <span>{stage.label}</span>
                         <span className="rounded-full bg-slate-50 border border-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500">
                           {stageApps.length}

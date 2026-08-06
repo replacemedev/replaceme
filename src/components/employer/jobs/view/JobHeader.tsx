@@ -65,27 +65,7 @@ export function JobHeader({
   };
 
   // Determine status badge classes
-  let statusBadgeClasses = "";
-  switch (status) {
-    case "Active":
-      statusBadgeClasses = "bg-emerald-50 text-emerald-700 border-emerald-200";
-      break;
-    case "Closed":
-      statusBadgeClasses = "bg-slate-100 text-slate-600 border-slate-200";
-      break;
-    case "Rejected":
-      statusBadgeClasses = "bg-amber-50 text-amber-900 border-amber-300";
-      break;
-    case "Deleted":
-      statusBadgeClasses = "bg-red-50 text-red-800 border-red-200";
-      break;
-    case "Pending Review":
-      statusBadgeClasses = "bg-amber-50 text-amber-700 border-amber-200";
-      break;
-    default:
-      statusBadgeClasses = "bg-slate-100 text-slate-600 border-slate-200";
-      break;
-  }
+  const statusBadgeClasses = "bg-slate-100 text-slate-800 border-slate-200";
 
   return (
     <div className="space-y-6">

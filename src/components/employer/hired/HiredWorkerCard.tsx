@@ -58,16 +58,7 @@ export function HiredWorkerCard({
 
   // Style helper for Type Badge
   const getBadgeStyle = () => {
-    switch (worker.employmentType) {
-      case "full-time":
-        return "bg-emerald-50 text-emerald-800 border-emerald-100";
-      case "contract":
-        return "bg-indigo-50 text-indigo-800 border-indigo-100";
-      case "part-time":
-        return "bg-amber-50 text-amber-800 border-amber-100";
-      default:
-        return "bg-slate-50 text-slate-800 border-slate-100";
-    }
+    return "bg-slate-100 text-slate-800 border-slate-200";
   };
 
   const getBadgeLabel = () => {
@@ -85,16 +76,7 @@ export function HiredWorkerCard({
 
   // Status Style helper
   const getStatusStyle = () => {
-    switch (worker.status) {
-      case "active":
-        return { dot: "bg-emerald-500", text: "text-emerald-700 bg-emerald-50 border-emerald-100" };
-      case "paused":
-        return { dot: "bg-amber-500", text: "text-amber-700 bg-amber-50 border-amber-100" };
-      case "terminated":
-        return { dot: "bg-slate-400", text: "text-slate-700 bg-slate-50 border-slate-100" };
-      default:
-        return { dot: "bg-slate-400", text: "text-slate-700 bg-slate-50 border-slate-100" };
-    }
+    return { dot: "bg-slate-400", text: "text-slate-800 bg-slate-100 border-slate-200" };
   };
 
   const statusStyle = getStatusStyle();

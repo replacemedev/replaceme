@@ -14,11 +14,11 @@ function normalizeStatus(status: string): string {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  pending: "bg-amber-50 text-amber-800 border-amber-200",
-  rejected: "bg-amber-50 text-amber-900 border-amber-300",
-  deleted: "bg-red-50 text-red-800 border-red-200",
-  closed: "bg-slate-100 text-slate-600 border-slate-200",
+  active: "bg-slate-100 text-slate-800 border-slate-200",
+  pending: "bg-slate-100 text-slate-800 border-slate-200",
+  rejected: "bg-slate-100 text-slate-800 border-slate-200",
+  deleted: "bg-slate-100 text-slate-800 border-slate-200",
+  closed: "bg-slate-100 text-slate-800 border-slate-200",
 };
 
 const STATUS_LABELS: Record<string, string> = {

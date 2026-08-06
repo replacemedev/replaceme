@@ -19,18 +19,8 @@ interface ApplicationStatusDropdownProps {
   candidateName?: string;
 }
 
-function selectStyles(status: ApplicationStatus): string {
-  switch (status) {
-    case "UNDER_REVIEW":
-      return "border-emerald-200 bg-emerald-50 text-emerald-800 focus:ring-emerald-500/30";
-    case "REJECTED":
-      return "border-red-200 bg-red-50 text-red-800 focus:ring-red-500/30";
-    case "HIRED":
-      return "border-violet-200 bg-violet-50 text-violet-800 focus:ring-violet-500/30";
-    case "PENDING":
-    default:
-      return "border-slate-200 bg-slate-50 text-slate-700 focus:ring-slate-500/30";
-  }
+function selectStyles(_status: ApplicationStatus): string {
+  return "border-slate-200 bg-slate-100 text-slate-800 focus:ring-slate-500/30";
 }
 
 export function ApplicationStatusDropdown({
