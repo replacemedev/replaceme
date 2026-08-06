@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Element, scroller } from "react-scroll";
+import { scroller } from "react-scroll";
 import { GUEST_HEADER_NAV } from "@/config/publicNav";
 import { PUBLIC_HEADER_SCROLL_OFFSET } from "@/lib/layout/public-shell";
 import {
@@ -285,7 +285,6 @@ export function LandingPageClient({
         <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] right-[-10%] bg-emerald-100/40`} aria-hidden />
 
-        <Element name="find-work" id="find-work-element" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28" aria-hidden />
         <div className={`${LANDING_INNER} relative z-10`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <div className="lg:col-span-5 space-y-4 sm:space-y-6 reveal-item">
@@ -341,7 +340,6 @@ export function LandingPageClient({
         <div className={LANDING_SECTION_GRID} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} top-[-10%] right-[-10%] bg-emerald-50/50`} aria-hidden />
 
-        <Element name="how-it-works" id="how-it-works-element" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28" aria-hidden />
         <div className={`${LANDING_INNER} relative z-10`}>
           {/* AEO: Question-format H2 targets "how does X work" voice-search and featured-snippet queries */}
           <div className="text-center mb-10 sm:mb-14 md:mb-20 reveal-item">
@@ -441,7 +439,6 @@ export function LandingPageClient({
         <div className={`${LANDING_AMBIENT_GLOW} -top-40 -right-40 bg-emerald-500/20 animate-float-slow-2`} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} -bottom-40 -left-40 bg-indigo-500/20 animate-float-slow-1`} aria-hidden />
 
-        <Element name="pricing" id="pricing-element" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28" aria-hidden />
         <div className={`${LANDING_INNER} max-w-7xl text-center relative z-10`}>
           <div className="reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white mb-3 sm:mb-4 font-bold tracking-tight">Simple, Transparent Pricing</h2>
@@ -477,7 +474,6 @@ export function LandingPageClient({
         <div className={LANDING_SECTION_GRID} aria-hidden />
         <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] left-[-10%] bg-emerald-50/45`} aria-hidden />
 
-        <Element name="faq" id="faq-element" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24 lg:scroll-mt-28" aria-hidden />
         <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
           <div className="text-center mb-10 sm:mb-14 md:mb-16 reveal-item">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-3 sm:mb-4 font-bold tracking-tight text-balance">What Do Employers and Job Seekers Ask About Replaceme?</h2>
