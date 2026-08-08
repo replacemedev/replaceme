@@ -277,6 +277,8 @@ export function LandingPageClient({
             />
           </div>
         </div>
+      </section>
+
       {/* For Job Seekers */}
       <section className={`${LANDING_SECTION} bg-gradient-to-b from-white via-[#f8fafc] to-white`}>
         <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" aria-hidden />
