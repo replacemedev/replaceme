@@ -4,11 +4,11 @@ import { CookieSettingsButton } from "@/components/shared/cookie-consent";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
 
 const linkClassName =
-  "text-base text-gray-600 hover:text-emerald-600 transition-colors block";
+  "text-sm text-slate-500 hover:text-slate-900 transition-colors block";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-white border-t border-gray-100 py-12 md:py-16 relative overflow-hidden">
+    <footer className="w-full bg-white border-t border-slate-100 py-12 md:py-16 relative overflow-hidden">
       {/* Subtle grid pattern background */}
       <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)] opacity-30 pointer-events-none z-0" />
 
@@ -18,7 +18,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1 xl:col-span-2 max-w-xs mb-2 lg:mb-0">
             <NavBrand homeHref="/" />
-            <p className="text-sm text-gray-600 mt-4 leading-relaxed">
+            <p className="text-sm text-slate-500 mt-4 leading-relaxed">
               Empowering global teams with elite Filipino remote talent. Building
               direct connections for long-term success.
             </p>
@@ -26,10 +26,10 @@ export function Footer() {
 
           {/* Employers */}
           <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-slate-900 tracking-wider uppercase mb-4">
               Employers
             </h3>
-            <nav className="space-y-3" aria-label="Employer links">
+            <nav className="space-y-2.5" aria-label="Employer links">
               <Link className={linkClassName} href="/signup">
                 Post a Job
               </Link>
@@ -47,10 +47,10 @@ export function Footer() {
 
           {/* Jobseekers */}
           <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-slate-900 tracking-wider uppercase mb-4">
               Jobseekers
             </h3>
-            <nav className="space-y-3" aria-label="Jobseeker links">
+            <nav className="space-y-2.5" aria-label="Jobseeker links">
               <Link className={linkClassName} href="/jobs">
                 Browse Jobs
               </Link>
@@ -65,10 +65,10 @@ export function Footer() {
 
           {/* Company & Legal */}
           <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-gray-950 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-slate-900 tracking-wider uppercase mb-4">
               Company &amp; Legal
             </h3>
-            <nav className="space-y-3" aria-label="Company and legal links">
+            <nav className="space-y-2.5" aria-label="Company and legal links">
               <Link className={linkClassName} href="/team">
                 Our Team
               </Link>
@@ -90,15 +90,15 @@ export function Footer() {
               <Link className={linkClassName} href="/cookie-policy">
                 Cookie Policy
               </Link>
-              <CookieSettingsButton className="text-left text-base text-gray-600 hover:text-emerald-600 transition-colors block w-full" />
+              <CookieSettingsButton className={`text-left ${linkClassName} w-full`} />
             </nav>
           </div>
         </div>
 
         {/* Bottom Zone — Fine Print */}
-        <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col gap-6">
+        <div className="mt-12 md:mt-16 pt-8 border-t border-slate-100 flex flex-col gap-6">
           {/* Legal Text Block */}
-          <div className="text-xs text-gray-500 text-left md:text-center space-y-2 leading-relaxed max-w-4xl mx-auto">
+          <div className="text-xs text-slate-500 text-left md:text-center space-y-2 leading-relaxed max-w-4xl mx-auto">
             <p>
               Employer plan payments are processed securely by Stripe. An
               Australian business operating Replaceme is the merchant of record
@@ -107,7 +107,7 @@ export function Footer() {
               Stripe fee. See our{" "}
               <Link
                 href="/refund-policy"
-                className="underline hover:text-emerald-600 transition-colors"
+                className="underline hover:text-slate-900 transition-colors"
               >
                 Refund Policy
               </Link>
@@ -122,14 +122,14 @@ export function Footer() {
               in-app chat matches (no email outreach). See our{" "}
               <Link
                 href="/privacy-policy"
-                className="underline hover:text-emerald-600 transition-colors"
+                className="underline hover:text-slate-900 transition-colors"
               >
                 Privacy Policy
               </Link>{" "}
               and{" "}
               <Link
                 href="/terms-of-service"
-                className="underline hover:text-emerald-600 transition-colors"
+                className="underline hover:text-slate-900 transition-colors"
               >
                 Terms of Service
               </Link>
@@ -138,7 +138,7 @@ export function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="flex justify-center items-center text-center text-xs md:text-sm text-gray-500 pt-2 border-t border-gray-100/60 w-full">
+          <div className="flex justify-center items-center text-center text-xs md:text-sm text-slate-500 pt-2 border-t border-slate-100 w-full">
             <span>© {new Date().getFullYear()} Replaceme. All rights reserved.</span>
           </div>
         </div>
