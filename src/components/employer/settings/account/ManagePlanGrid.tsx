@@ -42,29 +42,24 @@ interface ManagePlanGridProps {
 const PLAN_META: {
   slug: SubscriptionTier;
   label: string;
-  detail: string;
   highlight?: boolean;
 }[] = [
   {
     slug: "discovery",
     label: "Discovery",
-    detail: "1 job · preview candidates",
   },
   {
     slug: "starter",
     label: "Starter",
-    detail: "3 jobs · 20 applicants/job",
   },
   {
     slug: "growth",
     label: "Growth",
-    detail: "10 jobs · 50 applicants/job",
     highlight: true,
   },
   {
     slug: "scale",
     label: "Scale",
-    detail: "Unlimited jobs & applicants",
   },
 ];
 
@@ -219,10 +214,6 @@ export function ManagePlanGrid({
                     priceClassName="text-3xl xl:text-4xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap"
                     centered
                   />
-
-                  <p className="mt-2 text-[11px] sm:text-xs leading-relaxed text-slate-500 font-medium">
-                    {plan.detail}
-                  </p>
                 </div>
 
                 <div className="mt-auto pt-5">
