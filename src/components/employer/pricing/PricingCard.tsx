@@ -60,7 +60,7 @@ export function PricingCardPrice({
   return (
     <div className="space-y-1">
       <div className="flex items-baseline gap-1.5 flex-nowrap mt-3">
-        <span className={priceClassName}>{formattedPrice}</span>
+        <span className={`shrink-0 ${priceClassName}`}>{formattedPrice}</span>
         <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">
           {isPaid ? "USD / mo" : "USD"}
         </span>
