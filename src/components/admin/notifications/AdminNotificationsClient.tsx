@@ -30,6 +30,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { AdminPageHeader } from "@/components/admin/shared/AdminPageHeader";
 import { AdminSectionLabel } from "@/components/admin/shared/AdminFilterPills";
 import { AdminTabs } from "@/components/admin/shared/AdminTabs";
+import { NotificationCardSkeleton } from "@/components/shared/notifications/NotificationCardSkeleton";
 import { AdminNotificationsPageSkeleton } from "@/components/admin/shared/AdminSkeletons";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
@@ -253,14 +254,7 @@ function AdminNotificationsInbox({
         />
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, index) => (
-            <div
-              key={index}
-              className="animate-pulse rounded-2xl border border-slate-200/80 bg-white px-4 py-4"
-            >
-              <div className="h-4 w-1/3 max-w-[14rem] rounded bg-slate-200/70" />
-              <div className="mt-3 h-3 w-full rounded bg-slate-100" />
-              <div className="mt-2 h-3 w-4/5 rounded bg-slate-50" />
-            </div>
+            <NotificationCardSkeleton key={index} />
           ))}
         </div>
       </div>
