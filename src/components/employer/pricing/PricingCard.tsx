@@ -59,13 +59,13 @@ export function PricingCardPrice({
 
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-1.5 flex-nowrap mt-3">
+      <div className="flex items-baseline justify-center gap-1.5 flex-nowrap mt-3">
         <span className={`shrink-0 ${priceClassName}`}>{formattedPrice}</span>
         <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">
           {isPaid ? "USD / mo" : "USD"}
         </span>
       </div>
-      <div className="min-h-[20px] mt-1 flex items-center">
+      <div className="min-h-[20px] mt-1 flex items-center justify-center text-center">
         {annualTotal != null ? (
           <p className={subtextClassName}>
             Billed annually at{" "}
