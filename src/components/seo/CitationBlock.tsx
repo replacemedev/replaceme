@@ -44,7 +44,7 @@ export function CitationBlock({
           aria-label={`Key statistic: ${stat}: ${statLabel}`}
         >
           <span
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22c55e] tracking-tight whitespace-nowrap"
+            className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#22c55e] tracking-tight whitespace-nowrap"
             itemProp="value"
           >
             {stat}
@@ -80,7 +80,7 @@ export function CitationBlockSkeleton({ className = "" }: { className?: string }
 
       {/* Footer Section (Pushed to bottom via mt-auto) */}
       <div className="mt-auto pt-6 border-t border-slate-100 flex items-baseline gap-2.5">
-        <SkeletonBlock className="h-10 w-16 bg-emerald-100/70 rounded-lg" />
+        <SkeletonBlock className="h-8 sm:h-9 w-16 bg-emerald-100/70 rounded-lg" />
         <SkeletonBlock className="h-4 w-32 bg-slate-100 rounded" />
       </div>
     </div>

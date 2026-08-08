@@ -258,9 +258,9 @@ export function LandingPageClient({
             <CitationBlock
               label="Skill Match Chat"
               headline="Automated skill matching stays inside platform chat"
-              body="When a Starter+ job goes live, Replaceme can open an in-app chat with overlapping workers and a Quick Apply action. Matches are never sent by email."
+              body="When a Starter+ job goes live, Replaceme can open an in-app chat with overlapping workers and a Quick Apply action."
               stat="Chat"
-              statLabel="only — no email"
+              statLabel="in-app"
             />
             <CitationBlock
               label="Transparent Pricing"
