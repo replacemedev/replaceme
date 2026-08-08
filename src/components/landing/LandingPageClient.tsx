@@ -136,9 +136,9 @@ export function LandingPageClient({
 
 
   return (
-    <main>
+    <main className="overflow-x-clip w-full min-w-0">
       {/* Hero Section */}
-      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 overflow-x-hidden bg-gradient-to-b from-white via-[#f8fafc] to-white">
+      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 bg-gradient-to-b from-white via-[#f8fafc] to-white">
         {/* Decorative Glowing Blobs */}
         <div className="absolute top-4 sm:top-8 left-[-5%] w-[min(450px,75vw)] h-[min(450px,75vw)] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none -z-10" />
         <div className="absolute top-1/2 -translate-y-1/2 right-[-5%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-indigo-100/25 blur-3xl animate-float-slow-2 pointer-events-none -z-10" />
