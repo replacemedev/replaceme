@@ -12,6 +12,20 @@ export interface PricingCardHeaderProps {
   badgeClassName?: string;
 }
 
+/**
+ * Shared styling classes for Pricing Cards to maintain visual consistency across 
+ * Landing Page, Public Pricing, Employer Pricing, and Account Settings.
+ */
+export const PRICING_CARD_STYLES = {
+  standard:
+    "border border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300",
+  highlighted:
+    "border-2 border-[#006e2f] bg-emerald-50/50 shadow-lg hover:shadow-xl transition-all duration-300",
+  current:
+    "border-2 border-[#006e2f] bg-emerald-50/40 shadow-md transition-all duration-300",
+};
+
+
 export function PricingCardHeader({
   title,
   savePct,

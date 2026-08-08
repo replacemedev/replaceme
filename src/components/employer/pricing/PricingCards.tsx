@@ -118,11 +118,11 @@ export function PricingCards({
 }: PricingCardsProps) {
   if (!plans || plans.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-white rounded-3xl shadow-sm border border-gray-100 max-w-2xl mx-auto my-8">
-        <p className="text-gray-500 font-medium text-lg">
+      <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center bg-white rounded-3xl shadow-sm border border-slate-200 max-w-2xl mx-auto my-8">
+        <p className="text-slate-500 font-medium text-lg">
           No pricing plans available at the moment.
         </p>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="text-slate-400 text-sm mt-1">
           Please check back later or contact support.
         </p>
       </div>
@@ -177,8 +177,8 @@ export function PricingCards({
               key={plan.id}
               className={`relative flex flex-col justify-between p-6 md:p-8 rounded-3xl transition-all duration-300 ${
                 isGrowth
-                  ? "border-2 border-[#006e2f] bg-gradient-to-b from-[#fafdfb] to-white shadow-lg lg:scale-105 z-10 hover:shadow-xl"
-                  : "border border-gray-100 bg-white shadow-sm hover:shadow-md hover:border-gray-200"
+                  ? "border-2 border-[#006e2f] bg-emerald-50/50 shadow-lg lg:scale-105 z-10 hover:shadow-xl"
+                  : "border border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300"
               }`}
             >
               {/* Badge Pinned to the Top */}
@@ -214,7 +214,7 @@ export function PricingCards({
 
                 {/* Description (Purpose/Perfect for) */}
                 <div className="mt-4 min-h-[50px] flex flex-col justify-start">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                     {detail.descriptionLabel}
                   </p>
                   <p className="text-slate-500 text-sm mt-1 leading-relaxed font-medium">
@@ -223,7 +223,7 @@ export function PricingCards({
                 </div>
 
                 {/* Divider */}
-                <div className="border-t border-gray-100 my-5" />
+                <div className="border-t border-slate-100 my-5" />
 
                 {/* Features List — icon sized to first-line height so wrap doesn't look mid-aligned */}
                 <ul className="space-y-3 flex-1">
@@ -246,7 +246,7 @@ export function PricingCards({
                       )}
                       <span
                         className={`min-w-0 text-xs font-medium leading-snug ${
-                          feature.included ? "text-gray-700" : "text-gray-400 line-through"
+                          feature.included ? "text-slate-700" : "text-slate-400 line-through"
                         }`}
                       >
                         {feature.text}

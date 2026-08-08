@@ -164,12 +164,12 @@ export function ManagePlanGrid({
             return (
               <div
                 key={plan.slug}
-                className={`relative flex h-full min-h-0 min-w-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-200 sm:p-6 ${
+                className={`relative flex h-full min-h-0 min-w-0 flex-col justify-between rounded-2xl p-5 transition-all duration-300 sm:p-6 ${
                   isCurrent
-                    ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
+                    ? "border-2 border-[#006e2f] bg-emerald-50/40 shadow-md"
                     : plan.highlight
-                      ? "border-[#006e2f]/40 bg-gradient-to-b from-[#fafdfb] to-white shadow-sm hover:-translate-y-0.5 hover:shadow-md"
-                      : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                      ? "border-2 border-[#006e2f] bg-emerald-50/50 shadow-lg hover:-translate-y-0.5 hover:shadow-xl"
+                      : "border border-slate-200 bg-white shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 }`}
               >
                 {isCurrent ? (

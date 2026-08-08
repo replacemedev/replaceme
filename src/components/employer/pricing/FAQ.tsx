@@ -63,12 +63,12 @@ export function FAQ(props: { items?: FAQItem[] }) {
         {faqs.map((faq, idx) => (
           <div
             key={idx}
-            className="border border-gray-100 rounded-3xl bg-white p-6 md:p-8 shadow-sm flex flex-col space-y-2"
+            className="border border-slate-200 rounded-3xl bg-white p-6 md:p-8 shadow-sm flex flex-col space-y-2"
           >
-            <h4 className="text-base font-bold text-gray-900 leading-snug">
+            <h4 className="text-base font-bold text-slate-900 leading-snug">
               {faq.question}
             </h4>
-            <p className="text-sm font-semibold text-gray-500 leading-relaxed">
+            <p className="text-sm font-semibold text-slate-500 leading-relaxed">
               {faq.answer}
             </p>
           </div>
