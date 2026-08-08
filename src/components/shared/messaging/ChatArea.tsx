@@ -110,6 +110,7 @@ export function ChatArea({
                 initials={initials}
                 size="xs"
                 priority
+                containerClassName="h-full w-full"
               />
             </div>
             <div className="flex-1 min-w-0">

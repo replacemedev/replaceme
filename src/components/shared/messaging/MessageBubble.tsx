@@ -131,7 +131,7 @@ function SystemMatchCard({
               ) : (
                 <span className="hidden sm:block" />
               )}
-              {showQuickApply ? (
+              {showQuickApply && payload.cta === "quick_apply" ? (
                 <button
                   type="button"
                   onClick={handleQuickApply}

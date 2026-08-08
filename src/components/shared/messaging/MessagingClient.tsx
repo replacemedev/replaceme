@@ -159,6 +159,7 @@ export function MessagingClient({
                     created_at: message.created_at,
                     sender_id: message.sender_id,
                     read_at: message.read_at,
+                    message_kind: message.message_kind,
                   },
                   unread_count:
                     message.sender_id === currentUserId ||
@@ -176,10 +177,44 @@ export function MessagingClient({
     [selectedThreadId, hasMoreMessages, nextCursor, router, currentUserId]
   );
 
+  const handleRealtimeMessageUpdate = useCallback(
+    (message: MessagingMessage) => {
+      setMessages((prev) => {
+        const next = prev.map((m) => (m.id === message.id ? { ...m, ...message } : m));
+        if (selectedThreadId) {
+          const cached = messagesCacheRef.current.get(selectedThreadId);
+          messagesCacheRef.current.set(selectedThreadId, {
+            messages: next,
+            hasMore: cached?.hasMore ?? hasMoreMessages,
+            nextCursor: cached?.nextCursor ?? nextCursor,
+          });
+        }
+        return next;
+      });
+
+      setThreads((prev) =>
+        prev.map((t) =>
+          t.id === message.thread_id && t.last_message
+            ? {
+                ...t,
+                last_message: {
+                  ...t.last_message,
+                  content: message.content,
+                  message_kind: message.message_kind,
+                },
+              }
+            : t
+        )
+      );
+    },
+    [selectedThreadId, hasMoreMessages, nextCursor]
+  );
+
   useMessagingThreadRealtime(
     selectedThreadId,
     currentUserId,
-    handleRealtimeMessage
+    handleRealtimeMessage,
+    handleRealtimeMessageUpdate
   );
 
   useMessagingInboxRealtime(role, currentUserId, companyProfileId, () => {

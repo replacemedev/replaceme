@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { computeWorkerProfileStrength } from "./profile-strength";
 import { computeKeywordMatchScore } from "../matching/keyword-match-score";
+import { scoreJobWorkerMatch } from "../matching/skill-match";
 import {
   workerSkillsStepSchema,
   workerIdentityStepSchema,
@@ -95,6 +96,55 @@ describe("worker profile overhaul gates", () => {
       workerTitle: "Senior Video Editor",
     });
     expect(score).toBeGreaterThanOrEqual(50);
+  });
+
+  it("recomputes overlap when job or worker skills change", () => {
+    const before = scoreJobWorkerMatch(
+      {
+        title: "Senior React Developer",
+        description: null,
+        skills: ["TypeScript", "React"],
+      },
+      {
+        skills: ["TypeScript"],
+        professional_title: "Developer",
+        bio: null,
+      }
+    );
+    expect(before.overlappingSkills).toEqual(["TypeScript"]);
+    expect(before.qualifies).toBe(true);
+
+    const afterJobSkillsChange = scoreJobWorkerMatch(
+      {
+        title: "Senior React Developer",
+        description: null,
+        skills: ["Video Editor", "Web Developer"],
+      },
+      {
+        skills: ["TypeScript"],
+        professional_title: "Developer",
+        bio: null,
+      }
+    );
+    expect(afterJobSkillsChange.overlappingSkills).toEqual([]);
+
+    const afterWorkerSkillsChange = scoreJobWorkerMatch(
+      {
+        title: "Senior React Developer",
+        description: null,
+        skills: ["Video Editor", "Web Developer"],
+      },
+      {
+        skills: ["Web Developer", "Video Editor"],
+        professional_title: "Developer",
+        bio: null,
+      }
+    );
+    expect(afterWorkerSkillsChange.overlappingSkills).toEqual([
+      "Video Editor",
+      "Web Developer",
+    ]);
+    expect(afterWorkerSkillsChange.qualifies).toBe(true);
   });
 
   it("requires gender, DOB, and spoken languages on profile edit details", () => {

@@ -85,15 +85,16 @@ export function AvatarImage({
     );
   }
 
+  // Always use fill + object-cover so the image covers the rounded box
+  // (fixed width/height attrs leave gaps inside sized wrappers).
   return (
     <OptimizedImage
       src={src}
       alt={alt}
-      width={px}
-      height={px}
+      fill
       sizes={`${px}px`}
       priority={priority}
-      className={`w-full h-full object-cover ${className} ${roundClass}`}
+      className={`object-cover ${className} ${roundClass}`.trim()}
       containerClassName={boxClass}
       transform={{
         width: retinaTransformWidth(px),

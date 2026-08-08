@@ -358,9 +358,18 @@ export async function quickApplyFromChat(input: {
         return { success: false, error: "Match message not found." };
       }
 
-      const payload = message.payload as { jobId?: string } | null;
+      const payload = message.payload as {
+        jobId?: string;
+        cta?: string;
+      } | null;
       if (payload?.jobId && payload.jobId !== parsed.data.jobId) {
         return { success: false, error: "Message does not match this job." };
+      }
+      if (payload?.cta !== "quick_apply") {
+        return {
+          success: false,
+          error: "This match is no longer eligible for Quick Apply.",
+        };
       }
 
       const { data: thread } = await supabase
