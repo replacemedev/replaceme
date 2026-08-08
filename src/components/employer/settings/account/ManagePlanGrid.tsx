@@ -220,7 +220,7 @@ export function ManagePlanGrid({
                     priceClassName="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
                   />
 
-                  <p className="mt-3 text-xs leading-relaxed text-slate-600">
+                  <p className="mt-2 text-[11px] sm:text-xs leading-relaxed text-slate-500 font-medium">
                     {plan.detail}
                   </p>
                 </div>

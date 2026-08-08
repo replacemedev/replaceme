@@ -53,24 +53,24 @@ export function PricingCardPrice({
   billingInterval = "year",
   monthlySubtext = "Billed monthly",
   freeSubtext,
-  priceClassName = "text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
-  subtextClassName = "text-sm text-slate-500 font-medium mt-1",
+  priceClassName = "text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
+  subtextClassName = "text-xs text-slate-500 font-medium mt-1",
 }: PricingCardPriceProps) {
   const formattedPrice = formatMoney(shownPrice, "USD", { symbolOnly: true });
 
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-1.5 whitespace-nowrap mt-4">
+      <div className="flex items-baseline gap-1.5 flex-wrap sm:flex-nowrap mt-3">
         <span className={priceClassName}>{formattedPrice}</span>
-        <span className="text-sm font-medium text-slate-500 whitespace-nowrap">
-          {isPaid ? "USD / month" : "USD"}
+        <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">
+          {isPaid ? "USD / mo" : "USD"}
         </span>
       </div>
       {annualTotal != null ? (
         <p className={subtextClassName}>
           Billed annually at{" "}
-          <span className="whitespace-nowrap">
-            {formatMoney(annualTotal, "USD", { symbolOnly: true })} USD/year
+          <span className="whitespace-nowrap font-semibold">
+            {formatMoney(annualTotal, "USD", { symbolOnly: true })} USD/yr
           </span>
         </p>
       ) : isPaid && billingInterval === "month" ? (
