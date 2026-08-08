@@ -3,7 +3,6 @@ import {
   LANDING_SKILL_MARQUEE_ROW,
 } from "@/config/landingSkills";
 import {
-  LANDING_AMBIENT_GLOW,
   LANDING_INNER,
   LANDING_SECTION,
   LANDING_SECTION_GRID,
@@ -49,7 +48,7 @@ export function LandingSkillsShowcase() {
     >
       <div className={LANDING_SECTION_GRID} aria-hidden />
       <div
-        className={`${LANDING_AMBIENT_GLOW} -top-[10%] right-[5%] bg-emerald-200/50`}
+        className="pointer-events-none absolute -z-10 rounded-full bg-emerald-200/40 opacity-60 blur-[70px] sm:blur-[90px] lg:blur-[110px] w-[260px] h-[260px] sm:w-[380px] sm:h-[380px] lg:w-[480px] lg:h-[480px] top-4 sm:top-8 md:top-12 right-[2%] sm:right-[5%]"
         aria-hidden
       />
 

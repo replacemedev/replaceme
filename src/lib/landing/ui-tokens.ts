@@ -1,7 +1,7 @@
 /** Zoom-stable landing section shells — clamp padding, max-width containment. */
 
 export const LANDING_SECTION =
-  "relative isolate overflow-hidden py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8";
+  "relative isolate overflow-x-hidden py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8";
 
 export const LANDING_INNER = "mx-auto w-full min-w-0 max-w-7xl";
 
