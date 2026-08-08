@@ -1,16 +1,11 @@
 import { notFound } from "next/navigation";
-import { Headphones } from "lucide-react";
 import { getEmployerContract } from "@/actions/employer/contracts";
-import { getEmployerPlanUsage } from "@/actions/employer/billing";
 import { ContractDetailClient } from "@/components/employer/contracts/ContractDetailClient";
-import { ContractStatusTimeline } from "@/components/employer/contracts/ContractStatusTimeline";
 import {
   EmployerPageHeader,
   EmployerPageShell,
   EmployerSectionCard,
 } from "@/components/employer/layout";
-import { normalizePlanSlug } from "@/lib/entitlements/ui-copy";
-import { EMPLOYER_CARD } from "@/lib/employer/ui-tokens";
 
 export const metadata = { title: "Contract" };
 export const dynamic = "force-dynamic";
@@ -21,15 +16,12 @@ export default async function EmployerContractPage({
   params: Promise<{ contractId: string }>;
 }) {
   const { contractId } = await params;
-  const [contract, planUsage] = await Promise.all([
-    getEmployerContract(contractId),
-    getEmployerPlanUsage(),
-  ]);
+  const contract = await getEmployerContract(contractId);
 
   if (!contract) notFound();
 
-  const planSlug = normalizePlanSlug(planUsage?.planSlug ?? "discovery");
-  const isScale = planSlug === "scale";
+  const isTerminated = contract.status.toLowerCase() === "terminated";
+  const isActive = contract.status.toLowerCase() === "active";
 
   return (
     <EmployerPageShell width="content" className="gap-6 pb-24 lg:pb-12">
@@ -40,28 +32,12 @@ export default async function EmployerContractPage({
         }`}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 space-y-6">
-          <ContractStatusTimeline contract={contract} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+        <div className="lg:col-span-2">
           <ContractDetailClient contract={contract} />
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-28">
-          {isScale ? (
-            <div className={`${EMPLOYER_CARD} p-5 space-y-2`}>
-              <div className="flex items-center gap-2 text-[#006e2f]">
-                <Headphones className="h-4 w-4" aria-hidden />
-                <p className="text-sm font-bold text-slate-900">
-                  Priority support
-                </p>
-              </div>
-              <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                Scale plan includes priority support for contract changes and
-                team management questions.
-              </p>
-            </div>
-          ) : null}
-
+        <aside className="lg:col-span-1 space-y-4 lg:sticky lg:top-28">
           <EmployerSectionCard
             title="Contract summary"
             description="Employment type and weekly commitment."
@@ -88,7 +64,15 @@ export default async function EmployerContractPage({
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-slate-500 font-medium">Status</dt>
-                <dd className="font-semibold text-[#006e2f] capitalize">
+                <dd
+                  className={`font-semibold capitalize ${
+                    isTerminated
+                      ? "text-red-600"
+                      : isActive
+                      ? "text-[#006e2f]"
+                      : "text-slate-600"
+                  }`}
+                >
                   {contract.status}
                 </dd>
               </div>
@@ -99,3 +83,4 @@ export default async function EmployerContractPage({
     </EmployerPageShell>
   );
 }
+
