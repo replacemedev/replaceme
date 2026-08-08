@@ -498,9 +498,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           disabled={isPending}
           maxSkills={6}
         />
-        <p className="text-xs font-semibold text-slate-500">
-          {skills.length}/6 selected · need 3–6 for a strong match profile.
-        </p>
       </OnboardingWizardShell>
     );
   }
@@ -511,7 +508,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         {...shellProps}
         stepLabel="Compensation"
         title="Set your rate expectations"
-        description="Optional: helps employers filter for budget fit. Billing stays in USD on paid plans."
         onBack={() => goBack("skills")}
         canSkip
         onSkip={() => goNext("about")}
