@@ -75,10 +75,10 @@ export function ApplicantsToolbar({
               key={opt.value}
               type="button"
               onClick={() => onStatusFilterChange(opt.value)}
-              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                 statusFilter === opt.value
-                  ? "bg-[#006e2f] text-white"
-                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  ? "bg-[#006e2f] text-white shadow-xs"
+                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {opt.label}
@@ -129,10 +129,10 @@ export function ApplicantsToolbar({
             <button
               type="button"
               onClick={() => onLanguageFilterChange("all")}
-              className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                 languageFilter === "all"
-                  ? "bg-emerald-700 text-white"
-                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white"
+                  ? "bg-[#006e2f] text-white shadow-xs"
+                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               All languages
@@ -142,10 +142,10 @@ export function ApplicantsToolbar({
                 key={lang}
                 type="button"
                 onClick={() => onLanguageFilterChange(lang)}
-                className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
                   languageFilter.toLowerCase() === lang.toLowerCase()
-                    ? "bg-emerald-700 text-white"
-                    : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white"
+                    ? "bg-[#006e2f] text-white shadow-xs"
+                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
                 {lang}
