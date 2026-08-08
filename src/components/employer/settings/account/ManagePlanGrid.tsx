@@ -135,7 +135,7 @@ export function ManagePlanGrid({
       </div>
 
       <div className="p-5 sm:p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 w-full items-stretch">
           {PLAN_META.map((plan) => {
             const isCurrent = isCurrentTier(plan.slug, currentPlan);
             const isUpgrade = isHigherTier(plan.slug, currentPlan);
@@ -195,20 +195,16 @@ export function ManagePlanGrid({
                   {/* Flex Header with Plan Label and Save Badge */}
                   <PricingCardHeader
                     title={
-                      <p
-                        className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider whitespace-nowrap ${
-                          plan.highlight ? "text-emerald-700" : "text-slate-900"
-                        }`}
-                      >
+                      <h3 className="flex items-center gap-1.5 text-xl font-bold text-slate-900 capitalize whitespace-nowrap">
                         {plan.label}
                         {plan.slug === "scale" ? (
                           <Sparkles
-                            size={14}
+                            size={16}
                             className="fill-yellow-500 text-yellow-500 shrink-0"
                             aria-hidden
                           />
                         ) : null}
-                      </p>
+                      </h3>
                     }
                     savePct={savePct}
                   />

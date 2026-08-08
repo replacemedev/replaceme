@@ -16,7 +16,7 @@ export function PricingCardHeader({
   title,
   savePct,
   className = "flex items-center justify-between gap-2 flex-wrap mb-4",
-  titleClassName = "text-2xl font-bold text-slate-900 capitalize whitespace-nowrap",
+  titleClassName = "text-xl md:text-2xl font-bold text-slate-900 capitalize whitespace-nowrap",
   badgeClassName = "inline-flex shrink-0 items-center rounded-full bg-[#e6fbf2] px-2.5 py-1 text-xs font-bold text-[#006e2f]",
 }: PricingCardHeaderProps) {
   return (
@@ -54,28 +54,23 @@ export function PricingCardPrice({
   monthlySubtext = "Billed monthly",
   freeSubtext,
   priceClassName = "text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
-  subtextClassName = "text-sm text-slate-500 font-medium",
+  subtextClassName = "text-sm text-slate-500 font-medium mt-1",
 }: PricingCardPriceProps) {
+  const formattedPrice = formatMoney(shownPrice, "USD", { symbolOnly: true });
+
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={priceClassName}>
-          {formatMoney(shownPrice, "USD", {
-            asReact: true,
-            codeClassName: "text-slate-500 text-sm font-semibold ml-1",
-          })}
+      <div className="flex items-baseline gap-1.5 whitespace-nowrap mt-4">
+        <span className={priceClassName}>{formattedPrice}</span>
+        <span className="text-sm font-medium text-slate-500 whitespace-nowrap">
+          {isPaid ? "USD / month" : "USD"}
         </span>
-        <span className="text-sm font-medium text-slate-500 whitespace-nowrap">/month</span>
       </div>
       {annualTotal != null ? (
         <p className={subtextClassName}>
           Billed annually at{" "}
           <span className="whitespace-nowrap">
-            {formatMoney(annualTotal, "USD", {
-              asReact: true,
-              codeClassName: "text-slate-400 text-xs font-semibold ml-0.5",
-            })}
-            /year
+            {formatMoney(annualTotal, "USD", { symbolOnly: true })} USD/year
           </span>
         </p>
       ) : isPaid && billingInterval === "month" ? (

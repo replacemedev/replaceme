@@ -15,23 +15,24 @@ export type CompensationCurrency = (typeof COMPENSATION_CURRENCIES)[number]["cod
 export function formatMoney(
   amount: number,
   currency?: string,
-  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: false }
+  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: false; symbolOnly?: boolean }
 ): string;
 export function formatMoney(
   amount: number,
   currency: string,
-  options: { perHour?: boolean; maximumFractionDigits?: number; asReact: true; codeClassName?: string }
+  options: { perHour?: boolean; maximumFractionDigits?: number; asReact: true; codeClassName?: string; symbolOnly?: boolean }
 ): React.ReactNode;
 export function formatMoney(
   amount: number,
   currency: string = "PHP",
-  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: boolean; codeClassName?: string }
+  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: boolean; codeClassName?: string; symbolOnly?: boolean }
 ): string | React.ReactNode {
   return formatCurrency(amount, currency, {
     perHour: options?.perHour,
     maximumFractionDigits: options?.maximumFractionDigits ?? 0,
     asReact: options?.asReact,
     codeClassName: options?.codeClassName,
+    symbolOnly: options?.symbolOnly,
   } as any);
 }
 
@@ -52,17 +53,17 @@ export function formatSalaryRange(
 export function formatCurrency(
   amount: number,
   currencyCode: string,
-  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: false }
+  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: false; symbolOnly?: boolean }
 ): string;
 export function formatCurrency(
   amount: number,
   currencyCode: string,
-  options: { perHour?: boolean; maximumFractionDigits?: number; asReact: true; codeClassName?: string }
+  options: { perHour?: boolean; maximumFractionDigits?: number; asReact: true; codeClassName?: string; symbolOnly?: boolean }
 ): React.ReactNode;
 export function formatCurrency(
   amount: number,
   currencyCode: string,
-  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: boolean; codeClassName?: string }
+  options?: { perHour?: boolean; maximumFractionDigits?: number; asReact?: boolean; codeClassName?: string; symbolOnly?: boolean }
 ): string | React.ReactNode {
   const digits = options?.maximumFractionDigits ?? 2;
   const currencyUpper = currencyCode ? currencyCode.toUpperCase() : "USD";
@@ -77,6 +78,10 @@ export function formatCurrency(
     }).format(amount);
   } catch {
     formatted = `${amount}`;
+  }
+
+  if (options?.symbolOnly) {
+    return formatted;
   }
 
   if (options?.asReact) {
