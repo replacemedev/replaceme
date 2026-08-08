@@ -188,60 +188,66 @@ export function ManagePlanGrid({
                 ) : null}
 
                 <div className="min-w-0">
-                  <p
-                    className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider sm:text-xs ${
-                      plan.highlight ? "text-emerald-600" : "text-slate-500"
-                    }`}
-                  >
-                    {plan.label}
-                    {plan.slug === "scale" ? (
-                      <Sparkles
-                        size={10}
-                        className="fill-yellow-500 text-yellow-500"
-                        aria-hidden
-                      />
-                    ) : null}
-                  </p>
-
-                  <div className="mt-2 flex flex-wrap items-baseline gap-x-1 gap-y-1">
-                    <span className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                      {formatMoney(shownPrice, "USD", {
-                        asReact: true,
-                        codeClassName:
-                          "text-slate-500 text-sm font-semibold ml-1",
-                      })}
-                    </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                      /month
-                    </span>
+                  {/* Flex Header with Plan Label and Save Badge */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
+                    <p
+                      className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider ${
+                        plan.highlight ? "text-emerald-700" : "text-slate-900"
+                      }`}
+                    >
+                      {plan.label}
+                      {plan.slug === "scale" ? (
+                        <Sparkles
+                          size={14}
+                          className="fill-yellow-500 text-yellow-500"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </p>
                     {savePct != null ? (
-                      <span className="inline-flex items-center rounded-full bg-[#e6fbf2] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#006e2f]">
-                        Save {savePct}%
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-[#e6fbf2] px-2.5 py-1 text-xs font-bold text-[#006e2f]">
+                        SAVE {savePct}%
                       </span>
                     ) : null}
                   </div>
 
-                  {annualTotal != null ? (
-                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
-                      Billed annually at{" "}
-                      {formatMoney(annualTotal, "USD", {
-                        asReact: true,
-                        codeClassName:
-                          "text-slate-400 text-[10px] font-semibold ml-0.5",
-                      })}
-                      /year
-                    </p>
-                  ) : isPaid && billingInterval === "month" ? (
-                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
-                      Billed monthly · save more on Annual
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-[11px] font-semibold leading-snug text-slate-500">
-                      Free forever
-                    </p>
-                  )}
+                  {/* Streamlined Pricing Block */}
+                  <div className="space-y-1">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                        {formatMoney(shownPrice, "USD", {
+                          asReact: true,
+                          codeClassName:
+                            "text-slate-500 text-sm font-semibold ml-1",
+                        })}
+                      </span>
+                      <span className="text-sm font-medium text-slate-500">
+                        /month
+                      </span>
+                    </div>
 
-                  <p className="mt-2 text-xs leading-relaxed text-slate-600">
+                    {annualTotal != null ? (
+                      <p className="text-sm text-slate-500 font-medium">
+                        Billed annually at{" "}
+                        {formatMoney(annualTotal, "USD", {
+                          asReact: true,
+                          codeClassName:
+                            "text-slate-400 text-xs font-semibold ml-0.5",
+                        })}
+                        /year
+                      </p>
+                    ) : isPaid && billingInterval === "month" ? (
+                      <p className="text-sm text-slate-500 font-medium">
+                        Billed monthly · save more on Annual
+                      </p>
+                    ) : (
+                      <p className="text-sm text-slate-500 font-medium">
+                        Free forever
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="mt-3 text-xs leading-relaxed text-slate-600">
                     {plan.detail}
                   </p>
                 </div>
