@@ -38,9 +38,9 @@ export function ChatInputArea({ onSendMessage, disabled }: ChatInputAreaProps) {
   };
 
   return (
-    <div className="shrink-0 border-t border-slate-200 bg-white p-4 sm:p-5">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <div className="relative flex items-center rounded-lg border border-slate-200 bg-[#f8fafd] px-4 py-3 transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
+    <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-2.5 sm:px-6 sm:py-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
+        <div className="relative flex items-center gap-2 rounded-xl border border-slate-200 bg-[#f8fafd] px-3.5 py-1.5 transition-all focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500/20">
           <input
             type="text"
             ref={inputRef}
@@ -55,7 +55,7 @@ export function ChatInputArea({ onSendMessage, disabled }: ChatInputAreaProps) {
           <button
             type="submit"
             disabled={disabled || isSending || !message.trim()}
-            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md bg-[#006e2f] text-white transition-colors hover:bg-[#005c26] active:bg-[#00421a] disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[#006e2f] text-white transition-colors hover:bg-[#005c26] active:bg-[#00421a] disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Send message"
           >
             <Send className="h-4 w-4" />
