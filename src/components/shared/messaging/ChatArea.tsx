@@ -103,14 +103,13 @@ export function ChatArea({
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
           <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200/60 bg-slate-50">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
               <AvatarImage
                 src={oppositeParty.avatarUrl}
                 alt={oppositeParty.name}
                 initials={initials}
                 size="xs"
                 priority
-                containerClassName="w-full h-full"
               />
             </div>
             <div className="flex-1 min-w-0">
