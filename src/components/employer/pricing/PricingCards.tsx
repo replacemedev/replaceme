@@ -257,7 +257,7 @@ export function PricingCards({
               </div>
 
               {/* Call to Action Button */}
-              <div className="mt-8 space-y-2">
+              <div className="mt-auto pt-8 space-y-2">
                 {isCurrent ? (
                   <Link
                     href="/employer/settings/account"

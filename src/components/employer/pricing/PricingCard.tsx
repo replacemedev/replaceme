@@ -16,7 +16,7 @@ export function PricingCardHeader({
   title,
   savePct,
   className = "flex items-center justify-between gap-2 flex-wrap mb-4",
-  titleClassName = "text-2xl font-bold text-slate-900 capitalize",
+  titleClassName = "text-2xl font-bold text-slate-900 capitalize whitespace-nowrap",
   badgeClassName = "inline-flex shrink-0 items-center rounded-full bg-[#e6fbf2] px-2.5 py-1 text-xs font-bold text-[#006e2f]",
 }: PricingCardHeaderProps) {
   return (
@@ -53,28 +53,30 @@ export function PricingCardPrice({
   billingInterval = "year",
   monthlySubtext = "Billed monthly",
   freeSubtext,
-  priceClassName = "text-4xl font-extrabold text-slate-900 tracking-tight",
+  priceClassName = "text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
   subtextClassName = "text-sm text-slate-500 font-medium",
 }: PricingCardPriceProps) {
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-1">
+      <div className="flex items-baseline gap-1 whitespace-nowrap">
         <span className={priceClassName}>
           {formatMoney(shownPrice, "USD", {
             asReact: true,
             codeClassName: "text-slate-500 text-sm font-semibold ml-1",
           })}
         </span>
-        <span className="text-sm font-medium text-slate-500">/month</span>
+        <span className="text-sm font-medium text-slate-500 whitespace-nowrap">/month</span>
       </div>
       {annualTotal != null ? (
         <p className={subtextClassName}>
           Billed annually at{" "}
-          {formatMoney(annualTotal, "USD", {
-            asReact: true,
-            codeClassName: "text-slate-400 text-xs font-semibold ml-0.5",
-          })}
-          /year
+          <span className="whitespace-nowrap">
+            {formatMoney(annualTotal, "USD", {
+              asReact: true,
+              codeClassName: "text-slate-400 text-xs font-semibold ml-0.5",
+            })}
+            /year
+          </span>
         </p>
       ) : isPaid && billingInterval === "month" ? (
         <p className={subtextClassName}>{monthlySubtext}</p>

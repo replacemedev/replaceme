@@ -135,7 +135,7 @@ export function ManagePlanGrid({
       </div>
 
       <div className="p-5 sm:p-8">
-        <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 min-[480px]:gap-5 xl:grid-cols-4 xl:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 items-stretch">
           {PLAN_META.map((plan) => {
             const isCurrent = isCurrentTier(plan.slug, currentPlan);
             const isUpgrade = isHigherTier(plan.slug, currentPlan);
@@ -196,7 +196,7 @@ export function ManagePlanGrid({
                   <PricingCardHeader
                     title={
                       <p
-                        className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider ${
+                        className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider whitespace-nowrap ${
                           plan.highlight ? "text-emerald-700" : "text-slate-900"
                         }`}
                       >
@@ -204,7 +204,7 @@ export function ManagePlanGrid({
                         {plan.slug === "scale" ? (
                           <Sparkles
                             size={14}
-                            className="fill-yellow-500 text-yellow-500"
+                            className="fill-yellow-500 text-yellow-500 shrink-0"
                             aria-hidden
                           />
                         ) : null}
@@ -229,107 +229,109 @@ export function ManagePlanGrid({
                   </p>
                 </div>
 
-                {isCurrent && canSwitchInterval ? (
-                  <button
-                    type="button"
-                    disabled={isUpgrading}
-                    onClick={() => onUpgrade(plan.slug, billingInterval)}
-                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
-                  >
-                    {isUpgrading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                        Redirecting
-                      </>
-                    ) : (
-                      "Switch"
-                    )}
-                  </button>
-                ) : isCurrent ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-5 min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
-                  >
-                    Current
-                  </button>
-                ) : isUpgrade && isPaid ? (
-                  <button
-                    type="button"
-                    disabled={isUpgrading}
-                    onClick={() => onUpgrade(plan.slug, billingInterval)}
-                    className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
-                  >
-                    {isUpgrading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                        Redirecting
-                      </>
-                    ) : (
-                      "Upgrade"
-                    )}
-                  </button>
-                ) : isDowngrade ? (
-                  isPaid ? (
+                <div className="mt-auto pt-5">
+                  {isCurrent && canSwitchInterval ? (
                     <button
                       type="button"
-                      disabled={isUpgrading || scheduledPlan === plan.slug}
+                      disabled={isUpgrading}
                       onClick={() => onUpgrade(plan.slug, billingInterval)}
-                      className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                      className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
                     >
-                      {scheduledPlan === plan.slug ? (
-                        "Scheduled"
-                      ) : isUpgrading ? (
+                      {isUpgrading ? (
                         <>
-                          <Loader2
-                            className="h-4 w-4 animate-spin"
-                            aria-hidden
-                          />
+                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                           Redirecting
                         </>
                       ) : (
-                        "Change"
+                        "Switch"
                       )}
                     </button>
+                  ) : isCurrent ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-600 disabled:opacity-70"
+                    >
+                      Current
+                    </button>
+                  ) : isUpgrade && isPaid ? (
+                    <button
+                      type="button"
+                      disabled={isUpgrading}
+                      onClick={() => onUpgrade(plan.slug, billingInterval)}
+                      className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#006e2f] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#005c26] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-50"
+                    >
+                      {isUpgrading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                          Redirecting
+                        </>
+                      ) : (
+                        "Upgrade"
+                      )}
+                    </button>
+                  ) : isDowngrade ? (
+                    isPaid ? (
+                      <button
+                        type="button"
+                        disabled={isUpgrading || scheduledPlan === plan.slug}
+                        onClick={() => onUpgrade(plan.slug, billingInterval)}
+                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                      >
+                        {scheduledPlan === plan.slug ? (
+                          "Scheduled"
+                        ) : isUpgrading ? (
+                          <>
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden
+                            />
+                            Redirecting
+                          </>
+                        ) : (
+                          "Change"
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={
+                          isCancelling ||
+                          cancelAtPeriodEnd ||
+                          scheduledPlan === "discovery"
+                        }
+                        onClick={() =>
+                          onCancelToDiscovery
+                            ? onCancelToDiscovery()
+                            : onManageBilling()
+                        }
+                        className="flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                      >
+                        {cancelAtPeriodEnd || scheduledPlan === "discovery" ? (
+                          "Scheduled"
+                        ) : isCancelling ? (
+                          <>
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden
+                            />
+                            Redirecting
+                          </>
+                        ) : (
+                          "Cancel"
+                        )}
+                      </button>
+                    )
                   ) : (
                     <button
                       type="button"
-                      disabled={
-                        isCancelling ||
-                        cancelAtPeriodEnd ||
-                        scheduledPlan === "discovery"
-                      }
-                      onClick={() =>
-                        onCancelToDiscovery
-                          ? onCancelToDiscovery()
-                          : onManageBilling()
-                      }
-                      className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:opacity-50"
+                      disabled
+                      className="min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400"
                     >
-                      {cancelAtPeriodEnd || scheduledPlan === "discovery" ? (
-                        "Scheduled"
-                      ) : isCancelling ? (
-                        <>
-                          <Loader2
-                            className="h-4 w-4 animate-spin"
-                            aria-hidden
-                          />
-                          Redirecting
-                        </>
-                      ) : (
-                        "Cancel"
-                      )}
+                      Free
                     </button>
-                  )
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-5 min-h-11 w-full whitespace-nowrap rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-400"
-                  >
-                    Free
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
             );
           })}
