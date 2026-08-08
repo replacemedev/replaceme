@@ -217,6 +217,7 @@ export function ManagePlanGrid({
                     billingInterval={billingInterval}
                     freeSubtext="Free forever"
                     priceClassName="text-3xl xl:text-4xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap"
+                    centered
                   />
 
                   <p className="mt-2 text-[11px] sm:text-xs leading-relaxed text-slate-500 font-medium">

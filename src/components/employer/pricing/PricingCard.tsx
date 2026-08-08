@@ -44,6 +44,7 @@ export interface PricingCardPriceProps {
   freeSubtext?: string;
   priceClassName?: string;
   subtextClassName?: string;
+  centered?: boolean;
 }
 
 export function PricingCardPrice({
@@ -54,18 +55,19 @@ export function PricingCardPrice({
   freeSubtext,
   priceClassName = "text-3xl xl:text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
   subtextClassName = "text-xs text-slate-500 font-medium",
+  centered = false,
 }: PricingCardPriceProps) {
   const formattedPrice = formatMoney(shownPrice, "USD", { symbolOnly: true });
 
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline justify-center gap-1.5 flex-nowrap mt-3">
+      <div className={`flex items-baseline gap-1.5 flex-nowrap mt-3 ${centered ? "justify-center" : ""}`}>
         <span className={`shrink-0 ${priceClassName}`}>{formattedPrice}</span>
         <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">
           {isPaid ? "USD / mo" : "USD"}
         </span>
       </div>
-      <div className="min-h-[20px] mt-1 flex items-center justify-center text-center">
+      <div className={`min-h-[20px] mt-1 flex items-center ${centered ? "justify-center text-center" : ""}`}>
         {annualTotal != null ? (
           <p className={subtextClassName}>
             Billed annually at{" "}
