@@ -462,12 +462,10 @@ export function LandingPageClient({
           </div>
           <Link
             href="/pricing"
-            className="group inline-flex mt-6 sm:mt-8 items-center justify-center bg-[#22c55e] text-white w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold hover:bg-[#16a34a] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] text-base sm:text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1d] reveal-item min-h-[48px]"
+            className="inline-flex mt-6 sm:mt-8 items-center justify-center bg-[#22c55e] text-white w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold text-base sm:text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1d] reveal-item min-h-[48px]"
             style={{ transitionDelay: "200ms" }}
           >
-            <span className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]">
-              Compare all plans
-            </span>
+            Compare all plans
           </Link>
         </div>
       </section>
