@@ -120,7 +120,7 @@ export function CompareTable({
     if (val === "x") {
       return (
         <div className="flex justify-center">
-          <span className="text-slate-300 font-medium">—</span>
+          <span className="text-gray-300 font-medium">—</span>
         </div>
       );
     }
@@ -132,7 +132,7 @@ export function CompareTable({
 
   return (
     <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h3 className="text-2xl font-bold text-slate-900 text-center mb-3">
+      <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">
         Compare Features
       </h3>
       <p className="text-center text-sm text-slate-500 font-medium mb-10 max-w-xl mx-auto">
@@ -142,13 +142,13 @@ export function CompareTable({
       </p>
       {/* Scrollport only — page body must not scroll horizontally */}
       <div
-        className="w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-xl shadow-sm ring-1 ring-slate-900/5 bg-white pb-1"
+        className="w-full max-w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-xl shadow-sm ring-1 ring-gray-900/5 bg-white pb-1"
         style={{ scrollbarWidth: "thin", scrollbarColor: "#e2e8f0 transparent" }}
       >
         <table className="w-full min-w-[720px] text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-200">
-              <th className="p-4 text-sm font-semibold text-slate-500 text-center whitespace-nowrap min-w-[9.5rem]">
+            <tr className="border-b border-gray-100">
+              <th className="p-4 text-sm font-semibold text-gray-500 text-center whitespace-nowrap min-w-[9.5rem]">
                 Feature
               </th>
               {ordered.map((plan) => {
@@ -160,10 +160,10 @@ export function CompareTable({
                   <th
                     key={plan.id}
                     className={`p-4 text-sm font-semibold text-center border-t-2 transition-all whitespace-nowrap min-w-[7rem] ${isGrowth
-                        ? "border-t-[#006e2f] bg-emerald-50/30 text-[#006e2f] font-bold"
-                        : isCurrent
-                          ? "border-t-transparent bg-[#fafdfb] text-[#006e2f]"
-                          : "border-t-transparent text-slate-900"
+                      ? "border-t-[#006e2f] bg-green-50/30 text-[#006e2f] font-bold"
+                      : isCurrent
+                        ? "border-t-transparent bg-[#fafdfb] text-[#006e2f]"
+                        : "border-t-transparent text-gray-900"
                       }`}
                   >
                     <span className="block whitespace-nowrap">{plan.name}</span>
@@ -177,11 +177,11 @@ export function CompareTable({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-gray-100">
             {rows.map((row) => (
               <tr
                 key={row.feature}
-                className="group hover:bg-slate-50 transition-colors"
+                className="group hover:bg-gray-50 transition-colors"
               >
                 <td className="p-4 text-sm font-medium text-slate-900 text-center whitespace-nowrap">
                   {row.feature}
@@ -195,10 +195,10 @@ export function CompareTable({
                     <td
                       key={plan.id}
                       className={`p-4 text-sm text-center transition-colors whitespace-nowrap ${isGrowth
-                          ? "bg-green-50/30 group-hover:bg-green-100/20"
-                          : isCurrent
-                            ? "bg-[#fafdfb]/60 group-hover:bg-[#fafdfb]/30"
-                            : ""
+                        ? "bg-green-50/30 group-hover:bg-green-100/20"
+                        : isCurrent
+                          ? "bg-[#fafdfb]/60 group-hover:bg-[#fafdfb]/30"
+                          : ""
                         }`}
                     >
                       {renderCell(row.values[plan.slug.toLowerCase()] ?? "—", row.highlight)}

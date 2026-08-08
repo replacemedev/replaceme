@@ -44,24 +44,24 @@ const PLAN_META: {
   label: string;
   highlight?: boolean;
 }[] = [
-  {
-    slug: "discovery",
-    label: "Discovery",
-  },
-  {
-    slug: "starter",
-    label: "Starter",
-  },
-  {
-    slug: "growth",
-    label: "Growth",
-    highlight: true,
-  },
-  {
-    slug: "scale",
-    label: "Scale",
-  },
-];
+    {
+      slug: "discovery",
+      label: "Discovery",
+    },
+    {
+      slug: "starter",
+      label: "Starter",
+    },
+    {
+      slug: "growth",
+      label: "Growth",
+      highlight: true,
+    },
+    {
+      slug: "scale",
+      label: "Scale",
+    },
+  ];
 
 function paidSlug(
   slug: SubscriptionTier
@@ -145,10 +145,10 @@ export function ManagePlanGrid({
 
             const shownPrice = paidKey
               ? displayMonthlyPrice(
-                  TIER_PRICES[paidKey],
-                  TIER_ANNUAL_PRICES[paidKey],
-                  billingInterval
-                )
+                TIER_PRICES[paidKey],
+                TIER_ANNUAL_PRICES[paidKey],
+                billingInterval
+              )
               : 0;
 
             const annualTotal =
@@ -164,13 +164,12 @@ export function ManagePlanGrid({
             return (
               <div
                 key={plan.slug}
-                className={`relative flex h-full min-h-0 min-w-0 flex-col justify-between rounded-2xl p-5 transition-all duration-300 sm:p-6 ${
-                  isCurrent
-                    ? "border-2 border-[#006e2f] bg-emerald-50/40 shadow-md"
+                className={`relative flex h-full min-h-0 min-w-0 flex-col justify-between rounded-2xl border p-5 transition-all duration-200 sm:p-6 ${isCurrent
+                    ? "border-emerald-500 bg-[#fafdfb] shadow-sm"
                     : plan.highlight
-                      ? "border-2 border-[#006e2f] bg-emerald-50/50 shadow-lg hover:-translate-y-0.5 hover:shadow-xl"
-                      : "border border-slate-200 bg-white shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-                }`}
+                      ? "border-[#006e2f]/40 bg-gradient-to-b from-[#fafdfb] to-white shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+                      : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                  }`}
               >
                 {isCurrent ? (
                   <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#006e2f] px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
