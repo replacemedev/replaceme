@@ -51,33 +51,32 @@ export function PricingCardPrice({
   annualTotal = null,
   isPaid = true,
   billingInterval = "year",
-  monthlySubtext = "Billed monthly",
   freeSubtext,
-  priceClassName = "text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
-  subtextClassName = "text-xs text-slate-500 font-medium mt-1",
+  priceClassName = "text-3xl xl:text-4xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap",
+  subtextClassName = "text-xs text-slate-500 font-medium",
 }: PricingCardPriceProps) {
   const formattedPrice = formatMoney(shownPrice, "USD", { symbolOnly: true });
 
   return (
     <div className="space-y-1">
-      <div className="flex items-baseline gap-1.5 flex-wrap sm:flex-nowrap mt-3">
+      <div className="flex items-baseline gap-1.5 flex-nowrap mt-3">
         <span className={priceClassName}>{formattedPrice}</span>
-        <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap">
+        <span className="text-xs sm:text-sm font-semibold text-slate-500 whitespace-nowrap shrink-0">
           {isPaid ? "USD / mo" : "USD"}
         </span>
       </div>
-      {annualTotal != null ? (
-        <p className={subtextClassName}>
-          Billed annually at{" "}
-          <span className="whitespace-nowrap font-semibold">
-            {formatMoney(annualTotal, "USD", { symbolOnly: true })} USD/yr
-          </span>
-        </p>
-      ) : isPaid && billingInterval === "month" ? (
-        <p className={subtextClassName}>{monthlySubtext}</p>
-      ) : freeSubtext ? (
-        <p className={subtextClassName}>{freeSubtext}</p>
-      ) : null}
+      <div className="min-h-[20px] mt-1 flex items-center">
+        {annualTotal != null ? (
+          <p className={subtextClassName}>
+            Billed annually at{" "}
+            <span className="whitespace-nowrap font-semibold">
+              {formatMoney(annualTotal, "USD", { symbolOnly: true })} USD/yr
+            </span>
+          </p>
+        ) : !isPaid && freeSubtext ? (
+          <p className={subtextClassName}>{freeSubtext}</p>
+        ) : null}
+      </div>
     </div>
   );
 }

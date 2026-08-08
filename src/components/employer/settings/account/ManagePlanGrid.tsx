@@ -215,9 +215,8 @@ export function ManagePlanGrid({
                     annualTotal={annualTotal}
                     isPaid={isPaid}
                     billingInterval={billingInterval}
-                    monthlySubtext="Billed monthly · save more on Annual"
                     freeSubtext="Free forever"
-                    priceClassName="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
+                    priceClassName="text-3xl xl:text-4xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap"
                   />
 
                   <p className="mt-2 text-[11px] sm:text-xs leading-relaxed text-slate-500 font-medium">
