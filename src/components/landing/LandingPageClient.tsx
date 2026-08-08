@@ -33,7 +33,6 @@ import {
   type BillingInterval,
 } from "@/lib/pricing/billing-interval";
 import {
-  LANDING_AMBIENT_GLOW,
   LANDING_INNER,
   LANDING_SECTION,
   LANDING_SECTION_GRID,
@@ -139,11 +138,11 @@ export function LandingPageClient({
   return (
     <main>
       {/* Hero Section */}
-      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-white via-[#f8fafc] to-[#f1f5f9]">
+      <section className="relative min-h-[calc(100svh-4rem)] flex items-center justify-center py-10 sm:py-12 md:py-16 lg:py-20 overflow-x-hidden bg-gradient-to-b from-white via-[#f8fafc] to-white">
         {/* Decorative Glowing Blobs */}
-        <div className="absolute top-[-20%] left-[-10%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none z-0" />
-        <div className="absolute top-[40%] right-[-10%] w-[min(600px,85vw)] h-[min(600px,85vw)] rounded-full bg-indigo-100/30 blur-3xl animate-float-slow-2 pointer-events-none z-0" />
-        <div className="absolute bottom-[-10%] left-[30%] w-[min(400px,75vw)] h-[min(400px,75vw)] rounded-full bg-teal-100/25 blur-3xl animate-float-slow-3 pointer-events-none z-0" />
+        <div className="absolute top-4 sm:top-8 left-[-5%] w-[min(450px,75vw)] h-[min(450px,75vw)] rounded-full bg-emerald-100/40 blur-3xl animate-float-slow-1 pointer-events-none -z-10" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-[-5%] w-[min(500px,80vw)] h-[min(500px,80vw)] rounded-full bg-indigo-100/25 blur-3xl animate-float-slow-2 pointer-events-none -z-10" />
+        <div className="absolute bottom-4 sm:bottom-8 left-[25%] w-[min(380px,70vw)] h-[min(380px,70vw)] rounded-full bg-teal-100/25 blur-3xl animate-float-slow-3 pointer-events-none -z-10" />
 
         {/* Dot Pattern Overlay */}
         <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
@@ -221,7 +220,7 @@ export function LandingPageClient({
       {/* Why Employers Choose Replaceme */}
       <section className={`${LANDING_SECTION} bg-white`}>
         <div className={LANDING_SECTION_GRID} aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} top-1/2 left-[-15%] bg-emerald-50/60`} aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-emerald-100/40 blur-[80px] sm:blur-[100px] w-[min(400px,75vw)] h-[min(400px,75vw)] top-1/2 -translate-y-1/2 left-[-5%]" aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
           {/* AEO: Question-format H2 targets "why use Replaceme" voice & featured-snippet queries */}
@@ -278,10 +277,10 @@ export function LandingPageClient({
             />
           </div>
         </div>
-      </section>      {/* For Job Seekers */}
-      <section className={`${LANDING_SECTION} bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9]`}>
+      {/* For Job Seekers */}
+      <section className={`${LANDING_SECTION} bg-gradient-to-b from-white via-[#f8fafc] to-white`}>
         <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] right-[-10%] bg-emerald-100/40`} aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-emerald-100/50 blur-[80px] sm:blur-[100px] w-[min(420px,75vw)] h-[min(420px,75vw)] bottom-6 sm:bottom-12 right-[2%] sm:right-[5%]" aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
           <Element name="find-work" id="find-work" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
@@ -335,9 +334,9 @@ export function LandingPageClient({
       </section>
 
       {/* How it Works */}
-      <section className={`${LANDING_SECTION} bg-white`}>
+      <section className={`${LANDING_SECTION} bg-gradient-to-b from-white via-[#f8fafc] to-white`}>
         <div className={LANDING_SECTION_GRID} aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} top-[-10%] right-[-10%] bg-emerald-50/50`} aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-emerald-100/40 blur-[80px] sm:blur-[100px] w-[min(400px,75vw)] h-[min(400px,75vw)] top-6 sm:top-12 right-[2%] sm:right-[5%]" aria-hidden />
 
         <div className={`${LANDING_INNER} relative z-10`}>
           <Element name="how-it-works" id="how-it-works" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
@@ -436,8 +435,8 @@ export function LandingPageClient({
       {/* Pricing Section */}
       <section className={`${LANDING_SECTION} bg-[#0a0f1d] text-white`}>
         <div className="absolute inset-0 bg-grid-white-dots opacity-15 pointer-events-none z-0" aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} -top-40 -right-40 bg-emerald-500/20 animate-float-slow-2`} aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} -bottom-40 -left-40 bg-indigo-500/20 animate-float-slow-1`} aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-emerald-500/20 blur-[100px] sm:blur-[120px] w-[min(450px,80vw)] h-[min(450px,80vw)] top-4 right-4 animate-float-slow-2" aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-indigo-500/20 blur-[100px] sm:blur-[120px] w-[min(450px,80vw)] h-[min(450px,80vw)] bottom-4 left-4 animate-float-slow-1" aria-hidden />
 
         <div className={`${LANDING_INNER} max-w-7xl text-center relative z-10`}>
           <Element name="pricing" id="pricing" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
@@ -448,7 +447,7 @@ export function LandingPageClient({
             </p>
           </div>
 
-          <div className="text-left text-slate-900 mt-6 sm:mt-8 space-y-6">
+          <div className="text-left text-[#0a0f1d] mt-6 sm:mt-8 space-y-6">
             <BillingIntervalToggle
               value={billingInterval}
               onChange={setBillingInterval}
@@ -471,9 +470,9 @@ export function LandingPageClient({
       </section>
 
       {/* FAQ Section */}
-      <section className={`${LANDING_SECTION} bg-white`}>
+      <section className={`${LANDING_SECTION} bg-gradient-to-b from-white via-[#f8fafc] to-white`}>
         <div className={LANDING_SECTION_GRID} aria-hidden />
-        <div className={`${LANDING_AMBIENT_GLOW} bottom-[-10%] left-[-10%] bg-emerald-50/45`} aria-hidden />
+        <div className="pointer-events-none absolute -z-10 rounded-full bg-emerald-100/40 blur-[80px] sm:blur-[100px] w-[min(380px,75vw)] h-[min(380px,75vw)] bottom-6 sm:bottom-12 left-[2%] sm:left-[5%]" aria-hidden />
 
         <div className={`${LANDING_INNER} max-w-3xl relative z-10`}>
           <Element name="faq" id="faq" className="h-0 w-0 scroll-mt-20 md:scroll-mt-24" aria-hidden />
