@@ -11,7 +11,13 @@ export const salaryCurrencySchema = z.enum([
   "CAD",
 ]);
 
-const currentYear = new Date().getFullYear();
+const isoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD).");
+
+export const workerGenderSchema = z.enum(["Male", "Female", "Other"], {
+  message: "Please select a valid gender option.",
+});
 
 export const workerIdentityStepSchema = z.object({
   professionalTitle: nonEmptyStringSchema.max(100, "Professional title cannot exceed 100 characters."),
@@ -19,9 +25,11 @@ export const workerIdentityStepSchema = z.object({
   middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional().nullable(),
   lastName: nonEmptyStringSchema.max(80, "Last name cannot exceed 80 characters."),
   suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional().nullable(),
-  gender: z.string().optional().nullable(),
-  civilStatus: z.string().optional().nullable(),
-  preferredLanguage: z.string().optional().nullable(),
+  gender: workerGenderSchema,
+  spokenLanguages: z
+    .array(z.string().min(1))
+    .min(1, "Select at least one spoken language.")
+    .max(8, "You can select up to 8 spoken languages."),
 });
 
 export const workerLocationStepSchema = z.object({
@@ -37,14 +45,13 @@ export const workerLocationStepSchema = z.object({
   ], {
     message: "Please select a valid availability option.",
   }),
-  isRemote: z.boolean(),
 });
 
 export const workerSkillsStepSchema = z.object({
   skills: z
     .array(z.string().min(1))
-    .min(1, "Select at least one skill.")
-    .max(8, "You can select up to 8 skills."),
+    .min(3, "Select at least 3 skills.")
+    .max(6, "You can select up to 6 skills."),
 });
 
 export const workerCompensationStepSchema = z.object({
@@ -71,22 +78,15 @@ export const workerCompensationStepSchema = z.object({
 
 export const workerAboutStepSchema = z.object({
   bio: z.string().max(2000, "Bio cannot exceed 2000 characters.").optional(),
-  birthDate: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid birthdate (YYYY-MM-DD).")
-    .nullable()
-    .optional(),
+  birthDate: isoDateSchema,
 });
 
-export const workerProjectStepSchema = z.object({
-  title: nonEmptyStringSchema.max(120, "Project title cannot exceed 120 characters."),
-  role: nonEmptyStringSchema.max(120, "Role cannot exceed 120 characters."),
-  year: z
-    .number({ message: "Project year must be a number." })
-    .int("Project year must be a whole number.")
-    .min(1970, "Project year must be 1970 or later.")
-    .max(currentYear + 1, "Project year cannot be in the far future."),
-  description: nonEmptyStringSchema.max(2000, "Project description cannot exceed 2000 characters."),
+export const jobExperienceStepSchema = z.object({
+  companyName: nonEmptyStringSchema.max(120, "Company name cannot exceed 120 characters."),
+  roleTitle: nonEmptyStringSchema.max(120, "Role title cannot exceed 120 characters."),
+  startDate: isoDateSchema,
+  endDate: isoDateSchema.nullable(),
+  description: nonEmptyStringSchema.max(2000, "Description cannot exceed 2000 characters."),
   skillsUsed: z.array(z.string().min(1)).max(20, "You can specify up to 20 skills."),
 });
 
@@ -94,7 +94,7 @@ export const workerProjectStepSchema = z.object({
 export const workerOnboardingSchema = z.object({
   professionalTitle: nonEmptyStringSchema.max(100),
   location: nonEmptyStringSchema.max(120),
-  skills: z.array(z.string().min(1)).min(1, "Select at least one skill").max(8),
+  skills: z.array(z.string().min(1)).min(3, "Select at least 3 skills").max(6),
   bio: z.string().max(500).optional(),
 });
 
@@ -151,6 +151,6 @@ export type WorkerOnboardingStep =
   | "skills"
   | "compensation"
   | "about"
-  | "project";
+  | "experience";
 
 export type EmployerOnboardingStep = "company" | "hiring" | "details" | "notification";

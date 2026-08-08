@@ -9,10 +9,27 @@ interface WorkerDeepDiveViewProps {
   data: AdminWorkerProfileDeepDive;
 }
 
+function formatExperiencePeriod(
+  startDate: string,
+  endDate: string | null
+): string {
+  const start = new Date(startDate);
+  const startLabel = Number.isNaN(start.getTime())
+    ? startDate
+    : start.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  if (!endDate) return `${startLabel} – Present`;
+  const end = new Date(endDate);
+  const endLabel = Number.isNaN(end.getTime())
+    ? endDate
+    : end.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return `${startLabel} – ${endLabel}`;
+}
+
 export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
   const name =
     formatFullName(data.firstName, data.middleName, data.lastName, data.suffix).trim() ||
     "Unnamed worker";
+  const spokenLanguages = data.spokenLanguages ?? [];
 
   return (
     <div className="space-y-6">
@@ -53,20 +70,29 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase text-slate-400">Remote</dt>
-              <dd className="text-slate-800 font-semibold">{data.isRemote ? "Yes" : "No"}</dd>
-            </div>
-            <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Gender</dt>
               <dd className="text-slate-800 font-semibold">{data.gender ?? "—"}</dd>
             </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase text-slate-400">Civil Status</dt>
-              <dd className="text-slate-800 font-semibold">{data.civilStatus ?? "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase text-slate-400">Preferred Language</dt>
-              <dd className="text-slate-800 font-semibold">{data.preferredLanguage ?? "—"}</dd>
+            <div className="sm:col-span-2">
+              <dt className="text-xs font-semibold uppercase text-slate-400">
+                Spoken Languages
+              </dt>
+              <dd className="mt-1.5">
+                {spokenLanguages.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {spokenLanguages.map((lang) => (
+                      <span
+                        key={lang}
+                        className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold text-slate-700"
+                      >
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-slate-800 font-semibold">—</span>
+                )}
+              </dd>
             </div>
             <div>
               <dt className="text-xs font-semibold uppercase text-slate-400">Birthdate</dt>
@@ -133,20 +159,32 @@ export function WorkerDeepDiveView({ data }: WorkerDeepDiveViewProps) {
         </div>
       </section>
 
-      {data.projects.length > 0 ? (
+      {data.jobExperiences.length > 0 ? (
         <section className="space-y-4">
-          <AdminSectionLabel>Projects</AdminSectionLabel>
+          <AdminSectionLabel>Job Experience</AdminSectionLabel>
           <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {data.projects.map((project) => (
+            {data.jobExperiences.map((exp) => (
               <li
-                key={project.id}
+                key={exp.id}
                 className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
               >
-                <p className="font-semibold text-slate-900">{project.title}</p>
+                <p className="font-semibold text-slate-900">{exp.roleTitle}</p>
                 <p className="text-xs text-slate-500">
-                  {project.role} · {project.year}
+                  {exp.companyName} · {formatExperiencePeriod(exp.startDate, exp.endDate)}
                 </p>
-                <p className="mt-2 text-sm text-slate-700 line-clamp-3">{project.description}</p>
+                <p className="mt-2 text-sm text-slate-700 line-clamp-3">{exp.description}</p>
+                {exp.skillsUsed.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {exp.skillsUsed.map((skill) => (
+                      <span
+                        key={skill}
+                        className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>

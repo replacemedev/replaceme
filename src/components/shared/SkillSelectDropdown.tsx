@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronDown, X, Search } from "lucide-react";
 import { ORDERED_SKILLS, PRIORITY_SKILLS } from "@/data/skills";
 
-const MAX_SKILLS = 5;
+const DEFAULT_MAX_SKILLS = 5;
 const prioritySet = new Set(PRIORITY_SKILLS as readonly string[]);
 
 interface SkillSelectDropdownProps {
@@ -14,6 +14,7 @@ interface SkillSelectDropdownProps {
   disabled?: boolean;
   label?: string;
   hint?: string;
+  maxSkills?: number;
 }
 
 export function SkillSelectDropdown({
@@ -23,6 +24,7 @@ export function SkillSelectDropdown({
   disabled = false,
   label,
   hint,
+  maxSkills = DEFAULT_MAX_SKILLS,
 }: SkillSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -43,12 +45,12 @@ export function SkillSelectDropdown({
     (skill: string) => {
       if (value.includes(skill)) {
         onChange(value.filter((s) => s !== skill));
-      } else if (value.length < MAX_SKILLS) {
+      } else if (value.length < maxSkills) {
         onChange([...value, skill]);
         setSearch("");
       }
     },
-    [value, onChange]
+    [value, onChange, maxSkills]
   );
 
   const removeSkill = (skill: string) => {
@@ -66,7 +68,7 @@ export function SkillSelectDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const isAtMax = value.length >= MAX_SKILLS;
+  const isAtMax = value.length >= maxSkills;
 
   return (
     <div className="space-y-2">
@@ -133,7 +135,7 @@ export function SkillSelectDropdown({
                 setSearch("");
               }
             }}
-            placeholder={isAtMax ? `Maximum ${MAX_SKILLS} skills selected` : placeholder}
+            placeholder={isAtMax ? `Maximum ${maxSkills} skills selected` : placeholder}
             disabled={disabled || isAtMax}
             className="flex-1 bg-transparent outline-none placeholder:text-slate-400"
             aria-label="Search and select skills"
@@ -210,7 +212,7 @@ export function SkillSelectDropdown({
 
       {/* Counter */}
       <p className={["text-xs", isAtMax ? "text-amber-600 font-semibold" : "text-slate-500"].join(" ")}>
-        {value.length}/{MAX_SKILLS} skills selected
+        {value.length}/{maxSkills} skills selected
         {isAtMax && " — remove one to add another"}
       </p>
     </div>

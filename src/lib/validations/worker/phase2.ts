@@ -31,7 +31,6 @@ export const updateWorkerSettingsSchema = z
   .object({
     availability: z.enum(["Full-time", "Part-time", "Contract", "Not available"]),
     hourlyRate: z.number().min(0).max(500),
-    isRemote: z.boolean(),
     salaryCurrency: compensationCurrencySchema.optional(),
   })
   .strict();
@@ -43,13 +42,17 @@ export const contractResponseSchema = z
   })
   .strict();
 
-export interface WorkerProjectRow {
+export interface JobExperienceRow {
   id: string;
-  title: string;
-  role: string;
-  year: number;
+  company_name: string;
+  role_title: string;
+  start_date: string;
+  end_date: string | null;
   description: string;
 }
+
+/** @deprecated Use JobExperienceRow */
+export type WorkerProjectRow = JobExperienceRow;
 
 export interface WorkerContractRow {
   id: string;
@@ -62,4 +65,3 @@ export interface WorkerContractRow {
   startDate: string;
   employmentType: string;
 }
-

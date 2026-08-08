@@ -23,9 +23,16 @@ export function JobSearchHero({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const ROLE_QUICK_FILTERS = [
+    "Virtual Assistant",
+    "Graphic Designer",
+    "Bookkeeper",
+    "Video Editor",
+  ] as const;
+
   const quickSkills = useMemo(() => {
-    const merged = [...skillSuggestions];
-    return Array.from(new Set(merged)).slice(0, 8);
+    const merged = [...ROLE_QUICK_FILTERS, ...skillSuggestions];
+    return Array.from(new Set(merged));
   }, [skillSuggestions]);
 
   return (
@@ -78,46 +85,51 @@ export function JobSearchHero({
           </form>
         </div>
 
-        {/* Quick Skills Filter row */}
-        <div className="flex flex-wrap gap-2 justify-center mt-5 max-w-3xl mx-auto w-full">
-          {quickSkills.map((skill) => {
-            const isActive = activeSkills.includes(skill);
-            return (
-              <button
-                key={skill}
-                type="button"
-                onClick={() => {
-                  const params = new URLSearchParams(searchParams.toString());
-                  if (keyword.trim()) {
-                    params.set("query", keyword.trim());
-                  } else {
-                    params.delete("query");
-                  }
-                  const s = params.get("skills");
-                  let skills = s ? s.split(",").filter(Boolean) : [];
-                  if (skills.includes(skill)) {
-                    skills = skills.filter((item) => item !== skill);
-                  } else {
-                    skills = [...skills, skill];
-                  }
-                  if (skills.length > 0) {
-                    params.set("skills", skills.join(","));
-                  } else {
-                    params.delete("skills");
-                  }
-                  startTransition(() => {
-                    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-                  });
-                }}
-                className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-colors ${isActive
-                  ? "bg-[#006e2f] text-white"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+        {/* Quick role pills — horizontal scroll on mobile */}
+        <div className="mt-5 max-w-3xl mx-auto w-full">
+          <div className="flex gap-2 overflow-x-auto pb-1 px-1 justify-start sm:justify-center snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {quickSkills.map((skill) => {
+              const isActive = activeSkills.includes(skill);
+              return (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (keyword.trim()) {
+                      params.set("query", keyword.trim());
+                    } else {
+                      params.delete("query");
+                    }
+                    const s = params.get("skills");
+                    let skills = s ? s.split(",").filter(Boolean) : [];
+                    if (skills.includes(skill)) {
+                      skills = skills.filter((item) => item !== skill);
+                    } else {
+                      skills = [...skills, skill];
+                    }
+                    if (skills.length > 0) {
+                      params.set("skills", skills.join(","));
+                    } else {
+                      params.delete("skills");
+                    }
+                    startTransition(() => {
+                      router.replace(`${pathname}?${params.toString()}`, {
+                        scroll: false,
+                      });
+                    });
+                  }}
+                  className={`snap-start shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors whitespace-nowrap ${
+                    isActive
+                      ? "bg-[#006e2f] text-white"
+                      : "bg-white border border-slate-200 hover:border-[#006e2f]/40 hover:bg-[#ebfdf2] text-slate-700"
                   }`}
-              >
-                {skill}
-              </button>
-            );
-          })}
+                >
+                  {skill}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

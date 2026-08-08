@@ -44,7 +44,7 @@ export function TermsOfServiceContent() {
   return (
     <div className="mx-auto max-w-3xl space-y-10 rounded-2xl border border-slate-200 bg-white px-6 py-8 shadow-xs sm:px-10 sm:py-12">
       <p className="inline-block rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">
-        Last updated: July 2026
+        Last updated: August 2026
       </p>
 
       <p className="text-[15px] leading-relaxed text-slate-600 sm:text-base">
@@ -81,6 +81,10 @@ export function TermsOfServiceContent() {
         <ul className="space-y-2 pl-1">
           <Bullet>Be at least 18 years old</Bullet>
           <Bullet>Provide accurate and complete information when signing up</Bullet>
+          <Bullet>
+            Workers must provide mandatory demographics (including date of birth and
+            gender) required for matching and identity verification
+          </Bullet>
           <Bullet>Keep your password secure and not share your account with anyone</Bullet>
           <Bullet>Notify us immediately if you suspect unauthorised access to your account</Bullet>
         </ul>
@@ -99,6 +103,11 @@ export function TermsOfServiceContent() {
           <Bullet>Pay agreed rates promptly and honour any work arrangements you make</Bullet>
           <Bullet>Not contact workers for purposes unrelated to the job posted</Bullet>
           <Bullet>
+            Understand that Starter+ plans may include automated skill-based matching
+            delivered in-app via chat (not email), and that workers may use Quick Apply
+            from those match messages
+          </Bullet>
+          <Bullet>
             Use “Report an issue” or email support for platform problems — employers cannot file
             in-app reports against workers
           </Bullet>
@@ -109,7 +118,16 @@ export function TermsOfServiceContent() {
         <p>As a worker, you agree to:</p>
         <ul className="space-y-2 pl-1">
           <Bullet>Provide accurate information on your profile, including skills and experience</Bullet>
+          <Bullet>
+            Complete mandatory profile fields (employee photo, gender, date of birth,
+            spoken languages, and 3–6 skills) so you can be matched to roles
+          </Bullet>
           <Bullet>Only apply for roles you are genuinely qualified for</Bullet>
+          <Bullet>
+            Understand that Replaceme may open in-app skill-match chat threads for
+            Starter+ employer jobs when your skills overlap; Quick Apply submits an
+            application inside the platform only (no email outreach for matches)
+          </Bullet>
           <Bullet>Communicate honestly and professionally with employers</Bullet>
           <Bullet>Not create multiple accounts or impersonate others</Bullet>
           <Bullet>Not share confidential employer information with third parties</Bullet>

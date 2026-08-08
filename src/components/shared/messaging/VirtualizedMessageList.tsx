@@ -52,6 +52,7 @@ interface VirtualizedMessageListProps {
   onLoadOlder: () => void;
   /** Bumps when the active thread changes so Virtuoso remounts cleanly. */
   threadKey: string;
+  showQuickApply?: boolean;
 }
 
 export function VirtualizedMessageList({
@@ -62,6 +63,7 @@ export function VirtualizedMessageList({
   emptyLabel,
   onLoadOlder,
   threadKey,
+  showQuickApply = false,
 }: VirtualizedMessageListProps) {
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const [firstItemIndex, setFirstItemIndex] = useState(VIRTUOSO_START_INDEX);
@@ -142,7 +144,11 @@ export function VirtualizedMessageList({
                 {formatDateSeparator(message.created_at)}
               </p>
             ) : null}
-            <MessageBubble message={message} currentUserId={currentUserId} />
+            <MessageBubble
+              message={message}
+              currentUserId={currentUserId}
+              showQuickApply={showQuickApply}
+            />
           </div>
         );
       }}

@@ -73,7 +73,7 @@ export async function getWorkerVerificationState(): Promise<WorkerVerificationSt
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select(
-        "id, role, first_name, last_name, email, professional_title, verification_status, is_verified, kyc_rejection_reason, gender, civil_status, id_type, id_number, id_expiration_date, id_issuing_country"
+        "id, role, first_name, middle_name, last_name, suffix, email, professional_title, verification_status, is_verified, kyc_rejection_reason, gender, birth_date, spoken_languages, id_type, id_number, id_expiration_date, id_issuing_country"
       )
       .eq("id", user.id)
       .single();

@@ -673,7 +673,7 @@ export type AdminChatThreadRow = AdminChatModerationFlagRow;
 
 export type AdminModerationThreadMessage = {
   id: string;
-  sender_id: string;
+  sender_id: string | null;
   content: string;
   created_at: string;
   is_flagged: boolean;

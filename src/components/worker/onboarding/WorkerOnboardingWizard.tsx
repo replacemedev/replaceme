@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 import { showErrorToast } from "@/utils/toast";
 import { usePhilippineLocations } from "@/hooks/usePhilippineLocations";
 import {
@@ -12,9 +13,8 @@ import {
 } from "@/actions/onboarding";
 import { OnboardingWizardShell } from "@/components/shared/onboarding/OnboardingWizardShell";
 import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
-import { profileImageHelperTextOptional } from "@/lib/storage/profile-image";
+import { profileImageHelperText } from "@/lib/storage/profile-image";
 import { SkillSelectDropdown } from "@/components/shared/SkillSelectDropdown";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   ONBOARDING_SELECT_CLASS,
 } from "@/config/onboarding";
@@ -29,6 +29,12 @@ const AVAILABILITY_OPTIONS = [
   "Not available",
 ] as const;
 
+const RATE_NOTE =
+  "Note: Please set a reasonable rate expectation to improve your chances of receiving job offers.";
+
+const SKILLS_HELPER =
+  "Pick at least one. This will help us find you the perfect role.";
+
 type WizardPhase =
   | "welcome"
   | "identity"
@@ -36,10 +42,86 @@ type WizardPhase =
   | "skills"
   | "compensation"
   | "about"
-  | "project";
+  | "experience";
 
 interface WorkerOnboardingWizardProps {
   draft: WorkerOnboardingDraft;
+}
+
+function parseLanguageChips(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function SpokenLanguagesInput({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  disabled?: boolean;
+}) {
+  const [draft, setDraft] = useState("");
+
+  function commit(raw: string) {
+    const parts = parseLanguageChips(raw);
+    if (parts.length === 0) return;
+    const merged = Array.from(new Set([...value, ...parts])).slice(0, 8);
+    onChange(merged);
+    setDraft("");
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-slate-700">
+        Spoken Languages
+      </label>
+      {value.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {value.map((lang) => (
+            <span
+              key={lang}
+              className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-[#ebfdf2] px-2.5 py-1 text-xs font-semibold text-[#006e2f]"
+            >
+              {lang}
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onChange(value.filter((l) => l !== lang))}
+                className="rounded-full p-0.5 hover:bg-emerald-100"
+                aria-label={`Remove ${lang}`}
+              >
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+        </div>
+      ) : null}
+      <input
+        type="text"
+        value={draft}
+        disabled={disabled || value.length >= 8}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            commit(draft);
+          }
+        }}
+        onBlur={() => {
+          if (draft.trim()) commit(draft);
+        }}
+        placeholder="e.g. English, Tagalog — press Enter"
+        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+      />
+      <p className="text-xs text-slate-500">
+        Add up to 8 languages. Separate with commas or press Enter.
+      </p>
+    </div>
+  );
 }
 
 export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
@@ -57,8 +139,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const suffix = draft.suffix;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(draft.avatarUrl);
   const [gender, setGender] = useState(draft.gender || "");
-  const [civilStatus, setCivilStatus] = useState(draft.civilStatus || "");
-  const [preferredLanguage, setPreferredLanguage] = useState(draft.preferredLanguage || "");
+  const [spokenLanguages, setSpokenLanguages] = useState<string[]>(
+    draft.spokenLanguages ?? []
+  );
   const [middleNameDraft, setMiddleNameDraft] = useState(middleName || "");
   const [suffixDraft, setSuffixDraft] = useState(suffix || "");
   const [region, setRegion] = useState(draft.region || "");
@@ -66,7 +149,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
   const [city, setCity] = useState(draft.city || "");
   const [addressLine1, setAddressLine1] = useState(draft.addressLine1 || "");
   const [availability, setAvailability] = useState(draft.availability);
-  const [isRemote, setIsRemote] = useState(draft.isRemote);
   const [skills, setSkills] = useState<string[]>(draft.skills);
   const [hourlyRate, setHourlyRate] = useState(
     draft.hourlyRate != null ? String(draft.hourlyRate) : ""
@@ -79,16 +161,13 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
     draft.expectedSalaryMax != null ? String(draft.expectedSalaryMax) : ""
   );
   const [bio, setBio] = useState(draft.bio);
-  const [birthDate, setBirthDate] = useState(
-    draft.birthDate ?? ""
-  );
-  const [projectTitle, setProjectTitle] = useState("");
-  const [projectRole, setProjectRole] = useState("");
-  const [projectYear, setProjectYear] = useState(
-    String(new Date().getFullYear())
-  );
-  const [projectDescription, setProjectDescription] = useState("");
-  const [projectSkills, setProjectSkills] = useState<string[]>([]);
+  const [birthDate, setBirthDate] = useState(draft.birthDate ?? "");
+  const [companyName, setCompanyName] = useState("");
+  const [roleTitle, setRoleTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [experienceDescription, setExperienceDescription] = useState("");
+  const [experienceSkills, setExperienceSkills] = useState<string[]>([]);
 
   const stepIndex: Record<WizardPhase, number> = {
     welcome: 0,
@@ -97,7 +176,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
     skills: 3,
     compensation: 4,
     about: 5,
-    project: 6,
+    experience: 6,
   };
 
   const goNext = (next: WizardPhase) => setPhase(next);
@@ -137,10 +216,12 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
 
   if (phase === "identity") {
     const isIdentityNextDisabled =
+      !avatarUrl ||
       !professionalTitle.trim() ||
       !firstName.trim() ||
       !lastName.trim() ||
-      !preferredLanguage.trim();
+      !gender ||
+      spokenLanguages.length === 0;
 
     return (
       <OnboardingWizardShell
@@ -158,9 +239,8 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               middleName: middleNameDraft.trim() || null,
               lastName: lastName.trim(),
               suffix: suffixDraft.trim() || null,
-              gender: gender || null,
-              civilStatus: civilStatus || null,
-              preferredLanguage: preferredLanguage.trim(),
+              gender,
+              spokenLanguages,
             });
             if (!result.success) {
               showErrorToast(result.error);
@@ -179,7 +259,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           }
           size="md"
           onAvatarChange={setAvatarUrl}
-          helperText={profileImageHelperTextOptional()}
+          helperText={profileImageHelperText()}
         />
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Professional title
@@ -188,7 +268,7 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             value={professionalTitle}
             onChange={(e) => setProfessionalTitle(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-4 py-3"
-            placeholder="e.g. Senior React Developer"
+            placeholder="e.g., Senior Video Editor"
           />
         </label>
         <div className="space-y-6 min-w-0">
@@ -241,47 +321,26 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           </div>
         </div>
 
-        <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Preferred Language
-          <input
-            type="text"
-            required
-            value={preferredLanguage}
-            onChange={(e) => setPreferredLanguage(e.target.value)}
-            placeholder="e.g. English, Tagalog"
-            className="w-full rounded-xl border border-slate-200 px-4 py-3"
-          />
-        </label>
+        <SpokenLanguagesInput
+          value={spokenLanguages}
+          onChange={setSpokenLanguages}
+          disabled={isPending}
+        />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Gender (optional)
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              <option value="">Prefer not to say</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </label>
-          <label className="block space-y-2 text-sm font-medium text-slate-700">
-            Civil Status (optional)
-            <select
-              value={civilStatus}
-              onChange={(e) => setCivilStatus(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              <option value="">Prefer not to say</option>
-              <option value="Single">Single</option>
-              <option value="Married">Married</option>
-              <option value="Divorced">Divorced</option>
-              <option value="Widowed">Widowed</option>
-            </select>
-          </label>
-        </div>
+        <label className="block space-y-2 text-sm font-medium text-slate-700">
+          Gender
+          <select
+            required
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          >
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
       </OnboardingWizardShell>
     );
   }
@@ -303,7 +362,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
               city,
               addressLine1: addressLine1.trim() || undefined,
               availability,
-              isRemote,
             });
             if (!result.success) {
               showErrorToast(result.error);
@@ -408,14 +466,6 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
             </select>
           </label>
         </div>
-        <label className="flex items-center gap-3 text-sm font-medium leading-snug text-slate-700">
-          <Checkbox
-            checked={isRemote}
-            onChange={(e) => setIsRemote(e.target.checked)}
-            className="shrink-0"
-          />
-          Open to fully remote roles
-        </label>
       </OnboardingWizardShell>
     );
   }
@@ -426,9 +476,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
         {...shellProps}
         stepLabel="Top skills"
         title="What are your strongest skills?"
-        description="Pick at least one. These power job matching and your profile."
+        description={SKILLS_HELPER}
         onBack={() => goBack("location")}
-        isNextDisabled={skills.length === 0}
+        isNextDisabled={skills.length < 3 || skills.length > 6}
         onNext={() => {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("skills", { skills });
@@ -442,11 +492,15 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
       >
         <SkillSelectDropdown
           label="Top skills"
-          hint="Pick up to 5 skills that best describe your expertise"
+          hint="Select 3–6 skills to continue."
           value={skills}
           onChange={setSkills}
           disabled={isPending}
+          maxSkills={6}
         />
+        <p className="text-xs font-semibold text-slate-500">
+          {skills.length}/6 selected · need 3–6 for a strong match profile.
+        </p>
       </OnboardingWizardShell>
     );
   }
@@ -481,6 +535,9 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           });
         }}
       >
+        <p className="rounded-xl border border-emerald-100 bg-[#ebfdf2]/60 px-4 py-3 text-xs font-medium leading-relaxed text-slate-700">
+          {RATE_NOTE}
+        </p>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Currency
           <select
@@ -536,23 +593,22 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
     return (
       <OnboardingWizardShell
         {...shellProps}
-        stepLabel="About you"
-        title="Tell employers your story"
-        description="A short bio builds trust. You can expand this anytime on your profile."
+        stepLabel="Your story"
+        title="Tell Employers Your Story"
+        description="Share a short bio and your date of birth so employers can get to know you."
         onBack={() => goBack("compensation")}
-        canSkip
-        onSkip={() => goNext("project")}
+        isNextDisabled={!birthDate.trim()}
         onNext={() => {
           startTransition(async () => {
             const result = await saveWorkerOnboardingStep("about", {
               bio: bio.trim() || undefined,
-              birthDate: birthDate.trim() ? birthDate : null,
+              birthDate: birthDate.trim(),
             });
             if (!result.success) {
               showErrorToast(result.error);
               return;
             }
-            goNext("project");
+            goNext("experience");
           });
         }}
       >
@@ -567,9 +623,10 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
           />
         </label>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Date of birth (optional)
+          Date of birth
           <input
             type="date"
+            required
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
@@ -579,90 +636,102 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
     );
   }
 
-  const hasProjectDraft =
-    projectTitle.trim() ||
-    projectRole.trim() ||
-    projectDescription.trim() ||
-    projectSkills.length > 0;
+  const hasExperienceDraft =
+    companyName.trim() ||
+    roleTitle.trim() ||
+    startDate.trim() ||
+    endDate.trim() ||
+    experienceDescription.trim() ||
+    experienceSkills.length > 0;
+
+  const experienceIncomplete =
+    Boolean(hasExperienceDraft) &&
+    (!companyName.trim() ||
+      !roleTitle.trim() ||
+      !startDate.trim() ||
+      !experienceDescription.trim());
+
+  async function finishOnboarding() {
+    const result = await finishWorkerOnboarding();
+    if (!result.success) {
+      showErrorToast(result.error);
+      return;
+    }
+    toast.success("Profile ready!");
+    router.replace("/worker/dashboard");
+    router.refresh();
+  }
 
   return (
     <OnboardingWizardShell
       {...shellProps}
-      stepLabel="Project spotlight"
-      title="Showcase a recent project"
-      description="Optional: one strong project helps you stand out in search."
+      stepLabel="Job experience"
+      title="Add recent work experience"
+      description="Optional: share a role you've held. You can add more from your profile later."
       onBack={() => goBack("about")}
       canSkip
       onSkip={() => {
         startTransition(async () => {
-          const result = await finishWorkerOnboarding();
-          if (!result.success) {
-            showErrorToast(result.error);
-            return;
-          }
-          toast.success("Profile ready!");
-          router.replace("/worker/dashboard");
-          router.refresh();
+          await finishOnboarding();
         });
       }}
       nextLabel="Finish"
-      isNextDisabled={Boolean(
-        hasProjectDraft &&
-          (!projectTitle.trim() ||
-            !projectRole.trim() ||
-            !projectDescription.trim() ||
-            projectSkills.length === 0)
-      )}
+      isNextDisabled={experienceIncomplete}
       onNext={() => {
         startTransition(async () => {
-          if (hasProjectDraft) {
-            const result = await saveWorkerOnboardingStep("project", {
-              title: projectTitle.trim(),
-              role: projectRole.trim(),
-              year: Number(projectYear),
-              description: projectDescription.trim(),
-              skillsUsed: projectSkills,
+          if (hasExperienceDraft) {
+            const result = await saveWorkerOnboardingStep("experience", {
+              companyName: companyName.trim(),
+              roleTitle: roleTitle.trim(),
+              startDate: startDate.trim(),
+              endDate: endDate.trim() ? endDate.trim() : null,
+              description: experienceDescription.trim(),
+              skillsUsed: experienceSkills,
             });
             if (!result.success) {
               showErrorToast(result.error);
               return;
             }
           }
-          const result = await finishWorkerOnboarding();
-          if (!result.success) {
-            showErrorToast(result.error);
-            return;
-          }
-          toast.success("Profile ready!");
-          router.replace("/worker/dashboard");
-          router.refresh();
+          await finishOnboarding();
         });
       }}
     >
       <label className="block space-y-2 text-sm font-medium text-slate-700">
-        Project title
+        Company name
         <input
-          value={projectTitle}
-          onChange={(e) => setProjectTitle(e.target.value)}
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
-          placeholder="e.g. E-commerce redesign"
+          placeholder="e.g. Acme Studio"
+        />
+      </label>
+      <label className="block space-y-2 text-sm font-medium text-slate-700">
+        Role title
+        <input
+          value={roleTitle}
+          onChange={(e) => setRoleTitle(e.target.value)}
+          className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          placeholder="e.g., Senior Video Editor"
         />
       </label>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Your role
+          Start date
           <input
-            value={projectRole}
-            onChange={(e) => setProjectRole(e.target.value)}
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-4 py-3"
           />
         </label>
         <label className="block space-y-2 text-sm font-medium text-slate-700">
-          Year
+          End date
+          <span className="ml-1 text-xs font-normal text-slate-400">(optional)</span>
           <input
-            type="number"
-            value={projectYear}
-            onChange={(e) => setProjectYear(e.target.value)}
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-4 py-3"
           />
         </label>
@@ -670,18 +739,20 @@ export function WorkerOnboardingWizard({ draft }: WorkerOnboardingWizardProps) {
       <label className="block space-y-2 text-sm font-medium text-slate-700">
         Description
         <textarea
-          value={projectDescription}
-          onChange={(e) => setProjectDescription(e.target.value)}
+          value={experienceDescription}
+          onChange={(e) => setExperienceDescription(e.target.value)}
           rows={3}
           className="w-full rounded-xl border border-slate-200 px-4 py-3"
+          placeholder="What you owned, outcomes, tools…"
         />
       </label>
       <SkillSelectDropdown
         label="Skills used"
-        hint="Technologies or skills you applied on this project"
-        value={projectSkills}
-        onChange={setProjectSkills}
+        hint="Optional — technologies or skills from this role"
+        value={experienceSkills}
+        onChange={setExperienceSkills}
         disabled={isPending}
+        maxSkills={20}
       />
     </OnboardingWizardShell>
   );

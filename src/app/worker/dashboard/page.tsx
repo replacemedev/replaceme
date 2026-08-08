@@ -40,7 +40,7 @@ export default async function WorkerDashboard() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url, salary_currency, verification_status, kyc_rejection_reason"
+      "id, first_name, last_name, role, professional_title, bio, location, portfolio_url, resume_url, cv_url, availability, hourly_rate, avatar_url, salary_currency, verification_status, kyc_rejection_reason, gender, birth_date, spoken_languages"
     )
     .eq("id", user.id)
     .single();
@@ -78,12 +78,14 @@ export default async function WorkerDashboard() {
     professionalTitle: profile.professional_title,
     bio: profile.bio,
     location: profile.location,
-    portfolioUrl: profile.portfolio_url,
     resumeUrl: profile.resume_url,
     cvUrl: profile.cv_url,
     availability: profile.availability,
     hourlyRate: profile.hourly_rate,
     avatarUrl: profile.avatar_url,
+    gender: profile.gender,
+    birthDate: profile.birth_date,
+    spokenLanguageCount: profile.spoken_languages?.length ?? 0,
     skillCount: skills?.length ?? 0,
   });
 

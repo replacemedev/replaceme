@@ -277,15 +277,13 @@ export type AdminWorkerProfileDeepDive = {
   city: string | null;
   addressLine1: string | null;
   availability: string | null;
-  isRemote: boolean | null;
   hourlyRate: number | null;
   salaryCurrency: string;
   accountStatus: string;
   verificationStatus: string | null;
   isVerified: boolean;
   gender?: string | null;
-  civilStatus?: string | null;
-  preferredLanguage?: string | null;
+  spokenLanguages?: string[] | null;
   tinNumber?: string | null;
   idType?: string | null;
   idNumber?: string | null;
@@ -296,11 +294,12 @@ export type AdminWorkerProfileDeepDive = {
     proficiency: number;
     proficiencyLabel: string | null;
   }>;
-  projects: Array<{
+  jobExperiences: Array<{
     id: string;
-    title: string;
-    role: string;
-    year: number;
+    companyName: string;
+    roleTitle: string;
+    startDate: string;
+    endDate: string | null;
     description: string;
     skillsUsed: string[];
   }>;
@@ -314,12 +313,12 @@ export async function getAdminWorkerProfileDeepDive(
     const id = z.string().uuid().parse(workerId);
     const { supabase } = await requireAdminCapability("jobs");
 
-    const [{ data: profile }, { data: skills }, { data: projects }] =
+    const [{ data: profile }, { data: skills }, { data: experiences }] =
       await Promise.all([
         supabase
           .from("profiles")
           .select(
-            "id, first_name, middle_name, last_name, suffix, gender, civil_status, preferred_language, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, is_remote, hourly_rate, salary_currency, created_at, role, account_status, verification_status, is_verified"
+            "id, first_name, middle_name, last_name, suffix, gender, spoken_languages, tin_number, id_type, id_number, id_expiration_date, id_issuing_country, email, professional_title, bio, birth_date, location, region, province, city, address_line_1, availability, hourly_rate, salary_currency, created_at, role, account_status, verification_status, is_verified"
           )
           .eq("id", id)
           .maybeSingle(),
@@ -330,11 +329,13 @@ export async function getAdminWorkerProfileDeepDive(
           .order("proficiency", { ascending: false })
           .limit(12),
         supabase
-          .from("worker_projects")
-          .select("id, title, role, year, description, skills_used")
+          .from("job_experiences")
+          .select(
+            "id, company_name, role_title, start_date, end_date, description, skills_used"
+          )
           .eq("worker_id", id)
-          .order("year", { ascending: false })
-          .limit(6),
+          .order("start_date", { ascending: false })
+          .limit(8),
       ]);
 
     if (!profile?.id || profile.role !== "worker") return null;
@@ -355,15 +356,13 @@ export async function getAdminWorkerProfileDeepDive(
       city: profile.city,
       addressLine1: profile.address_line_1,
       availability: profile.availability,
-      isRemote: profile.is_remote,
       hourlyRate: profile.hourly_rate,
       salaryCurrency: profile.salary_currency ?? "PHP",
       accountStatus: profile.account_status,
       verificationStatus: profile.verification_status ?? null,
       isVerified: Boolean(profile.is_verified),
       gender: profile.gender,
-      civilStatus: profile.civil_status,
-      preferredLanguage: profile.preferred_language,
+      spokenLanguages: profile.spoken_languages ?? [],
       tinNumber: profile.tin_number,
       idType: profile.id_type,
       idNumber: profile.id_number,
@@ -374,13 +373,14 @@ export async function getAdminWorkerProfileDeepDive(
         proficiency: s.proficiency,
         proficiencyLabel: s.proficiency_label ?? null,
       })),
-      projects: (projects ?? []).map((p) => ({
-        id: p.id,
-        title: p.title,
-        role: p.role,
-        year: p.year,
-        description: p.description,
-        skillsUsed: p.skills_used ?? [],
+      jobExperiences: (experiences ?? []).map((e) => ({
+        id: e.id,
+        companyName: e.company_name,
+        roleTitle: e.role_title,
+        startDate: e.start_date,
+        endDate: e.end_date,
+        description: e.description,
+        skillsUsed: e.skills_used ?? [],
       })),
       createdAt: profile.created_at,
     };

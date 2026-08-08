@@ -25,11 +25,12 @@ type WorkerSkillPreview = {
   proficiency_label?: string;
 };
 
-type WorkerProjectPreview = {
+type JobExperiencePreview = {
   id?: string;
-  title?: string;
-  role?: string;
-  year?: number;
+  company_name?: string;
+  role_title?: string;
+  start_date?: string;
+  end_date?: string | null;
   description?: string;
   skills_used?: string[];
 };
@@ -38,8 +39,27 @@ function asWorkerSkills(value: unknown): WorkerSkillPreview[] {
   return Array.isArray(value) ? (value as WorkerSkillPreview[]) : [];
 }
 
-function asWorkerProjects(value: unknown): WorkerProjectPreview[] {
-  return Array.isArray(value) ? (value as WorkerProjectPreview[]) : [];
+function asJobExperiences(value: unknown): JobExperiencePreview[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((raw) => {
+    const row = raw as JobExperiencePreview;
+    return {
+      id: row.id,
+      company_name: row.company_name?.trim() || "Previous role",
+      role_title: row.role_title?.trim() || "Contributor",
+      start_date: row.start_date,
+      end_date: row.end_date ?? null,
+      description: row.description,
+      skills_used: Array.isArray(row.skills_used) ? row.skills_used : [],
+    };
+  });
+}
+
+function asSpokenLanguages(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((lang) => (typeof lang === "string" ? lang.trim() : ""))
+    .filter(Boolean);
 }
 
 export async function getEmployerCandidateProfile(
@@ -113,7 +133,8 @@ export async function getEmployerCandidateProfile(
       : "anonymous_preview";
   const resumeCheck = await assertEmployerResumeDownload(profile.id);
   const workerSkills = asWorkerSkills(candidate.worker_skills);
-  const workerProjects = asWorkerProjects(candidate.worker_projects);
+  const jobExperiences = asJobExperiences(candidate.job_experiences);
+  const spokenLanguages = asSpokenLanguages(candidate.spoken_languages);
   const showHourly = planSlug !== "discovery";
 
   return {
@@ -141,7 +162,8 @@ export async function getEmployerCandidateProfile(
       bio: (candidate.bio as string | null) ?? null,
       skills,
       workerSkills,
-      workerProjects,
+      jobExperiences,
+      spokenLanguages,
       experienceYears: Number(candidate.experience_years ?? 0),
       avatarUrl: (candidate.avatar_url as string | null) ?? null,
       email: (candidate.email as string | null) ?? null,

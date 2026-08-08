@@ -26,6 +26,12 @@ const EMPTY_FORM = {
   experienceDuration: "",
 };
 
+const SKILLS_HELPER =
+  "Pick at least one. This will help us find you the perfect role.";
+
+const MIN_SKILLS = 3;
+const MAX_SKILLS = 6;
+
 export function SkillsManageModal({
   open,
   onClose,
@@ -49,6 +55,11 @@ export function SkillsManageModal({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!editingId && skills.length >= MAX_SKILLS) {
+      toast.error(`You can select up to ${MAX_SKILLS} skills.`);
+      return;
+    }
+
     startTransition(async () => {
       if (editingId) {
         const result = await updateWorkerSkill({
@@ -128,6 +139,8 @@ export function SkillsManageModal({
     });
   }
 
+  const atMax = !editingId && skills.length >= MAX_SKILLS;
+
   return (
     <ProfileModal
       open={open}
@@ -138,11 +151,17 @@ export function SkillsManageModal({
       }}
       footer={
         <p className="text-xs text-slate-500">
-          Skills appear on your public profile with proficiency bars.
+          {skills.length}/{MAX_SKILLS} selected · need {MIN_SKILLS}–{MAX_SKILLS} to stay match-ready
         </p>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-slate-600">{SKILLS_HELPER}</p>
+          <p className="text-[11px] font-semibold text-slate-400">
+            Profile strength requires {MIN_SKILLS}–{MAX_SKILLS} skills.
+          </p>
+        </div>
         <label className="block text-sm font-medium text-slate-700">
           Skill name
           <input
@@ -150,7 +169,8 @@ export function SkillsManageModal({
             value={form.skillName}
             onChange={(e) => setForm({ ...form, skillName: e.target.value })}
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            placeholder="e.g. React"
+            placeholder="Type a skill (e.g. Video Editing)"
+            disabled={atMax}
           />
         </label>
         <label className="block text-sm font-medium text-slate-700">
@@ -159,6 +179,7 @@ export function SkillsManageModal({
             value={form.proficiency}
             onChange={(e) => handleProficiencyChange(Number(e.target.value))}
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            disabled={atMax}
           >
             {PROFICIENCY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -176,12 +197,13 @@ export function SkillsManageModal({
             }
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             placeholder="e.g. 1–2 years"
+            disabled={atMax}
           />
         </label>
         <div className="flex gap-2">
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isPending || atMax}
             className="rounded-xl bg-[#006e2f] px-4 py-2 text-xs font-bold text-white hover:bg-[#005c26] disabled:opacity-60"
           >
             {editingId ? "Update skill" : "Add skill"}

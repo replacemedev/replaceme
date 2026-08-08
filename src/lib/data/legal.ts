@@ -14,7 +14,7 @@ export const DISCOVERY_JOB_APPROVAL_SLA = {
   overdueAfterHours: 48,
 } as const;
 
-export const LEGAL_LAST_UPDATED = "July 29, 2026";
+export const LEGAL_LAST_UPDATED = "August 8, 2026";
 
 export const PRIVACY_PAGE_META: PageContentMeta = {
   lastUpdated: LEGAL_LAST_UPDATED,

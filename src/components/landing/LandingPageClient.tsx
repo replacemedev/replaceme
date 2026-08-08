@@ -242,7 +242,7 @@ export function LandingPageClient({
                 <Handshake className="h-7 w-7 sm:h-8 sm:w-8 text-[#22c55e]" aria-hidden />
               </div>
               <h3 className="font-body-bold text-lg sm:text-xl mb-2 sm:mb-3 text-slate-800 font-bold">Built-In Hiring Flow</h3>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Manage job posts, applicant pipelines, and direct messages in one clear employer dashboard.</p>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Manage job posts, applicant pipelines, and direct messages in one clear employer dashboard. Starter+ plans also get automated skill-match chat when worker skills overlap your requirements.</p>
             </div>
             <div className="bg-[#f8fafc] rounded-3xl p-5 sm:p-8 md:p-10 text-center border border-slate-100 card-premium-hover reveal-item" style={{ transitionDelay: "400ms" }}>
               <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 sm:mb-8 border border-slate-100">
@@ -256,11 +256,11 @@ export function LandingPageClient({
           {/* GEO: CitationBlock row — data-dense facts for LLM citation extraction */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch mt-10 sm:mt-14 reveal-item" style={{ transitionDelay: "200ms" }}>
             <CitationBlock
-              label="Salary Protection"
-              headline="Workers receive 100% of their agreed salary"
-              body="Replaceme never deducts commissions or markups from worker earnings. Employers pay workers directly on agreed terms."
-              stat="0%"
-              statLabel="salary commission"
+              label="Skill Match Chat"
+              headline="Automated skill matching stays inside platform chat"
+              body="When a Starter+ job goes live, Replaceme can open an in-app chat with overlapping workers and a Quick Apply action. Matches are never sent by email."
+              stat="Chat"
+              statLabel="only — no email"
             />
             <CitationBlock
               label="Transparent Pricing"

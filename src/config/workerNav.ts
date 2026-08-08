@@ -4,11 +4,8 @@ import {
   Bookmark,
   FileText,
   MessageSquare,
-  Handshake,
   User,
   Settings,
-  DollarSign,
-  Bell,
   ShieldCheck,
   type LucideIcon,
 } from "lucide-react";

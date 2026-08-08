@@ -14,12 +14,12 @@ import {
   employerNotificationStepSchema,
   employerOnboardingSchema,
   EmployerOnboardingStep,
+  jobExperienceStepSchema,
   workerAboutStepSchema,
   workerCompensationStepSchema,
   workerIdentityStepSchema,
   workerLocationStepSchema,
   workerOnboardingSchema,
-  workerProjectStepSchema,
   workerSkillsStepSchema,
   WorkerOnboardingStep,
 } from "@/lib/validations/onboarding";
@@ -37,8 +37,7 @@ export type WorkerOnboardingDraft = {
   lastName: string;
   suffix: string;
   gender: string;
-  civilStatus: string;
-  preferredLanguage: string;
+  spokenLanguages: string[];
   avatarUrl: string | null;
   location: string;
   region: string;
@@ -46,7 +45,6 @@ export type WorkerOnboardingDraft = {
   city: string;
   addressLine1: string;
   availability: string;
-  isRemote: boolean;
   skills: string[];
   hourlyRate: number | null;
   salaryCurrency: string;
@@ -156,7 +154,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
     const { data: profile } = await supabase
       .from("profiles")
       .select(
-        "professional_title, first_name, middle_name, last_name, suffix, gender, civil_status, preferred_language, avatar_url, location, region, province, city, address_line_1, availability, is_remote, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
+        "professional_title, first_name, middle_name, last_name, suffix, gender, spoken_languages, avatar_url, location, region, province, city, address_line_1, availability, skills, hourly_rate, salary_currency, expected_salary_min, expected_salary_max, bio, birth_date"
       )
       .eq("id", user.id)
       .single();
@@ -170,8 +168,7 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       lastName: profile.last_name ?? "",
       suffix: profile.suffix ?? "",
       gender: profile.gender ?? "",
-      civilStatus: profile.civil_status ?? "",
-      preferredLanguage: profile.preferred_language ?? "",
+      spokenLanguages: profile.spoken_languages ?? [],
       avatarUrl: profile.avatar_url ?? null,
       location: profile.location ?? "",
       region: profile.region ?? "",
@@ -179,7 +176,6 @@ export async function getWorkerOnboardingDraft(): Promise<WorkerOnboardingDraft 
       city: profile.city ?? "",
       addressLine1: profile.address_line_1 ?? "",
       availability: profile.availability ?? "Full-time",
-      isRemote: profile.is_remote ?? false,
       skills: profile.skills ?? [],
       hourlyRate: profile.hourly_rate ?? null,
       salaryCurrency: profile.salary_currency ?? "PHP",
@@ -248,9 +244,8 @@ export async function saveWorkerOnboardingStep(
             middle_name: parsed.middleName || null,
             last_name: parsed.lastName,
             suffix: parsed.suffix || null,
-            gender: parsed.gender || null,
-            civil_status: parsed.civilStatus || null,
-            preferred_language: parsed.preferredLanguage || null,
+            gender: parsed.gender,
+            spoken_languages: parsed.spokenLanguages,
             updated_at: now,
           })
           .eq("id", user.id);
@@ -274,7 +269,6 @@ export async function saveWorkerOnboardingStep(
             address_line_1: parsed.addressLine1 || null,
             location: formatted || null,
             availability: parsed.availability,
-            is_remote: parsed.isRemote,
             updated_at: now,
           })
           .eq("id", user.id);
@@ -316,24 +310,25 @@ export async function saveWorkerOnboardingStep(
           .from("profiles")
           .update({
             bio: parsed.bio?.trim() ? parsed.bio.trim() : null,
-            birth_date: parsed.birthDate ?? null,
+            birth_date: parsed.birthDate,
             updated_at: now,
           })
           .eq("id", user.id);
         if (error) return fail("Failed to save bio.");
         break;
       }
-      case "project": {
-        const parsed = workerProjectStepSchema.parse(input);
-        const { error } = await supabase.from("worker_projects").insert({
+      case "experience": {
+        const parsed = jobExperienceStepSchema.parse(input);
+        const { error } = await supabase.from("job_experiences").insert({
           worker_id: user.id,
-          title: parsed.title,
-          role: parsed.role,
-          year: parsed.year,
+          company_name: parsed.companyName,
+          role_title: parsed.roleTitle,
+          start_date: parsed.startDate,
+          end_date: parsed.endDate,
           description: parsed.description,
           skills_used: parsed.skillsUsed,
         });
-        if (error) return fail("Failed to save project.");
+        if (error) return fail("Failed to save job experience.");
         break;
       }
       default:
@@ -436,6 +431,11 @@ export async function finishWorkerOnboarding() {
 
     if (error) return fail("Failed to complete onboarding.");
 
+    const { triggerSkillMatchForWorker } = await import(
+      "@/lib/server/matching/skill-match-outreach"
+    );
+    triggerSkillMatchForWorker(user.id);
+
     revalidatePath("/worker");
     return ok();
   });
@@ -489,6 +489,11 @@ export async function completeWorkerOnboarding(input: {
     } catch {
       return fail("Failed to sync skills.");
     }
+
+    const { triggerSkillMatchForWorker } = await import(
+      "@/lib/server/matching/skill-match-outreach"
+    );
+    triggerSkillMatchForWorker(user.id);
 
     revalidatePath("/worker");
     return ok();

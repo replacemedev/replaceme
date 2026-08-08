@@ -6,8 +6,8 @@ import {
   patchWorkerProfileSchema,
   updateWorkerSkillSchema,
   workerSkillInputSchema,
-  workerProjectInputSchema,
-  updateWorkerProjectSchema,
+  jobExperienceInputSchema,
+  updateJobExperienceSchema,
   type PatchWorkerProfileInput,
 } from "@/lib/validations/worker/profile-inline";
 import { updateWorkerSettingsSchema } from "@/lib/validations/worker/phase2";
@@ -95,8 +95,7 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   if (data.cvUrl !== undefined) update.cv_url = emptyToNull(data.cvUrl);
   if (data.birthDate !== undefined) update.birth_date = data.birthDate;
   if (data.gender !== undefined) update.gender = emptyToNull(data.gender);
-  if (data.civilStatus !== undefined) update.civil_status = emptyToNull(data.civilStatus);
-  if (data.preferredLanguage !== undefined) update.preferred_language = emptyToNull(data.preferredLanguage);
+  if (data.spokenLanguages !== undefined) update.spoken_languages = data.spokenLanguages;
   if (data.tinNumber !== undefined) update.tin_number = emptyToNull(data.tinNumber);
   if (data.idType !== undefined) update.id_type = emptyToNull(data.idType);
   if (data.idNumber !== undefined) update.id_number = emptyToNull(data.idNumber);
@@ -114,6 +113,12 @@ export async function patchWorkerProfile(payload: PatchWorkerProfileInput) {
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   await emitWorkerAuditLog(ctx.profile.id, "worker.profile_updated");
   revalidatePath("/worker/profile");
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
+
   return { success: true };
 }
 
@@ -136,7 +141,6 @@ export async function updateWorkerSettings(payload: unknown) {
     .update({
       availability: parsed.data.availability,
       hourly_rate: parsed.data.hourlyRate,
-      is_remote: parsed.data.isRemote,
       ...(parsed.data.salaryCurrency
         ? { salary_currency: parsed.data.salaryCurrency }
         : {}),
@@ -151,6 +155,12 @@ export async function updateWorkerSettings(payload: unknown) {
   await emitWorkerAuditLog(ctx.profile.id, "worker.settings_updated");
   revalidatePath("/worker/settings");
   revalidatePath("/worker/profile");
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
+
   return { success: true };
 }
 
@@ -181,6 +191,25 @@ export async function createWorkerSkill(payload: unknown) {
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
+
+  // Keep profiles.skills in sync for matching / strength scoring
+  const { data: skillRows } = await ctx.supabase
+    .from("worker_skills")
+    .select("skill_name")
+    .eq("worker_id", ctx.profile.id);
+  const skillNames = [
+    ...new Set((skillRows ?? []).map((s) => s.skill_name).filter(Boolean)),
+  ];
+  await ctx.supabase
+    .from("profiles")
+    .update({ skills: skillNames, updated_at: new Date().toISOString() })
+    .eq("id", ctx.profile.id);
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
+
   return { success: true, id: data.id };
 }
 
@@ -211,6 +240,24 @@ export async function updateWorkerSkill(payload: unknown) {
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
+
+  const { data: skillRows } = await ctx.supabase
+    .from("worker_skills")
+    .select("skill_name")
+    .eq("worker_id", ctx.profile.id);
+  const skillNames = [
+    ...new Set((skillRows ?? []).map((s) => s.skill_name).filter(Boolean)),
+  ];
+  await ctx.supabase
+    .from("profiles")
+    .update({ skills: skillNames, updated_at: new Date().toISOString() })
+    .eq("id", ctx.profile.id);
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
+
   return { success: true };
 }
 
@@ -229,28 +276,47 @@ export async function deleteWorkerSkill(skillId: string) {
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
   revalidatePath("/worker/profile");
+
+  const { data: skillRows } = await ctx.supabase
+    .from("worker_skills")
+    .select("skill_name")
+    .eq("worker_id", ctx.profile.id);
+  const skillNames = [
+    ...new Set((skillRows ?? []).map((s) => s.skill_name).filter(Boolean)),
+  ];
+  await ctx.supabase
+    .from("profiles")
+    .update({ skills: skillNames, updated_at: new Date().toISOString() })
+    .eq("id", ctx.profile.id);
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
+
   return { success: true };
 }
 
-export async function createWorkerProject(payload: unknown) {
+export async function createJobExperience(payload: unknown) {
   const ctx = await requireWorker();
   if (!ctx) return { error: "Unauthorized" };
 
-  const parsed = workerProjectInputSchema.safeParse(payload);
+  const parsed = jobExperienceInputSchema.safeParse(payload);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid project" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid experience" };
   }
 
-  const { data, error } = await ctx.supabase.from("worker_projects").insert({
+  const { data, error } = await ctx.supabase.from("job_experiences").insert({
     worker_id: ctx.profile.id,
-    title: parsed.data.title,
-    role: parsed.data.role,
-    year: parsed.data.year,
+    company_name: parsed.data.companyName,
+    role_title: parsed.data.roleTitle,
+    start_date: parsed.data.startDate,
+    end_date: parsed.data.endDate,
     description: parsed.data.description,
     skills_used: parsed.data.skillsUsed,
   }).select("id").single();
 
-  if (error || !data?.id) return { error: "Failed to add project." };
+  if (error || !data?.id) return { error: "Failed to add job experience." };
 
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
@@ -258,21 +324,27 @@ export async function createWorkerProject(payload: unknown) {
   return { success: true, id: data.id };
 }
 
-export async function updateWorkerProject(payload: unknown) {
+/** @deprecated Use createJobExperience */
+export async function createWorkerProject(payload: unknown) {
+  return createJobExperience(payload);
+}
+
+export async function updateJobExperience(payload: unknown) {
   const ctx = await requireWorker();
   if (!ctx) return { error: "Unauthorized" };
 
-  const parsed = updateWorkerProjectSchema.safeParse(payload);
+  const parsed = updateJobExperienceSchema.safeParse(payload);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid project" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid experience" };
   }
 
   const { error } = await ctx.supabase
-    .from("worker_projects")
+    .from("job_experiences")
     .update({
-      title: parsed.data.title,
-      role: parsed.data.role,
-      year: parsed.data.year,
+      company_name: parsed.data.companyName,
+      role_title: parsed.data.roleTitle,
+      start_date: parsed.data.startDate,
+      end_date: parsed.data.endDate,
       description: parsed.data.description,
       skills_used: parsed.data.skillsUsed,
       updated_at: new Date().toISOString(),
@@ -280,7 +352,7 @@ export async function updateWorkerProject(payload: unknown) {
     .eq("id", parsed.data.id)
     .eq("worker_id", ctx.profile.id);
 
-  if (error) return { error: "Failed to update project." };
+  if (error) return { error: "Failed to update job experience." };
 
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
@@ -288,17 +360,22 @@ export async function updateWorkerProject(payload: unknown) {
   return { success: true };
 }
 
-export async function deleteWorkerProject(projectId: string) {
+/** @deprecated Use updateJobExperience */
+export async function updateWorkerProject(payload: unknown) {
+  return updateJobExperience(payload);
+}
+
+export async function deleteJobExperience(experienceId: string) {
   const ctx = await requireWorker();
   if (!ctx) return { error: "Unauthorized" };
 
   const { error } = await ctx.supabase
-    .from("worker_projects")
+    .from("job_experiences")
     .delete()
-    .eq("id", projectId)
+    .eq("id", experienceId)
     .eq("worker_id", ctx.profile.id);
 
-  if (error) return { error: "Failed to delete project." };
+  if (error) return { error: "Failed to delete job experience." };
 
   await invalidateWorkerCache(ctx.profile.id);
   await invalidateEmployerCachesForWorker(ctx.profile.id);
@@ -306,24 +383,35 @@ export async function deleteWorkerProject(projectId: string) {
   return { success: true };
 }
 
-export async function getWorkerProjects() {
+/** @deprecated Use deleteJobExperience */
+export async function deleteWorkerProject(projectId: string) {
+  return deleteJobExperience(projectId);
+}
+
+export async function getJobExperiences() {
   const ctx = await requireWorker();
   if (!ctx) return [];
 
   const { data } = await ctx.supabase
-    .from("worker_projects")
-    .select("id, title, role, year, description, skills_used")
+    .from("job_experiences")
+    .select("id, company_name, role_title, start_date, end_date, description, skills_used")
     .eq("worker_id", ctx.profile.id)
-    .order("year", { ascending: false });
+    .order("start_date", { ascending: false });
 
   return (data ?? []).map((row) => ({
     id: row.id,
-    title: row.title,
-    role: row.role,
-    year: row.year,
+    companyName: row.company_name,
+    roleTitle: row.role_title,
+    startDate: row.start_date,
+    endDate: row.end_date,
     description: row.description,
     skillsUsed: row.skills_used ?? [],
   }));
+}
+
+/** @deprecated Use getJobExperiences */
+export async function getWorkerProjects() {
+  return getJobExperiences();
 }
 
 export async function uploadWorkerAvatar(formData: FormData) {
@@ -394,6 +482,11 @@ export async function uploadWorkerAvatar(formData: FormData) {
   revalidatePath("/worker/dashboard");
   revalidatePath("/worker/onboarding");
   revalidatePath("/", "layout");
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
 
   return { success: true, avatarUrl };
 }
@@ -518,6 +611,11 @@ export async function uploadWorkerResume(formData: FormData) {
   revalidatePath("/worker/dashboard");
   revalidatePath("/worker/onboarding");
   revalidatePath("/", "layout");
+
+  const { triggerSkillMatchForWorker } = await import(
+    "@/lib/server/matching/skill-match-outreach"
+  );
+  triggerSkillMatchForWorker(ctx.profile.id);
 
   return { success: true, resumeUrl: storagePath };
 }

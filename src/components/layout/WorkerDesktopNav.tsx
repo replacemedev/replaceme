@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Bell, DollarSign } from "lucide-react";
+import { ChevronDown, Bell } from "lucide-react";
 import { NavUnderlineLink } from "@/components/shared/nav/NavUnderlineLink";
 
 const PRIMARY = [
@@ -16,7 +16,6 @@ const PRIMARY = [
 
 const MORE = [
   { href: "/worker/notifications", label: "Notifications", icon: Bell },
-  { href: "/worker/earnings", label: "Earnings", icon: DollarSign },
 ];
 
 function isActive(pathname: string, href: string) {

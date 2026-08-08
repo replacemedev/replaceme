@@ -5,8 +5,7 @@ export interface WorkerProfile {
   last_name: string | null;
   suffix?: string | null;
   gender?: string | null;
-  civil_status?: string | null;
-  preferred_language?: string | null;
+  spoken_languages?: string[] | null;
   tin_number?: string | null;
   id_type?: string | null;
   id_number?: string | null;
@@ -30,7 +29,6 @@ export interface WorkerProfile {
   cv_url: string | null;
   birth_date: string | null;
   is_top_rated: boolean | null;
-  is_remote: boolean | null;
   created_at: string;
   is_verified?: boolean;
 }
@@ -45,15 +43,19 @@ export interface WorkerSkillDetailed {
   proficiency_label: string | null;
 }
 
-export interface WorkerProject {
+export interface JobExperience {
   id: string;
   worker_id: string;
-  title: string;
-  role: string;
-  year: number;
+  company_name: string;
+  role_title: string;
+  start_date: string;
+  end_date: string | null;
   description: string;
   skills_used: string[];
 }
+
+/** @deprecated Use JobExperience — field names changed (company_name, role_title, start_date, end_date). */
+export type WorkerProject = JobExperience;
 
 export interface EmployerTestimonial {
   id: string;

@@ -30,6 +30,9 @@ interface ApplicantsToolbarProps {
   onStatusFilterChange: (value: ApplicantStatusFilter) => void;
   sortKey: ApplicantSortKey;
   onSortKeyChange: (value: ApplicantSortKey) => void;
+  languageFilter: string;
+  languageOptions: string[];
+  onLanguageFilterChange: (value: string) => void;
 }
 
 export function ApplicantsToolbar({
@@ -40,9 +43,13 @@ export function ApplicantsToolbar({
   onStatusFilterChange,
   sortKey,
   onSortKeyChange,
+  languageFilter,
+  languageOptions,
+  onLanguageFilterChange,
 }: ApplicantsToolbarProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="relative max-w-md flex-1">
         <Search
           size={16}
@@ -50,7 +57,7 @@ export function ApplicantsToolbar({
         />
         <input
           type="search"
-          placeholder="Search candidates..."
+          placeholder="Search name, skills, or languages..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="h-10 w-full rounded-lg border border-slate-100 bg-slate-50 pl-10 pr-4 text-xs font-body-base placeholder:text-slate-400 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006e2f]/30"
@@ -59,7 +66,7 @@ export function ApplicantsToolbar({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         <div
-          className="flex gap-1 overflow-x-auto pb-1 sm:pb-0"
+          className="flex gap-1 overflow-x-auto pb-1 sm:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           role="group"
           aria-label="Filter by status"
         >
@@ -68,7 +75,7 @@ export function ApplicantsToolbar({
               key={opt.value}
               type="button"
               onClick={() => onStatusFilterChange(opt.value)}
-              className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                 statusFilter === opt.value
                   ? "bg-[#006e2f] text-white"
                   : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -107,6 +114,46 @@ export function ApplicantsToolbar({
           </div>
         </div>
       </div>
+      </div>
+
+      {languageOptions.length > 0 ? (
+        <div className="space-y-2 border-t border-slate-100 pt-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Spoken Languages
+          </p>
+          <div
+            className="flex gap-1.5 overflow-x-auto pb-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Filter by spoken language"
+          >
+            <button
+              type="button"
+              onClick={() => onLanguageFilterChange("all")}
+              className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                languageFilter === "all"
+                  ? "bg-emerald-700 text-white"
+                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white"
+              }`}
+            >
+              All languages
+            </button>
+            {languageOptions.map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => onLanguageFilterChange(lang)}
+                className={`snap-start shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  languageFilter.toLowerCase() === lang.toLowerCase()
+                    ? "bg-emerald-700 text-white"
+                    : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white"
+                }`}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

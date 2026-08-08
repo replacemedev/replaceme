@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 const optionalUrl = z.union([z.literal(""), z.string().url({ message: "Please enter a valid URL." })]);
-const currentYear = new Date().getFullYear();
+const isoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD).");
+
+export const workerGenderSchema = z.enum(["Male", "Female", "Other"]);
 
 export const patchWorkerProfileSchema = z
   .object({
@@ -9,9 +13,11 @@ export const patchWorkerProfileSchema = z
     middleName: z.string().max(80, "Middle name cannot exceed 80 characters.").optional().nullable(),
     lastName: z.string().min(1, "Last name is required.").max(80, "Last name cannot exceed 80 characters."),
     suffix: z.string().max(10, "Suffix cannot exceed 10 characters.").optional().nullable(),
-    gender: z.string().optional().nullable(),
-    civilStatus: z.string().optional().nullable(),
-    preferredLanguage: z.string().optional().nullable(),
+    gender: workerGenderSchema,
+    spokenLanguages: z
+      .array(z.string().min(1))
+      .min(1, "Add at least one spoken language.")
+      .max(8),
     professionalTitle: z.string().min(2, "Professional title must be at least 2 characters.").max(120, "Professional title cannot exceed 120 characters."),
     bio: z.string().max(2000, "Bio cannot exceed 2000 characters."),
     region: z.string().max(100, "Region cannot exceed 100 characters.").optional().nullable(),
@@ -21,17 +27,39 @@ export const patchWorkerProfileSchema = z
     portfolioUrl: optionalUrl,
     resumeUrl: optionalUrl,
     cvUrl: optionalUrl,
-    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid birthdate (YYYY-MM-DD).").nullable(),
+    birthDate: isoDateSchema,
     tinNumber: z.string().optional().nullable(),
     idType: z.string().optional().nullable(),
     idNumber: z.string().optional().nullable(),
-    idExpirationDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD).").optional().nullable(),
+    idExpirationDate: isoDateSchema.optional().nullable(),
     idIssuingCountry: z.string().optional().nullable(),
   })
   .partial()
   .strict();
 
+/** Full personal/demographics save from the profile edit modal (not a sparse patch). */
+export const workerEditDetailsSchema = z
+  .object({
+    firstName: z.string().min(1, "First name is required.").max(80),
+    middleName: z.string().max(80).optional().nullable(),
+    lastName: z.string().min(1, "Last name is required.").max(80),
+    suffix: z.string().max(10).optional().nullable(),
+    birthDate: isoDateSchema,
+    gender: workerGenderSchema,
+    spokenLanguages: z
+      .array(z.string().min(1))
+      .min(1, "Add at least one spoken language.")
+      .max(8),
+    tinNumber: z.string().optional().nullable(),
+    idType: z.string().optional().nullable(),
+    idNumber: z.string().optional().nullable(),
+    idExpirationDate: isoDateSchema.optional().nullable(),
+    idIssuingCountry: z.string().optional().nullable(),
+  })
+  .strict();
+
 export type PatchWorkerProfileInput = z.infer<typeof patchWorkerProfileSchema>;
+export type WorkerEditDetailsInput = z.infer<typeof workerEditDetailsSchema>;
 
 export const workerSkillInputSchema = z
   .object({
@@ -48,17 +76,18 @@ export const updateWorkerSkillSchema = workerSkillInputSchema
   .extend({ id: z.string().uuid() })
   .strict();
 
-export const workerProjectInputSchema = z
+export const jobExperienceInputSchema = z
   .object({
-    title: z.string().min(1).max(120),
-    role: z.string().min(1).max(120),
-    year: z.number().int().min(1970).max(currentYear + 1),
+    companyName: z.string().min(1).max(120),
+    roleTitle: z.string().min(1).max(120),
+    startDate: isoDateSchema,
+    endDate: isoDateSchema.nullable(),
     description: z.string().min(1).max(2000),
     skillsUsed: z.array(z.string().min(1).max(60)).max(20),
   })
   .strict();
 
-export const updateWorkerProjectSchema = workerProjectInputSchema
+export const updateJobExperienceSchema = jobExperienceInputSchema
   .extend({ id: z.string().uuid() })
   .strict();
 

@@ -19,7 +19,7 @@ import {
 import { toast } from "sonner";
 import { showErrorToast } from "@/utils/toast";
 import { ResumeUpload } from "./ResumeUpload";
-import { patchWorkerProfile, deleteWorkerProject } from "@/actions/worker/profile";
+import { patchWorkerProfile, deleteJobExperience } from "@/actions/worker/profile";
 import { formatMoney } from "@/lib/format/currency";
 import { formatFullName } from "@/lib/format/name";
 import { calculateAge } from "@/utils/date";
@@ -29,25 +29,25 @@ import { ProfileAvatarUpload } from "@/components/shared/ProfileAvatarUpload";
 import { profileImageHelperText } from "@/lib/storage/profile-image";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { SkillProgressBar } from "@/components/worker/profile/SkillProgressBar";
-import { ProjectHighlightItem } from "@/components/worker/profile/ProjectHighlightItem";
+import { JobExperienceItem } from "@/components/worker/profile/ProjectHighlightItem";
 import { TestimonialCard } from "@/components/worker/profile/TestimonialCard";
 import { InlineEditableRow } from "@/components/worker/profile/inline/InlineEditableRow";
 import { RateAvailabilityModal } from "@/components/worker/profile/inline/RateAvailabilityModal";
 import { SkillsManageModal } from "@/components/worker/profile/inline/SkillsManageModal";
 import { LocationManageModal } from "@/components/worker/profile/inline/LocationManageModal";
-import { ProjectFormModal } from "@/components/worker/profile/inline/ProjectFormModal";
+import { JobExperienceFormModal } from "@/components/worker/profile/inline/JobExperienceFormModal";
 import { WorkerEditDetailsModal } from "@/components/worker/profile/inline/WorkerEditDetailsModal";
 import type {
   WorkerProfile,
   WorkerSkillDetailed,
-  WorkerProject,
+  JobExperience,
   EmployerTestimonial,
 } from "@/types/worker-profile";
 
 export interface WorkerProfileEditorProps {
   profile: WorkerProfile;
   skills: WorkerSkillDetailed[];
-  projects: WorkerProject[];
+  experiences: JobExperience[];
   testimonials: EmployerTestimonial[];
   reviewCount: number;
   averageRating: number;
@@ -59,7 +59,7 @@ export interface WorkerProfileEditorProps {
 export function WorkerProfileEditor({
   profile: initialProfile,
   skills: initialSkills,
-  projects: initialProjects,
+  experiences: initialExperiences,
   testimonials,
   reviewCount,
   averageRating,
@@ -69,14 +69,14 @@ export function WorkerProfileEditor({
 }: WorkerProfileEditorProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [skills, setSkills] = useState(initialSkills);
-  const [projects, setProjects] = useState(initialProjects);
+  const [experiences, setExperiences] = useState(initialExperiences);
   const [rateModalOpen, setRateModalOpen] = useState(false);
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
-  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [experienceModalOpen, setExperienceModalOpen] = useState(false);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<WorkerProject | null>(null);
-  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
+  const [editingExperience, setEditingExperience] = useState<JobExperience | null>(null);
+  const [deleteExperienceId, setDeleteExperienceId] = useState<string | null>(null);
   const [bioEditing, setBioEditing] = useState(false);
   const [bioDraft, setBioDraft] = useState(profile.bio ?? "");
   const [birthDateEditing, setBirthDateEditing] = useState(false);
@@ -158,8 +158,9 @@ export function WorkerProfileEditor({
         }
         : {}),
       ...(patch.gender !== undefined ? { gender: patch.gender } : {}),
-      ...(patch.civilStatus !== undefined ? { civil_status: patch.civilStatus } : {}),
-      ...(patch.preferredLanguage !== undefined ? { preferred_language: patch.preferredLanguage } : {}),
+      ...(patch.spokenLanguages !== undefined
+        ? { spoken_languages: patch.spokenLanguages }
+        : {}),
       ...(patch.tinNumber !== undefined ? { tin_number: patch.tinNumber } : {}),
       ...(patch.idType !== undefined ? { id_type: patch.idType } : {}),
       ...(patch.idNumber !== undefined ? { id_number: patch.idNumber } : {}),
@@ -209,8 +210,11 @@ export function WorkerProfileEditor({
 
   function saveBirthDate() {
     startTransition(async () => {
-      const date = birthDateDraft ? birthDateDraft : null;
-      const result = await saveProfileField({ birthDate: date });
+      if (!birthDateDraft) {
+        toast.error("Date of birth is required.");
+        return;
+      }
+      const result = await saveProfileField({ birthDate: birthDateDraft });
       if (!("error" in result)) {
         setBirthDateEditing(false);
         toast.success("Birthdate updated");
@@ -230,17 +234,17 @@ export function WorkerProfileEditor({
     });
   }
 
-  function confirmDeleteProject() {
-    if (!deleteProjectId) return;
+  function confirmDeleteExperience() {
+    if (!deleteExperienceId) return;
     startTransition(async () => {
-      const result = await deleteWorkerProject(deleteProjectId);
+      const result = await deleteJobExperience(deleteExperienceId);
       if (result.error) {
         showErrorToast(result.error);
         return;
       }
-      setProjects((prev) => prev.filter((p) => p.id !== deleteProjectId));
-      setDeleteProjectId(null);
-      toast.success("Project removed");
+      setExperiences((prev) => prev.filter((p) => p.id !== deleteExperienceId));
+      setDeleteExperienceId(null);
+      toast.success("Experience removed");
     });
   }
 
@@ -356,13 +360,13 @@ export function WorkerProfileEditor({
                     <span className="text-slate-500 font-medium">Gender</span>
                     <span className="text-slate-800 font-semibold">{profile.gender || "Not specified"}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-500 font-medium">Civil Status</span>
-                    <span className="text-slate-800 font-semibold">{profile.civil_status || "Not specified"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-500 font-medium">Preferred Language</span>
-                    <span className="text-slate-800 font-semibold">{profile.preferred_language || "Not specified"}</span>
+                  <div className="flex justify-between py-1 border-b border-slate-50 gap-3">
+                    <span className="text-slate-500 font-medium shrink-0">Spoken Languages</span>
+                    <span className="text-slate-800 font-semibold text-right">
+                      {(profile.spoken_languages?.length ?? 0) > 0
+                        ? profile.spoken_languages!.join(", ")
+                        : "Not specified"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -451,7 +455,7 @@ export function WorkerProfileEditor({
             )}
           </div>
 
-          {/* Projects */}
+          {/* Job Experience */}
           <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.02)] p-6 space-y-6">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
@@ -459,15 +463,15 @@ export function WorkerProfileEditor({
                   <Briefcase size={18} className="stroke-[2.5]" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 tracking-tight uppercase">
-                  Project Highlights
+                  Job Experience
                 </h3>
               </div>
               {isOwner ? (
                 <button
                   type="button"
                   onClick={() => {
-                    setEditingProject(null);
-                    setProjectModalOpen(true);
+                    setEditingExperience(null);
+                    setExperienceModalOpen(true);
                   }}
                   className="text-xs font-bold text-[#006e2f] hover:text-[#005321] flex items-center gap-1"
                 >
@@ -476,18 +480,18 @@ export function WorkerProfileEditor({
                 </button>
               ) : null}
             </div>
-            {projects.length > 0 ? (
+            {experiences.length > 0 ? (
               <div className="space-y-6 divide-y divide-slate-100">
-                {projects.map((project, idx) => (
-                  <div key={project.id} className={idx > 0 ? "pt-6" : ""}>
+                {experiences.map((experience, idx) => (
+                  <div key={experience.id} className={idx > 0 ? "pt-6" : ""}>
                     <div className="flex justify-end gap-1 mb-1">
                       {isOwner ? (
                         <>
                           <button
                             type="button"
                             onClick={() => {
-                              setEditingProject(project);
-                              setProjectModalOpen(true);
+                              setEditingExperience(experience);
+                              setExperienceModalOpen(true);
                             }}
                             className="text-[10px] font-bold text-[#006e2f] hover:underline"
                           >
@@ -495,22 +499,22 @@ export function WorkerProfileEditor({
                           </button>
                           <button
                             type="button"
-                            onClick={() => setDeleteProjectId(project.id)}
+                            onClick={() => setDeleteExperienceId(experience.id)}
                             className="p-1 text-slate-400 hover:text-red-600"
-                            aria-label="Delete project"
+                            aria-label="Delete experience"
                           >
                             <Trash2 size={12} />
                           </button>
                         </>
                       ) : null}
                     </div>
-                    <ProjectHighlightItem project={project} />
+                    <JobExperienceItem experience={experience} />
                   </div>
                 ))}
               </div>
             ) : (
               <p className="p-6 text-center text-slate-400 font-semibold text-sm italic">
-                No projects showcased yet.
+                No job experience listed yet.
               </p>
             )}
           </div>
@@ -591,6 +595,7 @@ export function WorkerProfileEditor({
                   <input
                     value={titleDraft}
                     onChange={(e) => setTitleDraft(e.target.value)}
+                    placeholder="e.g., Senior Video Editor"
                     className="rounded-lg border border-slate-200 px-2 py-1 text-sm text-center max-w-[220px]"
                   />
                   <button type="button" onClick={saveTitle} className="text-[#006e2f]">
@@ -624,11 +629,6 @@ export function WorkerProfileEditor({
               {profile.is_top_rated ? (
                 <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-bold text-[#006e2f] bg-[#ebfdf2] border border-[#006e2f]/20 uppercase">
                   Top Rated
-                </span>
-              ) : null}
-              {profile.is_remote ? (
-                <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200">
-                  Remote
                 </span>
               ) : null}
             </div>
@@ -782,7 +782,6 @@ export function WorkerProfileEditor({
             initial={{
               availability: profile.availability ?? "Full-time",
               hourlyRate: Number(profile.hourly_rate ?? 0),
-              isRemote: Boolean(profile.is_remote),
               salaryCurrency: profile.salary_currency ?? "PHP",
             }}
             onSaved={(data) =>
@@ -790,7 +789,6 @@ export function WorkerProfileEditor({
                 ...prev,
                 availability: data.availability,
                 hourly_rate: data.hourlyRate,
-                is_remote: data.isRemote,
                 salary_currency: data.salaryCurrency,
               }))
             }
@@ -801,15 +799,15 @@ export function WorkerProfileEditor({
             skills={skills}
             onSkillsChange={setSkills}
           />
-          <ProjectFormModal
-            open={projectModalOpen}
+          <JobExperienceFormModal
+            open={experienceModalOpen}
             onClose={() => {
-              setProjectModalOpen(false);
-              setEditingProject(null);
+              setExperienceModalOpen(false);
+              setEditingExperience(null);
             }}
-            project={editingProject}
+            experience={editingExperience}
             onSaved={(saved) => {
-              setProjects((prev) => {
+              setExperiences((prev) => {
                 const exists = prev.some((p) => p.id === saved.id);
                 if (exists) {
                   return prev.map((p) => (p.id === saved.id ? saved : p));
@@ -839,13 +837,13 @@ export function WorkerProfileEditor({
             }}
           />
           <ConfirmDialog
-            open={Boolean(deleteProjectId)}
-            title="Remove project?"
-            description="This project will be removed from your public profile."
+            open={Boolean(deleteExperienceId)}
+            title="Remove experience?"
+            description="This job experience will be removed from your public profile."
             confirmLabel="Remove"
             variant="danger"
-            onConfirm={confirmDeleteProject}
-            onCancel={() => setDeleteProjectId(null)}
+            onConfirm={confirmDeleteExperience}
+            onCancel={() => setDeleteExperienceId(null)}
           />
           <WorkerEditDetailsModal
             open={detailsModalOpen}
@@ -857,8 +855,7 @@ export function WorkerProfileEditor({
               suffix: profile.suffix || "",
               birthDate: profile.birth_date || "",
               gender: profile.gender || "",
-              civilStatus: profile.civil_status || "",
-              preferredLanguage: profile.preferred_language || "",
+              spokenLanguages: profile.spoken_languages || [],
               tinNumber: profile.tin_number || "",
               idType: profile.id_type || "",
               idNumber: profile.id_number || "",
@@ -866,8 +863,10 @@ export function WorkerProfileEditor({
               idIssuingCountry: profile.id_issuing_country || "",
             }}
             onSaved={async (data) => {
-              const res = await saveProfileField(data);
-              if (!res.error) {
+              const res = await saveProfileField(
+                data as Parameters<typeof saveProfileField>[0]
+              );
+              if (!("error" in res)) {
                 setDetailsModalOpen(false);
                 toast.success("Personal details updated successfully.");
               }

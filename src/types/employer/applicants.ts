@@ -15,6 +15,7 @@ export interface Applicant {
   matchLabel: MatchLabel;
   status: ApplicantStatus;
   skills: string[];
+  spokenLanguages: string[];
   experienceYears: number;
   isUnlocked: boolean;
   identityMode?: "full" | "anonymous_preview";

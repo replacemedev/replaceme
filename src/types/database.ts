@@ -484,24 +484,30 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          message_kind: string
+          payload: Json | null
           read_at: string | null
-          sender_id: string
+          sender_id: string | null
           thread_id: string
         }
         Insert: {
           content: string
           created_at?: string
           id?: string
+          message_kind?: string
+          payload?: Json | null
           read_at?: string | null
-          sender_id: string
+          sender_id?: string | null
           thread_id: string
         }
         Update: {
           content?: string
           created_at?: string
           id?: string
+          message_kind?: string
+          payload?: Json | null
           read_at?: string | null
-          sender_id?: string
+          sender_id?: string | null
           thread_id?: string
         }
         Relationships: [
@@ -1151,55 +1157,6 @@ export type Database = {
           },
           {
             foreignKeyName: "disputes_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
-      earnings_overview: {
-        Row: {
-          amount: number
-          created_at: string
-          id: string
-          is_highlighted: boolean
-          month_name: string
-          worker_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          id?: string
-          is_highlighted?: boolean
-          month_name: string
-          worker_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          id?: string
-          is_highlighted?: boolean
-          month_name?: string
-          worker_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "earnings_overview_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "earnings_overview_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "earnings_overview_worker_id_fkey"
             columns: ["worker_id"]
             isOneToOne: false
             referencedRelation: "worker_profiles"
@@ -1937,6 +1894,67 @@ export type Database = {
           },
         ]
       }
+      job_experiences: {
+        Row: {
+          company_name: string
+          created_at: string
+          description: string
+          end_date: string | null
+          id: string
+          role_title: string
+          skills_used: string[] | null
+          start_date: string
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          description: string
+          end_date?: string | null
+          id?: string
+          role_title: string
+          skills_used?: string[] | null
+          start_date: string
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          id?: string
+          role_title?: string
+          skills_used?: string[] | null
+          start_date?: string
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_experiences_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_experiences_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "job_experiences_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           email_applications: boolean
@@ -2231,7 +2249,6 @@ export type Database = {
           bio: string | null
           birth_date: string | null
           city: string | null
-          civil_status: string | null
           country: string | null
           created_at: string
           cv_url: string | null
@@ -2250,7 +2267,6 @@ export type Database = {
           id_issuing_country: string | null
           id_number: string | null
           id_type: string | null
-          is_remote: boolean | null
           is_top_rated: boolean | null
           is_verified: boolean
           kyc_rejection_reason: string | null
@@ -2262,7 +2278,6 @@ export type Database = {
           middle_name: string | null
           onboarding_completed_at: string | null
           portfolio_url: string | null
-          preferred_language: string | null
           professional_title: string | null
           profile_visibility: string
           province: string | null
@@ -2273,6 +2288,7 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
           salary_currency: string
           skills: string[] | null
+          spoken_languages: string[] | null
           stripe_customer_id: string | null
           suffix: string | null
           suspension_ends_at: string | null
@@ -2291,7 +2307,6 @@ export type Database = {
           bio?: string | null
           birth_date?: string | null
           city?: string | null
-          civil_status?: string | null
           country?: string | null
           created_at?: string
           cv_url?: string | null
@@ -2310,7 +2325,6 @@ export type Database = {
           id_issuing_country?: string | null
           id_number?: string | null
           id_type?: string | null
-          is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
           kyc_rejection_reason?: string | null
@@ -2322,7 +2336,6 @@ export type Database = {
           middle_name?: string | null
           onboarding_completed_at?: string | null
           portfolio_url?: string | null
-          preferred_language?: string | null
           professional_title?: string | null
           profile_visibility?: string
           province?: string | null
@@ -2333,6 +2346,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
+          spoken_languages?: string[] | null
           stripe_customer_id?: string | null
           suffix?: string | null
           suspension_ends_at?: string | null
@@ -2351,7 +2365,6 @@ export type Database = {
           bio?: string | null
           birth_date?: string | null
           city?: string | null
-          civil_status?: string | null
           country?: string | null
           created_at?: string
           cv_url?: string | null
@@ -2370,7 +2383,6 @@ export type Database = {
           id_issuing_country?: string | null
           id_number?: string | null
           id_type?: string | null
-          is_remote?: boolean | null
           is_top_rated?: boolean | null
           is_verified?: boolean
           kyc_rejection_reason?: string | null
@@ -2382,7 +2394,6 @@ export type Database = {
           middle_name?: string | null
           onboarding_completed_at?: string | null
           portfolio_url?: string | null
-          preferred_language?: string | null
           professional_title?: string | null
           profile_visibility?: string
           province?: string | null
@@ -2393,6 +2404,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["user_role"]
           salary_currency?: string
           skills?: string[] | null
+          spoken_languages?: string[] | null
           stripe_customer_id?: string | null
           suffix?: string | null
           suspension_ends_at?: string | null
@@ -2644,6 +2656,79 @@ export type Database = {
           svix_id?: string
         }
         Relationships: []
+      }
+      skill_match_outreach: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          match_score: number | null
+          overlapping_skills: string[] | null
+          thread_id: string | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          match_score?: number | null
+          overlapping_skills?: string[] | null
+          thread_id?: string | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          match_score?: number | null
+          overlapping_skills?: string[] | null
+          thread_id?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_match_outreach_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_match_outreach_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_match_outreach_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_match_outreach_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_match_outreach_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "skill_match_outreach_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["worker_id"]
+          },
+        ]
       }
       stripe_webhook_events: {
         Row: {
@@ -3099,64 +3184,6 @@ export type Database = {
           },
         ]
       }
-      worker_projects: {
-        Row: {
-          created_at: string
-          description: string
-          id: string
-          role: string
-          skills_used: string[]
-          title: string
-          updated_at: string
-          worker_id: string
-          year: number
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          id?: string
-          role: string
-          skills_used?: string[]
-          title: string
-          updated_at?: string
-          worker_id: string
-          year: number
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          id?: string
-          role?: string
-          skills_used?: string[]
-          title?: string
-          updated_at?: string
-          worker_id?: string
-          year?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "worker_projects_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "worker_projects_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["profile_id"]
-          },
-          {
-            foreignKeyName: "worker_projects_worker_id_fkey"
-            columns: ["worker_id"]
-            isOneToOne: false
-            referencedRelation: "worker_profiles"
-            referencedColumns: ["worker_id"]
-          },
-        ]
-      }
       worker_saved_jobs: {
         Row: {
           created_at: string
@@ -3529,19 +3556,27 @@ export type Database = {
       worker_profiles: {
         Row: {
           avatar_url: string | null
+          birth_date: string | null
           created_at: string | null
           email: string | null
           experience_years: number | null
           first_name: string | null
           full_name: string | null
+          gender: string | null
           hourly_rate: number | null
+          id_expiration_date: string | null
+          id_issuing_country: string | null
+          id_number: string | null
+          id_type: string | null
           is_verified: boolean | null
           last_name: string | null
           middle_name: string | null
           professional_title: string | null
           profile_id: string | null
           skills: string[] | null
+          spoken_languages: string[] | null
           suffix: string | null
+          tin_number: string | null
           updated_at: string | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
@@ -3550,19 +3585,27 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string | null
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           middle_name?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
+          spoken_languages?: string[] | null
           suffix?: string | null
+          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -3571,19 +3614,27 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string | null
           email?: string | null
           experience_years?: number | null
           first_name?: string | null
           full_name?: string | null
+          gender?: string | null
           hourly_rate?: number | null
+          id_expiration_date?: string | null
+          id_issuing_country?: string | null
+          id_number?: string | null
+          id_type?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           middle_name?: string | null
           professional_title?: string | null
           profile_id?: string | null
           skills?: string[] | null
+          spoken_languages?: string[] | null
           suffix?: string | null
+          tin_number?: string | null
           updated_at?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]

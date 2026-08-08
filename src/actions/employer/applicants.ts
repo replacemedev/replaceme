@@ -59,6 +59,7 @@ function fallbackApplicant(
     matchLabel: matchLabelFromScore(app.match_score ?? 0),
     status: app.status as ApplicationStatus,
     skills: [],
+    spokenLanguages: [],
     experienceYears: 0,
     isUnlocked: isFull,
     identityMode: isFull ? "full" : "anonymous_preview",
@@ -88,6 +89,11 @@ function mapPreviewToApplicant(
   const skills = Array.isArray(candidate.skills)
     ? (candidate.skills as string[])
     : [];
+  const spokenLanguages = Array.isArray(candidate.spoken_languages)
+    ? (candidate.spoken_languages as string[]).filter(
+        (lang): lang is string => typeof lang === "string" && lang.trim().length > 0
+      )
+    : [];
   const matchScore = preview.match_score ?? app.match_score ?? 0;
 
   if (isFull) {
@@ -108,6 +114,7 @@ function mapPreviewToApplicant(
       matchLabel: matchLabelFromScore(matchScore),
       status: app.status as ApplicationStatus,
       skills,
+      spokenLanguages,
       experienceYears: Number(candidate.experience_years ?? 0),
       isUnlocked: true,
       identityMode: "full",
@@ -141,6 +148,7 @@ function mapPreviewToApplicant(
     matchLabel: matchLabelFromScore(matchScore),
     status: app.status as ApplicationStatus,
     skills,
+    spokenLanguages,
     experienceYears: Number(candidate.experience_years ?? 0),
     isUnlocked: false,
     identityMode: "anonymous_preview",

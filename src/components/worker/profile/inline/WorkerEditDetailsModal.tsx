@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { ProfileModal } from "./ProfileModal";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { patchWorkerProfileSchema } from "@/lib/validations/worker/profile-inline";
+import { workerEditDetailsSchema } from "@/lib/validations/worker/profile-inline";
 
 interface WorkerEditDetailsModalProps {
   open: boolean;
@@ -16,15 +16,22 @@ interface WorkerEditDetailsModalProps {
     suffix: string;
     birthDate: string;
     gender: string;
-    civilStatus: string;
-    preferredLanguage: string;
+    spokenLanguages: string[];
     tinNumber: string;
     idType: string;
     idNumber: string;
     idExpirationDate: string;
     idIssuingCountry: string;
   };
-  onSaved: (data: any) => void;
+  onSaved: (data: Record<string, unknown>) => void;
+}
+
+function parseLanguages(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 8);
 }
 
 export function WorkerEditDetailsModal({
@@ -41,8 +48,9 @@ export function WorkerEditDetailsModal({
   const [suffix, setSuffix] = useState(initial.suffix);
   const [birthDate, setBirthDate] = useState(initial.birthDate);
   const [gender, setGender] = useState(initial.gender);
-  const [civilStatus, setCivilStatus] = useState(initial.civilStatus);
-  const [preferredLanguage, setPreferredLanguage] = useState(initial.preferredLanguage);
+  const [spokenLanguagesInput, setSpokenLanguagesInput] = useState(
+    (initial.spokenLanguages ?? []).join(", ")
+  );
   const [tinNumber, setTinNumber] = useState(initial.tinNumber);
   const [idType, setIdType] = useState(initial.idType);
   const [idNumber, setIdNumber] = useState(initial.idNumber);
@@ -55,15 +63,16 @@ export function WorkerEditDetailsModal({
     startTransition(async () => {
       setErrors({});
 
+      const spokenLanguages = parseLanguages(spokenLanguagesInput);
+
       const payload = {
         firstName,
         middleName: middleName || null,
         lastName,
         suffix: suffix || null,
-        birthDate: birthDate || null,
-        gender: gender || null,
-        civilStatus: civilStatus || null,
-        preferredLanguage: preferredLanguage || null,
+        birthDate,
+        gender,
+        spokenLanguages,
         tinNumber: tinNumber || null,
         idType: idType || null,
         idNumber: idNumber || null,
@@ -71,7 +80,7 @@ export function WorkerEditDetailsModal({
         idIssuingCountry: idIssuingCountry || null,
       };
 
-      const parsed = patchWorkerProfileSchema.safeParse(payload);
+      const parsed = workerEditDetailsSchema.safeParse(payload);
       if (!parsed.success) {
         const formattedErrors: Record<string, string> = {};
         parsed.error.issues.forEach((err) => {
@@ -187,8 +196,9 @@ export function WorkerEditDetailsModal({
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Demographics</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Birthdate
+              Date of Birth
               <input
+                required
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
@@ -198,46 +208,42 @@ export function WorkerEditDetailsModal({
                 <p className="text-[10px] font-semibold text-red-500">{errors.birthDate}</p>
               )}
             </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <label className="block space-y-1 text-xs font-bold text-slate-500">
               Gender
               <select
+                required
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 className={inputClass}
               >
-                <option value="">Select...</option>
+                <option value="" disabled>
+                  Select...
+                </option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
               </select>
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Civil Status
-              <select
-                value={civilStatus}
-                onChange={(e) => setCivilStatus(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">Select...</option>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Divorced">Divorced</option>
-                <option value="Widowed">Widowed</option>
-              </select>
-            </label>
-            <label className="block space-y-1 text-xs font-bold text-slate-500">
-              Language
-              <input
-                value={preferredLanguage}
-                onChange={(e) => setPreferredLanguage(e.target.value)}
-                placeholder="English / Tagalog"
-                className={inputClass}
-              />
+              {errors.gender && (
+                <p className="text-[10px] font-semibold text-red-500">{errors.gender}</p>
+              )}
             </label>
           </div>
+          <label className="block space-y-1 text-xs font-bold text-slate-500">
+            Spoken Languages
+            <input
+              required
+              value={spokenLanguagesInput}
+              onChange={(e) => setSpokenLanguagesInput(e.target.value)}
+              placeholder="English, Tagalog"
+              className={inputClass}
+            />
+            <span className="mt-1 block text-[10px] font-medium text-slate-400">
+              Comma-separated list (up to 8)
+            </span>
+            {errors.spokenLanguages && (
+              <p className="text-[10px] font-semibold text-red-500">{errors.spokenLanguages}</p>
+            )}
+          </label>
         </div>
 
         <div className="space-y-3 pt-4 border-t border-slate-100">
@@ -265,7 +271,7 @@ export function WorkerEditDetailsModal({
               >
                 <option value="">Select...</option>
                 <option value="Passport">Passport</option>
-                <option value="Driver's License">Driver's License</option>
+                <option value="Driver's License">Driver&apos;s License</option>
                 <option value="National ID">National ID</option>
                 <option value="UMID">UMID</option>
                 <option value="Other">Other</option>

@@ -22,7 +22,7 @@ export default async function WorkerSettingsPage() {
     supabase
       .from("profiles")
       .select(
-        "availability, hourly_rate, is_remote, salary_currency, role, email"
+        "availability, hourly_rate, salary_currency, role, email"
       )
       .eq("id", user.id)
       .single(),
@@ -50,7 +50,6 @@ export default async function WorkerSettingsPage() {
         initial={{
           availability: profile.availability ?? "Full-time",
           hourlyRate: Number(profile.hourly_rate ?? 0),
-          isRemote: Boolean(profile.is_remote),
           salaryCurrency: profile.salary_currency ?? "PHP",
         }}
       />

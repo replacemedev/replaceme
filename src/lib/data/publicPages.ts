@@ -158,14 +158,14 @@ export const CONTACT_PAGE: ContactPageConfig = {
 };
 
 export const EMPLOYER_FAQ_META: PageContentMeta = {
-  lastUpdated: "June 26, 2026",
+  lastUpdated: "August 8, 2026",
   badge: "Employers",
   badgeVariant: "pill",
   description: "Answers for companies hiring through Replaceme.",
 };
 
 export const WORKER_FAQ_META: PageContentMeta = {
-  lastUpdated: "June 26, 2026",
+  lastUpdated: "August 8, 2026",
   badge: "Jobseekers",
   badgeVariant: "pill",
   description: "Answers for professionals finding remote work on Replaceme.",
@@ -203,6 +203,12 @@ export const EMPLOYER_FAQ: FaqPageConfig = {
       question: "Are there any hidden fees or salary markups?",
       answer: "No. You pay 100% of the agreed salary directly to your worker.",
     },
+    {
+      id: "employer-faq-6",
+      question: "What is skill-match chat?",
+      answer:
+        "On Starter and above, when a job goes live Replaceme can open an in-app chat with workers whose skills overlap the role. Matches stay inside the platform — we never email candidates for these introductions.",
+    },
   ],
 };
 
@@ -237,6 +243,12 @@ export const WORKER_FAQ: FaqPageConfig = {
       question: "How do I apply for jobs?",
       answer:
         "Simply create a complete profile, browse the active job listings on your dashboard, and click apply.",
+    },
+    {
+      id: "worker-faq-6",
+      question: "What is a skill-match chat message?",
+      answer:
+        "When your skills overlap a Starter+ employer job, Replaceme may open an in-app chat with a match card and Quick Apply. These introductions stay inside the platform — we do not email you for skill matches.",
     },
   ],
 };

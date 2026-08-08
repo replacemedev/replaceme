@@ -6,7 +6,7 @@ import { WorkerProfileEditor } from "@/components/worker/profile/WorkerProfileEd
 import {
   WorkerProfile,
   WorkerSkillDetailed,
-  WorkerProject,
+  JobExperience,
   EmployerTestimonial,
 } from "@/types/worker-profile";
 
@@ -24,12 +24,12 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
 
   const resolvedSearchParams = await searchParams;
   const targetId = resolvedSearchParams.id || null;
-
-  let workerId = targetId;
-  if (!workerId) {
-    if (!user) redirect("/signin");
-    workerId = user.id;
+  const resolvedWorkerId = targetId || user?.id;
+  if (!resolvedWorkerId) {
+    redirect("/signin");
+    return null;
   }
+  const workerId: string = resolvedWorkerId;
 
   const isOwner = user?.id === workerId;
 
@@ -87,8 +87,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     last_name: profileRow.last_name,
     suffix: profileRow.suffix,
     gender: profileRow.gender,
-    civil_status: profileRow.civil_status,
-    preferred_language: profileRow.preferred_language,
+    spoken_languages: profileRow.spoken_languages ?? [],
     tin_number: profileRow.tin_number,
     id_type: profileRow.id_type,
     id_number: profileRow.id_number,
@@ -112,7 +111,6 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     cv_url: profileRow.cv_url,
     birth_date: profileRow.birth_date,
     is_top_rated: profileRow.is_top_rated,
-    is_remote: profileRow.is_remote,
     created_at: profileRow.created_at,
     is_verified: Boolean(profileRow.is_verified),
   };
@@ -133,18 +131,19 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     proficiency_label: row.proficiency_label,
   }));
 
-  const { data: projectsRows } = await supabase
-    .from("worker_projects")
+  const { data: experienceRows } = await supabase
+    .from("job_experiences")
     .select("*")
     .eq("worker_id", workerId)
-    .order("year", { ascending: false });
+    .order("start_date", { ascending: false });
 
-  const projects: WorkerProject[] = (projectsRows || []).map((row) => ({
+  const experiences: JobExperience[] = (experienceRows || []).map((row) => ({
     id: row.id,
     worker_id: row.worker_id,
-    title: row.title,
-    role: row.role,
-    year: row.year,
+    company_name: row.company_name,
+    role_title: row.role_title,
+    start_date: row.start_date,
+    end_date: row.end_date,
     description: row.description,
     skills_used: row.skills_used ?? [],
   }));
@@ -216,7 +215,7 @@ export default async function WorkerProfilePage({ searchParams }: PageProps) {
     <WorkerProfileEditor
       profile={profile}
       skills={skills}
-      projects={projects}
+      experiences={experiences}
       testimonials={testimonials}
       reviewCount={reviewCount}
       averageRating={averageRating}

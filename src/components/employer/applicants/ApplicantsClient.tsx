@@ -68,6 +68,7 @@ export function ApplicantsClient({
 
   const statusFilter = getParam("status", "all") as ApplicantStatusFilter;
   const sortKey = getParam("sort", "newest") as ApplicantSortKey;
+  const languageFilter = getParam("lang", "all");
   const [viewMode, setViewMode] = useState<"pipeline" | "cards" | "table">("pipeline");
   const [hiringApp, setHiringApp] = useState<{ id: string; name: string } | null>(null);
   const [expandedMobileStage, setExpandedMobileStage] = useState<ApplicationStatus | null>("PENDING");
@@ -149,6 +150,17 @@ export function ApplicantsClient({
     toast.success("Candidate status updated.");
   };
 
+  const languageOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const app of applicants) {
+      for (const lang of app.spokenLanguages ?? []) {
+        const trimmed = lang.trim();
+        if (trimmed) set.add(trimmed);
+      }
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [applicants]);
+
   const filteredApplicants = useMemo(() => {
     const query = searchValue.toLowerCase();
 
@@ -157,10 +169,18 @@ export function ApplicantsClient({
         !query ||
         app.name.toLowerCase().includes(query) ||
         app.role.toLowerCase().includes(query) ||
-        app.skills.some((s) => s.toLowerCase().includes(query));
+        app.skills.some((s) => s.toLowerCase().includes(query)) ||
+        (app.spokenLanguages ?? []).some((lang) =>
+          lang.toLowerCase().includes(query)
+        );
       const matchesStatus =
         statusFilter === "all" || app.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesLanguage =
+        languageFilter === "all" ||
+        (app.spokenLanguages ?? []).some(
+          (lang) => lang.toLowerCase() === languageFilter.toLowerCase()
+        );
+      return matchesSearch && matchesStatus && matchesLanguage;
     });
 
     result = [...result].sort((a, b) => {
@@ -182,7 +202,7 @@ export function ApplicantsClient({
     });
 
     return result;
-  }, [applicants, searchValue, statusFilter, sortKey]);
+  }, [applicants, searchValue, statusFilter, sortKey, languageFilter]);
 
   const tableRows: ApplicantTrackerRow[] = useMemo(
     () =>
@@ -275,6 +295,9 @@ export function ApplicantsClient({
         onStatusFilterChange={(val) => setParam("status", val)}
         sortKey={sortKey}
         onSortKeyChange={(val) => setParam("sort", val)}
+        languageFilter={languageFilter}
+        languageOptions={languageOptions}
+        onLanguageFilterChange={(val) => setParam("lang", val)}
       />
 
       <div className="flex items-center gap-2">

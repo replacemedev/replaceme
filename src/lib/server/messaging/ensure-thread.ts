@@ -20,6 +20,37 @@ export async function employerHasMessagedThread(
   return (count ?? 0) > 0;
 }
 
+/** True when the thread has a system_match outreach message. */
+export async function threadHasSystemMatchMessage(
+  supabase: Supabase,
+  threadId: string
+): Promise<boolean> {
+  const { count, error } = await supabase
+    .from("chat_messages")
+    .select("*", { count: "exact", head: true })
+    .eq("thread_id", threadId)
+    .eq("message_kind", "system_match");
+
+  if (error) return false;
+  return (count ?? 0) > 0;
+}
+
+/**
+ * Workers may reply when the employer has messaged OR a skill-match
+ * system message opened the thread (Quick Apply outreach).
+ */
+export async function workerMayReplyInThread(
+  supabase: Supabase,
+  threadId: string,
+  employerId: string
+): Promise<boolean> {
+  const [employerMessaged, hasSystemMatch] = await Promise.all([
+    employerHasMessagedThread(supabase, threadId, employerId),
+    threadHasSystemMatchMessage(supabase, threadId),
+  ]);
+  return employerMessaged || hasSystemMatch;
+}
+
 /**
  * Employer-only: create or return a chat thread for a visible applicant on a job.
  * Requires Starter+ messaging entitlement (Discovery blocked).

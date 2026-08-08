@@ -5,14 +5,6 @@ export interface WorkerSkill {
   proficiency: number;
 }
 
-export interface EarningsMonth {
-  id: string;
-  worker_id: string;
-  month_name: string;
-  amount: number;
-  is_highlighted: boolean;
-}
-
 export interface RecommendedJob {
   id: string;
   employer_id: string;
@@ -37,7 +29,6 @@ export interface WorkerDashboardData {
   stats: WorkerStats;
   recommendedJobs: RecommendedJob[];
   skills: WorkerSkill[];
-  earnings: EarningsMonth[];
 }
 
 export interface RecentMessage {

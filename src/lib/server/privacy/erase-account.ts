@@ -424,7 +424,7 @@ export async function executeAccountErasure(
         tin_number: null,
         birth_date: null,
         gender: null,
-        civil_status: null,
+        spoken_languages: null,
         is_verified: false,
         verification_status: "unverified",
         kyc_rejection_reason: null,

@@ -137,6 +137,13 @@ export async function createJobPost(payload: CreateJobInput) {
     revalidatePath("/employer/jobs");
     revalidatePath(`/employer/jobs/${newJob.id}`);
 
+    if (jobStatus === "Active") {
+      const { triggerSkillMatchForJob } = await import(
+        "@/lib/server/matching/skill-match-outreach"
+      );
+      triggerSkillMatchForJob(newJob.id);
+    }
+
     return {
       success: true,
       message:
@@ -220,6 +227,13 @@ export async function updateJobPost(payload: UpdateJobInput) {
     revalidatePath("/employer/dashboard");
     revalidatePath("/employer/jobs");
     revalidatePath(`/employer/jobs/${parsed.data.jobId}`);
+
+    if (existing.status === "Active") {
+      const { triggerSkillMatchForJob } = await import(
+        "@/lib/server/matching/skill-match-outreach"
+      );
+      triggerSkillMatchForJob(parsed.data.jobId);
+    }
 
     return {
       success: true,

@@ -46,7 +46,7 @@ export function PrivacyPolicyContent() {
     <div className="mx-auto max-w-3xl space-y-10 rounded-2xl border border-slate-200 bg-white px-6 py-8 shadow-xs sm:px-10 sm:py-12">
       {/* Last updated */}
       <p className="inline-block rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700">
-        Last updated: July 2026
+        Last updated: August 2026
       </p>
 
       {/* Intro */}
@@ -94,11 +94,21 @@ export function PrivacyPolicyContent() {
         <p className="font-semibold text-slate-800">Information you give us:</p>
         <ul className="space-y-2 pl-1">
           <Bullet>Name, email address, and password when you create an account</Bullet>
-          <Bullet>Professional details: job title, skills, work experience, and bio (workers)</Bullet>
+          <Bullet>Professional details: job title, skills (including typed skills), job experience history, and bio (workers)</Bullet>
+          <Bullet>
+            Worker demographics required for a complete profile: date of birth, gender
+            (Male, Female, or Other), spoken languages, and employee photo
+          </Bullet>
+          <Bullet>Identity verification documents and related KYC fields for workers (admin-reviewed)</Bullet>
           <Bullet>Company name, industry, size, and website (employers)</Bullet>
           <Bullet>Profile photos or company logos you upload</Bullet>
-          <Bullet>Messages and communications sent through the platform</Bullet>
+          <Bullet>Messages and communications sent through the platform, including automated skill-match chat messages</Bullet>
           <Bullet>Payment billing details (processed securely by Stripe — we do not store card numbers)</Bullet>
+        </ul>
+
+        <p className="font-semibold text-slate-800">What we do not collect from employers:</p>
+        <ul className="space-y-2 pl-1">
+          <Bullet>Employer TIN/EIN, date of birth, gender, or personal home address</Bullet>
         </ul>
 
         <p className="font-semibold text-slate-800">Information collected automatically:</p>
@@ -114,7 +124,11 @@ export function PrivacyPolicyContent() {
         <p>We use your information to:</p>
         <ul className="space-y-2 pl-1">
           <Bullet>Create and manage your account</Bullet>
-          <Bullet>Match workers with relevant job postings</Bullet>
+          <Bullet>
+            Match workers with relevant job postings, including automated skill overlap
+            matching that opens an in-app chat thread with a Quick Apply action for
+            Starter+ employer jobs (matches are never sent by email)
+          </Bullet>
           <Bullet>Enable employers and workers to communicate</Bullet>
           <Bullet>Process subscription payments and credits</Bullet>
           <Bullet>Send you important notifications about your account or applications</Bullet>
@@ -131,7 +145,9 @@ export function PrivacyPolicyContent() {
         <p>We do not sell your personal data. We share information only in these circumstances:</p>
         <ul className="space-y-2 pl-1">
           <Bullet>
-            <strong>Between users:</strong> Employers see worker profiles when you apply or your profile matches their search.
+            <strong>Between users:</strong> Employers see worker profiles when you apply.
+            Starter+ employers may also receive automated skill-match introductions in
+            platform chat when a worker&apos;s skills overlap a job&apos;s requirements.
             Workers see employer company profiles and job details.
           </Bullet>
           <Bullet>

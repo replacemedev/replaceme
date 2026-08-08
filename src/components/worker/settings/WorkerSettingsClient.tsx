@@ -12,7 +12,6 @@ import {
 import { WorkerAccountIdentityCard } from "@/components/worker/settings/WorkerAccountIdentityCard";
 import { DataDeletionRequestCard } from "@/components/shared/privacy/DataDeletionRequestCard";
 import { ContactSupportCard } from "@/components/shared/privacy/ContactSupportCard";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const SETTINGS_NAV = [
   {
@@ -39,7 +38,6 @@ interface WorkerSettingsClientProps {
   initial: {
     availability: string;
     hourlyRate: number;
-    isRemote: boolean;
     salaryCurrency: string;
   };
   deletionStatus?: { status: string; createdAt: string; scheduledFor?: string | null } | null;
@@ -62,7 +60,6 @@ export function WorkerSettingsClient({
   const [salaryCurrency, setSalaryCurrency] = useState(
     initial.salaryCurrency as CompensationCurrency
   );
-  const [isRemote, setIsRemote] = useState(initial.isRemote);
 
   function saveSettings(e: React.FormEvent) {
     e.preventDefault();
@@ -70,7 +67,6 @@ export function WorkerSettingsClient({
       const result = await updateWorkerSettings({
         availability: availability as (typeof AVAILABILITY)[number],
         hourlyRate: Number(hourlyRate),
-        isRemote,
         salaryCurrency,
       });
       if (result.error) toast.error(result.error);
@@ -169,14 +165,6 @@ export function WorkerSettingsClient({
               onChange={(e) => setHourlyRate(e.target.value)}
               className={inputClassName}
             />
-          </label>
-          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-semibold leading-snug text-slate-700">
-            <Checkbox
-              checked={isRemote}
-              onChange={(e) => setIsRemote(e.target.checked)}
-              className="shrink-0"
-            />
-            Open to remote work
           </label>
           <button
             type="submit"

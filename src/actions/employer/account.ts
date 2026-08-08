@@ -65,7 +65,6 @@ export async function updateEmployerAccountDetails(data: {
         tin_number: null,
         birth_date: null,
         gender: null,
-        civil_status: null,
       })
       .eq("id", user.id);
 

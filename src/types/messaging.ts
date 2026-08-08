@@ -29,6 +29,8 @@ export interface MessagingParty {
   isVerified?: boolean;
 }
 
+export type ChatMessageKind = "user" | "system_match";
+
 /** Role-agnostic thread for shared inbox UI. */
 export interface MessagingThread {
   id: string;
@@ -47,14 +49,18 @@ export interface MessagingThread {
   last_message: {
     content: string;
     created_at: string;
-    sender_id: string;
+    sender_id: string | null;
     read_at: string | null;
+    message_kind?: ChatMessageKind;
   } | null;
   unread_count: number;
   marked_unread: boolean;
 }
 
-export interface MessagingMessage extends DbChatMessage {
+export interface MessagingMessage extends Omit<DbChatMessage, "sender_id" | "message_kind" | "payload"> {
+  sender_id: string | null;
+  message_kind?: ChatMessageKind;
+  payload?: Record<string, unknown> | null;
   sender: {
     id: string;
     full_name: string | null;

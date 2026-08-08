@@ -1,12 +1,33 @@
 "use client";
 
 import { AvatarImage } from "@/components/shared/media/AvatarImage";
-import { ExternalLink, MapPin, Briefcase, Clock, Wallet, Mail, MessageSquare, Phone, Sparkles, FileText, FolderGit2, UserCheck, User } from "lucide-react";
+import { ExternalLink, MapPin, Briefcase, Clock, Wallet, Mail, MessageSquare, Phone, Sparkles, FileText, Building2, UserCheck, User, Languages } from "lucide-react";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { formatMoney, formatSalaryRange } from "@/lib/format/currency";
 import { CandidateProfileActions } from "./CandidateProfileActions";
 import { EmployerPageShell } from "@/components/employer/layout";
+
+function formatExperiencePeriod(
+  startDate?: string,
+  endDate?: string | null
+): string | null {
+  if (!startDate) return null;
+  const start = new Date(startDate);
+  if (Number.isNaN(start.getTime())) return null;
+  const startLabel = start.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+  if (!endDate) return `${startLabel} – Present`;
+  const end = new Date(endDate);
+  if (Number.isNaN(end.getTime())) return `${startLabel} – Present`;
+  const endLabel = end.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+  return `${startLabel} – ${endLabel}`;
+}
 
 export type EmployerCandidateProfileData = {
   jobTitle: string;
@@ -30,14 +51,16 @@ export type EmployerCandidateProfileData = {
       skill_name?: string;
       proficiency_label?: string;
     }>;
-    workerProjects: Array<{
+    jobExperiences: Array<{
       id?: string;
-      title?: string;
-      role?: string;
-      year?: number;
+      company_name?: string;
+      role_title?: string;
+      start_date?: string;
+      end_date?: string | null;
       description?: string;
       skills_used?: string[];
     }>;
+    spokenLanguages: string[];
     experienceYears: number;
     avatarUrl: string | null;
     email: string | null;
@@ -200,11 +223,26 @@ export function EmployerCandidateProfile({
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-sm text-slate-600">
-              <Briefcase className="h-4.5 w-4.5 text-emerald-700 shrink-0" aria-hidden />
-              <span>
-                <strong className="text-slate-900">{candidate.experienceYears} years</strong> of professional experience
+            <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 text-sm text-slate-600">
+              <span className="inline-flex items-center gap-2 min-w-0">
+                <Briefcase className="h-4.5 w-4.5 text-emerald-700 shrink-0" aria-hidden />
+                <span>
+                  <strong className="text-slate-900">{candidate.experienceYears} years</strong> of professional experience
+                </span>
               </span>
+              {candidate.spokenLanguages.length > 0 ? (
+                <span className="inline-flex items-start gap-2 min-w-0">
+                  <Languages className="h-4.5 w-4.5 text-emerald-700 shrink-0 mt-0.5" aria-hidden />
+                  <span className="min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                      Spoken Languages
+                    </span>
+                    <span className="font-semibold text-slate-800 break-words">
+                      {candidate.spokenLanguages.join(" · ")}
+                    </span>
+                  </span>
+                </span>
+              ) : null}
             </div>
           </section>
 
@@ -247,19 +285,18 @@ export function EmployerCandidateProfile({
                   </p>
                 </section>
 
-                {/* Restricted Section: Project highlights / Work history */}
+                {/* Restricted Section: Job experience */}
                 <section className="bg-white border border-slate-100/90 shadow-xs sm:rounded-2xl p-6 space-y-4">
                   <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
-                    Project highlights
+                    Job experience
                   </h2>
                   <ul className="space-y-4">
                     <li className="space-y-1">
                       <p className="text-sm font-bold text-slate-900">
                         Senior Full-Stack Developer
-                        <span className="font-medium text-slate-400"> · 2024</span>
                       </p>
                       <p className="text-xs font-semibold text-slate-500">
-                        E-Commerce Platform Redesign
+                        Example Company · 2022 – Present
                       </p>
                       <p className="text-sm text-slate-600 leading-relaxed">
                         Led development of a high-performance web storefront, optimizing image loading and page speed.
@@ -294,38 +331,43 @@ export function EmployerCandidateProfile({
                 </section>
               )}
 
-              {candidate.workerProjects.length > 0 && (
+              {candidate.jobExperiences.length > 0 && (
                 <section className="bg-white border border-slate-200/80 shadow-sm sm:rounded-2xl p-6 sm:p-8 space-y-4 transition-all hover:border-slate-300/80">
                   <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                    <FolderGit2 className="h-4.5 w-4.5 text-emerald-700" />
-                    Project Highlights
+                    <Building2 className="h-4.5 w-4.5 text-emerald-700" />
+                    Job Experience
                   </h2>
                   <ul className="divide-y divide-slate-100 pt-2">
-                    {candidate.workerProjects.map((project, idx) => (
-                      <li key={project.id ?? project.title} className={`py-4 space-y-2 ${idx === 0 ? "pt-0" : ""}`}>
+                    {candidate.jobExperiences.map((exp, idx) => {
+                      const period = formatExperiencePeriod(
+                        exp.start_date,
+                        exp.end_date
+                      );
+                      return (
+                      <li key={exp.id ?? `${exp.company_name}-${exp.role_title}-${idx}`} className={`py-4 space-y-2 ${idx === 0 ? "pt-0" : ""}`}>
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                           <h3 className="text-base font-bold text-slate-900">
-                            {project.title}
+                            {exp.role_title || "Role"}
                           </h3>
-                          {project.year ? (
+                          {period ? (
                             <span className="text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
-                              {project.year}
+                              {period}
                             </span>
                           ) : null}
                         </div>
-                        {project.role ? (
+                        {exp.company_name ? (
                           <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                            {project.role}
+                            {exp.company_name}
                           </p>
                         ) : null}
-                        {project.description ? (
+                        {exp.description ? (
                           <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                            {project.description}
+                            {exp.description}
                           </p>
                         ) : null}
-                        {project.skills_used && project.skills_used.length > 0 ? (
+                        {exp.skills_used && exp.skills_used.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5 pt-1.5">
-                            {project.skills_used.map((sku) => (
+                            {exp.skills_used.map((sku) => (
                               <span key={sku} className="text-[10px] font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded px-2 py-0.5">
                                 {sku}
                               </span>
@@ -333,7 +375,8 @@ export function EmployerCandidateProfile({
                           </div>
                         ) : null}
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </section>
               )}

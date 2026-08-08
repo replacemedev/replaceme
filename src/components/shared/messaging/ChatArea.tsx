@@ -261,6 +261,7 @@ export function ChatArea({
               : "No messages yet."
           }
           onLoadOlder={() => onLoadOlderMessages?.()}
+          showQuickApply={role === "worker"}
         />
       </div>
 

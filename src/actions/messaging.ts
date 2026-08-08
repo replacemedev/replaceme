@@ -18,6 +18,7 @@ import {
   extractJobRolesFromThreads,
   MESSAGING_MESSAGES_PAGE_SIZE,
   MESSAGING_THREADS_PAGE_SIZE,
+  type ChatMessageKind,
   MessagingJobRole,
   MessagingMessage,
   MessagingMessagesPage,
@@ -39,8 +40,8 @@ import {
   invalidateWorkerMessagingCache,
 } from "@/lib/server/redis-cache";
 import {
-  employerHasMessagedThread,
   ensureEmployerMessagingThread,
+  workerMayReplyInThread,
 } from "@/lib/server/messaging/ensure-thread";
 
 async function getAuthenticatedProfile() {
@@ -65,8 +66,9 @@ async function getAuthenticatedProfile() {
 type LastMessageRow = {
   content: string;
   created_at: string;
-  sender_id: string;
+  sender_id: string | null;
   read_at: string | null;
+  message_kind?: ChatMessageKind;
 };
 
 /** Parallel per-thread meta fetches — avoids sequential N+1 waterfalls. */
@@ -86,12 +88,24 @@ async function enrichThreads(
       threadIds.map(async (id) => {
         const { data } = await supabase
           .from("chat_messages")
-          .select("content, created_at, sender_id, read_at")
+          .select("content, created_at, sender_id, read_at, message_kind")
           .eq("thread_id", id)
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-        return [id, (data as LastMessageRow | null) ?? null] as const;
+        const row = data
+          ? {
+              content: data.content,
+              created_at: data.created_at,
+              sender_id: data.sender_id,
+              read_at: data.read_at,
+              message_kind:
+                data.message_kind === "system_match"
+                  ? ("system_match" as const)
+                  : ("user" as const),
+            }
+          : null;
+        return [id, row] as const;
       })
     ),
     Promise.all(
@@ -100,7 +114,7 @@ async function enrichThreads(
           .from("chat_messages")
           .select("*", { count: "exact", head: true })
           .eq("thread_id", id)
-          .neq("sender_id", currentUserId)
+          .or(`sender_id.is.null,sender_id.neq.${currentUserId}`)
           .is("read_at", null);
         return [id, count ?? 0] as const;
       })
@@ -173,8 +187,11 @@ async function enrichThreads(
   return sortThreadsByRecentActivity(mapped);
 }
 
-/** One query: which threads already have a non-worker (employer) message. */
-async function filterThreadsWithEmployerMessages(
+/**
+ * Worker inbox: show threads with an employer message OR a system_match
+ * skill-match outreach (sender_id null — excluded by neq alone).
+ */
+async function filterThreadsVisibleToWorker(
   supabase: Awaited<ReturnType<typeof createClient>>,
   threads: Array<Record<string, unknown>>,
   workerId: string
@@ -191,9 +208,11 @@ async function filterThreadsWithEmployerMessages(
   const threadIds = withEmployer.map((t) => t.id as string);
   const { data: rows } = await supabase
     .from("chat_messages")
-    .select("thread_id")
+    .select("thread_id, sender_id, message_kind")
     .in("thread_id", threadIds)
-    .neq("sender_id", workerId);
+    .or(
+      `sender_id.neq.${workerId},sender_id.is.null,message_kind.eq.system_match`
+    );
 
   const activeIds = new Set((rows ?? []).map((r) => r.thread_id));
   return withEmployer.filter((t) => activeIds.has(t.id as string));
@@ -225,7 +244,7 @@ async function loadMessagingThreadsPage(
       return { threads: [], hasMore: false };
     }
 
-    const activeThreads = await filterThreadsWithEmployerMessages(
+    const activeThreads = await filterThreadsVisibleToWorker(
       supabase,
       threads ?? [],
       profile.id
@@ -321,7 +340,9 @@ async function fetchMessagesPage(
 ): Promise<MessagingMessagesPage> {
   let query = supabase
     .from("chat_messages")
-    .select(`*, sender:profiles (id, full_name, avatar_url, role)`)
+    .select(
+      `id, thread_id, sender_id, content, created_at, read_at, message_kind, payload, sender:profiles (id, full_name, avatar_url, role)`
+    )
     .eq("thread_id", threadId)
     .order("created_at", { ascending: false })
     .limit(limit + 1);
@@ -336,7 +357,21 @@ async function fetchMessagesPage(
     return { messages: [], hasMore: false, nextCursor: null };
   }
 
-  const rows = (data ?? []) as MessagingMessage[];
+  const rows = (data ?? []).map((row) => {
+    const kind =
+      row.message_kind === "system_match" ? "system_match" : "user";
+    const payload =
+      row.payload && typeof row.payload === "object" && !Array.isArray(row.payload)
+        ? (row.payload as Record<string, unknown>)
+        : null;
+    return {
+      ...row,
+      sender_id: row.sender_id ?? null,
+      message_kind: kind as ChatMessageKind,
+      payload,
+      sender: row.sender ?? null,
+    } as MessagingMessage;
+  });
   const hasMore = rows.length > limit;
   const page = hasMore ? rows.slice(0, limit) : rows;
   // Newest-first from DB → chronological for UI
@@ -510,12 +545,12 @@ export async function sendMessagingMessage(
     }
 
     if (thread.worker_id === user.id && employerId) {
-      const employerMessaged = await employerHasMessagedThread(
+      const mayReply = await workerMayReplyInThread(
         supabase,
         parsed.threadId,
         employerId
       );
-      if (!employerMessaged) {
+      if (!mayReply) {
         return fail("You can reply after the employer sends the first message.");
       }
     }
@@ -539,6 +574,7 @@ export async function sendMessagingMessage(
         thread_id: parsed.threadId,
         sender_id: user.id,
         content: parsed.content,
+        message_kind: "user",
       })
       .select("id")
       .single();
@@ -613,7 +649,7 @@ export async function markMessagingThreadRead(
       .from("chat_messages")
       .update({ read_at: new Date().toISOString() })
       .eq("thread_id", parsed.threadId)
-      .neq("sender_id", user.id)
+      .or(`sender_id.is.null,sender_id.neq.${user.id}`)
       .is("read_at", null);
 
     if (error) {
@@ -775,7 +811,7 @@ export async function ensureMessagingThread(
       };
 }
 
-/** Worker: thread is available only after the employer has sent the first message. */
+/** Worker: thread available after employer message OR system_match outreach. */
 export async function getWorkerApplicationMessaging(jobId: string): Promise<{
   threadId: string | null;
   employerHasMessaged: boolean;
@@ -793,8 +829,6 @@ export async function getWorkerApplicationMessaging(jobId: string): Promise<{
       .eq("candidate_id", profile.id)
       .maybeSingle();
 
-    if (!application) return null;
-
     const { data: thread } = await supabase
       .from("chat_threads")
       .select("id, company_profiles (employer_id)")
@@ -802,7 +836,9 @@ export async function getWorkerApplicationMessaging(jobId: string): Promise<{
       .eq("job_id", jobId)
       .maybeSingle();
 
+    // Skill-match threads can exist before an application; still surface them.
     if (!thread) {
+      if (!application) return null;
       return { threadId: null, employerHasMessaged: false };
     }
 
@@ -816,15 +852,15 @@ export async function getWorkerApplicationMessaging(jobId: string): Promise<{
       return { threadId: null, employerHasMessaged: false };
     }
 
-    const employerHasMessaged = await employerHasMessagedThread(
+    const mayAccess = await workerMayReplyInThread(
       supabase,
       thread.id,
       employerId
     );
 
     return {
-      threadId: employerHasMessaged ? thread.id : null,
-      employerHasMessaged,
+      threadId: mayAccess ? thread.id : null,
+      employerHasMessaged: mayAccess,
     };
   } catch (err) {
     safeError("getWorkerApplicationMessaging:", err);
@@ -879,7 +915,7 @@ export async function getUnreadMessagingCount(
       .from("chat_messages")
       .select("*", { count: "exact", head: true })
       .in("thread_id", threadIds)
-      .neq("sender_id", profile.id)
+      .or(`sender_id.is.null,sender_id.neq.${profile.id}`)
       .is("read_at", null);
 
     return count ?? 0;

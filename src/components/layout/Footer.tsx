@@ -115,9 +115,11 @@ export function Footer() {
             </p>
             <p>
               Platform work and identity verification are strictly restricted to
-              citizens of the Philippines. We do not collect employer TIN/EIN,
-              date of birth, gender, civil status, or personal home address. See
-              our{" "}
+              citizens of the Philippines. For workers, we collect date of birth
+              and gender for matching and identity verification. We do not
+              collect employer TIN/EIN, date of birth, gender, or personal home
+              address. Starter+ employers may receive automated skill-based
+              in-app chat matches (no email outreach). See our{" "}
               <Link
                 href="/privacy-policy"
                 className="underline hover:text-emerald-600 transition-colors"

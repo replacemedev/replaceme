@@ -503,6 +503,11 @@ export async function approveJobPost(jobId: string): Promise<ActionResult> {
 
     await logAdminAction("approve_job", "job", id);
     await revalidateJobModerationSurfaces(id, existing.employer_id);
+
+    void import("@/lib/server/matching/skill-match-outreach")
+      .then(({ triggerSkillMatchForJob }) => triggerSkillMatchForJob(id))
+      .catch((err) => safeWarn("approveJobPost skill-match", err));
+
     return { success: true };
   } catch (err) {
     return {
