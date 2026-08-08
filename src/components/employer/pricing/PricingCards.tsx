@@ -15,6 +15,8 @@ import {
   displayMonthlyPrice,
 } from "@/lib/pricing/billing-interval";
 
+import { PricingCardHeader, PricingCardPrice } from "./PricingCard";
+
 interface PricingCardsProps {
   plans: PricingPlan[];
   currentPlanSlug?: SubscriptionTier | null;
@@ -197,45 +199,18 @@ export function PricingCards({
 
               <div className="flex-1 flex flex-col">
                 {/* Flex Header with Plan Title and Save Badge */}
-                <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
-                  <h3 className="text-2xl font-bold text-slate-900 capitalize">
-                    {plan.name}
-                  </h3>
-                  {savePct != null ? (
-                    <span className="inline-flex shrink-0 items-center rounded-full bg-[#e6fbf2] px-2.5 py-1 text-xs font-bold text-[#006e2f]">
-                      SAVE {savePct}%
-                    </span>
-                  ) : null}
-                </div>
+                <PricingCardHeader
+                  title={plan.name}
+                  savePct={savePct}
+                />
 
                 {/* Streamlined Pricing Block */}
-                <div className="space-y-1">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">
-                      {formatMoney(shownPrice, "USD", {
-                        asReact: true,
-                        codeClassName: "text-slate-500 text-sm font-semibold ml-1",
-                      })}
-                    </span>
-                    <span className="text-sm font-medium text-slate-500">
-                      /month
-                    </span>
-                  </div>
-                  {annualTotal != null ? (
-                    <p className="text-sm text-slate-500 font-medium">
-                      Billed annually at{" "}
-                      {formatMoney(annualTotal, "USD", {
-                        asReact: true,
-                        codeClassName: "text-slate-400 text-xs font-semibold ml-0.5",
-                      })}
-                      /year
-                    </p>
-                  ) : isPaid && billingInterval === "month" ? (
-                    <p className="text-sm text-slate-500 font-medium">
-                      Billed monthly
-                    </p>
-                  ) : null}
-                </div>
+                <PricingCardPrice
+                  shownPrice={shownPrice}
+                  annualTotal={annualTotal}
+                  isPaid={isPaid}
+                  billingInterval={billingInterval}
+                />
 
                 {/* Description (Purpose/Perfect for) */}
                 <div className="mt-4 min-h-[50px] flex flex-col justify-start">

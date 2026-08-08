@@ -19,6 +19,10 @@ import {
   type BillingInterval,
 } from "@/lib/pricing/billing-interval";
 import { formatMoney } from "@/lib/format/currency";
+import {
+  PricingCardHeader,
+  PricingCardPrice,
+} from "@/components/employer/pricing/PricingCard";
 
 interface ManagePlanGridProps {
   currentPlan: SubscriptionTier;
@@ -189,63 +193,36 @@ export function ManagePlanGrid({
 
                 <div className="min-w-0">
                   {/* Flex Header with Plan Label and Save Badge */}
-                  <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
-                    <p
-                      className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider ${
-                        plan.highlight ? "text-emerald-700" : "text-slate-900"
-                      }`}
-                    >
-                      {plan.label}
-                      {plan.slug === "scale" ? (
-                        <Sparkles
-                          size={14}
-                          className="fill-yellow-500 text-yellow-500"
-                          aria-hidden
-                        />
-                      ) : null}
-                    </p>
-                    {savePct != null ? (
-                      <span className="inline-flex shrink-0 items-center rounded-full bg-[#e6fbf2] px-2.5 py-1 text-xs font-bold text-[#006e2f]">
-                        SAVE {savePct}%
-                      </span>
-                    ) : null}
-                  </div>
+                  <PricingCardHeader
+                    title={
+                      <p
+                        className={`flex items-center gap-1 text-base sm:text-lg font-extrabold uppercase tracking-wider ${
+                          plan.highlight ? "text-emerald-700" : "text-slate-900"
+                        }`}
+                      >
+                        {plan.label}
+                        {plan.slug === "scale" ? (
+                          <Sparkles
+                            size={14}
+                            className="fill-yellow-500 text-yellow-500"
+                            aria-hidden
+                          />
+                        ) : null}
+                      </p>
+                    }
+                    savePct={savePct}
+                  />
 
                   {/* Streamlined Pricing Block */}
-                  <div className="space-y-1">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                        {formatMoney(shownPrice, "USD", {
-                          asReact: true,
-                          codeClassName:
-                            "text-slate-500 text-sm font-semibold ml-1",
-                        })}
-                      </span>
-                      <span className="text-sm font-medium text-slate-500">
-                        /month
-                      </span>
-                    </div>
-
-                    {annualTotal != null ? (
-                      <p className="text-sm text-slate-500 font-medium">
-                        Billed annually at{" "}
-                        {formatMoney(annualTotal, "USD", {
-                          asReact: true,
-                          codeClassName:
-                            "text-slate-400 text-xs font-semibold ml-0.5",
-                        })}
-                        /year
-                      </p>
-                    ) : isPaid && billingInterval === "month" ? (
-                      <p className="text-sm text-slate-500 font-medium">
-                        Billed monthly · save more on Annual
-                      </p>
-                    ) : (
-                      <p className="text-sm text-slate-500 font-medium">
-                        Free forever
-                      </p>
-                    )}
-                  </div>
+                  <PricingCardPrice
+                    shownPrice={shownPrice}
+                    annualTotal={annualTotal}
+                    isPaid={isPaid}
+                    billingInterval={billingInterval}
+                    monthlySubtext="Billed monthly · save more on Annual"
+                    freeSubtext="Free forever"
+                    priceClassName="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
+                  />
 
                   <p className="mt-3 text-xs leading-relaxed text-slate-600">
                     {plan.detail}
