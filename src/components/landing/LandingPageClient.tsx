@@ -462,11 +462,10 @@ export function LandingPageClient({
           </div>
           <Link
             href="/pricing"
-            className="inline-flex mt-6 sm:mt-8 items-center justify-center gap-2 bg-[#22c55e] text-white w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-extrabold hover:bg-[#16a34a] hover:-translate-y-0.5 transition-all duration-300 text-base sm:text-lg reveal-item min-h-[48px]"
+            className="inline-flex mt-6 sm:mt-8 items-center justify-center bg-[#22c55e] text-white w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold hover:bg-[#16a34a] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-300 text-base sm:text-lg shadow-[0_8px_20px_-4px_rgba(34,197,94,0.35)] hover:shadow-[0_12px_25px_-4px_rgba(34,197,94,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1d] reveal-item min-h-[48px]"
             style={{ transitionDelay: "200ms" }}
           >
             Compare all plans
-            <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
           </Link>
         </div>
       </section>
