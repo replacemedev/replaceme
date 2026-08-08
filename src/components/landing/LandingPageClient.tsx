@@ -462,7 +462,7 @@ export function LandingPageClient({
           </div>
           <Link
             href="/pricing"
-            className="inline-flex mt-6 sm:mt-8 items-center justify-center bg-[#22c55e] text-white w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold text-base sm:text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#22c55e] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1d] reveal-item min-h-[48px]"
+            className="inline-flex mt-6 sm:mt-8 items-center justify-center bg-[#16a34a] text-white w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-xl font-body-bold font-bold text-base sm:text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16a34a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1d] reveal-item min-h-[48px]"
             style={{ transitionDelay: "200ms" }}
           >
             Compare all plans
