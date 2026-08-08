@@ -45,6 +45,7 @@ export function WorkerCard({
                   initials={initials}
                   size="sm"
                   rounded="full"
+                  containerClassName="w-full h-full"
                 />
               ) : (
                 <div

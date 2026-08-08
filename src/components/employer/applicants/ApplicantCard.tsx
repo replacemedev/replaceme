@@ -72,6 +72,7 @@ export function ApplicantCard({
                 initials={initials}
                 size="sm"
                 rounded="full"
+                containerClassName="w-full h-full"
               />
             ) : (
               <div

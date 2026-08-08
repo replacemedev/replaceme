@@ -62,6 +62,7 @@ export function AvatarImage({
 }: AvatarImageProps) {
   const px = SIZE_PX[size];
   const isFluid =
+    /(?:^|\s)(?:w-|h-|aspect-)/.test(containerClassName) ||
     containerClassName.includes("w-full") ||
     containerClassName.includes("h-full") ||
     containerClassName.includes("aspect-square");

@@ -207,7 +207,7 @@ export const EMPLOYER_FAQ: FaqPageConfig = {
       id: "employer-faq-6",
       question: "What is skill-match chat?",
       answer:
-        "On Starter and above, when a job goes live Replaceme can open an in-app chat with workers whose skills overlap the role. Matches stay inside the platform — we never email candidates for these introductions.",
+        "On Starter and above, when a job goes live Replaceme can open an in-app chat with workers whose skills overlap the role. Matches stay inside the platform. We never email candidates for these introductions.",
     },
   ],
 };
@@ -248,7 +248,7 @@ export const WORKER_FAQ: FaqPageConfig = {
       id: "worker-faq-6",
       question: "What is a skill-match chat message?",
       answer:
-        "When your skills overlap a Starter+ employer job, Replaceme may open an in-app chat with a match card and Quick Apply. These introductions stay inside the platform — we do not email you for skill matches.",
+        "When your skills overlap a Starter+ employer job, Replaceme may open an in-app chat with a match card and Quick Apply. These introductions stay inside the platform. We do not email you for skill matches.",
     },
   ],
 };
