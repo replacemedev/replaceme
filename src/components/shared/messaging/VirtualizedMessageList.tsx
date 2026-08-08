@@ -43,6 +43,18 @@ function isNewDay(current: MessagingMessage, previous: MessagingMessage | undefi
   );
 }
 
+function isConsecutiveSender(
+  current: MessagingMessage,
+  previous: MessagingMessage | undefined
+) {
+  if (!previous) return false;
+  if (isNewDay(current, previous)) return false;
+  if ((current.message_kind ?? "user") !== (previous.message_kind ?? "user")) {
+    return false;
+  }
+  return current.sender_id === previous.sender_id;
+}
+
 interface VirtualizedMessageListProps {
   messages: MessagingMessage[];
   currentUserId: string;
@@ -137,10 +149,12 @@ export function VirtualizedMessageList({
         const previous = messages[dataIndex - 1];
         const showSeparator = isNewDay(message, previous);
 
+        const consecutive = isConsecutiveSender(message, previous);
+
         return (
           <div className="px-1">
             {showSeparator ? (
-              <p className="text-center text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-6 mt-2">
+              <p className="mb-3 mt-1 text-center text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 {formatDateSeparator(message.created_at)}
               </p>
             ) : null}
@@ -148,6 +162,7 @@ export function VirtualizedMessageList({
               message={message}
               currentUserId={currentUserId}
               showQuickApply={showQuickApply}
+              isConsecutive={consecutive}
             />
           </div>
         );

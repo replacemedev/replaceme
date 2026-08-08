@@ -32,14 +32,13 @@ export function StaffDirectoryGrid({
           className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]"
         >
           <div className="flex items-start gap-3">
-            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-              <AvatarImage
-                src={member.avatarUrl}
-                alt={member.displayName}
-                initials={initials(member.displayName)}
-                size="sm"
-              />
-            </div>
+            <AvatarImage
+              src={member.avatarUrl}
+              alt={member.displayName}
+              initials={initials(member.displayName)}
+              size="sm"
+              containerClassName="h-14 w-14 min-h-14 min-w-14 border border-slate-200 bg-slate-100"
+            />
             <div className="min-w-0">
               <p className="truncate text-base font-bold text-slate-900">
                 {member.displayName}

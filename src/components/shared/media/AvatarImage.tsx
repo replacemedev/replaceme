@@ -2,32 +2,18 @@
 
 import { OptimizedImage } from "./OptimizedImage";
 import { retinaTransformWidth } from "@/lib/storage/optimized-image-url";
+import {
+  AVATAR_SIZE_PX,
+  AVATAR_TEXT_CLASS,
+  buildAvatarBoxClass,
+  type AvatarSize,
+} from "./avatar-box-class";
 
-export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
-
-const SIZE_PX: Record<AvatarSize, number> = {
-  xs: 32,
-  sm: 48,
-  md: 96,
-  lg: 128,
-  xl: 144,
-};
-
-const SIZE_CLASS: Record<AvatarSize, string> = {
-  xs: "h-8 w-8",
-  sm: "h-12 w-12",
-  md: "h-24 w-24",
-  lg: "h-32 w-32",
-  xl: "h-36 w-36",
-};
-
-const TEXT_CLASS: Record<AvatarSize, string> = {
-  xs: "text-xs",
-  sm: "text-sm",
-  md: "text-xl",
-  lg: "text-2xl",
-  xl: "text-3xl",
-};
+export type { AvatarSize } from "./avatar-box-class";
+export {
+  buildAvatarBoxClass,
+  hasExplicitSquareContainer,
+} from "./avatar-box-class";
 
 export interface AvatarImageProps {
   src: string | null | undefined;
@@ -43,7 +29,7 @@ export interface AvatarImageProps {
 function initialsFallback(initials: string, size: AvatarSize, rounded: string) {
   return (
     <span
-      className={`flex h-full w-full items-center justify-center bg-[#ebfdf2] font-bold text-[#006e2f] ${TEXT_CLASS[size]} ${rounded}`}
+      className={`flex h-full w-full items-center justify-center bg-[#ebfdf2] font-bold text-[#006e2f] ${AVATAR_TEXT_CLASS[size]} ${rounded}`}
     >
       {initials}
     </span>
@@ -60,22 +46,14 @@ export function AvatarImage({
   className = "object-cover",
   containerClassName = "",
 }: AvatarImageProps) {
-  const px = SIZE_PX[size];
-  const isFluid =
-    /(?:^|\s)(?:w-|h-|aspect-)/.test(containerClassName) ||
-    containerClassName.includes("w-full") ||
-    containerClassName.includes("h-full") ||
-    containerClassName.includes("aspect-square");
-  const sizeClass = isFluid ? "" : SIZE_CLASS[size];
+  const px = AVATAR_SIZE_PX[size];
   const roundClass =
     rounded === "full"
       ? "rounded-full"
       : rounded === "2xl"
         ? "rounded-2xl"
         : "rounded-xl";
-
-  // Safari/WebKit: overflow + rounded on the box; object-cover on the image.
-  const boxClass = `relative block shrink-0 overflow-hidden ${sizeClass} ${roundClass} ${containerClassName}`.trim();
+  const boxClass = buildAvatarBoxClass({ size, rounded, containerClassName });
 
   if (!src?.trim()) {
     return (
@@ -94,7 +72,7 @@ export function AvatarImage({
       fill
       sizes={`${px}px`}
       priority={priority}
-      className={`object-cover ${className} ${roundClass}`.trim()}
+      className={`h-full w-full object-cover ${className} ${roundClass}`.trim()}
       containerClassName={boxClass}
       transform={{
         width: retinaTransformWidth(px),

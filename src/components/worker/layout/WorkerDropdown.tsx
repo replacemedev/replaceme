@@ -91,15 +91,14 @@ export function WorkerDropdown({
           aria-label="User menu"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white">
-              <AvatarImage
-                src={profile?.avatar_url}
-                alt={`${displayName}'s Avatar`}
-                initials={initials}
-                size="xs"
-                priority
-              />
-            </div>
+            <AvatarImage
+              src={profile?.avatar_url}
+              alt={`${displayName}'s Avatar`}
+              initials={initials}
+              size="xs"
+              priority
+              containerClassName="border border-slate-200 bg-white"
+            />
             <span className="flex items-center gap-1 text-sm font-bold text-slate-800 select-none truncate">
               <span className="truncate">{displayName}</span>
               <VerifiedBadge show={isVerified} size="sm" />
@@ -254,15 +253,14 @@ export function WorkerDropdown({
         aria-expanded={dropdownOpen}
         aria-label="User menu"
       >
-        <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
-          <AvatarImage
-            src={profile?.avatar_url}
-            alt={`${displayName}'s Avatar`}
-            initials={initials}
-            size="xs"
-            priority
-          />
-        </div>
+        <AvatarImage
+          src={profile?.avatar_url}
+          alt={`${displayName}'s Avatar`}
+          initials={initials}
+          size="xs"
+          priority
+          containerClassName="border border-slate-100 bg-slate-50"
+        />
 
         <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-700 select-none">
           <span className="max-w-[100px] truncate">{displayName}</span>

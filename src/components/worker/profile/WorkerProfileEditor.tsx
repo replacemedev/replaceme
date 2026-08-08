@@ -566,16 +566,14 @@ export function WorkerProfileEditor({
                 helperText={profileImageHelperText()}
               />
             ) : (
-              <div className="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 overflow-hidden rounded-full border-4 border-white bg-slate-50 shadow-md">
-                <AvatarImage
-                  src={profile.avatar_url}
-                  alt={fullName}
-                  initials={initials}
-                  size="xl"
-                  priority
-                  containerClassName="w-full h-full"
-                />
-              </div>
+              <AvatarImage
+                src={profile.avatar_url}
+                alt={fullName}
+                initials={initials}
+                size="xl"
+                priority
+                containerClassName="mx-auto w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 border-4 border-white bg-slate-50 shadow-md"
+              />
             )}
 
             <div className="space-y-2 flex flex-col items-center">

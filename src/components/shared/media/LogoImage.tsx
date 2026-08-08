@@ -37,6 +37,9 @@ export function LogoImage({
           ? "rounded-xl"
           : "rounded-lg";
   const initial = label.trim().charAt(0).toUpperCase() || "?";
+  // Circular marks must stay square under flex pressure.
+  const squareGuard =
+    rounded === "full" ? "shrink-0 aspect-square" : "shrink-0";
 
   const fallback = (
     <span
@@ -46,9 +49,17 @@ export function LogoImage({
     </span>
   );
 
+  const fitClass = fit === "contain" ? "object-contain" : "object-cover";
+  const imageClass =
+    className === "object-cover"
+      ? `h-full w-full ${fitClass} ${roundClass}`
+      : `h-full w-full ${fitClass} ${className} ${roundClass}`;
+
   if (!src?.trim()) {
     return (
-      <span className={`relative block h-full w-full overflow-hidden ${roundClass}`}>
+      <span
+        className={`relative block h-full w-full overflow-hidden ${squareGuard} ${roundClass}`}
+      >
         {fallback}
       </span>
     );
@@ -61,8 +72,8 @@ export function LogoImage({
       fill
       sizes={sizes ?? `${sizePx}px`}
       priority={priority}
-      className={`${className} ${roundClass}`}
-      containerClassName={`h-full w-full ${roundClass}`}
+      className={imageClass.trim()}
+      containerClassName={`relative h-full w-full overflow-hidden ${squareGuard} ${roundClass}`}
       transform={{ width: retinaTransformWidth(sizePx), resize: fit, quality: 80 }}
       fallback={fallback}
     />

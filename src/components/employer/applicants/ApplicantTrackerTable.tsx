@@ -9,6 +9,7 @@ import { EmployerInlineActions } from "@/components/employer/layout/EmployerInli
 import { UnlockOverlay } from "@/components/shared/entitlements/UnlockOverlay";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 
 export type ApplicantTrackerRow = {
   id: string;
@@ -90,19 +91,15 @@ export function ApplicantTrackerTable({
               >
                 <td className="px-4 py-3 min-w-0">
                   <div className="flex items-center gap-3 min-w-0">
-                    {row.avatarUrl && !row.isPreview ? (
-                      <img
-                        src={row.avatarUrl}
-                        alt=""
-                        className="h-9 w-9 shrink-0 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="relative h-9 w-9 shrink-0 rounded-full bg-slate-200 inline-flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-slate-400">
-                          ?
-                        </span>
-                      </span>
-                    )}
+                    <AvatarImage
+                      src={
+                        row.avatarUrl && !row.isPreview ? row.avatarUrl : null
+                      }
+                      alt=""
+                      initials={row.isPreview ? "?" : row.name.slice(0, 2)}
+                      size="xs"
+                      containerClassName="h-9 w-9 min-h-9 min-w-9 bg-slate-200"
+                    />
                     <div className="min-w-0 flex-1">
                       <Link
                         href={`/employer/candidates/${row.candidateId}?jobId=${row.jobId}`}

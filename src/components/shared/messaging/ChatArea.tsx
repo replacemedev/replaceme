@@ -103,16 +103,14 @@ export function ChatArea({
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {onBack ? <MobileChatBackButton onBack={onBack} /> : null}
           <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[#e8f5e9]">
-              <AvatarImage
-                src={oppositeParty.avatarUrl}
-                alt={oppositeParty.name}
-                initials={initials}
-                size="xs"
-                priority
-                containerClassName="h-full w-full"
-              />
-            </div>
+            <AvatarImage
+              src={oppositeParty.avatarUrl}
+              alt={oppositeParty.name}
+              initials={initials}
+              size="xs"
+              priority
+              containerClassName="h-10 w-10 min-h-10 min-w-10 bg-[#e8f5e9]"
+            />
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-slate-900 text-sm md:text-base truncate">
                 {contextTitle}

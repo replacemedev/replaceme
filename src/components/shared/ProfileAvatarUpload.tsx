@@ -181,18 +181,14 @@ export function ProfileAvatarUpload({
 
   if (!editable) {
     return (
-      <div
-        className={`relative mx-auto ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden`}
-      >
-        <AvatarImage
-          src={previewUrl}
-          alt={displayName}
-          initials={initials}
-          size={sizeClass.avatar}
-          priority
-          containerClassName="w-full h-full"
-        />
-      </div>
+      <AvatarImage
+        src={previewUrl}
+        alt={displayName}
+        initials={initials}
+        size={sizeClass.avatar}
+        priority
+        containerClassName={`mx-auto ${sizeClass.ring} border-4 border-white shadow-md bg-slate-50`}
+      />
     );
   }
 
@@ -204,7 +200,7 @@ export function ProfileAvatarUpload({
           onClick={() => !busy && inputRef.current?.click()}
           disabled={busy}
           aria-label={previewUrl ? "Change profile photo" : "Upload profile photo"}
-          className={`relative ${sizeClass.ring} rounded-full border-4 border-white shadow-md bg-slate-50 overflow-hidden transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100`}
+          className="relative block p-0 border-0 bg-transparent rounded-full transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/40 disabled:opacity-70 disabled:hover:scale-100"
         >
           <AvatarImage
             src={previewUrl}
@@ -212,10 +208,10 @@ export function ProfileAvatarUpload({
             initials={initials}
             size={sizeClass.avatar}
             priority
-            containerClassName="w-full h-full"
+            containerClassName={`${sizeClass.ring} border-4 border-white shadow-md bg-slate-50`}
           />
 
-          <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-slate-900/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+          <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-slate-900/50 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
             <Camera size={iconSize} strokeWidth={2.25} />
             <span className="text-[10px] font-bold uppercase tracking-wide">
               {previewUrl ? "Change" : "Upload"}
@@ -223,7 +219,7 @@ export function ProfileAvatarUpload({
           </span>
 
           {busy ? (
-            <span className="absolute inset-0 flex items-center justify-center bg-white/85">
+            <span className="absolute inset-0 flex items-center justify-center rounded-full bg-white/85">
               <Loader2 className="h-7 w-7 text-[#006e2f] animate-spin" />
             </span>
           ) : null}

@@ -56,15 +56,13 @@ export function InboxThreadItem({ thread, isActive, onClick }: InboxThreadItemPr
           : "pl-4 hover:bg-slate-50/80"
       }`}
     >
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200/60 bg-slate-50">
-        <AvatarImage
-          src={oppositeParty.avatarUrl}
-          alt={oppositeParty.name}
-          initials={initials(oppositeParty.name)}
-          size="xs"
-          containerClassName="w-full h-full"
-        />
-      </div>
+      <AvatarImage
+        src={oppositeParty.avatarUrl}
+        alt={oppositeParty.name}
+        initials={initials(oppositeParty.name)}
+        size="xs"
+        containerClassName="h-10 w-10 min-h-10 min-w-10 border border-slate-200/60 bg-slate-50"
+      />
 
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline gap-2 mb-0.5 min-w-0">

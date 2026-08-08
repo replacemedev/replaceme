@@ -132,15 +132,14 @@ export function AdminTeamMemberDetailsDrawer({
       ) : data ? (
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm">
-              <AvatarImage
-                src={data.avatarUrl}
-                alt={fullName}
-                initials={initialsFrom(data)}
-                size="lg"
-                priority
-              />
-            </div>
+            <AvatarImage
+              src={data.avatarUrl}
+              alt={fullName}
+              initials={initialsFrom(data)}
+              size="lg"
+              priority
+              containerClassName="border border-slate-200 bg-slate-100 shadow-sm"
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate text-lg font-extrabold text-slate-900">
                 {fullName}

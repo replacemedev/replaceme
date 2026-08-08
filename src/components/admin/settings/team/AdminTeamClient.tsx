@@ -97,14 +97,13 @@ function MemberIdentity({ member }: { member: AdminTeamRow }) {
 
   return (
     <div className="flex min-w-0 items-start gap-3">
-      <div className="shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-        <AvatarImage
-          src={member.avatar_url ?? null}
-          alt={name}
-          initials={memberInitials(member)}
-          size="sm"
-        />
-      </div>
+      <AvatarImage
+        src={member.avatar_url ?? null}
+        alt={name}
+        initials={memberInitials(member)}
+        size="sm"
+        containerClassName="border border-slate-200 bg-slate-100"
+      />
       <div className="min-w-0">
         <p className="truncate font-semibold text-slate-900">{name}</p>
         <p className="truncate text-xs text-slate-500">{member.email}</p>

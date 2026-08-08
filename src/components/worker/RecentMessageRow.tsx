@@ -30,7 +30,7 @@ export function RecentMessageRow({ message }: RecentMessageRowProps) {
       className="group flex items-center justify-between p-4 bg-white border border-slate-200 hover:border-slate-300 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-200 gap-4"
     >
       <div className="flex items-center gap-4 min-w-0 flex-1">
-        <div className="relative w-12 h-12 rounded-full shrink-0 border border-slate-100 bg-slate-50 overflow-hidden">
+        <div className="relative size-12 min-h-12 min-w-12 shrink-0 aspect-square overflow-hidden rounded-full border border-slate-100 bg-slate-50">
           {message.other_company_logo ? (
             <LogoImage
               src={message.other_company_logo}

@@ -34,16 +34,17 @@ function ActorCell({ log }: { log: AdminAuditLogRow }) {
 
   return (
     <div className="flex items-center gap-2.5 min-w-0 max-w-[220px]">
-      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+      <div className="relative shrink-0">
         {log.actor_avatar_url ? (
           <AvatarImage
             src={log.actor_avatar_url}
             alt=""
             initials={name.slice(0, 2)}
             size="xs"
+            containerClassName="bg-slate-100 ring-1 ring-slate-200/80"
           />
         ) : (
-          <span className="flex h-full w-full items-center justify-center text-slate-400">
+          <span className="flex size-8 min-h-8 min-w-8 shrink-0 aspect-square items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-400 ring-1 ring-slate-200/80">
             <UserRound className="h-3.5 w-3.5" aria-hidden />
           </span>
         )}

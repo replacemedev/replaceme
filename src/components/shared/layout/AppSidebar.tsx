@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { getActiveAdminNavHref } from "@/config/adminNav";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 
 export interface AppSidebarNavItem {
   href: string;
@@ -48,17 +49,13 @@ export function AppSidebar({
         className={`px-4 py-5 border-b border-slate-100 ${showBrand ? "" : "pt-6"}`}
       >
         <div className="flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-100 p-3">
-          {profile.avatarUrl ? (
-            <img
-              src={profile.avatarUrl}
-              alt=""
-              className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-xs"
-            />
-          ) : (
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ebfdf2] text-sm font-bold text-[#006e2f] border border-emerald-100">
-              {profile.initials}
-            </span>
-          )}
+          <AvatarImage
+            src={profile.avatarUrl}
+            alt=""
+            initials={profile.initials}
+            size="xs"
+            containerClassName="h-10 w-10 min-h-10 min-w-10 border-2 border-white shadow-xs bg-[#ebfdf2]"
+          />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-slate-900">
               {profile.displayName}

@@ -65,22 +65,19 @@ export function AdminDropdown({
     });
   };
 
-  const avatar = (
-    <div className="relative shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-900">
-      {profile?.avatar_url ? (
-        <AvatarImage
-          src={profile.avatar_url}
-          alt={`${displayName}'s Avatar`}
-          initials={initials}
-          size="xs"
-          priority
-        />
-      ) : (
-        <span className="flex h-8 w-8 items-center justify-center">
-          <Shield size={16} className="text-white" aria-hidden />
-        </span>
-      )}
-    </div>
+  const avatar = profile?.avatar_url ? (
+    <AvatarImage
+      src={profile.avatar_url}
+      alt={`${displayName}'s Avatar`}
+      initials={initials}
+      size="xs"
+      priority
+      containerClassName="border border-slate-200 bg-slate-900"
+    />
+  ) : (
+    <span className="relative flex size-8 min-h-8 min-w-8 shrink-0 aspect-square items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-900">
+      <Shield size={16} className="text-white" aria-hidden />
+    </span>
   );
 
   const navLinks = (mobile: boolean) => (

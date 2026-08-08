@@ -37,7 +37,7 @@ export function WorkerCard({
       <div>
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-emerald-50">
+            <div className="relative shrink-0">
               {worker.avatarUrl && !isPreview ? (
                 <AvatarImage
                   src={worker.avatarUrl}
@@ -45,11 +45,11 @@ export function WorkerCard({
                   initials={initials}
                   size="sm"
                   rounded="full"
-                  containerClassName="w-full h-full"
+                  containerClassName="border border-slate-100 bg-emerald-50"
                 />
               ) : (
                 <div
-                  className={`w-full h-full flex items-center justify-center font-extrabold text-sm rounded-full ${
+                  className={`size-12 min-h-12 min-w-12 shrink-0 aspect-square flex items-center justify-center font-extrabold text-sm rounded-full border border-slate-100 ${
                     isPreview
                       ? "bg-slate-100 text-slate-400 blur-[1px]"
                       : "bg-emerald-100 text-emerald-800"
@@ -59,7 +59,7 @@ export function WorkerCard({
                 </div>
               )}
               {isPreview ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px]">
+                <span className="absolute inset-0 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-[2px]">
                   <Lock className="h-4 w-4 text-slate-500" aria-hidden />
                 </span>
               ) : null}

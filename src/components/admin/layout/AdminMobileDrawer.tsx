@@ -73,14 +73,13 @@ export function AdminMobileDrawer({
             onClick={onClose}
             className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#006e2f]/30"
           >
-            <div className="relative shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-              <AvatarImage
-                src={profile.avatarUrl ?? null}
-                alt={profile.displayName}
-                initials={profile.initials}
-                size="sm"
-              />
-            </div>
+            <AvatarImage
+              src={profile.avatarUrl ?? null}
+              alt={profile.displayName}
+              initials={profile.initials}
+              size="sm"
+              containerClassName="border border-slate-200 bg-slate-100"
+            />
             <span className="min-w-0">
               <span className="block truncate text-sm font-bold text-slate-900">
                 {profile.displayName}

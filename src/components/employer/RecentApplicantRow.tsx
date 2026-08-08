@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { RecentApplicant } from "@/types/employer";
 import { VerifiedBadge } from "@/components/shared/VerifiedBadge";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 
 interface RecentApplicantRowProps {
   applicant: RecentApplicant;
@@ -39,18 +40,13 @@ export function RecentApplicantRow({
       }`}
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-sm font-semibold text-slate-600 border border-slate-200 select-none overflow-hidden relative">
-          {applicant.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={applicant.avatar_url}
-              alt={applicant.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span>{initials}</span>
-          )}
-        </div>
+        <AvatarImage
+          src={applicant.avatar_url}
+          alt={applicant.name}
+          initials={initials}
+          size="xs"
+          containerClassName="h-10 w-10 min-h-10 min-w-10 border border-slate-200 bg-slate-100 select-none"
+        />
 
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">

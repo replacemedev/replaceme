@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { Check, ArrowLeft } from "lucide-react";
-import Image from "next/image";
 import { NavBrand } from "@/components/shared/nav/NavBrand";
+import { AvatarImage } from "@/components/shared/media/AvatarImage";
 import { formatCurrency } from "@/lib/format/currency";
 import type { BillingInterval } from "@/lib/pricing/billing-interval";
 
@@ -101,21 +101,13 @@ export function OrderSummary({
             &ldquo;{testimonial.quote}&rdquo;
           </p>
           <div className="flex items-center gap-3 relative z-10">
-            {testimonial.avatarUrl ? (
-              <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-white shadow-sm">
-                <Image
-                  src={testimonial.avatarUrl}
-                  alt={testimonial.author}
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center border border-white shadow-sm">
-                {testimonial.author.substring(0, 2).toUpperCase()}
-              </div>
-            )}
+            <AvatarImage
+              src={testimonial.avatarUrl}
+              alt={testimonial.author}
+              initials={testimonial.author.substring(0, 2).toUpperCase()}
+              size="xs"
+              containerClassName="h-10 w-10 min-h-10 min-w-10 border border-white shadow-sm bg-blue-100"
+            />
             <div>
               <h4 className="text-xs font-bold text-gray-900">
                 {testimonial.author}

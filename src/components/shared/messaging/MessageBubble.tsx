@@ -1,6 +1,6 @@
 "use client";
 
-/* Hallmark · pre-emit critique: P4 H4 E5 S4 R5 V4 */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
 
 import React, { useState, useTransition } from "react";
 import { Briefcase, Sparkles } from "lucide-react";
@@ -13,6 +13,8 @@ interface MessageBubbleProps {
   currentUserId: string;
   /** Workers see Quick Apply on system_match cards; employers do not. */
   showQuickApply?: boolean;
+  /** Same sender as the previous bubble in the thread (tighter stack). */
+  isConsecutive?: boolean;
 }
 
 type SystemMatchPayload = {
@@ -41,10 +43,12 @@ function SystemMatchCard({
   message,
   formatTime,
   showQuickApply,
+  isConsecutive,
 }: {
   message: ChatMessage;
   formatTime: (iso: string) => string;
   showQuickApply: boolean;
+  isConsecutive: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [applied, setApplied] = useState(false);
@@ -80,41 +84,47 @@ function SystemMatchCard({
   };
 
   return (
-    <div className="flex flex-col items-start w-full mb-6 last:mb-2 max-w-[92%] sm:max-w-[78%] mr-auto">
-      <p className="mb-1.5 ml-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-700/80">
-        {senderLabel}
-      </p>
+    <div
+      className={`flex w-full max-w-[85%] flex-col items-start mr-auto sm:max-w-md ${
+        isConsecutive ? "mb-2" : "mb-4"
+      } last:mb-1`}
+    >
+      {!isConsecutive ? (
+        <p className="mb-1 ml-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-700/80">
+          {senderLabel}
+        </p>
+      ) : null}
       <div className="w-full overflow-hidden rounded-2xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50/90 via-white to-white shadow-xs">
-        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:gap-5 sm:p-5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-            <Sparkles className="h-5 w-5" aria-hidden />
+        <div className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-start sm:gap-3 sm:p-3.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+            <Sparkles className="h-4 w-4" aria-hidden />
           </div>
 
-          <div className="min-w-0 flex-1 space-y-3">
-            <div className="space-y-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                 Skill match
               </p>
-              <h3 className="flex items-start gap-2 text-base font-bold text-slate-900 sm:text-lg">
+              <h3 className="flex items-start gap-1.5 text-sm font-semibold text-slate-900 sm:text-base">
                 <Briefcase
-                  className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600"
                   aria-hidden
                 />
                 <span className="min-w-0 break-words">{jobTitle}</span>
               </h3>
               {message.content ? (
-                <p className="text-sm leading-relaxed text-slate-600">
+                <p className="text-xs leading-snug text-slate-600 sm:text-[13px]">
                   {message.content}
                 </p>
               ) : null}
             </div>
 
             {skills.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {skills.map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800"
+                    className="rounded-full border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800"
                   >
                     {skill}
                   </span>
@@ -122,9 +132,9 @@ function SystemMatchCard({
               </div>
             ) : null}
 
-            <div className="flex flex-col gap-3 border-t border-emerald-100/80 pt-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-2 border-t border-emerald-100/80 pt-2 sm:flex-row sm:items-center sm:justify-between">
               {score != null ? (
-                <p className="text-sm font-semibold text-slate-700">
+                <p className="text-xs font-semibold text-slate-700">
                   Match score{" "}
                   <span className="font-extrabold text-emerald-700">{score}%</span>
                 </p>
@@ -136,7 +146,7 @@ function SystemMatchCard({
                   type="button"
                   onClick={handleQuickApply}
                   disabled={isPending || applied || !payload.jobId}
-                  className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
                   {applied ? "Applied" : isPending ? "Applying…" : "Quick Apply"}
                 </button>
@@ -146,8 +156,8 @@ function SystemMatchCard({
         </div>
       </div>
 
-      <div className="mt-2 ml-1 flex items-center gap-1.5">
-        <span className="text-[11px] font-semibold text-slate-400">
+      <div className="mt-1 ml-1 flex items-center gap-1.5">
+        <span className="text-[10px] font-semibold text-slate-400">
           {formatTime(message.created_at)}
         </span>
       </div>
@@ -159,6 +169,7 @@ export function MessageBubble({
   message,
   currentUserId,
   showQuickApply = false,
+  isConsecutive = false,
 }: MessageBubbleProps) {
   const isSystemMatch = message.message_kind === "system_match";
   const isMe = Boolean(message.sender_id) && message.sender_id === currentUserId;
@@ -181,7 +192,7 @@ export function MessageBubble({
         return (
           <div
             key={idx}
-            className="my-3 p-4 bg-slate-50 border border-slate-200/60 rounded-xl font-mono text-[12px] text-slate-700 leading-relaxed select-all"
+            className="my-1.5 rounded-lg border border-slate-200/60 bg-slate-50 p-2.5 font-mono text-[11px] leading-snug text-slate-700 select-all"
           >
             {trimmed.split("\n").map((line, lidx) => (
               <div key={lidx}>{line}</div>
@@ -197,7 +208,7 @@ export function MessageBubble({
         return (
           <div
             key={idx}
-            className="my-3 p-4 bg-slate-50 border border-slate-200/60 rounded-xl font-mono text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap select-all"
+            className="my-1.5 whitespace-pre-wrap rounded-lg border border-slate-200/60 bg-slate-50 p-2.5 font-mono text-[11px] leading-snug text-slate-700 select-all"
           >
             {trimmed}
           </div>
@@ -206,7 +217,10 @@ export function MessageBubble({
 
       const lines = trimmed.split("\n");
       return (
-        <p key={idx} className="text-[14px] leading-relaxed text-slate-700 font-medium mb-3 last:mb-0">
+        <p
+          key={idx}
+          className="mb-1.5 text-[13px] font-medium leading-snug text-slate-700 last:mb-0 sm:text-sm"
+        >
           {lines.map((line, lidx) => {
             const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
             const urlRegex = /(https?:\/\/[^\s]+)/gi;
@@ -221,7 +235,7 @@ export function MessageBubble({
                     <a
                       key={pidx}
                       href={`mailto:${part}`}
-                      className="text-[#006e2f] hover:underline font-semibold"
+                      className="font-semibold text-[#006e2f] hover:underline"
                     >
                       {part}
                     </a>
@@ -239,7 +253,7 @@ export function MessageBubble({
                       href={part}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#006e2f] hover:underline font-semibold"
+                      className="font-semibold text-[#006e2f] hover:underline"
                     >
                       {part}
                     </a>
@@ -267,19 +281,24 @@ export function MessageBubble({
         message={message}
         formatTime={formatTime}
         showQuickApply={showQuickApply}
+        isConsecutive={isConsecutive}
       />
     );
   }
 
+  const stackGap = isConsecutive ? "mb-2" : "mb-4";
+
   if (isMe) {
     return (
-      <div className="flex flex-col items-end w-full mb-6 last:mb-2 max-w-[85%] sm:max-w-[70%] ml-auto">
-        <div className="w-full bg-[#e8f5e9]/55 border border-[#c8e6c9]/40 rounded-2xl p-5 shadow-xs">
+      <div
+        className={`ml-auto flex w-fit max-w-[85%] flex-col items-end sm:max-w-[70%] ${stackGap} last:mb-1`}
+      >
+        <div className="w-fit max-w-full rounded-2xl border border-[#c8e6c9]/40 bg-[#e8f5e9]/55 px-3.5 py-2 shadow-xs">
           {renderParsedContent(message.content)}
         </div>
 
-        <div className="flex items-center gap-1.5 mt-2 mr-1">
-          <span className="text-[11px] font-semibold text-slate-400">
+        <div className="mt-1 mr-1 flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold text-slate-400">
             {formatTime(message.created_at)}
           </span>
         </div>
@@ -293,18 +312,20 @@ export function MessageBubble({
       : message.sender?.full_name?.trim() || null;
 
   return (
-    <div className="flex flex-col items-start w-full mb-6 last:mb-2 max-w-[85%] sm:max-w-[72%] mr-auto">
-      {otherLabel ? (
-        <p className="mb-1.5 ml-1 text-[11px] font-semibold text-slate-500">
+    <div
+      className={`mr-auto flex w-fit max-w-[85%] flex-col items-start sm:max-w-[72%] ${stackGap} last:mb-1`}
+    >
+      {!isConsecutive && otherLabel ? (
+        <p className="mb-1 ml-1 text-[10px] font-semibold text-slate-500">
           {otherLabel}
         </p>
       ) : null}
-      <div className="w-full bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs">
+      <div className="w-fit max-w-full rounded-2xl border border-slate-200/80 bg-white px-3.5 py-2 shadow-xs">
         {renderParsedContent(message.content)}
       </div>
 
-      <div className="flex items-center gap-1.5 mt-2 ml-1">
-        <span className="text-[11px] font-semibold text-slate-400">
+      <div className="mt-1 ml-1 flex items-center gap-1.5">
+        <span className="text-[10px] font-semibold text-slate-400">
           {formatTime(message.created_at)}
         </span>
       </div>

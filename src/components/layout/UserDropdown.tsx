@@ -74,15 +74,14 @@ export function UserDropdown({
           aria-label="User menu"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white">
-              <AvatarImage
-                src={profile?.avatar_url}
-                alt={`${displayName}'s Avatar`}
-                initials={initials}
-                size="xs"
-                priority
-              />
-            </div>
+            <AvatarImage
+              src={profile?.avatar_url}
+              alt={`${displayName}'s Avatar`}
+              initials={initials}
+              size="xs"
+              priority
+              containerClassName="border border-slate-200 bg-white"
+            />
             <span className="text-sm font-bold text-slate-800 select-none truncate">
               {displayName}
             </span>
@@ -150,15 +149,14 @@ export function UserDropdown({
         aria-label="User menu"
       >
         {/* User Avatar Circle */}
-        <div className="relative w-8 h-8 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50">
-          <AvatarImage
-            src={profile?.avatar_url}
-            alt={`${displayName}'s Avatar`}
-            initials={initials}
-            size="xs"
-            priority
-          />
-        </div>
+        <AvatarImage
+          src={profile?.avatar_url}
+          alt={`${displayName}'s Avatar`}
+          initials={initials}
+          size="xs"
+          priority
+          containerClassName="border border-slate-100 bg-slate-50"
+        />
 
         <span className="hidden sm:inline-block text-xs font-semibold text-slate-700 max-w-[120px] truncate select-none">
           {displayName}
